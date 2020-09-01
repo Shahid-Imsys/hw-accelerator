@@ -1,9 +1,10 @@
--- NoC simulation for Imsys Accelerator
+-- IO block simulation for Imsys Accelerator
 -- 
 -- Top file
 -- Design: Imsys AB
 -- Implemented: Bengt Andersson
 -- Revision 0
+
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -13,14 +14,13 @@ library work;
 use work.defines.all;
 
 
-entity NoC is
+entity IO_block is
 	port (
 	);
-end NoC;
+end IO_block;
 
 
 
-architecture struct of NoC is
+architecture struct of IO_block is
 
-end struct NoC;
-
+end struct IO_block;

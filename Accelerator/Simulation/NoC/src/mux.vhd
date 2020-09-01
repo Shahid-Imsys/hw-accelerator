@@ -1,6 +1,6 @@
 -- NoC MUX Part of NoC simulation pkg
 -- 
--- Design: Harald bergh
+-- Design: Imsys AB
 -- Implemented: Bengt Andersson
 -- Revision 0
 

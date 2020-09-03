@@ -1,6 +1,6 @@
 -- IO block simulation for Imsys Accelerator
 -- 
--- Top file
+-- 
 -- Design: Imsys AB
 -- Implemented: Bengt Andersson
 -- Revision 0
@@ -14,13 +14,15 @@ library work;
 use work.defines.all;
 
 
-entity IO_block is
+entity ETH_phy is
 	port (
+		data_in	: in Byte; 
+		data_ut	: out Byte; 
 	);
-end IO_block;
+end ETH_phy;
 
 
 
-architecture struct of IO_block is
+architecture struct of ETH_phy is
 
-end struct IO_block;
+end struct ETH_phy;

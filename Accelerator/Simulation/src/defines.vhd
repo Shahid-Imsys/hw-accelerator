@@ -13,7 +13,7 @@ package ACC_types is
 
 -- Will this work?, BA
 
-type BYTE is array (7 downto 0) of std_ulogic;
+type Byte is array (7 downto 0) of std_ulogic;
 type NoC_bus is array (63 downto 0) of BYTE;
 
 end package ACC_types;

@@ -275,32 +275,47 @@ begin
 	data_transfer : process (clk_p, delay)
 	
 	begin
-	  if delay = '1'then
-		  if rising_edge(clk_p) then
-			  if byte_ctr = "1111" then -- Delay one clock cycle for writing to mem words
-				byte_ctr_buffer <= (others => '0');
-				byte_ctr <= byte_ctr_buffer;
-				  if byte_ctr_buffer = "1111" then
-					noc_reg_rdy <= '1';
-				  else
-					noc_reg_rdy <= '0';
-				  end if; 
-		      else
-		        noc_reg_rdy <= '0';
+	    if delay = '1'then
+		    if rising_edge(clk_p) then
 				byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
-				byte_ctr_buffer <= (others=> '1');
-			  end if;
-		  end if;
-	  end if;
+				if noc_cmd = "100011" or noc_cmd = "100101" then
+			        if byte_ctr = "1110" then -- Delay one clock cycle for writing to mem words
+				    --byte_ctr_buffer <= (others => '0');
+				    --byte_ctr <= (others => '0');
+				      --if byte_ctr_buffer = "1111" then
+				    	noc_reg_rdy <= '1';
+				    elsif byte_ctr = "1111" then
+				    	byte_ctr <= (others=> '0');
+				    	noc_reg_rdy <= '0';
+				      --else
+				    	--noc_reg_rdy <= '0';
+				      --end if; 
+		            else
+		            noc_reg_rdy <= '0';
+				    --byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
+				    --byte_ctr_buffer <= (others=> '1');
+					end if;
+				elsif noc_cmd = "100100" then
+					if byte_ctr = "0000" then
+						noc_reg_rdy <= '1';
+					elsif byte_ctr = "1111" then 
+						noc_reg_rdy <= '0';
+						byte_ctr <= (others=> '0');
+					else 
+						noc_reg_rdy <= '0';
+					end if;
+				end if;
+		    end if;
+	    end if;
 	end process;
 	
 	data_write : process (noc_cmd, byte_ctr, byte_ctr_buffer,delay)
 	begin
 		if delay = '1' then
           if noc_cmd = "100011" or noc_cmd ="100101" then
-			if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
+			--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
 				noc_data(to_integer(unsigned(byte_ctr))) <= data;
-			end if;
+			--end if;
 		  end if;
 		end if;
 	end process;
@@ -308,8 +323,12 @@ begin
 	data_read : process (noc_cmd, byte_ctr, byte_ctr_buffer)
 
     begin
-	if noc_cmd = "100100" and byte_ctr_buffer = "1111" and byte_ctr = "0000" then
-		data <= data_out(to_integer(unsigned(byte_ctr)));
+	if noc_cmd = "100100"  then
+		if byte_ctr /= "0000" then
+		    data <= data_out(to_integer(unsigned(byte_ctr)-1));
+		else
+			data <= data_out(15);
+		end if;			
 	else
 		data <= (others => 'Z');
     end if;
@@ -334,7 +353,7 @@ begin
 		        elsif noc_cmd = "100100" then
 		        	if len_ctr = (len_ctr'range => '0') then
 		        		noc_read <= '0';
-		        	elsif noc_read = '1' then
+					else
 		        		len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 		        		addr_c <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_c))+1,15));
 		        		noc_read <= '1';
@@ -358,7 +377,7 @@ begin
 		            end if;
         
 		        end if;
-		    else
+			else
 		    	len_ctr  <= len_ctr ;
 		    	addr_c   <= addr_c  ;
 		    	pk_reg   <= pk_reg  ;

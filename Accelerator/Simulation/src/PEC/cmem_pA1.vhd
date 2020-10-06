@@ -56,29 +56,30 @@ end entity cmem;
 	   
 architecture rtl of cmem is
 
--- component CMEM_32KX16 is
---   port(
---	     addr_c      :  in std_logic_vector(14 downto 0);
---		 WR          :  in std_logic;
---		 RD          :  in std_logic;   
---		 D0          :  inout std_logic_vector(7 downto 0);
---		 D1          :  inout std_logic_vector(7 downto 0);
---		 D2          :  inout std_logic_vector(7 downto 0);
---		 D3          :  inout std_logic_vector(7 downto 0);
---		 D4          :  inout std_logic_vector(7 downto 0);
---		 D5          :  inout std_logic_vector(7 downto 0);
---		 D6          :  inout std_logic_vector(7 downto 0);
---		 D7          :  inout std_logic_vector(7 downto 0);
---		 D8          :  inout std_logic_vector(7 downto 0);
---		 D9          :  inout std_logic_vector(7 downto 0);
---		 D10         :  inout std_logic_vector(7 downto 0);
---		 D11         :  inout std_logic_vector(7 downto 0);
---		 D12         :  inout std_logic_vector(7 downto 0);
---		 D13         :  inout std_logic_vector(7 downto 0);
---		 D14         :  inout std_logic_vector(7 downto 0);
---		 D15         :  inout std_logic_vector(7 downto 0)
---		 );
--- end component;
+ component CMEM_32KX16 is
+   port(
+	     addr_c      :  in std_logic_vector(14 downto 0);
+         CK          :  in std_logic;
+		 WR          :  in std_logic;
+		 RD          :  in std_logic;   
+		 D0          :  inout std_logic_vector(7 downto 0);
+		 D1          :  inout std_logic_vector(7 downto 0);
+		 D2          :  inout std_logic_vector(7 downto 0);
+		 D3          :  inout std_logic_vector(7 downto 0);
+		 D4          :  inout std_logic_vector(7 downto 0);
+		 D5          :  inout std_logic_vector(7 downto 0);
+		 D6          :  inout std_logic_vector(7 downto 0);
+		 D7          :  inout std_logic_vector(7 downto 0);
+		 D8          :  inout std_logic_vector(7 downto 0);
+		 D9          :  inout std_logic_vector(7 downto 0);
+		 D10         :  inout std_logic_vector(7 downto 0);
+		 D11         :  inout std_logic_vector(7 downto 0);
+		 D12         :  inout std_logic_vector(7 downto 0);
+		 D13         :  inout std_logic_vector(7 downto 0);
+		 D14         :  inout std_logic_vector(7 downto 0);
+		 D15         :  inout std_logic_vector(7 downto 0)
+		 );
+ end component;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
   --signal rst_en   : std_logic;  --Reset
@@ -279,7 +280,7 @@ begin
 		    if rising_edge(clk_p) then
 				byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				if noc_cmd = "100011" or noc_cmd = "100101" then
-			        if byte_ctr = "1110" then -- Delay one clock cycle for writing to mem words
+			        if byte_ctr = "1110" then 
 				    --byte_ctr_buffer <= (others => '0');
 				    --byte_ctr <= (others => '0');
 				      --if byte_ctr_buffer = "1111" then
@@ -397,27 +398,28 @@ begin
 	end process;
            		
 	--Memory blocks
---    clustermem : CMEM_32KX16
---	port map (
---		addr_c => addr_c,
---		WR => noc_write, 
---		RD => noc_read,
---        D0 => noc_data(0),
---		D1 => noc_data(1),
---		D2 => noc_data(2),
---		D3 => noc_data(3),
---		D4 => noc_data(4),
---		D5 => noc_data(5),
---		D6 => noc_data(6),
---		D7 => noc_data(7),
---		D8 => noc_data(8),
---		D9 => noc_data(9),
---		D10 => noc_data(10),
---		D11 => noc_data(11),
---		D12 => noc_data(12),
---		D13 => noc_data(13),
---		D14 => noc_data(14),
---		D15 => noc_data(15)
---        );		
---
+    clustermem : CMEM_32KX16
+	port map (
+		addr_c => addr_c,
+		CK => clk_p,
+		WR => noc_write, 
+		RD => noc_read,
+        D0 => noc_data(0),
+		D1 => noc_data(1),
+		D2 => noc_data(2),
+		D3 => noc_data(3),
+		D4 => noc_data(4),
+		D5 => noc_data(5),
+		D6 => noc_data(6),
+		D7 => noc_data(7),
+		D8 => noc_data(8),
+		D9 => noc_data(9),
+		D10 => noc_data(10),
+		D11 => noc_data(11),
+		D12 => noc_data(12),
+		D13 => noc_data(13),
+		D14 => noc_data(14),
+		D15 => noc_data(15)
+        );		
+
 end architecture rtl; 

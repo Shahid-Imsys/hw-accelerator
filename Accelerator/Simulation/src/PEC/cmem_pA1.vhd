@@ -77,7 +77,25 @@ architecture rtl of cmem is
 		 D12         :  inout std_logic_vector(7 downto 0);
 		 D13         :  inout std_logic_vector(7 downto 0);
 		 D14         :  inout std_logic_vector(7 downto 0);
-		 D15         :  inout std_logic_vector(7 downto 0)
+		 D15         :  inout std_logic_vector(7 downto 0);
+
+		 DI0          :  inout std_logic_vector(7 downto 0);
+		 DI1          :  inout std_logic_vector(7 downto 0);
+		 DI2          :  inout std_logic_vector(7 downto 0);
+		 DI3          :  inout std_logic_vector(7 downto 0);
+		 DI4          :  inout std_logic_vector(7 downto 0);
+		 DI5          :  inout std_logic_vector(7 downto 0);
+		 DI6          :  inout std_logic_vector(7 downto 0);
+		 DI7          :  inout std_logic_vector(7 downto 0);
+		 DI8          :  inout std_logic_vector(7 downto 0);
+		 DI9          :  inout std_logic_vector(7 downto 0);
+		 DI10         :  inout std_logic_vector(7 downto 0);
+		 DI11         :  inout std_logic_vector(7 downto 0);
+		 DI12         :  inout std_logic_vector(7 downto 0);
+		 DI13         :  inout std_logic_vector(7 downto 0);
+		 DI14         :  inout std_logic_vector(7 downto 0);
+		 DI15         :  inout std_logic_vector(7 downto 0)
+ 
 		 );
  end component;
   --Control flip-flops  --TBD
@@ -95,13 +113,17 @@ architecture rtl of cmem is
   signal noc_write : std_logic:='0';  --Write command
   signal noc_read  : std_logic:='0';  --Read command
   signal delay     : std_logic:='0';  --Delay flipflop
+  signal req_int   : std_logic;      --Request type ff
+  signal dir_sel   : std_logic;
   --Control registers
-  type noc_reg is array (15 downto 0) of std_logic_vector(7 downto 0);  
-  signal noc_data     : noc_reg;                        --NOC data register
-  signal data_out     : noc_reg;
-  signal req_core_int : std_logic_vector(143 downto 0);  --Request register from PE  
+  type reg is array (15 downto 0) of std_logic_vector(7 downto 0);  
+  signal noc_data     : reg;                        --NOC data register
+  signal data_out     : reg;
+  signal data_core_int : reg;                       --Data register for PE  
   signal addr_c       : std_logic_vector(14 downto 0);   --CMEM column address pointer
   signal noc_cmd      : std_logic_vector(5 downto 0);    --NOC command register
+  signal pe_int       : std_logic_vector(1 downto 0);    --PE internal destination
+  signal pe_num       : std_logic_vector(5 downto 0);    --PEs' seriel number
   --State machine
   --signal tag_ctr      : std_logic_vector(5 downto 0);  
   signal byte_ctr     : std_logic_vector(3 downto 0):="0000";    --Byte counter
@@ -117,32 +139,49 @@ architecture rtl of cmem is
   signal delay_c      : std_logic_vector(28  downto 0);
   signal delay_b      : std_logic_vector(36  downto 0);
   
+  
 begin
   ------------------------------------------------------------------------------
   -- Reset
   ------------------------------------------------------------------------------
-  --reset: process(noc_cmd)
-  --begin
-  --if rising_edge(clk_p) and noc_cmd = "101111" then
-	  --peci_busy      <= '0';
-	  --sig_fin        <= '0';
-	  --noc_reg_rdy    <= '0';
-	  --noc_write      <= '0';
-	  --noc_read       <= '0';
-	  --cmd_in         <= '0';
-	  --delay          <= '0';
-	  --addr_c         <= (others => '0');
-	  --noc_cmd        <= (others => '0');
-	  --byte_ctr       <= (others => '0');
-	  --len_ctr        <= (others => '0');
-	  --pk_reg         <= (others => '0');
-	  --pk_ctr         <= (others => '0');
-	  --dist_reg       <= (others => '0');
-	  --dist_ctr       <= (others => '0');
-	  
-	  
-  --end if;
---end process;
+  reset: process(clk_p)
+  begin
+	if rising_edge(clk_p)then
+		if noc_cmd = "101111" then
+	        peci_busy      <= '0';
+	        sig_fin        <= '0';
+	        noc_reg_rdy    <= '0';
+	        noc_write      <= '0';
+	        noc_read       <= '0';
+	        cmd_in         <= '0';
+	        delay          <= '0';
+	        addr_c         <= (others => '0');
+	        noc_cmd        <= (others => '0');
+	        byte_ctr       <= (others => '0');
+	        len_ctr        <= (others => '0');
+	        pk_reg         <= (others => '0');
+	        pk_ctr         <= (others => '0');
+	        dist_reg       <= (others => '0');
+	        dist_ctr       <= (others => '0');
+	    else  
+			peci_busy      <= 'Z';
+	        sig_fin        <= 'Z';
+	        noc_reg_rdy    <= 'Z';
+	        noc_write      <= 'Z';
+	        noc_read       <= 'Z';
+	        cmd_in         <= 'Z';
+	        delay          <= 'Z';
+	        addr_c         <= (others => 'Z');
+	        noc_cmd        <= (others => 'Z');
+	        byte_ctr       <= (others => 'Z');
+	        len_ctr        <= (others => 'Z');
+	        pk_reg         <= (others => 'Z');
+	        pk_ctr         <= (others => 'Z');
+	        dist_reg       <= (others => 'Z');
+			dist_ctr       <= (others => 'Z');
+		end if;
+    end if;
+end process;
   
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
@@ -151,9 +190,10 @@ begin
    variable tag_ctr_1 : integer:= 64;  -- To be replaced within define document
   begin 
 	if rising_edge(clk_p) then
-		if noc_reg_rdy= '1' and len_ctr = (len_ctr'range => '0') then
+		if noc_reg_rdy= '1' and len_ctr = (len_ctr'range => '0') then --Refresh when data transfer is finished
 			sig_fin <= '0';
-        elsif peci_busy = '0' then
+		elsif peci_busy = '0' then
+			tag_ctr_1 := 64;
             if tag = '1' then
                 peci_busy <= '1'; 
             else
@@ -193,7 +233,7 @@ begin
   variable tag_ctr_3 : integer:=38;   --Both to be described in define document
   begin
 	if rising_edge(clk_p) then 
-		if sig_fin = '1' and delay = '0' then --and peci_busy = '1' Bug TB fixed
+		if sig_fin = '1' and delay = '0' then 
 		  if noc_cmd = "100011" or noc_cmd = "100100" then
 		  	tag_ctr_2 := tag_ctr_2 - 1;
 		  	if tag_ctr_2 > 14 then
@@ -231,7 +271,9 @@ begin
 		  		end loop;
 		  	end if;
 		  end if;
-	    elsif delay = '1' then 
+		elsif delay = '1' then
+		tag_ctr_2 := 30;
+		tag_ctr_3 := 38; 
 		len_ctr <= (others=> 'Z');
 		addr_c <= (others=> 'Z');
 		pk_reg <= (others=> 'Z');
@@ -396,13 +438,43 @@ begin
 		end if;
 	end if;
 	end process;
-           		
+	
+	-----------------------------------------------------------------------------
+	--PEC side 
+	-----------------------------------------------------------------------------
+	pec_req: process(clk_p)
+	begin
+		if rising_edge(clk_p) then
+			if noc_cmd = "101100" then  --To be replaced with parameter in define 
+				noc_write <= req_core(143);
+				noc_read <= not req_core(143)
+				addr_c <= req_core(142 downto 128);
+				pe_int <= req_core(127 downto 126);
+				pe_num <= req_core(125 downto 120);
+                dir_sel <= '1';
+			else
+				noc_write <= 'Z';
+				noc_read  <= 'Z'; 
+				addr_c <= (others => 'Z');
+				dir_sel <= '0';
+			end if;
+		end if;
+	end process;
+
+	pe_read: process(clk_p，noc_read)    --still use noc_read ff, can be renamed to read later
+	begin
+		if rising_edge(clk_p) then
+			if noc_read = '1' then
+			core_reg <= data_core_int    --16 byte trasnfer
+
+				
+
 	--Memory blocks
     clustermem : CMEM_32KX16
 	port map (
 		addr_c => addr_c,
 		CK => clk_p,
-		WR => noc_write, 
+		WR => noc_write, --To be written as one write ff instead of 2 ffs
 		RD => noc_read,
         D0 => noc_data(0),
 		D1 => noc_data(1),
@@ -419,7 +491,24 @@ begin
 		D12 => noc_data(12),
 		D13 => noc_data(13),
 		D14 => noc_data(14),
-		D15 => noc_data(15)
+		D15 => noc_data(15)，
+
+		DI0 => data_core_int(0),
+		DI1 => data_core_int(1),
+		DI2 => data_core_int(2),
+		DI3 => data_core_int(3),
+		DI4 => data_core_int(4),
+		DI5 => data_core_int(5),
+		DI6 => data_core_int(6),
+		DI7 => data_core_int(7),
+		DI8 => data_core_int(8),
+		DI9 => data_core_int(9),
+		DI10 => data_core_int(10),
+		DI11 => data_core_int(11),
+		DI12 => data_core_int(12),
+		DI13 => data_core_int(13),
+		DI14 => data_core_int(14),
+		DI15 => data_core_int(15)
         );		
 
 end architecture rtl; 

@@ -35,6 +35,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.all;
+
 --use work.defines.all;
 
 entity cmem is
@@ -48,7 +49,8 @@ entity cmem is
 --Data line   
 	  data             : inout std_logic_vector(7 downto 0);
 --PE request
-	  req_core         : inout std_logic_vector(143 downto 0);  
+	  req_core         : in std_logic_vector(31 downto 0);
+      data_pe          : out std_logic_vector(127 downto 0);
 --Feedback signals
       fb               : out std_logic
 	  ); 

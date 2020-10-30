@@ -33,6 +33,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.cluster_pkg.all;
 
 entity req_logic is
     port(
@@ -40,26 +41,9 @@ entity req_logic is
         req_core  : out std_logic_vector(31 downto 0);
         req_sig   : in std_logic_vector(63 downto 0);
         ack_sig   : out std_logic_vector(63 downto 0);
-        req_in_1  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
-        req_in_2  : in std_logic_vector(25 downto 0);
+        req_in    : in pe_req;
+        data_core : in std_logic_vector(134 downto 0);
+        data_out  : out pe_data
     );
 end entity req_logic;
 
@@ -173,7 +157,7 @@ end process;
 --PE Mux
 process(id_num)
 begin
-    pe_mux_out <= pe_req_in(to_integer(unsigned(id_num)));
+    pe_mux_out <= req_in(to_integer(unsigned(id_num)));
 end process;
 
 --Request FIFO
@@ -181,6 +165,21 @@ process(id_num,pe_mux_out)
 begin
     req_core <= pe_mux_out & id_num;
     fifo_rdy <= '1';
+end process;
+
+----------------------------------------------------------------
+--Data Input Logic
+----------------------------------------------------------------
+--PE Demux
+process(data_core)  --Should internal destination listed here?
+begin
+    if data_core(134)= '1' then
+        for i in 63 downto 0 loop
+            data_out (i)<= data_core(127 downto 0);
+        end loop;
+    elsif data_core(134)= '0' then
+        data_out(to_integer(unsigned(data_core(133 downto 128)))) <= data_core(127 downto 0);
+    end if;
 end process;
 
 

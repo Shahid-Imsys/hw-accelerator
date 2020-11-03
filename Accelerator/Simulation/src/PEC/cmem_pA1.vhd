@@ -50,7 +50,7 @@ entity cmem is
 	  data             : inout std_logic_vector(7 downto 0);
 --PE request
 	  req_core         : in std_logic_vector(31 downto 0);
-      data_pe          : out std_logic_vector(127 downto 0);
+      data_pe          : out std_logic_vector(134 downto 0);
 --Feedback signals
       fb               : out std_logic
 	  ); 
@@ -100,6 +100,8 @@ architecture rtl of cmem is
  
 		 );
  end component;
+  --Clock signals
+  signal clk_m    : std_logic; --CM clock
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
   --signal rst_en   : std_logic;  --Reset
@@ -116,7 +118,8 @@ architecture rtl of cmem is
   signal noc_read  : std_logic:='0';  --Read command
   signal delay     : std_logic:='0';  --Delay flipflop
   signal req_int   : std_logic;      --Request type ff
-  signal dir_sel   : std_logic;
+  signal dir_sel   : std_logic;      --CM address arbiter
+  signal broadcast_int : std_logic;  --Broadcast to PE
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);  
   signal noc_data     : reg;                        --NOC data register
@@ -448,26 +451,44 @@ end process;
 	begin
 		if rising_edge(clk_p) then
 			if noc_cmd = "101100" then  --To be replaced with parameter in define 
-				noc_write <= req_core(143);
-				noc_read <= not req_core(143)
-				addr_c <= req_core(142 downto 128);
-				pe_int <= req_core(127 downto 126);
-				pe_num <= req_core(125 downto 120);
-                dir_sel <= '1';
+				noc_write <= req_core(31);
+				noc_read <= not req_core(31);
+				addr_c <= req_core(30 downto 16);
+				pe_int <= req_core(15 downto 14);
+				broadcast_int <= req_core(13);
+				pe_num <= req_core(5 downto 0);
+				dir_sel <= '1';
+				clk_m <= clk_p;
 			else
 				noc_write <= 'Z';
 				noc_read  <= 'Z'; 
 				addr_c <= (others => 'Z');
 				dir_sel <= '0';
+				clk_m <= clk_a;
 			end if;
 		end if;
 	end process;
 
-	pe_read: process(clk_p，noc_read)    --still use noc_read ff, can be renamed to read later
+	pe_read: process(clk_p，noc_read, dir_sel)    --still use noc_read ff, can be renamed to read later
 	begin
 		if rising_edge(clk_p) then
-			if noc_read = '1' then
-			core_reg <= data_core_int    --16 byte trasnfer
+			if dir_sel = '1' and noc_read = '1' then
+				data_pe(134) <= broadcast_int;   --Internal broadcasting
+				data_pe(133 downto 128) <= pe_int;
+				data_pe(127 downto 0) <= data_core_int(15 downto 0);   --16 byte trasnfer	
+			end if;
+		end if;
+	end process;
+
+	pe_write: process(clk_p,noc_write, dir_sel)
+	begin
+		if rising_edge(clk_p) then
+			if dir_sel= '1' and noc_write = '1' then --This noc_write is not similar with the noc_write sent to memory block
+
+				
+
+
+	
 
 				
 
@@ -475,7 +496,7 @@ end process;
     clustermem : CMEM_32KX16
 	port map (
 		addr_c => addr_c,
-		CK => clk_p,
+		CK => clk_m,
 		WR => noc_write, --To be written as one write ff instead of 2 ffs
 		RD => noc_read,
         D0 => noc_data(0),

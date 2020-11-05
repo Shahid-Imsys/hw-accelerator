@@ -51,6 +51,7 @@ begin
 
 port (
 		switch_In 		: in	NoC_bus;
+		switch_Out_en   : in    std_logic;
 		decoder         : in	std_logic_vector(63 downto 0);
 		switch_mux		: in	std_logic_vector(3 downto 0);
 		switch_Out 		: out	NoC_bus
@@ -119,4 +120,9 @@ begin
 			end if;	
 		end;
 	end;
+
+	if (switch_Out_en = '1') then 
+		switch_Out <= mux_out;
+	end if;	
+
 end;

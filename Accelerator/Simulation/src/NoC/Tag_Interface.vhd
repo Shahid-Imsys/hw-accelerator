@@ -1,0 +1,84 @@
+-------------------------------------------------------------------------------
+--                                                                           --
+--   COPYRIGHT (C)                       Imsys Technologies AB,  2005        --
+--                                                                           --
+--   The copyright to the document(s) herein is the property of Imsys        --
+--   Technologies AB, Sweden.                                                --
+--                                                                           --
+--   The document(s) may be used and/or copied only with the written         --
+--   permission from Imsys Technologies AB or in accordance with the         --
+--   terms and conditions stipulated in the agreement/contract under         --
+--   which the document(s) have been supplied.                               --
+--                                                                           --
+-------------------------------------------------------------------------------
+-- Title      : Tag_Interface
+-- Project    : GP3000
+-------------------------------------------------------------------------------
+-- File       : Tag_Interface.vhd
+-- Author     : Azadeh Kaffash
+-- Company    : Imsys Technologies AB
+-- Date       : 2020.11.09
+-------------------------------------------------------------------------------
+-- Description: -- Tag Inteface part of NOC          
+-------------------------------------------------------------------------------
+-- TO-DO list : 
+--              
+--              
+-------------------------------------------------------------------------------
+-- Revisions  : 0
+-- Date					Version		Author	Description
+-- 2020-11-09 		     1.0	     AK			Created
+-------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+
+library work;
+use work.defines.all;
+
+
+entity Tag_Interface is    
+    port (
+            clk             : in    std_logic;
+            Load_TAG_Cmd    : in    std_logic;
+            Load_TAG_Arg    : in    std_logic;
+            shift           : in    std_logic;
+            PEC_AS          : in    std_logic_vector(14 downto 0);
+            PEC_TS          : in    std_logic_vector(14 downto 0);
+            PEC_CMD         : in    std_logic_vector( 5 downto 0);
+            Tag_Line        : out   std_logic
+        );
+    end;
+
+
+architecture struct of Tag_Interface is
+    begin
+
+        signal PEC_Reg  : std_logic_vector(35 downto 0) <= ( others => '0'); 
+        signal PEC_CMD_Ready : std_logic: = '0';
+        signal PEC_Arg_Ready : std_logic: = '0';
+
+        process (clk)
+        begin
+            if rising_edge(clk) then
+
+                if Load_TAG_Cmd = '1' then
+                    PEC_Reg(35 downto 30)       <= PEC_CMD;
+                    PEC_CMD_Ready               <= '1';
+                end if;
+
+                if Load_TAG_Arg = '1' then
+                    PEC_Reg(29 downto 15)       <= PEC_TS;
+                    PEC_Reg(14 downto 0)        <= PEC_AS;
+                    PEC_Arg_Ready               <= '1'; 
+                end if;    
+
+                if shift = 'l' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
+                    Tag_Line                    <= PEC_Reg(35);
+                    PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) && '0';
+                end if;
+
+            end if;    
+        end process;
+
+    end;    

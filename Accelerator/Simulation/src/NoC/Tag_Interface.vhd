@@ -54,11 +54,12 @@ entity Tag_Interface is
 
 
 architecture struct of Tag_Interface is
-    begin
 
-        signal PEC_Reg       : std_logic_vector(35 downto 0) <= ( others => '0'); 
-        signal PEC_CMD_Ready : std_logic: = '0';
-        signal PEC_Arg_Ready : std_logic: = '0';
+        signal PEC_Reg       : std_logic_vector(35 downto 0);
+        signal PEC_CMD_Ready : std_logic:= '0';
+        signal PEC_Arg_Ready : std_logic:= '0';
+        
+        begin
 
         process (clk)
         begin
@@ -76,9 +77,9 @@ architecture struct of Tag_Interface is
                     PEC_Arg_Ready               <= '1'; 
                 end if;    
 
-                if Shift = 'l' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
+                if Shift = '1' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
                     Tag_Line                    <= PEC_Reg(35);
-                    PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) && '0';
+                    PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) & '0';
                 end if;
 
                 if falling_edge(Shift) then

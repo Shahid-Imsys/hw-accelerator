@@ -62,6 +62,7 @@ architecture struct of Tag_Interface is
 
         process (clk)
         begin
+            
             if rising_edge(clk) then
 
                 if Load_TAG_Cmd_reg = '1' then

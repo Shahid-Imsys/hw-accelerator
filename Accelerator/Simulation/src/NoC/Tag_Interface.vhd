@@ -39,14 +39,16 @@ use work.defines.all;
 
 entity Tag_Interface is    
     port (
-            clk             : in    std_logic;
-            Load_TAG_Cmd    : in    std_logic;
-            Load_TAG_Arg    : in    std_logic;
-            shift           : in    std_logic;
-            PEC_AS          : in    std_logic_vector(14 downto 0);
-            PEC_TS          : in    std_logic_vector(14 downto 0);
-            PEC_CMD         : in    std_logic_vector( 5 downto 0);
-            Tag_Line        : out   std_logic
+
+            clk                 : in    std_logic;
+            Load_TAG_Cmd_reg    : in    std_logic;
+            Load_TAG_Arg_reg    : in    std_logic;
+            Shift               : in    std_logic;
+            PEC_AS              : in    std_logic_vector(14 downto 0);
+            PEC_TS              : in    std_logic_vector(14 downto 0);
+            PEC_CMD             : in    std_logic_vector( 5 downto 0);
+            Tag_Line            : out   std_logic
+
         );
     end;
 
@@ -54,7 +56,7 @@ entity Tag_Interface is
 architecture struct of Tag_Interface is
     begin
 
-        signal PEC_Reg  : std_logic_vector(35 downto 0) <= ( others => '0'); 
+        signal PEC_Reg       : std_logic_vector(35 downto 0) <= ( others => '0'); 
         signal PEC_CMD_Ready : std_logic: = '0';
         signal PEC_Arg_Ready : std_logic: = '0';
 
@@ -62,21 +64,27 @@ architecture struct of Tag_Interface is
         begin
             if rising_edge(clk) then
 
-                if Load_TAG_Cmd = '1' then
+                if Load_TAG_Cmd_reg = '1' then
                     PEC_Reg(35 downto 30)       <= PEC_CMD;
                     PEC_CMD_Ready               <= '1';
                 end if;
 
-                if Load_TAG_Arg = '1' then
+                if Load_TAG_Arg_reg = '1' then
                     PEC_Reg(29 downto 15)       <= PEC_TS;
                     PEC_Reg(14 downto 0)        <= PEC_AS;
                     PEC_Arg_Ready               <= '1'; 
                 end if;    
 
-                if shift = 'l' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
+                if Shift = 'l' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
                     Tag_Line                    <= PEC_Reg(35);
                     PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) && '0';
                 end if;
+
+                if falling_edge(Shift) then
+                    PEC_CMD_Ready               <= '0';
+                    PEC_Arg_Ready               <= '0';
+                    PEC_Reg                     <= ( others => '0'); 
+                end if;    
 
             end if;    
         end process;

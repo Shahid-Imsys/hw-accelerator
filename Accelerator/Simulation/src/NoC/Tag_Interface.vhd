@@ -33,9 +33,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-library work;
-use work.defines.all;
-
 
 entity Tag_Interface is    
     port (
@@ -85,6 +82,7 @@ architecture struct of Tag_Interface is
                 if falling_edge(Shift) then
                     PEC_CMD_Ready               <= '0';
                     PEC_Arg_Ready               <= '0';
+                    Tag_Line                    <= '0';
                     PEC_Reg                     <= ( others => '0'); 
                 end if;    
 

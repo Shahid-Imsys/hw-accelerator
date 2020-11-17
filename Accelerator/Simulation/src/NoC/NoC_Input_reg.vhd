@@ -33,9 +33,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-library work;
-use work.defines.all;
-
 
 entity NoC_Input_reg is
     port (

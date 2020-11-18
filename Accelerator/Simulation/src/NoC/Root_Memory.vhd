@@ -42,10 +42,10 @@ entity Root_Memory is
         Load_Add_Gen        : in    std_logic;
         Load_Add_Gen_Value  : in    std_logic_vector(12 downto 0);
         DataIn              : in    std_logic_vector(511 downto 0);
-        DataOut             : out   std_logic_vector(511 downto 0);
-        AddressT            : out   std_logic_vector(12 downto 0)
+        DataOut             : out   std_logic_vector(511 downto 0)
      );
 end Root_Memory;
+
 
 architecture Behavioral of Root_Memory is
 
@@ -66,7 +66,6 @@ architecture Behavioral of Root_Memory is
 begin
 
     we(0)   <= Write_Read_Mode;
-    AddressT<= Address;
 
     process (clk)
     begin 

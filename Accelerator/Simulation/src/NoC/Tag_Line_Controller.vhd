@@ -35,7 +35,6 @@ use ieee.std_logic_unsigned.all;
 
 
 entity Tag_Line_Controller is
-
     port(
         clk                 : in    std_logic;
         Load_Shift_Counter  : in    std_logic;
@@ -43,29 +42,29 @@ entity Tag_Line_Controller is
         Shift_Count         : in    std_logic_vector(7 downto 0);
         Shift               : out   std_logic
     );
+end Tag_Line_Controller;
 
-    end;
 
+architecture struct of Tag_Line_Controller is
 
-    architecture struct of Tag_Line_Controller is
-        begin  
+    signal Shift_Counter : std_logic_vector(7 downto 0) := ( others => '0');
 
-        signal Shift_Counter : std_logic_vector(7 downto 0) := ( others => '0');
+begin  
 
-        process (clk)
-        begin
-            if rising_edge(clk) then
-                if Load_Shift_Counter = '1' then
-                    Shift_Counter <= Shift_Count;
-                elsif Shift_Counter = 0 then
-                    Shift <= '0';
-                elsif Start_Shift = '1' then
-                    Shift_Counter <= Shift_Counter - 1;
-                    Shift <= '1';
-                end if;
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if Load_Shift_Counter = '1' then
+                Shift_Counter <= Shift_Count;
+            elsif Shift_Counter = 0 then
+                Shift <= '0';
+            elsif Start_Shift = '1' then
+                Shift_Counter <= Shift_Counter - 1;
+                Shift <= '1';
             end if;
-        end process;
-    end;              
+        end if;
+    end process;
+end;              
                 
 
                         

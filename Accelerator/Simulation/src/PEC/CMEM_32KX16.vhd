@@ -41,7 +41,7 @@ entity CMEM_32KX16 is
         CK          :  in std_logic;
         WR          :  in std_logic;
         RD          :  in std_logic;
-        CS          :  in std_logic;
+        --CS          :  in std_logic;
         D0          :  inout std_logic_vector(7 downto 0);
         D1          :  inout std_logic_vector(7 downto 0);
         D2          :  inout std_logic_vector(7 downto 0);
@@ -131,25 +131,26 @@ begin
     process(CK)
     begin
         if rising_edge(CK) then
-            if CS = '0' then
+            --if CS = '0' then
                 if WR = '1' then
                     for i in 0 to 15 loop
-                        mem(to_integer(unsigned(addr_c)))(8*1+7 downto 8*i) <= di_up(i);
+                        mem(to_integer(unsigned(addr_c)))(8*i+7 downto 8*i) <= di_up(i);
                     end loop;
+                elsif RD = '1' then
                     for i in 0 to 15 loop
                         do_up(i)<= mem(to_integer(unsigned(addr_c)))(8*i+7 downto 8*i);
                     end loop;
                 end if;
-            elsif CS = '1' then
-                if WR = '1' then
-                    for i in 0 to 15 loop
-                        mem(to_integer(unsigned(addr_c)))(8*1+7 downto 8*i) <= di_down(i);
-                    end loop;
-                    for i in 0 to 15 loop
-                        do_down(i)<= mem(to_integer(unsigned(addr_c)))(8*i+7 downto 8*i);
-                    end loop;
-                end if;
-            end if;
+            --elsif CS = '1' then
+                --if WR = '1' then
+                    --for i in 0 to 15 loop
+                        --mem(to_integer(unsigned(addr_c)))(8*i+7 downto 8*i) <= di_down(i);
+                    --end loop;
+                    --for i in 0 to 15 loop
+                        --do_down(i)<= mem(to_integer(unsigned(addr_c)))(8*i+7 downto 8*i);
+                    --end loop;
+                --end if;
+            --end if;
         end if;
     end process;
 

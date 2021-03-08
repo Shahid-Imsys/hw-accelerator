@@ -19,7 +19,7 @@
 -- Company    : Imsys Technologies AB
 -- Date       : 
 -------------------------------------------------------------------------------
--- Description: Request buffer logic
+-- Description: Request buffer logic and data distribution network
 --              
 --              
 -------------------------------------------------------------------------------
@@ -29,57 +29,108 @@
 -- Revisions  :
 -- Date					Version		Author	Description
 -- 2020-10-21  		     1.0	     CJ			Created
+-- 2020-11-15            2.0         CJ         Distribution network added
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cluster_pkg.all;
 
-entity req_logic is
+entity req_dst_logic is
     port(
-        clk_p     : in std_logic;
-        req_core  : out std_logic_vector(31 downto 0);
-        req_sig   : in std_logic_vector(63 downto 0);
-        ack_sig   : out std_logic_vector(63 downto 0);
-        req_in    : in pe_req;
-        data_core : in std_logic_vector(134 downto 0);
-        data_out  : out pe_data
+        --Shared
+        CLK_E     : in std_logic;
+        RESET     : in std_logic;
+        --Requet logic
+        --REQ_CORE  : out std_logic_vector(31 downto 0);
+        REQ_TO_NOC : out std_logic;
+        REQ_SIG   : in std_logic_vector(63 downto 0);
+        ACK_SIG   : out std_logic_vector(63 downto 0);
+        PE_REQ_IN    : in pe_req;
+        OUTPUT    : out std_logic_vector(31 downto 0);
+        RD_FIFO   : in std_logic;
+        FOUR_WD_LEFT : out std_logic;
+        --DATA_CORE : in std_logic_vector(134 downto 0);
+        --Distribution network
+        DATA_NOC  : in std_logic_vector(127 downto 0);
+        PE_UNIT   : in std_logic_vector(5 downto 0);
+        B_CAST    : in std_logic;
+        DATA_OUT  : out pe_data
+    
     );
-end entity req_logic;
+end entity req_dst_logic;
 
-architecture behav of req_logic is
-    type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
+architecture rtl of req_dst_logic is
+COMPONENT fifo_generator_0
+    PORT (
+    clk : IN STD_LOGIC;
+    srst : IN STD_LOGIC;
+    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    wr_en : IN STD_LOGIC;
+    rd_en : IN STD_LOGIC;
+    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    full : OUT STD_LOGIC;
+    almost_full : OUT STD_LOGIC;
+    empty : OUT STD_LOGIC;
+    almost_empty : OUT STD_LOGIC;
+    prog_empty : OUT STD_LOGIC
+  );
+END COMPONENT;
+    --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
     signal id_num   : std_logic_vector(5 downto 0);
     signal poll_act : std_logic;
-    signal fifo_rdy : std_logic;
+    signal fifo_rdy : std_logic; --active low
     signal add_in_1 : std_logic_vector(5 downto 0);
     signal add_in_2 : std_logic_vector(5 downto 0);
     signal add_out  : std_logic_vector(5 downto 0);
     signal bs_out   : std_logic_vector(63 downto 0);
-    signal pe_mux_out : std_logic_vector(25 downto 0);
+    signal pe_mux_out : std_logic_vector(31 downto 0);
+    signal req_core  :  std_logic_vector(31 downto 0);
+    signal wr      : std_logic;
+    signal rd      : std_logic;
+    signal full    : std_logic;
+    signal almost_full : std_logic;
+    signal empty   : std_logic;
+    signal almost_empty : std_logic;
+
 
 begin
 -------------------------------------------------------------
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
-process (clk_p)
-begin 
-    if fifo_rdy='1' and req_sig /= (req_sig'range => '0') and rising_edge(clk_p) then 
-        poll_act <= '1'; 
-    else
-        poll_act <= '0';
+process (clk_e)
+begin
+    if rising_edge(clk_e) then 
+        if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+            poll_act <= '1'; 
+        else
+            poll_act <= '0';
+        end if;
     end if;
 end process;
---ID Number Register
-process(poll_act)
+
+process(clk_e)
+begin 
+    if rising_edge(clk_e) then
+        if req_sig /= (req_sig'range => '0') then
+        REQ_TO_NOC <= '1';
+        else
+        REQ_TO_NOC <= '0';
+        end if;
+    end if;
+end process;
+--ID Number Register and write controller
+process(poll_act,clk_e)
 --variable num : integer := 0;
 begin
-    --num := to_integer(unsigned(id_num)); 
-    if poll_act = '1' then
-        ack_sig(to_integer(unsigned(id_num)))<= '1';
-        req_core (5 downto 0) <= id_num;
-        id_num <= add_out;
+    if rising_edge(clk_e) then
+        if poll_act = '1' then
+            ack_sig <= (to_integer(unsigned(id_num))=> '1', others => '0');
+            --req_core (5 downto 0) <= id_num;
+            id_num <= add_out;
+            wr <= '1';
+        end if;
     end if;
 end process;
 
@@ -157,30 +208,41 @@ end process;
 --PE Mux
 process(id_num)
 begin
-    pe_mux_out <= req_in(to_integer(unsigned(id_num)));
+    pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num)));
 end process;
 
 --Request FIFO
-process(id_num,pe_mux_out)
-begin
-    req_core <= pe_mux_out & id_num;
-    fifo_rdy <= '1';
-end process;
+req_core <= pe_mux_out;
+fifo_rdy <= almost_full;
+rd       <= RD_FIFO;
 
 ----------------------------------------------------------------
---Data Input Logic
+--Distribution network
 ----------------------------------------------------------------
 --PE Demux
-process(data_core)  --Should internal destination listed here?
+process(clk_e)  --Should internal destination listed here?
 begin
-    if data_core(134)= '1' then
+    if B_CAST= '1' then
         for i in 63 downto 0 loop
-            data_out (i)<= data_core(127 downto 0);
+            data_out (i)<= DATA_NOC;
         end loop;
-    elsif data_core(134)= '0' then
-        data_out(to_integer(unsigned(data_core(133 downto 128)))) <= data_core(127 downto 0);
+    else 
+        data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
     end if;
 end process;
 
-
+request_fifo : fifo_generator_0
+  PORT MAP (
+    clk => clk_e,
+    srst => reset,
+    din => req_core,
+    wr_en => wr,
+    rd_en => rd,
+    dout => output,
+    full => full,
+    almost_full => almost_full,
+    empty => empty,
+    almost_empty => almost_empty,
+    prog_empty => FOUR_WD_LEFT
+  );
 end architecture;

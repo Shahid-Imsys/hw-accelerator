@@ -50,11 +50,17 @@ entity cluster_controller is
 --Data line   
 	  DATA             : in std_logic_vector(7 downto 0);
 	  DATA_OUT         : out std_logic_vector(7 downto 0);
---PE request
-	  REQ_CORE         : in std_logic_vector(31 downto 0); --read and write request logic
-      DATA_PE          : out std_logic_vector(134 downto 0) --Data transfer to PE
 --Feedback signals
       --fb               : out std_logic
+--Request and distribution logic signals
+      RST_R            : out std_logic;
+	  REQ_IN           : in std_logic;
+	  REQ_FIFO          : in std_logic_vector(31 downto 0);
+	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
+	  PE_UNIT          : out std_logic_vector(5 downto 0);
+	  B_CAST           : out std_logic;
+	  RD_FIFO          : out std_logic;
+	  FOUR_WD_LEFT     : in std_logic
 	  ); 
 end entity cluster_controller;
 	   
@@ -102,6 +108,8 @@ architecture rtl of cluster_controller is
  
 		 );
  end component;
+ 
+
   --Clock signals
   signal clk_m    : std_logic; --CM clock
   --Control flip-flops  --TBD
@@ -123,11 +131,16 @@ architecture rtl of cluster_controller is
   signal req_int   : std_logic;      --Request type ff
   signal broadcast_int : std_logic;  --Broadcast to PE
   signal r_delay   :std_logic;  --First clock delay when read.
+  signal pe_req_type : std_logic_vector(1 downto 0);
+  signal cb_status  : std_logic;
+  signal req_exe   : std_logic;
+  signal write_req : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);  
   signal noc_data     : reg;                        --NOC data register
   --signal data_out     : reg;
-  signal data_core_int : reg;                       --Data register for PE  
+  signal data_core_int : reg;                       --Data register for PE
+  signal req_last     : std_logic_vector(5 downto 0);   --Request last field
   signal addr_c       : std_logic_vector(14 downto 0);   --CMEM column address pointer
   signal addr_n       : std_logic_vector(14 downto 0);   --NOC address pointer
   signal addr_p       : std_logic_vector(14 downto 0);   --PE  side address pointer
@@ -135,21 +148,25 @@ architecture rtl of cluster_controller is
   signal noc_cmd      : std_logic_vector(4 downto 0);    --NOC command control register
   signal pe_int       : std_logic_vector(1 downto 0);    --PE internal destination
   signal pe_num       : std_logic_vector(5 downto 0);    --PEs' seriel number
+  signal pe_to_CM     : std_logic_vector(127 downto 0);
+  signal id_num       : std_logic_vector(5 downto 0);
   --State machine
   --signal tag_ctr      : std_logic_vector(5 downto 0);  
   signal byte_ctr     : std_logic_vector(3 downto 0):="0000";    --Byte counter
   signal byte_ctr_buffer : std_logic_vector (3 downto 0);  --Buffers to delay 1 clock cycle for byte counter
-  signal len_ctr      : std_logic_vector(14 downto 0);   --Data block length counter
+  signal len_ctr      : std_logic_vector(14 downto 0);
+  signal len_ctr_p    : std_logic_vector(8 downto 0);   --Data block length counter
   signal pk_reg       : std_logic_vector(3 downto 0);  --Data pack size register, length TBD or to be a constant instead
   signal pk_ctr       : std_logic_vector(3 downto 0);
   signal dist_reg     : std_logic_vector(3 downto 0);  --Data pack distance register, length TBD
   signal dist_ctr     : std_logic_vector(3 downto 0);
+  signal b_cast_ctr   : std_logic_vector(5 downto 0);
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
   signal delay_c      : std_logic_vector(29  downto 0);
   signal delay_b      : std_logic_vector(37  downto 0);
-  
+
   
 begin
 clk_gen : process(clk_e, noc_reg_rdy)
@@ -246,21 +263,34 @@ begin
 --	end if;
 --  end process;
   
-  tag_translate : process (peci_busy, clk_e, sig_fin)
-  begin
-		if rising_edge (clk_e) then
-			if noc_cmd = "01111" then
-				noc_cmd <= (others => '0');
-				noc_cmd_buf <= (others => '0');
-		    elsif peci_busy = '1' and sig_fin = '0' then
-			    noc_cmd <= noc_cmd_buf;
-		        noc_cmd_buf(0)<= tag;
-		        for i in 0 to 3 loop
-		        noc_cmd_buf(i+1) <= noc_cmd_buf(i);
-		        end loop;
-			end if;
-	    end if;
-  end process;
+    tag_translate : process (peci_busy, clk_e, sig_fin)
+    variable noc_cmd_ctr : integer :=5;
+    begin
+    	  if rising_edge (clk_e) then
+    	        if noc_cmd = "01111" then
+    			    noc_cmd <= (others => '0');
+    			    noc_cmd_buf <= (others => '0');
+    		    elsif peci_busy = '1' and sig_fin = '0' then
+    			    if noc_cmd_ctr /= 0 then
+    			    noc_cmd <= (others => '1');
+    			    --noc_cmd <= noc_cmd_buf;
+    			    noc_cmd_buf(0)<= tag;
+    			    for i in 0 to 3 loop
+    			    noc_cmd_buf(i+1) <= noc_cmd_buf(i);
+    			    end loop;
+    			    noc_cmd_ctr := noc_cmd_ctr -1;
+    			    elsif noc_cmd_ctr = 0 then
+    			    noc_cmd <= noc_cmd_buf;
+    			    end if;
+			    elsif peci_busy='0' and sig_fin='0' and delay='0' and rd_trig ='0'  then
+					noc_cmd_ctr := 5;
+					noc_cmd <= (others => '0');
+    		    else 
+    			    noc_cmd_ctr := 5;
+    			    --noc_cmd <= (others => '0');
+    		    end if;
+    	  end if;
+    end process;
   
   noc_ctrl: process(clk_e,sig_fin,noc_cmd)
   
@@ -523,48 +553,104 @@ begin
 --	-----------------------------------------------------------------------------
 --	--PEC side 
 --	-----------------------------------------------------------------------------
---	--Request fifo
+--	--Request logic reset
+    req_rst : process(clk_e)
+    begin
+		if rising_edge(clk_e) then
+			if noc_cmd = "01111" then
+				RST_R <= '1';
+			else
+				RST_R <= '0';
+			end if;
+		end if;
+	end process;
+
 --
---	
---	pec_req: process(clk_e)
---	begin
---		if rising_edge(clk_e) then
---			if noc_cmd = "101100" then  --To be replaced with parameter in define 
---				noc_write <= not req_core(30); --31 and 30 bits "01" for broadcast,"11"for read, and "10"for write
---				noc_read <=  req_core(30);
---				broadcast_int <= not req_core(31);
---				addr_p <= req_core(29 downto 15);
---				len_ctr<= req_core(14 downto 7);
---				--pe_int <= req_core(15 downto 14);
---				pe_num <= req_core(5 downto 0); --pe_unit
---				clk_m <= clk_e;
---			else
---				noc_write <= 'Z';
---				noc_read  <= 'Z'; 
---				addr_p <= (others => 'Z');
---				clk_m <= clk_a;
---			end if;
---		end if;
---	end process;
---
-----	pe_read: process(clk_e，noc_read, dir_sel)    --still use noc_read ff, can be renamed to read later
-----	begin
-----		if rising_edge(clk_e) then
-----			if dir_sel = '1' and noc_read = '1' then
-----				data_pe(134) <= broadcast_int;   --Internal broadcasting
-----				data_pe(133 downto 128) <= pe_int;
-----				data_pe(127 downto 0) <= data_core_int(15 downto 0);   --16 byte trasnfer	
-----			end if;
-----		end if;
-----	end process;
-----
-----	pe_write: process(clk_e,noc_write, dir_sel)
-----	begin
-----		if rising_edge(clk_e) then
-----			if dir_sel= '1' and noc_write = '1' then --This noc_write is not similar with the noc_write sent to memory block
---
+	req_trans: process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			if REQ_IN = '1' and noc_reg_rdy = '0' and req_exe = '0' and write_req = '0' then
+				RD_FIFO <= '1';
+				pe_req_type <= REQ_FIFO(31 downto 30);
+				addr_p <= REQ_FIFO(29 downto 15);
+				len_ctr_p <='0' & REQ_FIFO(14 downto 7);--additional one bits for maximum transfer case
+				req_last <= REQ_FIFO(5 downto 0);
+			elsif req_exe = '0' and write_req = '1' then  --Write case
+				RD_FIFO <= '0';
+			elsif req_exe = '1' and write_req = '1' then 
+				RD_FIFO <= '1';
+			else
+				RD_FIFO <= '0';
+				pe_req_type <= (others => '0');
+				addr_p <= (others => '0');
+				len_ctr_p <= (others => '0');
+				req_last <= (others => '0');
+			end if;
+		end if;
+	end process;
+    
+	trans_type : process(pe_req_type,clk_e)
+    begin
+        if pe_req_type = "01" then
+			if cb_status = '0' then
+				cb_status <= '1';
+				b_cast_ctr <= req_last;
+			elsif cb_status = '1' then
+				if rising_edge(clk_e) then
+				    if b_cast_ctr /= "000000" then
+					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
+					elsif b_cast_ctr = "000000" then
+						if len_ctr_p /= "111111111" then
+						req_exe <= '1';
+						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+						elsif len_ctr_p = "111111111" then
+							req_exe <= '0';
+							cb_status <= '0';
+						end if;
+					end if;
+				end if;
+			end if;
+		elsif pe_req_type = "10" then
+			id_num <= req_last;
+			if rising_edge(clk_e) then
+				if len_ctr_p /= "111111111" then
+					req_exe <= '1';
+					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+				elsif len_ctr_p = "111111111" then
+					req_exe <= '0';
+				end if;
+			end if;
+		elsif pe_req_type = "11" then
+			id_num <= req_last;
+            write_req <= '1';
+			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
+				req_exe <= '1';
+				for i in 3 downto 0 loop
+				    if rising_edge(clk_e) then
+                        pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
+				    end if;
+			    end loop;
+				req_exe <= '0';
+				write_req <= '0';
+			end if;
+		end if;
+	end process;
+
+--Req_logic reset
+process(clk_e)
+begin
+	if rising_edge(clk_e) then
+		if noc_cmd = "01111" then
+			rst_r <= '1';
+		else
+			rst_r <= '0';
+		end if;
+	end if;
+end process;
+
 --------------------------------------------------------------
---
 -- Address MUX
 process(noc_reg_rdy)				
 begin

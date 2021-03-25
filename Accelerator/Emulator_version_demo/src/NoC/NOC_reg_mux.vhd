@@ -11,45 +11,52 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : Noc_Input_Reg
+-- Title      : NOC_reg_mux
 -- Project    : GP3000
 -------------------------------------------------------------------------------
--- File       : Noc_Input_Reg.vhd
+-- File       : NOC_reg_mux.vhd
 -- Author     : Azadeh Kaffash
 -- Company    : Imsys Technologies AB
--- Date       : 28.01.2021
+-- Date       : 04.02.2021
 -------------------------------------------------------------------------------
--- Description: -- NoC Input register    
+-- Description: Multiplexes different inputs to the NOC register
 -------------------------------------------------------------------------------
 -- TO-DO list :           
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
+-- 2020-11-24 		     1.0	     AK			Created
 -------------------------------------------------------------------------------
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library work;
-use work.ACC_types.all;
 
 
-entity Noc_Input_Reg is
-    port (
-            clk                 : in  std_logic;
-            NoC_Input_reg_In    : in  std_logic_vector(15 downto 0);
-            NoC_Input_reg_Out   : out std_logic_vector(15 downto 0)
-        );
-end Noc_Input_Reg;
+entity NOC_reg_mux is
+  Port(
+      clk               : in  std_logic;
+      select_mux        : in  std_logic_vector(1 downto 0);
+      Input_reg_data    : in  std_logic_vector(15 downto 0);
+      Root_Memory_data  : in  std_logic_vector(15 downto 0);
+      Mux_Demux_data    : in  std_logic_vector(255 downto 0);
+      Dataout_mux       : out std_logic_vector(255 downto 0)
+  );
+end NOC_reg_mux;
 
-architecture Behavioral of Noc_Input_Reg is
+architecture Behavioral of NOC_reg_mux is
 
 begin
-    process (clk)
-    begin
-        if rising_edge(clk) then     
-            NoC_Input_reg_Out   <= NoC_Input_reg_In;
+	process (select_mux,Input_reg_data,Root_Memory_data,Mux_Demux_data)
+	begin
+	    if select_mux = "00" then
+            Dataout_mux     <= x"000000000000000000000000000000000000000000000000000000000000" & Input_reg_data;
+        elsif  select_mux = "01" then
+            Dataout_mux     <= x"000000000000000000000000000000000000000000000000000000000000" & Root_Memory_data;
+        elsif  select_mux = "11" then
+            Dataout_mux     <= Mux_Demux_data;
+        else     
+            Dataout_mux     <= ( others => '0');
         end if;
-    end process;
+    end process;        
+
 end Behavioral;
-
-

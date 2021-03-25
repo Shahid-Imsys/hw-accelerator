@@ -29,44 +29,44 @@
 -- Date					Version		Author	Description
 -- 2020-11-30 		     1.0	     AK			Created
 -------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity Mux_Reg is
-    port(
+  Port (
         clk                 : in  std_logic;
+        Load_Mux_Reg        : in  std_logic;
         Control_Data        : in  std_logic_vector(7 downto 0);
         NoC_Reg_Mux         : out std_logic_vector(1 downto 0);
-        EM_PCIecmd_as       : out std_logic;
-        MD32B_PCIeCmdReg    : out std_logic;
-        NocData_Switch      : out std_logic;
-        Unicast_Broadcast   : out std_logic;
+        MD_PCIe_cmd         : out std_logic;
+        --NocData_Switch      : out std_logic;
+        PCIedata_Switch     : out std_logic;
         Noc_Bus_Dir         : out std_logic
-        );
+   );
 end Mux_Reg;
+
 
 architecture Behavioral of Mux_Reg is
 
-    signal Mux_Register     : std_logic_vector(7 downto 0);
-
+    signal Mux_register :   std_logic_vector(7 downto 0):= (others => '0');
+    
 begin
 
     process(clk)
     begin
         if rising_edge(clk) then
-            Mux_Register <= Control_Data;
+            if (Load_Mux_Reg = '1') then 
+                Mux_register     <=  Control_Data;
+            end if;    
         end if;
     end process;
-
-    NoC_Reg_Mux         <= Mux_Register(1 downto 0);
-    EM_PCIecmd_as       <= Mux_Register(2);
-    MD32B_PCIeCmdReg    <= Mux_Register(3);
-    NocData_Switch      <= Mux_Register(4);
-    Unicast_Broadcast   <= Mux_Register(5);
-    Noc_Bus_Dir         <= Mux_Register(6);
-
+    
+    NoC_Reg_Mux         <=  Mux_register(1 downto 0);  
+    MD_PCIe_cmd         <=  Mux_register(3);
+    PCIedata_Switch     <=  Mux_register(4);
+    Noc_Bus_Dir         <=  Mux_register(6);  
+    
 end Behavioral;
 
 

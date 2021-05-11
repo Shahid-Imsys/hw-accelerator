@@ -19,11 +19,9 @@
 -- Company    : Imsys Technologies AB
 -- Date       : 2020.11.09
 -------------------------------------------------------------------------------
--- Description: -- Tag Inteface part of NOC          
+-- Description: Tag Inteface part of NOC          
 -------------------------------------------------------------------------------
--- TO-DO list : 
---              
---              
+-- TO-DO list :       
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
@@ -33,34 +31,37 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-
 entity Tag_Interface is    
     port(
-        clk                 : in    std_logic;
-        Load_TAG_Cmd_reg    : in    std_logic;
-        Load_TAG_Arg_reg    : in    std_logic;
-        Shift               : in    std_logic;
-        PEC_AS              : in    std_logic_vector(14 downto 0);
-        PEC_TS              : in    std_logic_vector(14 downto 0);
-        PEC_CMD             : in    std_logic_vector( 5 downto 0);
-        Tag_Line            : out   std_logic
+        clk                 : in  std_logic;
+        Load_TAG_Cmd_reg    : in  std_logic;
+        Load_TAG_Arg_reg    : in  std_logic;
+        Tag_shift           : in  std_logic;
+        PEC_AS              : in  std_logic_vector(14 downto 0);
+        PEC_TS              : in  std_logic_vector(14 downto 0);
+        PEC_CMD             : in  std_logic_vector( 5 downto 0);
+        Tag_Line            : out std_logic
         );
     end;
 
-
 architecture struct of Tag_Interface is
 
-    signal PEC_Reg       : std_logic_vector(35 downto 0);
-    signal PEC_CMD_Ready : std_logic:= '0';
-    signal PEC_Arg_Ready : std_logic:= '0';
+    signal PEC_Reg          : std_logic_vector(36 downto 0):= (others => '0');  -- to add one cycle for CC command buffer original was signal PEC_Reg          : std_logic_vector(35 downto 0):= (others => '0');
+    signal PEC_CMD_Ready    : std_logic:= '0';
+    signal PEC_Arg_Ready    : std_logic:= '0';
+    signal Tag_shift_p      : std_logic:= '0';
         
 begin
 
     process (clk)
     begin  
         if rising_edge(clk) then
+ 
+            Tag_shift_p     <= Tag_shift;           
             if Load_TAG_Cmd_reg = '1' then
-                PEC_Reg(35 downto 30)       <= PEC_CMD;
+--                PEC_Reg(35 downto 30)       <= PEC_CMD;
+                PEC_Reg(36 downto 31)       <= PEC_CMD;  -- to add one cycle for CC command buffer
+                PEC_Reg(30)                 <= '0';      -- to add one cycle for CC command buffer
                 PEC_CMD_Ready               <= '1';
             end if;
 
@@ -70,12 +71,15 @@ begin
                 PEC_Arg_Ready               <= '1'; 
             end if;    
 
-            if Shift = '1' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
-                Tag_Line                    <= PEC_Reg(35);
-                PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) & '0';
+            if Tag_shift = '1' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
+--                Tag_Line                    <= PEC_Reg(35); -- to add one cycle for CC command buffer
+--                PEC_Reg(35 downto 0)        <= PEC_Reg(34 downto 0) & '0'; -- to add one cycle for CC command buffer
+                Tag_Line                    <= PEC_Reg(36); 
+                PEC_Reg(36 downto 0)        <= PEC_Reg(35 downto 0) & '0';                
             end if;
 
-            if falling_edge(Shift) then
+            --if falling_edge(Tag_shift) then
+            if Tag_shift = '0' and Tag_shift_p = '1' then
                 PEC_CMD_Ready               <= '0';
                 PEC_Arg_Ready               <= '0';
                 Tag_Line                    <= '0';
@@ -83,5 +87,4 @@ begin
             end if;    
         end if;    
     end process;
-    
-end;    
+end;

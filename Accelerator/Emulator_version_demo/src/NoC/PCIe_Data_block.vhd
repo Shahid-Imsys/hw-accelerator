@@ -11,15 +11,15 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : Noc_Input_Reg
+-- Title      : PCIe_Data_block
 -- Project    : GP3000
 -------------------------------------------------------------------------------
--- File       : Noc_Input_Reg.vhd
+-- File       : PCIe_Data_block.vhd
 -- Author     : Azadeh Kaffash
 -- Company    : Imsys Technologies AB
--- Date       : 28.01.2021
+-- Date       : 02.02.2021
 -------------------------------------------------------------------------------
--- Description: -- NoC Input register    
+-- Description: PCIe Data block
 -------------------------------------------------------------------------------
 -- TO-DO list :           
 -------------------------------------------------------------------------------
@@ -29,27 +29,35 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library work;
-use work.ACC_types.all;
+use ieee.std_logic_unsigned.all;
 
 
-entity Noc_Input_Reg is
-    port (
-            clk                 : in  std_logic;
-            NoC_Input_reg_In    : in  std_logic_vector(15 downto 0);
-            NoC_Input_reg_Out   : out std_logic_vector(15 downto 0)
-        );
-end Noc_Input_Reg;
+entity PCIe_Data_block is
+  Port (
+        clk                 : in  std_logic;
+        Load_PCIe_CMD_reg   : in  std_logic;
+        MD_PCIe_cmd         : in  std_logic;        
+        Data_Input          : in  std_logic_vector(7 downto 0);
+        Mux_Demux_data      : in  std_logic_vector(255 downto 0);
+        Noc_data            : out std_logic_vector(255 downto 0)
+   );
+end PCIe_Data_block;
 
-architecture Behavioral of Noc_Input_Reg is
+architecture Behavioral of PCIe_Data_block is
 
-begin
+    signal PCIe_CMD_reg : std_logic_vector(7 downto 0):= ( others => '0');
+
+ begin
+ 
     process (clk)
-    begin
-        if rising_edge(clk) then     
-            NoC_Input_reg_Out   <= NoC_Input_reg_In;
+    begin  
+        if rising_edge(clk) then
+            if Load_PCIe_CMD_reg = '1' then
+               PCIe_CMD_reg   <= Data_Input;
+            end if;
         end if;
     end process;
+    
+    Noc_data       <= x"00000000000000000000000000000000000000000000000000000000000000" & PCIe_CMD_reg when MD_PCIe_cmd = '1' else Mux_Demux_data;
+        
 end Behavioral;
-
-

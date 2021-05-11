@@ -19,11 +19,9 @@
 -- Company    : Imsys Technologies AB
 -- Date       : 2020.11.16
 -------------------------------------------------------------------------------
--- Description: -- Root Memory  
+-- Description: Root Memory  
 -------------------------------------------------------------------------------
--- TO-DO list : 
---              
---              
+-- TO-DO list :       
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
@@ -40,17 +38,18 @@ entity Root_Memory is
         Write_Read_Mode     : in    std_logic;
         Enable              : in    std_logic;
         Load_Add_Gen        : in    std_logic;
-        Load_Add_Gen_Value  : in    std_logic_vector(12 downto 0);
-        DataIn              : in    std_logic_vector(511 downto 0);
-        DataOut             : out   std_logic_vector(511 downto 0)
+        Add_Gen_Value       : in    std_logic_vector(12 downto 0);
+        DataIn              : in    std_logic_vector(15 downto 0);
+        DataOut             : out   std_logic_vector(15 downto 0)
      );
 end Root_Memory;
 
-
 architecture Behavioral of Root_Memory is
 
-    signal we           : std_logic_vector(0 downto 0);
-    signal Address      : std_logic_vector(12 downto 0);
+    signal we           : std_logic_vector(0 downto 0):= (others => '0');
+    signal Address      : std_logic_vector(12 downto 0):= (others => '0');
+    signal Enable_p     : std_logic:= '0';
+    signal mem_enable   : std_logic:= '0'; 
 
     component blk_mem_gen_0
       port (
@@ -58,30 +57,33 @@ architecture Behavioral of Root_Memory is
         ena     : in std_logic;
         wea     : in std_logic_vector(0 downto 0);
         addra   : in std_logic_vector(12 downto 0);
-        dina    : in std_logic_vector(511 downto 0);
-        douta   : out std_logic_vector(511 downto 0)
+        dina    : in std_logic_vector(15 downto 0);
+        douta   : out std_logic_vector(15 downto 0)
       );
     end component;
   
 begin
 
-    we(0)   <= Write_Read_Mode;
+    we(0)       <= Write_Read_Mode;
 
     process (clk)
     begin 
         if rising_edge(clk) then
             if Load_Add_Gen = '1' then
-                Address   <= Load_Add_Gen_Value;
+                Address   <= Add_Gen_Value;
             elsif Enable = '1' then 
                 Address   <= Address + 1;
-            end if;    
+            end if;
+            Enable_p      <= Enable;    
         end if;
     end process;
+    
+    mem_enable <= (Enable or Enable_p) when Write_Read_Mode = '0' else Enable;
 
-    Root_mem : blk_mem_gen_0
+      Root_Memory_Inst : blk_mem_gen_0
       port map (
         clka    => clk,
-        ena     => Enable,
+        ena     => mem_enable,
         wea     => we,
         addra   => Address,
         dina    => DataIn,

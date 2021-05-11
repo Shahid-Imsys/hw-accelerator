@@ -11,45 +11,43 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : Noc_Input_Reg
+-- Title      : PCIe_Request
 -- Project    : GP3000
 -------------------------------------------------------------------------------
--- File       : Noc_Input_Reg.vhd
+-- File       : PCIe_Request.vhd
 -- Author     : Azadeh Kaffash
 -- Company    : Imsys Technologies AB
--- Date       : 28.01.2021
+-- Date       : 04.02.2021
 -------------------------------------------------------------------------------
--- Description: -- NoC Input register    
+-- Description: PCIe_Request
 -------------------------------------------------------------------------------
 -- TO-DO list :           
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
 -------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library work;
-use work.ACC_types.all;
 
+entity PCIe_Request is
+  Port(
+      clk               : in  std_logic;
+      Data_in           : in  std_logic_vector(1 downto 0);
+      enable            : in  std_logic;
+      PCIe_Request_out  : out std_logic_vector(1 downto 0)
+   );
+end PCIe_Request;
 
-entity Noc_Input_Reg is
-    port (
-            clk                 : in  std_logic;
-            NoC_Input_reg_In    : in  std_logic_vector(15 downto 0);
-            NoC_Input_reg_Out   : out std_logic_vector(15 downto 0)
-        );
-end Noc_Input_Reg;
-
-architecture Behavioral of Noc_Input_Reg is
+architecture Behavioral of PCIe_Request is
 
 begin
-    process (clk)
-    begin
-        if rising_edge(clk) then     
-            NoC_Input_reg_Out   <= NoC_Input_reg_In;
-        end if;
-    end process;
+	process(Clk)
+	begin
+		if rising_edge (Clk) then
+			if (enable = '1') then 
+                PCIe_Request_out     <= Data_in;
+			end if;
+		end if;	
+	end process;
+
 end Behavioral;
-
-

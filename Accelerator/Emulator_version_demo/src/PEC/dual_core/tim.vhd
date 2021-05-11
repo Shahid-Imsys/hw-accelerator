@@ -65,7 +65,7 @@ entity tim is
 --  clk_i      : in std_logic;  -- I/O clock input
 		
 		-- Microinstruction fields
-		pl         : in  std_logic_vector(79 downto 0); -- Used for CALL SP & ACK SPREQ
+		pl         : in  std_logic_vector(127 downto 0); -- Used for CALL SP & ACK SPREQ
 		
 		--pl_shin_pa : in  std_logic_vector(3 downto 0); -- Used for CALL SP & ACK SPREQ
 		--pl_alud    : in  std_logic_vector(2 downto 2); -- Only bit 2 used here

@@ -93,7 +93,9 @@ entity core is
 		test_pll    : out std_logic;  -- PLL in test mode
     xout        : in  std_logic;  -- XOSC ref. clock output
     -- Power on signal
-    pwr_ok      : in  std_logic;  -- Power is on 
+    pwr_ok      : in  std_logic;  -- Power is on
+    -- Execution signal
+    exe         : in std_logic; 
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -118,6 +120,8 @@ entity core is
     bmem_we_n   : out  std_logic;
     short_cycle : out std_logic;
     bmem_ce_n   : out  std_logic;
+    -- CC signal
+    ddi_vld    : in std_logic;
 	-- router control signals
 --	router_ir_en : out std_logic;    --delete by HYX, 20141027
 --	north_en	 : out std_logic;       --delete by HYX, 20141027
@@ -177,13 +181,13 @@ entity core is
     mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high) 
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
-    mpram_a     : out std_logic_vector(13 downto 0);-- Address  
-    mpram_d     : out std_logic_vector(79 downto 0);-- Data to memory
+    mpram_a     : out std_logic_vector(7 downto 0);-- Address  -- CJ
+    mpram_d     : out std_logic_vector(127 downto 0);-- Data to memory --CJ
     mpram_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
     mpram_we_n  : out std_logic;                    -- Write enable(active low)
     -- MPROM/MPRAM data out bus
-    mp_q        : in  std_logic_vector(79 downto 0);-- Data from MPROM/MPRAM
+    mp_q        : in  std_logic_vector(127 downto 0);-- Data from MPROM/MPRAM
     -- GMEM signals
     gmem_a      : out std_logic_vector(9 downto 0);  
     gmem_d      : out std_logic_vector(7 downto 0);  
@@ -274,7 +278,8 @@ architecture struct of core is
 -- Internal signals
 ---------------------------------------------------------------------
   -- Microinstruction pipeline register
-  signal pl         : std_logic_vector(79 downto 0);
+  signal pl         : std_logic_vector(127 downto 0);
+  constant init_mpgm : std_logic_vector(127 downto 0) := (others => '-');--TBA--CJ
 
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
@@ -338,9 +343,9 @@ architecture struct of core is
   signal ld_crb     : std_logic;                    
   signal rst_seqc_n : std_logic;                    
   signal dsi        : std_logic_vector(7 downto 0); 
-  signal mpga       : std_logic_vector(13 downto 0);
-  signal curr_mpga  : std_logic_vector(13 downto 0);
-  signal mar        : std_logic_vector(13 downto 0);
+  signal mpga       : std_logic_vector(7 downto 0);--CJ
+  signal curr_mpga  : std_logic_vector(7 downto 0);
+  signal mar        : std_logic_vector(7 downto 0);
 
   -- ALU signals
   signal flag_fn      : std_logic;
@@ -392,10 +397,10 @@ architecture struct of core is
   signal lmpen      : std_logic;               
   signal adl_cy     : std_logic;               
   signal mmr_hold_e : std_logic;               
-  
+  signal exe_i      : std_logic;      --Added by CJ
   -- MPLL signals
   signal lmpwe_n  : std_logic;
-  signal udo      : std_logic_vector(79 downto 0);  
+  signal udo      : std_logic_vector(127 downto 0);  --CJ
   signal ldmp_sig  : std_logic;  
   
   -- CPC signals
@@ -424,7 +429,9 @@ architecture struct of core is
   attribute syn_keep of dbus_int  : signal is true;
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
-  
+  -- Microprogram loading signal --CJ
+  signal ld_mpgm:  std_logic; 
+  signal vldl   : std_logic;
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -441,7 +448,40 @@ begin
   dbus <= dbus_int;
   pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
   aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
+---------------------------------------------------------------------
+-- Microinstruction loading 
+---------------------------------------------------------------------
+  exe_i <= exe; 
+  --ld_mpgm <= pl(100) and pl(98);
+  data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
+  begin
+      if clk_e_neg_int = '1' then
+        vldl <= ddi_vld;
+        --vldl <= mid;
+      end if;
+  end process;
 
+  mpgm_load : process(clk_p, vldl, ddi_vld)
+  begin 
+        if ddi_vld = '0' and vldl = '1' then  --act at falling_edge of ddi_vld signal
+            ld_mpgm <= '0';
+        else
+            ld_mpgm <= pl(100) and pl(98);
+        end if;
+  end process;
+
+  --init_load: process(clk_p)
+  --begin
+  --  if rising_edge(clk_p) then
+  --    if rst_en_int = '0' then
+  --      init_mpgm <= '0';
+  --    elsif exe_i = '1' then
+  --      init_mpgm <= '1';
+  --    elsif dtm_fin <= '1' then --?
+  --      init_mpgm <= '0';
+  --    end if;
+  --  end if;
+  --end process;
 ---------------------------------------------------------------------
 -- Microinstruction pipeline register
 ---------------------------------------------------------------------
@@ -455,13 +495,19 @@ begin
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
   --pl_out <= pl;
+  -- If ld_mpgm is high, loading is inhibited andthe register keeps a 
+  --previously loaded instruction. Init_ld has the highest priority.
   pl_reg: process (clk_p, rst_en_int)
   begin
     if rising_edge(clk_p) then--  
         if rst_en_int = '0' then    
             pl <= (others => '0');
         elsif clk_e_pos_int = '0' then
-            if plsel_n = '1' then
+            if exe = '1' then
+                pl <= init_mpgm;
+            elsif ld_mpgm = '1' then
+                pl <= pl;
+            elsif plsel_n = '1' then
                 pl <= mp_q;
             elsif plcpe_n = '0' then
                 pl <= udo;
@@ -774,7 +820,9 @@ begin
       clkreq_gen    => clkreq_gen,              
       ira2          => ira2,                
       irq0          => irq0,               
-      irq1          => irq1,               
+      irq1          => irq1,
+      dfm_vld       => ddi_vld,
+      vldl          => vldl,               
       -- Condition inputs
       spreq_n       => spreq_n,             
       spack_n       => spack_n,             
@@ -986,6 +1034,7 @@ begin
       t_rp        => t_rp,               
       fast_d      => fast_d_int, 
 	  short_cycle => short_cycle_int,
+	  exe         => exe, --CJ Added
       -- Data paths
       dbus        => dbus_int,             
       ybus        => ybus,             
@@ -1001,7 +1050,7 @@ begin
       i_double    => i_double,           
       lmpen       => lmpen,           
       adl_cy      => adl_cy,             
-      hold_e      => mmr_hold_e,             
+      hold_e      => mmr_hold_e,          
       -- SDRAM signals
       d_addr      => d_addr,
       d_cs        => dcs_o,              

@@ -46,7 +46,7 @@ entity clc is
     clk_e_pos     : in  std_logic;  -- Execution clock
     rst_en       : in  std_logic;  -- Reset input (active  low)
     -- Microprogram fields
-    pl           : in  std_logic_vector(79 downto 0);
+    pl           : in  std_logic_vector(127 downto 0);
     -- Static control inputs
     dbl_direct   : in  std_logic;  -- Double step control input
     pup_irq      : in  std_logic_vector(1 downto 0); -- Enable wake on IRQ
@@ -58,6 +58,8 @@ entity clc is
     ira2         : in  std_logic; 
     irq0         : in  std_logic; 
     irq1         : in  std_logic; 
+    dfm_vld      : in  std_logic; -- Added by CJ
+    vldl         : in  std_logic; -- 1 clock latch of dfm_vld signal
     -- Condition inputs
     spreq_n      : in  std_logic; 
     spack_n      : in  std_logic; 
@@ -99,9 +101,9 @@ entity clc is
     --Data Outputs
     dsi          : out std_logic_vector(7 downto 0);  
     --Microprogram address outputs
-    mpga         : out std_logic_vector(13 downto  0); 
-    curr_mpga    : out std_logic_vector(13 downto  0); 
-    mar          : out std_logic_vector(13 downto  0));
+    mpga         : out std_logic_vector(7 downto  0); --CJ
+    curr_mpga    : out std_logic_vector(7 downto  0); --CJ
+    mar          : out std_logic_vector(7 downto  0)); --CJ
 end;
 
 architecture rtl of clc is
@@ -109,23 +111,23 @@ architecture rtl of clc is
   signal pl_map    : std_logic_vector(3 downto 0); 
   signal pl_aux1   : std_logic_vector(2 downto 0); 
   -- Internal buses
-  signal pc        : std_logic_vector(13 downto 0);
+  signal pc        : std_logic_vector(7 downto 0); --CJ
   signal di        : std_logic_vector(7 downto 0); 
                                                    
   signal ir        : std_logic_vector(7 downto 0);
   signal irq       : std_logic_vector(2 downto 0);
   -- Stack
   signal st_ctr    : std_logic_vector(4 downto 0);
-  signal st_out    : std_logic_vector(13 downto 0);
+  signal st_out    : std_logic_vector(13 downto 0); --CJ
   signal st_full   : std_logic; 
   signal st_empty  : std_logic; 
   signal st_push   : std_logic; 
   signal st_pop    : std_logic; 
   signal st_we_n   : std_logic; 
   -- Loop counter/register
-  signal ctr_in    : std_logic_vector(11 downto 0);-- Counter/register input
+  signal ctr_in    : std_logic_vector(7 downto 0);-- Counter/register input --CJ
                                                    -- bus
-  signal ctr_out   : std_logic_vector(11 downto 0);-- Counter/register output
+  signal ctr_out   : std_logic_vector(7 downto 0);-- Counter/register output --CJ
                                                    -- bus
   signal ctr_eq0   : std_logic; 
   signal ctr_dec   : std_logic; 
@@ -159,9 +161,9 @@ architecture rtl of clc is
   signal irq0_s2   : std_logic; 
   signal irq1_s2   : std_logic; 
   -- Internal copies of output signals
-  signal mpga_int  : std_logic_vector(13 downto 0);
+  signal mpga_int  : std_logic_vector(7 downto 0); --CJ
   --signal mpga_int_b  : std_logic_vector(13 downto 0);--buffer added by maning
-  signal curr_mpga_int: std_logic_vector(13 downto  0);
+  signal curr_mpga_int: std_logic_vector(7 downto  0); --CJ
   signal trace_int : std_logic;
   signal stack_in  : std_logic_vector(13 downto 0);
   
@@ -172,6 +174,7 @@ architecture rtl of clc is
   signal pl_sig12      : std_logic;        
   signal pl_sig18   : std_logic_vector(3 downto 0);
   signal pl_sig15     : std_logic_vector(4 downto 0);
+  signal pl_ld_mpgm  : std_logic; --Added by CJ
   
 
 begin
@@ -180,7 +183,7 @@ begin
   pl_sig8   <= pl(28)&pl(62)&(pl(26) xor pl(17))&(pl(3) xor pl(59))&(pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24) ;
   pl_map  <= (pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
   pl_aux1 <= pl_sig1(4 downto 2);
-
+  pl_ld_mpgm <= pl(100) and pl(98); --Added by CJ
 ----------------------------------------------------------------------
   -- Sequence control decode logic. 
 ----------------------------------------------------------------------
@@ -197,16 +200,19 @@ begin
       pl_cond      => pl_sig1,
       pl_cpol      => pl_sig2,
       pl_ad        => pl_sig8,
+      mpgm_ld      => pl_ld_mpgm, --Added by CJ
       ira1         => special,
       ira2         => ira2,
       st_full      => st_full,
       st_empty     => st_empty,
       ctr_eq0      => ctr_eq0,
       cond_pass    => cpass,
+      dfm_vld      => dfm_vld, --CJ
+      vldl         => vldl,    --CJ
       di           => di,
       y_reg        => y_reg,
       pc           => pc,
-      sout         => st_out,
+      sout         => st_out(7 downto 0), --CJ
       rout         => ctr_out,
       st_push      => st_push,
       st_pop       => st_pop,
@@ -223,7 +229,8 @@ begin
 ----------------------------------------------------------------------
   -- Microprogram stack memory. 
 ----------------------------------------------------------------------
-  stack_in <= curr_mpga_int(13 downto 12) & pc(11 downto 0);
+  --stack_in <= curr_mpga_int(13 downto 12) & pc(11 downto 0);--CJ
+  stack_in <= "000000" & pc;
   stack9x141 : entity work.stack9x14(register_based)
     port map (
         rst_en => rst_en,
@@ -257,7 +264,7 @@ begin
         end if;
     end if;
   end process;
-  
+
 ----------------------------------------------------------------------
   -- Loop counter/register. 
 ----------------------------------------------------------------------
@@ -287,8 +294,10 @@ begin
   -- The ctr_eq0 signal is active (high) when the counter/register
   -- is zero or, if dbl_direct is set (double stepping is active), at
   -- least the high eleven bits of it are zero.
-  ctr_eq0 <= '1' when ctr_out(11 downto 1) = 0 and
-             (ctr_out(0) = '0' or dbl_direct = '1') else '0';
+  --ctr_eq0 <= '1' when ctr_out(11 downto 1) = 0 and
+             --(ctr_out(0) = '0' or dbl_direct = '1') else '0';--CJ
+  ctr_eq0 <= '1' when ctr_out(7 downto 1) = 0 and
+             (ctr_out(0) = '0' or dbl_direct = '1') else '0'; 
   
 ----------------------------------------------------------------------
   -- Program counter register/incrementor. 
@@ -336,11 +345,12 @@ begin
   -- program is not jumping. pc wraps at 4k word boundaries.
   -- The two high bits are unchanged when there is no select block
   -- operation.
-  pc(11 downto 0)  <= curr_mpga_int(11 downto 0) + 1;   -- Increment low 12
+  --pc(11 downto 0)  <= curr_mpga_int(11 downto 0) + 1;   -- Increment low 12
                                                         -- bits, wrap at 4k
-  pc(13 downto 12) <= pl_sig18(1 downto 0) when selblk_pa = '1' else
-                      pl_aux1(2 downto 1) when selblk_aux1 = '1' else
-                      curr_mpga_int(13 downto 12);
+    pc(7 downto 0)  <= curr_mpga_int(7 downto 0) + 1; --CJ
+  --pc(13 downto 12) <= pl_sig18(1 downto 0) when selblk_pa = '1' else       --Deleted by CJ
+  --                    pl_aux1(2 downto 1) when selblk_aux1 = '1' else     --Deleted by CJ
+  --                    curr_mpga_int(13 downto 12);     --Deleted by CJ
 
   -- Microprogram Address Register. This register is loaded at every
   -- clock edge in stop mode or at CALL SP in run mode. Its purpose
@@ -352,7 +362,8 @@ begin
             mar <= (others => '0');
         elsif (clk_e_pos = '0') then
             if ld_mar = '1' then
-              mar(13 downto 0) <= curr_mpga_int(13 downto 0);
+              --mar(13 downto 0) <= curr_mpga_int(13 downto 0); --CJ
+              mar <= curr_mpga_int; --CJ
             end if;
         end if;
     end if;

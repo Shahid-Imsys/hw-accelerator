@@ -55,11 +55,11 @@ entity mpgm is
 		lmpwe_n     : in  std_logic;  -- From MPLL, low when self-load write
 		en_pmem     : in  std_logic;  -- Enable patch memory, from CRB
 		-- Inputs
-		mpga        : in  std_logic_vector(13 downto 0);  -- from CLC, mpgm address
+		mpga        : in  std_logic_vector(7 downto 0);  -- from CLC, mpgm address  --CJ
 		latch       : in  std_logic_vector(7 downto 0);   -- Latch register, used when loading
 		y_reg       : in  std_logic_vector(7 downto 0);   -- Y bus, used when loading   
 		-- Outputs to MPRAM/MPROM
-		mpram_a     : out std_logic_vector(13 downto 0);  -- MPG RAM address    
+		mpram_a     : out std_logic_vector(4 downto 0);  -- MPG RAM address    --CJ
 		mprom_oe    : out std_logic_vector(1 downto 0);   -- ROM output enable (active high)
 		mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
 		mprom_ce    : out std_logic_vector(1 downto 0);   -- ROM chip enable (active high)
@@ -82,20 +82,31 @@ architecture rtl of mpgm is
 
 begin  -- rtl
 	-- Address muxes			
-	patch_addr <=	mpga when patched = '0' else
-								"01111" & pmem_q & mpga(6 downto 0);	-- When a ROM address is patched to RAM
+	--patch_addr <=	mpga when patched = '0' else           --Deleted by CJ
+	--							"01111" & pmem_q & mpga(6 downto 0);	-- When a ROM address is patched to RAM           --Deleted by CJ
+	--ram_addr <=	patch_addr when lmpen = '0' else           --Deleted by CJ
+	--						latch(5 downto 0) & y_reg;							-- When self-loading RAM           --Deleted by CJ
+	--						           --Deleted by CJ
+	--mpram_a <=	ram_addr;           --Deleted by CJ
+	--           --Deleted by CJ
+	--pmem_a(10) <= ram_addr(1) when lmpen = '1' or plsel_n = '0' else           --Deleted by CJ
+	--							ram_addr(13);           --Deleted by CJ
+	--pmem_a(9) <= 	ram_addr(0) when lmpen = '1' or plsel_n = '0' else           --Deleted by CJ
+	--							ram_addr(11) when ram_addr(13) = '1' else           --Deleted by CJ
+	--							ram_addr(12);           --Deleted by CJ
+	--pmem_a(8 downto 0) <= ram_addr(10 downto 2);           --Deleted by CJ
+	--ram_addr <= mpga when lmpen = '0' else
+		        --latch(5 downto 0) & y_reg;
+    process(lmpen)
+    begin
+	if lmpen = '0' then
+        ram_addr <= mpga;
+	else
+		ram_addr <= y_reg;  --CJ
+	end if;
+	end process;
+	mpram_a <= ram_addr;
 
-	ram_addr <=	patch_addr when lmpen = '0' else
-							latch(5 downto 0) & y_reg;							-- When self-loading RAM
-							
-	mpram_a <=	ram_addr;
-	
-	pmem_a(10) <= ram_addr(1) when lmpen = '1' or plsel_n = '0' else
-								ram_addr(13);
-	pmem_a(9) <= 	ram_addr(0) when lmpen = '1' or plsel_n = '0' else
-								ram_addr(11) when ram_addr(13) = '1' else
-								ram_addr(12);
-	pmem_a(8 downto 0) <= ram_addr(10 downto 2);
 
 	-- Microprogram RAM address
 --  mpram_a <=	mpga										when lmpen = '0' and patched_ff = '0' else
@@ -110,55 +121,56 @@ begin  -- rtl
 
 	process (even_c, held_e, patch_addr, lmpen, lmpwe_n, latch)
 	begin
-		mprom_ce_int	<= "00";
-		mpram_ce_int	<= "00";
+		--mprom_ce_int	<= "00";  --Deleted by CJ
+		mpram_ce_int	<= "00";  
 		if held_e = '0' and even_c = '1' then	-- Generate CE on clk_e falling edge     --and even_c = '1'  2011-12-13 10:30:32 for maning 
 --		if even_c = '1' then
 			-- Read access or SP write access			
-			case patch_addr(13 downto 11) is
-				when "000" =>                   -- Address 0000 to 07FF
-					mprom_ce_int(0)  <= '1';      -- in ROM 0
-				when "001" =>                   -- Address 0800 to 0FFF
-					mpram_ce_int(0)  <= '1';      -- in RAM 0
-				when "010" =>                   -- Address 1000 to 17FF
-					mprom_ce_int(0)  <= '1';      -- in ROM 0
-				when "011" =>                   -- Address 1800 to 1FFF
-					mpram_ce_int(1)  <= '1';      -- in RAM 1
-				when "100"|"101"|"110"|"111" => -- Address 2000 to 3FFF
-					mprom_ce_int(1)  <= '1';      -- in ROM 1
-				when others => null;
-			end case;
-
+			--case patch_addr(13 downto 11) is
+			--	when "000" =>                   -- Address 0000 to 07FF  --Deleted by CJ
+			--		mprom_ce_int(0)  <= '1';      -- in ROM 0          
+			--	when "001" =>                   -- Address 0800 to 0FFF--Deleted by CJ
+			--		mpram_ce_int(0)  <= '1';      -- in RAM 0          
+			--	when "010" =>                   -- Address 1000 to 17FF--Deleted by CJ
+			--		mprom_ce_int(0)  <= '1';      -- in ROM 0
+			--	when "011" =>                   -- Address 1800 to 1FFF--Deleted by CJ
+			--		mpram_ce_int(1)  <= '1';      -- in RAM 1
+			--	when "100"|"101"|"110"|"111" => -- Address 2000 to 3FFF--Deleted by CJ
+			--		mprom_ce_int(1)  <= '1';      -- in ROM 1
+			--	when others => null;
+			--end case;
+        mpram_ce_int <= "01";
 			-- Self-load write access			
-			if lmpen = '1' and lmpwe_n = '0' and latch(5) = '0' then
-				if latch(4) = '0' then
-					mpram_ce_int(0)  <= '1'; -- Write CE to RAM 0
-				else
-					mpram_ce_int(1)  <= '1'; -- Write CE to RAM 1
-				end if;
-			end if;
+			--if lmpen = '1' and lmpwe_n = '0' and latch(5) = '0' then
+			--	if latch(4) = '0' then
+			--		mpram_ce_int(0)  <= '1'; -- Write CE to RAM 0
+			--	else
+			--		mpram_ce_int(1)  <= '1'; -- Write CE to RAM 1
+			--	end if;
+			--end if;
 		end if;
 	end process;
-	mprom_ce <= mprom_ce_int;
+	--mprom_ce <= mprom_ce_int;
 	mpram_ce <= mpram_ce_int;
 
-	process (even_c, held_e, mprom_ce_int, en_pmem, plsel_n, lmpen, lmpwe_n, latch)
-	begin
-		pmem_ce_nint	<= '1';
-
-		-- Read access or SP write access			
-		if (en_pmem = '1' or plsel_n = '0') and mprom_ce_int /= "00" then
-			pmem_ce_nint <= '0';
-		end if;
-
-		-- Self-load write access			
-		if held_e = '0' and even_c = '1' then	-- Generate CE on clk_e falling edge
-			if lmpen = '1' and lmpwe_n = '0' and latch(5) = '1' then
-				pmem_ce_nint <= '0'; -- Write CE to PMEM
-			end if;
-		end if;
-	end process;
-	pmem_ce_n <= pmem_ce_nint;
+	--process (even_c, held_e, mprom_ce_int, en_pmem, plsel_n, lmpen, lmpwe_n, latch)
+	--begin
+	--	pmem_ce_nint	<= '1';
+--
+	--	-- Read access or SP write access			
+	--	--if (en_pmem = '1' or plsel_n = '0') and mprom_ce_int /= "00" then
+	--	if en_pmem = '1' or plsel_n = '0' then
+	--		pmem_ce_nint <= '0';
+	--	end if;
+--
+	--	-- Self-load write access			
+	--	if held_e = '0' and even_c = '1' then	-- Generate CE on clk_e falling edge
+	--		if lmpen = '1' and lmpwe_n = '0' and latch(5) = '1' then
+	--			pmem_ce_nint <= '0'; -- Write CE to PMEM
+	--		end if;
+	--	end if;
+	--end process;
+	--pmem_ce_n <= pmem_ce_nint;
 
 	-- Output enable generation
 	process (clk_p)
@@ -167,15 +179,16 @@ begin  -- rtl
 		    if rst_cn = '0' then
 			    oe_sel <= "00";
 		    elsif (clk_e_neg = '0') then   --falling edge of clk_e
-			    if mprom_ce_int(0) = '1' then
-			    	oe_sel <= "00";
-			    elsif mprom_ce_int(1) = '1' then
-			    	oe_sel <= "01";
-			    elsif mpram_ce_int(0) = '1' then
-			    	oe_sel <= "10";
-			    else
-			    	oe_sel <= "11";
-			    end if;
+			    --if mprom_ce_int(0) = '1' then      --Deleted by CJ 
+			    --	oe_sel <= "00";
+			    --elsif mprom_ce_int(1) = '1' then   
+			    --	oe_sel <= "01";
+			    --elsif mpram_ce_int(0) = '1' then
+			    --	oe_sel <= "10";
+			    --else
+			    --	oe_sel <= "11";
+			    --end if;
+				oe_sel <= "10";
 			end if;
 		end if;
 	end process;
@@ -197,6 +210,6 @@ begin  -- rtl
 		end if;
 	end process;
 
-	patched <= patch_en and (pmem_q(0) or pmem_q(1));
+	--patched <= patch_en and (pmem_q(0) or pmem_q(1));
 	
 end rtl;

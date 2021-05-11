@@ -45,7 +45,7 @@ entity gmem is
 		gate_e			: in std_logic;	-- Copy of execution clock used for gating 
         held_e			:	in std_logic;	-- High when clk_e is held, multiple of 2 clk_c
 		-- Microprogram fields
-		pl		: in std_logic_vector(79 downto 0); 
+		pl		: in std_logic_vector(127 downto 0); 
 		mp_gass			: in std_logic_vector(1 downto 0);  --from microprogram word
 		-- Static control inputs
 		use_direct	: in std_logic; -- Selects 'direct' as bus driver

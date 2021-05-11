@@ -50,7 +50,7 @@ entity ios is
     clk_i_pos       : in    std_logic;      -- I/O clock
 --    gate_i      : in    std_logic;      -- Copy of clk_i used for gating 
     -- Microprogram fields
-    pl         : in    std_logic_vector(79 downto 0);   -- PD field
+    pl         : in    std_logic_vector(127 downto 0);   -- PD field
     -- Static control inputs
     -- Static control inputs
     use_direct  : in    std_logic;      -- Set when the direct bus is used
@@ -87,6 +87,9 @@ entity ios is
     ack_sig               : in std_logic;
     pe_request            : out std_logic_vector(31 downto 0); --used to generate pe_req_in
     data_dfm              : in std_logic_vector(127 downto 0);
+    dfm_vld               : in std_logic;
+    
+  );
 
 
 end ios;

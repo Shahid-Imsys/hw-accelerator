@@ -64,7 +64,7 @@ entity crb is
     mreset      : in  std_logic;  -- MRESET pin reset (active low)
     pwr_ok      : in  std_logic;  -- Power-on reset (active low)
     -- Microprogram control
-    pl          : in  std_logic_vector(79 downto 0);  --from the microprogram word
+    pl          : in  std_logic_vector(127 downto 0);  --from the microprogram word
     -- Other control inputs 
     ld_crb      : in  std_logic;  -- Load data in CRB reg from D bus, from CLC
     rd_crb      : in  std_logic;  -- Output CRB reg on crb_out, from DSL

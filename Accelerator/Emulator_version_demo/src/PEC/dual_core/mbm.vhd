@@ -47,7 +47,7 @@ entity mbm is
     clk_e_pos  : in      std_logic;                    -- Execution clock
     rst_en  : in std_logic;
     -- Microprogram fields
-    pl        : in      std_logic_vector(79 downto 0);
+    pl        : in      std_logic_vector(127 downto 0);
     -- Control inputs
     ld_nreg     : in    std_logic;                    -- NREG load signal, from CLC
     -- Data inputs

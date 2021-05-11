@@ -53,7 +53,7 @@ entity mpll is
     direct     : in  std_logic_vector(7 downto 0);  -- data bus
     -- Output
     lmpwe_n    : out std_logic;   -- write mpgm mem pulse
-    udo        : out std_logic_vector(79 downto 0));  -- mpgRAM input data bus
+    udo        : out std_logic_vector(127 downto 0));  -- mpgRAM input data bus --CJ
 end mpll;
 
 architecture rtl of mpll is
@@ -111,7 +111,8 @@ begin
         elsif clk_c2_pos = '0' then
             if wmlat = '1' then     
               -- SP load
-              for i in 9 downto 0 loop
+              --for i in 9 downto 0 loop
+                for i in 14 downto 0 loop --CJ 
                 if byte_sel = i+1 then
                   udo((i+1)*8 - 1 downto i*8) <= dfsr;
                 end if;

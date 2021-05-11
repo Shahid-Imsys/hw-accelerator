@@ -40,7 +40,7 @@ entity dsl is
     -- Microprogram fields
     
     -- Microprogram fields
-    pl      : in  std_logic_vector(79 downto 0);  
+    pl      : in  std_logic_vector(127 downto 0);  
     
     mp_ds         : in  std_logic_vector(3 downto 0);  
     mp_miform     : in  std_logic;        

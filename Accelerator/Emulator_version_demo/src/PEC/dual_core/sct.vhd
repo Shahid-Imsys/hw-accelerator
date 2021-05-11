@@ -45,6 +45,7 @@ entity sct is
 		pl_cond			: in  std_logic_vector(4 downto 0);
 		pl_cpol			: in  std_logic;                    
 		pl_ad				: in  std_logic_vector(11 downto 0);
+		mpgm_ld         : in std_logic; --Added by CJ
 		-- Control inputs
 		ira1				: in  std_logic;  -- SPECIAL flip-flop
 		ira2				: in  std_logic;  -- PSCTR carry-out flip-flop (from GMEM)
@@ -52,12 +53,14 @@ entity sct is
 		st_empty		: in  std_logic;  -- Stack empty (active high) 
 		ctr_eq0			: in  std_logic;  -- Counter/register zero (active high)
 		cond_pass		: in  std_logic;  -- Condition pass (active high)
+		dfm_vld         : in  std_logic;  -- DFM data valid --Added by CJ
+		vldl            : in  std_logic;  -- one clock latch of dfm_vld
 		--Data Inputs
 		di					: in  std_logic_vector(7 downto 0);		-- Next address mux 
 		y_reg				: in  std_logic_vector(7 downto 0);		-- Y bus register
-		pc					: in  std_logic_vector(13 downto 0);	-- Program counter
-		sout				: in  std_logic_vector(13 downto 0);	-- Stack output
-		rout				: in  std_logic_vector(11 downto 0);	-- Counter/register output
+		pc					: in  std_logic_vector(7 downto 0);	-- Program counter--CJ
+		sout				: in  std_logic_vector(7 downto 0);	-- Stack output --CJ
+		rout				: in  std_logic_vector(7 downto 0);	-- Counter/register output --CJ
 		--Control Outputs
 		st_push			: out std_logic;	-- Increment stack counter (active high)
 		st_pop			: out std_logic;	-- Decrement stack counter (active high)
@@ -68,9 +71,9 @@ entity sct is
 		rst_seqc_n	: out std_logic;  -- SEQC controlled reset (active low)
 		--Data Outputs
 		dsi					: out std_logic_vector(7 downto 0);   -- Data to DSL (DSOURCE CU)
-		rin					: out std_logic_vector(11 downto 0);	-- Counter/register input 
+		rin					: out std_logic_vector(7 downto 0);	-- Counter/register input --CJ
 		--Microprogram address output
-		mpa					: out std_logic_vector(13 downto 0));	-- Mpgm address to memories 
+		mpa					: out std_logic_vector(7 downto 0));	-- Mpgm address to memories --CJ
 end;
 
 architecture rtl of sct is
@@ -130,14 +133,15 @@ begin
 											pl_aux2, pl_map, cond_pass, ctr_eq0, req,
 											pc, rin_int, rout, sout)
 		variable d_plus			: std_logic_vector(2 downto 0);
-		variable pc_pc_pc		: std_logic_vector(13 downto 0);
-		variable pc_pc_ri		: std_logic_vector(13 downto 0);
-		variable pc_ri_ri		: std_logic_vector(13 downto 0);
-		variable z_ri_ri		: std_logic_vector(13 downto 0);
-		variable pc_rc_rc		: std_logic_vector(13 downto 0);
-		variable st_st_st		: std_logic_vector(13 downto 0);
+		variable pc_pc_pc		: std_logic_vector(7 downto 0); --CJ
+		variable pc_pc_ri		: std_logic_vector(7 downto 0); --CJ
+		variable pc_ri_ri		: std_logic_vector(7 downto 0); --CJ
+		variable z_ri_ri		: std_logic_vector(7 downto 0); --CJ
+		variable pc_rc_rc		: std_logic_vector(7 downto 0); --CJ
+		variable st_st_st		: std_logic_vector(7 downto 0); --CJ
 		variable plus1_int	: std_logic;
-		variable mpa_int		: std_logic_vector(13 downto 0);
+		variable mpa_int		: std_logic_vector(7 downto 0); --CJ
+		variable mpa_lc        : std_logic_vector(7 downto 0);
 	begin
 		-- This intermediate vector is used when rin_sel should be controlled by
 		-- cond(4) and map(3..2) (the "d PLUS (L/M)SHALF of.." operations).
@@ -146,10 +150,14 @@ begin
 		-- These intermediate vectors are used to assign different source
 		-- combinations to the microprogram address in a convenient way.
 		pc_pc_pc := pc;
-		pc_pc_ri := pc(13 downto 8) & rin_int(7 downto 0);
-		pc_ri_ri := pc(13 downto 12) & rin_int;
-		z_ri_ri  := "00" & rin_int;
-		pc_rc_rc := pc(13 downto 12) & rout;
+		--pc_pc_ri := pc(13 downto 8) & rin_int(7 downto 0);  -- CJ
+		pc_pc_ri := rin_int(7 downto 0);
+		--pc_ri_ri := pc(13 downto 12) & rin_int;           --Removed by CJ
+		pc_ri_ri := rin_int(7 downto 0); 
+		--z_ri_ri  := "00" & rin_int;                       --Removed by CJ 
+		z_ri_ri  := rin_int;     
+		--pc_rc_rc := pc(13 downto 12) & rout;              --CJ
+		pc_rc_rc := rout;                                   --CJ
 		st_st_st := sout;
 
 		-- Default values
@@ -236,8 +244,17 @@ begin
 					mpa_int := pc_rc_rc;	-- To stored on fail
 				end if;
 			------------------------------------------------------------------------
-			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond
-				if cond_pass = '1' then
+			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.
+			    if mpgm_ld = '1' then
+					if dfm_vld = '1' then
+						mpa_int := pc_pc_pc;
+					elsif dfm_vld = '0' and vldl = '1' then
+						mpa_int := mpa_lc;
+					else 
+					    mpa_int := pc_ri_ri;
+					    mpa_lc  := pc_ri_ri;
+					end if;
+				elsif cond_pass = '1' then
 					mpa_int := pc_ri_ri;	-- Jump long on pass
 				else
 					mpa_int := pc_pc_pc;	-- Continue on fail
@@ -577,7 +594,7 @@ begin
 	-- High part of rin is always taken from the ad field, except when the
 	-- counter/register is loaded short (rin_short set), in which case it
 	-- is set to zero.
-	rin_int(11 downto 8)	<= pl_ad(11 downto 8) when rin_short = '0' else (others => '0');
+	--rin_int(11 downto 8)	<= pl_ad(11 downto 8) when rin_short = '0' else (others => '0');--Deleted by CJ
 
 	-- Middle part of rin is taken from the rin mux except when using a "d
 	-- PLUS (L/M)SHALF OF .." construct (shmadis not set), in which case
@@ -610,10 +627,10 @@ begin
 					dsi <= sout(7 downto 0);
 				when DS_CTRL	=>		-- (1) DSOURCE CTRL
 					dsi <= rout(7 downto 0);
-				when DS_CSTACKH	=>	-- (2) DSOURCE CSTACKH
-					dsi <= st_empty & '0' & sout(13 downto 8);	-- Stack empty in high bit
-				when DS_CTRH	=>		-- (3) DSOURCE CTRH
-					dsi <= "0000" & rout(11 downto 8);
+				--when DS_CSTACKH	=>	-- (2) DSOURCE CSTACKH                             
+				--	dsi <= st_empty & '0' & sout(13 downto 8);	-- Stack empty in high bit
+				--when DS_CTRH	=>		-- (3) DSOURCE CTRH
+				--	dsi <= "0000" & rout(11 downto 8);
 				when others => null;
 			end case;
 		else

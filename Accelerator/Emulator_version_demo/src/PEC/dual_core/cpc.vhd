@@ -49,7 +49,7 @@ entity cpc is
     spack_n     : in std_logic;      -- SP acknowledge from TIM           
     ld_mar      : in std_logic;      -- Catch bus (CALL SP) from TIM           
     -- Data inputs
-    mp_q        : in std_logic_vector(79 downto 0); -- Microprogram data
+    mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
     pmem_q      : in std_logic_vector(1 downto 0);  -- Patch memory data
     curr_mpga   : in std_logic_vector(13 downto 0); -- Current mpgm address
     mar         : in std_logic_vector(13 downto 0); -- MAR register, from CLC
@@ -64,7 +64,7 @@ entity cpc is
     plcpe_n     : out std_logic;        -- Pipeline register clock enable
     spack_cmd   : out std_logic;        -- SP acknowledge, to TIM 
     gen_spreq   : out std_logic;        -- To TIM to generate SPREQ     
-    byte_sel    : out std_logic_vector(3 downto 0); -- uWord byte select, to MPLL 
+    byte_sel    : out std_logic_vector(3 downto 0); -- uWord byte select, to MPLL --CJ
     wmlat       : out std_logic;        -- Load uWord latch ctrl, to MPLL
     -- Data outputs
     dtal        : out std_logic_vector(7 downto 0);  -- data to 'DSL'
@@ -90,7 +90,7 @@ architecture rtl of cpc is
   signal wdclc          : std_logic;
   signal wdalc          : std_logic;
   signal tx_sel         : std_logic_vector(2 downto 0);
-  signal byte_cnt       : std_logic_vector(3 downto 0);
+  signal byte_cnt       : std_logic_vector(3 downto 0);--std_logic_vector(3 downto 0);--CJ
   signal byte_cnt_zero  : std_logic;
   signal dbreg          : std_logic_vector(7 downto 0);
   -- TRC signals
@@ -294,8 +294,10 @@ begin
                     byte_cnt <= (others => '0');
                 elsif byte_rec = '1' then
                     if byte_cnt_zero = '1' then
+                        --cmd_reg <= dfsr_int(7 downto 4);
+                        --byte_cnt <= dfsr_int(3 downto 0);
                         cmd_reg <= dfsr_int(7 downto 4);
-                        byte_cnt <= dfsr_int(3 downto 0);
+                        byte_cnt <= dfsr_int(3 downto 0);  --CJ
                     else
                         byte_cnt <= byte_cnt - 1;
                     end if;
@@ -440,8 +442,20 @@ begin
           mpd_muxout <= mp_q(71 downto 64);
         when "1010" =>
           mpd_muxout <= mp_q(79 downto 72);
+        --CJ Added----------------
+        when "1011" =>
+          mpd_muxout <= mp_q(87 downto 80);
+        when "1100" =>
+          mpd_muxout <= mp_q(95 downto 88);
+        when "1101" =>
+          mpd_muxout <= mp_q(103 downto 96);
+        when "1110" =>
+          mpd_muxout <= mp_q(111 downto 104);
+        --when "1111" =>
+          --mpd_muxout <= "000000" & pmem_q;
         when "1111" =>
-          mpd_muxout <= "000000" & pmem_q;
+          mpd_muxout <= mp_q(119 downto 112);
+        --CJ Added----------------
         when others =>
           mpd_muxout <= (others => '-');
       end case;

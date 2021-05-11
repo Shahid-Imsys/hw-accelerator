@@ -42,7 +42,7 @@ entity alu is
 		clk_e_pos			: in std_logic;		-- Clock input		
 		rst_n				: in std_logic;		-- reset input added by maning
 		-- Microprogram fields
-		pl          	    : in std_logic_vector(79 downto 0);	-- uProg word field
+		pl          	    : in std_logic_vector(127 downto 0);	-- uProg word field
 		--Data inputs
 		dbus				: in std_logic_vector(7 downto 0);	-- D bus
 		-- Flags

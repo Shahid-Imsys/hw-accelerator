@@ -77,11 +77,11 @@ COMPONENT fifo_generator_0
   );
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
-    signal id_num   : std_logic_vector(5 downto 0);
+    signal id_num   : std_logic_vector(5 downto 0):="000000";
     signal poll_act : std_logic;
     signal fifo_rdy : std_logic; --active low
     signal add_in_1 : std_logic_vector(5 downto 0);
-    signal add_in_2 : std_logic_vector(5 downto 0);
+    signal add_in_2 : std_logic_vector(5 downto 0):="000000";
     signal add_out  : std_logic_vector(5 downto 0);
     signal bs_out   : std_logic_vector(63 downto 0);
     signal pe_mux_out : std_logic_vector(31 downto 0);
@@ -92,33 +92,59 @@ END COMPONENT;
     signal almost_full : std_logic;
     signal empty   : std_logic;
     signal almost_empty : std_logic;
+    signal wr_req  : std_logic;
+    signal ack_sig_i :std_logic_vector(63 downto 0);
+    signal loop_c  : integer := 0;
 
 
 begin
+    --Recognize the write request and hold the wr_req signal for 4 clock cycles.
+    process(clk_e)
+    --variable loop_c : integer:= 0;
+    begin
+        if rising_edge(clk_e) then
+            loop_c <= loop_c + 1;
+            if loop_c = 1 then
+                if pe_mux_out(31)= '1' and pe_mux_out(30) = '1' then
+                    wr_req <= '1';
+                else 
+                    wr_req <= '0';
+                    loop_c <= 0;
+                end if;
+            elsif loop_c = 5 then
+                wr_req <= '0';
+                loop_c <= 0;
+            end if;
+        end if;
+    end process;
+            
+    --Chain bit is going to be added
 -------------------------------------------------------------
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
-process (clk_e)
+process (clk_e, fifo_rdy, req_sig)
 begin
-    if rising_edge(clk_e) then 
-        if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+    --if rising_edge(clk_e) then
+    if reset = '1' then
+            poll_act <= '0'; 
+    elsif fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
             poll_act <= '1'; 
-        else
+    else
             poll_act <= '0';
-        end if;
     end if;
+    --end if;
 end process;
 
-process(clk_e)
+process(clk_e,req_sig)
 begin 
-    if rising_edge(clk_e) then
+    --if rising_edge(clk_e) then
         if req_sig /= (req_sig'range => '0') then
         REQ_TO_NOC <= '1';
         else
         REQ_TO_NOC <= '0';
         end if;
-    end if;
+    --end if;
 end process;
 --ID Number Register and write controller
 process(poll_act,clk_e)
@@ -126,94 +152,120 @@ process(poll_act,clk_e)
 begin
     if rising_edge(clk_e) then
         if poll_act = '1' then
-            ack_sig <= (to_integer(unsigned(id_num))=> '1', others => '0');
+            ack_sig_i <= (others => '0');
+            ack_sig_i(to_integer(unsigned(id_num))) <= '1';
             --req_core (5 downto 0) <= id_num;
-            id_num <= add_out;
+            --id_num <= add_out;
             wr <= '1';
+        else
+            wr <= '0';
+        end if;
+    end if;
+end process;
+ack_sig <= ack_sig_i;
+--Barrel Shifter
+
+process(clk_e, id_num, req_sig, poll_act)
+variable sh_0, sh_1, sh_2, sh_3, sh_4, sh_5 : std_logic_vector(63 downto 0);
+begin
+    if poll_act = '1' then
+        if wr_req = '0' then
+            if id_num(5) = '0' then
+                sh_5 := req_sig;
+            elsif id_num(5) = '1' then
+                sh_5 := req_sig(31 downto 0) & req_sig(63 downto 32);
+            end if;
+        
+            if id_num(4) = '0' then
+                sh_4 := sh_5;
+            elsif id_num(4) = '1' then
+                sh_4 := sh_5(47 downto 0) & sh_5(63 downto 48);
+            end if;
+        
+            if id_num(3) = '0' then
+                sh_3 := sh_4;
+            elsif id_num(3) = '1' then
+                sh_3 := sh_4(55 downto 0) & sh_4(63 downto 56);
+            end if;
+        
+            if id_num(2) = '0' then
+                sh_2 := sh_3;
+            elsif id_num(2) = '1' then
+                sh_2 := sh_3(59 downto 0) & sh_3(63 downto 60);
+            end if;
+        
+            if id_num(1) = '0' then
+                sh_1 := sh_2;
+            elsif id_num(1) = '1' then
+                sh_1 := sh_2(61 downto 0) & sh_2(63 downto 62);
+            end if;
+        
+            if id_num(0) = '0' then
+                sh_0 := sh_1;
+            elsif id_num(0) = '1' then
+                sh_0 := sh_1(62 downto 0) & sh_1(63);
+            end if;
+    
+            bs_out <= sh_0;
+        elsif wr_req = '1' then
+            bs_out <= (others =>'0');
         end if;
     end if;
 end process;
 
---Barrel Shifter
+--Priority Encoder 
 
-process(id_num, req_sig)
-variable sh_0, sh_1, sh_2, sh_3, sh_4, sh_5 : std_logic_vector(63 downto 0);
-begin
-    if id_num(5) = '0' then
-        sh_5 := req_sig;
-    elsif id_num(5) = '1' then
-        sh_5 := req_sig(31 downto 0) & req_sig(63 downto 32);
-    end if;
-
-    if id_num(4) = '0' then
-        sh_4 := sh_5;
-    elsif id_num(4) = '1' then
-        sh_4 := sh_5(47 downto 0) & sh_5(63 downto 48);
-    end if;
-
-    if id_num(3) = '0' then
-        sh_3 := sh_4;
-    elsif id_num(3) = '1' then
-        sh_3 := sh_4(55 downto 0) & sh_4(63 downto 56);
-    end if;
-
-    if id_num(2) = '0' then
-        sh_2 := sh_3;
-    elsif id_num(2) = '1' then
-        sh_2 := sh_3(59 downto 0) & sh_3(63 downto 60);
-    end if;
-
-    if id_num(1) = '0' then
-        sh_1 := sh_2;
-    elsif id_num(1) = '1' then
-        sh_1 := sh_2(61 downto 0) & sh_2(63 downto 62);
-    end if;
-
-    if id_num(0) = '0' then
-        sh_0 := sh_1;
-    elsif id_num(0) = '1' then
-        sh_0 := sh_1(62 downto 0) & sh_1(63);
-    end if;
-
-    bs_out <= sh_0;
-end process;
-
---Priority Encoder
-
-process(bs_out)
+process(clk_e,bs_out)
 variable cnt : integer := 0;
-variable scop : std_logic := '0';
+--variable scop : std_logic := '0';
 begin
-    for i in 63 downto 0 loop
-    scop:= scop and bs_out(i);
-    if scop = '0'then
-        cnt := cnt+1;
-    elsif scop = '1' then
-        add_in_2 <= std_logic_vector(to_unsigned(cnt -1, 6));
-        exit;
+    if poll_act = '1' and wr_req = '0'then
+        cnt := 0;
+        for i in 63 downto 0 loop
+            --scop:= scop or bs_out(i);
+            if bs_out(i) = '0'then
+                cnt := cnt+1;
+            elsif bs_out(i) = '1' then
+                add_in_2 <= std_logic_vector(to_unsigned(cnt +1, 6));
+                --scop := '0';
+                exit;
+            end if;
+        end loop;
+    else 
+        add_in_2 <= (others => '0');
     end if;
-    end loop;
 end process;
 
 --Adder
 
-process(add_in_2)
+process(clk_e)
 begin
-    add_out<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),6));
+    add_in_1 <= id_num;
+    if rising_edge(clk_e) then
+    --add_in_1 <= id_num;
+    if wr_req = '0' then
+        id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),6));
+    elsif wr_req = '1' then
+        id_num <= add_in_1;
+    end if;
+    end if;
 end process;
 
 ----------------------------------------------------------------
 --Request Buffer
 ----------------------------------------------------------------
 --PE Mux
-process(id_num)
+process(ack_sig_i,id_num,loop_c)
 begin
-    pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num)));
+    --if rising_edge(clk_e) then
+    if poll_act = '1'then
+    pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle as req_sig is raised.
+    end if;
 end process;
 
 --Request FIFO
 req_core <= pe_mux_out;
-fifo_rdy <= almost_full;
+fifo_rdy <= almost_full and rd;
 rd       <= RD_FIFO;
 
 ----------------------------------------------------------------

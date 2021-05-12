@@ -258,7 +258,7 @@ end process;
 process(ack_sig_i,id_num,loop_c)
 begin
     --if rising_edge(clk_e) then
-    if poll_act = '1'then
+    if poll_act = '1' or wr_req = '1' then
     pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle as req_sig is raised.
     end if;
 end process;

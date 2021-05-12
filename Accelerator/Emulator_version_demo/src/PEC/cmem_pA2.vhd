@@ -60,7 +60,7 @@ entity cluster_controller is
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
 	  B_CAST           : out std_logic;
 	  RD_FIFO          : out std_logic;
-	  FOUR_WD_LEFT     : in std_logic
+	  FOUR_WD_LEFT     : in std_logic 	  
 	  ); 
 end entity cluster_controller;
 	   
@@ -164,11 +164,16 @@ architecture rtl of cluster_controller is
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
-  signal delay_c      : std_logic_vector(29  downto 0);
-  signal delay_b      : std_logic_vector(37  downto 0);
-
+  signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
+  signal delay_b      : std_logic_vector(37 downto 0);
+  signal rd_ena       : std_logic;
   
+  signal one_c_delay :std_logic;
+  signal two_c_delay :std_logic;
+  
+ 
 begin
+          
 clk_gen : process(clk_e, noc_reg_rdy)
 begin
   if rising_edge(clk_e) then
@@ -228,7 +233,7 @@ begin
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
-  cmd_activate : process(clk_e)
+  cmd_activate : process(clk_e) --39 - 33 = 6 6 must be kept
    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
 	if rising_edge(clk_e) then
@@ -239,7 +244,7 @@ begin
 	    elsif noc_reg_rdy= '1' and len_ctr = "000000000000000" then --Refresh when data transfer is finished
 			sig_fin <= '0';
 		elsif peci_busy = '0' then
-			tag_ctr_1 := 38;
+			tag_ctr_1 := 41; --40; --38;
             if tag = '1' then
                 peci_busy <= '1'; 
             else
@@ -247,7 +252,7 @@ begin
 			end if;
         elsif peci_busy= '1' then
             tag_ctr_1 := tag_ctr_1-1;
-			if tag_ctr_1 = 32 then --5 for collecting data to NOC command buffer, 1 for transfer form buffer to NOC command register
+			if tag_ctr_1 = 35 then --34 then --32 then --5 for collecting data to NOC command buffer, 1 for transfer form buffer to NOC command register
 				sig_fin <= '1';
 			elsif tag_ctr_1 = 0 then
                 peci_busy <= '0';
@@ -367,15 +372,16 @@ begin
 				delay_c <= (others => '0');
 				delay_b <= (others => '0');
 			elsif noc_cmd = "00011" then
+			
 			    if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
 				    delay <= '0';
 			    elsif peci_busy = '1' and sig_fin = '1' then
 			    --if noc_cmd = "00011" or noc_cmd = "00100" then
 			    	delay_c(0) <= '1';
-		            for i in 0 to 28 loop
+		            for i in 0 to 32 loop--30 loop --28 loop
 			    		delay_c(i+1) <= delay_c(i);
 			    	end loop;
-					delay <= delay_c(29);
+					delay <= delay_c(33);--(31); --(29);
 				end if;
 			elsif noc_cmd = "00101" then
 				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
@@ -404,18 +410,21 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
 	rd_act : process(clk_e)
-	variable two_cycle_delay: std_logic_vector(2 downto 0);
+	--variable two_cycle_delay: std_logic_vector(2 downto 0);
     begin
 		if rising_edge(clk_e) then
-			two_cycle_delay(0) := delay;
-			rd_trig <= two_cycle_delay(2);
-            for i in 0 to 1 loop
-				two_cycle_delay(i+1) := two_cycle_delay(i);
-			end loop;
+			--two_cycle_delay(0) := delay;
+			one_c_delay <= delay;
+			two_c_delay <= one_c_delay;
+            --for i in 0 to 1 loop
+			--	two_cycle_delay(i+1) := two_cycle_delay(i);
+			--end loop;
 		end if;
 	end process; 
+	rd_trig <= (one_c_delay and two_c_delay);	
+	
 	
 	--Byte counter calculation
 	    	  
@@ -426,7 +435,7 @@ begin
 			if noc_cmd = "01111" then
 				byte_ctr <= "0000";
 		    elsif noc_cmd = "00011" or noc_cmd = "00101" then
-	            if delay = '1'then
+	            if delay = '1' then
                  	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
 				else
 					byte_ctr <= "1111"; 
@@ -550,128 +559,136 @@ begin
 	end if;
 	end process;
 	
---	-----------------------------------------------------------------------------
---	--PEC side 
---	-----------------------------------------------------------------------------
---	--Request logic reset
-    req_rst : process(clk_e)
-    begin
-		if rising_edge(clk_e) then
-			if noc_cmd = "01111" then
-				RST_R <= '1';
-			else
-				RST_R <= '0';
-			end if;
-		end if;
-	end process;
+-- --	-----------------------------------------------------------------------------
+-- --	--PEC side 
+-- --	-----------------------------------------------------------------------------
+-- --	--Request logic reset
+--     req_rst : process(clk_e)
+--     begin
+-- 		if rising_edge(clk_e) then
+-- 			if noc_cmd = "01111" then
+-- 				RST_R <= '1';
+-- 			else
+-- 				RST_R <= '0';
+-- 			end if;
+-- 		end if;
+-- 	end process;
 
---
-	req_trans: process(clk_e)
-	begin
-		if rising_edge(clk_e) then
-			if REQ_IN = '1' and noc_reg_rdy = '0' and req_exe = '0' and write_req = '0' then
-				RD_FIFO <= '1';
-				pe_req_type <= REQ_FIFO(31 downto 30);
-				addr_p <= REQ_FIFO(29 downto 15);
-				len_ctr_p <='0' & REQ_FIFO(14 downto 7);--additional one bits for maximum transfer case
-				req_last <= REQ_FIFO(5 downto 0);
-			elsif req_exe = '0' and write_req = '1' then  --Write case
-				RD_FIFO <= '0';
-			elsif req_exe = '1' and write_req = '1' then 
-				RD_FIFO <= '1';
-			else
-				RD_FIFO <= '0';
-				pe_req_type <= (others => '0');
-				addr_p <= (others => '0');
-				len_ctr_p <= (others => '0');
-				req_last <= (others => '0');
-			end if;
-		end if;
-	end process;
+-- --
+-- 	req_trans: process(clk_e)
+-- 	begin
+-- 		if rising_edge(clk_e) then
+-- 			if REQ_IN = '1' and noc_reg_rdy = '0' and req_exe = '0' and write_req = '0' then
+-- 				RD_FIFO <= '1';
+-- 				pe_req_type <= REQ_FIFO(31 downto 30);
+-- 				addr_p <= REQ_FIFO(29 downto 15);
+-- 				len_ctr_p <='0' & REQ_FIFO(14 downto 7);--additional one bits for maximum transfer case
+-- 				req_last <= REQ_FIFO(5 downto 0);
+-- 			elsif req_exe = '0' and write_req = '1' then  --Write case
+-- 				RD_FIFO <= '0';
+-- 			elsif req_exe = '1' and write_req = '1' then 
+-- 				RD_FIFO <= '1';
+-- 			else
+-- 				RD_FIFO <= '0';
+-- 				pe_req_type <= (others => '0');
+-- 				addr_p <= (others => '0');
+-- 				len_ctr_p <= (others => '0');
+-- 				req_last <= (others => '0');
+-- 			end if;
+-- 		end if;
+-- 	end process;
     
-	trans_type : process(pe_req_type,clk_e)
-    begin
-        if pe_req_type = "01" then
-			if cb_status = '0' then
-				cb_status <= '1';
-				b_cast_ctr <= req_last;
-			elsif cb_status = '1' then
-				if rising_edge(clk_e) then
-				    if b_cast_ctr /= "000000" then
-					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
-					elsif b_cast_ctr = "000000" then
-						if len_ctr_p /= "111111111" then
-						req_exe <= '1';
-						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
-						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
-						elsif len_ctr_p = "111111111" then
-							req_exe <= '0';
-							cb_status <= '0';
-						end if;
-					end if;
-				end if;
-			end if;
-		elsif pe_req_type = "10" then
-			id_num <= req_last;
-			if rising_edge(clk_e) then
-				if len_ctr_p /= "111111111" then
-					req_exe <= '1';
-					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
-					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
-				elsif len_ctr_p = "111111111" then
-					req_exe <= '0';
-				end if;
-			end if;
-		elsif pe_req_type = "11" then
-			id_num <= req_last;
-            write_req <= '1';
-			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
-				req_exe <= '1';
-				for i in 3 downto 0 loop
-				    if rising_edge(clk_e) then
-                        pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
-				    end if;
-			    end loop;
-				req_exe <= '0';
-				write_req <= '0';
-			end if;
-		end if;
-	end process;
+-- 	trans_type : process(pe_req_type,clk_e)
+--     begin
+--         if pe_req_type = "01" then
+-- 			if cb_status = '0' then
+-- 				cb_status <= '1';
+-- 				b_cast_ctr <= req_last;
+-- 			elsif cb_status = '1' then
+-- 				if rising_edge(clk_e) then
+-- 				    if b_cast_ctr /= "000000" then
+-- 					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
+-- 					elsif b_cast_ctr = "000000" then
+-- 						if len_ctr_p /= "111111111" then
+-- 						req_exe <= '1';
+-- 						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+-- 						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+-- 						elsif len_ctr_p = "111111111" then
+-- 							req_exe <= '0';
+-- 							cb_status <= '0';
+-- 						end if;
+-- 					end if;
+-- 				end if;
+-- 			end if;
+-- 		elsif pe_req_type = "10" then
+-- 			id_num <= req_last;
+-- 			if rising_edge(clk_e) then
+-- 				if len_ctr_p /= "111111111" then
+-- 					req_exe <= '1';
+-- 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+-- 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+-- 				elsif len_ctr_p = "111111111" then
+-- 					req_exe <= '0';
+-- 				end if;
+-- 			end if;
+-- 		elsif pe_req_type = "11" then
+-- 			id_num <= req_last;
+--             write_req <= '1';
+-- 			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
+-- 				req_exe <= '1';
+-- 				for i in 3 downto 0 loop
+-- 				    if rising_edge(clk_e) then
+--                         pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
+-- 				    end if;
+-- 			    end loop;
+-- 				req_exe <= '0';
+-- 				write_req <= '0';
+-- 			end if;
+-- 		end if;
+-- 	end process;
 
---Req_logic reset
-process(clk_e)
-begin
-	if rising_edge(clk_e) then
-		if noc_cmd = "01111" then
-			rst_r <= '1';
-		else
-			rst_r <= '0';
-		end if;
-	end if;
-end process;
+-- --Req_logic reset
+-- process(clk_e)
+-- begin
+-- 	if rising_edge(clk_e) then
+-- 		if noc_cmd = "01111" then
+-- 			rst_r <= '1';
+-- 		else
+-- 			rst_r <= '0';
+-- 		end if;
+-- 	end if;
+-- end process;
 
---------------------------------------------------------------
--- Address MUX
-process(noc_reg_rdy)				
-begin
-	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
-		addr_c <= addr_n;
+-- --------------------------------------------------------------
+-- -- Address MUX
+-- process(noc_reg_rdy)				
+-- begin
+-- 	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
+-- 		addr_c <= addr_n;
 		
-	elsif noc_reg_rdy = '0' then
-		addr_c <= addr_p;
-	end if;
-end process;
+-- 	elsif noc_reg_rdy = '0' then
+-- 		addr_c <= addr_p;
+-- 	end if;
+-- end process;
 
 TAG_FB <= sig_fin or delay;
 
 	
-
+process(noc_cmd)
+begin 
+if noc_cmd = "00100" then
+rd_ena <= '1';
+else
+rd_ena <= '0';
+end if;
+end process;
+CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;	
 				
 
 	--Memory blocks
     clustermem : CMEM_32KX16
 	port map (
-		addr_c => addr_c,
+		addr_c => addr_n, --addr_c,
 		CK => clk_m,
 		WR => noc_write, --To be written as one write ff instead of 2 ffs
 		RD => noc_read,

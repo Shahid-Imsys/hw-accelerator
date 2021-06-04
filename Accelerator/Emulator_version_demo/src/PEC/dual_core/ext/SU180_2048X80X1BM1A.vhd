@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 use std.textio.all;
 use work.all;
 
-entity SU180_2048X80X1BM1A is
+entity SU180_256X128X1BM1A is
 	port (
 		A0		:	in	std_logic; 
 		A1		:	in	std_logic; 
@@ -14,9 +14,9 @@ entity SU180_2048X80X1BM1A is
 		A5		:	in	std_logic; 
 		A6		:	in	std_logic; 
 		A7		:	in	std_logic; 
-		A8		:	in	std_logic; 
-		A9		:	in	std_logic; 
-		A10		:	in	std_logic;
+		--A8		:	in	std_logic; 
+		--A9		:	in	std_logic; 
+		--A10		:	in	std_logic;
 		DO0		: out std_logic;
 		DO1		: out std_logic;
 		DO2		: out std_logic;
@@ -97,6 +97,54 @@ entity SU180_2048X80X1BM1A is
 		DO77	: out std_logic;
 		DO78	: out std_logic;
 		DO79	: out std_logic;
+		DO80	: out std_logic;
+		DO81	: out std_logic;
+		DO82	: out std_logic;
+		DO83	: out std_logic;
+		DO84	: out std_logic;
+		DO85	: out std_logic;
+		DO86	: out std_logic;
+		DO87	: out std_logic;
+		DO88	: out std_logic;
+		DO89	: out std_logic;
+		DO90	: out std_logic;
+		DO91	: out std_logic;
+		DO92	: out std_logic;
+		DO93	: out std_logic;
+		DO94	: out std_logic;
+		DO95	: out std_logic;
+		DO96	: out std_logic;
+		DO97	: out std_logic;
+		DO98	: out std_logic;
+		DO99	: out std_logic;
+		DO100	: out std_logic;
+		DO101	: out std_logic;
+		DO102	: out std_logic;
+		DO103	: out std_logic;
+		DO104	: out std_logic;
+		DO105	: out std_logic;
+		DO106	: out std_logic;
+		DO107	: out std_logic;
+		DO108	: out std_logic;
+		DO109	: out std_logic;
+		DO110	: out std_logic;
+		DO111	: out std_logic;
+		DO112	: out std_logic;
+		DO113	: out std_logic;
+		DO114	: out std_logic;
+		DO115	: out std_logic;
+		DO116	: out std_logic;
+		DO117	: out std_logic;
+		DO118	: out std_logic;
+		DO119	: out std_logic;
+		DO120	: out std_logic;
+		DO121	: out std_logic;
+		DO122	: out std_logic;
+		DO123	: out std_logic;
+		DO124	: out std_logic;
+		DO125	: out std_logic;
+		DO126	: out std_logic;
+		DO127	: out std_logic;
 		DI0		: in std_logic;
 		DI1		: in std_logic;
 		DI2		: in std_logic;
@@ -177,15 +225,63 @@ entity SU180_2048X80X1BM1A is
 		DI77	: in std_logic;
 		DI78	: in std_logic;
 		DI79	: in std_logic;
+		DI80	: in std_logic;
+		DI81	: in std_logic;
+		DI82	: in std_logic;
+		DI83	: in std_logic;
+		DI84	: in std_logic;
+		DI85	: in std_logic;
+		DI86	: in std_logic;
+		DI87	: in std_logic;
+		DI88	: in std_logic;
+		DI89	: in std_logic;
+		DI90	: in std_logic;
+		DI91	: in std_logic;
+		DI92	: in std_logic;
+		DI93	: in std_logic;
+		DI94	: in std_logic;
+		DI95	: in std_logic;
+		DI96	: in std_logic;
+		DI97	: in std_logic;
+		DI98	: in std_logic;
+		DI99	: in std_logic;
+		DI100	: in std_logic;
+		DI101	: in std_logic;
+		DI102	: in std_logic;
+		DI103	: in std_logic;
+		DI104	: in std_logic;
+		DI105	: in std_logic;
+		DI106	: in std_logic;
+		DI107	: in std_logic;
+		DI108	: in std_logic;
+		DI109	: in std_logic;
+		DI110	: in std_logic;
+		DI111	: in std_logic;
+		DI112	: in std_logic;
+		DI113	: in std_logic;
+		DI114	: in std_logic;
+		DI115	: in std_logic;
+		DI116	: in std_logic;
+		DI117	: in std_logic;
+		DI118	: in std_logic;
+		DI119	: in std_logic;
+		DI120	: in std_logic;
+		DI121	: in std_logic;
+		DI122	: in std_logic;
+		DI123	: in std_logic;
+		DI124	: in std_logic;
+		DI125	: in std_logic;
+		DI126	: in std_logic;
+		DI127	: in std_logic;
 		WEB	: in	std_logic;
 		CK	: in	std_logic;
 		CS	: in	std_logic;
 		OE	: in	std_logic);
-end SU180_2048X80X1BM1A;
+end SU180_256X128X1BM1A;
 
-architecture struct of SU180_2048X80X1BM1A is
-	type ram_type is array (2047 downto 0) of std_logic_vector(79 downto 0);
-	type ram_type_b is array (2047 downto 0) of bit_vector(79 downto 0);
+architecture struct of SU180_256X128X1BM1A is
+	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
+	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
 		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
 		FILE ram_file : text is in ram_file_name;
 		variable ram_file_line : line;
@@ -193,7 +289,7 @@ architecture struct of SU180_2048X80X1BM1A is
 		variable RAM :ram_type;
 		begin
 			--for i in rom_type'range loop
-			for i in 0 to 2047 loop
+			for i in 0 to 255 loop
 				readline(ram_file, ram_file_line);
 				read(ram_file_line, RAM_B(i));
 				RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -202,17 +298,17 @@ architecture struct of SU180_2048X80X1BM1A is
 	    end function;
 	    
 	    
-	signal RAM	: ram_type := init_ram_from_file("mpram0.data");
-	signal addr	: std_logic_vector(10 downto 0);
-	signal di		: std_logic_vector(79 downto 0);
-	signal do		: std_logic_vector(79 downto 0);
+	signal RAM	: ram_type := init_ram_from_file("SequenceTest_F.data");
+	signal addr	: std_logic_vector(7 downto 0);
+	signal di		: std_logic_vector(127 downto 0);
+	signal do		: std_logic_vector(127 downto 0);
 	attribute ram_style					: string;
 	attribute ram_style of RAM	: signal is "block";
 
 begin
-	addr(10)	<= A10; 
-	addr(9)		<= A9; 
-	addr(8)		<= A8; 
+	--addr(10)	<= A10; 
+	--addr(9)		<= A9; 
+	--addr(8)		<= A8; 
 	addr(7)		<= A7; 
 	addr(6)		<= A6; 
 	addr(5)		<= A5; 
@@ -222,6 +318,54 @@ begin
 	addr(1)		<= A1; 
 	addr(0)		<= A0; 
 
+	 di(80)       <= DI80;    --CJ ADDED
+     di(81)       <= DI81;    --CJ ADDED
+     di(82)       <= DI82;    --CJ ADDED
+     di(83)       <= DI83;    --CJ ADDED
+     di(84)       <= DI84;    --CJ ADDED
+     di(85)       <= DI85;    --CJ ADDED
+     di(86)       <= DI86;    --CJ ADDED
+     di(87)       <= DI87;    --CJ ADDED
+     di(88)       <= DI88;    --CJ ADDED
+     di(89)       <= DI89;    --CJ ADDED
+     di(90)       <= DI90;    --CJ ADDED
+     di(91)       <= DI91;    --CJ ADDED
+     di(92)       <= DI92;    --CJ ADDED
+     di(93)       <= DI93;    --CJ ADDED
+     di(94)       <= DI94;    --CJ ADDED
+     di(95)       <= DI95;    --CJ ADDED
+     di(96)       <= DI96;    --CJ ADDED
+     di(97)       <= DI97;    --CJ ADDED
+     di(98)       <= DI98;    --CJ ADDED
+     di(99)       <= DI99;    --CJ ADDED
+     di(100)       <= DI100;  --CJ ADDED
+     di(101)       <= DI101;  --CJ ADDED
+     di(102)       <= DI102;  --CJ ADDED
+     di(103)       <= DI103;  --CJ ADDED
+     di(104)       <= DI104;  --CJ ADDED
+     di(105)       <= DI105;  --CJ ADDED
+     di(106)       <= DI106;  --CJ ADDED
+     di(107)       <= DI107;  --CJ ADDED
+     di(108)       <= DI108;  --CJ ADDED
+     di(109)       <= DI109;  --CJ ADDED
+     di(110)       <= DI110;  --CJ ADDED
+     di(111)       <= DI111;  --CJ ADDED
+     di(112)       <= DI112;  --CJ ADDED
+     di(113)       <= DI113;  --CJ ADDED
+     di(114)       <= DI114;  --CJ ADDED
+     di(115)       <= DI115;  --CJ ADDED
+     di(116)       <= DI116;  --CJ ADDED
+     di(117)       <= DI117;  --CJ ADDED
+     di(118)       <= DI118;  --CJ ADDED
+     di(119)       <= DI119;  --CJ ADDED
+     di(120)       <= DI120;  --CJ ADDED
+     di(121)       <= DI121;  --CJ ADDED
+     di(122)       <= DI122;  --CJ ADDED
+     di(123)       <= DI123;  --CJ ADDED
+     di(124)       <= DI124;  --CJ ADDED
+     di(125)       <= DI125;  --CJ ADDED
+     di(126)       <= DI126;  --CJ ADDED
+     di(127)       <= DI127;  --CJ ADDED
 	di(79)	<= DI79; 
 	di(78)	<= DI78; 
 	di(77)	<= DI77; 
@@ -314,6 +458,54 @@ begin
 			end if;
 		end if;
 	end process;
+    DO80        <= do(80)  when OE = '1' else 'Z';
+    DO81        <= do(81)  when OE = '1' else 'Z';
+    DO82        <= do(82)  when OE = '1' else 'Z';
+    DO83        <= do(83)  when OE = '1' else 'Z';
+    DO84        <= do(84)  when OE = '1' else 'Z';
+    DO85        <= do(85)  when OE = '1' else 'Z';
+    DO86        <= do(86)  when OE = '1' else 'Z';
+    DO87        <= do(87)  when OE = '1' else 'Z';
+    DO88        <= do(88)  when OE = '1' else 'Z';
+    DO89        <= do(89)  when OE = '1' else 'Z';
+    DO90        <= do(90)  when OE = '1' else 'Z';
+    DO91        <= do(91)  when OE = '1' else 'Z';
+    DO92        <= do(92)  when OE = '1' else 'Z';
+    DO93        <= do(93)  when OE = '1' else 'Z';
+    DO94        <= do(94)  when OE = '1' else 'Z';
+    DO95        <= do(95)  when OE = '1' else 'Z';
+    DO96        <= do(96)  when OE = '1' else 'Z';
+    DO97        <= do(97)  when OE = '1' else 'Z';
+    DO98        <= do(98)  when OE = '1' else 'Z';
+    DO99        <= do(99)  when OE = '1' else 'Z';
+    DO100       <= do(100) when OE = '1' else 'Z';
+    DO101       <= do(101) when OE = '1' else 'Z';
+    DO102       <= do(102) when OE = '1' else 'Z';
+    DO103       <= do(103) when OE = '1' else 'Z';
+    DO104       <= do(104) when OE = '1' else 'Z';
+    DO105       <= do(105) when OE = '1' else 'Z';
+    DO106       <= do(106) when OE = '1' else 'Z';
+    DO107       <= do(107) when OE = '1' else 'Z';
+    DO108       <= do(108) when OE = '1' else 'Z';
+    DO109       <= do(109) when OE = '1' else 'Z';
+    DO110       <= do(110) when OE = '1' else 'Z';
+    DO111       <= do(111) when OE = '1' else 'Z';
+    DO112       <= do(112) when OE = '1' else 'Z';
+    DO113       <= do(113) when OE = '1' else 'Z';
+    DO114       <= do(114) when OE = '1' else 'Z';
+    DO115       <= do(115) when OE = '1' else 'Z';
+    DO116       <= do(116) when OE = '1' else 'Z';
+    DO117       <= do(117) when OE = '1' else 'Z';
+    DO118       <= do(118) when OE = '1' else 'Z';
+    DO119       <= do(119) when OE = '1' else 'Z';
+    DO120       <= do(120) when OE = '1' else 'Z';
+    DO121       <= do(121) when OE = '1' else 'Z';
+    DO122       <= do(122) when OE = '1' else 'Z';
+    DO123       <= do(123) when OE = '1' else 'Z';
+    DO124       <= do(124) when OE = '1' else 'Z';
+    DO125       <= do(125) when OE = '1' else 'Z';
+    DO126       <= do(126) when OE = '1' else 'Z';
+    DO127       <= do(127) when OE = '1' else 'Z';
 
 	DO79	<= do(79) when OE = '1' else 'Z';
 	DO78	<= do(78) when OE = '1' else 'Z';

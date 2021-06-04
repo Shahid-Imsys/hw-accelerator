@@ -54,7 +54,7 @@ entity cluster_controller is
       --fb               : out std_logic
 --Request and distribution logic signals
       RST_R            : out std_logic;
-	  REQ_IN           : in std_logic;
+	  REQ_IN           : in std_logic;  --req to noc in reg logic
 	  REQ_FIFO          : in std_logic_vector(31 downto 0);
 	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
@@ -66,7 +66,7 @@ end entity cluster_controller;
 	   
 architecture rtl of cluster_controller is
 
- component CMEM_32KX16 is
+component CMEM_32KX16 is
    port(
 	     addr_c      :  in std_logic_vector(14 downto 0);
          CK          :  in std_logic;
@@ -107,7 +107,7 @@ architecture rtl of cluster_controller is
 		 DI15         :  inout std_logic_vector(7 downto 0)
  
 		 );
- end component;
+end component;
  
 
   --Clock signals
@@ -559,121 +559,129 @@ begin
 	end if;
 	end process;
 	
--- --	-----------------------------------------------------------------------------
--- --	--PEC side 
--- --	-----------------------------------------------------------------------------
--- --	--Request logic reset
---     req_rst : process(clk_e)
---     begin
--- 		if rising_edge(clk_e) then
--- 			if noc_cmd = "01111" then
--- 				RST_R <= '1';
--- 			else
--- 				RST_R <= '0';
--- 			end if;
--- 		end if;
--- 	end process;
+ --	-----------------------------------------------------------------------------
+ --	--PEC side 
+ --	-----------------------------------------------------------------------------
+ --	--Request logic reset
+     req_rst : process(clk_e)
+     begin
+ 		if rising_edge(clk_e) then
+ 			if noc_cmd = "01111" then
+ 				RST_R <= '1';
+ 			else
+ 				RST_R <= '0';
+ 			end if;
+ 		end if;
+ 	end process;
 
--- --
--- 	req_trans: process(clk_e)
--- 	begin
--- 		if rising_edge(clk_e) then
--- 			if REQ_IN = '1' and noc_reg_rdy = '0' and req_exe = '0' and write_req = '0' then
--- 				RD_FIFO <= '1';
--- 				pe_req_type <= REQ_FIFO(31 downto 30);
--- 				addr_p <= REQ_FIFO(29 downto 15);
--- 				len_ctr_p <='0' & REQ_FIFO(14 downto 7);--additional one bits for maximum transfer case
--- 				req_last <= REQ_FIFO(5 downto 0);
--- 			elsif req_exe = '0' and write_req = '1' then  --Write case
--- 				RD_FIFO <= '0';
--- 			elsif req_exe = '1' and write_req = '1' then 
--- 				RD_FIFO <= '1';
--- 			else
--- 				RD_FIFO <= '0';
--- 				pe_req_type <= (others => '0');
--- 				addr_p <= (others => '0');
--- 				len_ctr_p <= (others => '0');
--- 				req_last <= (others => '0');
--- 			end if;
--- 		end if;
--- 	end process;
+ --
+ 	req_trans: process(clk_e)
+ 	begin
+ 		--if rising_edge(clk_e) then --0519
+ 			if REQ_IN = '1' and req_exe = '0' and write_req = '0' then --?
+ 				RD_FIFO <= '1';
+ 				pe_req_type <= REQ_FIFO(31 downto 30);
+ 				addr_p <= REQ_FIFO(14 downto 0);
+ 				len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
+ 				req_last <= REQ_FIFO(29 downto 24);
+ 			elsif req_exe = '0' and write_req = '1' then  --Write case
+ 				RD_FIFO <= '0';
+ 			elsif req_exe = '1' and write_req = '1' then 
+ 				RD_FIFO <= '1';
+ 			else
+ 				RD_FIFO <= '0';
+ 				pe_req_type <= (others => '0');
+ 				addr_p <= (others => '0');
+ 				len_ctr_p <= (others => '0');
+ 				req_last <= (others => '0');
+ 			end if;
+ 		--end if;
+ 	end process;
     
--- 	trans_type : process(pe_req_type,clk_e)
---     begin
---         if pe_req_type = "01" then
--- 			if cb_status = '0' then
--- 				cb_status <= '1';
--- 				b_cast_ctr <= req_last;
--- 			elsif cb_status = '1' then
--- 				if rising_edge(clk_e) then
--- 				    if b_cast_ctr /= "000000" then
--- 					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
--- 					elsif b_cast_ctr = "000000" then
--- 						if len_ctr_p /= "111111111" then
--- 						req_exe <= '1';
--- 						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
--- 						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
--- 						elsif len_ctr_p = "111111111" then
--- 							req_exe <= '0';
--- 							cb_status <= '0';
--- 						end if;
--- 					end if;
--- 				end if;
--- 			end if;
--- 		elsif pe_req_type = "10" then
--- 			id_num <= req_last;
--- 			if rising_edge(clk_e) then
--- 				if len_ctr_p /= "111111111" then
--- 					req_exe <= '1';
--- 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
--- 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
--- 				elsif len_ctr_p = "111111111" then
--- 					req_exe <= '0';
--- 				end if;
--- 			end if;
--- 		elsif pe_req_type = "11" then
--- 			id_num <= req_last;
---             write_req <= '1';
--- 			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
--- 				req_exe <= '1';
--- 				for i in 3 downto 0 loop
--- 				    if rising_edge(clk_e) then
---                         pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
--- 				    end if;
--- 			    end loop;
--- 				req_exe <= '0';
--- 				write_req <= '0';
--- 			end if;
--- 		end if;
--- 	end process;
-
--- --Req_logic reset
--- process(clk_e)
--- begin
--- 	if rising_edge(clk_e) then
--- 		if noc_cmd = "01111" then
--- 			rst_r <= '1';
--- 		else
--- 			rst_r <= '0';
--- 		end if;
--- 	end if;
--- end process;
-
--- --------------------------------------------------------------
--- -- Address MUX
--- process(noc_reg_rdy)				
--- begin
--- 	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
--- 		addr_c <= addr_n;
+ 	trans_type : process(pe_req_type,clk_e)
+    begin
+		if noc_reg_rdy = '0' then
+            if pe_req_type = "01" then
+ 			    if cb_status = '0' then
+ 				cb_status <= '1';
+ 				b_cast_ctr <= req_last;
+ 			    elsif cb_status = '1' then
+ 				if rising_edge(clk_e) then
+ 				    if b_cast_ctr /= "000000" then
+ 					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
+ 					elsif b_cast_ctr = "000000" then
+ 						if len_ctr_p /= "111111111" then
+ 						req_exe <= '1';
+ 						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+ 						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+ 						elsif len_ctr_p = "111111111" then
+ 							req_exe <= '0';
+ 							cb_status <= '0';
+ 						end if;
+ 					end if;
+ 				end if;
+ 			    end if;
+ 		elsif pe_req_type = "10" then
+ 			id_num <= req_last;
+ 			if rising_edge(clk_e) then
+ 				if len_ctr_p /= "111111111" then
+ 					req_exe <= '1';
+ 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+ 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+ 				elsif len_ctr_p = "111111111" then
+ 					req_exe <= '0';
+ 				end if;
+ 			end if;
+ 		elsif pe_req_type = "11" then
+ 			id_num <= req_last;
+             write_req <= '1';
+ 			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
+ 				req_exe <= '1';
+ 				for i in 3 downto 0 loop
+ 				    if rising_edge(clk_e) then --will it cause any clock delay?
+                         pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
+ 				    end if;
+ 			    end loop;
+ 				req_exe <= '0';
+ 				write_req <= '0';
+ 			end if;
+ 		end if;
+	end if;
+ 	end process;
+--distribution network
+process (req_exe,addr_p)
+begin
+	if req_exe = '1' then
 		
--- 	elsif noc_reg_rdy = '0' then
--- 		addr_c <= addr_p;
--- 	end if;
--- end process;
+
+
+
+ --Req_logic reset
+ --process(clk_e)
+ --begin
+ --	if rising_edge(clk_e) then
+ --		if noc_cmd = "01111" then
+ --			rst_r <= '1';
+ --		else
+ --			rst_r <= '0';
+ --		end if;
+ --	end if;
+ --end process;
+
+
+ -- Address MUX
+ process(noc_reg_rdy)				
+ begin
+ 	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
+ 		addr_c <= addr_n;		
+ 	elsif noc_reg_rdy = '0' then
+ 		addr_c <= addr_p;
+ 	end if;
+ end process;
 
 TAG_FB <= sig_fin or delay;
 
-	
+----------------------------------------------------------------------------------	
 process(noc_cmd)
 begin 
 if noc_cmd = "00100" then
@@ -684,11 +692,10 @@ end if;
 end process;
 CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;	
 				
-
 	--Memory blocks
     clustermem : CMEM_32KX16
 	port map (
-		addr_c => addr_n, --addr_c,
+		addr_c => addr_c, 
 		CK => clk_m,
 		WR => noc_write, --To be written as one write ff instead of 2 ffs
 		RD => noc_read,

@@ -60,7 +60,7 @@ entity debug_trace is
     rd      : in std_logic;     -- Read signal from parallel port (active high)
     rsel    : out std_logic;    -- rdata output select
     -- Trace port interface
-    mpg_a   : in  std_logic_vector(13 downto 0); -- Trace data (uaddress)
+    mpg_a   : in  std_logic_vector(7 downto 0); -- Trace data (uaddress)
     d       : in  std_logic_vector(7 downto 0);  -- Trace data (D-bus)
     y       : in  std_logic_vector(7 downto 0);  -- Trace data (Y-bus)
     -- Trace memory interface
@@ -236,9 +236,9 @@ begin
   -- '1' in bit 16 to show where the writing begins. 
   
   o <= x"00008000" when we_trig = '1' and trig_pt = "11" else
-       d & y & "00" & mpg_a; -- dbus, ybus and the 14 bit uaddress
+       d & y & "00000000" & mpg_a; -- dbus, ybus and the 8 bit uaddress --CJ
   
-  data <= d & y & "00" & mpg_a;          
+  data <= d & y & "00000000" & mpg_a;          
 
   -- Instance of memctrl. Produces control signals gw and adsc to the trace
   -- memory, as well as reset signals gone and stepped to the control logic.

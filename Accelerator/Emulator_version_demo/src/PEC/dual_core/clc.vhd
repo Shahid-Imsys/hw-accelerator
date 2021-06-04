@@ -168,7 +168,7 @@ architecture rtl of clc is
   signal stack_in  : std_logic_vector(13 downto 0);
   
   signal pl_sig0      : std_logic_vector(4 downto 0);
-  signal pl_sig1      : std_logic_vector(4 downto 0);
+  signal pl_sig1      : std_logic_vector(5 downto 0);
   signal pl_sig2      : std_logic;                    
   signal pl_sig8        : std_logic_vector(11 downto 0);
   signal pl_sig12      : std_logic;        
@@ -179,7 +179,7 @@ architecture rtl of clc is
 
 begin
   -- Create named signals for overlapping microprogram fields.
-  pl_sig1 <= pl(52)&pl(73)&pl(78)&pl(57)&pl(46);
+  pl_sig1 <= pl(115)&pl(52)&pl(73)&pl(78)&pl(57)&pl(46);
   pl_sig8   <= pl(28)&pl(62)&(pl(26) xor pl(17))&(pl(3) xor pl(59))&(pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24) ;
   pl_map  <= (pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
   pl_aux1 <= pl_sig1(4 downto 2);
@@ -437,7 +437,7 @@ begin
     flag_fa := flag_fc and not flag_fz;
     flag_dsxfc := d_sign xor flag_fc;
     
-    case pl_sig1(4 downto 0) is
+    case pl_sig1(5 downto 0) is
       when COND_ZERO =>    sel_cond <= flag_zero;     
       when COND_CARRY =>   sel_cond <= flag_carry;    
       when COND_FH =>      sel_cond <= flag_fh;       

@@ -43,7 +43,7 @@ ENTITY mpmem_inf IS
         c2_mprom_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high) 
         c2_mprom_oe    : in std_logic_vector(1 downto 0); --Output enable(active high)
         -- MPRAM signals
-        c2_mpram_a     : in std_logic_vector(4 downto 0);  -- Address      --Modified by CJ
+        c2_mpram_a     : in std_logic_vector(7 downto 0);  -- Address      --Modified by CJ
         c2_mpram_d     : in std_logic_vector(127 downto 0);-- Data to memory --CJ
         c2_mpram_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high)
         c2_mpram_oe    : in std_logic_vector(1 downto 0); -- Output enable(active high)
@@ -55,7 +55,7 @@ ENTITY mpmem_inf IS
         c2_pmem_ce_n   : in std_logic;
         c2_pmem_we_n   : in std_logic;
         
-        c2_mp_q        : out std_logic_vector(79 downto 0);
+        c2_mp_q        : out std_logic_vector(127 downto 0);
         --memory interface
         --ROM0
         ROM0_DO     : in  std_logic_vector (79 downto 0); 
@@ -77,7 +77,7 @@ ENTITY mpmem_inf IS
         --RAM0      becomes ROM in low power version
         RAM0_DO     : in  std_logic_vector (127 downto 0); --Modified by CJ
         RAM0_DI     : out std_logic_vector (127 downto 0); --Modified by CJ
-        RAM0_A      : out std_logic_vector (4 downto 0);
+        RAM0_A      : out std_logic_vector (7 downto 0);
         RAM0_WEB    : out std_logic;
 --        RAM0_CSB    : out std_logic;
         RAM0_OE     : out std_logic;
@@ -141,16 +141,17 @@ BEGIN
 --  --  RAM1_CSB <= NOT (c1_mpram_ce(1) OR c2_mpram_ce(1));
     --RAM1_CS <= c1_mpram_ce(1) OR c2_mpram_ce(1);
 ----------------------------------------------------------------------------------------------------------------------------------------- 
-    c1_mp_q_int <=  ROM0_DO WHEN c1_mprom_oe(0) = '1' ELSE               
-                    ROM1_DO WHEN c1_mprom_oe(1) = '1' ELSE
-                    RAM0_DO WHEN c1_mpram_oe(0) = '1' ELSE
-                    RAM1_DO WHEN c1_mpram_oe(1) = '1' ELSE  -- 
-                    ROM0_DO;
-    c2_mp_q_int <=  ROM0_DO WHEN c2_mprom_oe(0) = '1' ELSE               
-                    ROM1_DO WHEN c2_mprom_oe(1) = '1' ELSE
-                    RAM0_DO WHEN c2_mpram_oe(0) = '1' ELSE
-                    RAM1_DO WHEN c2_mpram_oe(1) = '1' ELSE   -- 
-                    ROM0_DO;
+    c1_mp_q_int <=  --ROM0_DO WHEN c1_mprom_oe(0) = '1' ELSE               
+                    --ROM1_DO WHEN c1_mprom_oe(1) = '1' ELSE
+                    RAM0_DO WHEN c1_mpram_oe(0) = '1'; --ELSE
+                    --RAM1_DO WHEN c1_mpram_oe(1) = '1' ELSE  -- 
+                    --ROM0_DO;
+    c2_mp_q_int <=  --ROM0_DO WHEN c2_mprom_oe(0) = '1' ELSE               
+                    --ROM1_DO WHEN c2_mprom_oe(1) = '1' ELSE
+                    RAM0_DO WHEN c2_mpram_oe(0) = '1';-- ELSE
+                    --RAM1_DO WHEN c2_mpram_oe(1) = '1' ELSE   -- 
+                    --ROM0_DO;
+                    --CJ
     c1_mp_q <= c1_mp_q_int;
     c2_mp_q <= c2_mp_q_int;
     -- process (clk_p)

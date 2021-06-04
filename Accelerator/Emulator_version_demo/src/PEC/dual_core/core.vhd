@@ -121,7 +121,7 @@ entity core is
     short_cycle : out std_logic;
     bmem_ce_n   : out  std_logic;
     -- CC signal
-    ddi_vld    : in std_logic;
+    ddi_vld    : in std_logic; --Added by CJ
 	-- router control signals
 --	router_ir_en : out std_logic;    --delete by HYX, 20141027
 --	north_en	 : out std_logic;       --delete by HYX, 20141027
@@ -236,8 +236,8 @@ entity core is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus
-    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
+    ddq_i       : in  std_logic_vector(127 downto 0); -- Data input bus
+    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
@@ -422,6 +422,7 @@ architecture struct of core is
   signal i_direct   : std_logic_vector(7 downto 0);                  
   signal dfio       : std_logic_vector(7 downto 0);
   signal ios_hold_e : std_logic;
+  signal ack_sig    : std_logic;
   
   attribute syn_keep              : boolean;
   attribute syn_keep of pend_i    : signal is true;
@@ -559,7 +560,7 @@ begin
       pmem_q      => pmem_q,    
       pmem_ce_n   => pmem_ce_n);    
 
-  mprom_a     <= mpga;
+  --mprom_a     <= mpga;
   mpram_d     <= udo;
   mpram_we_n  <= mpram_we_nint and lmpwe_n;
   pmem_d      <= udo(1 downto 0);
@@ -821,8 +822,8 @@ begin
       ira2          => ira2,                
       irq0          => irq0,               
       irq1          => irq1,
-      dfm_vld       => ddi_vld,
-      vldl          => vldl,               
+      dfm_vld       => ddi_vld, --Added by CJ
+      vldl          => vldl,    --Added by CJ          
       -- Condition inputs
       spreq_n       => spreq_n,             
       spack_n       => spack_n,             
@@ -1143,6 +1144,7 @@ begin
   ios: entity work.ios
     port map (
       -- Clock and reset signals
+      --ack_sig        => ack_sig,  --CJ
       rst_en         => rst_en_int,
       clk_p          => clk_p,   
       clk_c_en          => clk_c_en,

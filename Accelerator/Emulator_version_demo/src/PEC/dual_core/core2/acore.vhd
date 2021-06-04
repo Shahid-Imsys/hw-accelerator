@@ -104,13 +104,13 @@ entity acore is
     mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high) 
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
-    mpram_a     : out std_logic_vector(13 downto 0);-- Address  
-    mpram_d     : out std_logic_vector(79 downto 0);-- Data to memory
+    mpram_a     : out std_logic_vector(7 downto 0);-- Address  
+    mpram_d     : out std_logic_vector(127 downto 0);-- Data to memory
     mpram_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
     mpram_we_n  : out std_logic;                    -- Write enable(active low)
     -- MPROM/MPRAM data out bus
-    mp_q        : in  std_logic_vector(79 downto 0);-- Data from MPROM/MPRAM
+    mp_q        : in  std_logic_vector(127 downto 0);-- Data from MPROM/MPRAM
     -- GMEM signals
     gmem_a      : out std_logic_vector(9 downto 0);  
     gmem_d      : out std_logic_vector(7 downto 0);  
@@ -123,6 +123,9 @@ entity acore is
     pmem_q      : in  std_logic_vector(1  downto 0);
     pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
+    -- CC signal
+    ddi_vld   : in std_logic; --Added by CJ
+    exe       : in std_logic;
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
@@ -135,7 +138,7 @@ entity acore is
     ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus
     ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
-    da_o        : out std_logic_vector(13 downto 0);  -- Address
+    da_o        : out std_logic_vector(7 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
     dcke_o      : out std_logic_vector(3 downto 0) -- Clock enable
 
@@ -148,7 +151,7 @@ architecture struct of acore is
 -- Internal signals
 ---------------------------------------------------------------------
   -- Microinstruction pipeline register
-  signal pl         : std_logic_vector(79 downto 0);
+  signal pl         : std_logic_vector(127 downto 0);
   signal core2_en_buf : std_logic;
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
@@ -207,9 +210,9 @@ architecture struct of acore is
   signal ld_crb     : std_logic;                    
   signal rst_seqc_n : std_logic;                    
   signal dsi        : std_logic_vector(7 downto 0); 
-  signal mpga       : std_logic_vector(13 downto 0);
-  signal curr_mpga  : std_logic_vector(13 downto 0);
-  signal mar        : std_logic_vector(13 downto 0);
+  signal mpga       : std_logic_vector(7 downto 0);
+  signal curr_mpga  : std_logic_vector(7 downto 0);
+  signal mar        : std_logic_vector(7 downto 0);
 
   -- ALU signals
   signal flag_fn      : std_logic;
@@ -277,7 +280,7 @@ architecture struct of acore is
   signal i_direct   : std_logic_vector(7 downto 0);                  
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
-  
+  signal vldl      : std_logic; --Added by CJ
   attribute syn_keep              : boolean;
   --attribute syn_keep of pend_i    : signal is true;
   -- To easy gate-level simulation
@@ -426,7 +429,9 @@ begin
       clkreq_gen    => clkreq_gen,              
       ira2          => ira2,                
       irq0          => irq0,               
-      irq1          => irq1,               
+      irq1          => irq1, 
+      dfm_vld       => ddi_vld,  --Added by CJ
+      vldl          => vldl,     --Added by CJ            
       -- Condition inputs
       spreq_n       => '1',             
       spack_n       => '1',             
@@ -666,7 +671,8 @@ begin
 	  ld_dqi_flash => '0',
       d_a         => da_o,             
       d_ba        => dba_o,              
-      d_dqm       => ddqm,             
+      d_dqm       => ddqm,
+      exe         => exe,    --Added by CJ         
       d_cke       => dcke_o);      
 
     i_direct <= x"00"; 

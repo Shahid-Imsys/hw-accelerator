@@ -81,13 +81,13 @@ entity ios is
     iomem_we_n  : out   std_logic;      -- Write enable (active low)
     iomem_a     : out   std_logic_vector(IOMEM_ADDR_WIDTH-2 downto 0);  -- Address
     iomem_d     : out   std_logic_vector(15 downto 0);  -- Data in
-    iomem_q     : in    std_logic_vector(15 downto 0); -- Data out
+    iomem_q     : in    std_logic_vector(15 downto 0) -- Data out
     --CJ start
-    req_logic_sig         : out std_logic; --used to generate req_sig
-    ack_sig               : in std_logic;
-    pe_request            : out std_logic_vector(31 downto 0); --used to generate pe_req_in
-    data_dfm              : in std_logic_vector(127 downto 0);
-    dfm_vld               : in std_logic;
+    --req_logic_sig         : out std_logic; --used to generate req_sig
+    --ack_sig               : in std_logic;
+    --pe_request            : out std_logic_vector(31 downto 0); --used to generate pe_req_in
+    --data_dfm              : in std_logic_vector(127 downto 0);
+    --dfm_vld               : in std_logic
     
   );
 

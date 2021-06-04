@@ -42,7 +42,7 @@ entity sct is
 		rst_en			: in  std_logic;  -- Reset input (active  low)
 		-- Microprogram fields
 		pl_seqc			: in  std_logic_vector(4 downto 0);
-		pl_cond			: in  std_logic_vector(4 downto 0);
+		pl_cond			: in  std_logic_vector(5 downto 0);
 		pl_cpol			: in  std_logic;                    
 		pl_ad				: in  std_logic_vector(11 downto 0);
 		mpgm_ld         : in std_logic; --Added by CJ
@@ -155,7 +155,7 @@ begin
 		--pc_ri_ri := pc(13 downto 12) & rin_int;           --Removed by CJ
 		pc_ri_ri := rin_int(7 downto 0); 
 		--z_ri_ri  := "00" & rin_int;                       --Removed by CJ 
-		z_ri_ri  := rin_int;     
+		z_ri_ri  := rin_int(7 downto 0);     
 		--pc_rc_rc := pc(13 downto 12) & rout;              --CJ
 		pc_rc_rc := rout;                                   --CJ
 		st_st_st := sout;
@@ -244,7 +244,7 @@ begin
 					mpa_int := pc_rc_rc;	-- To stored on fail
 				end if;
 			------------------------------------------------------------------------
-			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.
+			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.--CJ
 			    if mpgm_ld = '1' then
 					if dfm_vld = '1' then
 						mpa_int := pc_pc_pc;
@@ -513,7 +513,7 @@ begin
 		-- Least significant bit of mpa is or:ed with plus1 and cond_pass,
 		-- to implement conditional PLUS 1 jumps. 
 		--plus1 <= plus1_int;
-		mpa <= mpa_int(13 downto 1) & (mpa_int(0) or (plus1_int and cond_pass));
+		mpa <= mpa_int(7 downto 1) & (mpa_int(0) or (plus1_int and cond_pass));
 		bad_plus <= mpa_int(0) and plus1_int;
 	end process seqc_dec;
 
@@ -607,7 +607,7 @@ begin
 	rin_int(2)						<= rin_mux(2) when shmadis = '1' or pl_bitmsk(2) = '1' else '0';
 	rin_int(1)						<= rin_mux(1) when shmadis = '1' or pl_bitmsk(1) = '1' else '0';
 	rin_int(0)						<= rin_mux(0) when shmadis = '1' or pl_bitmsk(0) = '1' else '0';
-	rin <= rin_int;
+	rin <= rin_int(7 downto 0);
 
 	-- Request signal used by SEQC_RESET, will cause BREAK calls if any unmasked
 	-- bits of the selected rin source nibble are set.

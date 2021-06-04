@@ -59,7 +59,7 @@ entity mpgm is
 		latch       : in  std_logic_vector(7 downto 0);   -- Latch register, used when loading
 		y_reg       : in  std_logic_vector(7 downto 0);   -- Y bus, used when loading   
 		-- Outputs to MPRAM/MPROM
-		mpram_a     : out std_logic_vector(4 downto 0);  -- MPG RAM address    --CJ
+		mpram_a     : out std_logic_vector(7 downto 0);  -- MPG RAM address    --CJ
 		mprom_oe    : out std_logic_vector(1 downto 0);   -- ROM output enable (active high)
 		mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
 		mprom_ce    : out std_logic_vector(1 downto 0);   -- ROM chip enable (active high)
@@ -78,7 +78,7 @@ architecture rtl of mpgm is
 	signal patch_en				: std_logic;
 	signal patched				: std_logic;
 	signal patch_addr			: std_logic_vector(13 downto 0);
-	signal ram_addr				: std_logic_vector(13 downto 0);
+	signal ram_addr				: std_logic_vector(7 downto 0); --CJ
 
 begin  -- rtl
 	-- Address muxes			
@@ -97,14 +97,8 @@ begin  -- rtl
 	--pmem_a(8 downto 0) <= ram_addr(10 downto 2);           --Deleted by CJ
 	--ram_addr <= mpga when lmpen = '0' else
 		        --latch(5 downto 0) & y_reg;
-    process(lmpen)
-    begin
-	if lmpen = '0' then
-        ram_addr <= mpga;
-	else
-		ram_addr <= y_reg;  --CJ
-	end if;
-	end process;
+	ram_addr <= mpga when lmpen = '0' else
+		        y_reg; --CJ
 	mpram_a <= ram_addr;
 
 

@@ -51,8 +51,8 @@ entity cpc is
     -- Data inputs
     mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
     pmem_q      : in std_logic_vector(1 downto 0);  -- Patch memory data
-    curr_mpga   : in std_logic_vector(13 downto 0); -- Current mpgm address
-    mar         : in std_logic_vector(13 downto 0); -- MAR register, from CLC
+    curr_mpga   : in std_logic_vector(7 downto 0); -- Current mpgm address
+    mar         : in std_logic_vector(7 downto 0); -- MAR register, from CLC
     dbus        : in std_logic_vector(7 downto 0); -- D bus
     ybus        : in std_logic_vector(7 downto 0); -- Y bus
     -- Control outputs
@@ -468,7 +468,8 @@ begin
     begin        
       case tx_sel is
         when "000" =>
-          dtsr <= "00" & mar(13 downto 8);
+          --dtsr <= "00" & mar(13 downto 8);
+          dtsr <= mar; --CJ
         when "001" =>
           dtsr <= mar(7 downto 0);
         when "010" =>

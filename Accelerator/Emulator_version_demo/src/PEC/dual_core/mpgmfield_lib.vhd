@@ -293,38 +293,39 @@ package mpgmfield_lib is
 
 	-- COND field
 	-- Condition selection.
-  constant COND_ZERO			: std_logic_vector(4 downto 0) :=  "00000";
-  constant COND_CARRY			: std_logic_vector(4 downto 0) :=  "00001";
-  constant COND_FH				: std_logic_vector(4 downto 0) :=  "00010";
-  constant COND_NEG				: std_logic_vector(4 downto 0) :=  "00011";
-  constant COND_FZ				: std_logic_vector(4 downto 0) :=  "00100";
-  constant COND_FC				: std_logic_vector(4 downto 0) :=  "00101";
-  constant COND_FN				: std_logic_vector(4 downto 0) :=  "00110";
-  constant COND_FV				: std_logic_vector(4 downto 0) :=  "00111";
-  constant COND_OVERFLOW	: std_logic_vector(4 downto 0) :=  "01000";
-  constant COND_LESS			: std_logic_vector(4 downto 0) :=  "01001";
-  constant COND_PCCY			: std_logic_vector(4 downto 0) :=  "01010";
-  constant COND_LINK			: std_logic_vector(4 downto 0) :=  "01011";
-  constant COND_ODD				: std_logic_vector(4 downto 0) :=  "01100";
-  constant COND_FL				: std_logic_vector(4 downto 0) :=  "01101";
-  constant COND_QLSB			: std_logic_vector(4 downto 0) :=  "01110";
-	constant COND_CNDFALSE	: std_logic_vector(4 downto 0) :=  "01111";
-  constant COND_DSXFC			: std_logic_vector(4 downto 0) :=  "10000";
-  constant COND_YBITSET		: std_logic_vector(4 downto 0) :=  "10001";
-  constant COND_PSCAFU		: std_logic_vector(4 downto 0) :=  "10010";
-  constant COND_PSCFULL		: std_logic_vector(4 downto 0) :=  "10011";
-  constant COND_PSCAEM		: std_logic_vector(4 downto 0) :=  "10100";
-  constant COND_PSCEM			: std_logic_vector(4 downto 0) :=  "10101";
-  constant COND_CTREQ0		: std_logic_vector(4 downto 0) :=  "10110";
-  constant COND_GREATER		: std_logic_vector(4 downto 0) :=  "10111";
-  constant COND_NSPREQ		: std_logic_vector(4 downto 0) :=  "11000";
-  constant COND_NSPACK		: std_logic_vector(4 downto 0) :=  "11001";
-  constant COND_FG				: std_logic_vector(4 downto 0) :=  "11010";
-  constant COND_ABOVE			: std_logic_vector(4 downto 0) :=  "11011";
-  constant COND_SPECIAL		: std_logic_vector(4 downto 0) :=  "11100";
-  constant COND_YEQNEG		: std_logic_vector(4 downto 0) :=  "11101";
-  constant COND_FA				: std_logic_vector(4 downto 0) :=  "11110";
-	constant COND_ADLCY			: std_logic_vector(4 downto 0) :=  "11111";
+  constant COND_ZERO			: std_logic_vector(5 downto 0) :=  "000000"; --Added one additional bit, CJ
+  constant COND_CARRY			: std_logic_vector(5 downto 0) :=  "000001";
+  constant COND_FH				: std_logic_vector(5 downto 0) :=  "000010";
+  constant COND_NEG				: std_logic_vector(5 downto 0) :=  "000011";
+  constant COND_FZ				: std_logic_vector(5 downto 0) :=  "000100";
+  constant COND_FC				: std_logic_vector(5 downto 0) :=  "000101";
+  constant COND_FN				: std_logic_vector(5 downto 0) :=  "000110";
+  constant COND_FV				: std_logic_vector(5 downto 0) :=  "000111";
+  constant COND_OVERFLOW	: std_logic_vector(5 downto 0) :=  "001000";
+  constant COND_LESS			: std_logic_vector(5 downto 0) :=  "001001";
+  constant COND_PCCY			: std_logic_vector(5 downto 0) :=  "001010";
+  constant COND_LINK			: std_logic_vector(5 downto 0) :=  "001011";
+  constant COND_ODD				: std_logic_vector(5 downto 0) :=  "001100";
+  constant COND_FL				: std_logic_vector(5 downto 0) :=  "001101";
+  constant COND_QLSB			: std_logic_vector(5 downto 0) :=  "001110";
+	constant COND_CNDFALSE	: std_logic_vector(5 downto 0) :=  "001111";
+  constant COND_DSXFC			: std_logic_vector(5 downto 0) :=  "010000";
+  constant COND_YBITSET		: std_logic_vector(5 downto 0) :=  "010001";
+  constant COND_PSCAFU		: std_logic_vector(5 downto 0) :=  "010010";
+  constant COND_PSCFULL		: std_logic_vector(5 downto 0) :=  "010011";
+  constant COND_PSCAEM		: std_logic_vector(5 downto 0) :=  "010100";
+  constant COND_PSCEM			: std_logic_vector(5 downto 0) :=  "010101";
+  constant COND_CTREQ0		: std_logic_vector(5 downto 0) :=  "010110";
+  constant COND_GREATER		: std_logic_vector(5 downto 0) :=  "010111";
+  constant COND_NSPREQ		: std_logic_vector(5 downto 0) :=  "011000";
+  constant COND_NSPACK		: std_logic_vector(5 downto 0) :=  "011001";
+  constant COND_FG				: std_logic_vector(5 downto 0) :=  "011010";
+  constant COND_ABOVE			: std_logic_vector(5 downto 0) :=  "011011";
+  constant COND_SPECIAL		: std_logic_vector(5 downto 0) :=  "011100";
+  constant COND_YEQNEG		: std_logic_vector(5 downto 0) :=  "011101";
+  constant COND_FA				: std_logic_vector(5 downto 0) :=  "011110";
+	constant COND_ADLCY			: std_logic_vector(5 downto 0) :=  "011111";
+  constant COND_VE_RDY    : std_logic_vector(5 downto 0) :=  "100000"; --New CJ
 
 --------------------------------------------------------------------------------
 	-- Constants for CLC.

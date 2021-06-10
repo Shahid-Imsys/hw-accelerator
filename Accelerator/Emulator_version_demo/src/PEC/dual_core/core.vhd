@@ -433,6 +433,7 @@ architecture struct of core is
   -- Microprogram loading signal --CJ
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
+  signal mpgmin : std_logic_vector(127 downto 0);
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -467,7 +468,7 @@ begin
         if ddi_vld = '0' and vldl = '1' then  --act at falling_edge of ddi_vld signal
             ld_mpgm <= '0';
         else
-            ld_mpgm <= pl(100) and pl(98);
+            ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97);
         end if;
   end process;
 
@@ -561,8 +562,8 @@ begin
       pmem_ce_n   => pmem_ce_n);    
 
   --mprom_a     <= mpga;
-  mpram_d     <= udo;
-  mpram_we_n  <= mpram_we_nint and lmpwe_n;
+  mpram_d     <= mpgmin when ld_mpgm = '1' else udo; --CJ
+  mpram_we_n  <= ddi_vld when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;
 
@@ -1066,7 +1067,8 @@ begin
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,             
-      d_cke       => dcke_o);              
+      d_cke       => dcke_o,
+      mpgmin     => MPGMM_IN);              
 
 ---------------------------------------------------------------------
 -- MPLL

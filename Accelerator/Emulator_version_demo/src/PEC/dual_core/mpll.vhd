@@ -109,6 +109,8 @@ begin
         if rst_cn = '0' then
             udo <= (others => '0');
         elsif clk_c2_pos = '0' then
+            --CC load
+            --CJ 
             if wmlat = '1' then     
               -- SP load
               --for i in 9 downto 0 loop

@@ -898,7 +898,7 @@ begin
     signal dfm_int      : std_logic_vector(7 downto 0);
     signal direct_int   : std_logic_vector(7 downto 0);    
   begin  -- block dtmc
-    dtm_mux_sel <= pl(119 downto 118); --CJ Added
+    dtm_mux_sel <= pl(117 downto 116); --CJ Added
     init_mpgm_rq <= "01111111001111110000000000000000"; --initial request data, send to ddq_o when exe is high
     -- This process output signals held_ff, which is just the held_e
     -- input signal clocked by clk_d, and dfm_kept, which is set after
@@ -987,12 +987,12 @@ begin
     -- This is the dfm demux. This block generates byte output to DSL 
     -- and direct bus. And double-speed transfer under the control of 
     -- dfm byte field in microcode to direct bus.
-    pl_dfm_byte <= pl(114 downto 111); --Use to select bytes in dfm --CJ
-    pl_sel_dfm_dst <= pl(100) & pl(98); --Internal destination of dfm --CJ
+    pl_dfm_byte <= pl(112 downto 109); --Use to select bytes in dfm --CJ
+    pl_sel_dfm_dst <= pl(106) & pl(100); --Internal destination of dfm --CJ
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if pl_sel_dfm_dst = "01" then --Load data in dfm to demux register
+            if pl_sel_dfm_dst = "00" then --Load data in dfm to demux register
                 if clk_e_neg = '1' and dbl_direct_int = '1' then
                     dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                   --next byte of current selected byte by microinsteuctions
@@ -1002,13 +1002,13 @@ begin
                     m_direct <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                     --dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                 end if;
-            elsif pl_sel_dfm_dst = "10" then --Load data in dfm to vector engine
+            elsif pl_sel_dfm_dst = "01" then --Load data in dfm to vector engine
                 if clk_e_pos = '1' then
                     ve_in_reg <= dfm_reg(63 downto 0);
                 elsif clk_e_neg = '1' then
                     ve_in_reg <= dfm_reg(127 downto 64);
                 end if;
-            elsif pl_sel_dfm_dst = "11" then
+            elsif pl_sel_dfm_dst = "10" then
                 if clk_e_pos = '1' then
                     MPGMM_IN <= dfm_reg;
                 end if;

@@ -45,7 +45,7 @@ entity sct is
 		pl_cond			: in  std_logic_vector(5 downto 0);
 		pl_cpol			: in  std_logic;                    
 		pl_ad				: in  std_logic_vector(11 downto 0);
-		mpgm_ld         : in std_logic; --Added by CJ
+		ld_mpgm         : in std_logic; --Added by CJ
 		-- Control inputs
 		ira1				: in  std_logic;  -- SPECIAL flip-flop
 		ira2				: in  std_logic;  -- PSCTR carry-out flip-flop (from GMEM)
@@ -115,6 +115,7 @@ architecture rtl of sct is
 	signal err_push			: std_logic;	-- Registered push error signal
 	signal errcode			: std_logic_vector(1 downto 0);		-- Error code
 	signal rin_int			: std_logic_vector(11 downto 0);	-- Internal copy of rin
+	signal ld_mpgm_int          : std_logic;  --CJ
 
 begin
 	-- Create named signals for overlapping microprogram fields.
@@ -245,7 +246,7 @@ begin
 				end if;
 			------------------------------------------------------------------------
 			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.--CJ
-			    if mpgm_ld = '1' then
+			    if ld_mpgm = '1' then
 					if dfm_vld = '1' then
 						mpa_int := pc_pc_pc;
 					elsif dfm_vld = '0' and vldl = '1' then

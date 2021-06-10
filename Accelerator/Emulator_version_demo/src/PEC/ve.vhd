@@ -51,7 +51,15 @@ entity ve is
         --Data inputs
         VE_IN     :            in std_logic_vector(63 downto 0);
         --Data outputs
-        VE_OUT    :            out std_logic_vector(7 downto 0)
+        VE_OUT_A    :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF0 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF1 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF2 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF3 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF4 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF5 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF6 :          out std_logic_vector(7 downto 0);  --Output to DSL
+        VE_OUT_BUF7 :          out std_logic_vector(7 downto 0)   --Output to DSL
        );
 end entity ve;
 
@@ -70,9 +78,19 @@ END COMPONENT;
 COMPONENT mult_gen_0
   PORT (
     CLK : IN STD_LOGIC;
+    CE  : IN STD_LOGIC;
     A : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
     P : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+  );
+END COMPONENT;
+COMPONENT dist_mem_gen_0
+  PORT (
+    a : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    d : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    clk : IN STD_LOGIC;
+    we : IN STD_LOGIC;
+    spo : OUT STD_LOGIC_VECTOR(63 DOWNTO 0)
   );
 END COMPONENT;
 
@@ -128,6 +146,38 @@ END COMPONENT;
     signal dfy_reg   : dfy_word;
     signal re_start_reg : std_logic; --RE start latch
     signal ve_start_reg : std_logic; --VE start latch
+    signal mode_a_reg  : std_logic;
+    signal mode_b_reg  : std_logic;
+    signal reload_ve   : std_logic;
+    signal reload_re   : std_logic;
+    signal rst_i       : std_logic;
+    signal sclr        : std_logic_vector(7 downto 0); --For clear accumulator 0-7
+    signal buf_out_l  : std_logic_vector(63 downto 0);
+    signal buf_out_r  : std_logic_vector(63 downto 0);
+    signal mul_out_0  : std_logic_vector(15 downto 0);
+    signal mul_out_1  : std_logic_vector(15 downto 0);
+    signal mul_out_2  : std_logic_vector(15 downto 0);
+    signal mul_out_3  : std_logic_vector(15 downto 0);
+    signal mul_out_4  : std_logic_vector(15 downto 0);
+    signal mul_out_5  : std_logic_vector(15 downto 0);
+    signal mul_out_6  : std_logic_vector(15 downto 0);
+    signal mul_out_7  : std_logic_vector(15 downto 0);
+    signal acc_out_0  : std_logic_vector(23 downto 0);
+    signal acc_out_1  : std_logic_vector(23 downto 0);
+    signal acc_out_2  : std_logic_vector(23 downto 0);
+    signal acc_out_3  : std_logic_vector(23 downto 0);
+    signal acc_out_4  : std_logic_vector(23 downto 0);
+    signal acc_out_5  : std_logic_vector(23 downto 0);
+    signal acc_out_6  : std_logic_vector(23 downto 0);
+    signal acc_out_7  : std_logic_vector(23 downto 0);
+    signal acc_out_8  : std_logic_vector(23 downto 0);
+    signal acc_out_a  : std_logic_vector(31 downto 0);
+    signal bypass     : std_logic;
+    signal sram_in    : std_logic_vector(63 downto 0);
+    signal sram_l_cs  : std_logic;
+    signal sram_r_cs  : std_logic;
+    --signal sramr_in    : std_logic_vector(63 downto 0);
+
 
     signal addr_p_l  : std_logic_vector(7 downto 0);
     signal addr_p_r  : std_logic_vector(7 downto 0);
@@ -147,7 +197,8 @@ END COMPONENT;
     constant VE_OFFSET_R     : std_logic_vector(4 downto 0) := x"0a"; --right offset
     constant VE_DEPTH_L      : std_logic_vector(4 downto 0) := x"0b"; --left depth
     constant VE_JUMP_L       : std_logic_vector(4 downto 0) := x"0c"; --left jump
-    constant DFY             : std_logic_vector(4 downto 0) := x"0d"; --write DFY 
+    constant DFY             : std_logic_vector(4 downto 0) := x"0d"; --write DFY
+    constant ACC_CLR         : std_logic_vector(4 downto 0) := x"1e"; --clear accumulator 
     constant MAC_SWITCH      : std_logic_vector(4 downto 0) := x"1f"; --write the multiplier control register
 
 
@@ -162,8 +213,11 @@ begin
     reg_in    <= PL(105 downto 101);
     mode_a    <= PL(98);
     mode_b    <= PL(97);
-    reload    <= PL(107); --ADDR_VE_RELOAD
-
+    reload_ve    <= PL(107); --ADDR_VE_RELOAD
+    reload_re <= PL(99);
+    --
+    rst_i <= RST;
+    sram_in <= VE_IN;
     reg_write: process(clk_p)
     begin
         if rising_edge(clk_p) and clk_e_neg = '1' then --clk_e_neg
@@ -193,6 +247,8 @@ begin
                 jump_l <= YBUS;
             elsif reg_in = DFY then
                 dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
+            elsif reg_in = ACC_CLR then
+                mul_ctl <= YBUS;
             elsif reg_in = MAC_SWITCH then
                 mul_ctl <= YBUS;
             end if;
@@ -202,9 +258,10 @@ begin
 --Receive Engine
 ----------------------------------------------------------------------------------
     re_start_latch: process(re_start,re_loop,reload)
+    begin
         if re_start = '1' then
             re_start_reg <= '1';
-        else if re_loop = (re_loop'range => '0') and reload = '0' then
+        elsif re_loop = (re_loop'range => '0') then
             re_start_reg <= '0';
         end if;
     end process;
@@ -218,13 +275,13 @@ begin
                 re_loop <= (others => '0');
             elsif re_source = '0' and re_start_reg = '1' and re_loop /= (re_loop'range => '0') and DDI_VLD = '1' then
 
-                re_loop <= re_loop -1;
+                re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
 
                 if mode_a = '1' then
                     if reload = '1' then
                         re_addr_l <= re_saddr_l;
                     else
-                        re_addr_l <= re_addr_l +1;
+                        re_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_l))+1,8));
                     end if;
                 end if;
 
@@ -232,12 +289,12 @@ begin
                     if reload = '1' then
                         re_addr_r <= re_saddr_r;
                     else
-                        re_addr_r <= re_addr_r +1;
+                        re_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_r))+1,8));
                     end if;
                 end if;
-            elsif re_start_reg = '1' and re_loop = (re_loop'range => '0') then
+            elsif re_start_reg = '0' and re_loop = (re_loop'range => '0') then
                 if reload = '1' then
-                    re_loop <= re_loop_reg -1;
+                    re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
                 end if;
             end if;
         end if;
@@ -249,12 +306,12 @@ begin
             if RST = '1' then
                 re_addr_a <= (others => '0');
                 re_addr_b <= (others => '0');
-            elsif re_source = '1' and re_start = '1' then
+            elsif re_source = '1' and re_start_reg = '1' then
                 if mode_a = '1' then
                     if reload = '1' then
                         re_addr_a <= re_saddr_a;
                     else
-                        re_addr_a <= re_addr_a +1;
+                        re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
                     end if;
                 end if;
                 
@@ -262,7 +319,7 @@ begin
                     if reload = '1' then
                         re_addr_b <= re_saddr_b;
                     else
-                        re_addr_b <= re_addr_b +1;
+                        re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
                     end if;
                 end if;
             end if;
@@ -279,14 +336,14 @@ begin
                 ve_addr_l <= (others => '0');
                 ve_addr_r <= (others => '0');
                 ve_loop <= (others => '0');
-            elsif ve_start = '1' and ve_loop /= (ve_loop'range => '0') then
-                ve_loop <= ve_loop -1;
+            elsif ve_start_reg = '1' and ve_loop /= (ve_loop'range => '0') then
+                ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
 
                 if mode_a = '1' then --active address pointer L
-                    if reload = '1' then --load starting address,controlled by first step signal
+                    if reload = '1' then --or internal_reload_l then --load starting address,controlled by first step signal
                         ve_addr_l <= ve_saddr_l;
                     else
-                        ve_addr_l <= ve_addr_l + step_l + jump_l + depth_l + offset_l; --calculate left address;
+                        ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l))+to_integer(unsigned(depth_l))+to_integer(unsigned(jump_l)),8)); --calculate left address;
                     end if;
                 end if;
     
@@ -294,10 +351,10 @@ begin
                     if reload = '1' then
                         ve_addr_r <= ve_saddr_r;
                     else
-                        ve_addr_r <= ve_addr_r + step_r + jump_r + depth_r + offset_r; --calculate left address;
+                        ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r))+ 1,8)); --calculate left address;
                     end if;
                 end if;
-            elsif ve_start = '1' and ve_loop = (ve_loop'range => '0') then
+            elsif ve_start_reg = '1' and ve_loop = (ve_loop'range => '0') then
                 if reload = '1' then
                     ve_loop <= ve_loop_reg;
                 end if;
@@ -310,7 +367,7 @@ begin
 ------------------------
     process
     begin
-        if re_start = '1' and re_source = '0' then --Use receive engine's address counter l and r
+        if re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
             if mode_a = '1' then
                 addr_p_l <= re_addr_l;
             end if;
@@ -318,13 +375,13 @@ begin
             if mode_b = '1' then
                 addr_p_r <= re_addr_r;
             end if;
-        elsif re_start = '1' and re_source = '1' then --Use receive engine's address counter a and b
+        elsif re_start_reg = '1' and re_source = '1' then --Use receive engine's address counter a and b
             if mode_a = '1' then
                 addr_p_l <= re_addr_a;
             elsif mode_b = '1' then
                 addr_p_l <= re_addr_b;
             end if;
-        elsif ve_start = '1' then --Use vector engine's address counter
+        elsif ve_start_reg = '1' then --Use vector engine's address counter
             if mode_a = '1' then
                 addr_p_l <= ve_addr_l;
             end if;
@@ -334,25 +391,170 @@ begin
             end if;
         end if;
     end process;
+sclr(7) <= not rst_i and acc_clr(7);
+sclr(6) <= not rst_i and acc_clr(6);
+sclr(5) <= not rst_i and acc_clr(5);
+sclr(4) <= not rst_i and acc_clr(4);
+sclr(3) <= not rst_i and acc_clr(3);
+sclr(2) <= not rst_i and acc_clr(2);
+sclr(1) <= not rst_i and acc_clr(1);
+sclr(0) <= not rst_i and acc_clr(0);
 
 accu_0 : c_accum_0
   PORT MAP (
-    B => B,
-    CLK => CLK,
-    CE => CE,
+    B => mul_out_0,
+    CLK => CLK_P,
+    CE => mul_ctl(0),
+    BYPASS => bypass, --NOT USED
+    SCLR => sclr(0),
+    Q => acc_out_0
+  );
+  accu_1 : c_accum_0
+  PORT MAP (
+    B => mul_out_1,
+    CLK => CLK_P,
+    CE => mul_ctl(1),
     BYPASS => BYPASS,
-    SCLR => SCLR,
-    Q => Q
+    SCLR => sclr(1),
+    Q => acc_out_1
+  );
+  accu_2 : c_accum_0
+  PORT MAP (
+    B => mul_out_2,
+    CLK => CLK_P,
+    CE => mul_ctl(2),
+    BYPASS => BYPASS,
+    SCLR => sclr(2),
+    Q => acc_out_2
+  );
+  accu_3 : c_accum_0
+  PORT MAP (
+    B => mul_out_3,
+    CLK => CLK_P,
+    CE => mul_ctl(3),
+    BYPASS => BYPASS,
+    SCLR => sclr(3),
+    Q => acc_out_3
+  );
+  accu_4 : c_accum_0
+  PORT MAP (
+    B => mul_out_4,
+    CLK => CLK_P,
+    CE => mul_ctl(4),
+    BYPASS => BYPASS,
+    SCLR => sclr(4),
+    Q => acc_out_4
+  );
+  accu_5 : c_accum_0
+  PORT MAP (
+    B => mul_out_5,
+    CLK => CLK_P,
+    CE => mul_ctl(5),
+    BYPASS => BYPASS,
+    SCLR => sclr(5),
+    Q => acc_out_5
+  );
+  accu_6 : c_accum_0
+  PORT MAP (
+    B => mul_out_6,
+    CLK => CLK_P,
+    CE => mul_ctl(6),
+    BYPASS => BYPASS,
+    SCLR => sclr(6),
+    Q => acc_out_6
+  );
+  accu_7 : c_accum_0
+  PORT MAP (
+    B => mul_out_7,
+    CLK => CLK_P,
+    CE => mul_ctl(7),
+    BYPASS => BYPASS,
+    SCLR => sclr(7),
+    Q => acc_out_7
   );
   mul_0 : mult_gen_0
   PORT MAP (
-    CLK => CLK,
-    A => A,
-    B => B,
-    P => P
+    CLK => CLK_P,
+    CE  => mul_ctl(0),
+    A => buf_out_l(7 downto 0),
+    B => buf_out_r(7 downto 0),
+    P => mul_out_0
   );
-            
-    
+  mul_1 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(1),
+    A => buf_out_l(15 downto 8),
+    B => buf_out_r(15 downto 8),
+    P => mul_out_1
+  );
+  mul_2 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(2),
+    A => buf_out_l(23 downto 16),
+    B => buf_out_r(23 downto 16),
+    P => mul_out_2
+  );
+  mul_3 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(3),
+    A => buf_out_l(31 downto 24),
+    B => buf_out_r(31 downto 24),
+    P => mul_out_3
+  );
+  mul_4 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(4),
+    A => buf_out_l(39 downto 32),
+    B => buf_out_r(39 downto 32),
+    P => mul_out_4
+  );
+  mul_5 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(5),
+    A => buf_out_l(47 downto 40),
+    B => buf_out_r(47 downto 40),
+    P => mul_out_5
+  );
+  mul_6 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(6),
+    A => buf_out_l(55 downto 48),
+    B => buf_out_r(55 downto 48),
+    P => mul_out_6
+  );
+  mul_7 : mult_gen_0
+  PORT MAP (
+    CLK => CLK_P,
+    CE  => mul_ctl(7),
+    A => buf_out_l(63 downto 56),
+    B => buf_out_r(63 downto 56),
+    P => mul_out_7
+  );
+  buf_0 : dist_mem_gen_0
+  PORT MAP (
+    a => addr_p_l,
+    d => sram_in,
+    clk => clk_p,
+    we => sram_l_cs, --
+    spo => buf_out_l
+  );
+  buf_1 : dist_mem_gen_0
+  PORT MAP (
+    a => addr_p_r,
+    d => sram_in,
+    clk => clk_p,
+    we => sram_r_cs,
+    spo => buf_out_r
+  );
+  --Overall accumulator
+  
+  end architecture;  
                     
 
                  

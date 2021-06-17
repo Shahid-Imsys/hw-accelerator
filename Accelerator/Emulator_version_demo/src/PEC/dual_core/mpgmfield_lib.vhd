@@ -325,7 +325,10 @@ package mpgmfield_lib is
   constant COND_YEQNEG		: std_logic_vector(5 downto 0) :=  "011101";
   constant COND_FA				: std_logic_vector(5 downto 0) :=  "011110";
 	constant COND_ADLCY			: std_logic_vector(5 downto 0) :=  "011111";
-  constant COND_VE_RDY    : std_logic_vector(5 downto 0) :=  "100000"; --New CJ
+  constant COND_VE_RDY    : std_logic_vector(5 downto 0) :=  "100000"; --Added by CJ
+  constant COND_RE_RDY    : std_logic_vector(5 downto 0) :=  "100001"; --Added by CJ
+  constant COND_DFM_RDY   : std_logic_vector(5 downto 0) :=  "100010"; --Added by CJ
+  constant COND_FIFO_RDY  : std_logic_vector(5 downto 0) :=  "100011"; --Added by CJ
 
 --------------------------------------------------------------------------------
 	-- Constants for CLC.

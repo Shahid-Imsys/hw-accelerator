@@ -66,6 +66,11 @@ entity dsl is
     gdata         : in  std_logic_vector(7 downto 0);
     dtal          : in  std_logic_vector(7 downto 0);
     dfp           : in  std_logic_vector(7 downto 0);
+    --CJ START ADDED
+    VE_OUT_A    :          in std_logic_vector(7 downto 0);  
+    VE_OUT_SING  :          in std_logic_vector(7 downto 0);  
+    --CJ END
+
     -- Control Output
     flag_yeqneg   : out std_logic;  
     load_b        : out std_logic;  
@@ -89,10 +94,11 @@ architecture rtl of dsl is
   signal mp_llfrg    : std_logic;
   signal mp_dsg      : std_logic;
   signal d_sign_int  : std_logic;
+  signal ve_data_sel : std_logic_vector(7 downto 0); --VE input 0-7 selector, Added by CJ
   
   -- Microprogram fields
   signal pl_sig6    : std_logic_vector(3 downto 0);  
-  signal pl_sig5       : std_logic_vector(3 downto 0);  
+  signal pl_sig5       : std_logic_vector(4 downto 0);  --Added one more bits by CJ
   signal pl_sig4   : std_logic;        
   signal pl_sig18  : std_logic_vector(3 downto 0);  
   signal pl_sig12     : std_logic; 
@@ -102,53 +108,57 @@ begin
   alu_flags <= inv_psmsb & trace & flag_oflow & flag_neg & flag_link &
                flag_zero & flag_pccy & flag_carry;
   pl_sig6  <= (pl(7) xor pl(36))&(pl(8) xor pl(50))&(pl(30) xor pl(62))&(pl(29) xor pl(10));
-  pl_sig5     <= pl(50)&pl(22)&pl(14)&pl(44);
+  pl_sig5     <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44); --Added one more bits by CJ
   pl_sig4 <= pl(45);
   D_source_selector : process (pl_sig4, pl_sig5, pl_sig6, alu_flags,
                                latch_int, y_reg, mbmd, gctr, crb_out, dfm,
                                dfio, dsi, gdata, dtal, dfp, yprio, d_sign_int)
   begin
     if pl_sig4 = '0' then	--CONSTANT
-      d_int <= pl_sig5 & pl_sig6;
+      d_int <= pl_sig5(3 downto 0) & pl_sig6;
     else
       case pl_sig5 is
-        when "0000" =>		--DSIGN
+        when "00000" =>		--DSIGN
           if d_sign_int = '0' then
           	d_int <= x"00";
           else
           	d_int <= x"FF";
           end if;  
-        when "0001" =>		--ALL FLAGS
+        when "00001" =>		--ALL FLAGS
           d_int <= alu_flags;
-        when "0010" =>		--LATCH
+        when "00010" =>		--LATCH
           d_int <= latch_int;
-        when "0011" =>		--YSWAPPED
+        when "00011" =>		--YSWAPPED
           d_int <= y_reg(3 downto 0) & y_reg(7 downto 4);
-        when "0100" =>		--Y
+        when "00100" =>		--Y
           d_int <= y_reg;
-        when "0101" =>		--MBM
+        when "00101" =>		--MBM
           d_int <= mbmd;
-        when "0110" =>		--GCTR
+        when "00110" =>		--GCTR
           d_int <= gctr;
-        when "0111" =>		--CRB
+        when "00111" =>		--CRB
           d_int <= crb_out;
-        when "1000" =>		--MEM
+        when "01000" =>		--MEM
           d_int <= dfm;
-        when "1001" =>		--INDATA
+        when "01001" =>		--INDATA
           d_int <= dfio;
-        when "1010" =>		--CU
+        when "01010" =>		--CU
           d_int <= dsi;	
-        when "1011" =>		--YFLIPPED
+        when "01011" =>		--YFLIPPED
           d_int <= y_reg(0) & y_reg(1) & y_reg(2) & y_reg(3) &
                    y_reg(4) & y_reg(5) & y_reg(6) & y_reg(7);
-        when "1100" =>		--G
+        when "01100" =>		--G
           d_int <= gdata;
-        when "1101" =>		--SP
+        when "01101" =>		--SP
           d_int <= dtal;
-        when "1110" =>		--PORT
+        when "01110" =>		--PORT
           d_int <= dfp;
-        when "1111" =>		--YPRIO
+        when "01111" =>		--YPRIO
           d_int <= yprio;
+        when "10000" =>
+          d_int <= VE_OUT_A; --Overall accumulator from VE; --Added by CJ
+        when "10001" =>
+          d_int <= VE_OUT_SING; --Single accumulator from VE; --Added by CJ
         when others => null;
       end case;
     end if;

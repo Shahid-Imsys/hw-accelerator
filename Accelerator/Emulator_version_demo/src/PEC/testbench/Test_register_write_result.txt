@@ -1,0 +1,42 @@
+New value @ core_addressReCounterLeft = 1
+New value @ core_addressReCounterRight = 2
+New value @ core_loopReCounter = 3
+New value @ core_PushBack_A_Addr = 4
+New value @ core_PushBack_B_Addr = 5
+New value @ core_addressVeCounterLeft = 6
+New value @ core_addressVeCounterRight = 7
+New value @ core_loopVeCounter = 8
+New value @ core_stepVeLeft = 9
+New value @ core_stepVeRight = 10
+New value @ core_depthVeLeft = 11
+New value @ core_jumpVeLeft = 12
+New value @ core_macs_on = 255
+
+New value @ core_addressReCounterLeft = 64
+New value @ core_addressReCounterRight = 65
+New value @ core_loopReCounter = 66
+New value @ core_PushBack_A_Addr = 67
+New value @ core_PushBack_B_Addr = 68
+New value @ core_addressVeCounterLeft = 69
+New value @ core_addressVeCounterRight = 70
+New value @ core_loopVeCounter = 71
+New value @ core_stepVeLeft = 72
+New value @ core_stepVeRight = 73
+New value @ core_depthVeLeft = 74
+New value @ core_jumpVeLeft = 75
+New value @ core_macs_on = 64
+
+New value @ core_addressReCounterLeft = 128
+New value @ core_addressReCounterRight = 129
+New value @ core_loopReCounter = 130
+New value @ core_PushBack_A_Addr = 131
+New value @ core_PushBack_B_Addr = 132
+New value @ core_addressVeCounterLeft = 133
+New value @ core_addressVeCounterRight = 134
+New value @ core_loopVeCounter = 135
+New value @ core_stepVeLeft = 136
+New value @ core_stepVeRight = 137
+New value @ core_depthVeLeft = 138
+New value @ core_jumpVeLeft = 139
+New value @ core_macs_on = 140
+

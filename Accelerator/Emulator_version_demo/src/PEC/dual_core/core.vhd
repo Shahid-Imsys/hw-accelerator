@@ -381,6 +381,8 @@ architecture struct of core is
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
   signal latch        : std_logic_vector(7  downto 0);
+  signal ve_out_a_int : std_logic_vector(7 downto 0); --Added by CJ      
+  signal ve_out_sing_int : std_logic_vector(7 downto 0); --Added by CJ     
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -434,6 +436,10 @@ architecture struct of core is
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
+  --Vector engine signal
+  signal ve_in_int  : std_logic_vector(63 downto 0);
+  signal ve_rdy_int : std_logic;
+  signal re_rdy_int : std_logic;
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -979,6 +985,9 @@ begin
       gdata         => gdata,            
       dtal          => dtal,             
       dfp           => dfp,
+      --CJ added
+      VE_OUT_A      => ve_out_a_int,
+      VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
       load_b        => open,       
@@ -1068,7 +1077,7 @@ begin
       d_ba        => dba_o,              
       d_dqm       => ddqm,             
       d_cke       => dcke_o,
-      mpgmin     => MPGMM_IN);              
+      MPGMM_IN     => mpgmin);              
 
 ---------------------------------------------------------------------
 -- MPLL
@@ -1187,8 +1196,23 @@ begin
       iomem_a        => iomem_a,
       iomem_d        => iomem_d,
       iomem_q        => iomem_q);
-     
-     
+
+      --CJ Added
+      vector_engine : entity work.ve
+      port map(
+      CLK_P       => clk_p,
+      CLK_E_POS   => clk_e_pos_int,
+      CLK_E_NEG   => clk_e_neg_int,
+      RST         => rst_en_int,
+      PL          => pl,
+      YBUS        => ybus,
+      DDI_VLD     => ddi_vld,
+      RE_RDY      => re_rdy_int,
+      VE_RDY      => ve_rdy_int,
+      VE_IN       => ve_in_int,
+      VE_OUT_A    => ve_out_a_int,
+      VE_OUT_SING => ve_out_sing_int
+      );
 end;
 
 

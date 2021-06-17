@@ -123,6 +123,7 @@ begin
 	pl_aux1		<= pl_cond(4 downto 2);
 	pl_aux2		<= pl_cond(1 downto 0);
 	pl_bitmsk	<= pl_cond(3 downto 0);
+	ld_mpgm_int <= ld_mpgm;
 
 --------------------------------------------------------------------------------
 	-- Sequence control decode.
@@ -246,7 +247,7 @@ begin
 				end if;
 			------------------------------------------------------------------------
 			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.--CJ
-			    if ld_mpgm = '1' then
+			    if ld_mpgm_int = '1' then
 					if dfm_vld = '1' then
 						mpa_int := pc_pc_pc;
 					elsif dfm_vld = '0' and vldl = '1' then

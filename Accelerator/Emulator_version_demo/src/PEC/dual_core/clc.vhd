@@ -200,7 +200,7 @@ begin
       pl_cond      => pl_sig1,
       pl_cpol      => pl_sig2,
       pl_ad        => pl_sig8,
-      mpgm_ld      => pl_ld_mpgm, --Added by CJ
+      ld_mpgm      => pl_ld_mpgm, --Added by CJ
       ira1         => special,
       ira2         => ira2,
       st_full      => st_full,

@@ -896,9 +896,11 @@ begin
 
     -- Signals needed just because VHDL is stupid 
     signal dfm_int      : std_logic_vector(7 downto 0);
-    signal direct_int   : std_logic_vector(7 downto 0);    
+    signal direct_int   : std_logic_vector(7 downto 0); 
+    signal fifo_push    : std_logic;   
   begin  -- block dtmc
     dtm_mux_sel <= pl(117 downto 116); --CJ Added
+    fifo_push <= pl(114);
     init_mpgm_rq <= "01111111001111110000000000000000"; --initial request data, send to ddq_o when exe is high
     -- This process output signals held_ff, which is just the held_e
     -- input signal clocked by clk_d, and dfm_kept, which is set after
@@ -988,11 +990,11 @@ begin
     -- and direct bus. And double-speed transfer under the control of 
     -- dfm byte field in microcode to direct bus.
     pl_dfm_byte <= pl(112 downto 109); --Use to select bytes in dfm --CJ
-    pl_sel_dfm_dst <= pl(106) & pl(100); --Internal destination of dfm --CJ
+    --pl_sel_dfm_dst <= pl(106) & pl(100); --Internal destination of dfm --CJ
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if pl_sel_dfm_dst = "00" then --Load data in dfm to demux register
+            --if pl_sel_dfm_dst = "00" then --Load data in dfm to demux register
                 if clk_e_neg = '1' and dbl_direct_int = '1' then
                     dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                   --next byte of current selected byte by microinsteuctions
@@ -1002,23 +1004,23 @@ begin
                     m_direct <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                     --dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                 end if;
-            elsif pl_sel_dfm_dst = "01" then --Load data in dfm to vector engine
+            --elsif pl_sel_dfm_dst = "01" then --Load data in dfm to vector engine
                 if clk_e_pos = '1' then
                     ve_in_reg <= dfm_reg(63 downto 0);
                 elsif clk_e_neg = '1' then
                     ve_in_reg <= dfm_reg(127 downto 64);
                 end if;
-            elsif pl_sel_dfm_dst = "10" then
+            --elsif pl_sel_dfm_dst = "10" then
                 if clk_e_pos = '1' then
                     MPGMM_IN <= dfm_reg;
                 end if;
-            else
-                m_direct <= (others =>'Z');
-                ve_in_reg <= (others => 'Z');
-                MPGMM_IN <= (others => 'Z');
+            --else
+                --m_direct <= (others =>'Z');
+                --ve_in_reg <= (others => 'Z');
+                --MPGMM_IN <= (others => 'Z');
                 
             end if;
-        end if;
+        --end if;
     end process;                    
   -----CJ-----              
     -- m_direct is the direct data bus from memory. It will always be driven
@@ -1044,12 +1046,11 @@ begin
 
     -- This is the DTM register. It is loaded from direct, dbus or ybus
     -- when ld_dtm is set.
-    process (clk_p)
+    process (ld_dtm, ybus, dbus, direct_int, rst_en)
     begin
-        if rising_edge(clk_p) then
             if rst_en = '0' then
                 dtm_mux <= x"00"; --CJ
-            elsif ld_dtm = '1' and clk_e_pos = '0' then
+            elsif ld_dtm = '1'  then
                 if use_direct_int = '1' then
                     dtm_mux <= direct_int;
                 elsif sely_d = '1' then
@@ -1058,7 +1059,6 @@ begin
                     dtm_mux <= dbus;--CJ
                 end if;
             end if;
-        end if;
     end process;
 
     -- This is the dtm_even register, the even address part of the data
@@ -1086,8 +1086,9 @@ begin
     --                         and gate_e = '1') else
     --          dtm_mux;
     
-    process(clk_e_pos, clk_e_neg,ld_dtm)
+    process(clk_p,clk_e_pos,ld_dtm)
     begin
+      if rising_edge(clk_p) then
         if ld_dtm = '1' then
           if dbl_direct_int = '1' then
             if clk_e_pos = '1' then
@@ -1100,15 +1101,19 @@ begin
             dtm_demux(to_integer(unsigned(dtm_mux_sel))) <= dtm_mux;
             end if;
           end if;
-        end if; 
+        end if;
+      end if; 
     end process; 
-    process(en_dqo_int)
-    begin 
-      if en_dqo_int = '1' then
-        d_dqo <= dtm_demux(3) & dtm_demux(2) & dtm_demux(1) & dtm_demux(0);
-      elsif exe = '1' then
-        d_dqo <= init_mpgm_rq; --
-        d_dqo <= (others => '-');
+    process(clk_p,fifo_push)
+    begin
+      if rising_edge(clk_p) and clk_e_pos = '1' then
+        if fifo_push = '1' then
+          d_dqo <= dtm_demux(3) & dtm_demux(2) & dtm_demux(1) & dtm_demux(0);
+        elsif exe = '1' then
+          d_dqo <= init_mpgm_rq;
+        else --
+          d_dqo <= (others => '-');
+        end if;
       end if;
     end process;
     -----CJ-----             

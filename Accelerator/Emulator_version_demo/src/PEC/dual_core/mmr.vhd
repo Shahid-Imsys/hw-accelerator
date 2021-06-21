@@ -32,6 +32,7 @@
 -- 2014-07-18       3.0             MN          Add out of line indicator for flash by detecting both the state machine and the adl
 -- 2014-06-15       3.1             MN          One line of flash is changed to 4x4=16 bytes
 -- 2015-08-12       3.2             MN          add page_changed flag
+-- 2021-06-18       4.1             CJ          Expand DTM register to 32 bits. Can be filled byte by byte in 4 clk_e cycles.
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -1046,7 +1047,7 @@ begin
 
     -- This is the DTM register. It is loaded from direct, dbus or ybus
     -- when ld_dtm is set.
-    process (ld_dtm, ybus, dbus, direct_int, rst_en)
+    process (rst_en,ld_dtm,direct_int,ybus,dbus)
     begin
             if rst_en = '0' then
                 dtm_mux <= x"00"; --CJ
@@ -1096,17 +1097,15 @@ begin
             elsif clk_e_neg = '1' then
             dtm_demux(to_integer(unsigned(dtm_mux_sel)+1)) <= dtm_mux;
             end if;
-          else
-            if clk_e_pos = '1' then
+          elsif clk_e_pos = '0' then
             dtm_demux(to_integer(unsigned(dtm_mux_sel))) <= dtm_mux;
-            end if;
           end if;
         end if;
       end if; 
     end process; 
     process(clk_p,fifo_push)
     begin
-      if rising_edge(clk_p) and clk_e_pos = '1' then
+      if rising_edge(clk_p) and clk_e_pos = '0' then
         if fifo_push = '1' then
           d_dqo <= dtm_demux(3) & dtm_demux(2) & dtm_demux(1) & dtm_demux(0);
         elsif exe = '1' then

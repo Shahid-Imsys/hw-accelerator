@@ -48,7 +48,7 @@ entity req_dst_logic is
         REQ_TO_NOC : out std_logic;
         REQ_SIG   : in std_logic_vector(63 downto 0);
         ACK_SIG   : out std_logic_vector(63 downto 0);
-        PE_REQ_IN    : in pe_req;
+        PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
         OUTPUT    : out std_logic_vector(31 downto 0);
         RD_FIFO   : in std_logic;
         FOUR_WD_LEFT : out std_logic;
@@ -95,35 +95,40 @@ END COMPONENT;
     signal empty   : std_logic;
     signal almost_empty : std_logic;
     signal wr_req  : std_logic;
-    signal ack_sig_i :std_logic_vector(63 downto 0);
+    signal ack_sig_i :std_logic_vector(63 downto 0); --Will be replaced with a DTM fifo signal.
     signal loop_c  : integer := 0;
     signal chain   : std_logic;
 
 
 begin
-    --Recognize the write request and hold the wr_req signal for 4 clock cycles.--when will the request come?
+    --Recognize the write request and hold the wr_req signal for 4 clock cycles.
     process(clk_p)
     --variable loop_c : integer:= 0;
     begin
         if rising_edge(clk_p) and clk_e_neg = '0' then
-            loop_c <= loop_c + 1;
-            if loop_c = 1 then
-                if pe_mux_out(31)= '1' and pe_mux_out(30) = '1' then
+            --loop_c <= loop_c + 1;
+            if loop_c = 0 then
+                if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
                     wr_req <= '1';
-                else 
+                    loop_c <= 1;
+                else
+                    if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
+                        chain<= '1';
+                    else
+                        chain <= '0';
+                    end if;
                     wr_req <= '0';
                     loop_c <= 0;
                 end if;
-            elsif loop_c = 5 then
+            elsif loop_c = 4 then
                 wr_req <= '0';
                 loop_c <= 0;
+            else
+                loop_c <= loop_c + 1;
             end if;
         end if;
     end process;
             
-    --Chain bit
-    chain <= pe_mux_out(29) when wr_req = '0' else
-        '1';
 
 -------------------------------------------------------------
 --Polling mechanism
@@ -156,26 +161,22 @@ end process;
 process(poll_act,clk_p)
 --variable num : integer := 0;
 begin
-    if rising_edge(clk_p) then
+    if rising_edge(clk_p) and clk_e_neg = '0' then
         if poll_act = '1' then
-            ack_sig_i <= (others => '0');
             ack_sig_i(to_integer(unsigned(id_num))) <= '1';
-            --req_core (5 downto 0) <= id_num;
-            --id_num <= add_out;
-            wr <= '1';
         else
-            wr <= '0';
+            ack_sig_i <= (others =>'0');
         end if;
     end if;
 end process;
 ack_sig <= ack_sig_i;
 --Barrel Shifter
 
-process(clk_p, id_num, req_sig, poll_act)
+process(poll_act,req_sig)
 variable sh_0, sh_1, sh_2, sh_3, sh_4, sh_5 : std_logic_vector(63 downto 0);
 begin
     if poll_act = '1' then
-        if wr_req = '0' and chain ='0' then
+        --if wr_req = '0' and chain ='0' then
             if id_num(5) = '0' then
                 sh_5 := req_sig;
             elsif id_num(5) = '1' then
@@ -213,27 +214,27 @@ begin
             end if;
     
             bs_out <= sh_0;
-        elsif wr_req = '1' or chain = '1' then
-            bs_out <= (others =>'0');
-        end if;
+        --elsif wr_req = '1' or chain = '1' then
+        --    bs_out <= (others =>'0');
+        --end if;
     end if;
 end process;
 
 --Priority Encoder 
 
-process(clk_p,bs_out)
+process(req_sig, poll_act,bs_out)
 variable cnt : integer := 0;
 --variable scop : std_logic := '0';
 begin
-    if clk_e_neg = '0' then
-        if poll_act = '1' and wr_req = '0' and chain = '0' then
+    --if rising_edge(clk_p) and clk_e_neg = '0' then
+        if poll_act = '1' then
             cnt := 0;
             for i in 63 downto 0 loop
                 --scop:= scop or bs_out(i);
                 if bs_out(i) = '0'then
                     cnt := cnt+1;
                 elsif bs_out(i) = '1' then
-                    add_in_2 <= std_logic_vector(to_unsigned(cnt +1, 6));
+                    add_in_2 <= std_logic_vector(to_unsigned(cnt +1, 6)); --id"000001" is the first PE
                     --scop := '0';
                     exit;
                 end if;
@@ -241,37 +242,37 @@ begin
         else 
             add_in_2 <= (others => '0');
         end if;
-    end if;
+    --end if;
 end process;
 
 --Adder
-
-process(clk_p)
+add_in_1 <= id_num;
+process(add_in_2,wr_req,chain)
 begin
-    add_in_1 <= id_num;
-    if rising_edge(clk_p) and clk_e_neg = '0'then
+    --if rising_edge(clk_p) and clk_e_neg = '1'then
     --add_in_1 <= id_num;
-    if wr_req = '0' then
-        id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),6));
-    elsif wr_req = '1' then
-        id_num <= add_in_1;
-    end if;
-    end if;
+        if wr_req = '1' or chain = '1' then
+            id_num <= add_in_1;
+        else
+            id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),6));
+        end if;
+    --end if;
 end process;
 
 ----------------------------------------------------------------
 --Request Buffer
 ----------------------------------------------------------------
 --PE Mux
-process(ack_sig_i,id_num,loop_c)
+process(clk_p)
 begin
-    --if rising_edge(clk_p) then
-    if poll_act = '1' or wr_req = '1' then
-    pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle as req_sig is raised.
+    if rising_edge(clk_p) and clk_e_neg = '0' then
+        pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
     end if;
 end process;
 
 --Request FIFO
+
+wr <= poll_act;
 req_core <= pe_mux_out;
 fifo_rdy <= almost_full and rd;
 rd       <= RD_FIFO;

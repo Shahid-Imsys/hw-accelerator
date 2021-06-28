@@ -44,7 +44,6 @@ entity req_dst_logic is
         CLK_E_NEG     : in std_logic;
         RESET     : in std_logic;
         --Requet logic
-        --REQ_CORE  : out std_logic_vector(31 downto 0);
         REQ_TO_NOC : out std_logic;
         REQ_SIG   : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
@@ -52,7 +51,6 @@ entity req_dst_logic is
         OUTPUT    : out std_logic_vector(31 downto 0);
         RD_FIFO   : in std_logic;
         FOUR_WD_LEFT : out std_logic;
-        --DATA_CORE : in std_logic_vector(134 downto 0);
         --Distribution network
         DATA_NOC  : in std_logic_vector(127 downto 0);
         PE_UNIT   : in std_logic_vector(3 downto 0);
@@ -105,10 +103,8 @@ END COMPONENT;
 begin
     --Recognize the write request and hold the wr_req signal for 4 clock cycles.
     process(clk_p)
-    --variable loop_c : integer:= 0;
     begin
         if rising_edge(clk_p) and clk_e_neg = '0' then
-            --loop_c <= loop_c + 1;
             if loop_c = 0 then
                 if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
                     wr_req <= '1';
@@ -138,7 +134,6 @@ begin
 --Activation 
 process (clk_p, fifo_rdy, req_sig)
 begin
-    --if rising_edge(clk_e) then
     if reset = '1' then
             poll_act <= '0'; 
     elsif fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
@@ -146,22 +141,18 @@ begin
     else
             poll_act <= '0';
     end if;
-    --end if;
 end process;
 
 process(clk_p,req_sig)
 begin 
-    --if rising_edge(clk_p) then
         if req_sig /= (req_sig'range => '0') then
         REQ_TO_NOC <= '1';
         else
         REQ_TO_NOC <= '0';
         end if;
-    --end if;
 end process;
 --ID Number Register and write controller
 process(poll_act,clk_p)
---variable num : integer := 0;
 begin
     if rising_edge(clk_p) and clk_e_neg = '0' then
         if poll_act = '1' then
@@ -172,24 +163,13 @@ begin
     end if;
 end process;
 ack_sig <= ack_sig_i;
+
 --Barrel Shifter
 
 process(poll_act,req_sig)
 variable sh_0, sh_1, sh_2, sh_3 : std_logic_vector(15 downto 0);
 begin
     if poll_act = '1' then
-        --if wr_req = '0' and chain ='0' then
-            --if id_num(5) = '0' then
-            --    sh_5 := req_sig;
-            --elsif id_num(5) = '1' then
-            --    sh_5 := req_sig(31 downto 0) & req_sig(63 downto 32);
-            --end if;
-        
-            --if id_num(4) = '0' then
-            --    sh_4 := sh_5;
-            --elsif id_num(4) = '1' then
-            --    sh_4 := sh_5(47 downto 0) & sh_5(63 downto 48);
-            --end if;
         
             if id_num(3) = '0' then
                 sh_3 := req_sig;
@@ -216,9 +196,7 @@ begin
             end if;
     
             bs_out <= sh_0;
-        --elsif wr_req = '1' or chain = '1' then
-        --    bs_out <= (others =>'0');
-        --end if;
+
     end if;
 end process;
 
@@ -226,39 +204,37 @@ end process;
 
 process(req_sig, poll_act,bs_out)
 variable cnt : integer := 0;
---variable scop : std_logic := '0';
 begin
-    --if rising_edge(clk_p) and clk_e_neg = '0' then
+    
         if poll_act = '1' then
             cnt := 0;
             for i in 15 downto 0 loop
-                --scop:= scop or bs_out(i);
+                
                 if bs_out(i) = '0'then
                     cnt := cnt+1;
                 elsif bs_out(i) = '1' then
                     add_in_2 <= std_logic_vector(to_unsigned(cnt +1, 4)); --id"0001" is the first PE
-                    --scop := '0';
+                    
                     exit;
                 end if;
             end loop;
         else 
             add_in_2 <= (others => '0');
         end if;
-    --end if;
+    
 end process;
 
 --Adder
 add_in_1 <= id_num;
 process(add_in_2,wr_req,chain)
 begin
-    --if rising_edge(clk_p) and clk_e_neg = '1'then
-    --add_in_1 <= id_num;
+
         if wr_req = '1' or chain = '1' then
             id_num <= add_in_1;
         else
             id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
         end if;
-    --end if;
+    
 end process;
 
 ----------------------------------------------------------------

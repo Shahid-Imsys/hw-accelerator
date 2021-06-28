@@ -400,11 +400,13 @@ architecture struct of core is
   signal adl_cy     : std_logic;               
   signal mmr_hold_e : std_logic;               
   signal exe_i      : std_logic;      --Added by CJ
+  signal dfm_rdy    : std_logic; --CJ 
+  signal dtm_fifo_rdy : std_logic; --CJ
   -- MPLL signals
   signal lmpwe_n  : std_logic;
   signal udo      : std_logic_vector(127 downto 0);  --CJ
-  signal ldmp_sig  : std_logic;  
-  
+  signal ldmp_sig  : std_logic; 
+
   -- CPC signals
   signal rsc_n        : std_logic;
   signal stop_step    : std_logic;
@@ -854,7 +856,11 @@ begin
       psc_aempty    => psc_aempty,          
       psc_empty     => psc_empty,           
       flag_yeqneg   => flag_yeqneg,         
-      adl_cy        => adl_cy,              
+      adl_cy        => adl_cy,
+      re_rdy        => re_rdy_int, --Added by CJ
+      ve_rdy        => ve_rdy_int, --Added by CJ
+      dfm_rdy       => dfm_rdy,--Added by CJ
+      fifo_rdy      => dtm_fifo_rdy, --Added by CJ              
       --Data Inputs
       dbus          => dbus_int,                
       y_reg         => y_reg,

@@ -84,6 +84,10 @@ entity clc is
     psc_empty    : in  std_logic; 
     flag_yeqneg  : in  std_logic; 
     adl_cy       : in  std_logic; 
+    re_rdy       : in  std_logic;--Added by CJ
+    ve_rdy       : in  std_logic;--Added by CJ
+    dfm_rdy      : in  std_logic;--Added by CJ
+    fifo_rdy     : in  std_logic;--Added by CJ
     --Data Inputs
     dbus         : in  std_logic_vector(7 downto 0);   
     y_reg        : in  std_logic_vector(7 downto 0);   
@@ -469,7 +473,11 @@ begin
       when COND_SPECIAL => sel_cond <= special;       
       when COND_YEQNEG =>  sel_cond <= flag_yeqneg;   
       when COND_FA =>      sel_cond <= flag_fa;       
-      when COND_ADLCY =>   sel_cond <= adl_cy;        
+      when COND_ADLCY =>   sel_cond <= adl_cy;
+      when COND_VE_RDY   =>sel_cond <= ve_rdy; --Added by CJ
+      when COND_RE_RDY   =>sel_cond <= re_rdy; --Added by CJ
+      when COND_DFM_RDY  =>sel_cond <= dfm_rdy; --Added by CJ
+      when COND_FIFO_RDY =>sel_cond <= fifo_rdy; --Added by CJ        
       when others  => null;
     end case;
   end process;

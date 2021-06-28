@@ -116,7 +116,9 @@ END COMPONENT;
     --Receive engine signals
     signal re_start : std_logic;
     signal re_source : std_logic;
+    signal re_rdy_int : std_logic;
     --Vector engine signals
+    signal ve_rdy_int : std_logic;
     signal ve_start : std_logic;
     signal dfy_dest_sel : std_logic_vector(2 downto 0);
     --signal wr_st_addr:std_logic; --TBD
@@ -399,6 +401,7 @@ begin
             end if;
         end if;
     end process;
+    RE_RDY <= not re_start_reg;
 ----------------------------------------------------------------------------------
 --Vector Engine
 ----------------------------------------------------------------------------------
@@ -418,16 +421,16 @@ begin
                 ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
 
                 if sram_l_cs = '1' then --active address pointer L
-                        ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l))+to_integer(unsigned(depth_l))+to_integer(unsigned(jump_l))+1,8)); --calculate left address;
+                        ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l))+to_integer(unsigned(depth_l))+to_integer(unsigned(jump_l)),8)); --calculate left address;
                 end if;
     
                 if sram_r_cs = '1' then --active address pointer R
-                    ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r))+ 1,8)); --calculate left address;
+                    ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)),8)); --calculate left address;
                 end if;
             end if;
         end if;
     end process;
-    
+    VE_RDY <= not ve_start_reg;
 ------------------------
 --Address_MUX
 ------------------------

@@ -50,6 +50,7 @@ entity req_dst_logic is
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
         OUTPUT    : out std_logic_vector(31 downto 0);
         RD_FIFO   : in std_logic;
+        FIFO_VLD  : out std_logic;
         FOUR_WD_LEFT : out std_logic;
         --Distribution network
         DATA_NOC  : in std_logic_vector(127 downto 0);
@@ -74,6 +75,7 @@ COMPONENT fifo_generator_0
     empty : OUT STD_LOGIC;
     almost_empty : OUT STD_LOGIC;
     prog_empty : OUT STD_LOGIC;
+    valid      : OUT STD_LOGIC;
     data_count : OUT STD_LOGIC_VECTOR(9 downto 0)
   );
 END COMPONENT;
@@ -283,6 +285,7 @@ request_fifo : fifo_generator_0
     empty => empty,
     almost_empty => almost_empty,
     prog_empty => FOUR_WD_LEFT,
+    valid      => FIFO_VLD,
     data_count => data_in_fifo
   );
 end architecture;

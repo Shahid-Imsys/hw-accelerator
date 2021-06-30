@@ -30,6 +30,8 @@
 -- Revisions  :
 -- Date					Version		Author	Description
 -- 2020-8-21  		     1.0	     CJ			Created
+-- 2021-6-29             3.0         CJ         Add PE related logic and interface
+--                                              Added clk_p and clk_e_neg for generate signals at falling_edge
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -41,7 +43,9 @@ use work.all;
 entity cluster_controller is
   port(
 --Clock inputs
-	  CLK_E            : in std_logic;     --PE clocks(pll clock)
+      CLK_P            : in std_logic;     --PE clock --0628
+	  CLK_E            : in std_logic;     --PE's execution clock 
+	  CLK_E_NEG        : in std_logic;     --Inverted clk_e
 --Clock outputs
 	  CLK_O            : out std_logic;    --not needed in this version
 --Tag line
@@ -53,58 +57,69 @@ entity cluster_controller is
 --Feedback signals
       --fb               : out std_logic
 --Request and distribution logic signals
-      RST_R            : out std_logic;
+      RST_R            : out std_logic;  --Active low
 	  REQ_IN           : in std_logic;  --req to noc in reg logic
 	  REQ_FIFO          : in std_logic_vector(31 downto 0);
 	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
+	  DATA_VLD         : out std_logic;
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
-	  B_CAST           : out std_logic;
+	  BC               : out std_logic; --Broadcast handshake
 	  RD_FIFO          : out std_logic;
-	  FOUR_WD_LEFT     : in std_logic 	  
+	  FIFO_VLD         : in std_logic
+	  --FOUR_WD_LEFT     : in std_logic 	  
 	  ); 
 end entity cluster_controller;
 	   
 architecture rtl of cluster_controller is
+--COMPONENT dist_mem_gen_0
+--  PORT (
+--    a : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
+--    d : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    clk : IN STD_LOGIC;
+--    we : IN STD_LOGIC;
+--    spo : OUT STD_LOGIC_VECTOR(127 DOWNTO 0)
+--  );
+--END COMPONENT;
 
 component CMEM_32KX16 is
    port(
 	     addr_c      :  in std_logic_vector(14 downto 0);
          CK          :  in std_logic;
 		 WR          :  in std_logic;
-		 RD          :  in std_logic;   
-		 D0          :  inout std_logic_vector(7 downto 0);
-		 D1          :  inout std_logic_vector(7 downto 0);
-		 D2          :  inout std_logic_vector(7 downto 0);
-		 D3          :  inout std_logic_vector(7 downto 0);
-		 D4          :  inout std_logic_vector(7 downto 0);
-		 D5          :  inout std_logic_vector(7 downto 0);
-		 D6          :  inout std_logic_vector(7 downto 0);
-		 D7          :  inout std_logic_vector(7 downto 0);
-		 D8          :  inout std_logic_vector(7 downto 0);
-		 D9          :  inout std_logic_vector(7 downto 0);
-		 D10         :  inout std_logic_vector(7 downto 0);
-		 D11         :  inout std_logic_vector(7 downto 0);
-		 D12         :  inout std_logic_vector(7 downto 0);
-		 D13         :  inout std_logic_vector(7 downto 0);
-		 D14         :  inout std_logic_vector(7 downto 0);
-		 D15         :  inout std_logic_vector(7 downto 0);
+		 RD          :  in std_logic;
+		 DI0          :  in std_logic_vector(7 downto 0);
+		 DI1          :  in std_logic_vector(7 downto 0);
+		 DI2          :  in std_logic_vector(7 downto 0);
+		 DI3          :  in std_logic_vector(7 downto 0);
+		 DI4          :  in std_logic_vector(7 downto 0);
+		 DI5          :  in std_logic_vector(7 downto 0);
+		 DI6          :  in std_logic_vector(7 downto 0);
+		 DI7          :  in std_logic_vector(7 downto 0);
+		 DI8          :  in std_logic_vector(7 downto 0);
+		 DI9          :  in std_logic_vector(7 downto 0);
+		 DI10         :  in std_logic_vector(7 downto 0);
+		 DI11         :  in std_logic_vector(7 downto 0);
+		 DI12         :  in std_logic_vector(7 downto 0);
+		 DI13         :  in std_logic_vector(7 downto 0);
+		 DI14         :  in std_logic_vector(7 downto 0);
+		 DI15         :  in std_logic_vector(7 downto 0);
 
-		 DI0          :  inout std_logic_vector(7 downto 0);
-		 DI1          :  inout std_logic_vector(7 downto 0);
-		 DI2          :  inout std_logic_vector(7 downto 0);
-		 DI3          :  inout std_logic_vector(7 downto 0);
-		 DI4          :  inout std_logic_vector(7 downto 0);
-		 DI5          :  inout std_logic_vector(7 downto 0);
-		 DI6          :  inout std_logic_vector(7 downto 0);
-		 DI7          :  inout std_logic_vector(7 downto 0);
-		 DI8          :  inout std_logic_vector(7 downto 0);
-		 DI9          :  inout std_logic_vector(7 downto 0);
-		 DI10         :  inout std_logic_vector(7 downto 0);
-		 DI11         :  inout std_logic_vector(7 downto 0);
-		 DI12         :  inout std_logic_vector(7 downto 0);
-		 DI13         :  inout std_logic_vector(7 downto 0);
-		 DI14         :  inout std_logic_vector(7 downto 0);
-		 DI15         :  inout std_logic_vector(7 downto 0)
+		 DO0          :  out std_logic_vector(7 downto 0);
+		 DO1          :  out std_logic_vector(7 downto 0);
+		 DO2          :  out std_logic_vector(7 downto 0);
+		 DO3          :  out std_logic_vector(7 downto 0);
+		 DO4          :  out std_logic_vector(7 downto 0);
+		 DO5          :  out std_logic_vector(7 downto 0);
+		 DO6          :  out std_logic_vector(7 downto 0);
+		 DO7          :  out std_logic_vector(7 downto 0);
+		 DO8          :  out std_logic_vector(7 downto 0);
+		 DO9          :  out std_logic_vector(7 downto 0);
+		 DO10         :  out std_logic_vector(7 downto 0);
+		 DO11         :  out std_logic_vector(7 downto 0);
+		 DO12         :  out std_logic_vector(7 downto 0);
+		 DO13         :  out std_logic_vector(7 downto 0);
+		 DO14         :  out std_logic_vector(7 downto 0);
+		 DO15         :  out std_logic_vector(7 downto 0)
  
 		 );
 end component;
@@ -112,6 +127,7 @@ end component;
 
   --Clock signals
   signal clk_m    : std_logic; --CM clock
+  signal rst_i    : std_logic;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
   --signal rst_en   : std_logic;  --Reset
@@ -124,8 +140,11 @@ end component;
   signal cmd_in    : std_logic:='0'; --command incoming ff
   signal sig_fin   : std_logic:='0'; --Tag signal collected
   signal noc_reg_rdy : std_logic:='0';  --NOC data register ready to interact with cluster memory words
+  signal noc_delay : std_logic; --one clock_e delay for noc_reg_rdy. Used to trigger 
   signal noc_write : std_logic:='0';  --Write command
   signal noc_read  : std_logic:='0';  --Read command
+  signal pe_write  : std_logic;
+  signal pe_read   : std_logic;
   signal delay     : std_logic:='0';  --Delay flipflop
   signal rd_trig   : std_logic;       --Read case trigger
   signal req_int   : std_logic;      --Request type ff
@@ -135,32 +154,42 @@ end component;
   signal cb_status  : std_logic;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
+  signal bc_i : std_logic;
   --Control registers
-  type reg is array (15 downto 0) of std_logic_vector(7 downto 0);  
-  signal noc_data     : reg;                        --NOC data register
+  type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
+  signal mem_in      : reg; --Input register to memory
+  signal mem_out     : reg; --Output register of memory    
+  signal noc_data_in     : reg;                        --NOC data input register
+  signal noc_data_out    : reg;                        --NOC data output register
   --signal data_out     : reg;
-  signal data_core_int : reg;                       --Data register for PE
+  signal pe_data_in      : reg;                     --Input register form pe side
+  signal data_core_int : reg;                       --Data register for PE --pe_data_out
   signal req_last     : std_logic_vector(5 downto 0);   --Request last field
   signal addr_c       : std_logic_vector(14 downto 0);   --CMEM column address pointer
   signal addr_n       : std_logic_vector(14 downto 0);   --NOC address pointer
   signal addr_p       : std_logic_vector(14 downto 0);   --PE  side address pointer
+  signal req_addr_p   : std_logic_vector(14 downto 0);
   signal noc_cmd_buf  : std_logic_vector(4 downto 0);    --NOC command buffer
   signal noc_cmd      : std_logic_vector(4 downto 0);    --NOC command control register
   signal pe_int       : std_logic_vector(1 downto 0);    --PE internal destination
   signal pe_num       : std_logic_vector(5 downto 0);    --PEs' seriel number
-  signal pe_to_CM     : std_logic_vector(127 downto 0);
+  --signal pe_to_CM     : std_logic_vector(127 downto 0);
   signal id_num       : std_logic_vector(5 downto 0);
+  signal wr_i        : std_logic;
+  signal rd_i         : std_logic;
   --State machine
   --signal tag_ctr      : std_logic_vector(5 downto 0);  
   signal byte_ctr     : std_logic_vector(3 downto 0):="0000";    --Byte counter
   signal byte_ctr_buffer : std_logic_vector (3 downto 0);  --Buffers to delay 1 clock cycle for byte counter
   signal len_ctr      : std_logic_vector(14 downto 0);
   signal len_ctr_p    : std_logic_vector(8 downto 0);   --Data block length counter
+  signal req_len_ctr_p : std_logic_vector(8 downto 0);
   signal pk_reg       : std_logic_vector(3 downto 0);  --Data pack size register, length TBD or to be a constant instead
   signal pk_ctr       : std_logic_vector(3 downto 0);
   signal dist_reg     : std_logic_vector(3 downto 0);  --Data pack distance register, length TBD
   signal dist_ctr     : std_logic_vector(3 downto 0);
   signal b_cast_ctr   : std_logic_vector(5 downto 0);
+  signal write_count  : integer range 0 to 3;
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
@@ -174,16 +203,7 @@ end component;
  
 begin
           
-clk_gen : process(clk_e, noc_reg_rdy)
-begin
-  if rising_edge(clk_e) then
-    if noc_reg_rdy = '1' then
-       clk_m <= clk_e;
-    else
-       clk_m <= '0';
-    end if;
-  end if;
-  end process;
+
   ------------------------------------------------------------------------------
   -- Reset
   ------------------------------------------------------------------------------
@@ -233,6 +253,14 @@ begin
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
+  rst : process(noc_cmd)
+  begin
+		if noc_cmd = "01111" then
+		  rst_i <= '0';
+		else
+		  rst_i <= '1';
+		end if;
+  end process;
   cmd_activate : process(clk_e) --39 - 33 = 6 6 must be kept
    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
@@ -415,6 +443,7 @@ begin
 	--variable two_cycle_delay: std_logic_vector(2 downto 0);
     begin
 		if rising_edge(clk_e) then
+            noc_delay <= noc_reg_rdy;
 			--two_cycle_delay(0) := delay;
 			one_c_delay <= delay;
 			two_c_delay <= one_c_delay;
@@ -456,38 +485,48 @@ begin
     begin
 		if noc_cmd = "01111" then
 			noc_reg_rdy <= '0';
+            noc_write <= '0';
+            noc_read <= '0';
         elsif delay = '1' then     
 		    if noc_cmd = "00011" or noc_cmd = "00101" then
 		        if byte_ctr = "0000" then 
 		        	noc_reg_rdy <= '1';
+                    noc_write <= '1';
 		        else
 		            noc_reg_rdy <= '0';
+                    noc_write <= '0';
 		    	end if;
 		    elsif noc_cmd = "00100" then
 		    	if byte_ctr = "1111" then
 		    		noc_reg_rdy <= '1';
+                    noc_read <= '1';
 		    	else 
 		    		noc_reg_rdy <= '0';
+                    noc_read <= '0';
 		    	end if;
 		    else 
-		    	noc_reg_rdy <='0';   
+		    	noc_reg_rdy <='0';
+                noc_write <= '0';
+                noc_read <= '0';   
 	        end if;
 		else 
-			noc_reg_rdy <='0';   
+			noc_reg_rdy <='0'; 
+            noc_write <= '0';
+            noc_read <= '0';  
 		end if;
 	end process;
 	
 	data_write : process (noc_cmd, byte_ctr, delay)
 	begin
 		if noc_cmd = "01111" then
-			noc_data <=(others => (others => '0'));
+			noc_data_in <=(others => (others => '0'));
 		elsif delay = '1' then
           if noc_cmd = "00011" or noc_cmd ="00101" then
 			--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
-				noc_data(to_integer(unsigned(byte_ctr))) <= DATA;
+				noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
 			--end if;
 		  else 
-		  noc_data <=(others => (others => 'Z'));
+		  noc_data_in <=(others => (others => 'Z'));
 		  end if;
 		end if;
 	end process;
@@ -496,7 +535,7 @@ begin
 
     begin
 	    if rd_trig = '1' then
-	        DATA_OUT <= noc_data(to_integer(unsigned(byte_ctr)+2));
+	        DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+2));
 	    else
 	           DATA_OUT <= (others => '0');
         end if;
@@ -517,19 +556,19 @@ begin
                 if noc_cmd = "00011" then
 		                len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 		            	addr_n <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));
-		            	noc_write <= '1';
+		            	--noc_write <= '1';
 		        --Read block
 		        elsif noc_cmd = "00100" then
 		        		len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 		        		addr_n <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));
-		        		noc_read <= '1';
+		        		--noc_read <= '1';
 		        --Write block burst
 		        elsif noc_cmd = "00101" then
 		            if dist_ctr = (dist_ctr'range => '0') and noc_write = '0'then
-		                noc_write <= '1';
+		                --noc_write <= '1';
 		            	pk_ctr <= pk_reg;
 		            elsif pk_ctr = (pk_ctr'range => '0') then
-		            	noc_write <= '0';			
+		            	--noc_write <= '0';			
 		            	dist_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(dist_ctr))-1,4));
 		            elsif noc_write = '1' then
 		              	pk_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(pk_ctr))-1,4));
@@ -547,8 +586,8 @@ begin
 		    	dist_ctr <= dist_ctr;
 	        end if;
 	    elsif delay = '0' then
-	    noc_write <='0';
-        noc_read <='0';
+	    --noc_write <='0';
+        --noc_read <='0';
 		len_ctr <= (others=> 'Z');
 		addr_n <= (others=> 'Z');
 		pk_reg <= (others=> 'Z');
@@ -563,121 +602,188 @@ begin
  --	--PEC side 
  --	-----------------------------------------------------------------------------
  --	--Request logic reset
-     req_rst : process(clk_e)
-     begin
- 		if rising_edge(clk_e) then
- 			if noc_cmd = "01111" then
- 				RST_R <= '1';
- 			else
- 				RST_R <= '0';
- 			end if;
- 		end if;
- 	end process;
+     RST_R <= rst_i;
 
- --
- 	req_trans: process(clk_e)
+ -- Fetch data from req_fifo
+    process(clk_p)
+        variable cmd_tr : std_logic; --Save 1 clock to handle the request
+	begin
+		if rising_edge(clk_p) and clk_e_neg = '0' then --RD_REQ raises at falling_edge of clk_e
+			if noc_cmd = "01111" then
+				RD_FIFO <= '0';
+                cmd_tr := '0';
+            else
+                if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '0' then
+                    cmd_tr := '1';
+                else
+                    cmd_tr := '0';
+                end if;
+
+			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '1' then --normal case
+			    	RD_FIFO <= '1';
+			    elsif req_exe = '1' and write_req = '1' then --write case
+			    	RD_FIFO <= '1';
+			    else
+			    	RD_FIFO <= '0';
+			    end if;
+            end if;
+		end if;
+	end process;
+
+ 	req_recording: process(clk_p)
  	begin
- 		--if rising_edge(clk_e) then --0519
- 			if REQ_IN = '1' and req_exe = '0' and write_req = '0' then --?
- 				RD_FIFO <= '1';
+ 		if rising_edge(clk_p) and clk_e_neg = '0' then --0628 --falling_edge of clk_e
+			if noc_cmd = "01111" then
+				pe_req_type <= (others => '0');
+				req_addr_p <= (others => '0');
+				req_len_ctr_p <= (others => '0');
+				req_last <= (others => '0');
+                bc_i <= '0';
+			elsif FIFO_VLD = '1' and req_exe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
- 				addr_p <= REQ_FIFO(14 downto 0);
- 				len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
+ 				req_addr_p <= REQ_FIFO(14 downto 0);
+ 				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
- 			elsif req_exe = '0' and write_req = '1' then  --Write case
- 				RD_FIFO <= '0';
- 			elsif req_exe = '1' and write_req = '1' then 
- 				RD_FIFO <= '1';
- 			else
- 				RD_FIFO <= '0';
- 				pe_req_type <= (others => '0');
- 				addr_p <= (others => '0');
- 				len_ctr_p <= (others => '0');
- 				req_last <= (others => '0');
- 			end if;
- 		--end if;
- 	end process;
-    
- 	trans_type : process(pe_req_type,clk_e)
-    begin
-		if noc_reg_rdy = '0' then
-            if pe_req_type = "01" then
- 			    if cb_status = '0' then
- 				cb_status <= '1';
- 				b_cast_ctr <= req_last;
- 			    elsif cb_status = '1' then
- 				if rising_edge(clk_e) then
- 				    if b_cast_ctr /= "000000" then
- 					    b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
- 					elsif b_cast_ctr = "000000" then
- 						if len_ctr_p /= "111111111" then
- 						req_exe <= '1';
- 						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
- 						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
- 						elsif len_ctr_p = "111111111" then
- 							req_exe <= '0';
- 							cb_status <= '0';
- 						end if;
- 					end if;
- 				end if;
- 			    end if;
- 		elsif pe_req_type = "10" then
- 			id_num <= req_last;
- 			if rising_edge(clk_e) then
- 				if len_ctr_p /= "111111111" then
- 					req_exe <= '1';
- 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
- 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
- 				elsif len_ctr_p = "111111111" then
- 					req_exe <= '0';
- 				end if;
- 			end if;
- 		elsif pe_req_type = "11" then
- 			id_num <= req_last;
-             write_req <= '1';
- 			if FOUR_WD_LEFT = '0' then--Check for 4 more words signal
- 				req_exe <= '1';
- 				for i in 3 downto 0 loop
- 				    if rising_edge(clk_e) then --will it cause any clock delay?
-                         pe_to_CM(32*i+31 downto 32*i) <= REQ_FIFO;
- 				    end if;
- 			    end loop;
- 				req_exe <= '0';
- 				write_req <= '0';
+                bc_i <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
+            elsif req_exe = '1' and len_ctr_p = "000000000" then
+                pe_req_type <= (others => '0');
+				req_addr_p <= (others => '0');
+				req_len_ctr_p <= (others => '0');
+				req_last <= (others => '0');
+                bc_i <= '0';
  			end if;
  		end if;
-	end if;
  	end process;
+    BC<= bc_i;
+    process(clk_e) --Reset need to be added 
+	begin 
+		if rising_edge(clk_e) then --falling edge of clk_e
+			if noc_cmd = "01111" then
+				req_exe <= '0';
+				cb_status <= '0';
+				b_cast_ctr <= (others => '0');
+				write_req <= '0';
+			elsif req_exe = '0' then
+			    if pe_req_type = "01" then
+			    	if cb_status = '0' then
+			    		cb_status <= '1';
+			    		b_cast_ctr <= req_last;
+			    	elsif cb_status = '1' then
+			    		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
+			    			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
+			    		elsif b_cast_ctr = "000000" then
+			    			if len_ctr_p /= "000000000" then
+			    				req_exe <= '1';
+			    				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
+			    				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
+			    			end if;
+			    		end if;
+			    	end if;
+			    elsif pe_req_type = "10" then
+			    	id_num <= req_last;
+			    	if len_ctr_p /= "000000000" then
+			    		req_exe <= '1';
+			    	end if;
+			    elsif pe_req_type = "11" then	
+			    	id_num <= req_last;
+                    write_req <= '1';
+			    	if len_ctr_p /= "000000000" then
+			    		req_exe <= '1';
+			    	end if;
+			    end if;
+            elsif req_exe = '1' then
+                if len_ctr_p = "000000000" then
+                    req_exe <= '0';
+                end if;
+            end if;
+		end if;
+	end process;
+    PE_UNIT <= id_num;
+	counting : process(clk_e)  
+	begin
+		if rising_edge(clk_e) then
+			if noc_cmd = "01111" then
+				addr_p <= (others => '0');
+				len_ctr_p <= (others => '0');
+				write_count <= 0;
+				pe_write <= '0';
+			elsif noc_reg_rdy = '0' then
+			    if req_exe = '1' then
+					if write_req = '0' then
+					    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+					    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+						pe_read <= '1'; 
+					elsif write_req = '1' then
+						pe_data_in(4*write_count) <= REQ_FIFO(7 downto 0);
+                        pe_data_in(4*write_count+1) <=REQ_FIFO(15 downto 8);
+                        pe_data_in(4*write_count+2) <=REQ_FIFO(23 downto 16);
+                        pe_data_in(4*write_count+3) <=REQ_FIFO(31 downto 24);
+						write_count <= write_count +1;
+						if write_count = 3 then
+							pe_write <= '1';
+						else
+							pe_write <= '0';
+						end if;
+					end if;
+				else
+					addr_p <= req_addr_p;
+					len_ctr_p <= req_len_ctr_p;
+				end if;
+			end if;
+		end if;
+	end process;
+
+
 --distribution network
-process (req_exe,addr_p)
-begin
-	if req_exe = '1' then
-		
+    process (clk_e)
+    begin
+    	if rising_edge(clk_e) then 
+            if req_exe = '1' then
+    	        for i in 15 downto 0 loop
+    	        	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
+    	        end loop;
+    	        	DATA_VLD <= not noc_reg_rdy;
+            else
+                DATA_TO_PE <= (others=>'0');
+                DATA_VLD <= '0';
+            end if;
+        end if;
+    end process;
 
 
-
- --Req_logic reset
- --process(clk_e)
- --begin
- --	if rising_edge(clk_e) then
- --		if noc_cmd = "01111" then
- --			rst_r <= '1';
- --		else
- --			rst_r <= '0';
- --		end if;
- --	end if;
- --end process;
-
-
- -- Address MUX
- process(noc_reg_rdy)				
+ --Address & trigger MUX
+ process(noc_reg_rdy,addr_p)				
  begin
  	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
- 		addr_c <= addr_n;		
+ 		addr_c <= addr_n;
+		wr_i <= noc_write;
+		rd_i <= noc_read;
  	elsif noc_reg_rdy = '0' then
  		addr_c <= addr_p;
+		wr_i <= pe_write;
+		rd_i <= pe_read;
  	end if;
  end process;
+
+ --Data MUX
+ --Input MUX
+    process(noc_reg_rdy)
+    begin
+        if noc_reg_rdy = '1' then
+            mem_in <= noc_data_in;
+        else
+            mem_in <= pe_data_in;
+        end if;
+    end process;
+--Output Latch
+    process(clk_e)
+    begin
+        if rising_edge(clk_e) then
+            if noc_delay = '1' then
+                noc_data_out <= data_core_int;
+            end if;
+        end if;
+    end process;
 
 TAG_FB <= sig_fin or delay;
 
@@ -696,42 +802,42 @@ CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;
     clustermem : CMEM_32KX16
 	port map (
 		addr_c => addr_c, 
-		CK => clk_m,
-		WR => noc_write, --To be written as one write ff instead of 2 ffs
-		RD => noc_read,
-        D0 => noc_data(0),
-		D1 => noc_data(1),
-		D2 => noc_data(2),
-		D3 => noc_data(3),
-		D4 => noc_data(4),
-		D5 => noc_data(5),
-		D6 => noc_data(6),
-		D7 => noc_data(7),
-		D8 => noc_data(8),
-		D9 => noc_data(9),
-		D10 => noc_data(10),
-		D11 => noc_data(11),
-		D12 => noc_data(12),
-		D13 => noc_data(13),
-		D14 => noc_data(14),
-		D15 => noc_data(15),
+		CK => clk_e,
+		WR => wr_i, --To be written as one write ff instead of 2 ffs
+		RD => rd_i,
+        DI0 => mem_in(0),
+		DI1 => mem_in(1),
+		DI2 => mem_in(2),
+		DI3 => mem_in(3),
+		DI4 => mem_in(4),
+		DI5 => mem_in(5),
+		DI6 => mem_in(6),
+		DI7 => mem_in(7),
+		DI8 => mem_in(8),
+		DI9 => mem_in(9),
+		DI10 => mem_in(10),
+		DI11 => mem_in(11),
+		DI12 => mem_in(12),
+		DI13 => mem_in(13),
+		DI14 => mem_in(14),
+		DI15 => mem_in(15),
 
-		DI0 => data_core_int(0),
-		DI1 => data_core_int(1),
-		DI2 => data_core_int(2),
-		DI3 => data_core_int(3),
-		DI4 => data_core_int(4),
-		DI5 => data_core_int(5),
-		DI6 => data_core_int(6),
-		DI7 => data_core_int(7),
-		DI8 => data_core_int(8),
-		DI9 => data_core_int(9),
-		DI10 => data_core_int(10),
-		DI11 => data_core_int(11),
-		DI12 => data_core_int(12),
-		DI13 => data_core_int(13),
-		DI14 => data_core_int(14),
-		DI15 => data_core_int(15)
+		DO0 => data_core_int(0),
+		DO1 => data_core_int(1),
+		DO2 => data_core_int(2),
+		DO3 => data_core_int(3),
+		DO4 => data_core_int(4),
+		DO5 => data_core_int(5),
+		DO6 => data_core_int(6),
+		DO7 => data_core_int(7),
+		DO8 => data_core_int(8),
+		DO9 => data_core_int(9),
+		DO10 => data_core_int(10),
+		DO11 => data_core_int(11),
+		DO12 => data_core_int(12),
+		DO13 => data_core_int(13),
+		DO14 => data_core_int(14),
+		DO15 => data_core_int(15)
         );		
 
 end architecture rtl; 
@@ -740,9 +846,5 @@ end architecture rtl;
 --NOTE
 -----------------------------------------------------------
 
---CM Address Arbiter expects NOC side have higher priority then PE side. How to indicate process and continue commands to PEs
---since the PE is responsible for request broadcast. Acknowledge signal required.
+--CM Address Arbiter expects NOC side have higher priority then PE side. 
 
---Feedback signal to be added. Apart from PECI-Busy. How NOC handle this feedback?
-
---Request FIFO issues. Size and speed.

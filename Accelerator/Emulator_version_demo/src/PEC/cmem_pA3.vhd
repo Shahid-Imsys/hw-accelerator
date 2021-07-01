@@ -189,7 +189,7 @@ end component;
   signal dist_reg     : std_logic_vector(3 downto 0);  --Data pack distance register, length TBD
   signal dist_ctr     : std_logic_vector(3 downto 0);
   signal b_cast_ctr   : std_logic_vector(5 downto 0);
-  signal write_count  : integer range 0 to 3;
+  signal write_count  : std_logic_vector(1 downto 0); --Wr req data counter
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
@@ -657,7 +657,7 @@ begin
     BC<= bc_i;
     process(clk_e) --Reset need to be added 
 	begin 
-		if rising_edge(clk_e) then --falling edge of clk_e
+		if rising_edge(clk_e) then 
 			if noc_cmd = "01111" then
 				req_exe <= '0';
 				cb_status <= '0';
@@ -691,10 +691,15 @@ begin
 			    		req_exe <= '1';
 			    	end if;
 			    end if;
-            elsif req_exe = '1' then
+            elsif req_exe = '1' then  --Reset
                 if len_ctr_p = "000000000" then
                     req_exe <= '0';
+					cb_status <= '0';
                 end if;
+
+				if write_count = "11" then
+					write_req<= '0';
+				end if;
             end if;
 		end if;
 	end process;
@@ -705,7 +710,7 @@ begin
 			if noc_cmd = "01111" then
 				addr_p <= (others => '0');
 				len_ctr_p <= (others => '0');
-				write_count <= 0;
+				write_count <= "00";
 				pe_write <= '0';
 			elsif noc_reg_rdy = '0' then
 			    if req_exe = '1' then
@@ -714,13 +719,14 @@ begin
 					    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
 						pe_read <= '1'; 
 					elsif write_req = '1' then
-						pe_data_in(4*write_count) <= REQ_FIFO(7 downto 0);
-                        pe_data_in(4*write_count+1) <=REQ_FIFO(15 downto 8);
-                        pe_data_in(4*write_count+2) <=REQ_FIFO(23 downto 16);
-                        pe_data_in(4*write_count+3) <=REQ_FIFO(31 downto 24);
-						write_count <= write_count +1;
-						if write_count = 3 then
+						pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
+                        pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
+                        pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
+                        pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
+						write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2)); 
+						if write_count = "11" then
 							pe_write <= '1';
+							len_ctr_p <= (others => '0');
 						else
 							pe_write <= '0';
 						end if;

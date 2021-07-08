@@ -158,6 +158,7 @@ process(poll_act,clk_p)
 begin
     if rising_edge(clk_p) and clk_e_neg = '0' then
         if poll_act = '1' then
+            ack_sig_i <= (others =>'0');
             ack_sig_i(to_integer(unsigned(id_num))) <= '1';
         else
             ack_sig_i <= (others =>'0');

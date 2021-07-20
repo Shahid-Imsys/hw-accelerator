@@ -48,15 +48,17 @@ entity req_dst_logic is
         REQ_SIG   : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
-        OUTPUT    : out std_logic_vector(31 downto 0);
+        OUTPUT    : out std_logic_vector(31 downto 0); --Output to CC
         RD_FIFO   : in std_logic;
         FIFO_VLD  : out std_logic;
-        FOUR_WD_LEFT : out std_logic;
+        --FOUR_WD_LEFT : out std_logic;
         --Distribution network
+        DATA_VLD : in std_logic;
         DATA_NOC  : in std_logic_vector(127 downto 0);
         PE_UNIT   : in std_logic_vector(3 downto 0);
         B_CAST    : in std_logic;
-        DATA_OUT  : out pe_data
+        DATA_VLD_OUT : out std_logic_vector(15 downto 0);
+        PE_DATA_OUT  : out pe_data
     
     );
 end entity req_dst_logic;
@@ -100,6 +102,8 @@ END COMPONENT;
     signal loop_c  : integer := 0;
     signal chain   : std_logic;
     signal data_in_fifo : std_logic_vector(9 downto 0);
+    signal prog_empty_i : std_logic;
+    signal data_vld_out_i : std_logic_vector(15 downto 0);
 
 
 begin
@@ -264,15 +268,20 @@ rd       <= RD_FIFO;
 --PE Demux
 process(clk_e)  --Should internal destination listed here?
 begin
+    if rising_edge(clk_e) then
+    data_vld_out_i<=( others => '0');
     if B_CAST= '1' then
         for i in 15 downto 0 loop
-            data_out (i)<= DATA_NOC;
+            pe_data_out (i)<= DATA_NOC;
+            data_vld_out_i (i) <= DATA_VLD;
         end loop;
-    else 
-        data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
+    else
+        data_vld_out_i(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
+        pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
+    end if;
     end if;
 end process;
-
+DATA_VLD_OUT <= data_vld_out_i; 
 request_fifo : fifo_generator_0
   PORT MAP (
     clk => clk_e,
@@ -285,7 +294,7 @@ request_fifo : fifo_generator_0
     almost_full => almost_full,
     empty => empty,
     almost_empty => almost_empty,
-    prog_empty => FOUR_WD_LEFT,
+    prog_empty => prog_empty_i,
     valid      => FIFO_VLD,
     data_count => data_in_fifo
   );

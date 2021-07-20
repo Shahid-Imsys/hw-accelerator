@@ -47,6 +47,7 @@ entity clc is
     rst_en       : in  std_logic;  -- Reset input (active  low)
     -- Microprogram fields
     pl           : in  std_logic_vector(127 downto 0);
+    ld_mpgm      : in  std_logic;
     -- Static control inputs
     dbl_direct   : in  std_logic;  -- Double step control input
     pup_irq      : in  std_logic_vector(1 downto 0); -- Enable wake on IRQ
@@ -187,7 +188,7 @@ begin
   pl_sig8   <= pl(28)&pl(62)&(pl(26) xor pl(17))&(pl(3) xor pl(59))&(pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24) ;
   pl_map  <= (pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
   pl_aux1 <= pl_sig1(4 downto 2);
-  pl_ld_mpgm <= pl(100) and pl(98); --Added by CJ
+  pl_ld_mpgm <= ld_mpgm; --Added by CJ
 ----------------------------------------------------------------------
   -- Sequence control decode logic. 
 ----------------------------------------------------------------------

@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use work.all;
 use work.gp_pkg.all;
 
-entity imsys_top is
+entity p_top is
   port (
 
     --ref_clk    : in    std_logic;                                      -- 270MHz reference clock. Can be used to generate internal clocks with an MMCM
@@ -69,6 +69,20 @@ entity imsys_top is
     --reg2_rdav        : out   std_logic;                     -- Read data valid
     --reg2_ac          : out   std_logic;                     -- Access complete
     
+    --Data interface --Added by CJ
+    C1_REQ    : out std_logic;
+    C2_REQ    : out std_logic;
+    C1_ACK    : in std_logic;
+    C2_ACK    : in std_logic;
+    C1_REQ_D  : out std_logic_vector(31 downto 0);
+    C2_REQ_D  : out std_logic_vector(31 downto 0);
+    C1_IN_D   : in std_logic_vector(127 downto 0);
+    C2_IN_D   : in std_logic_vector(127 downto 0);
+    C1_DDI_VLD : in std_logic;
+    C2_DDI_VLD : in std_logic;
+    EXE        : in std_logic;
+    --EXE and VLD?
+
     -- clocks and control signals
     HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
     MRESET     : in    std_logic;                  -- system reset               low active
@@ -83,9 +97,9 @@ entity imsys_top is
     MSDIN      : in    std_logic;                  -- serial data in (debug)     
     MSDOUT     : out   std_logic                   -- serial data out    
   );
-end imsys_top;
+end p_top;
 
-architecture struct of imsys_top is
+architecture struct of p_top is
 
 
   ------------------------------------------------------
@@ -208,232 +222,232 @@ architecture struct of imsys_top is
    end component;
 
   -- pmem
-  component SY180_2048X2X1CM8
-  port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      A10                        :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      WEB                        :   IN   std_logic;
-      CK                         :   IN   std_logic;
-      CSB                         :   IN   std_logic
-      );
-  end component;
+  --component SY180_2048X2X1CM8
+  --port(
+  --    A0                         :   IN   std_logic;
+  --    A1                         :   IN   std_logic;
+  --    A2                         :   IN   std_logic;
+  --    A3                         :   IN   std_logic;
+  --    A4                         :   IN   std_logic;
+  --    A5                         :   IN   std_logic;
+  --    A6                         :   IN   std_logic;
+  --    A7                         :   IN   std_logic;
+  --    A8                         :   IN   std_logic;
+  --    A9                         :   IN   std_logic;
+  --    A10                        :   IN   std_logic;
+  --    DO0                        :   OUT   std_logic;
+  --    DO1                        :   OUT   std_logic;
+  --    DI0                        :   IN   std_logic;
+  --    DI1                        :   IN   std_logic;
+  --    WEB                        :   IN   std_logic;
+  --    CK                         :   IN   std_logic;
+  --    CSB                         :   IN   std_logic
+  --    );
+  --end component;
 
 
 --ROM0
-  component SP180_4096X80BM1A
-  port(
-      A0                            :   IN   std_logic;
-      A1                            :   IN   std_logic;
-      A2                            :   IN   std_logic;
-      A3                            :   IN   std_logic;
-      A4                            :   IN   std_logic;
-      A5                            :   IN   std_logic;
-      A6                            :   IN   std_logic;
-      A7                            :   IN   std_logic;
-      A8                            :   IN   std_logic;
-      A9                            :   IN   std_logic;
-      A10                            :   IN   std_logic;
-      A11                            :   IN   std_logic;
-      DO0                           :   OUT   std_logic;
-      DO1                           :   OUT   std_logic;
-      DO2                           :   OUT   std_logic;
-      DO3                           :   OUT   std_logic;
-      DO4                           :   OUT   std_logic;
-      DO5                           :   OUT   std_logic;
-      DO6                           :   OUT   std_logic;
-      DO7                           :   OUT   std_logic;
-      DO8                           :   OUT   std_logic;
-      DO9                           :   OUT   std_logic;
-      DO10                           :   OUT   std_logic;
-      DO11                           :   OUT   std_logic;
-      DO12                           :   OUT   std_logic;
-      DO13                           :   OUT   std_logic;
-      DO14                           :   OUT   std_logic;
-      DO15                           :   OUT   std_logic;
-      DO16                           :   OUT   std_logic;
-      DO17                           :   OUT   std_logic;
-      DO18                           :   OUT   std_logic;
-      DO19                           :   OUT   std_logic;
-      DO20                           :   OUT   std_logic;
-      DO21                           :   OUT   std_logic;
-      DO22                           :   OUT   std_logic;
-      DO23                           :   OUT   std_logic;
-      DO24                           :   OUT   std_logic;
-      DO25                           :   OUT   std_logic;
-      DO26                           :   OUT   std_logic;
-      DO27                           :   OUT   std_logic;
-      DO28                           :   OUT   std_logic;
-      DO29                           :   OUT   std_logic;
-      DO30                           :   OUT   std_logic;
-      DO31                           :   OUT   std_logic;
-      DO32                           :   OUT   std_logic;
-      DO33                           :   OUT   std_logic;
-      DO34                           :   OUT   std_logic;
-      DO35                           :   OUT   std_logic;
-      DO36                           :   OUT   std_logic;
-      DO37                           :   OUT   std_logic;
-      DO38                           :   OUT   std_logic;
-      DO39                           :   OUT   std_logic;
-      DO40                           :   OUT   std_logic;
-      DO41                           :   OUT   std_logic;
-      DO42                           :   OUT   std_logic;
-      DO43                           :   OUT   std_logic;
-      DO44                           :   OUT   std_logic;
-      DO45                           :   OUT   std_logic;
-      DO46                           :   OUT   std_logic;
-      DO47                           :   OUT   std_logic;
-      DO48                           :   OUT   std_logic;
-      DO49                           :   OUT   std_logic;
-      DO50                           :   OUT   std_logic;
-      DO51                           :   OUT   std_logic;
-      DO52                           :   OUT   std_logic;
-      DO53                           :   OUT   std_logic;
-      DO54                           :   OUT   std_logic;
-      DO55                           :   OUT   std_logic;
-      DO56                           :   OUT   std_logic;
-      DO57                           :   OUT   std_logic;
-      DO58                           :   OUT   std_logic;
-      DO59                           :   OUT   std_logic;
-      DO60                           :   OUT   std_logic;
-      DO61                           :   OUT   std_logic;
-      DO62                           :   OUT   std_logic;
-      DO63                           :   OUT   std_logic;
-      DO64                           :   OUT   std_logic;
-      DO65                           :   OUT   std_logic;
-      DO66                           :   OUT   std_logic;
-      DO67                           :   OUT   std_logic;
-      DO68                           :   OUT   std_logic;
-      DO69                           :   OUT   std_logic;
-      DO70                           :   OUT   std_logic;
-      DO71                           :   OUT   std_logic;
-      DO72                           :   OUT   std_logic;
-      DO73                           :   OUT   std_logic;
-      DO74                           :   OUT   std_logic;
-      DO75                           :   OUT   std_logic;
-      DO76                           :   OUT   std_logic;
-      DO77                           :   OUT   std_logic;
-      DO78                           :   OUT   std_logic;
-      DO79                           :   OUT   std_logic;
-      CK                               :   IN   std_logic;
-      CS                               :   IN   std_logic;
-      OE                               :   IN   std_logic
-      );
-  end component;
+  --component SP180_4096X80BM1A
+  --port(
+  --    A0                            :   IN   std_logic;
+  --    A1                            :   IN   std_logic;
+  --    A2                            :   IN   std_logic;
+  --    A3                            :   IN   std_logic;
+  --    A4                            :   IN   std_logic;
+  --    A5                            :   IN   std_logic;
+  --    A6                            :   IN   std_logic;
+  --    A7                            :   IN   std_logic;
+  --    A8                            :   IN   std_logic;
+  --    A9                            :   IN   std_logic;
+  --    A10                            :   IN   std_logic;
+  --    A11                            :   IN   std_logic;
+  --    DO0                           :   OUT   std_logic;
+  --    DO1                           :   OUT   std_logic;
+  --    DO2                           :   OUT   std_logic;
+  --    DO3                           :   OUT   std_logic;
+  --    DO4                           :   OUT   std_logic;
+  --    DO5                           :   OUT   std_logic;
+  --    DO6                           :   OUT   std_logic;
+  --    DO7                           :   OUT   std_logic;
+  --    DO8                           :   OUT   std_logic;
+  --    DO9                           :   OUT   std_logic;
+  --    DO10                           :   OUT   std_logic;
+  --    DO11                           :   OUT   std_logic;
+  --    DO12                           :   OUT   std_logic;
+  --    DO13                           :   OUT   std_logic;
+  --    DO14                           :   OUT   std_logic;
+  --    DO15                           :   OUT   std_logic;
+  --    DO16                           :   OUT   std_logic;
+  --    DO17                           :   OUT   std_logic;
+  --    DO18                           :   OUT   std_logic;
+  --    DO19                           :   OUT   std_logic;
+  --    DO20                           :   OUT   std_logic;
+  --    DO21                           :   OUT   std_logic;
+  --    DO22                           :   OUT   std_logic;
+  --    DO23                           :   OUT   std_logic;
+  --    DO24                           :   OUT   std_logic;
+  --    DO25                           :   OUT   std_logic;
+  --    DO26                           :   OUT   std_logic;
+  --    DO27                           :   OUT   std_logic;
+  --    DO28                           :   OUT   std_logic;
+  --    DO29                           :   OUT   std_logic;
+  --    DO30                           :   OUT   std_logic;
+  --    DO31                           :   OUT   std_logic;
+  --    DO32                           :   OUT   std_logic;
+  --    DO33                           :   OUT   std_logic;
+  --    DO34                           :   OUT   std_logic;
+  --    DO35                           :   OUT   std_logic;
+  --    DO36                           :   OUT   std_logic;
+  --    DO37                           :   OUT   std_logic;
+  --    DO38                           :   OUT   std_logic;
+  --    DO39                           :   OUT   std_logic;
+  --    DO40                           :   OUT   std_logic;
+  --    DO41                           :   OUT   std_logic;
+  --    DO42                           :   OUT   std_logic;
+  --    DO43                           :   OUT   std_logic;
+  --    DO44                           :   OUT   std_logic;
+  --    DO45                           :   OUT   std_logic;
+  --    DO46                           :   OUT   std_logic;
+  --    DO47                           :   OUT   std_logic;
+  --    DO48                           :   OUT   std_logic;
+  --    DO49                           :   OUT   std_logic;
+  --    DO50                           :   OUT   std_logic;
+  --    DO51                           :   OUT   std_logic;
+  --    DO52                           :   OUT   std_logic;
+  --    DO53                           :   OUT   std_logic;
+  --    DO54                           :   OUT   std_logic;
+  --    DO55                           :   OUT   std_logic;
+  --    DO56                           :   OUT   std_logic;
+  --    DO57                           :   OUT   std_logic;
+  --    DO58                           :   OUT   std_logic;
+  --    DO59                           :   OUT   std_logic;
+  --    DO60                           :   OUT   std_logic;
+  --    DO61                           :   OUT   std_logic;
+  --    DO62                           :   OUT   std_logic;
+  --    DO63                           :   OUT   std_logic;
+  --    DO64                           :   OUT   std_logic;
+  --    DO65                           :   OUT   std_logic;
+  --    DO66                           :   OUT   std_logic;
+  --    DO67                           :   OUT   std_logic;
+  --    DO68                           :   OUT   std_logic;
+  --    DO69                           :   OUT   std_logic;
+  --    DO70                           :   OUT   std_logic;
+  --    DO71                           :   OUT   std_logic;
+  --    DO72                           :   OUT   std_logic;
+  --    DO73                           :   OUT   std_logic;
+  --    DO74                           :   OUT   std_logic;
+  --    DO75                           :   OUT   std_logic;
+  --    DO76                           :   OUT   std_logic;
+  --    DO77                           :   OUT   std_logic;
+  --    DO78                           :   OUT   std_logic;
+  --    DO79                           :   OUT   std_logic;
+  --    CK                               :   IN   std_logic;
+  --    CS                               :   IN   std_logic;
+  --    OE                               :   IN   std_logic
+  --    );
+  --end component;
 
 
 -- ROM1
-   component SP180_4096X80BM1B
-   port(
-       A0                            :   IN   std_logic;
-       A1                            :   IN   std_logic;
-       A2                            :   IN   std_logic;
-       A3                            :   IN   std_logic;
-       A4                            :   IN   std_logic;
-       A5                            :   IN   std_logic;
-       A6                            :   IN   std_logic;
-       A7                            :   IN   std_logic;
-       A8                            :   IN   std_logic;
-       A9                            :   IN   std_logic;
-       A10                            :   IN   std_logic;
-       A11                            :   IN   std_logic;
-       DO0                           :   OUT   std_logic;
-       DO1                           :   OUT   std_logic;
-       DO2                           :   OUT   std_logic;
-       DO3                           :   OUT   std_logic;
-       DO4                           :   OUT   std_logic;
-       DO5                           :   OUT   std_logic;
-       DO6                           :   OUT   std_logic;
-       DO7                           :   OUT   std_logic;
-       DO8                           :   OUT   std_logic;
-       DO9                           :   OUT   std_logic;
-       DO10                           :   OUT   std_logic;
-       DO11                           :   OUT   std_logic;
-       DO12                           :   OUT   std_logic;
-       DO13                           :   OUT   std_logic;
-       DO14                           :   OUT   std_logic;
-       DO15                           :   OUT   std_logic;
-       DO16                           :   OUT   std_logic;
-       DO17                           :   OUT   std_logic;
-       DO18                           :   OUT   std_logic;
-       DO19                           :   OUT   std_logic;
-       DO20                           :   OUT   std_logic;
-       DO21                           :   OUT   std_logic;
-       DO22                           :   OUT   std_logic;
-       DO23                           :   OUT   std_logic;
-       DO24                           :   OUT   std_logic;
-       DO25                           :   OUT   std_logic;
-       DO26                           :   OUT   std_logic;
-       DO27                           :   OUT   std_logic;
-       DO28                           :   OUT   std_logic;
-       DO29                           :   OUT   std_logic;
-       DO30                           :   OUT   std_logic;
-       DO31                           :   OUT   std_logic;
-       DO32                           :   OUT   std_logic;
-       DO33                           :   OUT   std_logic;
-       DO34                           :   OUT   std_logic;
-       DO35                           :   OUT   std_logic;
-       DO36                           :   OUT   std_logic;
-       DO37                           :   OUT   std_logic;
-       DO38                           :   OUT   std_logic;
-       DO39                           :   OUT   std_logic;
-       DO40                           :   OUT   std_logic;
-       DO41                           :   OUT   std_logic;
-       DO42                           :   OUT   std_logic;
-       DO43                           :   OUT   std_logic;
-       DO44                           :   OUT   std_logic;
-       DO45                           :   OUT   std_logic;
-       DO46                           :   OUT   std_logic;
-       DO47                           :   OUT   std_logic;
-       DO48                           :   OUT   std_logic;
-       DO49                           :   OUT   std_logic;
-       DO50                           :   OUT   std_logic;
-       DO51                           :   OUT   std_logic;
-       DO52                           :   OUT   std_logic;
-       DO53                           :   OUT   std_logic;
-       DO54                           :   OUT   std_logic;
-       DO55                           :   OUT   std_logic;
-       DO56                           :   OUT   std_logic;
-       DO57                           :   OUT   std_logic;
-       DO58                           :   OUT   std_logic;
-       DO59                           :   OUT   std_logic;
-       DO60                           :   OUT   std_logic;
-       DO61                           :   OUT   std_logic;
-       DO62                           :   OUT   std_logic;
-       DO63                           :   OUT   std_logic;
-       DO64                           :   OUT   std_logic;
-       DO65                           :   OUT   std_logic;
-       DO66                           :   OUT   std_logic;
-       DO67                           :   OUT   std_logic;
-       DO68                           :   OUT   std_logic;
-       DO69                           :   OUT   std_logic;
-       DO70                           :   OUT   std_logic;
-       DO71                           :   OUT   std_logic;
-       DO72                           :   OUT   std_logic;
-       DO73                           :   OUT   std_logic;
-       DO74                           :   OUT   std_logic;
-       DO75                           :   OUT   std_logic;
-       DO76                           :   OUT   std_logic;
-       DO77                           :   OUT   std_logic;
-       DO78                           :   OUT   std_logic;
-       DO79                           :   OUT   std_logic;
-       CK                               :   IN   std_logic;
-       CS                               :   IN   std_logic;
-       OE                               :   IN   std_logic
-       );
-   end component;
+   --component SP180_4096X80BM1B
+   --port(
+   --    A0                            :   IN   std_logic;
+   --    A1                            :   IN   std_logic;
+   --    A2                            :   IN   std_logic;
+   --    A3                            :   IN   std_logic;
+   --    A4                            :   IN   std_logic;
+   --    A5                            :   IN   std_logic;
+   --    A6                            :   IN   std_logic;
+   --    A7                            :   IN   std_logic;
+   --    A8                            :   IN   std_logic;
+   --    A9                            :   IN   std_logic;
+   --    A10                            :   IN   std_logic;
+   --    A11                            :   IN   std_logic;
+   --    DO0                           :   OUT   std_logic;
+   --    DO1                           :   OUT   std_logic;
+   --    DO2                           :   OUT   std_logic;
+   --    DO3                           :   OUT   std_logic;
+   --    DO4                           :   OUT   std_logic;
+   --    DO5                           :   OUT   std_logic;
+   --    DO6                           :   OUT   std_logic;
+   --    DO7                           :   OUT   std_logic;
+   --    DO8                           :   OUT   std_logic;
+   --    DO9                           :   OUT   std_logic;
+   --    DO10                           :   OUT   std_logic;
+   --    DO11                           :   OUT   std_logic;
+   --    DO12                           :   OUT   std_logic;
+   --    DO13                           :   OUT   std_logic;
+   --    DO14                           :   OUT   std_logic;
+   --    DO15                           :   OUT   std_logic;
+   --    DO16                           :   OUT   std_logic;
+   --    DO17                           :   OUT   std_logic;
+   --    DO18                           :   OUT   std_logic;
+   --    DO19                           :   OUT   std_logic;
+   --    DO20                           :   OUT   std_logic;
+   --    DO21                           :   OUT   std_logic;
+   --    DO22                           :   OUT   std_logic;
+   --    DO23                           :   OUT   std_logic;
+   --    DO24                           :   OUT   std_logic;
+   --    DO25                           :   OUT   std_logic;
+   --    DO26                           :   OUT   std_logic;
+   --    DO27                           :   OUT   std_logic;
+   --    DO28                           :   OUT   std_logic;
+   --    DO29                           :   OUT   std_logic;
+   --    DO30                           :   OUT   std_logic;
+   --    DO31                           :   OUT   std_logic;
+   --    DO32                           :   OUT   std_logic;
+   --    DO33                           :   OUT   std_logic;
+   --    DO34                           :   OUT   std_logic;
+   --    DO35                           :   OUT   std_logic;
+   --    DO36                           :   OUT   std_logic;
+   --    DO37                           :   OUT   std_logic;
+   --    DO38                           :   OUT   std_logic;
+   --    DO39                           :   OUT   std_logic;
+   --    DO40                           :   OUT   std_logic;
+   --    DO41                           :   OUT   std_logic;
+   --    DO42                           :   OUT   std_logic;
+   --    DO43                           :   OUT   std_logic;
+   --    DO44                           :   OUT   std_logic;
+   --    DO45                           :   OUT   std_logic;
+   --    DO46                           :   OUT   std_logic;
+   --    DO47                           :   OUT   std_logic;
+   --    DO48                           :   OUT   std_logic;
+   --    DO49                           :   OUT   std_logic;
+   --    DO50                           :   OUT   std_logic;
+   --    DO51                           :   OUT   std_logic;
+   --    DO52                           :   OUT   std_logic;
+   --    DO53                           :   OUT   std_logic;
+   --    DO54                           :   OUT   std_logic;
+   --    DO55                           :   OUT   std_logic;
+   --    DO56                           :   OUT   std_logic;
+   --    DO57                           :   OUT   std_logic;
+   --    DO58                           :   OUT   std_logic;
+   --    DO59                           :   OUT   std_logic;
+   --    DO60                           :   OUT   std_logic;
+   --    DO61                           :   OUT   std_logic;
+   --    DO62                           :   OUT   std_logic;
+   --    DO63                           :   OUT   std_logic;
+   --    DO64                           :   OUT   std_logic;
+   --    DO65                           :   OUT   std_logic;
+   --    DO66                           :   OUT   std_logic;
+   --    DO67                           :   OUT   std_logic;
+   --    DO68                           :   OUT   std_logic;
+   --    DO69                           :   OUT   std_logic;
+   --    DO70                           :   OUT   std_logic;
+   --    DO71                           :   OUT   std_logic;
+   --    DO72                           :   OUT   std_logic;
+   --    DO73                           :   OUT   std_logic;
+   --    DO74                           :   OUT   std_logic;
+   --    DO75                           :   OUT   std_logic;
+   --    DO76                           :   OUT   std_logic;
+   --    DO77                           :   OUT   std_logic;
+   --    DO78                           :   OUT   std_logic;
+   --    DO79                           :   OUT   std_logic;
+   --    CK                               :   IN   std_logic;
+   --    CS                               :   IN   std_logic;
+   --    OE                               :   IN   std_logic
+   --    );
+   --end component;
 
   --RAM 0
   component SU180_256X128X1BM1A
@@ -713,224 +727,224 @@ architecture struct of imsys_top is
   END component;
 
 -- RAM 1
-  component SU180_2048X80X1BM1B
-  port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      A10                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DO8                        :   OUT   std_logic;
-      DO9                        :   OUT   std_logic;
-      DO10                        :   OUT   std_logic;
-      DO11                        :   OUT   std_logic;
-      DO12                        :   OUT   std_logic;
-      DO13                        :   OUT   std_logic;
-      DO14                        :   OUT   std_logic;
-      DO15                        :   OUT   std_logic;
-      DO16                        :   OUT   std_logic;
-      DO17                        :   OUT   std_logic;
-      DO18                        :   OUT   std_logic;
-      DO19                        :   OUT   std_logic;
-      DO20                        :   OUT   std_logic;
-      DO21                        :   OUT   std_logic;
-      DO22                        :   OUT   std_logic;
-      DO23                        :   OUT   std_logic;
-      DO24                        :   OUT   std_logic;
-      DO25                        :   OUT   std_logic;
-      DO26                        :   OUT   std_logic;
-      DO27                        :   OUT   std_logic;
-      DO28                        :   OUT   std_logic;
-      DO29                        :   OUT   std_logic;
-      DO30                        :   OUT   std_logic;
-      DO31                        :   OUT   std_logic;
-      DO32                        :   OUT   std_logic;
-      DO33                        :   OUT   std_logic;
-      DO34                        :   OUT   std_logic;
-      DO35                        :   OUT   std_logic;
-      DO36                        :   OUT   std_logic;
-      DO37                        :   OUT   std_logic;
-      DO38                        :   OUT   std_logic;
-      DO39                        :   OUT   std_logic;
-      DO40                        :   OUT   std_logic;
-      DO41                        :   OUT   std_logic;
-      DO42                        :   OUT   std_logic;
-      DO43                        :   OUT   std_logic;
-      DO44                        :   OUT   std_logic;
-      DO45                        :   OUT   std_logic;
-      DO46                        :   OUT   std_logic;
-      DO47                        :   OUT   std_logic;
-      DO48                        :   OUT   std_logic;
-      DO49                        :   OUT   std_logic;
-      DO50                        :   OUT   std_logic;
-      DO51                        :   OUT   std_logic;
-      DO52                        :   OUT   std_logic;
-      DO53                        :   OUT   std_logic;
-      DO54                        :   OUT   std_logic;
-      DO55                        :   OUT   std_logic;
-      DO56                        :   OUT   std_logic;
-      DO57                        :   OUT   std_logic;
-      DO58                        :   OUT   std_logic;
-      DO59                        :   OUT   std_logic;
-      DO60                        :   OUT   std_logic;
-      DO61                        :   OUT   std_logic;
-      DO62                        :   OUT   std_logic;
-      DO63                        :   OUT   std_logic;
-      DO64                        :   OUT   std_logic;
-      DO65                        :   OUT   std_logic;
-      DO66                        :   OUT   std_logic;
-      DO67                        :   OUT   std_logic;
-      DO68                        :   OUT   std_logic;
-      DO69                        :   OUT   std_logic;
-      DO70                        :   OUT   std_logic;
-      DO71                        :   OUT   std_logic;
-      DO72                        :   OUT   std_logic;
-      DO73                        :   OUT   std_logic;
-      DO74                        :   OUT   std_logic;
-      DO75                        :   OUT   std_logic;
-      DO76                        :   OUT   std_logic;
-      DO77                        :   OUT   std_logic;
-      DO78                        :   OUT   std_logic;
-      DO79                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      DI8                        :   IN   std_logic;
-      DI9                        :   IN   std_logic;
-      DI10                        :   IN   std_logic;
-      DI11                        :   IN   std_logic;
-      DI12                        :   IN   std_logic;
-      DI13                        :   IN   std_logic;
-      DI14                        :   IN   std_logic;
-      DI15                        :   IN   std_logic;
-      DI16                        :   IN   std_logic;
-      DI17                        :   IN   std_logic;
-      DI18                        :   IN   std_logic;
-      DI19                        :   IN   std_logic;
-      DI20                        :   IN   std_logic;
-      DI21                        :   IN   std_logic;
-      DI22                        :   IN   std_logic;
-      DI23                        :   IN   std_logic;
-      DI24                        :   IN   std_logic;
-      DI25                        :   IN   std_logic;
-      DI26                        :   IN   std_logic;
-      DI27                        :   IN   std_logic;
-      DI28                        :   IN   std_logic;
-      DI29                        :   IN   std_logic;
-      DI30                        :   IN   std_logic;
-      DI31                        :   IN   std_logic;
-      DI32                        :   IN   std_logic;
-      DI33                        :   IN   std_logic;
-      DI34                        :   IN   std_logic;
-      DI35                        :   IN   std_logic;
-      DI36                        :   IN   std_logic;
-      DI37                        :   IN   std_logic;
-      DI38                        :   IN   std_logic;
-      DI39                        :   IN   std_logic;
-      DI40                        :   IN   std_logic;
-      DI41                        :   IN   std_logic;
-      DI42                        :   IN   std_logic;
-      DI43                        :   IN   std_logic;
-      DI44                        :   IN   std_logic;
-      DI45                        :   IN   std_logic;
-      DI46                        :   IN   std_logic;
-      DI47                        :   IN   std_logic;
-      DI48                        :   IN   std_logic;
-      DI49                        :   IN   std_logic;
-      DI50                        :   IN   std_logic;
-      DI51                        :   IN   std_logic;
-      DI52                        :   IN   std_logic;
-      DI53                        :   IN   std_logic;
-      DI54                        :   IN   std_logic;
-      DI55                        :   IN   std_logic;
-      DI56                        :   IN   std_logic;
-      DI57                        :   IN   std_logic;
-      DI58                        :   IN   std_logic;
-      DI59                        :   IN   std_logic;
-      DI60                        :   IN   std_logic;
-      DI61                        :   IN   std_logic;
-      DI62                        :   IN   std_logic;
-      DI63                        :   IN   std_logic;
-      DI64                        :   IN   std_logic;
-      DI65                        :   IN   std_logic;
-      DI66                        :   IN   std_logic;
-      DI67                        :   IN   std_logic;
-      DI68                        :   IN   std_logic;
-      DI69                        :   IN   std_logic;
-      DI70                        :   IN   std_logic;
-      DI71                        :   IN   std_logic;
-      DI72                        :   IN   std_logic;
-      DI73                        :   IN   std_logic;
-      DI74                        :   IN   std_logic;
-      DI75                        :   IN   std_logic;
-      DI76                        :   IN   std_logic;
-      DI77                        :   IN   std_logic;
-      DI78                        :   IN   std_logic;
-      DI79                        :   IN   std_logic;
-      WEB                         :   IN   std_logic;
-      CK                          :   IN   std_logic;
-      CS                          :   IN   std_logic;
-      OE                          :   IN   std_logic
-      );
-  END component;
+  --component SU180_2048X80X1BM1B
+  --port(
+  --    A0                         :   IN   std_logic;
+  --    A1                         :   IN   std_logic;
+  --    A2                         :   IN   std_logic;
+  --    A3                         :   IN   std_logic;
+  --    A4                         :   IN   std_logic;
+  --    A5                         :   IN   std_logic;
+  --    A6                         :   IN   std_logic;
+  --    A7                         :   IN   std_logic;
+  --    A8                         :   IN   std_logic;
+  --    A9                         :   IN   std_logic;
+  --    A10                         :   IN   std_logic;
+  --    DO0                        :   OUT   std_logic;
+  --    DO1                        :   OUT   std_logic;
+  --    DO2                        :   OUT   std_logic;
+  --    DO3                        :   OUT   std_logic;
+  --    DO4                        :   OUT   std_logic;
+  --    DO5                        :   OUT   std_logic;
+  --    DO6                        :   OUT   std_logic;
+  --    DO7                        :   OUT   std_logic;
+  --    DO8                        :   OUT   std_logic;
+  --    DO9                        :   OUT   std_logic;
+  --    DO10                        :   OUT   std_logic;
+  --    DO11                        :   OUT   std_logic;
+  --    DO12                        :   OUT   std_logic;
+  --    DO13                        :   OUT   std_logic;
+  --    DO14                        :   OUT   std_logic;
+  --    DO15                        :   OUT   std_logic;
+  --    DO16                        :   OUT   std_logic;
+  --    DO17                        :   OUT   std_logic;
+  --    DO18                        :   OUT   std_logic;
+  --    DO19                        :   OUT   std_logic;
+  --    DO20                        :   OUT   std_logic;
+  --    DO21                        :   OUT   std_logic;
+  --    DO22                        :   OUT   std_logic;
+  --    DO23                        :   OUT   std_logic;
+  --    DO24                        :   OUT   std_logic;
+  --    DO25                        :   OUT   std_logic;
+  --    DO26                        :   OUT   std_logic;
+  --    DO27                        :   OUT   std_logic;
+  --    DO28                        :   OUT   std_logic;
+  --    DO29                        :   OUT   std_logic;
+  --    DO30                        :   OUT   std_logic;
+  --    DO31                        :   OUT   std_logic;
+  --    DO32                        :   OUT   std_logic;
+  --    DO33                        :   OUT   std_logic;
+  --    DO34                        :   OUT   std_logic;
+  --    DO35                        :   OUT   std_logic;
+  --    DO36                        :   OUT   std_logic;
+  --    DO37                        :   OUT   std_logic;
+  --    DO38                        :   OUT   std_logic;
+  --    DO39                        :   OUT   std_logic;
+  --    DO40                        :   OUT   std_logic;
+  --    DO41                        :   OUT   std_logic;
+  --    DO42                        :   OUT   std_logic;
+  --    DO43                        :   OUT   std_logic;
+  --    DO44                        :   OUT   std_logic;
+  --    DO45                        :   OUT   std_logic;
+  --    DO46                        :   OUT   std_logic;
+  --    DO47                        :   OUT   std_logic;
+  --    DO48                        :   OUT   std_logic;
+  --    DO49                        :   OUT   std_logic;
+  --    DO50                        :   OUT   std_logic;
+  --    DO51                        :   OUT   std_logic;
+  --    DO52                        :   OUT   std_logic;
+  --    DO53                        :   OUT   std_logic;
+  --    DO54                        :   OUT   std_logic;
+  --    DO55                        :   OUT   std_logic;
+  --    DO56                        :   OUT   std_logic;
+  --    DO57                        :   OUT   std_logic;
+  --    DO58                        :   OUT   std_logic;
+  --    DO59                        :   OUT   std_logic;
+  --    DO60                        :   OUT   std_logic;
+  --    DO61                        :   OUT   std_logic;
+  --    DO62                        :   OUT   std_logic;
+  --    DO63                        :   OUT   std_logic;
+  --    DO64                        :   OUT   std_logic;
+  --    DO65                        :   OUT   std_logic;
+  --    DO66                        :   OUT   std_logic;
+  --    DO67                        :   OUT   std_logic;
+  --    DO68                        :   OUT   std_logic;
+  --    DO69                        :   OUT   std_logic;
+  --    DO70                        :   OUT   std_logic;
+  --    DO71                        :   OUT   std_logic;
+  --    DO72                        :   OUT   std_logic;
+  --    DO73                        :   OUT   std_logic;
+  --    DO74                        :   OUT   std_logic;
+  --    DO75                        :   OUT   std_logic;
+  --    DO76                        :   OUT   std_logic;
+  --    DO77                        :   OUT   std_logic;
+  --    DO78                        :   OUT   std_logic;
+  --    DO79                        :   OUT   std_logic;
+  --    DI0                        :   IN   std_logic;
+  --    DI1                        :   IN   std_logic;
+  --    DI2                        :   IN   std_logic;
+  --    DI3                        :   IN   std_logic;
+  --    DI4                        :   IN   std_logic;
+  --    DI5                        :   IN   std_logic;
+  --    DI6                        :   IN   std_logic;
+  --    DI7                        :   IN   std_logic;
+  --    DI8                        :   IN   std_logic;
+  --    DI9                        :   IN   std_logic;
+  --    DI10                        :   IN   std_logic;
+  --    DI11                        :   IN   std_logic;
+  --    DI12                        :   IN   std_logic;
+  --    DI13                        :   IN   std_logic;
+  --    DI14                        :   IN   std_logic;
+  --    DI15                        :   IN   std_logic;
+  --    DI16                        :   IN   std_logic;
+  --    DI17                        :   IN   std_logic;
+  --    DI18                        :   IN   std_logic;
+  --    DI19                        :   IN   std_logic;
+  --    DI20                        :   IN   std_logic;
+  --    DI21                        :   IN   std_logic;
+  --    DI22                        :   IN   std_logic;
+  --    DI23                        :   IN   std_logic;
+  --    DI24                        :   IN   std_logic;
+  --    DI25                        :   IN   std_logic;
+  --    DI26                        :   IN   std_logic;
+  --    DI27                        :   IN   std_logic;
+  --    DI28                        :   IN   std_logic;
+  --    DI29                        :   IN   std_logic;
+  --    DI30                        :   IN   std_logic;
+  --    DI31                        :   IN   std_logic;
+  --    DI32                        :   IN   std_logic;
+  --    DI33                        :   IN   std_logic;
+  --    DI34                        :   IN   std_logic;
+  --    DI35                        :   IN   std_logic;
+  --    DI36                        :   IN   std_logic;
+  --    DI37                        :   IN   std_logic;
+  --    DI38                        :   IN   std_logic;
+  --    DI39                        :   IN   std_logic;
+  --    DI40                        :   IN   std_logic;
+  --    DI41                        :   IN   std_logic;
+  --    DI42                        :   IN   std_logic;
+  --    DI43                        :   IN   std_logic;
+  --    DI44                        :   IN   std_logic;
+  --    DI45                        :   IN   std_logic;
+  --    DI46                        :   IN   std_logic;
+  --    DI47                        :   IN   std_logic;
+  --    DI48                        :   IN   std_logic;
+  --    DI49                        :   IN   std_logic;
+  --    DI50                        :   IN   std_logic;
+  --    DI51                        :   IN   std_logic;
+  --    DI52                        :   IN   std_logic;
+  --    DI53                        :   IN   std_logic;
+  --    DI54                        :   IN   std_logic;
+  --    DI55                        :   IN   std_logic;
+  --    DI56                        :   IN   std_logic;
+  --    DI57                        :   IN   std_logic;
+  --    DI58                        :   IN   std_logic;
+  --    DI59                        :   IN   std_logic;
+  --    DI60                        :   IN   std_logic;
+  --    DI61                        :   IN   std_logic;
+  --    DI62                        :   IN   std_logic;
+  --    DI63                        :   IN   std_logic;
+  --    DI64                        :   IN   std_logic;
+  --    DI65                        :   IN   std_logic;
+  --    DI66                        :   IN   std_logic;
+  --    DI67                        :   IN   std_logic;
+  --    DI68                        :   IN   std_logic;
+  --    DI69                        :   IN   std_logic;
+  --    DI70                        :   IN   std_logic;
+  --    DI71                        :   IN   std_logic;
+  --    DI72                        :   IN   std_logic;
+  --    DI73                        :   IN   std_logic;
+  --    DI74                        :   IN   std_logic;
+  --    DI75                        :   IN   std_logic;
+  --    DI76                        :   IN   std_logic;
+  --    DI77                        :   IN   std_logic;
+  --    DI78                        :   IN   std_logic;
+  --    DI79                        :   IN   std_logic;
+  --    WEB                         :   IN   std_logic;
+  --    CK                          :   IN   std_logic;
+  --    CS                          :   IN   std_logic;
+  --    OE                          :   IN   std_logic
+  --    );
+  --END component;
 -- application and microprogram shared memory
-  component SU180_16384X8X1BM8
-  port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      A10                         :   IN   std_logic;
-      A11                         :   IN   std_logic;
-      A12                         :   IN   std_logic;
-      A13                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      WEB                       :   IN   std_logic;
-      CK                            :   IN   std_logic;
-      CS                           :   IN   std_logic;
-      OE                            :   IN   std_logic
-      );
- end component;
+ -- component SU180_16384X8X1BM8
+ -- port(
+ --     A0                         :   IN   std_logic;
+ --     A1                         :   IN   std_logic;
+ --     A2                         :   IN   std_logic;
+ --     A3                         :   IN   std_logic;
+ --     A4                         :   IN   std_logic;
+ --     A5                         :   IN   std_logic;
+ --     A6                         :   IN   std_logic;
+ --     A7                         :   IN   std_logic;
+ --     A8                         :   IN   std_logic;
+ --     A9                         :   IN   std_logic;
+ --     A10                         :   IN   std_logic;
+ --     A11                         :   IN   std_logic;
+ --     A12                         :   IN   std_logic;
+ --     A13                         :   IN   std_logic;
+ --     DO0                        :   OUT   std_logic;
+ --     DO1                        :   OUT   std_logic;
+ --     DO2                        :   OUT   std_logic;
+ --     DO3                        :   OUT   std_logic;
+ --     DO4                        :   OUT   std_logic;
+ --     DO5                        :   OUT   std_logic;
+ --     DO6                        :   OUT   std_logic;
+ --     DO7                        :   OUT   std_logic;
+ --     DI0                        :   IN   std_logic;
+ --     DI1                        :   IN   std_logic;
+ --     DI2                        :   IN   std_logic;
+ --     DI3                        :   IN   std_logic;
+ --     DI4                        :   IN   std_logic;
+ --     DI5                        :   IN   std_logic;
+ --     DI6                        :   IN   std_logic;
+ --     DI7                        :   IN   std_logic;
+ --     WEB                       :   IN   std_logic;
+ --     CK                            :   IN   std_logic;
+ --     CS                           :   IN   std_logic;
+ --     OE                            :   IN   std_logic
+ --     );
+ --end component;
 
 
 
@@ -1012,8 +1026,9 @@ architecture struct of imsys_top is
   -- core/peri driven signals
   -----------------------------------------------------------------------------
   -- Signals to other blocks
-  signal exe          : std_logic; --CJ
-  signal ddi_vld      : std_logic; --CJ
+  signal exe_i          : std_logic; --CJ
+  signal ddi_vld_c1      : std_logic; --CJ
+  signal ddi_vld_c2      : std_logic; --CJ
   signal pll_frange   : std_logic;
   signal pll_n        : std_logic_vector(5 downto 0);
   signal pll_m        : std_logic_vector(2 downto 0);
@@ -1282,14 +1297,14 @@ architecture struct of imsys_top is
     signal c2_d_ras    : std_logic;  -- RAS to SDRAM
     signal c2_d_cas    : std_logic;  -- CAS to SDRAM
     signal c2_d_we     : std_logic;  -- WE to SDRAM
-    signal c2_d_dqi    : std_logic_vector(7 downto 0); -- Data in from processor
-    signal c2_d_dqo    : std_logic_vector(7 downto 0); -- Data out to processor
+    signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
+    signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
     
-  signal c2_mprom_a       : std_logic_vector(13 downto 0); 
+  signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
   signal c2_mprom_ce      : std_logic_vector(1 downto 0);  
   signal c2_mprom_oe      : std_logic_vector(1 downto 0);
-  signal c2_mpram_a       : std_logic_vector(7 downto 0); 
-  signal c2_mpram_d       : std_logic_vector(127 downto 0);   
+  signal c2_mpram_a       : std_logic_vector(7 downto 0); --CJ
+  signal c2_mpram_d       : std_logic_vector(127 downto 0); --CJ  
   signal c2_mpram_ce      : std_logic_vector(1 downto 0);    
   signal c2_mpram_oe      : std_logic_vector(1 downto 0);    
   signal c2_mpram_we_n    : std_logic;                       
@@ -1479,6 +1494,12 @@ begin
   io_iso <= '1';
 
   pllout <= HCLK;
+  ddi_vld_c1 <= C1_DDI_VLD;
+  ddi_vld_c2 <= C2_DDI_VLD;
+  C1_REQ_D <=c1_d_dqi;
+  C2_REQ_D <= c2_d_dqi;
+  c1_d_dqo <= C1_IN_D;
+  c2_d_dqo <= C2_IN_D;
   process
   begin
     lp_pwr_ok <= '0';
@@ -1501,206 +1522,206 @@ begin
 
   -- mprom0, mprom1
  --  mprom00
-  mprom00: SP180_4096X80BM1A
-  PORT MAP (
-      A0          => rom0_addr_sig(0),
-      A1          => rom0_addr_sig(1),               
-      A2          => rom0_addr_sig(2),              
-      A3          => rom0_addr_sig(3),             
-      A4          => rom0_addr_sig(4),             
-      A5          => rom0_addr_sig(5),               
-      A6          => rom0_addr_sig(6),               
-      A7          => rom0_addr_sig(7),               
-      A8          => rom0_addr_sig(8),               
-      A9          => rom0_addr_sig(9),               
-      A10         => rom0_addr_sig(10),
-      A11         => rom0_addr_sig(11),                
-      DO0         => mp_ROM0_DO(0),              
-      DO1         => mp_ROM0_DO(1),              
-      DO2         => mp_ROM0_DO(2),              
-      DO3         => mp_ROM0_DO(3),               
-      DO4         => mp_ROM0_DO(4),               
-      DO5         => mp_ROM0_DO(5),               
-      DO6         => mp_ROM0_DO(6),               
-      DO7         => mp_ROM0_DO(7),              
-      DO8         => mp_ROM0_DO(8),               
-      DO9         => mp_ROM0_DO(9),               
-      DO10        => mp_ROM0_DO(10),              
-      DO11        => mp_ROM0_DO(11),              
-      DO12        => mp_ROM0_DO(12),              
-      DO13        => mp_ROM0_DO(13),               
-      DO14        => mp_ROM0_DO(14),                
-      DO15        => mp_ROM0_DO(15),              
-      DO16        => mp_ROM0_DO(16),              
-      DO17        => mp_ROM0_DO(17),                
-      DO18        => mp_ROM0_DO(18),               
-      DO19        => mp_ROM0_DO(19),               
-      DO20        => mp_ROM0_DO(20),           
-      DO21        => mp_ROM0_DO(21),               
-      DO22        => mp_ROM0_DO(22),               
-      DO23        => mp_ROM0_DO(23),               
-      DO24        => mp_ROM0_DO(24),                
-      DO25        => mp_ROM0_DO(25),               
-      DO26        => mp_ROM0_DO(26),               
-      DO27        => mp_ROM0_DO(27),               
-      DO28        => mp_ROM0_DO(28),               
-      DO29        => mp_ROM0_DO(29),               
-      DO30        => mp_ROM0_DO(30),               
-      DO31        => mp_ROM0_DO(31),              
-      DO32        => mp_ROM0_DO(32),             
-      DO33        => mp_ROM0_DO(33),             
-      DO34        => mp_ROM0_DO(34),            
-      DO35        => mp_ROM0_DO(35),             
-      DO36        => mp_ROM0_DO(36),              
-      DO37        => mp_ROM0_DO(37),               
-      DO38        => mp_ROM0_DO(38),               
-      DO39        => mp_ROM0_DO(39),               
-      DO40        => mp_ROM0_DO(40),             
-      DO41        => mp_ROM0_DO(41),              
-      DO42        => mp_ROM0_DO(42),             
-      DO43        => mp_ROM0_DO(43),               
-      DO44        => mp_ROM0_DO(44),               
-      DO45        => mp_ROM0_DO(45),              
-      DO46        => mp_ROM0_DO(46),               
-      DO47        => mp_ROM0_DO(47),              
-      DO48        => mp_ROM0_DO(48),                
-      DO49        => mp_ROM0_DO(49),             
-      DO50        => mp_ROM0_DO(50),              
-      DO51        => mp_ROM0_DO(51),               
-      DO52        => mp_ROM0_DO(52),             
-      DO53        => mp_ROM0_DO(53),           
-      DO54        => mp_ROM0_DO(54),             
-      DO55        => mp_ROM0_DO(55),             
-      DO56        => mp_ROM0_DO(56),              
-      DO57        => mp_ROM0_DO(57),             
-      DO58        => mp_ROM0_DO(58),          
-      DO59        => mp_ROM0_DO(59),              
-      DO60        => mp_ROM0_DO(60),             
-      DO61        => mp_ROM0_DO(61),           
-      DO62        => mp_ROM0_DO(62),             
-      DO63        => mp_ROM0_DO(63),               
-      DO64        => mp_ROM0_DO(64),              
-      DO65        => mp_ROM0_DO(65),             
-      DO66        => mp_ROM0_DO(66),               
-      DO67        => mp_ROM0_DO(67),              
-      DO68        => mp_ROM0_DO(68),             
-      DO69        => mp_ROM0_DO(69),            
-      DO70        => mp_ROM0_DO(70),           
-      DO71        => mp_ROM0_DO(71),             
-      DO72        => mp_ROM0_DO(72),        
-      DO73        => mp_ROM0_DO(73),              
-      DO74        => mp_ROM0_DO(74),              
-      DO75        => mp_ROM0_DO(75),             
-      DO76        => mp_ROM0_DO(76),               
-      DO77        => mp_ROM0_DO(77),          
-      DO78        => mp_ROM0_DO(78),           
-      DO79        => mp_ROM0_DO(79),                         
-      CK          => clk_p,           
-      CS          => mp_ROM0_CS,               
-      OE          => mp_ROM0_OE                
-      );
+--  mprom00: SP180_4096X80BM1A
+--  PORT MAP (
+--      A0          => rom0_addr_sig(0),
+--      A1          => rom0_addr_sig(1),               
+--      A2          => rom0_addr_sig(2),              
+--      A3          => rom0_addr_sig(3),             
+--      A4          => rom0_addr_sig(4),             
+--      A5          => rom0_addr_sig(5),               
+--      A6          => rom0_addr_sig(6),               
+--      A7          => rom0_addr_sig(7),               
+--      A8          => rom0_addr_sig(8),               
+--      A9          => rom0_addr_sig(9),               
+--      A10         => rom0_addr_sig(10),
+--      A11         => rom0_addr_sig(11),                
+--      DO0         => mp_ROM0_DO(0),              
+--      DO1         => mp_ROM0_DO(1),              
+--      DO2         => mp_ROM0_DO(2),              
+--      DO3         => mp_ROM0_DO(3),               
+--      DO4         => mp_ROM0_DO(4),               
+--      DO5         => mp_ROM0_DO(5),               
+--      DO6         => mp_ROM0_DO(6),               
+--      DO7         => mp_ROM0_DO(7),              
+--      DO8         => mp_ROM0_DO(8),               
+--      DO9         => mp_ROM0_DO(9),               
+--      DO10        => mp_ROM0_DO(10),              
+--      DO11        => mp_ROM0_DO(11),              
+--      DO12        => mp_ROM0_DO(12),              
+--      DO13        => mp_ROM0_DO(13),               
+--      DO14        => mp_ROM0_DO(14),                
+--      DO15        => mp_ROM0_DO(15),              
+--      DO16        => mp_ROM0_DO(16),              
+--      DO17        => mp_ROM0_DO(17),                
+--      DO18        => mp_ROM0_DO(18),               
+--      DO19        => mp_ROM0_DO(19),               
+--      DO20        => mp_ROM0_DO(20),           
+--      DO21        => mp_ROM0_DO(21),               
+--      DO22        => mp_ROM0_DO(22),               
+--      DO23        => mp_ROM0_DO(23),               
+--      DO24        => mp_ROM0_DO(24),                
+--      DO25        => mp_ROM0_DO(25),               
+--      DO26        => mp_ROM0_DO(26),               
+--      DO27        => mp_ROM0_DO(27),               
+--      DO28        => mp_ROM0_DO(28),               
+--      DO29        => mp_ROM0_DO(29),               
+--      DO30        => mp_ROM0_DO(30),               
+--      DO31        => mp_ROM0_DO(31),              
+--      DO32        => mp_ROM0_DO(32),             
+--      DO33        => mp_ROM0_DO(33),             
+--      DO34        => mp_ROM0_DO(34),            
+--      DO35        => mp_ROM0_DO(35),             
+--      DO36        => mp_ROM0_DO(36),              
+--      DO37        => mp_ROM0_DO(37),               
+--      DO38        => mp_ROM0_DO(38),               
+--      DO39        => mp_ROM0_DO(39),               
+--      DO40        => mp_ROM0_DO(40),             
+--      DO41        => mp_ROM0_DO(41),              
+--      DO42        => mp_ROM0_DO(42),             
+--      DO43        => mp_ROM0_DO(43),               
+--      DO44        => mp_ROM0_DO(44),               
+--      DO45        => mp_ROM0_DO(45),              
+--      DO46        => mp_ROM0_DO(46),               
+--      DO47        => mp_ROM0_DO(47),              
+--      DO48        => mp_ROM0_DO(48),                
+--      DO49        => mp_ROM0_DO(49),             
+--      DO50        => mp_ROM0_DO(50),              
+--      DO51        => mp_ROM0_DO(51),               
+--      DO52        => mp_ROM0_DO(52),             
+--      DO53        => mp_ROM0_DO(53),           
+--      DO54        => mp_ROM0_DO(54),             
+--      DO55        => mp_ROM0_DO(55),             
+--      DO56        => mp_ROM0_DO(56),              
+--      DO57        => mp_ROM0_DO(57),             
+--      DO58        => mp_ROM0_DO(58),          
+--      DO59        => mp_ROM0_DO(59),              
+--      DO60        => mp_ROM0_DO(60),             
+--      DO61        => mp_ROM0_DO(61),           
+--      DO62        => mp_ROM0_DO(62),             
+--      DO63        => mp_ROM0_DO(63),               
+--      DO64        => mp_ROM0_DO(64),              
+--      DO65        => mp_ROM0_DO(65),             
+--      DO66        => mp_ROM0_DO(66),               
+--      DO67        => mp_ROM0_DO(67),              
+--      DO68        => mp_ROM0_DO(68),             
+--      DO69        => mp_ROM0_DO(69),            
+--      DO70        => mp_ROM0_DO(70),           
+--      DO71        => mp_ROM0_DO(71),             
+--      DO72        => mp_ROM0_DO(72),        
+--      DO73        => mp_ROM0_DO(73),              
+--      DO74        => mp_ROM0_DO(74),              
+--      DO75        => mp_ROM0_DO(75),             
+--      DO76        => mp_ROM0_DO(76),               
+--      DO77        => mp_ROM0_DO(77),          
+--      DO78        => mp_ROM0_DO(78),           
+--      DO79        => mp_ROM0_DO(79),                         
+--      CK          => clk_p,           
+--      CS          => mp_ROM0_CS,               
+--      OE          => mp_ROM0_OE                
+--      );--
+--
 
-
-    
- --  mprom11
-   mprom11: SP180_4096X80BM1B
-   PORT MAP (
-       A0          => mp_ROM1_A(0),
-       A1          => mp_ROM1_A(1),               
-       A2          => mp_ROM1_A(2),              
-       A3          => mp_ROM1_A(3),             
-       A4          => mp_ROM1_A(4),             
-       A5          => mp_ROM1_A(5),               
-       A6          => mp_ROM1_A(6),               
-       A7          => mp_ROM1_A(7),               
-       A8          => mp_ROM1_A(8),               
-       A9          => mp_ROM1_A(9),               
-       A10         => mp_ROM1_A(10),
-       A11         => mp_ROM1_A(11),                
-       DO0         => mp_ROM1_DO(0),               
-       DO1         => mp_ROM1_DO(1),               
-       DO2         => mp_ROM1_DO(2),              
-       DO3         => mp_ROM1_DO(3),               
-       DO4         => mp_ROM1_DO(4),               
-       DO5         => mp_ROM1_DO(5),               
-       DO6         => mp_ROM1_DO(6),               
-       DO7         => mp_ROM1_DO(7),              
-       DO8         => mp_ROM1_DO(8),               
-       DO9         => mp_ROM1_DO(9),               
-       DO10        => mp_ROM1_DO(10),              
-       DO11        => mp_ROM1_DO(11),              
-       DO12        => mp_ROM1_DO(12),              
-       DO13        => mp_ROM1_DO(13),               
-       DO14        => mp_ROM1_DO(14),                
-       DO15        => mp_ROM1_DO(15),              
-       DO16        => mp_ROM1_DO(16),              
-       DO17        => mp_ROM1_DO(17),                
-       DO18        => mp_ROM1_DO(18),               
-       DO19        => mp_ROM1_DO(19),               
-       DO20        => mp_ROM1_DO(20),           
-       DO21        => mp_ROM1_DO(21),               
-       DO22        => mp_ROM1_DO(22),               
-       DO23        => mp_ROM1_DO(23),               
-       DO24        => mp_ROM1_DO(24),                
-       DO25        => mp_ROM1_DO(25),               
-       DO26        => mp_ROM1_DO(26),               
-       DO27        => mp_ROM1_DO(27),               
-       DO28        => mp_ROM1_DO(28),               
-       DO29        => mp_ROM1_DO(29),               
-       DO30        => mp_ROM1_DO(30),               
-       DO31        => mp_ROM1_DO(31),              
-       DO32        => mp_ROM1_DO(32),             
-       DO33        => mp_ROM1_DO(33),             
-       DO34        => mp_ROM1_DO(34),            
-       DO35        => mp_ROM1_DO(35),             
-       DO36        => mp_ROM1_DO(36),              
-       DO37        => mp_ROM1_DO(37),               
-       DO38        => mp_ROM1_DO(38),               
-       DO39        => mp_ROM1_DO(39),               
-       DO40        => mp_ROM1_DO(40),             
-       DO41        => mp_ROM1_DO(41),              
-       DO42        => mp_ROM1_DO(42),             
-       DO43        => mp_ROM1_DO(43),               
-       DO44        => mp_ROM1_DO(44),               
-       DO45        => mp_ROM1_DO(45),              
-       DO46        => mp_ROM1_DO(46),               
-       DO47        => mp_ROM1_DO(47),              
-       DO48        => mp_ROM1_DO(48),                
-       DO49        => mp_ROM1_DO(49),             
-       DO50        => mp_ROM1_DO(50),              
-       DO51        => mp_ROM1_DO(51),               
-       DO52        => mp_ROM1_DO(52),             
-       DO53        => mp_ROM1_DO(53),           
-       DO54        => mp_ROM1_DO(54),             
-       DO55        => mp_ROM1_DO(55),             
-       DO56        => mp_ROM1_DO(56),              
-       DO57        => mp_ROM1_DO(57),             
-       DO58        => mp_ROM1_DO(58),          
-       DO59        => mp_ROM1_DO(59),              
-       DO60        => mp_ROM1_DO(60),             
-       DO61        => mp_ROM1_DO(61),           
-       DO62        => mp_ROM1_DO(62),             
-       DO63        => mp_ROM1_DO(63),               
-       DO64        => mp_ROM1_DO(64),              
-       DO65        => mp_ROM1_DO(65),             
-       DO66        => mp_ROM1_DO(66),               
-       DO67        => mp_ROM1_DO(67),              
-       DO68        => mp_ROM1_DO(68),             
-       DO69        => mp_ROM1_DO(69),            
-       DO70        => mp_ROM1_DO(70),           
-       DO71        => mp_ROM1_DO(71),             
-       DO72        => mp_ROM1_DO(72),        
-       DO73        => mp_ROM1_DO(73),              
-       DO74        => mp_ROM1_DO(74),              
-       DO75        => mp_ROM1_DO(75),             
-       DO76        => mp_ROM1_DO(76),               
-       DO77        => mp_ROM1_DO(77),          
-       DO78        => mp_ROM1_DO(78),           
-       DO79        => mp_ROM1_DO(79),                         
-       CK          => clk_p, 
-       CS          => mp_ROM1_CS,               
-       OE          => mp_ROM1_OE                
-       );
+--    
+-- --  mprom11
+--   mprom11: SP180_4096X80BM1B
+--   PORT MAP (
+--       A0          => mp_ROM1_A(0),
+--       A1          => mp_ROM1_A(1),               
+--       A2          => mp_ROM1_A(2),              
+--       A3          => mp_ROM1_A(3),             
+--       A4          => mp_ROM1_A(4),             
+--       A5          => mp_ROM1_A(5),               
+--       A6          => mp_ROM1_A(6),               
+--       A7          => mp_ROM1_A(7),               
+--       A8          => mp_ROM1_A(8),               
+--       A9          => mp_ROM1_A(9),               
+--       A10         => mp_ROM1_A(10),
+--       A11         => mp_ROM1_A(11),                
+--       DO0         => mp_ROM1_DO(0),               
+--       DO1         => mp_ROM1_DO(1),               
+--       DO2         => mp_ROM1_DO(2),              
+--       DO3         => mp_ROM1_DO(3),               
+--       DO4         => mp_ROM1_DO(4),               
+--       DO5         => mp_ROM1_DO(5),               
+--       DO6         => mp_ROM1_DO(6),               
+--       DO7         => mp_ROM1_DO(7),              
+--       DO8         => mp_ROM1_DO(8),               
+--       DO9         => mp_ROM1_DO(9),               
+--       DO10        => mp_ROM1_DO(10),              
+--       DO11        => mp_ROM1_DO(11),              
+--       DO12        => mp_ROM1_DO(12),              
+--       DO13        => mp_ROM1_DO(13),               
+--       DO14        => mp_ROM1_DO(14),                
+--       DO15        => mp_ROM1_DO(15),              
+--       DO16        => mp_ROM1_DO(16),              
+--       DO17        => mp_ROM1_DO(17),                
+--       DO18        => mp_ROM1_DO(18),               
+--       DO19        => mp_ROM1_DO(19),               
+--       DO20        => mp_ROM1_DO(20),           
+--       DO21        => mp_ROM1_DO(21),               
+--       DO22        => mp_ROM1_DO(22),               
+--       DO23        => mp_ROM1_DO(23),               
+--       DO24        => mp_ROM1_DO(24),                
+--       DO25        => mp_ROM1_DO(25),               
+--       DO26        => mp_ROM1_DO(26),               
+--       DO27        => mp_ROM1_DO(27),               
+--       DO28        => mp_ROM1_DO(28),               
+--       DO29        => mp_ROM1_DO(29),               
+--       DO30        => mp_ROM1_DO(30),               
+--       DO31        => mp_ROM1_DO(31),              
+--       DO32        => mp_ROM1_DO(32),             
+--       DO33        => mp_ROM1_DO(33),             
+--       DO34        => mp_ROM1_DO(34),            
+--       DO35        => mp_ROM1_DO(35),             
+--       DO36        => mp_ROM1_DO(36),              
+--       DO37        => mp_ROM1_DO(37),               
+--       DO38        => mp_ROM1_DO(38),               
+--       DO39        => mp_ROM1_DO(39),               
+--       DO40        => mp_ROM1_DO(40),             
+--       DO41        => mp_ROM1_DO(41),              
+--       DO42        => mp_ROM1_DO(42),             
+--       DO43        => mp_ROM1_DO(43),               
+--       DO44        => mp_ROM1_DO(44),               
+--       DO45        => mp_ROM1_DO(45),              
+--       DO46        => mp_ROM1_DO(46),               
+--       DO47        => mp_ROM1_DO(47),              
+--       DO48        => mp_ROM1_DO(48),                
+--       DO49        => mp_ROM1_DO(49),             
+--       DO50        => mp_ROM1_DO(50),              
+--       DO51        => mp_ROM1_DO(51),               
+--       DO52        => mp_ROM1_DO(52),             
+--       DO53        => mp_ROM1_DO(53),           
+--       DO54        => mp_ROM1_DO(54),             
+--       DO55        => mp_ROM1_DO(55),             
+--       DO56        => mp_ROM1_DO(56),              
+--       DO57        => mp_ROM1_DO(57),             
+--       DO58        => mp_ROM1_DO(58),          
+--       DO59        => mp_ROM1_DO(59),              
+--       DO60        => mp_ROM1_DO(60),             
+--       DO61        => mp_ROM1_DO(61),           
+--       DO62        => mp_ROM1_DO(62),             
+--       DO63        => mp_ROM1_DO(63),               
+--       DO64        => mp_ROM1_DO(64),              
+--       DO65        => mp_ROM1_DO(65),             
+--       DO66        => mp_ROM1_DO(66),               
+--       DO67        => mp_ROM1_DO(67),              
+--       DO68        => mp_ROM1_DO(68),             
+--       DO69        => mp_ROM1_DO(69),            
+--       DO70        => mp_ROM1_DO(70),           
+--       DO71        => mp_ROM1_DO(71),             
+--       DO72        => mp_ROM1_DO(72),        
+--       DO73        => mp_ROM1_DO(73),              
+--       DO74        => mp_ROM1_DO(74),              
+--       DO75        => mp_ROM1_DO(75),             
+--       DO76        => mp_ROM1_DO(76),               
+--       DO77        => mp_ROM1_DO(77),          
+--       DO78        => mp_ROM1_DO(78),           
+--       DO79        => mp_ROM1_DO(79),                         
+--       CK          => clk_p, 
+--       CS          => mp_ROM1_CS,               
+--       OE          => mp_ROM1_OE                
+--       );
 
   mpram00: SU180_256X128X1BM1A
   PORT MAP (
@@ -1977,184 +1998,184 @@ begin
       OE          => '1'                
       );
 
-  mpram11: SU180_2048X80X1BM1B
-  PORT MAP (
-      A0          => mp_RAM1_A(0),
-      A1          => mp_RAM1_A(1),               
-      A2          => mp_RAM1_A(2),              
-      A3          => mp_RAM1_A(3),             
-      A4          => mp_RAM1_A(4),             
-      A5          => mp_RAM1_A(5),               
-      A6          => mp_RAM1_A(6),               
-      A7          => mp_RAM1_A(7),               
-      A8          => mp_RAM1_A(8),               
-      A9          => mp_RAM1_A(9),               
-      A10         => mp_RAM1_A(10),                
-      DO0         => mp_RAM1_DO(0),               
-      DO1         => mp_RAM1_DO(1),               
-      DO2         => mp_RAM1_DO(2),              
-      DO3         => mp_RAM1_DO(3),               
-      DO4         => mp_RAM1_DO(4),               
-      DO5         => mp_RAM1_DO(5),               
-      DO6         => mp_RAM1_DO(6),               
-      DO7         => mp_RAM1_DO(7),              
-      DO8         => mp_RAM1_DO(8),               
-      DO9         => mp_RAM1_DO(9),               
-      DO10        => mp_RAM1_DO(10),              
-      DO11        => mp_RAM1_DO(11),              
-      DO12        => mp_RAM1_DO(12),              
-      DO13        => mp_RAM1_DO(13),               
-      DO14        => mp_RAM1_DO(14),                
-      DO15        => mp_RAM1_DO(15),              
-      DO16        => mp_RAM1_DO(16),              
-      DO17        => mp_RAM1_DO(17),                
-      DO18        => mp_RAM1_DO(18),               
-      DO19        => mp_RAM1_DO(19),               
-      DO20        => mp_RAM1_DO(20),           
-      DO21        => mp_RAM1_DO(21),               
-      DO22        => mp_RAM1_DO(22),               
-      DO23        => mp_RAM1_DO(23),               
-      DO24        => mp_RAM1_DO(24),                
-      DO25        => mp_RAM1_DO(25),               
-      DO26        => mp_RAM1_DO(26),               
-      DO27        => mp_RAM1_DO(27),               
-      DO28        => mp_RAM1_DO(28),               
-      DO29        => mp_RAM1_DO(29),               
-      DO30        => mp_RAM1_DO(30),               
-      DO31        => mp_RAM1_DO(31),              
-      DO32        => mp_RAM1_DO(32),             
-      DO33        => mp_RAM1_DO(33),             
-      DO34        => mp_RAM1_DO(34),            
-      DO35        => mp_RAM1_DO(35),             
-      DO36        => mp_RAM1_DO(36),              
-      DO37        => mp_RAM1_DO(37),               
-      DO38        => mp_RAM1_DO(38),               
-      DO39        => mp_RAM1_DO(39),               
-      DO40        => mp_RAM1_DO(40),             
-      DO41        => mp_RAM1_DO(41),              
-      DO42        => mp_RAM1_DO(42),             
-      DO43        => mp_RAM1_DO(43),               
-      DO44        => mp_RAM1_DO(44),               
-      DO45        => mp_RAM1_DO(45),              
-      DO46        => mp_RAM1_DO(46),               
-      DO47        => mp_RAM1_DO(47),              
-      DO48        => mp_RAM1_DO(48),                
-      DO49        => mp_RAM1_DO(49),             
-      DO50        => mp_RAM1_DO(50),              
-      DO51        => mp_RAM1_DO(51),               
-      DO52        => mp_RAM1_DO(52),             
-      DO53        => mp_RAM1_DO(53),           
-      DO54        => mp_RAM1_DO(54),             
-      DO55        => mp_RAM1_DO(55),             
-      DO56        => mp_RAM1_DO(56),              
-      DO57        => mp_RAM1_DO(57),             
-      DO58        => mp_RAM1_DO(58),          
-      DO59        => mp_RAM1_DO(59),              
-      DO60        => mp_RAM1_DO(60),             
-      DO61        => mp_RAM1_DO(61),           
-      DO62        => mp_RAM1_DO(62),             
-      DO63        => mp_RAM1_DO(63),               
-      DO64        => mp_RAM1_DO(64),              
-      DO65        => mp_RAM1_DO(65),             
-      DO66        => mp_RAM1_DO(66),               
-      DO67        => mp_RAM1_DO(67),              
-      DO68        => mp_RAM1_DO(68),             
-      DO69        => mp_RAM1_DO(69),            
-      DO70        => mp_RAM1_DO(70),           
-      DO71        => mp_RAM1_DO(71),             
-      DO72        => mp_RAM1_DO(72),        
-      DO73        => mp_RAM1_DO(73),              
-      DO74        => mp_RAM1_DO(74),              
-      DO75        => mp_RAM1_DO(75),             
-      DO76        => mp_RAM1_DO(76),               
-      DO77        => mp_RAM1_DO(77),          
-      DO78        => mp_RAM1_DO(78),           
-      DO79        => mp_RAM1_DO(79),            
-      DI0         => mp_RAM1_DI(0),           
-      DI1         => mp_RAM1_DI(1),             
-      DI2         => mp_RAM1_DI(2),            
-      DI3         => mp_RAM1_DI(3),            
-      DI4         => mp_RAM1_DI(4),           
-      DI5         => mp_RAM1_DI(5),            
-      DI6         => mp_RAM1_DI(6),           
-      DI7         => mp_RAM1_DI(7),         
-      DI8         => mp_RAM1_DI(8),           
-      DI9         => mp_RAM1_DI(9),           
-      DI10        => mp_RAM1_DI(10),              
-      DI11        => mp_RAM1_DI(11),              
-      DI12        => mp_RAM1_DI(12),              
-      DI13        => mp_RAM1_DI(13),             
-      DI14        => mp_RAM1_DI(14),           
-      DI15        => mp_RAM1_DI(15),            
-      DI16        => mp_RAM1_DI(16),          
-      DI17        => mp_RAM1_DI(17),               
-      DI18        => mp_RAM1_DI(18),               
-      DI19        => mp_RAM1_DI(19),              
-      DI20        => mp_RAM1_DI(20),               
-      DI21        => mp_RAM1_DI(21),               
-      DI22        => mp_RAM1_DI(22),              
-      DI23        => mp_RAM1_DI(23),                
-      DI24        => mp_RAM1_DI(24),             
-      DI25        => mp_RAM1_DI(25),              
-      DI26        => mp_RAM1_DI(26),                
-      DI27        => mp_RAM1_DI(27),               
-      DI28        => mp_RAM1_DI(28),              
-      DI29        => mp_RAM1_DI(29),           
-      DI30        => mp_RAM1_DI(30),               
-      DI31        => mp_RAM1_DI(31),            
-      DI32        => mp_RAM1_DI(32),              
-      DI33        => mp_RAM1_DI(33),              
-      DI34        => mp_RAM1_DI(34),        
-      DI35        => mp_RAM1_DI(35),            
-      DI36        => mp_RAM1_DI(36),             
-      DI37        => mp_RAM1_DI(37),               
-      DI38        => mp_RAM1_DI(38),             
-      DI39        => mp_RAM1_DI(39),           
-      DI40        => mp_RAM1_DI(40),           
-      DI41        => mp_RAM1_DI(41),             
-      DI42        => mp_RAM1_DI(42),           
-      DI43        => mp_RAM1_DI(43),            
-      DI44        => mp_RAM1_DI(44),           
-      DI45        => mp_RAM1_DI(45),              
-      DI46        => mp_RAM1_DI(46),          
-      DI47        => mp_RAM1_DI(47),            
-      DI48        => mp_RAM1_DI(48),            
-      DI49        => mp_RAM1_DI(49),              
-      DI50        => mp_RAM1_DI(50),              
-      DI51        => mp_RAM1_DI(51),             
-      DI52        => mp_RAM1_DI(52),              
-      DI53        => mp_RAM1_DI(53),            
-      DI54        => mp_RAM1_DI(54),          
-      DI55        => mp_RAM1_DI(55),               
-      DI56        => mp_RAM1_DI(56),             
-      DI57        => mp_RAM1_DI(57),             
-      DI58        => mp_RAM1_DI(58),               
-      DI59        => mp_RAM1_DI(59),           
-      DI60        => mp_RAM1_DI(60),             
-      DI61        => mp_RAM1_DI(61),             
-      DI62        => mp_RAM1_DI(62),              
-      DI63        => mp_RAM1_DI(63),            
-      DI64        => mp_RAM1_DI(64),           
-      DI65        => mp_RAM1_DI(65),              
-      DI66        => mp_RAM1_DI(66),               
-      DI67        => mp_RAM1_DI(67),           
-      DI68        => mp_RAM1_DI(68),            
-      DI69        => mp_RAM1_DI(69),              
-      DI70        => mp_RAM1_DI(70),            
-      DI71        => mp_RAM1_DI(71),            
-      DI72        => mp_RAM1_DI(72),              
-      DI73        => mp_RAM1_DI(73),             
-      DI74        => mp_RAM1_DI(74),             
-      DI75        => mp_RAM1_DI(75),              
-      DI76        => mp_RAM1_DI(76),              
-      DI77        => mp_RAM1_DI(77),               
-      DI78        => mp_RAM1_DI(78),             
-      DI79        => mp_RAM1_DI(79),           
-      WEB         => mp_RAM1_WEB,              
-      CK          => clk_p,            
-      CS          => mp_RAM1_CS,               
-      OE          => '1'                
-      );
+  --mpram11: SU180_2048X80X1BM1B
+  --PORT MAP (
+  --    A0          => mp_RAM1_A(0),
+  --    A1          => mp_RAM1_A(1),               
+  --    A2          => mp_RAM1_A(2),              
+  --    A3          => mp_RAM1_A(3),             
+  --    A4          => mp_RAM1_A(4),             
+  --    A5          => mp_RAM1_A(5),               
+  --    A6          => mp_RAM1_A(6),               
+  --    A7          => mp_RAM1_A(7),               
+  --    A8          => mp_RAM1_A(8),               
+  --    A9          => mp_RAM1_A(9),               
+  --    A10         => mp_RAM1_A(10),                
+  --    DO0         => mp_RAM1_DO(0),               
+  --    DO1         => mp_RAM1_DO(1),               
+  --    DO2         => mp_RAM1_DO(2),              
+  --    DO3         => mp_RAM1_DO(3),               
+  --    DO4         => mp_RAM1_DO(4),               
+  --    DO5         => mp_RAM1_DO(5),               
+  --    DO6         => mp_RAM1_DO(6),               
+  --    DO7         => mp_RAM1_DO(7),              
+  --    DO8         => mp_RAM1_DO(8),               
+  --    DO9         => mp_RAM1_DO(9),               
+  --    DO10        => mp_RAM1_DO(10),              
+  --    DO11        => mp_RAM1_DO(11),              
+  --    DO12        => mp_RAM1_DO(12),              
+  --    DO13        => mp_RAM1_DO(13),               
+  --    DO14        => mp_RAM1_DO(14),                
+  --    DO15        => mp_RAM1_DO(15),              
+  --    DO16        => mp_RAM1_DO(16),              
+  --    DO17        => mp_RAM1_DO(17),                
+  --    DO18        => mp_RAM1_DO(18),               
+  --    DO19        => mp_RAM1_DO(19),               
+  --    DO20        => mp_RAM1_DO(20),           
+  --    DO21        => mp_RAM1_DO(21),               
+  --    DO22        => mp_RAM1_DO(22),               
+  --    DO23        => mp_RAM1_DO(23),               
+  --    DO24        => mp_RAM1_DO(24),                
+  --    DO25        => mp_RAM1_DO(25),               
+  --    DO26        => mp_RAM1_DO(26),               
+  --    DO27        => mp_RAM1_DO(27),               
+  --    DO28        => mp_RAM1_DO(28),               
+  --    DO29        => mp_RAM1_DO(29),               
+  --    DO30        => mp_RAM1_DO(30),               
+  --    DO31        => mp_RAM1_DO(31),              
+  --    DO32        => mp_RAM1_DO(32),             
+  --    DO33        => mp_RAM1_DO(33),             
+  --    DO34        => mp_RAM1_DO(34),            
+  --    DO35        => mp_RAM1_DO(35),             
+  --    DO36        => mp_RAM1_DO(36),              
+  --    DO37        => mp_RAM1_DO(37),               
+  --    DO38        => mp_RAM1_DO(38),               
+  --    DO39        => mp_RAM1_DO(39),               
+  --    DO40        => mp_RAM1_DO(40),             
+  --    DO41        => mp_RAM1_DO(41),              
+  --    DO42        => mp_RAM1_DO(42),             
+  --    DO43        => mp_RAM1_DO(43),               
+  --    DO44        => mp_RAM1_DO(44),               
+  --    DO45        => mp_RAM1_DO(45),              
+  --    DO46        => mp_RAM1_DO(46),               
+  --    DO47        => mp_RAM1_DO(47),              
+  --    DO48        => mp_RAM1_DO(48),                
+  --    DO49        => mp_RAM1_DO(49),             
+  --    DO50        => mp_RAM1_DO(50),              
+  --    DO51        => mp_RAM1_DO(51),               
+  --    DO52        => mp_RAM1_DO(52),             
+  --    DO53        => mp_RAM1_DO(53),           
+  --    DO54        => mp_RAM1_DO(54),             
+  --    DO55        => mp_RAM1_DO(55),             
+  --    DO56        => mp_RAM1_DO(56),              
+  --    DO57        => mp_RAM1_DO(57),             
+  --    DO58        => mp_RAM1_DO(58),          
+  --    DO59        => mp_RAM1_DO(59),              
+  --    DO60        => mp_RAM1_DO(60),             
+  --    DO61        => mp_RAM1_DO(61),           
+  --    DO62        => mp_RAM1_DO(62),             
+  --    DO63        => mp_RAM1_DO(63),               
+  --    DO64        => mp_RAM1_DO(64),              
+  --    DO65        => mp_RAM1_DO(65),             
+  --    DO66        => mp_RAM1_DO(66),               
+  --    DO67        => mp_RAM1_DO(67),              
+  --    DO68        => mp_RAM1_DO(68),             
+  --    DO69        => mp_RAM1_DO(69),            
+  --    DO70        => mp_RAM1_DO(70),           
+  --    DO71        => mp_RAM1_DO(71),             
+  --    DO72        => mp_RAM1_DO(72),        
+  --    DO73        => mp_RAM1_DO(73),              
+  --    DO74        => mp_RAM1_DO(74),              
+  --    DO75        => mp_RAM1_DO(75),             
+  --    DO76        => mp_RAM1_DO(76),               
+  --    DO77        => mp_RAM1_DO(77),          
+  --    DO78        => mp_RAM1_DO(78),           
+  --    DO79        => mp_RAM1_DO(79),            
+  --    DI0         => mp_RAM1_DI(0),           
+  --    DI1         => mp_RAM1_DI(1),             
+  --    DI2         => mp_RAM1_DI(2),            
+  --    DI3         => mp_RAM1_DI(3),            
+  --    DI4         => mp_RAM1_DI(4),           
+  --    DI5         => mp_RAM1_DI(5),            
+  --    DI6         => mp_RAM1_DI(6),           
+  --    DI7         => mp_RAM1_DI(7),         
+  --    DI8         => mp_RAM1_DI(8),           
+  --    DI9         => mp_RAM1_DI(9),           
+  --    DI10        => mp_RAM1_DI(10),              
+  --    DI11        => mp_RAM1_DI(11),              
+  --    DI12        => mp_RAM1_DI(12),              
+  --    DI13        => mp_RAM1_DI(13),             
+  --    DI14        => mp_RAM1_DI(14),           
+  --    DI15        => mp_RAM1_DI(15),            
+  --    DI16        => mp_RAM1_DI(16),          
+  --    DI17        => mp_RAM1_DI(17),               
+  --    DI18        => mp_RAM1_DI(18),               
+  --    DI19        => mp_RAM1_DI(19),              
+  --    DI20        => mp_RAM1_DI(20),               
+  --    DI21        => mp_RAM1_DI(21),               
+  --    DI22        => mp_RAM1_DI(22),              
+  --    DI23        => mp_RAM1_DI(23),                
+  --    DI24        => mp_RAM1_DI(24),             
+  --    DI25        => mp_RAM1_DI(25),              
+  --    DI26        => mp_RAM1_DI(26),                
+  --    DI27        => mp_RAM1_DI(27),               
+  --    DI28        => mp_RAM1_DI(28),              
+  --    DI29        => mp_RAM1_DI(29),           
+  --    DI30        => mp_RAM1_DI(30),               
+  --    DI31        => mp_RAM1_DI(31),            
+  --    DI32        => mp_RAM1_DI(32),              
+  --    DI33        => mp_RAM1_DI(33),              
+  --    DI34        => mp_RAM1_DI(34),        
+  --    DI35        => mp_RAM1_DI(35),            
+  --    DI36        => mp_RAM1_DI(36),             
+  --    DI37        => mp_RAM1_DI(37),               
+  --    DI38        => mp_RAM1_DI(38),             
+  --    DI39        => mp_RAM1_DI(39),           
+  --    DI40        => mp_RAM1_DI(40),           
+  --    DI41        => mp_RAM1_DI(41),             
+  --    DI42        => mp_RAM1_DI(42),           
+  --    DI43        => mp_RAM1_DI(43),            
+  --    DI44        => mp_RAM1_DI(44),           
+  --    DI45        => mp_RAM1_DI(45),              
+  --    DI46        => mp_RAM1_DI(46),          
+  --    DI47        => mp_RAM1_DI(47),            
+  --    DI48        => mp_RAM1_DI(48),            
+  --    DI49        => mp_RAM1_DI(49),              
+  --    DI50        => mp_RAM1_DI(50),              
+  --    DI51        => mp_RAM1_DI(51),             
+  --    DI52        => mp_RAM1_DI(52),              
+  --    DI53        => mp_RAM1_DI(53),            
+  --    DI54        => mp_RAM1_DI(54),          
+  --    DI55        => mp_RAM1_DI(55),               
+  --    DI56        => mp_RAM1_DI(56),             
+  --    DI57        => mp_RAM1_DI(57),             
+  --    DI58        => mp_RAM1_DI(58),               
+  --    DI59        => mp_RAM1_DI(59),           
+  --    DI60        => mp_RAM1_DI(60),             
+  --    DI61        => mp_RAM1_DI(61),             
+  --    DI62        => mp_RAM1_DI(62),              
+  --    DI63        => mp_RAM1_DI(63),            
+  --    DI64        => mp_RAM1_DI(64),           
+  --    DI65        => mp_RAM1_DI(65),              
+  --    DI66        => mp_RAM1_DI(66),               
+  --    DI67        => mp_RAM1_DI(67),           
+  --    DI68        => mp_RAM1_DI(68),            
+  --    DI69        => mp_RAM1_DI(69),              
+  --    DI70        => mp_RAM1_DI(70),            
+  --    DI71        => mp_RAM1_DI(71),            
+  --    DI72        => mp_RAM1_DI(72),              
+  --    DI73        => mp_RAM1_DI(73),             
+  --    DI74        => mp_RAM1_DI(74),             
+  --    DI75        => mp_RAM1_DI(75),              
+  --    DI76        => mp_RAM1_DI(76),              
+  --    DI77        => mp_RAM1_DI(77),               
+  --    DI78        => mp_RAM1_DI(78),             
+  --    DI79        => mp_RAM1_DI(79),           
+  --    WEB         => mp_RAM1_WEB,              
+  --    CK          => clk_p,            
+  --    CS          => mp_RAM1_CS,               
+  --    OE          => '1'                
+  --    );
 
 
 
@@ -2229,27 +2250,27 @@ begin
 
 --  -- pmem
  --    mppmem
-  mppmem: SY180_2048X2X1CM8
-  PORT MAP (
-      A0          => mp_PM_A(0),
-      A1          => mp_PM_A(1),              
-      A2          => mp_PM_A(2),             
-      A3          => mp_PM_A(3),            
-      A4          => mp_PM_A(4),            
-      A5          => mp_PM_A(5),              
-      A6          => mp_PM_A(6),              
-      A7          => mp_PM_A(7),              
-      A8          => mp_PM_A(8),              
-      A9          => mp_PM_A(9),
-      A10         => mp_PM_A(10),                             
-      DO0         => mp_PM_DO(0),              
-      DO1         => mp_PM_DO(1),                                  
-      DI0         => mp_PM_DI(0),           
-      DI1         => mp_PM_DI(1),                           
-      WEB         => mp_PM_WEB,             
-      CK          => clk_p,           
-      CSB          => mp_PM_CSB                               
-      );
+  --mppmem: SY180_2048X2X1CM8
+  --PORT MAP (
+  --    A0          => mp_PM_A(0),
+  --    A1          => mp_PM_A(1),              
+  --    A2          => mp_PM_A(2),             
+  --    A3          => mp_PM_A(3),            
+  --    A4          => mp_PM_A(4),            
+  --    A5          => mp_PM_A(5),              
+  --    A6          => mp_PM_A(6),              
+  --    A7          => mp_PM_A(7),              
+  --    A8          => mp_PM_A(8),              
+  --    A9          => mp_PM_A(9),
+  --    A10         => mp_PM_A(10),                             
+  --    DO0         => mp_PM_DO(0),              
+  --    DO1         => mp_PM_DO(1),                                  
+  --    DI0         => mp_PM_DI(0),           
+  --    DI1         => mp_PM_DI(1),                           
+  --    WEB         => mp_PM_WEB,             
+  --    CK          => clk_p,           
+  --    CSB          => mp_PM_CSB                               
+  --    );
 	   
 --  -- trcmem
   trcmem: SY180_256X32X1CM4
@@ -2333,157 +2354,157 @@ begin
 
 
 
-  ram1: SU180_16384X8X1BM8        -- need modification flag, 2015lp
-  port MAP (
-      A0          =>  RAM1_A(0),
-      A1          =>  RAM1_A(1),
-      A2          =>  RAM1_A(2),
-      A3          =>  RAM1_A(3),
-      A4          =>  RAM1_A(4),
-      A5          =>  RAM1_A(5),
-      A6          =>  RAM1_A(6),
-      A7          =>  RAM1_A(7),
-      A8          =>  RAM1_A(8),
-      A9          =>  RAM1_A(9),
-      A10         =>  RAM1_A(10),
-      A11         =>  RAM1_A(11),
-      A12         =>  RAM1_A(12),
-      A13         =>  RAM1_A(13),
-      DO0         =>  RAM1_DO(0),
-      DO1         =>  RAM1_DO(1),
-      DO2         =>  RAM1_DO(2),
-      DO3         =>  RAM1_DO(3),
-      DO4         =>  RAM1_DO(4),
-      DO5         =>  RAM1_DO(5),
-      DO6         =>  RAM1_DO(6),
-      DO7         =>  RAM1_DO(7),
-      DI0         =>  RAM1_DI(0),
-      DI1         =>  RAM1_DI(1),
-      DI2         =>  RAM1_DI(2),
-      DI3         =>  RAM1_DI(3),
-      DI4         =>  RAM1_DI(4),
-      DI5         =>  RAM1_DI(5),
-      DI6         =>  RAM1_DI(6),
-      DI7         =>  RAM1_DI(7), 
-      WEB         =>  RAM1_WEB, 
-      CK          =>  clk_p, 
-      CS          =>  RAM1_CS, 
-      OE          =>  '1'   
-      );
+  --ram1: SU180_16384X8X1BM8        -- need modification flag, 2015lp
+  --port MAP (
+  --    A0          =>  RAM1_A(0),
+  --    A1          =>  RAM1_A(1),
+  --    A2          =>  RAM1_A(2),
+  --    A3          =>  RAM1_A(3),
+  --    A4          =>  RAM1_A(4),
+  --    A5          =>  RAM1_A(5),
+  --    A6          =>  RAM1_A(6),
+  --    A7          =>  RAM1_A(7),
+  --    A8          =>  RAM1_A(8),
+  --    A9          =>  RAM1_A(9),
+  --    A10         =>  RAM1_A(10),
+  --    A11         =>  RAM1_A(11),
+  --    A12         =>  RAM1_A(12),
+  --    A13         =>  RAM1_A(13),
+  --    DO0         =>  RAM1_DO(0),
+  --    DO1         =>  RAM1_DO(1),
+  --    DO2         =>  RAM1_DO(2),
+  --    DO3         =>  RAM1_DO(3),
+  --    DO4         =>  RAM1_DO(4),
+  --    DO5         =>  RAM1_DO(5),
+  --    DO6         =>  RAM1_DO(6),
+  --    DO7         =>  RAM1_DO(7),
+  --    DI0         =>  RAM1_DI(0),
+  --    DI1         =>  RAM1_DI(1),
+  --    DI2         =>  RAM1_DI(2),
+  --    DI3         =>  RAM1_DI(3),
+  --    DI4         =>  RAM1_DI(4),
+  --    DI5         =>  RAM1_DI(5),
+  --    DI6         =>  RAM1_DI(6),
+  --    DI7         =>  RAM1_DI(7), 
+  --    WEB         =>  RAM1_WEB, 
+  --    CK          =>  clk_p, 
+  --    CS          =>  RAM1_CS, 
+  --    OE          =>  '1'   
+  --    );
+--
+  --ram2: SU180_16384X8X1BM8        -- need modification flag, 2015lp
+  --port MAP (
+  --    A0          =>  RAM2_A(0),
+  --    A1          =>  RAM2_A(1),
+  --    A2          =>  RAM2_A(2),
+  --    A3          =>  RAM2_A(3),
+  --    A4          =>  RAM2_A(4),
+  --    A5          =>  RAM2_A(5),
+  --    A6          =>  RAM2_A(6),
+  --    A7          =>  RAM2_A(7),
+  --    A8          =>  RAM2_A(8),
+  --    A9          =>  RAM2_A(9),
+  --    A10         =>  RAM2_A(10),
+  --    A11         =>  RAM2_A(11),
+  --    A12         =>  RAM2_A(12),
+  --    A13         =>  RAM2_A(13),
+  --    DO0         =>  RAM2_DO(0),
+  --    DO1         =>  RAM2_DO(1),
+  --    DO2         =>  RAM2_DO(2),
+  --    DO3         =>  RAM2_DO(3),
+  --    DO4         =>  RAM2_DO(4),
+  --    DO5         =>  RAM2_DO(5),
+  --    DO6         =>  RAM2_DO(6),
+  --    DO7         =>  RAM2_DO(7),
+  --    DI0         =>  RAM2_DI(0),
+  --    DI1         =>  RAM2_DI(1),
+  --    DI2         =>  RAM2_DI(2),
+  --    DI3         =>  RAM2_DI(3),
+  --    DI4         =>  RAM2_DI(4),
+  --    DI5         =>  RAM2_DI(5),
+  --    DI6         =>  RAM2_DI(6),
+  --    DI7         =>  RAM2_DI(7), 
+  --    WEB         =>  RAM2_WEB, 
+  --    CK          =>  clk_p, 
+  --    CS          =>  RAM2_CS, 
+  --    OE          =>  '1'   
+  --    );
+--
+  --ram3: SU180_16384X8X1BM8        -- need modification flag, 2015lp
+  --port MAP (
+  --    A0          =>  RAM3_A(0),
+  --    A1          =>  RAM3_A(1),
+  --    A2          =>  RAM3_A(2),
+  --    A3          =>  RAM3_A(3),
+  --    A4          =>  RAM3_A(4),
+  --    A5          =>  RAM3_A(5),
+  --    A6          =>  RAM3_A(6),
+  --    A7          =>  RAM3_A(7),
+  --    A8          =>  RAM3_A(8),
+  --    A9          =>  RAM3_A(9),
+  --    A10         =>  RAM3_A(10),
+  --    A11         =>  RAM3_A(11),
+  --    A12         =>  RAM3_A(12),
+  --    A13         =>  RAM3_A(13),
+  --    DO0         =>  RAM3_DO(0),
+  --    DO1         =>  RAM3_DO(1),
+  --    DO2         =>  RAM3_DO(2),
+  --    DO3         =>  RAM3_DO(3),
+  --    DO4         =>  RAM3_DO(4),
+  --    DO5         =>  RAM3_DO(5),
+  --    DO6         =>  RAM3_DO(6),
+  --    DO7         =>  RAM3_DO(7),
+  --    DI0         =>  RAM3_DI(0),
+  --    DI1         =>  RAM3_DI(1),
+  --    DI2         =>  RAM3_DI(2),
+  --    DI3         =>  RAM3_DI(3),
+  --    DI4         =>  RAM3_DI(4),
+  --    DI5         =>  RAM3_DI(5),
+  --    DI6         =>  RAM3_DI(6),
+  --    DI7         =>  RAM3_DI(7), 
+  --    WEB         =>  RAM3_WEB, 
+  --    CK          =>  clk_p, 
+  --    CS          =>  RAM3_CS, 
+  --    OE          =>  '1'   
+  --    );
 
-  ram2: SU180_16384X8X1BM8        -- need modification flag, 2015lp
-  port MAP (
-      A0          =>  RAM2_A(0),
-      A1          =>  RAM2_A(1),
-      A2          =>  RAM2_A(2),
-      A3          =>  RAM2_A(3),
-      A4          =>  RAM2_A(4),
-      A5          =>  RAM2_A(5),
-      A6          =>  RAM2_A(6),
-      A7          =>  RAM2_A(7),
-      A8          =>  RAM2_A(8),
-      A9          =>  RAM2_A(9),
-      A10         =>  RAM2_A(10),
-      A11         =>  RAM2_A(11),
-      A12         =>  RAM2_A(12),
-      A13         =>  RAM2_A(13),
-      DO0         =>  RAM2_DO(0),
-      DO1         =>  RAM2_DO(1),
-      DO2         =>  RAM2_DO(2),
-      DO3         =>  RAM2_DO(3),
-      DO4         =>  RAM2_DO(4),
-      DO5         =>  RAM2_DO(5),
-      DO6         =>  RAM2_DO(6),
-      DO7         =>  RAM2_DO(7),
-      DI0         =>  RAM2_DI(0),
-      DI1         =>  RAM2_DI(1),
-      DI2         =>  RAM2_DI(2),
-      DI3         =>  RAM2_DI(3),
-      DI4         =>  RAM2_DI(4),
-      DI5         =>  RAM2_DI(5),
-      DI6         =>  RAM2_DI(6),
-      DI7         =>  RAM2_DI(7), 
-      WEB         =>  RAM2_WEB, 
-      CK          =>  clk_p, 
-      CS          =>  RAM2_CS, 
-      OE          =>  '1'   
-      );
-
-  ram3: SU180_16384X8X1BM8        -- need modification flag, 2015lp
-  port MAP (
-      A0          =>  RAM3_A(0),
-      A1          =>  RAM3_A(1),
-      A2          =>  RAM3_A(2),
-      A3          =>  RAM3_A(3),
-      A4          =>  RAM3_A(4),
-      A5          =>  RAM3_A(5),
-      A6          =>  RAM3_A(6),
-      A7          =>  RAM3_A(7),
-      A8          =>  RAM3_A(8),
-      A9          =>  RAM3_A(9),
-      A10         =>  RAM3_A(10),
-      A11         =>  RAM3_A(11),
-      A12         =>  RAM3_A(12),
-      A13         =>  RAM3_A(13),
-      DO0         =>  RAM3_DO(0),
-      DO1         =>  RAM3_DO(1),
-      DO2         =>  RAM3_DO(2),
-      DO3         =>  RAM3_DO(3),
-      DO4         =>  RAM3_DO(4),
-      DO5         =>  RAM3_DO(5),
-      DO6         =>  RAM3_DO(6),
-      DO7         =>  RAM3_DO(7),
-      DI0         =>  RAM3_DI(0),
-      DI1         =>  RAM3_DI(1),
-      DI2         =>  RAM3_DI(2),
-      DI3         =>  RAM3_DI(3),
-      DI4         =>  RAM3_DI(4),
-      DI5         =>  RAM3_DI(5),
-      DI6         =>  RAM3_DI(6),
-      DI7         =>  RAM3_DI(7), 
-      WEB         =>  RAM3_WEB, 
-      CK          =>  clk_p, 
-      CS          =>  RAM3_CS, 
-      OE          =>  '1'   
-      );
-
-  ram4: SU180_16384X8X1BM8        -- need modification flag, 2015lp
-  port MAP (
-      A0          =>  RAM4_A(0),
-      A1          =>  RAM4_A(1),
-      A2          =>  RAM4_A(2),
-      A3          =>  RAM4_A(3),
-      A4          =>  RAM4_A(4),
-      A5          =>  RAM4_A(5),
-      A6          =>  RAM4_A(6),
-      A7          =>  RAM4_A(7),
-      A8          =>  RAM4_A(8),
-      A9          =>  RAM4_A(9),
-      A10         =>  RAM4_A(10),
-      A11         =>  RAM4_A(11),
-      A12         =>  RAM4_A(12),
-      A13         =>  RAM4_A(13),
-      DO0         =>  RAM4_DO(0),
-      DO1         =>  RAM4_DO(1),
-      DO2         =>  RAM4_DO(2),
-      DO3         =>  RAM4_DO(3),
-      DO4         =>  RAM4_DO(4),
-      DO5         =>  RAM4_DO(5),
-      DO6         =>  RAM4_DO(6),
-      DO7         =>  RAM4_DO(7),
-      DI0         =>  RAM4_DI(0),
-      DI1         =>  RAM4_DI(1),
-      DI2         =>  RAM4_DI(2),
-      DI3         =>  RAM4_DI(3),
-      DI4         =>  RAM4_DI(4),
-      DI5         =>  RAM4_DI(5),
-      DI6         =>  RAM4_DI(6),
-      DI7         =>  RAM4_DI(7), 
-      WEB         =>  RAM4_WEB, 
-      CK          =>  clk_p, 
-      CS          =>  RAM4_CS, 
-      OE          =>  '1'   
-      );
+  --ram4: SU180_16384X8X1BM8        -- need modification flag, 2015lp
+  --port MAP (
+  --    A0          =>  RAM4_A(0),
+  --    A1          =>  RAM4_A(1),
+  --    A2          =>  RAM4_A(2),
+  --    A3          =>  RAM4_A(3),
+  --    A4          =>  RAM4_A(4),
+  --    A5          =>  RAM4_A(5),
+  --    A6          =>  RAM4_A(6),
+  --    A7          =>  RAM4_A(7),
+  --    A8          =>  RAM4_A(8),
+  --    A9          =>  RAM4_A(9),
+  --    A10         =>  RAM4_A(10),
+  --    A11         =>  RAM4_A(11),
+  --    A12         =>  RAM4_A(12),
+  --    A13         =>  RAM4_A(13),
+  --    DO0         =>  RAM4_DO(0),
+  --    DO1         =>  RAM4_DO(1),
+  --    DO2         =>  RAM4_DO(2),
+  --    DO3         =>  RAM4_DO(3),
+  --    DO4         =>  RAM4_DO(4),
+  --    DO5         =>  RAM4_DO(5),
+  --    DO6         =>  RAM4_DO(6),
+  --    DO7         =>  RAM4_DO(7),
+  --    DI0         =>  RAM4_DI(0),
+  --    DI1         =>  RAM4_DI(1),
+  --    DI2         =>  RAM4_DI(2),
+  --    DI3         =>  RAM4_DI(3),
+  --    DI4         =>  RAM4_DI(4),
+  --    DI5         =>  RAM4_DI(5),
+  --    DI6         =>  RAM4_DI(6),
+  --    DI7         =>  RAM4_DI(7), 
+  --    WEB         =>  RAM4_WEB, 
+  --    CK          =>  clk_p, 
+  --    CS          =>  RAM4_CS, 
+  --    OE          =>  '1'   
+  --    );
 
 
   -----------------------------------------------------------------------------
@@ -2718,8 +2739,8 @@ begin
 --	east_en	 	    => east_en	 	 ,       --delete by HYX, 20141027
 --	router_clk_en => router_clk_en,  --delete by HYX, 20141027
     -- RTC block signals
-    exe => exe,         --CJ
-    ddi_vld => ddi_vld, --CJ
+    exe => exe_i,         --CJ
+    ddi_vld => ddi_vld_c1, --CJ
     reset_core_n   => reset_core_n   ,
     reset_iso      => reset_iso      ,
 	reset_iso_clear=> reset_iso_clear,
@@ -2787,8 +2808,8 @@ begin
     dras_o        => c1_d_ras, --: out std_logic;  -- Row address strobe
     dcas_o        => c1_d_cas, --: out std_logic;  -- Column address strobe
     dwe_o         => c1_d_we,  --: out std_logic;  -- Write enable
-    ddq_i         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus
-    ddq_o         => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus
+    ddq_i         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
+    ddq_o         => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
     ddq_en        => ddq_en, --: out std_logic;  -- Data output bus enable
     da_o          => da_o,   --: out std_logic_vector(13 downto 0);  -- Address
     dba_o         => dba_o,  --: out std_logic_vector(1 downto 0); -- Bank address
@@ -2820,98 +2841,98 @@ begin
     -- pf_hi      => pf_hi          ,   --: out std_logic;  -- High drive on port F pins
     -- pg_hi      => pg_hi             --: out std_logic  -- High drive on port G pins
     ); 
-  --core2 : entity work.acore 
-  --port map(
------------------------------------------------------------------------
-  --  -- Signals to/from other blocks
------------------------------------------------------------------------
-  --  -- Clocks to/from clock block
-  --  clk_p         => clk_p  ,      
-  --  clk_c_en      => clk_c_en  ,
-  --  even_c        => even_c,     
-  --  --clk_c2_pos  => clk_c2a_pos,
-  --  clk_e_pos     => clk_ea_pos,
-  --  --clk_e_neg   => clk_ea_neg,
-	--  clk_d_pos		  => clk_da_pos,    -- Control outputs to the clock block
-  --  --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
-  --  --rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-  --  --din_e       => din_ea,  -- D input to FF generating clk_e
-  --  -- signals from the master core
-  --  rst_cn        => c2_core2_en,       --reset core2 if disabled
-  --  rsc_n         => c2_rsc_n,
-  --  clkreq_gen    => '0',
-  --  core2_en      => c2_core2_en     ,
-  --  crb_out       => c2_crb_out      ,
-  --  en_pmem       => c2_en_pmem      ,
-  --  en_wdog       => c2_en_wdog      ,
-  --  pup_clk       => c2_pup_clk      ,
-  --  pup_irq    	  => c2_pup_irq    	,
-  --  r_size     	  => c2_r_size     	,
-  --  c_size     	  => c2_c_size     	,
-  --  t_ras      	  => c2_t_ras      	,
-  --  t_rcd      	  => c2_t_rcd      	,
-  --  t_rp       	  => c2_t_rp       	,
-----    en_mexec   	  => c2_en_mexec   	,
-  --  dqm_size      => dqm_size     ,
-  --  fast_d        => fast_d       ,
-  --  short_cycle   => short_cycle,
-  --  
-  --  crb_sel       => c2_crb_sel,
-  --  --  Signals to/from Peripheral block
-  --  dfp           => dfp          , 
-  --  --dbus        : out std_logic_vector(7 downto 0);
-  --  --rst_en      : out std_logic;
-  --  --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
-  --  --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
-  --  ddqm          => open,   
-  --  irq0          => '1',  -- Interrupt request 0   
-  --  irq1          => '1',  -- Interrupt request 1   
------------------------------------------------------------------------
-  --  -- Memory signals
------------------------------------------------------------------------
-  --  -- MPROM signals
-  --  mprom_a       => c2_mprom_a    ,
-  --  mprom_ce      => c2_mprom_ce   ,
-  --  mprom_oe      => c2_mprom_oe   ,
-  --  -- MPRAM signals
-  --  mpram_a       => c2_mpram_a    ,-- Address  
-  --  mpram_d       => c2_mpram_d    ,-- Data to memory
-  --  mpram_ce      => c2_mpram_ce   ,-- Chip enable(active high)
-  --  mpram_oe      => c2_mpram_oe   ,-- Output enable(active high)
-  --  mpram_we_n    => c2_mpram_we_n ,-- Write enable(active low)
-  --  -- MPROM/MPRAM data out bus
-  --  mp_q          => c2_mp_q      ,-- Data from MPROM/MPRAM
-  --  -- GMEM signals
-  --  gmem_a        => c2_gmem_a      ,  
-  --  gmem_d        => c2_gmem_d      ,  
-  --  gmem_q        => c2_gmem_q      ,
-  --  gmem_ce_n     => c2_gmem_ce_n   ,   
-  --  gmem_we_n     => c2_gmem_we_n   ,   
-  --  -- PMEM signals (Patch memory)
-  --  pmem_a        => c2_pmem_a      ,
-  --  pmem_d        => c2_pmem_d      ,
-  --  pmem_q        => c2_pmem_q      ,
-  --  pmem_ce_n     => c2_pmem_ce_n   ,  
-  --  pmem_we_n     => c2_pmem_we_n   ,
-  --  exe          => exe ,     --CJ
-  --   ddi_vld      =>ddi_vld, --CJ 
------------------------------------------------------------------------
-  --  -- PADS
------------------------------------------------------------------------
-  --  -- DRAM signals     
-  --  d_addr        => c2_d_addr,
-  --  dcs_o         => c2_d_cs,
-  --  dras_o        => c2_d_ras,
-  --  dcas_o        => c2_d_cas,
-  --  dwe_o         => c2_d_we,
-  --  ddq_i         => c2_d_dqo,   -- Data input bus
-  --  ddq_o         => c2_d_dqi,   -- out std_logic_vector(7 downto 0); -- Data output bus
-  --  ddq_en        => open,
-  --  da_o          => open,
-  --  dba_o         => open,
-  --  dcke_o        => open -- Clock enable
+  core2 : entity work.acore 
+  port map(
+---------------------------------------------------------------------
+    -- Signals to/from other blocks
+---------------------------------------------------------------------
+    -- Clocks to/from clock block
+    clk_p         => clk_p  ,      
+    clk_c_en      => clk_c_en  ,
+    even_c        => even_c,     
+    --clk_c2_pos  => clk_c2a_pos,
+    clk_e_pos     => clk_ea_pos,
+    --clk_e_neg   => clk_ea_neg,
+	  clk_d_pos		  => clk_da_pos,    -- Control outputs to the clock block
+    --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
+    --rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
+    --din_e       => din_ea,  -- D input to FF generating clk_e
+    -- signals from the master core
+    rst_cn        => c2_core2_en,       --reset core2 if disabled
+    rsc_n         => c2_rsc_n,
+    clkreq_gen    => '0',
+    core2_en      => c2_core2_en     ,
+    crb_out       => c2_crb_out      ,
+    en_pmem       => c2_en_pmem      ,
+    en_wdog       => c2_en_wdog      ,
+    pup_clk       => c2_pup_clk      ,
+    pup_irq    	  => c2_pup_irq    	,
+    r_size     	  => c2_r_size     	,
+    c_size     	  => c2_c_size     	,
+    t_ras      	  => c2_t_ras      	,
+    t_rcd      	  => c2_t_rcd      	,
+    t_rp       	  => c2_t_rp       	,
+--    en_mexec   	  => c2_en_mexec   	,
+    dqm_size      => dqm_size     ,
+    fast_d        => fast_d       ,
+    short_cycle   => short_cycle,
+    
+    crb_sel       => c2_crb_sel,
+    --  Signals to/from Peripheral block
+    dfp           => dfp          , 
+    --dbus        : out std_logic_vector(7 downto 0);
+    --rst_en      : out std_logic;
+    --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
+    --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
+    ddqm          => open,   
+    irq0          => '1',  -- Interrupt request 0   
+    irq1          => '1',  -- Interrupt request 1   
+---------------------------------------------------------------------
+    -- Memory signals
+---------------------------------------------------------------------
+    -- MPROM signals
+    mprom_a       => c2_mprom_a    ,
+    mprom_ce      => c2_mprom_ce   ,
+    mprom_oe      => c2_mprom_oe   ,
+    -- MPRAM signals
+    mpram_a       => c2_mpram_a    ,-- Address  
+    mpram_d       => c2_mpram_d    ,-- Data to memory
+    mpram_ce      => c2_mpram_ce   ,-- Chip enable(active high)
+    mpram_oe      => c2_mpram_oe   ,-- Output enable(active high)
+    mpram_we_n    => c2_mpram_we_n ,-- Write enable(active low)
+    -- MPROM/MPRAM data out bus
+    mp_q          => c2_mp_q      ,-- Data from MPROM/MPRAM
+    -- GMEM signals
+    gmem_a        => c2_gmem_a      ,  
+    gmem_d        => c2_gmem_d      ,  
+    gmem_q        => c2_gmem_q      ,
+    gmem_ce_n     => c2_gmem_ce_n   ,   
+    gmem_we_n     => c2_gmem_we_n   ,   
+    -- PMEM signals (Patch memory)
+    pmem_a        => c2_pmem_a      ,
+    pmem_d        => c2_pmem_d      ,
+    pmem_q        => c2_pmem_q      ,
+    pmem_ce_n     => c2_pmem_ce_n   ,  
+    pmem_we_n     => c2_pmem_we_n   ,
+    exe          => exe ,     --CJ
+     ddi_vld      =>ddi_vld_c2, --CJ 
+---------------------------------------------------------------------
+    -- PADS
+---------------------------------------------------------------------
+    -- DRAM signals     
+    d_addr        => c2_d_addr,
+    dcs_o         => c2_d_cs,
+    dras_o        => c2_d_ras,
+    dcas_o        => c2_d_cas,
+    dwe_o         => c2_d_we,
+    ddq_i         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
+    ddq_o         => c2_d_dqi,   -- out std_logic_vector(31 downto 0); -- Data output bus
+    ddq_en        => open,
+    da_o          => open,
+    dba_o         => open,
+    dcke_o        => open -- Clock enable
 
-  --  );  
+    );  
 
 
     

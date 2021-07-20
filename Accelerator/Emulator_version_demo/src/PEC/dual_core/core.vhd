@@ -476,7 +476,7 @@ begin
         if ddi_vld = '0' and vldl = '1' then  --act at falling_edge of ddi_vld signal
             ld_mpgm <= '0';
         else
-            ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97);
+            ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
         end if;
   end process;
 
@@ -819,7 +819,8 @@ begin
       clk_e_pos      => clk_e_pos_int,
       rst_en        => rst_en_int,              
       -- Microprogram fields
-      pl            => pl, 
+      pl            => pl,
+      ld_mpgm       => ld_mpgm, 
       -- Static control inputs
       dbl_direct    => dbl_direct,            
       pup_irq       => pup_irq,           

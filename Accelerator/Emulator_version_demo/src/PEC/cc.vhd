@@ -11,10 +11,10 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : cmem
+-- Title      : Cluster Controller
 -- Project    : GP3000
 -------------------------------------------------------------------------------
--- File       : cmem.vhd
+-- File       : cc.vhd
 -- Author     : Chuhang Jin
 -- Company    : Imsys Technologies AB
 -- Date       : 
@@ -54,6 +54,9 @@ entity cluster_controller is
 --Data line   
 	  DATA             : in std_logic_vector(7 downto 0);
 	  DATA_OUT         : out std_logic_vector(7 downto 0);
+--PE Control
+      EXE              : out std_logic;   --Start execution
+	  RESUME           : out std_logic;   --Resume paused execution
 --Feedback signals
       --fb               : out std_logic
 --Request and distribution logic signals
@@ -133,7 +136,8 @@ end component;
   --signal rst_en   : std_logic;  --Reset
   signal cmc      : std_logic;  --Communication
   signal dir_n    : std_logic;  --NOC side direction
-  signal exe      : std_logic;  --Execution
+  signal exe_i      : std_logic;  --Execution
+  signal resume_i : std_logic; --Continue
   signal dir_p    : std_logic;  --PE side direction
   signal debug    : std_logic:='0';
   signal peci_busy : std_logic:='0'; --Cluster interface busy 
@@ -327,11 +331,13 @@ begin
   
   noc_ctrl: process(clk_e,sig_fin,noc_cmd)
   
-  variable tag_ctr_2 : integer:=30;
-  variable tag_ctr_3 : integer:=38;   --Both to be described in define document
+  variable tag_ctr_2 : integer;
+  variable tag_ctr_3 : integer;   --Both to be described in define document
   begin
 	if rising_edge(clk_e) then
 		if noc_cmd = "01111" then
+			tag_ctr_2 := 30;
+			tag_ctr_3 := 38;
 			len_ctr <= (others => '0');
 			addr_n  <= (others => '0');
 			pk_reg  <= (others => '0');
@@ -385,6 +391,35 @@ begin
 
 	end if;
   end process; 
+    
+    exe_and_resume: process(clk_e)
+		variable idle: boolean;
+	begin
+		if rising_edge(clk_e) then
+			if noc_cmd = "01111" then
+				exe_i <= '0';
+				resume_i <= '0';
+				idle := true;
+			elsif noc_cmd = "00110" then --exe command
+				exe_i<= '0';
+				if idle then
+					exe <= '1';
+					idle := false;
+				end if;
+			elsif noc_cmd = "01000" then --continue command
+				resume_i<= '0';
+				if idle then
+					resume_i<= '1';
+					idle := false;
+				end if;
+			else
+				idle := true;
+			end if;
+		end if;
+	end process;
+    EXE <= exe_i;
+	RESUME <= resume_i;
+
   
   ------------------------------------------------------------------------------
   -- Data transfer

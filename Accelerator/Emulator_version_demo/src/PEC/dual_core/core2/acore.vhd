@@ -100,7 +100,7 @@ entity acore is
     -- Memory signals
 ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a     : out std_logic_vector(13 downto 0);-- Address  
+    mprom_a     : out std_logic_vector(13 downto 0);-- Address  --CJ
     mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high) 
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
@@ -125,7 +125,7 @@ entity acore is
     pmem_we_n   : out std_logic;
     -- CC signal
     ddi_vld   : in std_logic; --Added by CJ
-    exe       : in std_logic;
+    exe       : in std_logic; --CONT need to be added
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
@@ -135,10 +135,10 @@ entity acore is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus
-    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
+    ddq_i       : in  std_logic_vector(127 downto 0); -- Data input bus --CJ
+    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus --CJ
     ddq_en      : out std_logic;  -- Data output bus enable
-    da_o        : out std_logic_vector(7 downto 0);  -- Address
+    da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
     dcke_o      : out std_logic_vector(3 downto 0) -- Clock enable
 
@@ -162,7 +162,7 @@ architecture struct of acore is
 
   signal odd_c      : std_logic;
   signal clk_e_pos_int  : std_logic;  -- Execution clock
-  signal clk_e_neg  : std_logic;  -- Execution clock
+  signal clk_e_neg_int  : std_logic;  -- Execution clock
   -- CRB signals
   --signal crb_out    	: std_logic_vector(7 downto 0);
   --signal en_pmem    	: std_logic;
@@ -247,7 +247,7 @@ architecture struct of acore is
   signal rd_crb       : std_logic;
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
-  signal latch        : std_logic_vector(7  downto 0);
+  signal latch        : std_logic_vector(7  downto 0); 
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -263,7 +263,9 @@ architecture struct of acore is
   signal i_double   : std_logic;               
   signal lmpen      : std_logic;               
   signal adl_cy     : std_logic;               
-  signal mmr_hold_e : std_logic;               
+  signal mmr_hold_e : std_logic; 
+  signal dfm_rdy    : std_logic; --CJ 
+  signal dtm_fifo_rdy : std_logic; --CJ              
   
   -- CPC signals
 --  signal plsel_n      : std_logic;
@@ -280,6 +282,12 @@ architecture struct of acore is
   signal i_direct   : std_logic_vector(7 downto 0);                  
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
+  --VE signals
+  signal ve_in_int  : std_logic_vector(63 downto 0);
+  signal ve_rdy_int : std_logic;
+  signal re_rdy_int : std_logic;
+  signal ve_out_a_int : std_logic_vector(7 downto 0);
+  signal ve_out_sing_int : std_logic_vector(7 downto 0);
   signal vldl      : std_logic; --Added by CJ
   attribute syn_keep              : boolean;
   --attribute syn_keep of pend_i    : signal is true;
@@ -352,7 +360,7 @@ begin
       -- Clock and reset
 	  core2_en    => core2_en_buf,
       rst_cn      => rst_cn,
-      clk_e_neg       => clk_e_neg,
+      clk_e_neg       => clk_e_neg_int,
       clk_p       => clk_p,
       -- Control signals
       even_c      => odd_c,
@@ -371,8 +379,8 @@ begin
       pmem_q      => pmem_q,    
       pmem_ce_n   => pmem_ce_n);    
 
-  mprom_a     <= mpga;
-  mpram_d     <= x"FFFFFFFFFFFFFFFFFFFF";
+  --mprom_a     <= mpga;
+  mpram_d     <= (others => '1');
   mpram_we_n  <= '1';
   pmem_d      <= "11";
   pmem_we_n   <= '1';
@@ -389,7 +397,7 @@ begin
       clk_c_en    => clk_c_en,            
       clk_c2_pos  => odd_c,            
       clk_e_pos   => clk_e_pos_int,            
-      clk_e_neg	  => clk_e_neg,
+      clk_e_neg	  => clk_e_neg_int,
       even_c      => even_c,
       rst_cn      => rst_cn, 
 	    core2_en    => core2_en_buf,     
@@ -418,7 +426,8 @@ begin
       clk_e_pos      => clk_e_pos_int,
       rst_en        => rst_en_int,               
       -- Microprogram fields
-      pl            => pl, 
+      pl            => pl,
+      ld_mpgm       => '0', 
       -- Static control inputs
       dbl_direct    => dbl_direct,            
       pup_irq       => pup_irq,           
@@ -455,7 +464,11 @@ begin
       psc_aempty    => psc_aempty,          
       psc_empty     => psc_empty,           
       flag_yeqneg   => flag_yeqneg,         
-      adl_cy        => adl_cy,              
+      adl_cy        => adl_cy, 
+      re_rdy        => re_rdy_int, --Added by CJ
+      ve_rdy        => ve_rdy_int, --Added by CJ
+      dfm_rdy       => dfm_rdy,--Added by CJ
+      fifo_rdy      => dtm_fifo_rdy, --Added by CJ               
       --Data Inputs
       dbus          => dbus_int,                
       y_reg         => y_reg,
@@ -517,7 +530,7 @@ begin
       rst_en     => rst_en_int,
       clk_p      => clk_p,              
       clk_e_pos   => clk_e_pos_int,
-      clk_e_neg   => clk_e_neg,
+      clk_e_neg   => clk_e_neg_int,
       gate_e     => clk_e_pos_int,          
       held_e     => held_e,           
       -- Microprogram fields
@@ -586,6 +599,9 @@ begin
       gdata         => gdata,            
       dtal          => dtal,             
       dfp           => dfp,
+       --CJ added
+       VE_OUT_A      => ve_out_a_int,
+       VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
       load_b        => open,       
@@ -625,7 +641,7 @@ begin
       -- Clock and reset functions
       rst_en      => rst_en_int,
       clk_p       => clk_p,
-      clk_e_neg    => clk_e_neg,
+      clk_e_neg    => clk_e_neg_int,
       clk_c2_pos      => odd_c,            
       clk_d_pos       => clk_d_pos,            
       clk_e_pos       => clk_e_pos_int,
@@ -672,8 +688,28 @@ begin
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,
-      exe         => exe,    --Added by CJ         
-      d_cke       => dcke_o);      
+      exe         => exe,    --Added by CJ 
+      --ddi_vld     => ddi_vld,  --Added by CJ        
+      d_cke       => dcke_o); 
+---------------------------------------------------------------------
+-- VE
+---------------------------------------------------------------------
+      --CJ Added
+      vector_engine : entity work.ve
+      port map(
+      CLK_P       => clk_p,
+      CLK_E_POS   => clk_e_pos_int,
+      CLK_E_NEG   => clk_e_neg_int,
+      RST         => rst_en_int,
+      PL          => pl,
+      YBUS        => ybus,
+      DDI_VLD     => ddi_vld,
+      RE_RDY      => re_rdy_int,
+      VE_RDY      => ve_rdy_int,
+      VE_IN       => ve_in_int,
+      VE_OUT_A    => ve_out_a_int,
+      VE_OUT_SING => ve_out_sing_int
+      );    
 
     i_direct <= x"00"; 
     dfio <= x"00";

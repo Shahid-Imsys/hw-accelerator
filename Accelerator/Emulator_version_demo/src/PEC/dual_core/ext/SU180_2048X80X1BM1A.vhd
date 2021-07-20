@@ -298,7 +298,7 @@ architecture struct of SU180_256X128X1BM1A is
 	    end function;
 	    
 	    
-	signal RAM	: ram_type := init_ram_from_file("Test_fifo_and_send_req_BE_F.data");
+	signal RAM	: ram_type; --:= init_ram_from_file("Test_fifo_and_send_req_BE_F.data");
 	signal addr	: std_logic_vector(7 downto 0);
 	signal di		: std_logic_vector(127 downto 0);
 	signal do		: std_logic_vector(127 downto 0);

@@ -47,6 +47,7 @@ entity clc is
     rst_en       : in  std_logic;  -- Reset input (active  low)
     -- Microprogram fields
     pl           : in  std_logic_vector(127 downto 0);
+    ld_mpgm      : in  std_logic;
     -- Static control inputs
     dbl_direct   : in  std_logic;  -- Double step control input
     pup_irq      : in  std_logic_vector(1 downto 0); -- Enable wake on IRQ
@@ -84,6 +85,10 @@ entity clc is
     psc_empty    : in  std_logic; 
     flag_yeqneg  : in  std_logic; 
     adl_cy       : in  std_logic; 
+    re_rdy       : in  std_logic;--Added by CJ
+    ve_rdy       : in  std_logic;--Added by CJ
+    dfm_rdy      : in  std_logic;--Added by CJ
+    fifo_rdy     : in  std_logic;--Added by CJ
     --Data Inputs
     dbus         : in  std_logic_vector(7 downto 0);   
     y_reg        : in  std_logic_vector(7 downto 0);   
@@ -183,7 +188,7 @@ begin
   pl_sig8   <= pl(28)&pl(62)&(pl(26) xor pl(17))&(pl(3) xor pl(59))&(pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24) ;
   pl_map  <= (pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
   pl_aux1 <= pl_sig1(4 downto 2);
-  pl_ld_mpgm <= pl(100) and pl(98); --Added by CJ
+  pl_ld_mpgm <= ld_mpgm; --Added by CJ
 ----------------------------------------------------------------------
   -- Sequence control decode logic. 
 ----------------------------------------------------------------------
@@ -469,7 +474,11 @@ begin
       when COND_SPECIAL => sel_cond <= special;       
       when COND_YEQNEG =>  sel_cond <= flag_yeqneg;   
       when COND_FA =>      sel_cond <= flag_fa;       
-      when COND_ADLCY =>   sel_cond <= adl_cy;        
+      when COND_ADLCY =>   sel_cond <= adl_cy;
+      when COND_VE_RDY   =>sel_cond <= ve_rdy; --Added by CJ
+      when COND_RE_RDY   =>sel_cond <= re_rdy; --Added by CJ
+      when COND_DFM_RDY  =>sel_cond <= dfm_rdy; --Added by CJ
+      when COND_FIFO_RDY =>sel_cond <= fifo_rdy; --Added by CJ        
       when others  => null;
     end case;
   end process;

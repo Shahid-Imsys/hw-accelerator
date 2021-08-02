@@ -1,0 +1,38 @@
+
+
+Test of writing registers and DTM from ALU.
+
+Registers are initialized using DBUS constants and passed value to Y-bus and written to work-register.
+
+W0 = 0x70
+W1 = 0x71
+W2 = 0x72
+W3 = 0x73
+W4 = 0x74
+W5 = 0x75
+W6 = 0x76
+W7 = 0x77
+
+
+Next sequence it to add one to the register value W0-W7 and write the result to DTM.
+
+DTM = 71 00 00 00
+DTM = 71 72 00 00
+DTM = 71 72 73 00
+DTM = 71 72 73 74
+DTM = 75 72 73 74
+DTM = 75 76 73 74
+DTM = 75 76 77 74
+DTM = 75 76 77 78
+
+Resulting workregisters are then.
+
+W0 = 0x71
+W1 = 0x72
+W2 = 0x73
+W3 = 0x74
+W4 = 0x75
+W5 = 0x76
+W6 = 0x77
+W7 = 0x78
+

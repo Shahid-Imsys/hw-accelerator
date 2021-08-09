@@ -5,70 +5,6 @@ use work.gp_pkg.all;
 
 entity p_top is
   port (
-
-    --ref_clk    : in    std_logic;                                      -- 270MHz reference clock. Can be used to generate internal clocks with an MMCM
-
-    ---- PCIe DMA
-    --pcie_req_if_clk_o           : out STD_LOGIC;                       -- Request interfaces clock (no requirements to frequency)
-    --pcie_req_if_rst_o           : out STD_LOGIC;                       -- Reset synchronized to request interfaces clock
-    --pcie_wr_req_ctrl_wrs        : out STD_LOGIC;                       -- Write strobe for write request control FIFO - validates all other wr_req_ctrl* signals - must be set in same
-    --                                                                   -- clock cycle as the last data word is written (wr_req_data)
-    --pcie_wr_req_ctrl_length     : out STD_LOGIC_VECTOR (4 downto 0);   -- Write request control - length in number of cachelines - 1
-    --pcie_wr_req_ctrl_start_addr : out STD_LOGIC_VECTOR (57 downto 0);  -- Write request control - cacheline aligned start address. Lower 6 bits of the byte address must be zero and are
-    --                                                                   -- not part of this signal.
-    --pcie_wr_req_ctrl_afu        : in  STD_LOGIC;                       -- Write request control FIFO almost full indication - used for backpresure when room for less than 5 entries
-    --pcie_wr_req_data_wrs        : out STD_LOGIC;                       -- Write strobe for write request data FIFO - validates wr_req_data
-    --pcie_wr_req_data            : out STD_LOGIC_VECTOR (255 downto 0); -- Write request data
-    --pcie_wr_req_data_afu        : in  STD_LOGIC;                       -- Write request data FIFO almost full indication - used for backpresure when room for less than 4kB data
-    --pcie_rd_req_wrs             : out STD_LOGIC;                       -- Write strobe for read request FIFO - validates all other rd_req* signals
-    --pcie_rd_req_start_addr      : out STD_LOGIC_VECTOR (57 downto 0);  -- Read request - cacheline aligned start address. Lower 6 bits of the byte address must be zero and are not included in this signal.
-    --pcie_rd_req_length          : out STD_LOGIC_VECTOR (4 downto 0);   -- Read request - length in number of Cachelines - 1
-    --pcie_rd_req_afu             : in  STD_LOGIC;                       -- Read request FIFO almost full indication - used for backpresure when room for less than 5 entries
-    --pcie_rd_resp_data_vld       : in  STD_LOGIC;                       -- Read response valid - validates all other rd_resp_data* signals. Data must be accepted by client as it arrives on this interface
-    --pcie_rd_resp_data_first     : in  STD_LOGIC;                       -- Read response first - high on first word of response
-    --pcie_rd_resp_data_last      : in  STD_LOGIC;                       -- Read response last - high on first word of response
-    --pcie_rd_resp_data           : in  STD_LOGIC_VECTOR (255 downto 0); -- Read response data
-
-    ---- DDR4
-    --ddr4_clk_i                  : in  STD_LOGIC;                       -- DDR4 clk (can be used for driving the DDR4 cell interface)
-    --ddr4_cell_clk_o             : out STD_LOGIC;                       -- Clock for DDR4 cell interface. Must not be faster than the 3ns DDR4 clock
-    --ddr4_cell_rst_o             : out STD_LOGIC;                       -- Reset for DDR4 cell interface.
-    --ddr4_cell_input_start       : out STD_LOGIC;                       -- Start of Cell indication
-    --ddr4_cell_input_data        : out STD_LOGIC_VECTOR (255 downto 0); -- Cell data bus. 2KB data must be provided without gaps. First word is indicated with cell_input_start = 1
-    --ddr4_cell_input_ready       : in  STD_LOGIC;                       -- Ready to receive cell. There is room for rest of current cell + 1 more cell of 2KB when cell_input_ready goes high.
-    --ddr4_input_addr             : out STD_LOGIC_VECTOR (21 downto 0);  -- Address where to write cell_input. Must be set in same cycle as cell_input_start.
-    --ddr4_cell_output_start      : in  STD_LOGIC;                       -- Start of Cell indication
-    --ddr4_cell_output_data       : in  STD_LOGIC_VECTOR (255 downto 0); -- Cell data bus. 2KB data is provided without gaps. First word is indicated with cell_output_start = 1
-    --ddr4_cell_output_ready      : out STD_LOGIC;                       -- Ready to receive cell. A new cell will only be output it this input is 1.
-    --ddr4_output_addr_vld        : out STD_LOGIC;                       -- Validates output_addr
-    --ddr4_output_addr            : out STD_LOGIC_VECTOR (21 downto 0);  -- Address where to read cell input. Is sampled when output_addr_vld is 1
-    --ddr4_output_addr_afu        : in  STD_LOGIC;                       -- Output address FIFO almost full. Room for 2 more addresses after being set.
-    --ddr4_output_addr_ovf        : in  STD_LOGIC;                       -- Output address FIFO has overflowed.
-
-    ---- Config and status interface#1
-    --reg1_ref_clk     : in    std_logic;                     -- reference clock for interface. Can be used to generate user_clk
-    --reg1_user_clk    : out   std_logic;                     -- User generated clock. All signals of the interface refers to this clock
-    --reg1_user_rst    : out   std_logic;                     -- Optional reset of register access module external to this module
-    --reg1_wea         : in    std_logic;                     -- Write enable
-    --reg1_wda         : in    std_logic_vector(31 downto 0); -- Write data
-    --reg1_ada         : in    std_logic_vector(15 downto 0); -- Address
-    --reg1_rea         : in    std_logic;                     -- Read enable
-    --reg1_rda         : out   std_logic_vector(31 downto 0); -- Read data
-    --reg1_rdav        : out   std_logic;                     -- Read data valid
-    --reg1_ac          : out   std_logic;                     -- Access complete
-
-    ---- Config and status interface#2
-    --reg2_ref_clk     : in    std_logic;                     -- reference clock for interface. Can be used to generate user_clk
-    --reg2_user_clk    : out   std_logic;                     -- User generated clock. All signals of the interface refers to this clock
-    --reg2_user_rst    : out   std_logic;                     -- Optional reset of register access module external to this module
-    --reg2_wea         : in    std_logic;                     -- Write enable
-    --reg2_wda         : in    std_logic_vector(31 downto 0); -- Write data
-    --reg2_ada         : in    std_logic_vector(15 downto 0); -- Address
-    --reg2_rea         : in    std_logic;                     -- Read enable
-    --reg2_rda         : out   std_logic_vector(31 downto 0); -- Read data
-    --reg2_rdav        : out   std_logic;                     -- Read data valid
-    --reg2_ac          : out   std_logic;                     -- Access complete
-    
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;
     C2_REQ    : out std_logic;
@@ -81,10 +17,10 @@ entity p_top is
     C1_DDI_VLD : in std_logic;
     C2_DDI_VLD : in std_logic;
     EXE        : in std_logic;
-    --EXE and VLD?
 
     -- clocks and control signals
     HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
+    EVEN_C     : in    std_logic;                  -- even pulses of HCLK. Used to generate clk_e_pos and clk_e_neg.
     MRESET     : in    std_logic;                  -- system reset               low active
     MIRQOUT    : out   std_logic;                  -- interrupt request output    
     MCKOUT0    : out   std_logic;                  -- for trace adapter
@@ -980,7 +916,7 @@ architecture struct of p_top is
   signal const_0      : std_logic; 
 
   -- Core clock buffers
-  signal even_c : std_logic;
+  --signal even_c : std_logic;
   signal clk_d  : std_logic;
   signal clk_d_pos  : std_logic;
   signal clk_da_pos  : std_logic;
@@ -1488,7 +1424,7 @@ begin
   rxout <= clk_s;
 
   wakeup_lp <= '1';
-  --lp_pwr_ok <= '1';
+  lp_pwr_ok <= '1';
   pmic_core_en <= '1';
   pmic_io_en <= '1';
   io_iso <= '1';
@@ -1500,13 +1436,13 @@ begin
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
   c2_d_dqo <= C2_IN_D;
-  process
-  begin
-    lp_pwr_ok <= '0';
-    wait for 32 ns;
-    lp_pwr_ok <= '1';
-    wait;
-  end process;
+  --process
+  --begin
+  --  lp_pwr_ok <= '0';
+  --  wait for 32 ns;
+  --  lp_pwr_ok <= '1';
+  --  wait;
+  --end process;
   --pllout <= ref_clk;
 -- RJ end
   

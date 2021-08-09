@@ -45,6 +45,7 @@
 -- 2013-02-13       5.0             MN          reconstruct the clock generator
 -- 2013-02-19       5.1             MN          change the clk_p generator
 -- 2015-07-14       5.2             MN          output different clk_d_pos for core1 and core2
+-- 2021-08-09       6.0             CJ          Move even_c to higher level
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -77,7 +78,7 @@ entity clk_gen is
     -- Buffered clock net outputs, to core 
     clk_p         : out std_logic;      -- PLL clock, also feedback to PLL  
     clk_c_en      : out std_logic;      -- PLL clock with enable  
-    even_c        : out std_logic;
+    even_c        : in std_logic;    --Use former generated even_c for other clocks --CJ
     --clk_c2_pos     : out std_logic;      -- clk_c / 2
     --clk_e_pos      : out std_logic;      -- Execution clock
     --clk_e_neg      : out std_logic;      -- Execution clock
@@ -111,7 +112,7 @@ architecture rtl of clk_gen is
   signal clk_c_int  : std_logic;
   -- Early copy of the even_c signal used in the core.
   -- Used here only to generate clk_d when fast_d is zero.
-  signal even_c_int     : std_logic;
+  --signal even_c_int     : std_logic; --Deleted by CJ
 
 	-- These intermediate signals are needed for zero-timing
 	-- simulation. They should not affect synthesis.
@@ -172,24 +173,24 @@ begin
   -- PLL output is the source of clk_c except when the PLL
   -- is disabled, then clk_c is taken directly from the
   -- reference oscillator. clk_c can be disabled by rst_cn
-  -- low. When disabled, clk_c stays high.
+  -- low. When disabled, clk_c stays high.f 
 --  clk_c_int		<= clk_p_int or not rst_cn;
-  clk_c_int		<=  rst_cn and (not clk_main_off);--add clk_main_off by maning 2012-06-14 16:46:16
+  --clk_c_int		<=  rst_cn and (not clk_main_off);--add clk_main_off by maning 2012-06-14 16:46:16
   --clk_c_int2	<= clk_c_int;
 
   -- Generation of even_c, high during even cycles of clk_c
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
-  begin
-    if rising_edge(clk_p_int) then
-        if rst_cn = '0' then
-            even_c_int <= '1';
-        elsif clk_c_int = '1' then
-            even_c_int <= not even_c_int;
-        end if;
-    end if;
-  end process;
-  even_c <= even_c_int;
+  --process (clk_p_int)                      --Deleted by CJ
+  --begin
+  --  if rising_edge(clk_p_int) then
+  --      if rst_cn = '0' then
+  --          even_c_int <= '1';
+  --      elsif clk_c_int = '1' then
+  --          even_c_int <= not even_c_int;
+  --      end if;
+  --  end if;
+  --end process;
+  --even_c <= even_c_int;
   -- Generation of clk_c2 which is a copy of even_c.
   --clk_c2_pos <= even_c;
  
@@ -246,12 +247,12 @@ begin
   -- set, low otherwise.
   -- NOTE that the source of this signal is clk_c_int, before the clock tree!
   clk_d_int <=	clk_p_int or (not clk_c_int) or not en_d when fast_d = '1' else
-								not even_c_int and en_d;
+								not even_c and en_d;
     
   clk_d_pos_int <= (not clk_c_int) or (not en_d) or hold_flash_d when fast_d = '1' else
-				   (not clk_c_int) or (not even_c_int) or (not en_d) or hold_flash_d;
+				   (not clk_c_int) or (not even_c) or (not en_d) or hold_flash_d;
   clk_da_pos_int <= (not clk_c_int) or not en_d when fast_d = '1' else
-				   (not clk_c_int) or even_c_int or (not en_d);  
+				   (not clk_c_int) or even_c or (not en_d);  
   -- Generate clk_u
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
   process (clk_p_int)

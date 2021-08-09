@@ -32,6 +32,7 @@
 -- 2020-8-21  		     1.0	     CJ			Created
 -- 2021-6-29             3.0         CJ         Add PE related logic and interface
 --                                              Added clk_p and clk_e_neg for generate signals at falling_edge
+-- 2021-8-9              3.1         CJ         Add even pulse signal generator
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -45,9 +46,13 @@ entity cluster_controller is
 --Clock inputs
       CLK_P            : in std_logic;     --PE clock --0628
 	  CLK_E            : in std_logic;     --PE's execution clock 
-	  CLK_E_NEG        : in std_logic;     --Inverted clk_e
+	  --CLK_E_NEG        : in std_logic;     --Inverted clk_e
+--Asynchronized reset input:
+      --RST_P            : in std_logic;
+	  RST_E            : in std_logic;
 --Clock outputs
 	  CLK_O            : out std_logic;    --not needed in this version
+	  EVEN_P           : out std_logic;    --To PE and network
 --Tag line
 	  TAG              : in std_logic;
 	  TAG_FB           : out std_logic;
@@ -130,6 +135,7 @@ end component;
 
   --Clock signals
   signal clk_m    : std_logic; --CM clock
+  signal even_p_int   : std_logic; --even pulses of clk_p,should have the same phase as the even_c in PE
   signal rst_i    : std_logic;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
@@ -207,7 +213,20 @@ end component;
  
 begin
           
-
+even_p_generateor: process(rst_e,clk_p)
+begin
+	if RST_E = '1' then
+		even_p_int <= '1';
+	elsif rising_edge(clk_p) then
+		if rst_i = '0' then
+			even_p_int <= '1';
+		else
+		    even_p_int <= not even_p_int;
+		end if;
+	end if;
+end process;
+EVEN_P <= even_p_int;		  
+		  
   ------------------------------------------------------------------------------
   -- Reset
   ------------------------------------------------------------------------------
@@ -413,6 +432,8 @@ begin
 					idle := false;
 				end if;
 			else
+			    exe_i <= '0';
+			    resume_i <= '0';
 				idle := true;
 			end if;
 		end if;
@@ -643,7 +664,7 @@ begin
     process(clk_p)
         variable cmd_tr : std_logic; --Save 1 clock to handle the request
 	begin
-		if rising_edge(clk_p) and clk_e_neg = '0' then --RD_REQ raises at falling_edge of clk_e
+		if rising_edge(clk_p) and even_p_int = '0' then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
                 cmd_tr := '0';
@@ -667,7 +688,7 @@ begin
 
  	req_recording: process(clk_p)
  	begin
- 		if rising_edge(clk_p) and clk_e_neg = '0' then --0628 --falling_edge of clk_e
+ 		if rising_edge(clk_p) and even_p_int = '0' then --0628 --falling_edge of clk_e
 			if noc_cmd = "01111" then
 				pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
@@ -799,7 +820,7 @@ begin
  		addr_c <= addr_n;
 		wr_i <= noc_write;
 		rd_i <= noc_read;
- 	elsif noc_reg_rdy = '0' then
+ 	elsif noc_reg_rdy /= '1' then
  		addr_c <= addr_p;
 		wr_i <= pe_write;
 		rd_i <= pe_read;

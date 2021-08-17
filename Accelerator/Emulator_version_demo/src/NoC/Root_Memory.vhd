@@ -35,6 +35,7 @@ use ieee.std_logic_unsigned.all;
 entity Root_Memory is
     Port(
         clk                 : in    std_logic;
+        reset               : in    std_logic;
         Write_Read_Mode     : in    std_logic;
         Enable              : in    std_logic;
         Load_Add_Gen        : in    std_logic;
@@ -46,9 +47,9 @@ end Root_Memory;
 
 architecture Behavioral of Root_Memory is
 
-    signal we           : std_logic_vector(0 downto 0):= (others => '0');
-    signal Address      : std_logic_vector(12 downto 0):= (others => '0');
-    signal Enable_p     : std_logic:= '0';
+    signal we           : std_logic_vector(0 downto 0);
+    signal Address      : std_logic_vector(12 downto 0);
+    signal Enable_p     : std_logic;
     signal mem_enable   : std_logic:= '0'; 
 
     component blk_mem_gen_0
@@ -69,25 +70,30 @@ begin
     process (clk)
     begin 
         if rising_edge(clk) then
-            if Load_Add_Gen = '1' then
-                Address   <= Add_Gen_Value;
-            elsif Enable = '1' then 
-                Address   <= Address + 1;
-            end if;
-            Enable_p      <= Enable;    
+            if reset = '1' then
+                Address     <= (others => '0'); 
+                Enable_p    <= '0';      
+            else
+                if Load_Add_Gen = '1' then
+                    Address   <= Add_Gen_Value;
+                elsif Enable = '1' then 
+                    Address   <= Address + 1;
+                end if;
+                Enable_p      <= Enable;
+            end if;                
         end if;
     end process;
     
     mem_enable <= (Enable or Enable_p) when Write_Read_Mode = '0' else Enable;
 
-      Root_Memory_Inst : blk_mem_gen_0
-      port map (
+    Root_Memory_Inst : blk_mem_gen_0
+    port map (
         clka    => clk,
         ena     => mem_enable,
         wea     => we,
         addra   => Address,
         dina    => DataIn,
         douta   => DataOut
-      );
+    );
 
 end Behavioral;

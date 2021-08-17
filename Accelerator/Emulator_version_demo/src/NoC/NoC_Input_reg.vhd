@@ -36,6 +36,7 @@ use work.ACC_types.all;
 entity Noc_Input_Reg is
     port (
             clk                 : in  std_logic;
+            reset               : in  std_logic;
             NoC_Input_reg_In    : in  std_logic_vector(15 downto 0);
             NoC_Input_reg_Out   : out std_logic_vector(15 downto 0)
         );
@@ -46,8 +47,12 @@ architecture Behavioral of Noc_Input_Reg is
 begin
     process (clk)
     begin
-        if rising_edge(clk) then     
-            NoC_Input_reg_Out   <= NoC_Input_reg_In;
+        if rising_edge(clk) then
+            if reset = '1' then
+                NoC_Input_reg_Out <= (others => '0');
+            else    
+                NoC_Input_reg_Out   <= NoC_Input_reg_In;
+            end if;    
         end if;
     end process;
 end Behavioral;

@@ -21,7 +21,7 @@
 -------------------------------------------------------------------------------
 -- Description: -- TAG Line Controller   
 -------------------------------------------------------------------------------
--- TO-DO list :         
+-- TO-DO list :       
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
@@ -36,6 +36,7 @@ use ieee.numeric_std.all;
 entity Tag_Line_Controller is
     port(
         clk                     : in  std_logic;
+        reset                   : in  std_logic;        
         Load_Tag_Shift_Counter  : in  std_logic;
         Start_Tag_Shift         : in  std_logic;
         Shift_Count             : in  std_logic_vector(7 downto 0);
@@ -46,15 +47,19 @@ end Tag_Line_Controller;
 
 architecture struct of Tag_Line_Controller is
 
-    signal Tag_Shift_Counter    : std_logic_vector(7 downto 0) := ( others => '0');
-    signal Start_Tag_Shift_pre  : std_logic:= '0';
+    signal Tag_Shift_Counter    : std_logic_vector(7 downto 0);
+    signal Start_Tag_Shift_pre  : std_logic;
 
 begin  
-    
+
     process (clk)
     begin
-        if rising_edge(clk) then    
-            if Load_Tag_Shift_Counter = '1' then
+        if rising_edge(clk) then
+            if reset = '1' then
+               Tag_Shift_Counter   <= (others => '0');
+               Start_Tag_Shift_pre <= '0';
+               TAG_shift           <= '0';
+            elsif Load_Tag_Shift_Counter = '1' then
                 Tag_Shift_Counter <= Shift_Count + '1';  -- to add one cycle for CC command buffer original was Tag_Shift_Counter <= Shift_Count;
             elsif Start_Tag_Shift = '1' or Start_Tag_Shift_pre = '1' then
                 Tag_Shift_Counter <= Tag_Shift_Counter - 1;
@@ -67,9 +72,5 @@ begin
                 end if;
             end if;
         end if;
-    end process;   
-end;             
-                
-
-                        
-
+    end process;
+end; 

@@ -17,17 +17,14 @@
 -- File       : Mux_Reg.vhd
 -- Author     : Azadeh Kaffash
 -- Company    : Imsys Technologies AB
--- Date       : 2020.11.30
+-- Date       : 28.01.2021
 -------------------------------------------------------------------------------
 -- Description: -- Mux Register  
 -------------------------------------------------------------------------------
--- TO-DO list : 
---              
---              
+-- TO-DO list :           
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
--- 2020-11-30 		     1.0	     AK			Created
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -36,6 +33,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity Mux_Reg is
   Port (
         clk                 : in  std_logic;
+        reset               : in  std_logic;
         Load_Mux_Reg        : in  std_logic;
         Control_Data        : in  std_logic_vector(7 downto 0);
         NoC_Reg_Mux         : out std_logic_vector(1 downto 0);
@@ -56,8 +54,10 @@ begin
     process(clk)
     begin
         if rising_edge(clk) then
-            if (Load_Mux_Reg = '1') then 
-                Mux_register     <=  Control_Data;
+            if reset = '1' then
+                Mux_register    <= (others => '0');
+            elsif (Load_Mux_Reg = '1') then 
+                Mux_register    <=  Control_Data;
             end if;    
         end if;
     end process;
@@ -68,5 +68,3 @@ begin
     Noc_Bus_Dir         <=  Mux_register(6);  
     
 end Behavioral;
-
-

@@ -35,6 +35,7 @@ use ieee.std_logic_unsigned.all;
 entity PCIe_Data_block is
   Port (
         clk                 : in  std_logic;
+        reset               : in  std_logic;
         Load_PCIe_CMD_reg   : in  std_logic;
         MD_PCIe_cmd         : in  std_logic;        
         Data_Input          : in  std_logic_vector(7 downto 0);
@@ -52,7 +53,9 @@ architecture Behavioral of PCIe_Data_block is
     process (clk)
     begin  
         if rising_edge(clk) then
-            if Load_PCIe_CMD_reg = '1' then
+            if reset = '1' then
+                PCIe_CMD_reg  <= (others => '0');
+            elsif Load_PCIe_CMD_reg = '1' then
                PCIe_CMD_reg   <= Data_Input;
             end if;
         end if;

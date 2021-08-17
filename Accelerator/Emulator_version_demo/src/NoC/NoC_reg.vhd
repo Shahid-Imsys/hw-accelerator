@@ -38,6 +38,7 @@ use work.ACC_types.all;
 entity Noc_Reg is
 port (		
 		clk			  		: in  std_logic;
+		reset               : in  std_logic;
 		Load_NOC_reg        : in  std_logic;		
 		Data_input          : in  std_logic_vector(255 downto 0);
 		Data_output         : out std_logic_vector(255 downto 0)	
@@ -52,9 +53,12 @@ begin
 	process(Clk)
 	begin
 		if rising_edge (Clk) then
-			if (Load_NOC_reg = '1') then 
-                Data_output     <= Data_input;
+		    if reset = '1' then
+                Data_output   <= (others => '0');
+			elsif (Load_NOC_reg = '1') then 
+                Data_output   <= Data_input;
 			end if;
 		end if;	
 	end process;	
+	
 end;

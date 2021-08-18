@@ -57,12 +57,12 @@ architecture Behavioral of Mux_Demux is
 
 begin
 
-    process (clk)
-    begin  
-        if rising_edge(clk) then
-            if reset = '1' then
-                MD_reg      <= (others => '0');           
-            elsif Load_MD_Reg = '1' then
+    process (clk, reset)
+    begin
+        if reset = '1' then
+          MD_reg      <= (others => '0'); 
+        elsif rising_edge(clk) then
+             if Load_MD_Reg = '1' then
                 if PCIe_Switch = '0' then     
                     MD_reg                    <= PCIe_data;
                 else 
@@ -77,9 +77,11 @@ begin
     Noc_data_mux_out              <= MD_reg;
 
     
-    process (clk)
+    process (clk, reset)
     begin  
-        if rising_edge(clk) then
+        if Reset = '1' then
+            MDC<= 0;
+        elsif rising_edge(clk) then
             if Reset_MDC = '1' then
                 MDC<= 0;
             elsif Step_MDC = '1' and MDC <15 then

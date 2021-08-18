@@ -896,6 +896,18 @@ Reset                   <= not(MRESET);
 --    end if;
 --end process;  
 
+reset_synchronisering : process (REF_CLK_i, PCIE_reset) is
+  variable reset_delay : std_logic_vector(1 downto 0);
+begin  -- process reset_synchronisering
+  if PCIE_reset = '1' then
+    Reset_NOC   <= '1';
+    reset_delay <= (others => '0');
+  elsif falling_edge(REF_CLK_i) then
+    reset_delay <= reset_delay(reset_delay'length-2 downto 0) & '0';
+    Reset_NOC   <= reset_delay(reset_delay'left);
+  end if;
+end process reset_synchronisering; 
+                                      
 Reset_NOC   <= PCIE_reset;  --Reset_cdc or PCIE_reset;
 
 Noc_Top_Inst: Noc_Top

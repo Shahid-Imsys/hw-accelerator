@@ -65,19 +65,19 @@ architecture Behavioral of Command_Decoder is
 
 begin
 
-    process(clk)
+    process(clk, reset)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
-                CMD_reg     <= (others => '0');
-                CMD_FF      <= '0';
-            elsif Load_CMD_reg = '1' then
-                CMD_reg <= Noc_data;
-            end if;
+        if reset = '1' then
+          CMD_reg     <= (others => '0');
+          CMD_FF      <= '0';
+        elsif rising_edge(clk) then
+          if Load_CMD_reg = '1' then
+            CMD_reg <= Noc_data;
+          end if;
             
-            CMD_FF   <= CMD_flag;
-            PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
-            PEC_FF1  <= PEC_Ready_In;
+          CMD_FF   <= CMD_flag;
+          PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
+          PEC_FF1  <= PEC_Ready_In;
         end if;
     end process;
 

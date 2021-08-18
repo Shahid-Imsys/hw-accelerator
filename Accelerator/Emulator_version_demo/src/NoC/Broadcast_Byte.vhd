@@ -51,21 +51,19 @@ architecture Behavioral of Broadcast_Byte is
 
 begin
 
-    process (clk)
+    process (clk, reset)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
-                Counter <= (others => '0');
-            else
-                if Reset_BC = '1' then
-                   Counter <= (others => '0');
-                elsif Step_BC = '1' then     
-                   Counter <= Counter + '1';
-                else 
-                   Counter <= (others => '0');
-                end if;
-            end if;                           
+      if reset = '1' then
+        Counter <= (others => '0');
+      elsif rising_edge(clk) then
+        if Reset_BC = '1' then
+          Counter <= (others => '0');
+        elsif Step_BC = '1' then     
+          Counter <= Counter + '1';
+        else 
+          Counter <= (others => '0');
         end if;
+      end if;
     end process;
     
     decoder <= "00000000000000000000000000000001"   when Counter = "00000" else

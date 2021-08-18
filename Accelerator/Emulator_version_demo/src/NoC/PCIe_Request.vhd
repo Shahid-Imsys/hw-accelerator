@@ -42,9 +42,11 @@ end PCIe_Request;
 architecture Behavioral of PCIe_Request is
 
 begin
-	process(clk)
+	process(clk, reset)
 	begin
-		if rising_edge (clk) then
+		if reset = '1' then
+		        PCIe_Request_out  <= (others => '0');
+                elsif rising_edge (clk) then
 		    if reset = '1' then
 		        PCIe_Request_out  <= (others => '0');
 			elsif (enable = '1') then

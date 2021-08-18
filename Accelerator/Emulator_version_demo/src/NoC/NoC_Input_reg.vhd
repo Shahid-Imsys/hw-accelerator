@@ -45,14 +45,12 @@ end Noc_Input_Reg;
 architecture Behavioral of Noc_Input_Reg is
 
 begin
-    process (clk)
+    process (clk, reset)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
-                NoC_Input_reg_Out <= (others => '0');
-            else    
-                NoC_Input_reg_Out   <= NoC_Input_reg_In;
-            end if;    
+        if reset = '1' then
+            NoC_Input_reg_Out <= (others => '0');
+        elsif rising_edge(clk) then
+            NoC_Input_reg_Out   <= NoC_Input_reg_In;
         end if;
     end process;
 end Behavioral;

@@ -51,12 +51,12 @@ architecture Behavioral of Mux_Reg is
     
 begin
 
-    process(clk)
+    process(clk, reset)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
+        if reset = '1' then
                 Mux_register    <= (others => '0');
-            elsif (Load_Mux_Reg = '1') then 
+        elsif rising_edge(clk) then
+            if (Load_Mux_Reg = '1') then 
                 Mux_register    <=  Control_Data;
             end if;    
         end if;

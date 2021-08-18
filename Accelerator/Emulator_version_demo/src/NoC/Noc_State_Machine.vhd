@@ -376,9 +376,8 @@ begin
     LC_Equal_LR_extend          <= LC_Equal_LR or LC_Equal_LR_latch;
 
 
-    process(clk)
+    process(clk, reset)
     begin
-        if rising_edge(clk) then 
             if reset = '1' then
                 Load_MD_Reg_i               <= '0';
                 Step_MDC_i                  <= '0';
@@ -434,8 +433,7 @@ begin
                 Loop_Mux                    <= (others => '0');
                 TC_Equal_Zero               <= '0';
                 Address_Counter             <= (others => '0');
-
-            else               
+            elsif rising_edge(clk) then                
 
                 LC_Equal_LR_latch           <= LC_Equal_LR;
                 Control_Data                <= Mem_Out(7 downto 0);
@@ -513,7 +511,6 @@ begin
                     Mode_Reg        <=  Control_Data;
                 end if;
                 
-            end if;  
         end if;  --clock
     end process;
 

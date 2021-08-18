@@ -7,7 +7,7 @@ use work.ACC_types.all;
 entity noc_bus is
   port (
     clk   : in std_logic;
-    rst_n : in std_logic;
+    rst  : in std_logic;
 
     enable : in std_logic;
 
@@ -49,9 +49,9 @@ begin  -- architecture rtl
   -----------------------------------------------------------------------------
   -- The data is straigth forward, only insert delays to compensate for length.
   -----------------------------------------------------------------------------
-  data_to_cc_proc : process (clk, rst_n) is
+  data_to_cc_proc : process (clk, rst) is
   begin  -- process data_to_cc
-    if rst_n = '0' then                 -- asynchronous reset (active low)
+    if rst = '1' then                 -- asynchronous reset (active low)
       master_noc_data_array <= (others => (others => (others => '0')));
       cc_noc_data_array     <= (others => (others => (others => '0')));
       master_tag_array      <= (others => (others => '0'));
@@ -72,9 +72,9 @@ begin  -- architecture rtl
   -- Tag line to master shall be a tree structure, a bit more complicated.
   -----------------------------------------------------------------------------
 
-  tag_to_cc_proc : process (clk, rst_n) is
+  tag_to_cc_proc : process (clk, rst) is
   begin  -- process tag_to_cc_lev_1
-    if rst_n = '0' then                 -- asynchronous reset (active low)
+    if rst = '1' then                 -- asynchronous reset (active low)
       tag_to_master   <= '0';
       tag_temp        <= '0';
     elsif clk'event and clk = '1' then  -- rising clock edge

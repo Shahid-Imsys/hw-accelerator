@@ -50,15 +50,15 @@ architecture Behavioral of PCIe_Data_block is
 
  begin
  
-    process (clk)
-    begin  
-        if rising_edge(clk) then
-            if reset = '1' then
-                PCIe_CMD_reg  <= (others => '0');
-            elsif Load_PCIe_CMD_reg = '1' then
-               PCIe_CMD_reg   <= Data_Input;
-            end if;
+    process (clk, reset)
+    begin          
+      if reset = '1' then
+        PCIe_CMD_reg  <= (others => '0');
+      elsif rising_edge(clk) then
+        if Load_PCIe_CMD_reg = '1' then
+          PCIe_CMD_reg   <= Data_Input;
         end if;
+      end if;
     end process;
     
     Noc_data       <= x"00000000000000000000000000000000000000000000000000000000000000" & PCIe_CMD_reg when MD_PCIe_cmd = '1' else Mux_Demux_data;

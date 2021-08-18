@@ -50,14 +50,14 @@ architecture struct of NoC_reg is
 
 begin
 
-	process(Clk)
+	process(Clk, reset)
 	begin
-		if rising_edge (Clk) then
-		    if reset = '1' then
-                Data_output   <= (others => '0');
-			elsif (Load_NOC_reg = '1') then 
-                Data_output   <= Data_input;
-			end if;
+                if reset = '1' then
+                  Data_output   <= (others => '0');	
+		elsif rising_edge (Clk) then
+                  if (Load_NOC_reg = '1') then 
+                    Data_output   <= Data_input;
+                  end if;
 		end if;	
 	end process;	
 	

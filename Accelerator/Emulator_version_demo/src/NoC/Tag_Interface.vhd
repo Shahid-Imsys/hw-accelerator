@@ -54,16 +54,16 @@ architecture struct of Tag_Interface is
         
 begin
 
-    process (clk)
+    process (clk, reset)
     begin  
-        if rising_edge(clk) then
-            if reset = '0' then
+        if reset = '0' then
                 PEC_Reg         <= (others => '0');
                 PEC_CMD_Ready   <= '0';
                 PEC_Arg_Ready   <= '0';
                 Tag_shift_p     <= '0';
                 Tag_Line        <= '0';
-            else
+        elsif rising_edge(clk) then
+           
                 Tag_shift_p     <= Tag_shift;           
                 if Load_TAG_Cmd_reg = '1' then
                     PEC_Reg(36 downto 31)       <= PEC_CMD;  -- to add one cycle for CC command buffer
@@ -87,8 +87,7 @@ begin
                     PEC_Arg_Ready               <= '0';
                     Tag_Line                    <= '0';
                     PEC_Reg                     <= ( others => '0'); 
-                end if;
-            end if;            
+                end if;       
         end if;    
     end process;
 end;

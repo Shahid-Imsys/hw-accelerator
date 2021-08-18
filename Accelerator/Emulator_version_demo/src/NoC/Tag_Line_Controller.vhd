@@ -52,14 +52,14 @@ architecture struct of Tag_Line_Controller is
 
 begin  
 
-    process (clk)
+    process (clk, reset)
     begin
-        if rising_edge(clk) then
-            if reset = '1' then
-               Tag_Shift_Counter   <= (others => '0');
-               Start_Tag_Shift_pre <= '0';
-               TAG_shift           <= '0';
-            elsif Load_Tag_Shift_Counter = '1' then
+        if reset = '1' then
+             Tag_Shift_Counter   <= (others => '0');
+             Start_Tag_Shift_pre <= '0';
+             TAG_shift           <= '0'; 
+        elsif rising_edge(clk) then
+            if Load_Tag_Shift_Counter = '1' then
                 Tag_Shift_Counter <= Shift_Count + '1';  -- to add one cycle for CC command buffer original was Tag_Shift_Counter <= Shift_Count;
             elsif Start_Tag_Shift = '1' or Start_Tag_Shift_pre = '1' then
                 Tag_Shift_Counter <= Tag_Shift_Counter - 1;

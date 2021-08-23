@@ -59,8 +59,8 @@ entity clc is
     ira2         : in  std_logic; 
     irq0         : in  std_logic; 
     irq1         : in  std_logic; 
-    dfm_vld      : in  std_logic; -- Added by CJ
-    vldl         : in  std_logic; -- 1 clock latch of dfm_vld signal
+    --dfm_vld      : in  std_logic; -- Added by CJ
+    mp_vld       : in  std_logic;
     -- Condition inputs
     spreq_n      : in  std_logic; 
     spack_n      : in  std_logic; 
@@ -180,6 +180,7 @@ architecture rtl of clc is
   signal pl_sig18   : std_logic_vector(3 downto 0);
   signal pl_sig15     : std_logic_vector(4 downto 0);
   signal pl_ld_mpgm  : std_logic; --Added by CJ
+
   
 
 begin
@@ -212,8 +213,8 @@ begin
       st_empty     => st_empty,
       ctr_eq0      => ctr_eq0,
       cond_pass    => cpass,
-      dfm_vld      => dfm_vld, --CJ
-      vldl         => vldl,    --CJ
+      --dfm_vld      => dfm_vld, --CJ
+      data_vld      => mp_vld,    --CJ
       di           => di,
       y_reg        => y_reg,
       pc           => pc,

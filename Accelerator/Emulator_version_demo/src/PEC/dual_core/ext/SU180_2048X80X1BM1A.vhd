@@ -281,24 +281,24 @@ end SU180_256X128X1BM1A;
 
 architecture struct of SU180_256X128X1BM1A is
 	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
-	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
-		FILE ram_file : text is in ram_file_name;
-		variable ram_file_line : line;
-		variable RAM_B : ram_type_b;
-		variable RAM :ram_type;
-		begin
-			--for i in rom_type'range loop
-			for i in 0 to 255 loop
-				readline(ram_file, ram_file_line);
-				read(ram_file_line, RAM_B(i));
-				RAM(i) := to_stdlogicvector(RAM_B(i));
-			end loop;
-		return RAM;
-	    end function;
+	--type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+	--	impure function init_ram_from_file (ram_file_name : in string) return ram_type is
+	--	FILE ram_file : text is in ram_file_name;
+	--	variable ram_file_line : line;
+	--	variable RAM_B : ram_type_b;
+	--	variable RAM :ram_type;
+	--	begin
+	--		--for i in rom_type'range loop
+	--		for i in 0 to 255 loop
+	--			readline(ram_file, ram_file_line);
+	--			read(ram_file_line, RAM_B(i));
+	--			RAM(i) := to_stdlogicvector(RAM_B(i));
+	--		end loop;
+	--	return RAM;
+	--    end function;
 	    
 	    
-	signal RAM	: ram_type; --:= init_ram_from_file("Test_fifo_and_send_req_BE_F.data");
+	signal RAM	: ram_type;--:= init_ram_from_file("SequenceTest_F.data");
 	signal addr	: std_logic_vector(7 downto 0);
 	signal di		: std_logic_vector(127 downto 0);
 	signal do		: std_logic_vector(127 downto 0);

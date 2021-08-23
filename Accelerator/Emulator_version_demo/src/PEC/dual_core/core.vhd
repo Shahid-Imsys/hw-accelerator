@@ -279,7 +279,7 @@ architecture struct of core is
 ---------------------------------------------------------------------
   -- Microinstruction pipeline register
   signal pl         : std_logic_vector(127 downto 0);
-  constant init_mpgm : std_logic_vector(127 downto 0) := (others => '-');--TBA--CJ
+  constant init_mpgm : std_logic_vector(127 downto 0) := (106 => '1', 100 => '1', 98 => '0', 97 => '0', 42 => '0', 74 => '0', 15 => '1', 5 => '0', 34 => '1',others => '-');--TBA--CJ
 
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
@@ -438,6 +438,8 @@ architecture struct of core is
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
+  signal temp        : std_logic; --Added by CJ. Used to latch vldl
+  signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
@@ -465,19 +467,29 @@ begin
   --ld_mpgm <= pl(100) and pl(98);
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
-      if clk_e_neg_int = '1' then
+      if rising_edge(clk_p) and clk_e_neg_int = '1' then
         vldl <= ddi_vld;
         --vldl <= mid;
       end if;
   end process;
+  --Two clock pulses delay generation
+  process(clk_p)
+  begin
+    if rising_edge(clk_p) and clk_e_pos_int = '0'then --Falling_edge of clk_e
+      temp <= vldl;
+      ltwo <= temp;
+    end if;
+  end process;
 
   mpgm_load : process(clk_p, vldl, ddi_vld)
   begin 
-        if ddi_vld = '0' and vldl = '1' then  --act at falling_edge of ddi_vld signal
-            ld_mpgm <= '0';
-        else
-            ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
-        end if;
+      if rising_edge(clk_p) and clk_e_neg_int = '0'then
+          if temp = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
+              ld_mpgm <= '0';
+          else
+              ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
+          end if;
+      end if;
   end process;
 
   --init_load: process(clk_p)
@@ -569,9 +581,9 @@ begin
       pmem_q      => pmem_q,    
       pmem_ce_n   => pmem_ce_n);    
 
-  --mprom_a     <= mpga;
-  mpram_d     <= mpgmin when ld_mpgm = '1' else udo; --CJ
-  mpram_we_n  <= ddi_vld when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
+  --mprom_a     <= mpga; --deleted by CJ
+  mpram_d     <= mpgmin;
+  mpram_we_n  <= not temp when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;
 
@@ -832,8 +844,8 @@ begin
       ira2          => ira2,                
       irq0          => irq0,               
       irq1          => irq1,
-      dfm_vld       => ddi_vld, --Added by CJ
-      vldl          => vldl,    --Added by CJ          
+      --dfm_vld       => ddi_vld, --Added by CJ
+      mp_vld          => ltwo,    --Added by CJ          
       -- Condition inputs
       spreq_n       => spreq_n,             
       spack_n       => spack_n,             
@@ -1084,7 +1096,8 @@ begin
       d_ba        => dba_o,              
       d_dqm       => ddqm,             
       d_cke       => dcke_o,
-      MPGMM_IN     => mpgmin);              
+      MPGMM_IN     => mpgmin,
+      LD_MPGM     => ld_mpgm);  --CJ            
 
 ---------------------------------------------------------------------
 -- MPLL

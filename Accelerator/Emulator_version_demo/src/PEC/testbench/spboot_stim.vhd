@@ -36,13 +36,16 @@ use ieee.std_logic_unsigned.all;
 --use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use std.textio.all;
-library work;
+--library work;
 --use work.io_utils.all;
-use work.mti_pkg.all;
+--use work.mti_pkg.all;
 
 entity spboot_stim is
   port(
-    MX1_CK   : inout std_logic;   
+    MX1_CK   : inout std_logic;
+    CLK_P    : out   std_logic;
+    EVEN_C   : out   std_logic; 
+    EXE      : out   std_logic; 
     MXOUT    : in    std_logic;   
     MEXEC    : in    std_logic;   
     MCKOUT0  : in    std_logic;   
@@ -165,47 +168,42 @@ begin  -- behav
 	MIRQ1 <= '1';
   
   process
-    constant  mpgm_size : integer := 2*2048*10; -- Microprogram size in bytes
+    constant  mpgm_size : integer := 256*15;--256 words * 120 bits each. --2*2048*10 -- Microprogram size in bytes
     type      mpgm_type is array (mpgm_size - 1 downto 0) of integer;
     variable  mpgm_area : mpgm_type; -- Microprogram data area
     variable  mpgm_ptr  : integer;   -- Microprogram data pointer
     CONSTANT not_digit : integer := -999;
     variable	l					: line;
-	--  FUNCTION digit_value(c : character) RETURN integer IS
-  --      BEGIN
-  --         IF (c >= '0') AND (c <= '9') THEN
-  --             RETURN (character'pos(c) - character'pos('0'));
-  --          ELSIF (c >= 'a') AND (c <= 'f') THEN
-  --              RETURN (character'pos(c) - character'pos('a') + 10);
-  --          ELSIF (c >= 'A') AND (c <= 'F') THEN
-  --              RETURN (character'pos(c) - character'pos('A') + 10);
-  --          ELSE
-  --              RETURN not_digit;
-  --          END IF;
-  --      END;
-
-	--impure function init_from_file (ram_file_name : in string) return mpgm_type is
-	--	FILE ram_file : text is in ram_file_name;
-	--	variable ram_file_line : line;
-	--	variable RAM : mpgm_type;
-	--	begin
-	--		--for i in rom_type'range loop
-	--		for i in 0 to mpgm_size-1 loop
-	--			readline(ram_file, ram_file_line);
-	--			for j in 0 to ram_file_line'right loop
-	--			RAM(i):=digit_value(ram_file_line(j));
-	--			end loop;
-	--		end loop;
-	--	return RAM;
-	--end function;
-	--procedure load_mpgm_file is
-	--begin
-	--mpgm_area := init_from_file ("RAM0.HEX");
-  --end procedure;
+	  FUNCTION digit_value(c : character) RETURN integer IS
+        BEGIN
+           IF (c >= '0') AND (c <= '9') THEN
+               RETURN (character'pos(c) - character'pos('0'));
+            ELSIF (c >= 'a') AND (c <= 'f') THEN
+                RETURN (character'pos(c) - character'pos('a') + 10);
+            ELSIF (c >= 'A') AND (c <= 'F') THEN
+                RETURN (character'pos(c) - character'pos('A') + 10);
+            ELSE
+                RETURN not_digit;
+            END IF;
+        END;
+	impure function init_from_file (ram_file_name : in string) return mpgm_type is
+		FILE ram_file : text is in ram_file_name;
+		variable ram_file_line : line;
+		variable RAM : mpgm_type;
+		begin
+			--for i in rom_type'range loop
+			for i in 0 to mpgm_size-1 loop
+				readline(ram_file, ram_file_line);
+				for j in 0 to ram_file_line'right loop
+				RAM(i):=digit_value(ram_file_line(j));
+				end loop;
+			end loop;
+		return RAM;
+	end function;
 
       procedure load_mpgm_file is
         file     mpgm0_file : text open read_mode is "RAM00.HEX";  -- Microprogram data file
-        file     mpgm1_file : text open read_mode is "RAM11.HEX";  -- Microprogram data file
+        --file     mpgm1_file : text open read_mode is "RAM11.HEX";  -- Microprogram data file
         variable mpgm_line  : line;                   -- Microprogram data line
         variable mpgm_bv_int : bit_vector(7 downto 0);
         variable mpgm_byte  : integer;                -- Microprogram data byte
@@ -227,7 +225,7 @@ begin  -- behav
         variable digit: integer;
       begin  -- load_mpgm_file
         mpgm_ptr := 0;
-        for j in 0 to 2047 loop
+        for j in 0 to 255 loop --for j in 0 to 2047 loop
           readline (mpgm0_file, mpgm_line);
           for i in 0 to mpgm_line'right loop
             digit := digit_value(mpgm_line(i));
@@ -241,20 +239,20 @@ begin  -- behav
             mpgm_ptr := mpgm_ptr + 1;
           end if;
         end loop;
-        for j in 0 to 2047 loop
-          readline (mpgm1_file, mpgm_line);
-          for i in 0 to mpgm_line'right loop
-            digit := digit_value(mpgm_line(i));
-          end loop;
-          if mpgm_line'length > 0 then
-            assert mpgm_ptr < mpgm_size
-              report "Microprogram HEX file too big!"
-              severity failure;                 -- exit simulation
-            mpgm_byte := digit;
-            mpgm_area(mpgm_ptr) := mpgm_byte;
-            mpgm_ptr := mpgm_ptr + 1;
-          end if;
-        end loop;
+        --for j in 0 to 2047 loop
+        --  readline (mpgm1_file, mpgm_line);
+        --  for i in 0 to mpgm_line'right loop
+        --    digit := digit_value(mpgm_line(i));
+        --  end loop;
+        --  if mpgm_line'length > 0 then
+        --    assert mpgm_ptr < mpgm_size
+        --      report "Microprogram HEX file too big!"
+        --      severity failure;                 -- exit simulation
+        --    mpgm_byte := digit;
+        --    mpgm_area(mpgm_ptr) := mpgm_byte;
+        --    mpgm_ptr := mpgm_ptr + 1;
+        --  end if;
+        --end loop;
         while mpgm_ptr < mpgm_size loop
           mpgm_area(mpgm_ptr) := 0;
           mpgm_ptr := mpgm_ptr + 1;
@@ -344,9 +342,14 @@ begin  -- behav
       end loop;
     end verifyMpgmWord;
 
-    procedure sendWord (constant word : in  std_logic_vector(79 downto 0)) is
+    procedure sendWord (constant word : in  std_logic_vector(119 downto 0)) is
     begin  -- sendWord
       send(WMDAT);
+      send(word(119 downto 112));
+      send(word(111 downto 104));
+      send(word(103 downto 96));
+      send(word(95 downto 88));
+      send(word(87 downto 80));
       send(word(79 downto 72));
       send(word(71 downto 64));
       send(word(63 downto 56));
@@ -399,7 +402,7 @@ begin  -- behav
       send(data8);  
     end wrCmd8;
 
-    procedure sendToPl (constant data : in std_logic_vector(79 downto 0)) is
+    procedure sendToPl (constant data : in std_logic_vector(119 downto 0)) is
     begin  -- sendToPl
       wrCmd1(WCDAP, SRTOPL);
       sendWord(data);
@@ -496,17 +499,17 @@ begin  -- behav
     sendWord(Reset);				-- Load MPLL with Reset word
     wrCmd1(WCDAP, SRTOPL);	-- Open data path to PL from MPLL
     wrCmd1(WTIMC, SSCU);		-- Load Reset into PL (and execute all zero word)
-    sendWord(Jump0FFF);			-- Load MPLL with Jump0FFF word    
-    wrCmd1(WTIMC, SSCU);		-- Load Jump0FFF into PL and execute Reset
-    sendWord(Continue);			-- Load MPLL with Continue word
-    wrCmd1(WTIMC, SSCU);		-- Load Continue into PL and execute Jump0FFF
-    wrCmd1(WTIMC, SSCU);		-- Clock once more on GP2000
-    send(RMDAT9);						-- Get the second byte of the first microprogram					
-    recv(recvWord);					-- word, and check that it is 0x07
-    assert recvWord = x"07"	    
-      report "!!!!!!!!!!!!!!!! Assertion violation !!!!!!!!!!!!!!!!!!!!!!"
-      severity failure;     -- exit simulation
-    wrCmd1(WCDAP, DISALL);	-- Disable all data paths. 
+    --sendWord(Jump0FFF);			-- Load MPLL with Jump0FFF word    
+    --wrCmd1(WTIMC, SSCU);		-- Load Jump0FFF into PL and execute Reset
+    --sendWord(Continue);			-- Load MPLL with Continue word
+    --wrCmd1(WTIMC, SSCU);		-- Load Continue into PL and execute Jump0FFF
+    --wrCmd1(WTIMC, SSCU);		-- Clock once more on GP2000
+    --send(RMDAT9);						-- Get the second byte of the first microprogram					
+    --recv(recvWord);					-- word, and check that it is 0x07
+    --assert recvWord = x"07"	    
+    --  report "!!!!!!!!!!!!!!!! Assertion violation !!!!!!!!!!!!!!!!!!!!!!"
+    --  severity failure;     -- exit simulation
+    --wrCmd1(WCDAP, DISALL);	-- Disable all data paths. 
 		Progress <= 2;
 
     ---------------------------------------------------------------------------
@@ -517,61 +520,61 @@ begin  -- behav
     MRESET <= '0';
     wait for 10*HALF_CLK_C_CYCLE;
     MRESET <= '1';
-    --wait until MRSTOUT = '1';	-- Wait for reset sequence to complete  --signal deleted CJ
+    wait until MRSTOUT = '1';	-- Wait for reset sequence to complete  
     MTEST <= '0';							-- Test mode disabled
-	Progress <= 3;
+	  Progress <= 3;
     -- Set up for loading microprogram at address 0x0800 (in MPRAM0)
     wrCmd1(WCDAP, DISALL);	-- Disable all data paths. 
     sendWord(Reset);				-- Load MPLL with Reset word
     wrCmd1(WCDAP, SRTOPL);	-- open data path to PL from MPLL
     wrCmd1(WTIMC, SSCU);		-- Load Reset into PL (and execute all zero word)
-    sendWord(Jump0FFF);			-- Load MPLL with Jump0FFF word    
+    sendWord(Jump0FFF);			-- Load MPLL with Jump0FFF word  --Now will jump to ff --CJ  
     wrCmd1(WTIMC, SSCU);		-- Load Jump0FFF into PL and execute Reset
     sendWord(Continue);			-- Load MPLL with Continue word
     wrCmd1(WTIMC, SSCU);		-- Load Continue into PL and execute Jump0FFF
     wrCmd1(WCDAP, WRMEM);		-- Make PL hold, activate WE to memory
     -- Write the first 2k word block
     mpgm_ptr := 0;
-    for i in 1 to 2048 loop	-- Write 2k words
+    for i in 1 to 256 loop	-- Write 2k words
       sendMpgmWord;					-- Send a word to MPLL 
       wrCmd1(WTIMC, SSCU);	-- Write word in memory and execute Continue
     end loop;
 		Progress <= 4;
     -- Set up for loading microprogram at address 0x1800 (in MPRAM1)
-    sendWord(Reset);				-- Load MPLL with Reset word
-    wrCmd1(WCDAP, SRTOPL);	-- open data path to PL from MPLL
-    wrCmd1(WTIMC, SSCU);		-- Load Reset into PL (and execute all zero word)
-    sendWord(Jump1FFF);			-- Load MPLL with Jump1FFF word    
-    wrCmd1(WTIMC, SSCU);		-- Load Jump1FFF into PL and execute Reset
-    sendWord(Continue);			-- Load MPLL with Continue word
-    wrCmd1(WTIMC, SSCU);		-- Load Continue into PL and execute Jump1FFF
-    wrCmd1(WCDAP, WRMEM);		-- Make PL hold, activate WE to memory
+    --sendWord(Reset);				-- Load MPLL with Reset word
+    --wrCmd1(WCDAP, SRTOPL);	-- open data path to PL from MPLL
+    --wrCmd1(WTIMC, SSCU);		-- Load Reset into PL (and execute all zero word)
+    --sendWord(Jump1FFF);			-- Load MPLL with Jump1FFF word    
+    --wrCmd1(WTIMC, SSCU);		-- Load Jump1FFF into PL and execute Reset
+    --sendWord(Continue);			-- Load MPLL with Continue word
+    --wrCmd1(WTIMC, SSCU);		-- Load Continue into PL and execute Jump1FFF
+    --wrCmd1(WCDAP, WRMEM);		-- Make PL hold, activate WE to memory
     -- Write the second 2k word block
-    mpgm_ptr := mpgm_size/2;
-    for i in 1 to 2048 loop	-- Write 2k words
-      sendMpgmWord;					-- Send a word to MPLL 
-      wrCmd1(WTIMC, SSCU);	-- Write word in memory and execute Continue
-    end loop;
-		Progress <= 5;
+    --mpgm_ptr := mpgm_size/2;
+    --for i in 1 to 2048 loop	-- Write 2k words
+    --  sendMpgmWord;					-- Send a word to MPLL 
+    --  wrCmd1(WTIMC, SSCU);	-- Write word in memory and execute Continue
+    --end loop;
+		--Progress <= 5;
     -- Set up for loading patch data at address 0x0100 (in PMEM)
-    wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
-    sendWord(Jump00FF);    -- Load MPLL with Jump00FF word    
-    wrCmd1(WTIMC, SSCU);   -- Load Jump00FF into PL (and execute Continue)
-    sendWord(Continue);    -- Load MPLL with Continue word
-    wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump00FF
-    wrCmd1(WCDAP, WRMEM);  -- Make PL hold, activate WE to memory
-    -- Write in the patch memory. Should write 00 at PMEM address
-   -- 0x040, 01 at 0x240, 10 at 0x440 and 11 at 0x640. The corresponding
-    -- patched logical ROM addresses are 0x0100, 0x1100, 0x2100 and 0x2900.
-    -- Finally, the patched-in RAM areas start at N/A, 0x1E80, 0x1F00, 0x1F80.
-    wrCmd1(WMDAT1, x"00"); -- Send a byte to MPLL (only two bits used) 
-    wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
-    wrCmd1(WMDAT1, x"01"); -- Send a byte to MPLL (only two bits used) 
-    wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
-    wrCmd1(WMDAT1, x"02"); -- Send a byte to MPLL (only two bits used) 
-    wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
-    wrCmd1(WMDAT1, x"03"); -- Send a byte to MPLL (only two bits used) 
-    wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continu
+    --wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
+    --sendWord(Jump00FF);    -- Load MPLL with Jump00FF word    
+    --wrCmd1(WTIMC, SSCU);   -- Load Jump00FF into PL (and execute Continue)
+    --sendWord(Continue);    -- Load MPLL with Continue word
+    --wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump00FF
+    --wrCmd1(WCDAP, WRMEM);  -- Make PL hold, activate WE to memory
+    ---- Write in the patch memory. Should write 00 at PMEM address
+    ---- 0x040, 01 at 0x240, 10 at 0x440 and 11 at 0x640. The corresponding
+    ---- patched logical ROM addresses are 0x0100, 0x1100, 0x2100 and 0x2900.
+    ---- Finally, the patched-in RAM areas start at N/A, 0x1E80, 0x1F00, 0x1F80.
+    --wrCmd1(WMDAT1, x"00"); -- Send a byte to MPLL (only two bits used) 
+    --wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
+    --wrCmd1(WMDAT1, x"01"); -- Send a byte to MPLL (only two bits used) 
+    --wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
+    --wrCmd1(WMDAT1, x"02"); -- Send a byte to MPLL (only two bits used) 
+    --wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continue
+    --wrCmd1(WMDAT1, x"03"); -- Send a byte to MPLL (only two bits used) 
+    --wrCmd1(WTIMC, SSCU);   -- Write word in memory and execute Continu
     ---------------------------------------------------------------------------
     -- VERIFY MICROPROGRAM
     ---------------------------------------------------------------------------
@@ -589,34 +592,34 @@ begin  -- behav
       wrCmd1(WTIMC, SSCU); -- Execute Continue
     end loop;
     -- Set up for reading microprogram at address 0x1802
-    wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
-    sendWord(Jump1802);    -- Load MPLL with Jump1802 word    
-    wrCmd1(WTIMC, SSCU);   -- Load Jump1802 into PL (and execute Continue)
-    sendWord(Continue);    -- Load MPLL with Continue word
-    wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump1802
-    wrCmd1(WCDAP, DISALL); -- Make PL hold
-    -- Read and verify the second 2k word block
-    mpgm_ptr := mpgm_size/2;
-    for i in 1 to 2 loop   -- Verify two words
-      verifyMpgmWord;      -- Read and verify a micro program word 
-      wrCmd1(WTIMC, SSCU); -- Execute Continue
-    end loop;
+    --wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
+    --sendWord(Jump1802);    -- Load MPLL with Jump1802 word    
+    --wrCmd1(WTIMC, SSCU);   -- Load Jump1802 into PL (and execute Continue)
+    --sendWord(Continue);    -- Load MPLL with Continue word
+    --wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump1802
+    --wrCmd1(WCDAP, DISALL); -- Make PL hold
+    ---- Read and verify the second 2k word block
+    --mpgm_ptr := mpgm_size/2;
+    --for i in 1 to 2 loop   -- Verify two words
+    --  verifyMpgmWord;      -- Read and verify a micro program word 
+    --  wrCmd1(WTIMC, SSCU); -- Execute Continue
+    --end loop;
     -- Set up for reading patch data at address 0x0100
-    wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
-    sendWord(Jump0100);    -- Load MPLL with Jump0100 word    
-    wrCmd1(WTIMC, SSCU);   -- Load Jump0100 into PL (and execute Continue)
-    sendWord(Continue);    -- Load MPLL with Continue word
-    wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump0100
-    wrCmd1(WCDAP, DISALL); -- Make PL hold
-    -- Read and verify patch data.
-    for i in 0 to 3 loop   -- Verify four two-bit words
-      send(RPDAT);         -- Read and verify a patch word
-      recv(recvWord);
-      assert (recvWord = std_logic_vector(to_unsigned(i, 8)))
-        report "Patch data write/read error!"
-        severity note;
-      wrCmd1(WTIMC, SSCU); -- Execute Continue
-    end loop;
+    --wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
+    --sendWord(Jump0100);    -- Load MPLL with Jump0100 word    
+    --wrCmd1(WTIMC, SSCU);   -- Load Jump0100 into PL (and execute Continue)
+    --sendWord(Continue);    -- Load MPLL with Continue word
+    --wrCmd1(WTIMC, SSCU);   -- Load Continue into PL and execute Jump0100
+    --wrCmd1(WCDAP, DISALL); -- Make PL hold
+    ---- Read and verify patch data.
+    --for i in 0 to 3 loop   -- Verify four two-bit words
+    --  send(RPDAT);         -- Read and verify a patch word
+    --  recv(recvWord);
+    --  assert (recvWord = std_logic_vector(to_unsigned(i, 8)))
+    --    report "Patch data write/read error!"
+    --    severity note;
+    --  wrCmd1(WTIMC, SSCU); -- Execute Continue
+    --end loop;
     
     ---------------------------------------------------------------------------
     -- START TEST MICROPROGRAM
@@ -672,66 +675,66 @@ begin  -- behav
       report "Check memory mode information!"
       severity note;    
     end if;
-  --  ---------------------------------------------------------------------------
-  --  -- SEND A FEW MICROPROGRAM WORDS THAT THE TEST PROGRAM CAN LOAD
-  --  ---------------------------------------------------------------------------
-  --  mpgm_ptr := mpgm_size-40;
-  --  for i in 1 to 40 loop   -- Send four words, ten bytes per word
-  --    sendMpgmByte;         -- Send a microprogram byte as a SPREQ 
-  --  end loop;
-  --  ---------------------------------------------------------------------------
-  --  -- CONTINUE COMMUNICATE WITH TEST MICROPROGRAM
-  --  ---------------------------------------------------------------------------
-  --  -- WaitTMpgm No.5
-  --  wait until MIRQOUT = '0';
-  --  RdDbus(CPpar);
-  --  wrCmd1(WTIMC, AKCC);    
-  --  if CPpar /= x"00" then
-  --    assert false
-  --      report "Error: Hardware failure detected -" severity warning;
-  --    if CPpar <= x"40" then
-  --      assert false report "Error in GPU." severity note;
-  --    elsif CPpar >= x"41" and CPpar <= x"4F" then
-  --      assert false report "Error in map memory." severity note;
-  --    elsif CPpar >= x"81" and CPpar <= x"8F" then
-  --      assert false report "Error in primary memory." severity note; 
-  --    elsif CPpar >= x"90" and CPpar <= x"9F" then
-  --      assert false report "Error in ADL stepping." severity note;
-  --    elsif CPpar >= x"A0" and CPpar <= x"AF" then
-  --      assert false report "Error in PC FIFO." severity note;
-  --    elsif CPpar = x"FF" then
-  --      assert false report "uProgram derailed." severity note;
-  --    else
-  --      assert false report "Unknown GPU error." severity note;      
-  --    end if;    
-  --  else
-  --    assert false report "Test OK!" severity note;
-  --  end if;
-  --  ---------------------------------------------------------------------------
-  --  -- SET UP DEBUG TRACE FUNCTION
-  --  ---------------------------------------------------------------------------
-  --  
-  --  wrCmd8(WSTRC, x"00", x"00", x"00", x"00", x"00", x"0E", x"41", x"41");
-  --                           -- trig at "0E00 41 41" 
-  --  wrCmd1(WGTRC, x"41");    -- go trace, trig point beginning 
-  --  
-  --  ---------------------------------------------------------------------------
-  --  -- READ TRACE DATA
-  --  ---------------------------------------------------------------------------
-  --  RdStatus1(recvWord);     -- Check that trace is running
-  --  assert recvWord(3) = '1';
-  --  wrCmd1(WGTRC, x"40");    -- reset trace
-  --  RdStatus1(recvWord);     -- Check that trace is reset
-  --  assert recvWord(3) = '0';    
-  --  RdTrcData(recvWord);
-  --  RdTrcData(recvWord);
-  --  RdTrcData(recvWord);
-  --  RdTrcData(recvWord);
-  -- 
-  --  wait for 10*HALF_CLK_C_CYCLE;
-  --  assert false
-  --    report "Simulation finished!"
-  --    severity failure;     -- exit simulation
+    ---------------------------------------------------------------------------
+    -- SEND A FEW MICROPROGRAM WORDS THAT THE TEST PROGRAM CAN LOAD
+    ---------------------------------------------------------------------------
+    mpgm_ptr := mpgm_size-40;
+    for i in 1 to 40 loop   -- Send four words, ten bytes per word
+      sendMpgmByte;         -- Send a microprogram byte as a SPREQ 
+    end loop;
+    ---------------------------------------------------------------------------
+    -- CONTINUE COMMUNICATE WITH TEST MICROPROGRAM
+    ---------------------------------------------------------------------------
+    -- WaitTMpgm No.5
+    wait until MIRQOUT = '0';
+    RdDbus(CPpar);
+    wrCmd1(WTIMC, AKCC);    
+    if CPpar /= x"00" then
+      assert false
+        report "Error: Hardware failure detected -" severity warning;
+      if CPpar <= x"40" then
+        assert false report "Error in GPU." severity note;
+      elsif CPpar >= x"41" and CPpar <= x"4F" then
+        assert false report "Error in map memory." severity note;
+      elsif CPpar >= x"81" and CPpar <= x"8F" then
+        assert false report "Error in primary memory." severity note; 
+      elsif CPpar >= x"90" and CPpar <= x"9F" then
+        assert false report "Error in ADL stepping." severity note;
+      elsif CPpar >= x"A0" and CPpar <= x"AF" then
+        assert false report "Error in PC FIFO." severity note;
+      elsif CPpar = x"FF" then
+        assert false report "uProgram derailed." severity note;
+      else
+        assert false report "Unknown GPU error." severity note;      
+      end if;    
+    else
+      assert false report "Test OK!" severity note;
+    end if;
+    ---------------------------------------------------------------------------
+    -- SET UP DEBUG TRACE FUNCTION
+    ---------------------------------------------------------------------------
+    
+    wrCmd8(WSTRC, x"00", x"00", x"00", x"00", x"00", x"0E", x"41", x"41");
+                             -- trig at "0E00 41 41" 
+    wrCmd1(WGTRC, x"41");    -- go trace, trig point beginning 
+    
+    ---------------------------------------------------------------------------
+    -- READ TRACE DATA
+    ---------------------------------------------------------------------------
+    RdStatus1(recvWord);     -- Check that trace is running
+    assert recvWord(3) = '1';
+    wrCmd1(WGTRC, x"40");    -- reset trace
+    RdStatus1(recvWord);     -- Check that trace is reset
+    assert recvWord(3) = '0';    
+    RdTrcData(recvWord);
+    RdTrcData(recvWord);
+    RdTrcData(recvWord);
+    RdTrcData(recvWord);
+   
+    wait for 10*HALF_CLK_C_CYCLE;
+    assert false
+      report "Simulation finished!"
+      severity failure;     -- exit simulation
   end process;
 
 end behav;

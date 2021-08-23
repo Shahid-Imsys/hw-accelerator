@@ -110,7 +110,7 @@ begin
     --Recognize the write request and hold the wr_req signal for 4 clock cycles.
     process(clk_p)
     begin
-        if rising_edge(clk_p) and EVEN_P = '1' then
+        if rising_edge(clk_p) and EVEN_P = '0' then
             if loop_c = 0 then
                 if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
                     wr_req <= '1';
@@ -160,7 +160,7 @@ end process;
 --ID Number Register and write controller
 process(poll_act,clk_p)
 begin
-    if rising_edge(clk_p) and EVEN_P = '1' then
+    if rising_edge(clk_p) and EVEN_P = '0' then
         if poll_act = '1' then
             ack_sig_i <= (others =>'0');
             ack_sig_i(to_integer(unsigned(id_num))) <= '1';
@@ -250,7 +250,7 @@ end process;
 --PE Mux
 process(clk_p)
 begin
-    if rising_edge(clk_p) and EVEN_P = '1' then
+    if rising_edge(clk_p) and EVEN_P = '0' then
         pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
     end if;
 end process;

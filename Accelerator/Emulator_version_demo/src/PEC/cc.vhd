@@ -47,9 +47,9 @@ entity cluster_controller is
       CLK_P            : in std_logic;     --PE clock --0628
 	  CLK_E            : in std_logic;     --PE's execution clock 
 	  --CLK_E_NEG        : in std_logic;     --Inverted clk_e
---Asynchronized reset input:
+--Power reset input:
       --RST_P            : in std_logic;
-	  RST_E            : in std_logic;
+	  RST_E            : in std_logic; --active low --For reset clk_e generator
 --Clock outputs
 	  CLK_O            : out std_logic;    --not needed in this version
 	  EVEN_P           : out std_logic;    --To PE and network
@@ -215,14 +215,10 @@ begin
           
 even_p_generateor: process(rst_e,clk_p)
 begin
-	if RST_E = '1' then
+	if rst_e = '1' then 
 		even_p_int <= '1';
 	elsif rising_edge(clk_p) then
-		if rst_i = '0' then
-			even_p_int <= '1';
-		else
 		    even_p_int <= not even_p_int;
-		end if;
 	end if;
 end process;
 EVEN_P <= even_p_int;		  

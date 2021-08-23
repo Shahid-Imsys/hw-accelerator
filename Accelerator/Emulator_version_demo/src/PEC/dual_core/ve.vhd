@@ -419,8 +419,8 @@ begin
                     ve_addr_r <= ve_saddr_r;
             elsif ve_start_reg = '1' and ve_loop /= (ve_loop'range => '0') then
                 ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
-
-                if sram_l_cs = '1' then --active address pointer L
+            ---------------------should Be able to reload one address pointer while keep another incrementing.During the process --TO BE FIXED!!--2021/8/17
+                if sram_l_cs = '1' then --active address pointer L 
                         ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l))+to_integer(unsigned(depth_l))+to_integer(unsigned(jump_l)),8)); --calculate left address;
                 end if;
     

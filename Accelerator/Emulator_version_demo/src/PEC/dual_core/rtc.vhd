@@ -75,8 +75,8 @@ entity rtc is
     RAM0_WEB          : in 	  std_logic;
     RAM0_CS           : in 	  std_logic;
 
-    xout                : in  std_logic;  -- external high frequency oscillator clock 
-    pllout              : in  std_logic;
+    xout                : in  std_logic;  -- external high frequency oscillator clock --Now same as the xout clock, by CJ.
+    pllout              : in  std_logic;  
     sel_pll             : in  std_logic;
     xout_selected       : out std_logic;
     lp_pwr_ok           : in  std_logic;  -- Core power indicator, controls mrxout_o   

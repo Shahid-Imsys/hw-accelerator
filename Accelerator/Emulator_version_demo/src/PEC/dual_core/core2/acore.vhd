@@ -439,8 +439,8 @@ begin
       ira2          => ira2,                
       irq0          => irq0,               
       irq1          => irq1, 
-      dfm_vld       => ddi_vld,  --Added by CJ
-      vldl          => vldl,     --Added by CJ            
+      --dfm_vld       => ddi_vld,  --Added by CJ
+      mp_vld        => '0',     --Added by CJ            
       -- Condition inputs
       spreq_n       => '1',             
       spack_n       => '1',             
@@ -689,6 +689,8 @@ begin
       d_ba        => dba_o,              
       d_dqm       => ddqm,
       exe         => exe,    --Added by CJ 
+      LD_MPGM     => '0',
+      
       --ddi_vld     => ddi_vld,  --Added by CJ        
       d_cke       => dcke_o); 
 ---------------------------------------------------------------------

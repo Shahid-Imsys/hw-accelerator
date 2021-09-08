@@ -11,16 +11,16 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : ram32x8
--- Project    : GP3000
+-- Title      : ram64x8
+-- Project    : GP3000 Accelerator
 -------------------------------------------------------------------------------
--- File       : ram32x8.vhd
+-- File       : ram64x8.vhd
 -- Author     : Christian Blixt
 -- Company    : Imsys AB
 -- Date       : 
 -------------------------------------------------------------------------------
 -- Description: 
--- 32 x 8 dual-port RAM.
+-- 64 x 8 dual-port RAM.
 -- 
 -------------------------------------------------------------------------------
 -- TO-DO list :
@@ -30,18 +30,19 @@
 -- Date         Version   Author  Description
 -- 2005-11-28		1.0				CB			Created
 -- 2012-08-16		2.1		MN		added reset signal
+-- 2021-08-25       3.0     CJ      Doubled the number of registers 32->64
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-entity ram32x8 is
+entity ram64x8 is
 	port(
 	    clk_p           : in    std_logic;
 		clk_e_pos    	: in	std_logic;											-- Clock input
 		rst_n			: in 	std_logic;
-		pl_aaddr	: in	std_logic_vector(4 downto 0); 	-- Read address A
-		pl_baddr	: in	std_logic_vector(4 downto 0); 	-- Read/write address B
+		pl_aaddr	: in	std_logic_vector(5 downto 0); 	-- Read address A
+		pl_baddr	: in	std_logic_vector(5 downto 0); 	-- Read/write address B
 		we_n			: in	std_logic;											-- Write enable (active low)
 		b_in			: in	std_logic_vector(7 downto 0);		-- Data input B
 		a_out			: out std_logic_vector(7 downto 0);		-- Data output A
@@ -53,8 +54,8 @@ end;
 -- implementation is desired. Requires some special timing constraints to work
 -- well.
 -------------------------------------------------------------------------------
-architecture latch_based of ram32x8 is
-	type mem_type is array (31 downto 0) of std_logic_vector(7 downto 0);
+architecture latch_based of ram64x8 is
+	type mem_type is array (63 downto 0) of std_logic_vector(7 downto 0);
 
 	signal ram 			: mem_type;    
 	signal decode_n : std_logic_vector(31 downto 0);
@@ -75,7 +76,7 @@ begin
 	-- to a set-up time before the latches close.
 	process (clk_e_pos, we_n, pl_baddr, b_in, decode_n)
 	begin
-		for i in 0 to 31 loop
+		for i in 0 to 63 loop
 			if we_n = '0' and pl_baddr = i then 
 				decode_n(i) <= '0';
 			else
@@ -110,8 +111,8 @@ end latch_based;
 -- implementation. Bigger and comsumes more power than the latch-based
 -- solution.
 -------------------------------------------------------------------------------
-architecture register_based of ram32x8 is
-	type mem_type is array (31 downto 0) of std_logic_vector(7 downto 0);
+architecture register_based of ram64x8 is
+	type mem_type is array (63 downto 0) of std_logic_vector(7 downto 0);
 	signal ram 			: mem_type;    
 
 begin

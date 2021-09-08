@@ -41,6 +41,7 @@ entity Cluster_top is
 	  clk_O  : out std_logic;
 	  TAG    : in std_logic;
 	  TAG_FB : out std_logic;
+      C_RDY  : out std_logic;
       DATA   : in std_logic_vector(7 downto 0);
       DATA_OUT  : out std_logic_vector(7 downto 0)
   );
@@ -69,6 +70,24 @@ port(
 
 	  EXE              : out std_logic;   --Start execution
 	  RESUME           : out std_logic;   --Resume paused execution
+--Feedback signals
+      C_RDY               : out std_logic;
+	  PE_RDY_0         : in std_logic;
+	  PE_RDY_1         : in std_logic;
+	  PE_RDY_2         : in std_logic;
+	  PE_RDY_3         : in std_logic;
+	  PE_RDY_4         : in std_logic;
+	  PE_RDY_5         : in std_logic;
+	  PE_RDY_6         : in std_logic;
+	  PE_RDY_7         : in std_logic;
+	  PE_RDY_8         : in std_logic;
+	  PE_RDY_9         : in std_logic;
+	  PE_RDY_10         : in std_logic;
+	  PE_RDY_11         : in std_logic;
+	  PE_RDY_12         : in std_logic;
+	  PE_RDY_13         : in std_logic;
+	  PE_RDY_14         : in std_logic;
+	  PE_RDY_15         : in std_logic;
 --PE request
     RST_R            : out std_logic;  --Active low
 	  REQ_IN           : in std_logic;  --req to noc in reg logic
@@ -79,8 +98,7 @@ port(
 	  BC              : out std_logic;
 	  RD_FIFO          : out std_logic;
 	  FIFO_VLD         : in std_logic
---Feedback signals
-      --fb               : out std_logic
+
 	  ); 
 	  end component;
 	  
@@ -169,7 +187,10 @@ component p_top
     C2_IN_D   : in std_logic_vector(127 downto 0);
     C1_DDI_VLD : in std_logic;
     C2_DDI_VLD : in std_logic;
-    EXE        : in std_logic  
+    C1_RDY     : out std_logic;
+    C2_RDY     : out std_logic;
+    EXE        : in std_logic;
+    RESUME     : in std_logic  
   );
 	end component;
 --signal clk_p_i : std_logic;
@@ -237,6 +258,7 @@ port map(
 	DATA_OUT => data_out_i,
 	exe      => exe,
 	resume   => resume,
+    C_RDY     => C_RDY,            
 	RST_R => rst_i,
 	REQ_IN     => req_in_i,
     REQ_FIFO   => req_fifo_i,
@@ -285,7 +307,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -312,7 +334,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -339,7 +361,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -366,7 +388,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -393,7 +415,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -420,7 +442,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -447,7 +469,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out
@@ -474,7 +496,7 @@ port map(
     EXE        => exe,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
-    MRESET     => '1',                 -- system reset               low active
+    MRESET     => rst_i,                 -- system reset               low active
     MIRQOUT    => open,                 -- interrupt request output    
     MCKOUT0    => open,                 -- for trace adapter
     MCKOUT1    => open,                 -- programable clock out

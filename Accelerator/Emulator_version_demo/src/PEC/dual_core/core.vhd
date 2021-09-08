@@ -95,7 +95,9 @@ entity core is
     -- Power on signal
     pwr_ok      : in  std_logic;  -- Power is on
     -- Execution signal
-    exe         : in std_logic; 
+    exe         : in std_logic;
+    resume      : in std_logic; 
+    ready       : out std_logic;
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -873,7 +875,8 @@ begin
       re_rdy        => re_rdy_int, --Added by CJ
       ve_rdy        => ve_rdy_int, --Added by CJ
       dfm_rdy       => dfm_rdy,--Added by CJ
-      fifo_rdy      => dtm_fifo_rdy, --Added by CJ              
+      fifo_rdy      => dtm_fifo_rdy, --Added by CJ
+      continue      => resume,              
       --Data Inputs
       dbus          => dbus_int,                
       y_reg         => y_reg,

@@ -16,7 +16,11 @@ entity p_top is
     C2_IN_D   : in std_logic_vector(127 downto 0);
     C1_DDI_VLD : in std_logic;
     C2_DDI_VLD : in std_logic;
+    C1_RDY     : out std_logic;
+    C2_RDY     : out std_logic;
     EXE        : in std_logic;
+    RESUME     : in std_logic;
+
 
     -- clocks and control signals
     HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
@@ -966,7 +970,6 @@ architecture struct of p_top is
   -- core/peri driven signals
   -----------------------------------------------------------------------------
   -- Signals to other blocks
-  signal exe_i          : std_logic; --CJ
   signal ddi_vld_c1      : std_logic; --CJ
   signal ddi_vld_c2      : std_logic; --CJ
   signal pll_frange   : std_logic;
@@ -2572,6 +2575,7 @@ begin
     clk_p         => clk_p,   --: in  std_logic;  -- PLL clock
     clk_c_en      => clk_c_en,   --: in  std_logic;  -- CP clock
     even_c        => even_c,
+    ready         => C1_RDY,
     --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2 
     clk_e_pos     => clk_e_pos,   --: out  std_logic;  -- Execution clock
     clk_e_neg     => clk_e_neg,   --: out  std_logic;  -- Execution clock
@@ -2680,6 +2684,7 @@ begin
 --	router_clk_en => router_clk_en,  --delete by HYX, 20141027
     -- RTC block signals
     exe => EXE,         --CJ
+    resume => RESUME,   --CJ
     ddi_vld => ddi_vld_c1, --CJ
     reset_core_n   => reset_core_n   ,
     reset_iso      => reset_iso      ,
@@ -2789,7 +2794,8 @@ begin
     -- Clocks to/from clock block
     clk_p         => clk_p  ,      
     clk_c_en      => clk_c_en  ,
-    even_c        => even_c,     
+    even_c        => even_c, 
+    ready         => C2_RDY,    
     --clk_c2_pos  => clk_c2a_pos,
     clk_e_pos     => clk_ea_pos,
     --clk_e_neg   => clk_ea_neg,
@@ -2856,6 +2862,7 @@ begin
     pmem_we_n     => c2_pmem_we_n   ,
     exe          => exe ,     --CJ
      ddi_vld      =>ddi_vld_c2, --CJ 
+     resume => RESUME,   --CJ
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------

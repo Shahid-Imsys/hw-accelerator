@@ -89,6 +89,7 @@ entity clc is
     ve_rdy       : in  std_logic;--Added by CJ
     dfm_rdy      : in  std_logic;--Added by CJ
     fifo_rdy     : in  std_logic;--Added by CJ
+    continue     : in  std_logic;--Added by CJ
     --Data Inputs
     dbus         : in  std_logic_vector(7 downto 0);   
     y_reg        : in  std_logic_vector(7 downto 0);   
@@ -425,7 +426,8 @@ begin
                  flag_carry, flag_yeqneg, psc_empty, flag_fc, y_bittst,
                  flag_fh, flag_pccy, psc_afull, flag_neg, flag_link,
                  psc_full, special, flag_fz, flag_fp, psc_aempty,
-                 flag_fn, flag_qlsb, flag_fv, ctr_eq0, adl_cy)
+                 flag_fn, flag_qlsb, flag_fv, ctr_eq0, adl_cy,ve_rdy,re_rdy,dfm_rdy,
+                 fifo_rdy,continue)
 	  variable flag_less		: std_logic; -- LESS flag = NEG xor OVERFLOW
 	  variable flag_fl			: std_logic; -- FL flag = FN xor FV
 	  variable flag_greater	: std_logic; -- GREATER flag = not LESS and not ZERO
@@ -479,7 +481,8 @@ begin
       when COND_VE_RDY   =>sel_cond <= ve_rdy; --Added by CJ
       when COND_RE_RDY   =>sel_cond <= re_rdy; --Added by CJ
       when COND_DFM_RDY  =>sel_cond <= dfm_rdy; --Added by CJ
-      when COND_FIFO_RDY =>sel_cond <= fifo_rdy; --Added by CJ        
+      when COND_FIFO_RDY =>sel_cond <= fifo_rdy; --Added by CJ
+      when COND_CONT     =>sel_cond <= continue; --Added by CJ        
       when others  => null;
     end case;
   end process;

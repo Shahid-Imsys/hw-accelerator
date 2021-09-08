@@ -29,6 +29,7 @@
 -- Revisions  :
 -- Date					Version		Author	Description
 -- 2021-5-19  		     1.0	     CJ			Created
+--2021-9-16              2.0         CJ         Advanced address generation and post processing block added
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -116,6 +117,7 @@ END COMPONENT;
     --Receive engine signals
     signal re_start : std_logic;
     signal re_source : std_logic;
+    signal re_source_reg : std_logic;
     signal re_rdy_int : std_logic;
     --Vector engine signals
     signal ve_rdy_int : std_logic;
@@ -127,12 +129,13 @@ END COMPONENT;
     --signal wr_depth  : std_logic;--TBD
     --signal mac_switch : std_logic;
     signal acc_latch  : std_logic;
-    signal acc_clear : std_logic; --clear the accumulators
       --Post processing --TBA
 
     --Shared signals
     signal mode_a : std_logic; --mode A activate
     signal mode_b : std_logic; --mode B activate
+    signal mode_c : std_logic; --Vector engine mode c;
+    signal mode_d : std_logic; --Vector engine mode d;
     signal reload : std_logic; --reload address counters 
     signal reg_in : std_logic_vector(4 downto 0); --parameter register set field, including loop counter.
     
@@ -155,19 +158,25 @@ END COMPONENT;
     signal ve_addr_r   : std_logic_vector(7 downto 0);
     signal ve_saddr_r  : std_logic_vector(7 downto 0);
     signal ve_loop     : std_logic_vector(7 downto 0);
+    signal ve_oloop    : std_logic_vector(7 downto 0);
     signal ve_loop_reg : std_logic_vector(7 downto 0);
+    signal ve_oloop_reg : std_logic_vecto(7 downto 0);
     signal offset_l    : std_logic_vector(7 downto 0); --offset register
     signal offset_r    : std_logic; 
     signal jump_l    : std_logic_vector(7 downto 0);--Jump register
     signal depth_l   : std_logic_vector(7 downto 0);--depth register
+    signal config    : std_logic_vector(7 downto 0); --configure register
+    signal ring_end_addr : std_logic_vector(7 downto 0);
+    signal ring_start_addr : std_logic_vector(7 downto 0);
+    signal curr_ring_addr : std_logic_vector(7 downto 0);
     signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
     signal dfy_reg   : dfy_word;
     signal re_start_reg : std_logic; --RE start latch
     signal ve_start_reg : std_logic; --VE start latch
-    --signal mode_a_reg  : std_logic; --replaced with sram_l_cs
-    --signal mode_b_reg  : std_logic; --replaced with sram_r_cs
-    signal reload_ve   : std_logic;
-    signal reload_re   : std_logic;
+    --signal mode_a_reg  : std_logic; --replaced with mode_a_l
+    --signal mode_b_reg  : std_logic; --replaced with mode_b_l
+    signal addr_reload   : std_logic;
+    signal addr_reload   : std_logic;
     signal rst_i       : std_logic;
     signal sclr_i        : std_logic; --For clear accumulator 0-7
     signal buf_out_l  : std_logic_vector(63 downto 0);
@@ -192,8 +201,8 @@ END COMPONENT;
     signal acc_out_a  : std_logic_vector(31 downto 0);
     signal bypass     : std_logic;
     signal sram_in    : std_logic_vector(63 downto 0);
-    signal sram_l_cs  : std_logic;
-    signal sram_r_cs  : std_logic;
+    signal mode_a_l  : std_logic;
+    signal mode_b_l  : std_logic;
     signal sram_l_we  : std_logic;
     signal sram_r_we  : std_logic;
     signal ve_clr_acc : std_logic; --clear accumulators
@@ -229,22 +238,28 @@ END COMPONENT;
     --------------------------------
     --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
     --------------------------------
-    constant NON_ACT         : std_logic_vector(4 downto 0) := "0"&x"0";
-    constant RE_START_ADDR_L : std_logic_vector(4 downto 0) := "0"&x"1"; --write left starting address of receive engine
-    constant RE_START_ADDR_R : std_logic_vector(4 downto 0) := "0"&x"2"; --write right starting address of recieve engine
-    constant RE_LC           : std_logic_vector(4 downto 0) := "0"&x"3"; --write receive engine's loop counter
-    constant DFY_ADDR_A      : std_logic_vector(4 downto 0) := "0"&x"4"; --push back address from DFY
-    constant DFY_ADDR_B      : std_logic_vector(4 downto 0) := "0"&x"5"; --push back address from DFY, B mode
-    constant VE_START_ADDR_L : std_logic_vector(4 downto 0) := "0"&x"6"; --vector engine's left starting address
-    constant VE_START_ADDR_R : std_logic_vector(4 downto 0) := "0"&x"7"; --vector engine's right starting address
-    constant VE_LC           : std_logic_vector(4 downto 0) := "0"&x"8"; --vector engine's loop counter
-    constant VE_OFFSET_L     : std_logic_vector(4 downto 0) := "0"&x"9"; --left offset
-    constant VE_OFFSET_R     : std_logic_vector(4 downto 0) := "0"&x"a"; --right offset
-    constant VE_DEPTH_L      : std_logic_vector(4 downto 0) := "0"&x"b"; --left depth
-    constant VE_JUMP_L       : std_logic_vector(4 downto 0) := "0"&x"c"; --left jump
-    constant DFY             : std_logic_vector(4 downto 0) := "0"&x"d"; --write DFY
-    --constant ACC_CLR         : std_logic_vector(4 downto 0) := x"1e"; --clear accumulator 
-    constant MAC_SWITCH      : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
+    constant CONS_NON_ACT         : std_logic_vector(4 downto 0) := "0"&x"0";
+    constant CONS_RE_START_ADDR_L : std_logic_vector(4 downto 0) := "0"&x"1"; --write left starting address of receive engine
+    constant CONS_RE_START_ADDR_R : std_logic_vector(4 downto 0) := "0"&x"2"; --write right starting address of recieve engine
+    constant CONS_RE_LC           : std_logic_vector(4 downto 0) := "0"&x"3"; --write receive engine's loop counter
+    constant CONS_DFY_ADDR_A      : std_logic_vector(4 downto 0) := "0"&x"4"; --push back address from DFY
+    constant CONS_DFY_ADDR_B      : std_logic_vector(4 downto 0) := "0"&x"5"; --push back address from DFY, B mode
+    constant CONS_VE_START_ADDR_L : std_logic_vector(4 downto 0) := "0"&x"6"; --vector engine's left starting address
+    constant CONS_VE_START_ADDR_R : std_logic_vector(4 downto 0) := "0"&x"7"; --vector engine's right starting address
+    constant CONS_VE_LC           : std_logic_vector(4 downto 0) := "0"&x"8"; --vector engine's INNER loop counter
+    constant CONS_VE_OFFSET_L     : std_logic_vector(4 downto 0) := "0"&x"9"; --left offset
+    constant CONS_VE_OFFSET_R     : std_logic_vector(4 downto 0) := "0"&x"a"; --right offset
+    constant CONS_VE_DEPTH_L      : std_logic_vector(4 downto 0) := "0"&x"b"; --left depth
+    constant CONS_VE_JUMP_L       : std_logic_vector(4 downto 0) := "0"&x"c"; --left jump
+    constant CONS_DFY_REG_SHIFT_IN: std_logic_vector(4 downto 0) := "0"&x"d"; --write DFY
+    constant CONS_DFY_REG_PARALLEL: std_logic_vector(4 downto 0) := "0"&x"e"; --write DFY in parallel from mac registers
+    constant CONS_DTM_REG_SHIFT_IN: std_logic_vector(4 downto 0) := "0"&x"f"; --Write DTM --?
+    constant CONS_VE_OLC          : std_logic_vector(4 downto 0) := "1"&x"0"; --write vector engine's OUTER loop counter
+    constant CONS_CONFIG          : std_logic_vector(4 downto 0) := "1"&x"1"; --write config register for both ring mode and inner-outer loop mode
+    constant CONS_RING_END        : std_logic_vector(4 downto 0) := "1"&x"2"; --Ring mode end address
+    constant CONS_RING_START      : std_logic_vector(4 downto 0) := "1"&x"3"; --Ring mode start address. 
+    constant CONS_CURR_RING       : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
+    constant CONS_MAC_SWITCH      : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
 
 
 begin
@@ -253,146 +268,268 @@ begin
     re_start  <= PL(100);
     ve_start  <= PL(95); --VE_ST
     acc_latch <= PL(94); --ACCTOREG
-    acc_clear <= PL(93); --CLR_ACC
-    re_source <= PL(96); --RE_DFY_SRC
+    re_source <= PL(96); --RE_DFY_SRC --
     reg_in    <= PL(105 downto 101);
-    mode_a    <= PL(98);
+    mode_a    <= PL(98) ;
     mode_b    <= PL(97);
-    reload_ve    <= PL(107); --ADDR_VE_RELOAD
-    reload_re <= PL(99);
+    addr_reload <= PL(99);
     ve_clr_acc <= PL(93);
     pl_ve_byte <= PL(112 downto 109);
     --
     rst_i <= RST;
     sram_in <= VE_IN;
-    reg_write: process(clk_e_neg)
+    reg_write: process(clk_p)
     begin
-        if clk_e_neg = '1' then --clk_e_neg
-            if reg_in = RE_START_ADDR_L then
+        if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge of clk_e
+            if reg_in = CONS_RE_START_ADDR_L then
                 re_saddr_l <= YBUS;
-            elsif reg_in = RE_START_ADDR_R then
+            elsif reg_in = CONS_RE_START_ADDR_R then
                 re_saddr_r <= YBUS;
-            elsif reg_in = RE_LC then
+            elsif reg_in = CONS_RE_LC then
                 re_loop_reg <= YBUS;
-            elsif reg_in = DFY_ADDR_A then
+            elsif reg_in = CONS_DFY_ADDR_A then
                 re_saddr_a <= YBUS;
-            elsif reg_in = DFY_ADDR_B then
+            elsif reg_in = CONS_DFY_ADDR_B then
                 re_saddr_b <= YBUS;
-            elsif reg_in = VE_START_ADDR_L then
+            elsif reg_in = CONS_VE_START_ADDR_L then
                 ve_saddr_l <= YBUS;
-            elsif reg_in = VE_START_ADDR_R then
+            elsif reg_in = CONS_VE_START_ADDR_R then
                 ve_saddr_r <= YBUS;
-            elsif reg_in = VE_LC then
+            elsif reg_in = CONS_VE_LC then
                 ve_loop_reg <= YBUS;
-            elsif reg_in = VE_OFFSET_L then
+            elsif reg_in = CONS_VE_OFFSET_L then
                 offset_l <= YBUS;
-            elsif reg_in = VE_OFFSET_R then
+            elsif reg_in = CONS_VE_OFFSET_R then
                 offset_r <= YBUS(0);
-            elsif reg_in = VE_DEPTH_L then
+            elsif reg_in = CONS_VE_DEPTH_L then
                 depth_l <= YBUS;
-            elsif reg_in = VE_JUMP_L then
+            elsif reg_in = CONS_VE_JUMP_L then
                 jump_l <= YBUS;
-            elsif reg_in = DFY then
+            elsif reg_in = CONS_DFY then
                 dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
+            elsif reg_in = CONS_VE_OLC then
+                ve_oloop_reg <= YBUS;
+            elsif reg_in = CONS_CONFIG then
+                config <= YBUS;
+            elsif reg_in = CONS_RING_END then
+                ring_end_addr <= YBUS;
+            elsif reg_in = CONS_RING_START then
+                ring_start_addr <= YBUS;
+                curr_ring_addr <= YBUS;
             --elsif reg_in = ACC_CLR then
                -- mul_ctl <= YBUS;
-            elsif reg_in = MAC_SWITCH then
+            elsif reg_in = CONS_MAC_SWITCH then
                 mul_ctl <= YBUS;
             end if;
         end if;
     end process;
 ----------------------------------------------------------------------------------
---Receive Engine
+--Latch signals
 ----------------------------------------------------------------------------------
-    latch_signals: process(clk_p,re_start,reload_re,re_loop,reload_ve,ve_start,ve_loop, mode_a, mode_b)
+    latch_signals: process(clk_p,re_start,addr_reload,re_loop,addr_reload,ve_start,ve_loop, mode_a, mode_b,mode_c)
     begin
-        if re_start = '1' then
+        if re_start = '1' then --always after loop counter is set
             re_start_reg <= '1';
-        elsif re_loop = (re_loop'range => '0') then
+        elsif re_loop = (re_loop'range => '0') and mode_c = '0'then --2.0
             re_start_reg <= '0';
         end if;
 
         if ve_start = '1' then
             ve_start_reg <= '1';
-        elsif ve_loop = (ve_loop'range => '0') then
+        elsif ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') and mode_c = '0'then --2.0
             ve_start_reg <= '0';
         end if;
-
-        if mode_a = '1' then
-            sram_l_cs <= '1';
-        elsif re_loop = (re_loop'range => '0') and ve_loop = (ve_loop'range => '0') then
-            sram_l_cs <= '0';
+        --mode a and b will be reflected by config registers when ve_starts
+        if re_start = '1' and mode_a = '1' then
+            mode_a_l <= '1';
+        elsif re_loop = (re_loop'range => '0') then
+            mode_a_l <= '0';
         end if;
 
-        if mode_b = '1' then
-            sram_r_cs <= '1';
-        elsif re_loop = (re_loop'range => '0') and ve_loop = (ve_loop'range => '0') then
-            sram_r_cs <= '0';
+        if re_start and mode_b = '1' then
+            mode_b_l <= '1';
+        elsif re_loop = (re_loop'range => '0') then
+            mode_b_l <= '0';
         end if;
-        
+
+
     end process;
-
-    receive_addr_write : process (clk_p)
+----------------------------------------------------------------------------------
+--Address generation block
+----------------------------------------------------------------------------------
+    --********************************
+    --Receive engine
+    --********************************
+    --Mode left and right for reveive engine, used to load srams from DTM. 
+    receive_addr_write : process (clk_p) 
     begin 
         if rising_edge(clk_p) then
             if RST = '0' then        --Active low or high?
                 re_addr_l<= (others => '0');
                 re_addr_r <= (others => '0');
                 re_loop <= (others => '0');
-            elsif reload_re = '1' then
+            elsif addr_reload = '1' then
                 re_loop <= re_loop_reg;
-                if sram_l_cs = '1' then
+                if mode_a_l = '1' then
                     re_addr_l <= re_saddr_l;
-                elsif sram_r_cs = '1' then
+                elsif mode_b_l = '1' then
                     re_addr_r <= re_saddr_r;
                 end if;
             elsif re_source = '0' and re_start_reg = '1' and re_loop /= (re_loop'range => '0') and DDI_VLD = '1' then
 
                 re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
 
-                if sram_l_cs = '1' then
+                if mode_a_l = '1' then      
                     re_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_l))+1,8));
                     
                 end if;
 
-                if sram_r_cs = '1' then
+                if mode_b_l = '1' then
                     re_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_r))+1,8));
                 end if;
+
             end if;
         end if;
     end process;
-
+    --Mode a and b for reloading receive engine, mode bits are not latched.
+    --re_start, re_source and modes are written in one microinstructions.
+    --addr_reload, modes are written in one microinstruction.
     pushback_addr_write : process(clk_p) --generate address counter a abd b
     begin
         if rising_edge(clk_p) then
             if RST = '0' then
                 re_addr_a <= (others => '0');
                 re_addr_b <= (others => '0');
-            elsif reload_re = '1' then
-                if sram_l_cs = '1' then
+            elsif addr_reload = '1' then
+                if mode_a = '1' then
                     re_addr_a <= re_saddr_a;
-                elsif sram_r_cs = '1' then
+                elsif mode_b = '1' then
                     re_addr_b <= re_saddr_b;
                 end if;
-            elsif re_source = '1' and re_start_reg = '1' then
-                if sram_l_cs = '1' then
+            elsif re_source = '1' and re_start = '1' then
+                if mode_a = '1'  then 
                     re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
                 end if;
                 
-                if sram_r_cs = '1' then
+                if mode_b = '1' then
                     re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
                 end if;
+
             end if;
         end if;
     end process;
 
+    --********************************
+    --Vector engine
+    --********************************
+    --Mode left and right of vector engine. Controlled by two loops
+    ve_addr_gene: process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if RST = '0' then
+                ve_addr_l <= (others => '0');
+                ve_addr_r <= (others => '0');
+                ve_loop <= (others => '0');
+                ve_oloop <= (others => '0');
+            if ve_start = '1' and addr_reload = '1' and mode_c = '0' then --load vector engine's outer loop  and inner loop by the control of microinstructions
+                ve_oloop <= ve_oloop_reg;
+                ve_loop <= ve_loop_reg;
+                ve_addr_l <= ve_saddr_l;
+                ve_addr_r <= ve_saddr_r;               
+            elsif ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0')then 
+                if ve_loop = (ve_loop'range => '0') then --acts when ve's outer loop counter goes to 0, 
+                    ve_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_oloop))-1,8));
+
+                    if config(4) = '1' then --reload by config register, bit 4 in configure register
+                    ve_loop <= ve_loop_reg;
+                    end if;
+
+                    if config(2) = '1' then 
+                    ve_addr_l <= ve_saddr_l;
+                    end if;
+
+                    if config(3) = '1' then
+                    ve_addr_r <= ve_saddr_r;
+                    end if;
+
+                elsif ve_loop /= (ve_loop'range => '0') then
+                    ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
+                    ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
+                    ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
+                end if;
+            end if;
+        end if;
+    end process;
+    
+    VE_RDY <= not ve_start_reg;
+    --********************************
+    --Mode c. Shared by RE and VE
+    --********************************
+    --How to control the right address?
+    mode_c_addr: process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if RST = '0' then
+                ring_start_addr <= (others => '0');
+                ring_end_addr <= (others => '0');
+                curr_ring_addr <= (others => '0');
+            elsif (re_start_reg = '1' or ve_start_reg = '1') and mode_c = '1' then
+                if curr_ring_addr = ring_end_addr then
+                    curr_ring_addr <= ring_start_addr;
+                else
+                    curr_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))
+                                                       +to_integer(unsigned(offset_l))
+                                                       +to_integer(unsigned(depth_l)),8));
+                end if;
+            else
+                curr_ring_addr <= (others => 'Z');
+            end if;
+        end if;
+    end process;
+
+
+    --**********************
+    --Address_MUX
+    --**********************
+    process(clk_p,re_start_reg,re_source,mode_a_l,mode_b_l,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r)
+    begin
+        if re_start = '1' or ve_start = '1' then
+            if mode_c = '1' then
+                addr_p_l <= curr_ring_addr;  
+            end if;      
+        elsif re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
+            if mode_a_l = '1' then
+                addr_p_l <= re_addr_l;
+            end if;
+
+            if mode_b_l = '1' then
+                addr_p_r <= re_addr_r;
+            end if;
+        elsif re_start_reg = '1' and re_source = '1' then --Use receive engine's address counter a and b --mode c added --2.0
+            if mode_a_l = '1' then
+                addr_p_l <= re_addr_a;
+            elsif mode_b_l = '1' then
+                addr_p_r <= re_addr_b;
+            end if;
+        elsif ve_start_reg = '1' then --Use vector engine's address counter
+            if config(2) = '1' then
+                addr_p_l <= ve_addr_l;
+            end if;
+
+            if config(3) = '1' then
+                addr_p_r <= ve_addr_r;
+            end if;
+        end if;
+    end process;
+
+    --Write enable signal to srams
     sram_we : process(clk_p)
     begin
         if rising_edge(clk_p) then
             if re_start_reg = '1' then
-                if sram_l_cs = '1' then
+                if mode_a_l = '1' then
                     sram_l_we <= '1';
-                elsif sram_r_cs = '1' then
+                elsif mode_b_l = '1' then
                     sram_r_we <= '1';
                 end if;
             elsif re_start_reg = '0' then
@@ -401,67 +538,15 @@ begin
             end if;
         end if;
     end process;
+
     RE_RDY <= not re_start_reg;
-----------------------------------------------------------------------------------
---Vector Engine
-----------------------------------------------------------------------------------
-
-    ve_addr_gene: process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if RST = '0' then
-                ve_addr_l <= (others => '0');
-                ve_addr_r <= (others => '0');
-                ve_loop <= (others => '0');
-            elsif reload_ve = '1' then
-                ve_loop <= ve_loop_reg;
-                    ve_addr_l <= ve_saddr_l;
-                    ve_addr_r <= ve_saddr_r;
-            elsif ve_start_reg = '1' and ve_loop /= (ve_loop'range => '0') then
-                ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
-            ---------------------should Be able to reload one address pointer while keep another incrementing.During the process --TO BE FIXED!!--2021/8/17
-                if sram_l_cs = '1' then --active address pointer L 
-                        ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l))+to_integer(unsigned(depth_l))+to_integer(unsigned(jump_l)),8)); --calculate left address;
-                end if;
-    
-                if sram_r_cs = '1' then --active address pointer R
-                    ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)),8)); --calculate left address;
-                end if;
-            end if;
-        end if;
-    end process;
-    VE_RDY <= not ve_start_reg;
-------------------------
---Address_MUX
-------------------------
-    process(clk_p,re_start_reg,re_source,sram_l_cs,sram_r_cs,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r)
-    begin
-        if re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
-            if sram_l_cs = '1' then
-                addr_p_l <= re_addr_l;
-            end if;
-
-            if sram_r_cs = '1' then
-                addr_p_r <= re_addr_r;
-            end if;
-        elsif re_start_reg = '1' and re_source = '1' then --Use receive engine's address counter a and b
-            if sram_l_cs = '1' then
-                addr_p_l <= re_addr_a;
-            elsif sram_r_cs = '1' then
-                addr_p_l <= re_addr_b;
-            end if;
-        elsif ve_start_reg = '1' then --Use vector engine's address counter
-            if sram_l_cs = '1' then
-                addr_p_l <= ve_addr_l;
-            end if;
-
-            if sram_r_cs = '1' then
-                addr_p_r <= ve_addr_r;
-            end if;
-        end if;
-    end process;
  sclr_i <= not rst_i and ve_clr_acc;
- --multiplier control logic:
+
+
+
+---------------------------------------------------------------
+--multiplier control logic:
+---------------------------------------------------------------
 process(clk_p)
 begin
     if rising_edge(clk_p) then
@@ -678,7 +763,12 @@ accu_0 : c_accum_0
                                 to_integer(unsigned(acc_out_5))+
                                 to_integer(unsigned(acc_out_6))+
                                 to_integer(unsigned(acc_out_7)),32));
-  --Output --Quantization block need to be added here
+
+
+
+------------------------------------------------------------------------------
+ --Output --Quantization block need to be added here
+ ------------------------------------------------------------------------------
   VE_OUT_A <= acc_out_a (7 downto 0);
 process(clk_p)
 begin
@@ -705,7 +795,7 @@ begin
     end if;
 end process;
   
-  end architecture;  
+end architecture;  
                     
 
                  

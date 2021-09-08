@@ -54,7 +54,10 @@ architecture struct of pe_tb is
             C2_IN_D   : in std_logic_vector(127 downto 0);
             C1_DDI_VLD : in std_logic;
             C2_DDI_VLD : in std_logic;
+            c1_rdy     : out std_logic;
+            c2_rdy     : out std_logic;
             EXE        : in std_logic;
+            RESUME     : in std_logic;
         
             -- clocks and control signals
             HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
@@ -111,6 +114,7 @@ architecture struct of pe_tb is
             MCKOUT0    : in std_logic;
             MWAKEUP_LP : out std_logic;
             MLP_PWR_OK : out std_logic;
+            RESUME     : out std_logic;
             c1_in_data : out std_logic_vector(127 downto 0);
             c1_ddi_vld : out std_logic
             );
@@ -133,7 +137,8 @@ architecture struct of pe_tb is
   signal MIRQ0_i        : std_logic;                      
   signal MIRQ1_i        : std_logic;                      
   signal MRXOUT       : std_logic; 
-  signal exe_i        : std_logic;                     
+  signal exe_i        : std_logic; 
+  signal resume_i     : std_logic;                    
   signal PE           : std_logic_vector(7 downto 0);   
   signal PF           : std_logic_vector(7 downto 0);   
   signal PG           : std_logic_vector(7 downto 0);   
@@ -196,7 +201,10 @@ begin  -- struct
         C2_IN_D    => (others=>'0'),
         C1_DDI_VLD => c1_vld,
         C2_DDI_VLD => '0',
+        c1_rdy     => open,
+        c2_rdy     => open,
         EXE        => exe_i,
+        RESUME     => resume_i,
         HCLK       => hclk_i,
         EVEN_C     => even_c_i,
         MRESET     => mreset_i,
@@ -243,6 +251,7 @@ begin  -- struct
         HCLK => hclk_i,
         EVEN_C => even_c_i,
         EXE  => exe_i,
+        RESUME => resume_i,
         MTEST => mtest_i,
         MRESET => mreset_i,
         MCKOUT0 => mckout0_i,

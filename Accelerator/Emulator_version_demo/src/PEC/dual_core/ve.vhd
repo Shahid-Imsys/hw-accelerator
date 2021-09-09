@@ -160,7 +160,7 @@ END COMPONENT;
     signal ve_loop     : std_logic_vector(7 downto 0);
     signal ve_oloop    : std_logic_vector(7 downto 0);
     signal ve_loop_reg : std_logic_vector(7 downto 0);
-    signal ve_oloop_reg : std_logic_vecto(7 downto 0);
+    signal ve_oloop_reg : std_logic_vector(7 downto 0);
     signal offset_l    : std_logic_vector(7 downto 0); --offset register
     signal offset_r    : std_logic; 
     signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -176,8 +176,7 @@ END COMPONENT;
     --signal mode_a_reg  : std_logic; --replaced with mode_a_l
     --signal mode_b_reg  : std_logic; --replaced with mode_b_l
     signal addr_reload   : std_logic;
-    signal addr_reload   : std_logic;
-    signal rst_i       : std_logic;
+    --signal rst_i       : std_logic;
     signal sclr_i        : std_logic; --For clear accumulator 0-7
     signal buf_out_l  : std_logic_vector(63 downto 0);
     signal buf_out_r  : std_logic_vector(63 downto 0);
@@ -264,19 +263,22 @@ END COMPONENT;
 
 begin
     --Microcode translation
+    --Some microinstructions are latched to registers and operates at clk_p frequency. 
+    --Not latched signals are used only in one microinstruction time (clk_e) together with 
+    --re_start and ve_start signals and mode abcd or relaod signal. 
     dfy_dest_sel <= PL (118 downto 116); --DEST_BYTE
     re_start  <= PL(100);
     ve_start  <= PL(95); --VE_ST
     acc_latch <= PL(94); --ACCTOREG
     re_source <= PL(96); --RE_DFY_SRC --
     reg_in    <= PL(105 downto 101);
-    mode_a    <= PL(98) ;
+    mode_a    <= PL(98);
     mode_b    <= PL(97);
     addr_reload <= PL(99);
     ve_clr_acc <= PL(93);
     pl_ve_byte <= PL(112 downto 109);
     --
-    rst_i <= RST;
+    --rst_i <= RST;
     sram_in <= VE_IN;
     reg_write: process(clk_p)
     begin
@@ -305,7 +307,7 @@ begin
                 depth_l <= YBUS;
             elsif reg_in = CONS_VE_JUMP_L then
                 jump_l <= YBUS;
-            elsif reg_in = CONS_DFY then
+            elsif reg_in = CONS_DFY_REG_SHIFT_IN then
                 dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
             elsif reg_in = CONS_VE_OLC then
                 ve_oloop_reg <= YBUS;
@@ -323,36 +325,37 @@ begin
             end if;
         end if;
     end process;
-----------------------------------------------------------------------------------
---Latch signals
-----------------------------------------------------------------------------------
+    
+    --Latched signals
+    --Some signals from pl registers are latched for receive engine and vector engine to operate
+    --without control from pl. Latched signals are cleared when loop registers goes to 0. 
     latch_signals: process(clk_p,re_start,addr_reload,re_loop,addr_reload,ve_start,ve_loop, mode_a, mode_b,mode_c)
     begin
-        if re_start = '1' then --always after loop counter is set
-            re_start_reg <= '1';
-        elsif re_loop = (re_loop'range => '0') and mode_c = '0'then --2.0
-            re_start_reg <= '0';
+        if rising_edge(clk_p) then --latches at the rising_edge of clk_p. 
+            if re_start = '1' then --always after loop counter is set
+                re_start_reg <= '1';
+            elsif re_loop = (re_loop'range => '0') then 
+                re_start_reg <= '0';
+            end if;
+    
+            if ve_start = '1' then
+                ve_start_reg <= '1';
+            elsif ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then 
+                ve_start_reg <= '0';
+            end if;
+            --mode a and b will be reflected by config registers when ve_starts
+            if re_start = '1' and mode_a = '1' then
+                mode_a_l <= '1';
+            elsif re_loop = (re_loop'range => '0') then
+                mode_a_l <= '0';
+            end if;
+    
+            if re_start= '1' and mode_b = '1' then
+                mode_b_l <= '1';
+            elsif re_loop = (re_loop'range => '0') then
+                mode_b_l <= '0';
+            end if;
         end if;
-
-        if ve_start = '1' then
-            ve_start_reg <= '1';
-        elsif ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') and mode_c = '0'then --2.0
-            ve_start_reg <= '0';
-        end if;
-        --mode a and b will be reflected by config registers when ve_starts
-        if re_start = '1' and mode_a = '1' then
-            mode_a_l <= '1';
-        elsif re_loop = (re_loop'range => '0') then
-            mode_a_l <= '0';
-        end if;
-
-        if re_start and mode_b = '1' then
-            mode_b_l <= '1';
-        elsif re_loop = (re_loop'range => '0') then
-            mode_b_l <= '0';
-        end if;
-
-
     end process;
 ----------------------------------------------------------------------------------
 --Address generation block
@@ -422,7 +425,7 @@ begin
     --********************************
     --Vector engine
     --********************************
-    --Mode left and right of vector engine. Controlled by two loops
+    --Mode left and right of vector engine. Controlled by latched control signal and two loopcounters
     ve_addr_gene: process(clk_p)
     begin
         if rising_edge(clk_p) then
@@ -431,13 +434,15 @@ begin
                 ve_addr_r <= (others => '0');
                 ve_loop <= (others => '0');
                 ve_oloop <= (others => '0');
-            if ve_start = '1' and addr_reload = '1' and mode_c = '0' then --load vector engine's outer loop  and inner loop by the control of microinstructions
+            if ve_start = '1' and addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+                if mode_a = '1' or mode_b = '1' then --only mode a and b requires outer loop to be reloaded
                 ve_oloop <= ve_oloop_reg;
+                end if;
                 ve_loop <= ve_loop_reg;
                 ve_addr_l <= ve_saddr_l;
                 ve_addr_r <= ve_saddr_r;               
-            elsif ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0')then 
-                if ve_loop = (ve_loop'range => '0') then --acts when ve's outer loop counter goes to 0, 
+            elsif ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0')then --when outer loop is not 0, do self reload.
+                if ve_loop = (ve_loop'range => '0') then --acts when ve's inner loop counter goes to 0, 
                     ve_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_oloop))-1,8));
 
                     if config(4) = '1' then --reload by config register, bit 4 in configure register
@@ -457,6 +462,14 @@ begin
                     ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
                     ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
                 end if;
+            
+            elsif ve_start_reg = '1' and ve_oloop = (ve_oloop'range => '0') then --outer loop is 0. Last loop.
+                if ve_loop /= (ve_loop'range => '0') then
+                    ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
+                    ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
+                    ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
+                end if;   
+            end if;
             end if;
         end if;
     end process;
@@ -473,7 +486,7 @@ begin
                 ring_start_addr <= (others => '0');
                 ring_end_addr <= (others => '0');
                 curr_ring_addr <= (others => '0');
-            elsif (re_start_reg = '1' or ve_start_reg = '1') and mode_c = '1' then
+            elsif re_start = '1' and mode_c = '1' then --clk_e synchronized
                 if curr_ring_addr = ring_end_addr then
                     curr_ring_addr <= ring_start_addr;
                 else
@@ -481,8 +494,18 @@ begin
                                                        +to_integer(unsigned(offset_l))
                                                        +to_integer(unsigned(depth_l)),8));
                 end if;
+            elsif ve_start_reg = '1' and config(6) = '1' then
+                if curr_ring_addr = ring_end_addr then
+                    curr_ring_addr <= ring_start_addr;
+                else
+                    curr_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))
+                                                       +to_integer(unsigned(offset_l))
+                                                       +to_integer(unsigned(depth_l)),8));
+                end if;
+                ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8));
             else
                 curr_ring_addr <= (others => 'Z');
+                ve_addr_r <= (others => 'Z');
             end if;
         end if;
     end process;
@@ -496,7 +519,10 @@ begin
         if re_start = '1' or ve_start = '1' then
             if mode_c = '1' then
                 addr_p_l <= curr_ring_addr;  
-            end if;      
+            end if;
+        elsif ve_start_reg = '1' and mode_c = '1' then
+            addr_p_l <= curr_ring_addr;
+            addr_p_r <= ve_addr_r; --reload reg required. --TBD      
         elsif re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
             if mode_a_l = '1' then
                 addr_p_l <= re_addr_l;
@@ -532,6 +558,8 @@ begin
                 elsif mode_b_l = '1' then
                     sram_r_we <= '1';
                 end if;
+            elsif re_start = '1' and mode_c = '1' then
+                sram_l_we <= CLK_E_POS;         --Enables only half time of clk_e cycle. POS or NEG TBA
             elsif re_start_reg = '0' then
                 sram_l_we <= '0';
                 sram_r_we <= '0';
@@ -540,7 +568,7 @@ begin
     end process;
 
     RE_RDY <= not re_start_reg;
- sclr_i <= not rst_i and ve_clr_acc;
+ sclr_i <= not RST and ve_clr_acc;
 
 
 

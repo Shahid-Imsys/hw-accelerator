@@ -198,6 +198,15 @@ END COMPONENT;
     signal acc_out_7  : std_logic_vector(23 downto 0);
     signal acc_out_8  : std_logic_vector(23 downto 0);
     signal acc_out_a  : std_logic_vector(31 downto 0);
+    signal acc_reg_0  : std_logic_vector(23 downto 0);
+    signal acc_reg_1  : std_logic_vector(23 downto 0);
+    signal acc_reg_2  : std_logic_vector(23 downto 0);
+    signal acc_reg_3  : std_logic_vector(23 downto 0);
+    signal acc_reg_4  : std_logic_vector(23 downto 0);
+    signal acc_reg_5  : std_logic_vector(23 downto 0);
+    signal acc_reg_6  : std_logic_vector(23 downto 0);
+    signal acc_reg_7  : std_logic_vector(23 downto 0);
+    signal acc_reg_a  : std_logic_vector(31 downto 0);
     signal bypass     : std_logic;
     signal sram_in    : std_logic_vector(63 downto 0);
     signal mode_a_l  : std_logic;
@@ -221,7 +230,7 @@ END COMPONENT;
     signal mctl_5 :  std_logic;
     signal mctl_6 :  std_logic;
     signal mctl_7 :  std_logic;
-    signal ve_mult_latch : std_logic;
+    signal mult_delay : std_logic;
     --accumulator control signals
     signal actl_0 : std_logic;
     signal actl_1 : std_logic;
@@ -231,9 +240,11 @@ END COMPONENT;
     signal actl_5 : std_logic;
     signal actl_6 : std_logic;
     signal actl_7 : std_logic;
-    signal a_latch : std_logic;
+    signal a_delay : std_logic;
     signal substract_i : std_logic;
     signal pcout_i : std_logic_vector(47 downto 0);
+    --latch control signal
+    signal latch_ena : std_logic;
     --------------------------------
     --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
     --------------------------------
@@ -259,6 +270,11 @@ END COMPONENT;
     constant CONS_RING_START      : std_logic_vector(4 downto 0) := "1"&x"3"; --Ring mode start address. 
     constant CONS_CURR_RING       : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
     constant CONS_MAC_SWITCH      : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
+    --------------------------------------------------------
+    --Delay FFs
+    --------------------------------------------------------
+    signal delay0 : std_logic; --
+    signal delay1 : std_logic;
 
 
 begin
@@ -283,7 +299,27 @@ begin
     reg_write: process(clk_p)
     begin
         if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge of clk_e
-            if reg_in = CONS_RE_START_ADDR_L then
+            if RST = '0' then
+                re_saddr_l        <= (others => '0');
+                re_saddr_r        <= (others => '0');
+                re_loop_reg       <= (others => '0');
+                re_saddr_a        <= (others => '0'); 
+                re_saddr_b        <= (others => '0'); 
+                ve_saddr_l        <= (others => '0');
+                ve_saddr_r        <= (others => '0');
+                ve_loop_reg       <= (others => '0');
+                offset_l          <= (others => '0'); 
+                offset_r          <= '0'; 
+                depth_l           <= (others => '0'); 
+                jump_l            <= (others => '0'); 
+                dfy_reg           <= (others =>(others => '0'));
+                ve_oloop_reg      <= (others => '0'); 
+                config            <= (others => '0'); 
+                ring_end_addr     <= (others => '0'); 
+                ring_start_addr   <= (others => '0'); 
+                curr_ring_addr    <= (others => '0'); 
+                mul_ctl           <= (others => '0'); 
+            elsif reg_in = CONS_RE_START_ADDR_L then
                 re_saddr_l <= YBUS;
             elsif reg_in = CONS_RE_START_ADDR_R then
                 re_saddr_r <= YBUS;
@@ -434,7 +470,7 @@ begin
                 ve_addr_r <= (others => '0');
                 ve_loop <= (others => '0');
                 ve_oloop <= (others => '0');
-            if ve_start = '1' and addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+            elsif ve_start = '1' and addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
                 if mode_a = '1' or mode_b = '1' then --only mode a and b requires outer loop to be reloaded
                 ve_oloop <= ve_oloop_reg;
                 end if;
@@ -470,7 +506,6 @@ begin
                     ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
                 end if;   
             end if;
-            end if;
         end if;
     end process;
     
@@ -503,7 +538,7 @@ begin
                                                        +to_integer(unsigned(depth_l)),8));
                 end if;
                 ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8));
-            else
+            else   --The two signals are also used in other processes
                 curr_ring_addr <= (others => 'Z');
                 ve_addr_r <= (others => 'Z');
             end if;
@@ -514,15 +549,27 @@ begin
     --**********************
     --Address_MUX
     --**********************
-    process(clk_p,re_start_reg,re_source,mode_a_l,mode_b_l,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r)
+    process(re_start_reg,re_source,mode_a_l,mode_b_l,ve_start,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r)
     begin
-        if re_start = '1' or ve_start = '1' then
+        if re_start = '1' or ve_start = '1' then --Not latched instructions.
             if mode_c = '1' then
-                addr_p_l <= curr_ring_addr;  
+                addr_p_l <= curr_ring_addr;
+                addr_p_r <= ve_addr_r;  
             end if;
-        elsif ve_start_reg = '1' and mode_c = '1' then
+
+        elsif ve_start_reg = '1' then 
+            if config(6) = '1' then
             addr_p_l <= curr_ring_addr;
-            addr_p_r <= ve_addr_r; --reload reg required. --TBD      
+            addr_p_r <= ve_addr_r;
+            end if; 
+                
+            if config(2) = '1' then
+                addr_p_l <= ve_addr_l;
+            end if;
+    
+            if config(3) = '1' then
+                addr_p_r <= ve_addr_r;
+            end if;
         elsif re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
             if mode_a_l = '1' then
                 addr_p_l <= re_addr_l;
@@ -537,21 +584,14 @@ begin
             elsif mode_b_l = '1' then
                 addr_p_r <= re_addr_b;
             end if;
-        elsif ve_start_reg = '1' then --Use vector engine's address counter
-            if config(2) = '1' then
-                addr_p_l <= ve_addr_l;
-            end if;
 
-            if config(3) = '1' then
-                addr_p_r <= ve_addr_r;
-            end if;
         end if;
     end process;
 
     --Write enable signal to srams
     sram_we : process(clk_p)
     begin
-        if rising_edge(clk_p) then
+        --if rising_edge(clk_p) then
             if re_start_reg = '1' then
                 if mode_a_l = '1' then
                     sram_l_we <= '1';
@@ -564,7 +604,7 @@ begin
                 sram_l_we <= '0';
                 sram_r_we <= '0';
             end if;
-        end if;
+        --end if;
     end process;
 
     RE_RDY <= not re_start_reg;
@@ -575,35 +615,73 @@ begin
 ---------------------------------------------------------------
 --multiplier control logic:
 ---------------------------------------------------------------
-process(clk_p)
+process(clk_p) --Enable control signal, synchronized by the data flow
 begin
     if rising_edge(clk_p) then
-        ve_mult_latch <= ve_start_reg;
+        delay0 <= ve_start_reg;
+        mult_delay <= delay0;
     end if;
 end process;
- mctl_0 <= mul_ctl(0) and (ve_start_reg or ve_mult_latch);
- mctl_1 <= mul_ctl(1) and (ve_start_reg or ve_mult_latch);
- mctl_2 <= mul_ctl(2) and (ve_start_reg or ve_mult_latch);
- mctl_3 <= mul_ctl(3) and (ve_start_reg or ve_mult_latch);
- mctl_4 <= mul_ctl(4) and (ve_start_reg or ve_mult_latch);
- mctl_5 <= mul_ctl(5) and (ve_start_reg or ve_mult_latch);
- mctl_6 <= mul_ctl(6) and (ve_start_reg or ve_mult_latch);
- mctl_7 <= mul_ctl(7) and (ve_start_reg or ve_mult_latch);
+ mctl_0 <= not mul_ctl(0) and (ve_start_reg and mult_delay);
+ mctl_1 <= not mul_ctl(1) and (ve_start_reg and mult_delay);
+ mctl_2 <= not mul_ctl(2) and (ve_start_reg and mult_delay);
+ mctl_3 <= not mul_ctl(3) and (ve_start_reg and mult_delay);
+ mctl_4 <= not mul_ctl(4) and (ve_start_reg and mult_delay);
+ mctl_5 <= not mul_ctl(5) and (ve_start_reg and mult_delay);
+ mctl_6 <= not mul_ctl(6) and (ve_start_reg and mult_delay);
+ mctl_7 <= not mul_ctl(7) and (ve_start_reg and mult_delay);
  process(clk_p)
  begin
      if rising_edge(clk_p) then
-         a_latch <= ve_mult_latch;
+         a_delay <= mult_delay;
      end if;
  end process;
- actl_0 <= mul_ctl(0) and (a_latch or ve_mult_latch);
- actl_1 <= mul_ctl(1) and (a_latch or ve_mult_latch);
- actl_2 <= mul_ctl(2) and (a_latch or ve_mult_latch);
- actl_3 <= mul_ctl(3) and (a_latch or ve_mult_latch);
- actl_4 <= mul_ctl(4) and (a_latch or ve_mult_latch);
- actl_5 <= mul_ctl(5) and (a_latch or ve_mult_latch);
- actl_6 <= mul_ctl(6) and (a_latch or ve_mult_latch);
- actl_7 <= mul_ctl(7) and (a_latch or ve_mult_latch);
+ actl_0 <= not mul_ctl(0) and (a_delay and delay0);
+ actl_1 <= not mul_ctl(1) and (a_delay and delay0);
+ actl_2 <= not mul_ctl(2) and (a_delay and delay0);
+ actl_3 <= not mul_ctl(3) and (a_delay and delay0);
+ actl_4 <= not mul_ctl(4) and (a_delay and delay0);
+ actl_5 <= not mul_ctl(5) and (a_delay and delay0);
+ actl_6 <= not mul_ctl(6) and (a_delay and delay0);
+ actl_7 <= not mul_ctl(7) and (a_delay and delay0);
  bypass <= '0';
+---------------------------------------------------------------
+--Post processing block
+---------------------------------------------------------------
+--Accumulator Latch
+process(clk_p)
+begin
+    if rising_edge(clk_p) then
+        if ve_start = '1' and clk_e_pos = '0' then
+            if acc_latch = '1' then
+                delay1 <= '1';
+            end if;
+        elsif ve_start_reg= '1' and ve_loop = (ve_loop'range => '0') and config(0) = '1' then
+            delay1 <= '1';
+        else
+            delay1 <= '0';
+        end if;
+        latch_ena <= delay1;
+    end if;
+end process;
+
+process(clk_p)
+begin 
+    if rising_edge(clk_p) and latch_ena = '1' then
+        acc_reg_0 <= acc_out_0;
+        acc_reg_1 <= acc_out_1;
+        acc_reg_2 <= acc_out_2;
+        acc_reg_3 <= acc_out_3;
+        acc_reg_4 <= acc_out_4;
+        acc_reg_5 <= acc_out_5;
+        acc_reg_6 <= acc_out_6;
+        acc_reg_7 <= acc_out_7;
+        acc_reg_a <= acc_out_a;
+    end if;
+end process;
+-- Shifter
+          
+
 accu_0 : c_accum_0
   PORT MAP (
     B => mul_out_0,

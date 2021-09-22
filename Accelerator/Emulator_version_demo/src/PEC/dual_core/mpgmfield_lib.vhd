@@ -229,7 +229,8 @@ package mpgmfield_lib is
   constant SEQC_CCERC			: std_logic_vector(4 downto 0) :=  "00010";
   constant SEQC_RETURN		: std_logic_vector(4 downto 0) :=  "00011";
   constant SEQC_GOTO			: std_logic_vector(4 downto 0) :=  "00100";
-  constant SEQC_LGOTO			: std_logic_vector(4 downto 0) :=  "00101";
+  --constant SEQC_LGOTO			: std_logic_vector(4 downto 0) :=  "00101";
+  constant SEQC_MPL 			: std_logic_vector(4 downto 0) :=  "00101"; --Added by CJ
   constant SEQC_DO				: std_logic_vector(4 downto 0) :=  "00110";
   constant SEQC_LDO				: std_logic_vector(4 downto 0) :=  "00111";
   constant SEQC_EGOTOSTD	: std_logic_vector(4 downto 0) :=  "01000";
@@ -329,6 +330,7 @@ package mpgmfield_lib is
   constant COND_RE_RDY    : std_logic_vector(5 downto 0) :=  "100001"; --Added by CJ
   constant COND_DFM_RDY   : std_logic_vector(5 downto 0) :=  "100010"; --Added by CJ
   constant COND_FIFO_RDY  : std_logic_vector(5 downto 0) :=  "100011"; --Added by CJ
+  constant COND_CONT      : std_logic_vector(5 downto 0) :=  "100100"; --Added by CJ --0823
 
 --------------------------------------------------------------------------------
 	-- Constants for CLC.

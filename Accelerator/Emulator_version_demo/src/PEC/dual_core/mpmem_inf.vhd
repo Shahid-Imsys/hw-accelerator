@@ -126,7 +126,8 @@ BEGIN
     RAM0_A <=  c1_mpram_a WHEN c1_mpram_ce(0) = '1' ELSE
                c2_mpram_a WHEN c2_mpram_ce(0) = '1' ELSE
                c1_mpram_a;                                                         
-    RAM0_WEB <= c1_mpram_we_n AND c2_mpram_we_n;
+    --RAM0_WEB <= c1_mpram_we_n AND c2_mpram_we_n; --Remove write mpram from c2 by CJ
+    RAM0_WEB <= c1_mpram_we_n;
 --    RAM0_CSB <= NOT (c1_mpram_ce(0) OR c2_mpram_ce(0));
     RAM0_OE <= c1_mpram_oe(0) OR c2_mpram_oe(0);
     RAM0_CS <= c1_mpram_ce(0) OR c2_mpram_ce(0);

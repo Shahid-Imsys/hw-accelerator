@@ -68,7 +68,8 @@ entity dsl is
     dfp           : in  std_logic_vector(7 downto 0);
     --CJ START ADDED
     VE_OUT_A    :          in std_logic_vector(7 downto 0);  
-    VE_OUT_SING  :          in std_logic_vector(7 downto 0);  
+    VE_OUT_SING  :          in std_logic_vector(7 downto 0); 
+    --ID_NUM      :           in std_logic_vector(7 downto 0); 
     --CJ END
 
     -- Control Output

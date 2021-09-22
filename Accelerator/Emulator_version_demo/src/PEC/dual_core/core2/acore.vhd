@@ -126,6 +126,8 @@ entity acore is
     -- CC signal
     ddi_vld   : in std_logic; --Added by CJ
     exe       : in std_logic; --CONT need to be added
+    resume    : in std_logic;
+    ready     : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
@@ -439,8 +441,8 @@ begin
       ira2          => ira2,                
       irq0          => irq0,               
       irq1          => irq1, 
-      dfm_vld       => ddi_vld,  --Added by CJ
-      vldl          => vldl,     --Added by CJ            
+      --dfm_vld       => ddi_vld,  --Added by CJ
+      mp_vld        => '0',     --Added by CJ            
       -- Condition inputs
       spreq_n       => '1',             
       spack_n       => '1',             
@@ -468,7 +470,8 @@ begin
       re_rdy        => re_rdy_int, --Added by CJ
       ve_rdy        => ve_rdy_int, --Added by CJ
       dfm_rdy       => dfm_rdy,--Added by CJ
-      fifo_rdy      => dtm_fifo_rdy, --Added by CJ               
+      fifo_rdy      => dtm_fifo_rdy, --Added by CJ
+      continue      => resume,   --Added by CJ               
       --Data Inputs
       dbus          => dbus_int,                
       y_reg         => y_reg,
@@ -689,6 +692,8 @@ begin
       d_ba        => dba_o,              
       d_dqm       => ddqm,
       exe         => exe,    --Added by CJ 
+      LD_MPGM     => '0',
+      
       --ddi_vld     => ddi_vld,  --Added by CJ        
       d_cke       => dcke_o); 
 ---------------------------------------------------------------------

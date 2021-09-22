@@ -103,7 +103,8 @@ entity mmr is
     d_dqm:      out std_logic_vector(7 downto 0);
     d_cke:      out std_logic_vector(3 downto 0);
     --Control Store signal
-    MPGMM_IN :  out std_logic_vector(127 downto 0));
+    MPGMM_IN :  out std_logic_vector(127 downto 0);
+    LD_MPGM  :  in std_logic);
 end;          
 
 architecture rtl of mmr is
@@ -960,7 +961,7 @@ begin
             if rst_en = '0' then
                 dfm_reg <= (others => '0');
             elsif clk_e_pos = '0' then
-                if ld_dqi = '1' then
+                if ld_dqi = '1' or ld_mpgm = '1' then
                     dfm_reg <= d_dqi;
                 elsif dfm_kept = '1' then
                     dfm_reg <= dfm_keep;

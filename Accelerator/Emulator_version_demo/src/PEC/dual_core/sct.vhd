@@ -29,6 +29,8 @@
 -- Date					Version		Author	Description
 -- 2005-11-28		1.1 			CB			Created
 -- 2012-08-15		2.0				MN			Removed plus1 since it is not used
+-- 2021-06-17       3.0             CJ          Changed the address to 8-bit value. 
+--                                              All relevant signals are shrinked accordingly.
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -53,8 +55,7 @@ entity sct is
 		st_empty		: in  std_logic;  -- Stack empty (active high) 
 		ctr_eq0			: in  std_logic;  -- Counter/register zero (active high)
 		cond_pass		: in  std_logic;  -- Condition pass (active high)
-		dfm_vld         : in  std_logic;  -- DFM data valid --Added by CJ
-		vldl            : in  std_logic;  -- one clock latch of dfm_vld
+		data_vld        : in  std_logic;  -- dfm data valid latch --Added by CJ
 		--Data Inputs
 		di					: in  std_logic_vector(7 downto 0);		-- Next address mux 
 		y_reg				: in  std_logic_vector(7 downto 0);		-- Y bus register
@@ -133,7 +134,7 @@ begin
 	-- and counter/register.
 	seqc_dec : process (rst_en, rst_err, pl_seqc, pl_cpol, pl_cond, pl_aux1,
 											pl_aux2, pl_map, cond_pass, ctr_eq0, req,
-											pc, rin_int, rout, sout)
+											pc, rin_int, rout, sout,ld_mpgm_int,data_vld)
 		variable d_plus			: std_logic_vector(2 downto 0);
 		variable pc_pc_pc		: std_logic_vector(7 downto 0); --CJ
 		variable pc_pc_ri		: std_logic_vector(7 downto 0); --CJ
@@ -143,7 +144,7 @@ begin
 		variable st_st_st		: std_logic_vector(7 downto 0); --CJ
 		variable plus1_int	: std_logic;
 		variable mpa_int		: std_logic_vector(7 downto 0); --CJ
-		variable mpa_lc        : std_logic_vector(7 downto 0);
+		--variable mpa_lc        : std_logic_vector(7 downto 0);
 	begin
 		-- This intermediate vector is used when rin_sel should be controlled by
 		-- cond(4) and map(3..2) (the "d PLUS (L/M)SHALF of.." operations).
@@ -246,20 +247,19 @@ begin
 					mpa_int := pc_rc_rc;	-- To stored on fail
 				end if;
 			------------------------------------------------------------------------
-			when SEQC_LGOTO =>				-- (08) LGO TO ad IF cond --Replace with microcode loading process.--CJ
+			when SEQC_MPL =>				-- (08) LGO TO ad IF cond --Replace with microprogram loading process.--CJ
+			    rin_sel <= RIN_Z;           -- makes z_ri_ri to all zero.
 			    if ld_mpgm_int = '1' then
-					if dfm_vld = '1' then
+					if data_vld = '1' then
 						mpa_int := pc_pc_pc;
-					elsif dfm_vld = '0' and vldl = '1' then
-						mpa_int := mpa_lc;
+					--elsif dfm_vld = '0' and vldl = '1' then
+					--	mpa_int := mpa_lc;
 					else 
-					    mpa_int := pc_ri_ri;
-					    mpa_lc  := pc_ri_ri;
+					    mpa_int := z_ri_ri;
+					    --mpa_lc  := pc_ri_ri;
 					end if;
-				elsif cond_pass = '1' then
-					mpa_int := pc_ri_ri;	-- Jump long on pass
 				else
-					mpa_int := pc_pc_pc;	-- Continue on fail
+					mpa_int := z_ri_ri;	-- Hold at address 0
 				end if;
 			------------------------------------------------------------------------
 			when SEQC_UDO =>					-- (09) UNC DO d

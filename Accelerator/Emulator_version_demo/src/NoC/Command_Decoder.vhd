@@ -17,11 +17,11 @@
 -- File       : Command_Decoder.vhd
 -- Author     : Azadeh Kaffash
 -- Company    : Imsys Technologies AB
--- Date       : 28.01.2021
+-- Date       : 28.01.2021 08:46:29
 -------------------------------------------------------------------------------
--- Description: Extracts different parts from the received command in NOC           
+-- Description: Extracts different parts from the received command in NOC            
 -------------------------------------------------------------------------------
--- TO-DO list :      
+-- TO-DO list :             
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date					Version		Author	Description
@@ -35,6 +35,7 @@ use ieee.numeric_std.all;
 entity Command_Decoder is
     Port(
         clk                 : in   std_logic;
+        reset               : in   std_logic;
         PEC_Ready_In        : in   std_logic;
         Set_PEC_FF2         : in   std_logic;
         CMD_flag            : in   std_logic; 
@@ -57,22 +58,26 @@ end Command_Decoder;
 
 architecture Behavioral of Command_Decoder is
 
-    signal CMD_reg      : std_logic_vector(95 downto 0):= (others => '0');
-    signal PEC_FF1      : std_logic:= '0';
+    signal CMD_reg      : std_logic_vector(95 downto 0);
+    signal PEC_FF1      : std_logic;
     signal PEC_FF2      : std_logic:= '0';
-    signal Adder        : std_logic_vector(6 downto 0):= (others => '0');
+    signal Adder        : std_logic_vector(6 downto 0);
 
 begin
 
-    process(clk)
+    process(clk, reset)
     begin
-        if rising_edge(clk) then
-            if Load_CMD_reg = '1' then
-                CMD_reg <= Noc_data;
-            end if;
-            CMD_FF   <= CMD_flag;
-            PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
-            PEC_FF1  <= PEC_Ready_In;
+        if reset = '1' then
+          CMD_reg     <= (others => '0');
+          CMD_FF      <= '0';
+        elsif rising_edge(clk) then
+          if Load_CMD_reg = '1' then
+            CMD_reg <= Noc_data;
+          end if;
+            
+          CMD_FF   <= CMD_flag;
+          PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
+          PEC_FF1  <= PEC_Ready_In;
         end if;
     end process;
 

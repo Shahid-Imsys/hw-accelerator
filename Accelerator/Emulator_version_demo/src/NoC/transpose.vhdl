@@ -11,7 +11,7 @@ entity transpose is
 
   port (
     clk              : in std_logic;
-    rst_n            : in std_logic;
+    rst              : in std_logic;
     write_enable     : in std_logic;
     noc_write_enable : in std_logic;
     adress           : in std_logic_vector(1 downto 0);
@@ -54,10 +54,10 @@ begin  -- architecture rtl
 
   data_out <= picture_array(to_integer(unsigned(adress)));
 
-  read_in_data : process (clk, rst_n) is
+  read_in_data : process (clk, rst) is
     variable v_adress : integer range 0 to 3;
   begin  -- process read_in_data
-    if rst_n = '0' then
+    if rst = '1' then
       picture_array <= (others => (others => (others => '0')));
     elsif clk'event and clk = '1' then
 

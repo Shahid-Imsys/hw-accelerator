@@ -102,37 +102,7 @@ port(
 	  ); 
 	  end component;
 	  
---component cluster_tb
---port(
-----Clock inputs
---	  CLK_P            : out std_logic;     --PE clocks
---	  CLK_E            : out std_logic;     --PE's execution clock 
---	  --CLK_E_NEG        : out std_logic;     --Inverted clk_e
---      RST_E            : out std_logic;
---      RST_P            : out std_logic;
-----Clock outputs
---	  CLK_O            : in std_logic;
-----Tag line
---	  TAG              : out std_logic;
---	  TAG_FB           : in std_logic;
-----Data line   
---	  DATA             : out std_logic_vector(7 downto 0);
---	  DATA_OUT         : in std_logic_vector(7 downto 0)
---	  -------------------------
-----PE request
---      --RST_R            : out std_logic;  --Active low
---	  --REQ_IN           : in std_logic;  --req to noc in reg logic
---	  --REQ_FIFO          : in std_logic_vector(31 downto 0);
---	  --DATA_TO_PE       : out std_logic_vector(127 downto 0);
---	  --DATA_VLD         : out std_logic;
---	  --PE_UNIT          : out std_logic_vector(5 downto 0);
---	  --BC              : out std_logic;
---	  --RD_FIFO          : out std_logic;
---	  --FIFO_VLD         : in std_logic
-----Feedback signals
---      --fb               : out std_logic
---	  );
---	  end component;
+
 component req_dst_logic
 	port(
         --Shared
@@ -190,7 +160,9 @@ component p_top
     C1_RDY     : out std_logic;
     C2_RDY     : out std_logic;
     EXE        : in std_logic;
-    RESUME     : in std_logic  
+    RESUME     : in std_logic;
+    MLP_PWR_OK : in    std_logic;                  -- Power on indecator --From Host directly
+    MWAKEUP_LP  : in    std_logic   
   );
 	end component;
 --signal clk_p_i : std_logic;
@@ -286,250 +258,266 @@ port map(
     FIFO_VLD   => fifo_vld_i
 );
 
-cluster_net: req_dst_logic
-port map(
-	CLK_P      =>clk_p,
-    CLK_E      =>clk_e,
-    --CLK_E_NEG  =>clk_e_neg_i,
-    EVEN_P     => even_p_i,
-    RESET      =>rst_i,
-    REQ_TO_NOC =>req_in_i,
-    REQ_SIG    =>req_sig_i,
-    ACK_SIG    =>ack_sig_i,
-    PE_REQ_IN  =>pe_req_in_i,
-    OUTPUT     =>req_fifo_i,
-    RD_FIFO    =>rd_fifo_i,
-    FIFO_VLD   =>fifo_vld_i,
-	DATA_VLD   =>data_vld_i,
-    DATA_NOC   =>data_to_pe_i,
-    PE_UNIT    =>pe_unit_i(3 downto 0),
-    B_CAST     =>bc_i,
-	DATA_VLD_OUT => data_vld_to_pe,
-    PE_DATA_OUT   => pe_data_out_i
-);
+--cluster_net: req_dst_logic
+--port map(
+--	CLK_P      =>clk_p,
+--    CLK_E      =>clk_e,
+--    --CLK_E_NEG  =>clk_e_neg_i,
+--    EVEN_P     => even_p_i,
+--    RESET      =>rst_i,
+--    REQ_TO_NOC =>req_in_i,
+--    REQ_SIG    =>req_sig_i,
+--    ACK_SIG    =>ack_sig_i,
+--    PE_REQ_IN  =>pe_req_in_i,
+--    OUTPUT     =>req_fifo_i,
+--    RD_FIFO    =>rd_fifo_i,
+--    FIFO_VLD   =>fifo_vld_i,
+--	DATA_VLD   =>data_vld_i,
+--    DATA_NOC   =>data_to_pe_i,
+--    PE_UNIT    =>pe_unit_i(3 downto 0),
+--    B_CAST     =>bc_i,
+--	DATA_VLD_OUT => data_vld_to_pe,
+--    PE_DATA_OUT   => pe_data_out_i
+--);
 
-pe_pair_1: p_top
-port map(
-	C1_REQ     => req_sig_i(15),
-    C2_REQ     => req_sig_i(14),
-    C1_ACK     => ack_sig_i(1),
-    C2_ACK     => ack_sig_i(2),
-    C1_REQ_D   => pe_req_in_i(1),
-    C2_REQ_D   => pe_req_in_i(2),
-    C1_IN_D    => pe_data_out_i(1),
-    C2_IN_D    => pe_data_out_i(2),
-    C1_DDI_VLD => data_vld_to_pe(1),
-    C2_DDI_VLD => data_vld_to_pe(2),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_2: p_top
-port map(
-	C1_REQ     => req_sig_i(13),
-    C2_REQ     => req_sig_i(12),
-    C1_ACK     => ack_sig_i(3),
-    C2_ACK     => ack_sig_i(4),
-    C1_REQ_D   => pe_req_in_i(3),
-    C2_REQ_D   => pe_req_in_i(4),
-    C1_IN_D    => pe_data_out_i(3),
-    C2_IN_D    => pe_data_out_i(4),
-    C1_DDI_VLD => data_vld_to_pe(3),
-    C2_DDI_VLD => data_vld_to_pe(4),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_3: p_top
-port map(
-	C1_REQ     => req_sig_i(11),
-    C2_REQ     => req_sig_i(10),
-    C1_ACK     => ack_sig_i(5),
-    C2_ACK     => ack_sig_i(6),
-    C1_REQ_D   => pe_req_in_i(5),
-    C2_REQ_D   => pe_req_in_i(6),
-    C1_IN_D    => pe_data_out_i(5),
-    C2_IN_D    => pe_data_out_i(6),
-    C1_DDI_VLD => data_vld_to_pe(5),
-    C2_DDI_VLD => data_vld_to_pe(6),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_4: p_top
-port map(
-	C1_REQ     => req_sig_i(9),
-    C2_REQ     => req_sig_i(8),
-    C1_ACK     => ack_sig_i(7),
-    C2_ACK     => ack_sig_i(8),
-    C1_REQ_D   => pe_req_in_i(7),
-    C2_REQ_D   => pe_req_in_i(8),
-    C1_IN_D    => pe_data_out_i(7),
-    C2_IN_D    => pe_data_out_i(8),
-    C1_DDI_VLD => data_vld_to_pe(7),
-    C2_DDI_VLD => data_vld_to_pe(8),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_5: p_top
-port map(
-	C1_REQ     => req_sig_i(7),
-    C2_REQ     => req_sig_i(6),
-    C1_ACK     => ack_sig_i(9),
-    C2_ACK     => ack_sig_i(10),
-    C1_REQ_D   => pe_req_in_i(9),
-    C2_REQ_D   => pe_req_in_i(10),
-    C1_IN_D    => pe_data_out_i(9),
-    C2_IN_D    => pe_data_out_i(10),
-    C1_DDI_VLD => data_vld_to_pe(9),
-    C2_DDI_VLD => data_vld_to_pe(10),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_6: p_top
-port map(
-	C1_REQ     => req_sig_i(5),
-    C2_REQ     => req_sig_i(4),
-    C1_ACK     => ack_sig_i(11),
-    C2_ACK     => ack_sig_i(12),
-    C1_REQ_D   => pe_req_in_i(11),
-    C2_REQ_D   => pe_req_in_i(12),
-    C1_IN_D    => pe_data_out_i(11),
-    C2_IN_D    => pe_data_out_i(12),
-    C1_DDI_VLD => data_vld_to_pe(11),
-    C2_DDI_VLD => data_vld_to_pe(12),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_7: p_top
-port map(
-	C1_REQ     => req_sig_i(3),
-    C2_REQ     => req_sig_i(2),
-    C1_ACK     => ack_sig_i(13),
-    C2_ACK     => ack_sig_i(14),
-    C1_REQ_D   => pe_req_in_i(13),
-    C2_REQ_D   => pe_req_in_i(14),
-    C1_IN_D    => pe_data_out_i(13),
-    C2_IN_D    => pe_data_out_i(14),
-    C1_DDI_VLD => data_vld_to_pe(13),
-    C2_DDI_VLD => data_vld_to_pe(14),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
-pe_pair_8: p_top
-port map(
-	C1_REQ     => req_sig_i(1),
-    C2_REQ     => req_sig_i(0),
-    C1_ACK     => ack_sig_i(15),
-    C2_ACK     => ack_sig_i(0),
-    C1_REQ_D   => pe_req_in_i(15),
-    C2_REQ_D   => pe_req_in_i(0),
-    C1_IN_D    => pe_data_out_i(15),
-    C2_IN_D    => pe_data_out_i(0),
-    C1_DDI_VLD => data_vld_to_pe(15),
-    C2_DDI_VLD => data_vld_to_pe(0),
-    EXE        => exe,
-    RESUME     => resume,
-	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
-    EVEN_C     => even_p_i,
-    MRESET     => rst_i,                 -- system reset               low active
-    MIRQOUT    => open,                 -- interrupt request output    
-    MCKOUT0    => open,                 -- for trace adapter
-    MCKOUT1    => open,                 -- programable clock out
-    MTEST      => '0',                 --                            high active                 
-    MBYPASS    => '0',
-    MIRQ0      => '1',                 --                            low active
-    MIRQ1      => '1',                 --                            low active
-    -- SW debug=>                                             
-    MSDIN      => '0',                 -- serial data in (debug)     
-    MSDOUT     => open                 -- serial data out  
-);
+--pe_pair_1: p_top
+--port map(
+--	C1_REQ     => req_sig_i(15),
+--    C2_REQ     => req_sig_i(14),
+--    C1_ACK     => ack_sig_i(1),
+--    C2_ACK     => ack_sig_i(2),
+--    C1_REQ_D   => pe_req_in_i(1),
+--    C2_REQ_D   => pe_req_in_i(2),
+--    C1_IN_D    => pe_data_out_i(1),
+--    C2_IN_D    => pe_data_out_i(2),
+--    C1_DDI_VLD => data_vld_to_pe(1),
+--    C2_DDI_VLD => data_vld_to_pe(2),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out  
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0' 
+--);
+--pe_pair_2: p_top
+--port map(
+--	C1_REQ     => req_sig_i(13),
+--    C2_REQ     => req_sig_i(12),
+--    C1_ACK     => ack_sig_i(3),
+--    C2_ACK     => ack_sig_i(4),
+--    C1_REQ_D   => pe_req_in_i(3),
+--    C2_REQ_D   => pe_req_in_i(4),
+--    C1_IN_D    => pe_data_out_i(3),
+--    C2_IN_D    => pe_data_out_i(4),
+--    C1_DDI_VLD => data_vld_to_pe(3),
+--    C2_DDI_VLD => data_vld_to_pe(4),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out  
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0'
+--);
+--pe_pair_3: p_top
+--port map(
+--	C1_REQ     => req_sig_i(11),
+--    C2_REQ     => req_sig_i(10),
+--    C1_ACK     => ack_sig_i(5),
+--    C2_ACK     => ack_sig_i(6),
+--    C1_REQ_D   => pe_req_in_i(5),
+--    C2_REQ_D   => pe_req_in_i(6),
+--    C1_IN_D    => pe_data_out_i(5),
+--    C2_IN_D    => pe_data_out_i(6),
+--    C1_DDI_VLD => data_vld_to_pe(5),
+--    C2_DDI_VLD => data_vld_to_pe(6),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out 
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0' 
+--);
+--pe_pair_4: p_top
+--port map(
+--	C1_REQ     => req_sig_i(9),
+--    C2_REQ     => req_sig_i(8),
+--    C1_ACK     => ack_sig_i(7),
+--    C2_ACK     => ack_sig_i(8),
+--    C1_REQ_D   => pe_req_in_i(7),
+--    C2_REQ_D   => pe_req_in_i(8),
+--    C1_IN_D    => pe_data_out_i(7),
+--    C2_IN_D    => pe_data_out_i(8),
+--    C1_DDI_VLD => data_vld_to_pe(7),
+--    C2_DDI_VLD => data_vld_to_pe(8),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out  
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0'
+--);
+--pe_pair_5: p_top
+--port map(
+--	C1_REQ     => req_sig_i(7),
+--    C2_REQ     => req_sig_i(6),
+--    C1_ACK     => ack_sig_i(9),
+--    C2_ACK     => ack_sig_i(10),
+--    C1_REQ_D   => pe_req_in_i(9),
+--    C2_REQ_D   => pe_req_in_i(10),
+--    C1_IN_D    => pe_data_out_i(9),
+--    C2_IN_D    => pe_data_out_i(10),
+--    C1_DDI_VLD => data_vld_to_pe(9),
+--    C2_DDI_VLD => data_vld_to_pe(10),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out 
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0' 
+--);
+--pe_pair_6: p_top
+--port map(
+--	C1_REQ     => req_sig_i(5),
+--    C2_REQ     => req_sig_i(4),
+--    C1_ACK     => ack_sig_i(11),
+--    C2_ACK     => ack_sig_i(12),
+--    C1_REQ_D   => pe_req_in_i(11),
+--    C2_REQ_D   => pe_req_in_i(12),
+--    C1_IN_D    => pe_data_out_i(11),
+--    C2_IN_D    => pe_data_out_i(12),
+--    C1_DDI_VLD => data_vld_to_pe(11),
+--    C2_DDI_VLD => data_vld_to_pe(12),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out 
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0' 
+--);
+--pe_pair_7: p_top
+--port map(
+--	C1_REQ     => req_sig_i(3),
+--    C2_REQ     => req_sig_i(2),
+--    C1_ACK     => ack_sig_i(13),
+--    C2_ACK     => ack_sig_i(14),
+--    C1_REQ_D   => pe_req_in_i(13),
+--    C2_REQ_D   => pe_req_in_i(14),
+--    C1_IN_D    => pe_data_out_i(13),
+--    C2_IN_D    => pe_data_out_i(14),
+--    C1_DDI_VLD => data_vld_to_pe(13),
+--    C2_DDI_VLD => data_vld_to_pe(14),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0'  
+--);
+--pe_pair_8: p_top
+--port map(
+--	C1_REQ     => req_sig_i(1),
+--    C2_REQ     => req_sig_i(0),
+--    C1_ACK     => ack_sig_i(15),
+--    C2_ACK     => ack_sig_i(0),
+--    C1_REQ_D   => pe_req_in_i(15),
+--    C2_REQ_D   => pe_req_in_i(0),
+--    C1_IN_D    => pe_data_out_i(15),
+--    C2_IN_D    => pe_data_out_i(0),
+--    C1_DDI_VLD => data_vld_to_pe(15),
+--    C2_DDI_VLD => data_vld_to_pe(0),
+--    EXE        => exe,
+--    RESUME     => resume,
+--	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
+--    EVEN_C     => even_p_i,
+--    MRESET     => rst_i,                 -- system reset               low active
+--    MIRQOUT    => open,                 -- interrupt request output    
+--    MCKOUT0    => open,                 -- for trace adapter
+--    MCKOUT1    => open,                 -- programable clock out
+--    MTEST      => '0',                 --                            high active                 
+--    MBYPASS    => '0',
+--    MIRQ0      => '1',                 --                            low active
+--    MIRQ1      => '1',                 --                            low active
+--    -- SW debug=>                                             
+--    MSDIN      => '0',                 -- serial data in (debug)     
+--    MSDOUT     => open,                 -- serial data out 
+--    MLP_PWR_OK => '0',
+--    MWAKEUP_LP => '0' 
+--);
 end RTL;

@@ -1007,9 +1007,9 @@ begin
                     --dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
                 end if;
             --elsif pl_sel_dfm_dst = "01" then --Load data in dfm to vector engine
-                if clk_e_pos = '1' then
+                if clk_e_neg = '1' then
                     ve_in_reg <= dfm_reg(63 downto 0);
-                elsif clk_e_neg = '1' then
+                elsif clk_e_pos = '1' then
                     ve_in_reg <= dfm_reg(127 downto 64);
                 end if;
             --elsif pl_sel_dfm_dst = "10" then

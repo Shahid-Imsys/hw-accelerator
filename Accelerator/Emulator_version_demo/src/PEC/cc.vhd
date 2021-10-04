@@ -361,68 +361,68 @@ EVEN_P <= even_p_int;
     	  end if;
     end process;
   
-  noc_ctrl: process(clk_e,sig_fin,noc_cmd)
-  
-  variable tag_ctr_2 : integer;
-  variable tag_ctr_3 : integer;   --Both to be described in define document
-  begin
-	if rising_edge(clk_e) then
-		if noc_cmd = "01111" then
-			tag_ctr_2 := 30;
-			tag_ctr_3 := 38;
-			len_ctr <= (others => '0');
-			addr_n  <= (others => '0');
-			pk_reg  <= (others => '0');
-			dist_reg <= (others => '0'); 
-		elsif sig_fin = '1' and delay = '0' then 
-		    if noc_cmd = "00011" or noc_cmd = "00100" then
-		    	tag_ctr_2 := tag_ctr_2 - 1;
-		    	if tag_ctr_2 > 14 then
-		    		len_ctr(0) <= tag; 
-		    		for i in 0 to 13 loop
-		    			len_ctr(i+1)<= len_ctr(i);
-		    		end loop;
-		    	elsif tag_ctr_2 <= 14 and tag_ctr_2 >= 0 then
-		    		addr_n(0) <= tag;
-		    		for i in 0 to 13 loop
-		    			addr_n(i+1)<= addr_n(i);
-		    		end loop;
-		    	end if;
-		    elsif noc_cmd = "00101" then
-		    	tag_ctr_3:= tag_ctr_3-1;
-		    	if tag_ctr_3 > 22 then
-		    		len_ctr(0) <= tag; 
-		    		for i in 0 to 13 loop
-		    			len_ctr(i+1)<= len_ctr(i);
-		    		end loop;
-		    	elsif tag_ctr_3 > 7 then
-		    		addr_n(0) <= tag;
-		    		for i in 0 to 13 loop
-		    			addr_n(i+1)<= addr_n(i);
-		    		end loop;
-		    	elsif tag_ctr_3 > 3 then
-		    		pk_reg(0) <= tag;
-		    		for i in 0 to 2 loop
-		    			pk_reg(i+1)<= pk_reg(i);
-		    		end loop;
-		    	elsif tag_ctr_3 >= 0 then
-		    		dist_reg(0) <= tag;
-		    		for i in 0 to 2 loop
-		    			dist_reg(i+1)<= dist_reg(i);
-		    		end loop;
-		    	end if;
-		    end if;
-		elsif delay = '1' then
-		tag_ctr_2 := 30;
-		tag_ctr_3 := 38; 
-		len_ctr <= (others=> 'Z');
-		addr_n <= (others=> 'Z');
-		pk_reg <= (others=> 'Z');
-		dist_reg <= (others=> 'Z');
-		end if;
-
-	end if;
-  end process; 
+--  noc_ctrl: process(clk_e,sig_fin,noc_cmd) --moved to mem_interaction process
+--  
+--  variable tag_ctr_2 : integer;
+--  variable tag_ctr_3 : integer;   --Both to be described in define document
+--  begin
+--	if rising_edge(clk_e) then
+--		if noc_cmd = "01111" then
+--			tag_ctr_2 := 30;
+--			tag_ctr_3 := 38;
+--			len_ctr <= (others => '0');
+--			addr_n  <= (others => '0');
+--			pk_reg  <= (others => '0');
+--			dist_reg <= (others => '0'); 
+--		elsif sig_fin = '1' and delay = '0' then 
+--		    if noc_cmd = "00011" or noc_cmd = "00100" then
+--		    	tag_ctr_2 := tag_ctr_2 - 1;
+--		    	if tag_ctr_2 > 14 then
+--		    		len_ctr(0) <= tag; 
+--		    		for i in 0 to 13 loop
+--		    			len_ctr(i+1)<= len_ctr(i);
+--		    		end loop;
+--		    	elsif tag_ctr_2 <= 14 and tag_ctr_2 >= 0 then
+--		    		addr_n(0) <= tag;
+--		    		for i in 0 to 13 loop
+--		    			addr_n(i+1)<= addr_n(i);
+--		    		end loop;
+--		    	end if;
+--		    elsif noc_cmd = "00101" then
+--		    	tag_ctr_3:= tag_ctr_3-1;
+--		    	if tag_ctr_3 > 22 then
+--		    		len_ctr(0) <= tag; 
+--		    		for i in 0 to 13 loop
+--		    			len_ctr(i+1)<= len_ctr(i);
+--		    		end loop;
+--		    	elsif tag_ctr_3 > 7 then
+--		    		addr_n(0) <= tag;
+--		    		for i in 0 to 13 loop
+--		    			addr_n(i+1)<= addr_n(i);
+--		    		end loop;
+--		    	elsif tag_ctr_3 > 3 then
+--		    		pk_reg(0) <= tag;
+--		    		for i in 0 to 2 loop
+--		    			pk_reg(i+1)<= pk_reg(i);
+--		    		end loop;
+--		    	elsif tag_ctr_3 >= 0 then
+--		    		dist_reg(0) <= tag;
+--		    		for i in 0 to 2 loop
+--		    			dist_reg(i+1)<= dist_reg(i);
+--		    		end loop;
+--		    	end if;
+--		    end if;
+--		elsif delay = '1' then
+--		tag_ctr_2 := 30;
+--		tag_ctr_3 := 38; 
+--		len_ctr <= (others=> 'Z');
+--		addr_n <= (others=> 'Z');
+--		pk_reg <= (others=> 'Z');
+--		dist_reg <= (others=> 'Z');
+--		end if;
+--
+--	end if;
+--  end process; 
     
     exe_and_resume: process(clk_e)
 		variable idle: boolean;
@@ -594,8 +594,8 @@ EVEN_P <= even_p_int;
 			--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
 				noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
 			--end if;
-		  else 
-		  noc_data_in <=(others => (others => 'Z'));
+		  --else 
+		  --noc_data_in <=(others => (others => 'Z'));
 		  end if;
 		end if;
 	end process;
@@ -611,10 +611,58 @@ EVEN_P <= even_p_int;
 	end process;
     
     memory_interaction : process (clk_e, noc_reg_rdy,delay)
-
+	variable tag_ctr_2 : integer;
+	variable tag_ctr_3 : integer;  
     begin
 	if rising_edge(clk_e) then
-	    if delay = '1' then
+		if noc_cmd = "01111" then
+			tag_ctr_2 := 30;
+			tag_ctr_3 := 38;
+			len_ctr <= (others => '0');
+			addr_n  <= (others => '0');
+			pk_reg  <= (others => '0');
+			dist_reg <= (others => '0'); 
+		elsif sig_fin = '1' and delay = '0' then 
+		    if noc_cmd = "00011" or noc_cmd = "00100" then
+		    	tag_ctr_2 := tag_ctr_2 - 1;
+		    	if tag_ctr_2 > 14 then
+		    		len_ctr(0) <= tag; 
+		    		for i in 0 to 13 loop
+		    			len_ctr(i+1)<= len_ctr(i);
+		    		end loop;
+		    	elsif tag_ctr_2 <= 14 and tag_ctr_2 >= 0 then
+		    		addr_n(0) <= tag;
+		    		for i in 0 to 13 loop
+		    			addr_n(i+1)<= addr_n(i);
+		    		end loop;
+		    	end if;
+		    elsif noc_cmd = "00101" then
+		    	tag_ctr_3:= tag_ctr_3-1;
+		    	if tag_ctr_3 > 22 then
+		    		len_ctr(0) <= tag; 
+		    		for i in 0 to 13 loop
+		    			len_ctr(i+1)<= len_ctr(i);
+		    		end loop;
+		    	elsif tag_ctr_3 > 7 then
+		    		addr_n(0) <= tag;
+		    		for i in 0 to 13 loop
+		    			addr_n(i+1)<= addr_n(i);
+		    		end loop;
+		    	elsif tag_ctr_3 > 3 then
+		    		pk_reg(0) <= tag;
+		    		for i in 0 to 2 loop
+		    			pk_reg(i+1)<= pk_reg(i);
+		    		end loop;
+		    	elsif tag_ctr_3 >= 0 then
+		    		dist_reg(0) <= tag;
+		    		for i in 0 to 2 loop
+		    			dist_reg(i+1)<= dist_reg(i);
+		    		end loop;
+		    	end if;
+		    end if;
+	    elsif delay = '1' then
+			tag_ctr_2 := 30;
+			tag_ctr_3 := 38;
 		    if noc_reg_rdy = '1' then
 		        --if len_ctr = (len_ctr'range => '0') then
 				    --noc_write <= '0';
@@ -657,12 +705,8 @@ EVEN_P <= even_p_int;
 	    elsif delay = '0' then
 	    --noc_write <='0';
         --noc_read <='0';
-		len_ctr <= (others=> 'Z');
-		addr_n <= (others=> 'Z');
-		pk_reg <= (others=> 'Z');
-		dist_reg <= (others=> 'Z');
-		pk_ctr <= (others => '0');
-		dist_ctr <=(others => '0'); 
+		pk_ctr <= (others => '0'); --reset
+		dist_ctr <=(others => '0'); --reset
 		end if;
 	end if;
 	end process;
@@ -813,7 +857,7 @@ EVEN_P <= even_p_int;
     process (clk_e)
     begin
     	if rising_edge(clk_e) then 
-            if req_exe = '1' then
+            if pe_read = '1' then --Data valid asserts together with output data
     	        for i in 15 downto 0 loop
     	        	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
     	        end loop;

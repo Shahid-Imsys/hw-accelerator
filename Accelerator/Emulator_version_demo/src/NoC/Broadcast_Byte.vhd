@@ -25,6 +25,7 @@
 -------------------------------------------------------------------------------
 -- Revisions  : 0
 -- Date					Version		Author	Description
+-- 2020-11-16 		     1.0	     AK			Created
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -35,6 +36,7 @@ use ieee.numeric_std.all;
 entity Broadcast_Byte is
     port(
 	    clk                  : in  std_logic;
+	    reset                : in  std_logic;
 	    Reset_BC             : in  std_logic;
 	    Step_BC              : in  std_logic;
 	    decoder              : out std_logic_vector(31 downto 0);
@@ -45,21 +47,23 @@ end Broadcast_Byte;
 
 architecture Behavioral of Broadcast_Byte is
 
-    signal Counter      : std_logic_vector(4 downto 0):= (others => '0');
+    signal Counter      : std_logic_vector(4 downto 0);
 
 begin
 
-    process (clk)
+    process (clk, reset)
     begin
-        if rising_edge(clk) then
-            if Reset_BC = '1' then
-               Counter <= (others => '0');
-            elsif Step_BC = '1' then     
-               Counter <= Counter + '1';
-            else 
-               Counter <= (others => '0');
-            end if;                   
+      if reset = '1' then
+        Counter <= (others => '0');
+      elsif rising_edge(clk) then
+        if Reset_BC = '1' then
+          Counter <= (others => '0');
+        elsif Step_BC = '1' then     
+          Counter <= Counter + '1';
+        else 
+          Counter <= (others => '0');
         end if;
+      end if;
     end process;
     
     decoder <= "00000000000000000000000000000001"   when Counter = "00000" else
@@ -100,3 +104,4 @@ begin
     
     
 end Behavioral;
+

@@ -147,7 +147,34 @@ component CMEM_32KX16 is
  
 		 );
 end component;
- 
+
+component delay_count is
+	port(
+		 clk_e             :   in std_logic;
+         peci_busy         :   in std_logic;
+         sig_fin           :   in std_logic;
+         noc_cmd           :   in std_logic_vector(4 downto 0);
+         noc_reg_rdy       :   in std_logic;
+         len_ctr           :   in std_logic_vector(14 downto 0);
+
+         delay             :   out std_logic
+        
+		);
+end component;
+
+component mem_ctrl is
+	port(
+		clk_e           : in std_logic;
+        byte_ctr        : in std_logic_vector(3 downto 0);
+        delay           : in std_logic;
+        noc_cmd         : in std_logic_vector(4 downto 0);
+
+        noc_reg_rdy     : out std_logic;
+        noc_write       : out std_logic;
+        noc_read        : out std_logic
+
+		);
+end component;
 
   --Clock signals
   signal clk_m    : std_logic; --CM clock
@@ -220,8 +247,8 @@ end component;
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
-  signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
-  signal delay_b      : std_logic_vector(37 downto 0);
+  --signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
+  --signal delay_b      : std_logic_vector(37 downto 0);
   signal rd_ena       : std_logic;
   
   signal one_c_delay :std_logic;
@@ -304,7 +331,6 @@ EVEN_P <= even_p_int;
 		if noc_cmd = "01111" then
 			sig_fin <= '0';
 			peci_busy <= '0';
-			sig_fin <= '0';
 	    elsif noc_reg_rdy= '1' and len_ctr = "000000000000000" then --Refresh when data transfer is finished
 			sig_fin <= '0';
 		elsif peci_busy = '0' then
@@ -458,55 +484,6 @@ EVEN_P <= even_p_int;
   ------------------------------------------------------------------------------
   -- Data transfer
   ------------------------------------------------------------------------------  
-	
-	delay_count: process(clk_e, peci_busy, sig_fin)
-    
-	begin
-
-		if rising_edge(clk_e) then
-			if noc_cmd = "01111" then
-				delay <= '0';
-				delay_c <= (others => '0');
-				delay_b <= (others => '0');
-			elsif noc_cmd = "00011" then
-			
-			    if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
-				    delay <= '0';
-			    elsif peci_busy = '1' and sig_fin = '1' then
-			    --if noc_cmd = "00011" or noc_cmd = "00100" then
-			    	delay_c(0) <= '1';
-		            for i in 0 to 32 loop--30 loop --28 loop
-			    		delay_c(i+1) <= delay_c(i);
-			    	end loop;
-					delay <= delay_c(33);--(31); --(29);
-				end if;
-			elsif noc_cmd = "00101" then
-				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
-					delay <= '0';
-				elsif peci_busy = '1' and sig_fin = '1' then	
-			    	delay_b(0) <= '1';
-		            for i in 0 to 36 loop
-			    	    delay_b(i+1) <= delay_b(i);
-			    	end loop;
-			    	delay <= delay_b(37);
-				end if;
-			elsif noc_cmd = "00100" then
-				if noc_reg_rdy= '1' and len_ctr = "111111111111111" then  
-					delay <= '0';
-				elsif peci_busy = '1' and sig_fin = '1' then
-					--if noc_cmd = "00011" or noc_cmd = "00100" then
-						delay_c(0) <= '1';
-						for i in 0 to 28 loop
-							delay_c(i+1) <= delay_c(i);
-						end loop;
-						delay <= delay_c(29);
-				end if;
-		    else 
-		        delay_c <=(others => '0');
-		        delay_b <=(others => '0');
-			end if;
-		end if;
-	end process;
 
 	rd_act : process(clk_e)
 	--variable two_cycle_delay: std_logic_vector(2 downto 0);
@@ -547,41 +524,6 @@ EVEN_P <= even_p_int;
 			else
 				byte_ctr<= "0000";
 		    end if;
-		end if;
-	end process;
-
-	mem_activation : process(clk_e, byte_ctr, delay)
-    begin
-		if noc_cmd = "01111" then
-			noc_reg_rdy <= '0';
-            noc_write <= '0';
-            noc_read <= '0';
-        elsif delay = '1' then     
-		    if noc_cmd = "00011" or noc_cmd = "00101" then
-		        if byte_ctr = "0000" then 
-		        	noc_reg_rdy <= '1';
-                    noc_write <= '1';
-		        else
-		            noc_reg_rdy <= '0';
-                    noc_write <= '0';
-		    	end if;
-		    elsif noc_cmd = "00100" then
-		    	if byte_ctr = "1111" then
-		    		noc_reg_rdy <= '1';
-                    noc_read <= '1';
-		    	else 
-		    		noc_reg_rdy <= '0';
-                    noc_read <= '0';
-		    	end if;
-		    else 
-		    	noc_reg_rdy <='0';
-                noc_write <= '0';
-                noc_read <= '0';   
-	        end if;
-		else 
-			noc_reg_rdy <='0'; 
-            noc_write <= '0';
-            noc_read <= '0';  
 		end if;
 	end process;
 	
@@ -965,6 +907,32 @@ CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;
 		DO14 => data_core_int(14),
 		DO15 => data_core_int(15)
         );		
+
+	delay_counter : delay_count
+	port map (
+		clk_e => clk_e,
+		peci_busy => peci_busy,
+		sig_fin => sig_fin,
+		noc_cmd => noc_cmd,
+		noc_reg_rdy => noc_reg_rdy,
+		len_ctr => len_ctr,
+
+		delay => delay
+
+	);
+
+	mem_control : mem_ctrl
+	port map (
+		clk_e => clk_e,
+        byte_ctr => byte_ctr,
+        delay => delay,
+        noc_cmd => noc_cmd,
+
+        noc_reg_rdy => noc_reg_rdy,
+        noc_write => noc_write,
+        noc_read => noc_read
+
+	);
 
 end architecture rtl; 
 

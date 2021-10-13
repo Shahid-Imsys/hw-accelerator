@@ -106,8 +106,8 @@ constant ADDRESS2 : std_logic_vector(14 downto 0) := "000000000000100";
 constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";
 constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000001100";
 constant WORD1   : mem_word := (15 =>"11111111", others =>(others=>'0'));
-constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));
-constant WORD3   : mem_word := (15 =>"11111111", 14 => "00001111", 11=> "00001001", others =>(others=>'0'));
+constant WORD2   : mem_word := (15 =>"01111111", 12=> "00001000", others =>(others=>'0'));
+constant WORD3   : mem_word := (15 =>"10111111", 14 => "00001111", 11=> "00001001", others =>(others=>'0'));
 constant WORD4   : mem_word := (others =>(others=>'1'));
 --PE side
 constant RD_REQ1 : std_logic_vector(31 downto 0) :="01000010000000100000000000000011"; --Broadcast request, start from address 3, 2 words, 3 Pe issues this request
@@ -196,7 +196,6 @@ end send15bits;
 
 procedure sendmemword (constant word : in mem_word)is
 begin
-  wait for 120 ns;
   data <= word(15);
   wait for 30 ns;
   data <= word(14);
@@ -257,6 +256,7 @@ send15bits(LENGTH1);
 send15bits(ADDRESS1);
 tag_in<= '0';
 progress <=2;
+wait for 120 ns;
 sendmemword(WORD1);
 sendmemword(WORD2);
 sendmemword(WORD3);

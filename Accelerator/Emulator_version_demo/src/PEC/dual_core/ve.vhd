@@ -495,11 +495,11 @@ begin
                 bias_index_wr <= (others => '0');
             elsif reg_in = CONS_BIAS_INDEX_START then
                 bias_index_wr <= YBUS(5 downto 0);
-            elsif addr_reload = '1' then
+            elsif re_source = '0' and addr_reload = '1' then
                 re_loop <= re_loop_reg;
-                if mode_a_l = '1' then
+                if mode_a_l = '1' and mode_b_l = '0'then
                     re_addr_l <= re_saddr_l;
-                elsif mode_b_l = '1' then
+                elsif mode_b_l = '1' and mode_a_l = '0'then
                     re_addr_r <= re_saddr_r;
                 end if;
             elsif re_source = '0' and re_start_reg = '1' and re_loop /= (re_loop'range => '0') and DDI_VLD = '1' then
@@ -521,21 +521,21 @@ begin
         end if;
     end process;
     --Mode a and b for reloading receive engine, mode bits are not latched.
-    --re_start, re_source and modes are written in one microinstructions.
+    --re_start, re_source and modes are written in one microinstruction.
     --addr_reload, modes are written in one microinstruction.
     pushback_addr_write : process(clk_p) --generate address counter a abd b
     begin
-        if rising_edge(clk_p) then
+        if rising_edge(clk_p) and clk_e_pos = '1'then --falling_edge of clock_e
             if RST = '0' then
                 re_addr_a <= (others => '0');
                 re_addr_b <= (others => '0');
-            elsif addr_reload = '1' then
+            elsif re_source = '1' and addr_reload = '1' then
                 if mode_a = '1' then
                     re_addr_a <= re_saddr_a;
                 elsif mode_b = '1' then
                     re_addr_b <= re_saddr_b;
                 end if;
-            elsif re_source = '1' and re_start = '1' then
+            elsif addr_reload = '0' and re_source = '1' and re_start = '1' then
                 if mode_a = '1'  then 
                     re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
                 elsif mode_b = '1' then
@@ -591,7 +591,7 @@ begin
                     mul_inn_ctl <= '1';
                 end if;
             
-            elsif ve_start_reg = '1' and ve_oloop = (ve_oloop'range => '0') then --outer loop is 0. Last loop.
+            elsif ve_start_reg = '1' and ve_oloop = (ve_oloop'range => '0') then --outer loop is 0. Last loop without self reloading process.
                 if ve_loop /= (ve_loop'range => '0') then
                     ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
                     ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
@@ -756,9 +756,9 @@ end process;
  actl_6 <= not mul_ctl(6) and a_delay and delay0 and acc_inn_ctl ;
  actl_7 <= not mul_ctl(7) and a_delay and delay0 and acc_inn_ctl ;
  bypass <= '0';
----------------------------------------------------------------
+
 --Zero point substractor, always active
----------------------------------------------------------------
+
 --Left substractor
 mul_in_l_0 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(7 downto 0)))-to_integer(unsigned(zp_data)),9));
 mul_in_l_1 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(15 downto 8)))-to_integer(unsigned(zp_data)),9));
@@ -966,7 +966,7 @@ begin
     end if;
 end process;
 
-adder_ena <= pp_stage_1 and not pp_ctl(1);
+adder_ena <= pp_stage_2 and not pp_ctl(1);
 
 process(clk_p) 
 begin

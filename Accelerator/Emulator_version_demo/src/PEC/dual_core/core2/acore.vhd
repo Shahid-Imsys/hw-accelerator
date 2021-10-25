@@ -249,7 +249,7 @@ architecture struct of acore is
   signal rd_crb       : std_logic;
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
-  signal latch        : std_logic_vector(7  downto 0); 
+  signal latch        : std_logic_vector(7  downto 0);
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -288,8 +288,8 @@ architecture struct of acore is
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
-  signal ve_out_a_int : std_logic_vector(7 downto 0);
-  signal ve_out_sing_int : std_logic_vector(7 downto 0);
+  signal ve_out_d_int : std_logic_vector(7 downto 0);
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);
   signal vldl      : std_logic; --Added by CJ
   attribute syn_keep              : boolean;
   --attribute syn_keep of pend_i    : signal is true;
@@ -603,8 +603,8 @@ begin
       dtal          => dtal,             
       dfp           => dfp,
        --CJ added
-       VE_OUT_A      => ve_out_a_int,
-       VE_OUT_SING   => ve_out_sing_int,
+       VE_OUT_D      => ve_out_d_int,
+       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
       load_b        => open,       
@@ -712,8 +712,8 @@ begin
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
-      VE_OUT_A    => ve_out_a_int,
-      VE_OUT_SING => ve_out_sing_int
+      VE_OUT_D    => ve_out_d_int,
+      VE_OUT_DTM => ve_out_dtm_int
       );    
 
     i_direct <= x"00"; 

@@ -383,8 +383,8 @@ architecture struct of core is
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
   signal latch        : std_logic_vector(7  downto 0);
-  signal ve_out_a_int : std_logic_vector(7 downto 0); --Added by CJ      
-  signal ve_out_sing_int : std_logic_vector(7 downto 0); --Added by CJ     
+  signal ve_out_d_int : std_logic_vector(7 downto 0); --Added by CJ      
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0); --Added by CJ     
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -1008,8 +1008,8 @@ begin
       dtal          => dtal,             
       dfp           => dfp,
       --CJ added
-      VE_OUT_A      => ve_out_a_int,
-      VE_OUT_SING   => ve_out_sing_int,
+      VE_OUT_D      => ve_out_d_int,
+      --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
       load_b        => open,       
@@ -1233,8 +1233,8 @@ begin
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
-      VE_OUT_A    => ve_out_a_int,
-      VE_OUT_SING => ve_out_sing_int
+      VE_OUT_D    => ve_out_d_int,
+      VE_OUT_DTM  => ve_out_dtm_int
       );
 end;
 

@@ -95,6 +95,7 @@ entity mmr is
     --d_dqo:      out std_logic_vector(7 downto 0); -- Data out to SDRAM
     d_dqi:      in  std_logic_vector(127 downto 0);  --CJ
     d_dqo:      out std_logic_vector(31 downto 0);   --CJ
+    ve_data   : out std_logic_vector(63 downto 0);   --CJ
     en_dqo:     out std_logic;  -- Output enable to SDRAM data bus
     out_line:   out std_logic;  -- one line is 8x4 = 32 bytes
 	  ld_dqi_flash:  in std_logic;
@@ -1023,7 +1024,8 @@ begin
                 
             end if;
         --end if;
-    end process;                    
+    end process;
+    ve_data <= ve_in_reg;                    
   -----CJ-----              
     -- m_direct is the direct data bus from memory. It will always be driven
     -- from the dfm register except when we are transferring two bytes per

@@ -1938,7 +1938,7 @@ begin
       WEB         => mp_RAM0_WEB,              
       CK          => clk_p,           
       CS          => mp_RAM0_CS,               
-      OE          => '1'                
+      OE          => std_logic'('1') --'1'                
       );
 
   --mpram11: SU180_2048X80X1BM1B
@@ -2611,7 +2611,7 @@ begin
 	  test_pll      => test_pll, --: out std_logic;  -- PLL in test mode
     xout          => hclk_i,     --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
     -- Power on signal
-    pwr_ok        => '1',--pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
+    pwr_ok        => std_logic'('1'), --'1',--pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
 	---------------------------------------------------------------------
     -- Memory signals
     ---------------------------------------------------------------------
@@ -2745,7 +2745,7 @@ begin
     mexec_o       => mexec_o, --: out std_logic;  -- clk_e test output
     mtest_i       => mtest_i,--: in  std_logic;  -- Test mode---
     mbypass_i     => mbypass_i,--: in  std_logic;  -- bypass PLL
-    mwake_i       => '0',--: in  std_logic;  -- wake up
+    mwake_i       => std_logic'('0'), --'0',--: in  std_logic;  -- wake up
     -- DRAM signals
 	  en_pmem2      => en_pmem2,
     d_addr        => c1_d_addr,--to internal sram block
@@ -2806,7 +2806,7 @@ begin
     -- signals from the master core
     rst_cn        => c2_core2_en,       --reset core2 if disabled
     rsc_n         => c2_rsc_n,
-    clkreq_gen    => '0',
+    clkreq_gen    => std_logic'('0'), --'0',
     core2_en      => c2_core2_en     ,
     crb_out       => c2_crb_out      ,
     en_pmem       => c2_en_pmem      ,
@@ -2831,8 +2831,8 @@ begin
     --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
     --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
     ddqm          => open,   
-    irq0          => '1',  -- Interrupt request 0   
-    irq1          => '1',  -- Interrupt request 1   
+    irq0          => std_logic'('1'), --'1',  -- Interrupt request 0   
+    irq1          => std_logic'('1'), --'1',  -- Interrupt request 1   
 ---------------------------------------------------------------------
     -- Memory signals
 ---------------------------------------------------------------------

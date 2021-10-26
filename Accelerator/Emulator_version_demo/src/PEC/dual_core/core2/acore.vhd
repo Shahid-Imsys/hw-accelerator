@@ -429,7 +429,7 @@ begin
       rst_en        => rst_en_int,               
       -- Microprogram fields
       pl            => pl,
-      ld_mpgm       => '0', 
+      ld_mpgm       => std_logic'('0'), --'0', 
       -- Static control inputs
       dbl_direct    => dbl_direct,            
       pup_irq       => pup_irq,           
@@ -442,10 +442,10 @@ begin
       irq0          => irq0,               
       irq1          => irq1, 
       --dfm_vld       => ddi_vld,  --Added by CJ
-      mp_vld        => '0',     --Added by CJ            
+      mp_vld        => std_logic'('0'), --'0',     --Added by CJ            
       -- Condition inputs
-      spreq_n       => '1',             
-      spack_n       => '1',             
+      spreq_n       => std_logic'('1'), --'1',             
+      spack_n       => std_logic'('1'), --'1',             
       d_sign      	=> d_sign,            
       y_bittst      => y_bittst,            
       flag_fn       => flag_fn,             
@@ -685,14 +685,15 @@ begin
       d_cas       => dcas_o,             
       d_we        => dwe_o,              
       d_dqi       => ddq_i,             
-      d_dqo       => ddq_o,             
+      d_dqo       => ddq_o,
+      ve_data     => ve_in_int,             
       en_dqo      => ddq_en,
-	  ld_dqi_flash => '0',
+	  ld_dqi_flash => std_logic'('0'), --'0',
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,
       exe         => exe,    --Added by CJ 
-      LD_MPGM     => '0',
+      LD_MPGM     => std_logic'('0'), --'0',
       
       --ddi_vld     => ddi_vld,  --Added by CJ        
       d_cke       => dcke_o); 
@@ -722,8 +723,3 @@ begin
     dtcl <= x"00";
     clk_e_pos <= clk_e_pos_int;
 end;
-
-
-
-
-

@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 use std.textio.all;
 use work.all;
 
-entity SP180_8192X80BM1A is
+entity SP180_4096X80BM1A is
 	port (
 		A0		:	in	std_logic; 
 		A1		:	in	std_logic; 
@@ -101,10 +101,10 @@ entity SP180_8192X80BM1A is
 		CK		:	in	std_logic;
 		CS		:	in	std_logic;
 		OE		:	in	std_logic);
-end SP180_8192X80BM1A;
+end SP180_4096X80BM1A;
 
-architecture struct of SP180_8192X80BM1A is
-	type rom_type is array (8191 downto 0) of bit_vector(79 downto 0);
+architecture struct of SP180_4096X80BM1A is
+	type rom_type is array (4095 downto 0) of bit_vector(79 downto 0);
 
 	impure function init_rom_from_file (rom_file_name : in string) return rom_type is
 		FILE rom_file : text is in rom_file_name;
@@ -118,7 +118,7 @@ architecture struct of SP180_8192X80BM1A is
 		return ROM;
 	end function;
 
-	signal ROM	: rom_type := init_rom_from_file("mprom00.data");
+	signal ROM	: rom_type := init_rom_from_file("mprom0.data");
 	signal addr	: std_logic_vector(11 downto 0);
 	signal data	: std_logic_vector(79 downto 0);
 	attribute rom_style					: string;

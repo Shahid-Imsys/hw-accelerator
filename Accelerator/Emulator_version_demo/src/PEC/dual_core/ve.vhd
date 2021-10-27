@@ -1211,8 +1211,8 @@ begin
             if clk_e_neg = '1' then
             dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
             end if;
-        elsif output_ena = '1' then --to feedback(dfy) register
-            if pp_ctl(4 downto 3) = "01" then
+        elsif output_ena = '1' then 
+            if pp_ctl(4 downto 3) = "01" then --to feedback(dfy) register
                 dfy_reg(to_integer(unsigned(output_c))) <= p_clip_out;
                 if output_c = x"7" then
                     output_c <=(others => '0');

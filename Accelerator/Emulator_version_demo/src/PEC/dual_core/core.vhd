@@ -238,7 +238,7 @@ entity core is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(127 downto 0); -- Data input bus
+    ddq_i       : in  std_logic_vector(127 downto 0); -- Ext memory data input bus
     ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
@@ -526,7 +526,7 @@ begin
     if rising_edge(clk_p) then--  
         if rst_en_int = '0' then    
             pl <= (others => '0');
-        elsif clk_e_pos_int = '0' then
+        elsif clk_e_pos_int = '0' then --rising_edge(clk_e)
             if exe = '1' then
                 pl <= init_mpgm;
             elsif ld_mpgm = '1' then

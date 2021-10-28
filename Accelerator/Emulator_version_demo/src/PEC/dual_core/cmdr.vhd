@@ -27,23 +27,7 @@
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date					Version		Author	Description
--- 2021-10-26           1.0         CJ      Created    
---     
---     
---     
---     
---     
---     
---     
---     
---     
---    
---     
---     
---    
---     
---     
---     
+-- 2021-10-26           1.0         CJ      Created        
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -58,9 +42,10 @@ entity cmdr is
         --Microprogram control
         PL        : in std_logic_vector(127 downto 0);
         --Cluster data interface
+        EXE       : in std_logic;
         DATA_VLD  : in std_logic;
         DIN       : in std_logic_vector(127 downto 0);
-        DOUT      : out std_logic_vector(32 downto 0);
+        DOUT      : out std_logic_vector(31 downto 0);
         --Core interface
         YBUS      : in std_logic_vector(7 downto 0);
         LD_MPGM   : in std_logic;
@@ -73,15 +58,43 @@ entity cmdr is
 end; 
 
 architecture rtl of cmdr is
+
+    COMPONENT fifo_generator_0
+    PORT (
+    clk : IN STD_LOGIC;
+    srst : IN STD_LOGIC;
+    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    wr_en : IN STD_LOGIC;
+    rd_en : IN STD_LOGIC;
+    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    full : OUT STD_LOGIC;
+    empty : OUT STD_LOGIC;
+    prog_full : OUT STD_LOGIC
+    );
+    END COMPONENT;
+
     --control fields
     signal pl_dbus_s     : std_logic_vector(4 downto 0);
     signal pl_dfm_byte    : std_logic_vector(3 downto 0);
+    --signal pl_pd_sig      : std_logic_vector(2 downto 0);
+    signal ddfm_trig     : std_logic;
+    signal ld_dtm        : std_logic;
+    signal fifo_push     : std_logic;
+    signal dtm_mux_sel    : std_logic_vector(1 downto 0);
+    signal send_req      : std_logic;
 
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
     signal dbus_reg    : std_logic_vector(127 downto 0);
     signal output_int  : std_logic_vector(32 downto 0);
     signal dbus_int    : std_logic_vector(7 downto 0);
+    signal dtm_reg     : std_logic_vector(31 downto 0);
+    signal ve_in_cnt   : std_logic_vector(1 downto 0);
+    signal ld_dtm_v    : std_logic;
+    signal fifo_wr_en  : std_logic;
+    signal fifo_rd_en  : std_logic;
+    signal init_mpgm_rq : std_logic_vector(31 downto 0);
+    signal empty       : std_logic;
 
 begin
 --*******************************************************************     
@@ -90,11 +103,21 @@ begin
     pl_dfm_byte  <= PL(112 downto 109);
     pl_dbus_s    <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44);
     process(clk_p)
-        variable dbus_trig: boolean;
+    begin 
+        if rising_edge(clk_p) then
+            if RST_EN = '0' then
+                ddfm_trig <= '0';
+            elsif pl_dbus_s = "10001" then
+                ddfm_trig <= '1';
+            elsif DATA_VLD = '1' then
+                ddfm_trig <= '0';
+            end if;
+        end if;
+    end process;
+    process(clk_p)
     begin
         if rising_edge(clk_p) then
             if RST_EN = '0' then
-                dbus_trig := true;
                 ve_data_int <= (others => '0');
                 mp_data_int <= (others => '0');
                 dbus_reg <= (others => '0');
@@ -105,12 +128,8 @@ begin
                 elsif CLK_E_NEG = '1' then
                     ve_data_int <= DIN(127 downto 64); --input upper half to vector engine at rising edge of clk_e
                 end if;
-
-                if pl_dbus_s = "10001" and dbus_trig then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
-                    dbus_trig := false;
+                if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
                     dbus_reg <= DIN;
-                elsif pl_dbus_s /= "10001" then
-                    dbus_trig := true;
                 end if;
             end if;
         end if;
@@ -124,4 +143,69 @@ begin
 --*******************************************************************     
 -- Cluster DTM
 --*******************************************************************
-    --Cluster DTM has two input sources. One is ybus, which is controlled by the microcode directly and the bandwidth is 8 bits per clock e cycle 
+    --Cluster DTM has two input sources. One is ybus, which is controlled by the microcode directly and the bandwidth is 8 bits per clock e cycle
+    --The other is VE's DTM buffer. The rate is 32 bits per clock e cycle.
+    --pl_pd_sig <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
+    ld_dtm <= pl(43) xor pl(39); --PD signal bit 1.
+    dtm_mux_sel <= pl(117 downto 116);
+    ld_dtm_v <= pl(88);
+    fifo_push <= pl(114);
+    send_req <= pl(113);
+    init_mpgm_rq <= "01111111001111110000000000000000";
+    process(clk_p)
+    begin
+        if rst_en = '0' then
+            dtm_reg <= (others => '0');
+            ve_in_cnt <= (others => '0');
+        elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
+            dtm_reg <= init_mpgm_rq;
+        elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
+            dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
+        elsif ld_dtm_v = '1' and CLK_E_NEG = '1' then
+            dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
+            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+        end if;
+    end process;
+    --Fifo control signals
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
+                if CLK_E_NEG = '0' then
+                    fifo_wr_en <= '1';
+                else
+                    fifo_wr_en <= '0';
+                end if;
+            else
+                fifo_wr_en <= '0';
+            end if;
+        end if;
+    end process;
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if send_req = '1' and CLK_E_NEG = '0' and empty = '0'then
+                fifo_rd_en <= '1';
+            else
+                fifo_rd_en <= '0';
+            end if;
+        end if;
+    end process;
+
+
+    req_fifo : fifo_generator_0
+    PORT MAP (
+    clk => CLK_P,
+    srst => rst_en,
+    din => dtm_reg,
+    wr_en => fifo_wr_en,
+    rd_en => fifo_rd_en,
+    dout => DOUT,
+    full => open,
+    empty => empty,
+    prog_full => open --asserts when 5 words inside
+    );
+end architecture;
+
+
+

@@ -185,41 +185,53 @@ component Noc_Top is
   );
   end component;
 
---  component cluster_controller is
---    port(
-----Clock inputs
---	  CLK_E            : in std_logic;     --PE clocks(pll clock)
-----Clock outputs
---	  CLK_O            : out std_logic;    --not needed in this version
-----Tag line
---	  TAG              : in std_logic;
---	  TAG_FB           : out std_logic;
-----Data line   
---	  DATA             : in std_logic_vector(7 downto 0);
---	  DATA_OUT         : out std_logic_vector(7 downto 0);
-----Request and distribution logic signals
---      RST_R            : out std_logic;
---	  REQ_IN           : in std_logic;
---	  REQ_FIFO         : in std_logic_vector(31 downto 0);
---	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
---	  PE_UNIT          : out std_logic_vector(5 downto 0);
---	  B_CAST           : out std_logic;
---	  RD_FIFO          : out std_logic;
---	  FOUR_WD_LEFT     : in std_logic  
---	  ); 
---    end component;
+ component Cluster_top is
+   Port( 
+	  CLK_P     : in std_logic;
+	  CLK_E     : in std_logic;
+      RST_P     : in std_logic;
+      RST_E     : in std_logic;
+	  clk_O     : out std_logic;
+	  TAG       : in std_logic;
+	  TAG_FB    : out std_logic;
+      C_RDY     : out std_logic;
+      DATA      : in std_logic_vector(7 downto 0);
+      DATA_OUT  : out std_logic_vector(7 downto 0);
+      noc_cmd_t : out std_logic_vector(4 downto 0);
+	  rd_trig_t : out std_logic
+  );
+end component;
     
 component clk_wiz_0
 port
  (-- Clock in ports
   -- Clock out ports
   clk_out1          : out    std_logic;
+  clk_out2          : out    std_logic;
   -- Status and control signals
   reset             : in     std_logic;
   locked            : out    std_logic;
   clk_in1           : in     std_logic
  );
 end component;
+
+component ila_6
+
+port (
+	clk : IN STD_LOGIC;
+	probe0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	probe1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	probe2 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
+	probe3 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
+	probe4 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+	probe9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
+);
+end component;
+
 
 signal REF_CLK_i                         : std_logic;
 signal CLK_L_i                           : std_logic; 
@@ -683,6 +695,21 @@ signal Reset_meta      : std_logic;
 signal Reset_cdc       : std_logic;
 signal PCIE_reset      : std_logic;
 signal Reset_NOC       : std_logic;
+signal noc_cmd1_t      : std_logic_vector (4 downto 0);
+signal noc_cmd2_t      : std_logic_vector (4 downto 0);
+signal rd_trig1_t      : std_logic;
+signal rd_trig2_t      : std_logic;
+
+signal	probe0_i       : std_logic_vector(15 downto 0); 
+signal	probe1_i       : std_logic_vector(15 downto 0); 
+signal	probe2_i       : std_logic_vector(4 downto 0); 
+signal	probe3_i       : std_logic_vector(4 downto 0); 
+signal	probe4_i       : std_logic_vector(0 downto 0); 
+signal	probe5_i       : std_logic_vector(0 downto 0); 
+signal	probe6_i       : std_logic_vector(0 downto 0); 
+signal	probe7_i       : std_logic_vector(0 downto 0); 
+signal	probe8_i       : std_logic_vector(0 downto 0);
+signal	probe9_i       : std_logic_vector(0 downto 0);
 
 
 begin
@@ -690,7 +717,9 @@ begin
 mmcm_inst : clk_wiz_0
    port map ( 
   -- Clock out ports  
-   clk_out1 => clk_gen,
+   clk_out1 => clk_gen, --180MHz
+   clk_out2 => CLK_P,   --Fast clock 360MHz
+
   -- Status and control signals                
    reset => Reset,
    locked => locked,
@@ -896,18 +925,6 @@ Reset                   <= not(MRESET);
 --    end if;
 --end process;  
 
-reset_synchronisering : process (REF_CLK_i, PCIE_reset) is
-  variable reset_delay : std_logic_vector(1 downto 0);
-begin  -- process reset_synchronisering
-  if PCIE_reset = '1' then
-    Reset_NOC   <= '1';
-    reset_delay <= (others => '0');
-  elsif falling_edge(REF_CLK_i) then
-    reset_delay <= reset_delay(reset_delay'length-2 downto 0) & '0';
-    Reset_NOC   <= reset_delay(reset_delay'left);
-  end if;
-end process reset_synchronisering; 
-                                      
 Reset_NOC   <= PCIE_reset;  --Reset_cdc or PCIE_reset;
 
 Noc_Top_Inst: Noc_Top
@@ -941,42 +958,65 @@ port map(
         pcie_wr_ctl_wrs_t   => pcie_wr_ctl_wrs_t
 );
      
---cluster_controller_Inst1: cluster_controller
---port map(
---        CLK_E               => REF_CLK_i,
---        CLK_O               => Gated_clk_from_PEC,      --Clock outputs   
---        TAG                 => Tag_Line,                --Tag line
---        TAG_FB              => TAG_FB1,
---        DATA                => NOC_bus_Out(7 downto 0), --Data line
---        DATA_OUT            => NOC_bus_In(7 downto 0),
---        --Request and distribution logic signals
---        RST_R               => open,
---        REQ_IN              => REQ_IN,
---        REQ_FIFO            => REQ_FIFO,
---        DATA_TO_PE          => open,
---        PE_UNIT             => open,
---        B_CAST              => open,
---        RD_FIFO             => open,
---        FOUR_WD_LEFT        => FOUR_WD_LEFT                          
---);
-    
---cluster_controller_Inst2: cluster_controller
---port map(
---        CLK_E               => REF_CLK_i,
---        CLK_O               => open,                    --Clock outputs   
---        TAG                 => Tag_Line,                --Tag line
---        TAG_FB              => TAG_FB2,
---        DATA                => NOC_bus_Out(15 downto 8), --Data line
---        DATA_OUT            => NOC_bus_In(15 downto 8),
---        --Request and distribution logic signals
---        RST_R               => open,
---        REQ_IN              => REQ_IN,
---        REQ_FIFO            => REQ_FIFO,
---        DATA_TO_PE          => open,
---        PE_UNIT             => open,
---        B_CAST              => open,
---        RD_FIFO             => open,
---        FOUR_WD_LEFT        => FOUR_WD_LEFT         
---); 
+Cluster_top_Inst1: Cluster_top
+port map(
+        CLK_P               => CLK_P,
+        CLK_E               => REF_CLK_i,
+        clk_O               => Gated_clk_from_PEC,      --Clock outputs   
+        RST_P               => '0',
+        RST_E               => '0',
+        TAG                 => Tag_Line,                --Tag line
+        TAG_FB              => TAG_FB1,
+        C_RDY               => open,
+        DATA                => NOC_bus_Out(7 downto 0), --Data line
+        DATA_OUT            => NOC_bus_In(7 downto 0),
+        noc_cmd_t           => noc_cmd1_t, 
+	    rd_trig_t           => rd_trig1_t           
+);
+  
+Cluster_top_Inst2: Cluster_top
+port map(
+        CLK_P               => CLK_P,
+        CLK_E               => REF_CLK_i,
+        clk_O               => open,      --Clock outputs   
+        RST_P               => '0',
+        RST_E               => '0',
+        TAG                 => Tag_Line,                --Tag line
+        TAG_FB              => TAG_FB2,
+        C_RDY               => open,
+        DATA                => NOC_bus_Out(15 downto 8), --Data line
+        DATA_OUT            => NOC_bus_In(15 downto 8),
+        noc_cmd_t           => noc_cmd2_t, 
+	    rd_trig_t           => rd_trig2_t                    
+);
+
+    probe0_i(15 downto 0) <= NOC_bus_In;
+    probe1_i(15 downto 0) <= NOC_bus_Out;
+    probe2_i(4 downto 0)  <= noc_cmd1_t;
+    probe3_i(4 downto 0)  <= noc_cmd2_t;
+    probe4_i(0)           <= rd_trig1_t;
+    probe5_i(0)           <= rd_trig2_t;
+    probe6_i(0)           <= Tag_Line;
+    probe7_i(0)           <= TAG_FB1;
+    probe8_i(0)           <= TAG_FB2;
+    probe9_i(0)           <= Tag_Line; 
+
+
+Ila_Imsys : ila_6
+port map
+(
+	clk => REF_CLK_i,
+	probe0 => probe0_i, 
+	probe1 => probe1_i, 
+	probe2 => probe2_i, 
+	probe3 => probe3_i, 
+	probe4 => probe4_i, 
+	probe5 => probe5_i, 
+	probe6 => probe6_i, 
+	probe7 => probe7_i, 
+	probe8 => probe8_i,
+	probe9 => probe9_i
+);
+   
 
 end struct;

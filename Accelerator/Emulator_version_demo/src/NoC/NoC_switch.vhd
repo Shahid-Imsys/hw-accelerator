@@ -39,11 +39,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+
 library work;
 use work.ACC_types.all;
 
+
 entity Noc_Switch is
 port (
+        reset           : in  std_logic;
 		switch_Input    : in  std_logic_vector(255 downto 0);
 		switch_Out_en   : in  std_logic;
 		decoder         : in  std_logic_vector(31 downto 0);
@@ -106,30 +109,35 @@ begin
 	
 	process (switch_mux,switch_bus,switch_mux_In)
 	begin
-		for i in 0 to 1 loop
-			if switch_mux = "0000" then
-			    mux_out(i) <= switch_mux_In(i);    
-			elsif switch_mux = "0001" then
-				mux_out(i) <= switch_bus; ------------------------if it is changing at the same time it may be unstabel??
-			elsif switch_mux = "0010" then
-				if (i > 0) then
-					mux_out(i) <= switch_mux_In(i-1);
-				else
-					mux_out(i) <=(others => '0');
-				end if;
-		    elsif switch_mux = "0011" then
-		        if (i < 1) then
-			        mux_out(i) <= switch_mux_In(i+1);
-				else
-					mux_out(i) <=(others => '0');
-				end if;	
-			else			        	    							
-	            mux_out(i) <=(others => '0');
-	        end if;
-	    end loop;
+        if reset = '1' then
+	        mux_out(0) <=(others => '0');
+	        mux_out(1) <=(others => '0');
+	    else    
+            for i in 0 to 1 loop
+                if switch_mux = "0000" then
+                    mux_out(i) <= switch_mux_In(i);    
+                elsif switch_mux = "0001" then
+                    mux_out(i) <= switch_bus; ------------------------if it is changing at the same time it may be unstabel??
+                elsif switch_mux = "0010" then
+                    if (i > 0) then
+                        mux_out(i) <= switch_mux_In(i-1);
+                    else
+                        mux_out(i) <=(others => '0');
+                    end if;
+                elsif switch_mux = "0011" then
+                    if (i < 1) then
+                        mux_out(i) <= switch_mux_In(i+1);
+                    else
+                        mux_out(i) <=(others => '0');
+                    end if;	
+                else			        	    							
+                    mux_out(i) <=(others => '0');
+                end if;
+            end loop;
+        end if;    
 	end process;  
 	
-	NOC_bus    <= (mux_out(1) &  mux_out(0)) when switch_Out_en = '0';
+	NOC_bus    <= (mux_out(1) &  mux_out(0)) when switch_Out_en = '0' else (others => '0');
 	switch_Out <= mux_out(1) &  mux_out(0);
-		
+	
 end;

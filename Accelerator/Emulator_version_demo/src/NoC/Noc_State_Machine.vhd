@@ -39,7 +39,7 @@ entity Noc_State_Machine is
         clk                     : in  std_logic;
         Gated_CLK_from_PEC      : in  std_logic;
         Reset                   : in  std_logic;
-        TAG_shift               : in  std_logic;                        -- Tag control 
+        TAG_shift               : in  std_logic;                        --Tag control 
         TS                      : in  std_logic_vector(15 downto 0);    -- from command decoder
         PEC_Ready               : in  std_logic;                        -- from command decoder 
         PCIe_ack                : in  std_logic;
@@ -77,7 +77,8 @@ entity Noc_State_Machine is
         pcie_wr_ctl_wrs_t       : in  std_logic;
         CMD_flag_t              : in  std_logic;
         Noc_CMD_flag_t          : in  std_logic;
-        PCIe_req_t              : in  std_logic
+        PCIe_req_t              : in  std_logic;
+        Address_Counter_t       : out std_logic_vector(7 downto 0)
         );
 end Noc_State_Machine;
 
@@ -155,10 +156,10 @@ architecture Behavioral of Noc_State_Machine is
         probe57 : in std_logic_vector(0 downto 0);
         probe58 : in std_logic_vector(11 downto 0);
         probe59 : in std_logic_vector(4 downto 0);
-        probe60 : in std_logic_vector(15 downto 0)	
+        probe60 : in std_logic_vector(15 downto 0)
     );
     end component;
-    
+
     signal  Load_Mode_Reg           : std_logic;
     signal  Reset_LC                : std_logic;   
     signal  Step_LC                 : std_logic;  
@@ -194,11 +195,12 @@ architecture Behavioral of Noc_State_Machine is
     signal  Reg_Area1               : std_logic_vector(6 downto 0);
     signal  Reg_Area2               : std_logic_vector(6 downto 0);
     signal  Reg_Area3               : std_logic_vector(6 downto 0);
-    signal  LC_Equal_LR             : std_logic:= '0';
+    signal  LC_Equal_LR             : std_logic;
     signal  Mem_Out                 : std_logic_vector(23 downto 0);
     signal  Mux1,Mux2               : std_logic_vector(7 downto 0);
     signal  LC_Equal_LR_latch       : std_logic; 
     signal  LC_Equal_LR_extend      : std_logic;
+    signal  TC_Mux                  : std_logic_vector(15 downto 0);
     --internal signals
 	signal  En_PCIe_Data_i          : std_logic;
 	signal  Load_CMD_Reg_i          : std_logic;
@@ -223,69 +225,69 @@ architecture Behavioral of Noc_State_Machine is
 	signal  R_W_PCIe_i              : std_logic;
 	signal  Step_BC_i               : std_logic;
 	signal  Load_Mux_Reg_i          : std_logic;
+	signal  Shift_TC_i              : std_logic;
     --ILA SIGNALS
-    signal probe0  : std_logic_vector(0 downto 0); 
-	signal probe1  : std_logic_vector(0 downto 0); 
-	signal probe2  : std_logic_vector(7 downto 0); 
-	signal probe3  : std_logic_vector(7 downto 0); 
-	signal probe4  : std_logic_vector(0 downto 0); 
-	signal probe5  : std_logic_vector(0 downto 0); 
-	signal probe6  : std_logic_vector(0 downto 0); 
-	signal probe7  : std_logic_vector(0 downto 0); 
-	signal probe8  : std_logic_vector(0 downto 0); 
-	signal probe9  : std_logic_vector(0 downto 0); 
-	signal probe10 : std_logic_vector(0 downto 0); 
-	signal probe11 : std_logic_vector(0 downto 0); 
-	signal probe12 : std_logic_vector(7 downto 0); 
-	signal probe13 : std_logic_vector(0 downto 0); 
-	signal probe14 : std_logic_vector(23 downto 0); 
-	signal probe15 : std_logic_vector(0 downto 0); 
-	signal probe16 : std_logic_vector(7 downto 0); 
-	signal probe17 : std_logic_vector(7 downto 0); 
-	signal probe18 : std_logic_vector(19 downto 0); 
-	signal probe19 : std_logic_vector(19 downto 0); 
-	signal probe20 : std_logic_vector(15 downto 0); 
-	signal probe21 : std_logic_vector(0 downto 0); 
-	signal probe22 : std_logic_vector(0 downto 0); 
-	signal probe23 : std_logic_vector(19 downto 0); 
-	signal probe24 : std_logic_vector(0 downto 0); 
-	signal probe25 : std_logic_vector(0 downto 0); 
-	signal probe26 : std_logic_vector(0 downto 0); 
-	signal probe27 : std_logic_vector(0 downto 0); 
-	signal probe28 : std_logic_vector(0 downto 0); 
-	signal probe29 : std_logic_vector(0 downto 0); 
-	signal probe30 : std_logic_vector(0 downto 0); 
-	signal probe31 : std_logic_vector(0 downto 0); 
-	signal probe32 : std_logic_vector(8 downto 0); 
-	signal probe33 : std_logic_vector(2 downto 0); 
-	signal probe34 : std_logic_vector(0 downto 0); 
-	signal probe35 : std_logic_vector(0 downto 0); 
-	signal probe36 : std_logic_vector(0 downto 0); 
-	signal probe37 : std_logic_vector(0 downto 0); 
-	signal probe38 : std_logic_vector(0 downto 0);
-	signal probe39 : std_logic_vector(0 downto 0);
-    signal probe40 : std_logic_vector(0 downto 0);
-    signal probe41 : std_logic_vector(0 downto 0);
-    signal probe42 : std_logic_vector(0 downto 0);
-    signal probe43 : std_logic_vector(0 downto 0);
-    signal probe44 : std_logic_vector(0 downto 0);
-    signal probe45 : std_logic_vector(0 downto 0);
-    signal probe46 : std_logic_vector(0 downto 0);
-    signal probe47 : std_logic_vector(0 downto 0);
-    signal probe48 : std_logic_vector(0 downto 0);
-    signal probe49 : std_logic_vector(0 downto 0);
-    signal probe50 : std_logic_vector(0 downto 0);
-    signal probe51 : std_logic_vector(0 downto 0);
-    signal probe52 : std_logic_vector(0 downto 0);
-    signal probe53 : std_logic_vector(0 downto 0);
-    signal probe54 : std_logic_vector(0 downto 0);
-    signal probe55 : std_logic_vector(0 downto 0);
-    signal probe56 : std_logic_vector(0 downto 0);
-    signal probe57 : std_logic_vector(0 downto 0);
-    signal probe58 : std_logic_vector(11 downto 0);
-    signal probe59 : std_logic_vector(4 downto 0);
-    signal probe60 : std_logic_vector(15 downto 0);	
-
+    signal probe0_i  : std_logic_vector(0 downto 0); 
+	signal probe1_i  : std_logic_vector(0 downto 0); 
+	signal probe2_i  : std_logic_vector(7 downto 0); 
+	signal probe3_i  : std_logic_vector(7 downto 0); 
+	signal probe4_i  : std_logic_vector(0 downto 0); 
+	signal probe5_i  : std_logic_vector(0 downto 0); 
+	signal probe6_i  : std_logic_vector(0 downto 0); 
+	signal probe7_i  : std_logic_vector(0 downto 0); 
+	signal probe8_i  : std_logic_vector(0 downto 0); 
+	signal probe9_i  : std_logic_vector(0 downto 0); 
+	signal probe10_i : std_logic_vector(0 downto 0); 
+	signal probe11_i : std_logic_vector(0 downto 0); 
+	signal probe12_i : std_logic_vector(7 downto 0); 
+	signal probe13_i : std_logic_vector(0 downto 0); 
+	signal probe14_i : std_logic_vector(23 downto 0); 
+	signal probe15_i : std_logic_vector(0 downto 0); 
+	signal probe16_i : std_logic_vector(7 downto 0); 
+	signal probe17_i : std_logic_vector(7 downto 0); 
+	signal probe18_i : std_logic_vector(19 downto 0); 
+	signal probe19_i : std_logic_vector(19 downto 0); 
+	signal probe20_i : std_logic_vector(15 downto 0); 
+	signal probe21_i : std_logic_vector(0 downto 0); 
+	signal probe22_i : std_logic_vector(0 downto 0); 
+	signal probe23_i : std_logic_vector(19 downto 0); 
+	signal probe24_i : std_logic_vector(0 downto 0); 
+	signal probe25_i : std_logic_vector(0 downto 0); 
+	signal probe26_i : std_logic_vector(0 downto 0); 
+	signal probe27_i : std_logic_vector(0 downto 0); 
+	signal probe28_i : std_logic_vector(0 downto 0); 
+	signal probe29_i : std_logic_vector(0 downto 0); 
+	signal probe30_i : std_logic_vector(0 downto 0); 
+	signal probe31_i : std_logic_vector(0 downto 0); 
+	signal probe32_i : std_logic_vector(8 downto 0); 
+	signal probe33_i : std_logic_vector(2 downto 0); 
+	signal probe34_i : std_logic_vector(0 downto 0); 
+	signal probe35_i : std_logic_vector(0 downto 0); 
+	signal probe36_i : std_logic_vector(0 downto 0); 
+	signal probe37_i : std_logic_vector(0 downto 0); 
+	signal probe38_i : std_logic_vector(0 downto 0);
+	signal probe39_i : std_logic_vector(0 downto 0);
+    signal probe40_i : std_logic_vector(0 downto 0);
+    signal probe41_i : std_logic_vector(0 downto 0);
+    signal probe42_i : std_logic_vector(0 downto 0);
+    signal probe43_i : std_logic_vector(0 downto 0);
+    signal probe44_i : std_logic_vector(0 downto 0);
+    signal probe45_i : std_logic_vector(0 downto 0);
+    signal probe46_i : std_logic_vector(0 downto 0);
+    signal probe47_i : std_logic_vector(0 downto 0);
+    signal probe48_i : std_logic_vector(0 downto 0);
+    signal probe49_i : std_logic_vector(0 downto 0);
+    signal probe50_i : std_logic_vector(0 downto 0);
+    signal probe51_i : std_logic_vector(0 downto 0);
+    signal probe52_i : std_logic_vector(0 downto 0);
+    signal probe53_i : std_logic_vector(0 downto 0);
+    signal probe54_i : std_logic_vector(0 downto 0);
+    signal probe55_i : std_logic_vector(0 downto 0);
+    signal probe56_i : std_logic_vector(0 downto 0);
+    signal probe57_i : std_logic_vector(0 downto 0);
+    signal probe58_i : std_logic_vector(11 downto 0);
+    signal probe59_i : std_logic_vector(4 downto 0);
+    signal probe60_i : std_logic_vector(15 downto 0);
 
 begin
 
@@ -312,6 +314,8 @@ begin
     R_W_PCIe              <= R_W_PCIe_i;
     Step_BC               <= Step_BC_i;
     Load_Mux_Reg          <= Load_Mux_Reg_i;
+    
+    Address_Counter_t     <= Address_Counter;
 
     Program_Memory : blk_mem_gen_1
     port map 
@@ -322,9 +326,10 @@ begin
         douta => Program_Mem_Out
     );
 
-    Mem_Out                     <= Program_Mem_Out when reset ='0' else (others => '0');
+    Mem_Out                     <= Program_Mem_Out;
     TSx16                       <= TS & "0000";
-    Loop_Mux                    <= x"000" & Control_Data  when Mode_Reg(6)= '0' else (TSx16); 
+    Loop_Mux                    <= x"000" & Control_Data  when Mode_Reg(6)= '0' else (TSx16);
+    TC_Mux                      <= TS                     when Shift_TC_i = '0' else '0' & TS(15 downto 1);
     Jump_condition_Mux          <= CMD_FF               when Mode_Reg(2 downto 0) = "000" else 
                                    PEC_Ready            when Mode_Reg(2 downto 0) = "001" else 
                                    not(PCIe_ack)        when Mode_Reg(2 downto 0) = "011" else 
@@ -378,283 +383,267 @@ begin
 
     process(clk, reset)
     begin
-            if reset = '1' then
-                Load_MD_Reg_i               <= '0';
-                Step_MDC_i                  <= '0';
-                Step_BC_i                   <= '0';
-                Reset_BC_i                  <= '0';
-                Start_Tag_Shift             <= '0';
-                Load_RM_as_gen              <= '0';
-                Load_CMD_Reg                <= '0';
-                Set_PEC_FF2                 <= '0';
-                Reset_MDC                   <= '0';
-                Load_Mux_Reg                <= '0';
-                Load_PEC_Reg                <= '0';
-                Load_Tag_Shift_Counter      <= '0';
-                Load_PCIe_CMD_Reg           <= '0';
-                Control_Data_Out            <= (others => '0');
-                Load_NOC_Reg                <= '0';
-                En_NOC_Transfer             <= '0';
-                En_RM                       <= '0';
-                En_PCIe_ctrl                <= '0';
-                En_PCIe_Data                <= '0';
-                
-                LC_Equal_LR_latch           <= '0';
-                Control_Data                <= (others => '0');               
-                Load_Mux_Reg_i              <= '0';
-                Load_Mode_Reg               <= '0';
-                Load_LR                     <= '0';
-                Load_PEC_Reg_i              <= '0'; 
-                Load_Tag_Shift_Counter_i    <= '0';
-                Load_Return_Reg1            <= '0';
-                Load_Return_Reg2            <= '0';
-                Load_Req_reg                <= '0';                   
-                Load_NOC_reg_i              <= '0';
-                En_NOC_Transfer_i           <= '0';
-                En_RM_i                     <= '0';
-                En_PCIe_ctrl_i              <= '0';
-                En_PCIe_Data_i              <= '0';                
-                Start_TAG_Shift_i           <= '0';
-                Load_RM_as_gen_i            <= '0';
-                Load_TC                     <= '0';
-                Reset_CM_Flag               <= '0';           
-                Load_CMD_Reg_i              <= '0';  
-                Set_PEC_FF2_i               <= '0';      
-                Reset_MDC_i                 <= '0';           
-                Step_LC                     <= '0';
-                Decr_TC                     <= '0';
-                Reset_LC_i                  <= '0';
-                Loop_Counter                <= (others => '0');
-                Loop_Register               <= (others => '0');
-                Transfer_Counter            <= (others => '0');
-                Return_Reg1                 <= (others => '0');
-                Return_Reg2                 <= (others => '0');
-                Mode_Reg                    <= (others => '0');
-                Loop_Mux                    <= (others => '0');
-                TC_Equal_Zero               <= '0';
-                Address_Counter             <= (others => '0');
-            elsif rising_edge(clk) then                
+        if reset = '1' then
+            Load_MD_Reg_i               <= '0';
+            Step_MDC_i                  <= '0';
+            Step_BC_i                   <= '0';
+            Reset_BC_i                  <= '0';
+            Load_PCIe_CMD_Reg_i         <= '0';
+            Control_Data_Out            <= (others => '0');
+            LC_Equal_LR_latch           <= '0';
+            Control_Data                <= (others => '0');               
+            Load_Mux_Reg_i              <= '0';
+            Load_Mode_Reg               <= '0';
+            Load_LR                     <= '0';
+            Load_PEC_Reg_i              <= '0'; 
+            Load_Tag_Shift_Counter_i    <= '0';
+            Load_Return_Reg1            <= '0';
+            Load_Return_Reg2            <= '0';
+            Load_Req_reg_i              <= '0';
+            Load_NOC_reg_i              <= '0';
+            En_NOC_Transfer_i           <= '0';
+            En_RM_i                     <= '0';
+            En_PCIe_ctrl_i              <= '0';
+            En_PCIe_Data_i              <= '0';
+            Start_TAG_Shift_i           <= '0';
+            Load_RM_as_gen_i            <= '0';
+            Load_TC                     <= '0';
+            Reset_CM_Flag               <= '0';
+            Load_CMD_Reg_i              <= '0';  
+            Set_PEC_FF2_i               <= '0';      
+            Reset_MDC_i                 <= '0';           
+            Step_LC                     <= '0';
+            Decr_TC                     <= '0';
+            Reset_LC_i                  <= '0';
+            Loop_Counter                <= (others => '0');
+            Loop_Register               <= (others => '0');
+            Transfer_Counter            <= (others => '0');
+            Return_Reg1                 <= (others => '0');
+            Return_Reg2                 <= (others => '0');
+            Mode_Reg                    <= (others => '0');
+            TC_Equal_Zero               <= '0';
+            Address_Counter             <= (others => '0');
+            Shift_TC_i                  <= '0';
+        elsif rising_edge(clk) then
+            LC_Equal_LR_latch           <= LC_Equal_LR;
+            Control_Data                <= Mem_Out(7 downto 0);
+            Control_Data_Out            <= Mem_Out(7 downto 0);
+            
+            Load_Mux_Reg_i              <= Decoder1(0);
+            Load_Mode_Reg               <= Decoder1(1);
+            Load_LR                     <= Decoder1(2);
+            Load_PEC_Reg_i              <= Decoder1(3);    
+            Load_Tag_Shift_Counter_i    <= Decoder1(4);
+            Load_Return_Reg1            <= Decoder1(5);
+            Load_Return_Reg2            <= Decoder1(6);
+            Load_PCIe_CMD_Reg_i         <= Decoder1(7);    
+            Load_Req_reg_i              <= Decoder1(8);     
+            
+            Load_NOC_reg_i              <= Mem_Out(12);
+            En_NOC_Transfer_i           <= Mem_Out(13);
+            En_RM_i                     <= Mem_Out(15);
+            En_PCIe_ctrl_i              <= Mem_Out(16);     
+            En_PCIe_Data_i              <= Mem_Out(17);    
+            
+            Start_TAG_Shift_i           <= Decoder2(0) and Mem_Out(0); 
+            Load_RM_as_gen_i            <= Decoder2(0) and Mem_Out(1);
+            Load_TC                     <= Decoder2(0) and Mem_Out(4);
+            Reset_CM_Flag               <= Decoder2(0) and Mem_Out(5);				
+            Shift_TC_i                  <= Decoder2(0) and Mem_Out(6);
+            Load_CMD_Reg_i              <= Decoder2(1) and Mem_Out(0);     
+            Set_PEC_FF2_i               <= Decoder2(1) and Mem_Out(2);      
+            Reset_MDC_i                 <= Decoder2(1) and Mem_Out(3);     
+            
+            Load_MD_Reg_i               <= Decoder2(2) and Mem_Out(0);    
+            Step_MDC_i                  <= Decoder2(2) and Mem_Out(1);    
+            Step_LC                     <= Decoder2(2) and Mem_Out(2);
+            Step_BC_i                   <= Decoder2(2) and Mem_Out(3);
+            Decr_TC                     <= Decoder2(2) and Mem_Out(4);
+            Reset_LC_i                  <= Decoder2(2) and Mem_Out(5);
+            Reset_BC_i                  <= Decoder2(2) and Mem_Out(6);
 
-                LC_Equal_LR_latch           <= LC_Equal_LR;
-                Control_Data                <= Mem_Out(7 downto 0);
-                Control_Data_Out            <= Mem_Out(7 downto 0);
-                
-                Load_Mux_Reg_i              <= Decoder1(0);
-                Load_Mode_Reg               <= Decoder1(1);
-                Load_LR                     <= Decoder1(2);
-                Load_PEC_Reg_i              <= Decoder1(3);    
-                Load_Tag_Shift_Counter_i    <= Decoder1(4);
-                Load_Return_Reg1            <= Decoder1(5);
-                Load_Return_Reg2            <= Decoder1(6);
-                Load_PCIe_CMD_Reg           <= Decoder1(7);    
-                Load_Req_reg                <= Decoder1(8);     
-                
-                Load_NOC_reg_i              <= Mem_Out(12);
-                En_NOC_Transfer_i           <= Mem_Out(13);
-                En_RM_i                     <= Mem_Out(15);
-                En_PCIe_ctrl_i              <= Mem_Out(16);     
-                En_PCIe_Data_i              <= Mem_Out(17);    
-                
-                Start_TAG_Shift_i           <= Decoder2(0) and Mem_Out(0); 
-                Load_RM_as_gen_i            <= Decoder2(0) and Mem_Out(1);
-                Load_TC                     <= Decoder2(0) and Mem_Out(4);
-                Reset_CM_Flag               <= Decoder2(0) and Mem_Out(5);            
-                Load_CMD_Reg_i              <= Decoder2(1) and Mem_Out(0);     
-                Set_PEC_FF2_i               <= Decoder2(1) and Mem_Out(2);      
-                Reset_MDC_i                 <= Decoder2(1) and Mem_Out(3);     
-                
-                Load_MD_Reg_i               <= Decoder2(2) and Mem_Out(0);    
-                Step_MDC_i                  <= Decoder2(2) and Mem_Out(1);    
-                Step_LC                     <= Decoder2(2) and Mem_Out(2);
-                Step_BC_i                   <= Decoder2(2) and Mem_Out(3);
-                Decr_TC                     <= Decoder2(2) and Mem_Out(4);
-                Reset_LC_i                  <= Decoder2(2) and Mem_Out(5);
-                Reset_BC_i                  <= Decoder2(2) and Mem_Out(6);   
-    
-                if Reset_LC_i = '1' then 
-                    Loop_Counter    <= (others => '0');
-                elsif Step_LC = '1' then
-                    Loop_Counter    <= Loop_Counter + '1';
-                end if;    
-    
-                if Load_LR = '1' then
-                    Loop_Register   <= Loop_Mux;
-                end if;          
-                 
-                if Transfer_Counter = x"0000" then
-                    TC_Equal_Zero    <= '1';
-                else
-                    TC_Equal_Zero    <= '0';
-                end if;
-                
-                if Load_TC = '1' then
-                    Transfer_Counter <= TS;
-                elsif Decr_TC ='1' then
-                    Transfer_Counter <= Transfer_Counter - '1';
-                end if; 
-                
-                if Load_AS_Counter = '1' then
-                    Address_Counter   <=  AS_Counter_Mux;
-                elsif Enable_AS_Counter = '1' then
-                    Address_Counter   <= Address_Counter + 1;
-                end if;
-    
-                if Load_Return_Reg1 = '1' then 
-                    Return_Reg1     <=  Control_Data;
-                end if;
-                
-                if Load_Return_Reg2 = '1' then 
-                    Return_Reg2     <=  Control_Data;
-                end if;
-                
-                if Load_Mode_Reg = '1' then 
-                    Mode_Reg        <=  Control_Data;
-                end if;
-                
-        end if;  --clock
+            if Reset_LC_i = '1' then 
+                Loop_Counter    <= (others => '0');
+            elsif Step_LC = '1' then
+                Loop_Counter    <= Loop_Counter + '1';
+            end if;    
+
+            if Load_LR = '1' then
+                Loop_Register   <= Loop_Mux;
+            end if;
+             
+            if Transfer_Counter = x"0000" then
+                TC_Equal_Zero    <= '1';
+            else
+                TC_Equal_Zero    <= '0';
+            end if;
+            
+            if Load_TC = '1' then
+                Transfer_Counter <= TC_Mux; --TS;
+            elsif Decr_TC ='1' then
+                Transfer_Counter <= Transfer_Counter - '1';
+            end if;
+            
+            if Load_AS_Counter = '1' then
+                Address_Counter   <=  AS_Counter_Mux;
+            elsif Enable_AS_Counter = '1' then
+                Address_Counter   <= Address_Counter + 1;
+            end if;
+
+            if Load_Return_Reg1 = '1' then 
+                Return_Reg1     <=  Control_Data;
+            end if;
+            
+            if Load_Return_Reg2 = '1' then 
+                Return_Reg2     <=  Control_Data;
+            end if;
+            
+            if Load_Mode_Reg = '1' then 
+                Mode_Reg        <=  Control_Data;
+            end if;
+        end if; --reset
     end process;
 
-    process(Gated_CLK_from_PEC)
+    process(Gated_CLK_from_PEC, reset)
     begin
-        if rising_edge(Gated_CLK_from_PEC) then
-            if reset = '1'then
-                CM_Flag_Latch <= '0';             
-            elsif Reset_CM_Flag = '1' then
+        if reset = '1'then
+            CM_Flag_Latch <= '0';
+        elsif rising_edge(Gated_CLK_from_PEC) then
+            if Reset_CM_Flag = '1' then
                 CM_Flag_Latch <= '0';
             else
                 CM_Flag_Latch <= Cond_Wait; 
             end if;
         end if;
     end process;
-            
-        
-    probe0(0)           <= h2c_cmd_t;
-    probe1(0)           <= CMD_flag_t;
-    probe2(7 downto 0)  <= Mux2;
-    probe3(7 downto 0)  <= Return_Reg2;
-    probe4(0)           <= Noc_CMD_flag_t;
-    probe5(0)           <= PCIe_req_t;
-    probe6(0)           <= c2h_cmd_t;
-    probe7(0)           <= PCIe_ack;
-    probe8(0)           <= En_PCIe_Data_i;
-    probe9(0)           <= pcie_wr_data_wrs_t;
-    probe10(0)          <= pcie_wr_ctl_wrs_t;
-    probe11(0)          <= Load_AS_Counter;
-    probe12(7 downto 0) <= Address_Counter;
-    probe13(0)          <= Enable_AS_Counter;
-    probe14(23 downto 0)<= Program_Mem_Out;
-    probe15(0)          <= Load_Mode_Reg;
-    probe16(7 downto 0) <= Mode_Reg;
-    probe17(7 downto 0) <= AS_Counter_Mux;
-    probe18(19 downto 0)<= Loop_Counter;
-    probe19(19 downto 0)<= Loop_Register;
-    probe20(15 downto 0)<= Transfer_Counter;
-    probe21(0)          <= TC_Equal_Zero;
-    probe22(0)          <= LC_Equal_LR;
-    probe23(19 downto 0)<= Loop_Mux;
-    probe24(0)          <= CMD_FF;
-    probe25(0)          <= Load_MD_Reg_i;
-    probe26(0)          <= CM_Flag_Latch;
-    probe27(0)          <= Load_Tag_Shift_Counter_i;
-    probe28(0)          <= Start_TAG_Shift_i;
-    probe29(0)          <= Tag_shift;
-    probe30(0)          <= Load_CMD_Reg_i;
-    probe31(0)          <= Jump_condition_Mux;
-    probe32(8 downto 0) <= decoder1;
-    probe33(2 downto 0) <= decoder2;
-    probe34(0)          <= Cond_Wait;
-    probe35(0)          <= Wait_condition_Mux;
-    probe36(0)          <= LC_Equal_LR_latch;
-    probe37(0)          <= LC_Equal_LR_extend;
-    probe38(0)          <= Mux1(0);
-    probe39(0)          <= Mux1(1);
-    probe40(0)          <= PEC_Ready;
-    probe41(0)          <= CMD_FF;
-    probe42(0)          <= PCIe_ready;
-    probe43(0)          <= Load_RM_as_gen_i;
-    probe44(0)          <= Load_PEC_Reg_i;
-    probe45(0)          <= Load_PEC_Reg_i;
-    probe46(0)          <= Load_PCIe_CMD_Reg_i;
-    probe47(0)          <= Load_Req_reg_i;
-    probe48(0)          <= En_PCIe_ctrl_i;
-    probe49(0)          <= Set_PEC_FF2_i;
-    probe50(0)          <= En_NOC_Transfer_i;
-    probe51(0)          <= En_RM_i;
-    probe52(0)          <= En_RM_i;
-    probe53(0)          <= R_W_RM_i;
-    probe54(0)          <= R_W_PCIe_i;
-    probe55(0)          <= Step_BC_i;
-    probe56(0)          <= Load_Mux_Reg_i;
-    probe57(0)          <= Reset;
-    probe58(11 downto 0)<= Opcode;
-    probe59(4 downto 0) <= BC;
-    probe60(15 downto 0)<= TS;
-    
-    
+	 
+    probe0_i(0)           <= h2c_cmd_t;
+    probe1_i(0)           <= CMD_flag_t;
+    probe2_i(7 downto 0)  <= Mux2;
+    probe3_i(7 downto 0)  <= Return_Reg2;
+    probe4_i(0)           <= Noc_CMD_flag_t;
+    probe5_i(0)           <= PCIe_req_t;
+    probe6_i(0)           <= c2h_cmd_t;
+    probe7_i(0)           <= PCIe_ack;
+    probe8_i(0)           <= En_PCIe_Data_i;
+    probe9_i(0)           <= pcie_wr_data_wrs_t;
+    probe10_i(0)          <= pcie_wr_ctl_wrs_t;
+    probe11_i(0)          <= Load_AS_Counter;
+    probe12_i(7 downto 0) <= Address_Counter;
+    probe13_i(0)          <= Enable_AS_Counter;
+    probe14_i(23 downto 0)<= Program_Mem_Out;
+    probe15_i(0)          <= Load_Mode_Reg;
+    probe16_i(7 downto 0) <= Mode_Reg;
+    probe17_i(7 downto 0) <= AS_Counter_Mux;
+    probe18_i(19 downto 0)<= Loop_Counter;
+    probe19_i(19 downto 0)<= Loop_Register;
+    probe20_i(15 downto 0)<= Transfer_Counter;
+    probe21_i(0)          <= TC_Equal_Zero;
+    probe22_i(0)          <= LC_Equal_LR;
+    probe23_i(19 downto 0)<= Loop_Mux;
+    probe24_i(0)          <= CMD_FF;
+    probe25_i(0)          <= Load_MD_Reg_i;
+    probe26_i(0)          <= CM_Flag_Latch;
+    probe27_i(0)          <= Load_Tag_Shift_Counter_i;
+    probe28_i(0)          <= Start_TAG_Shift_i;
+    probe29_i(0)          <= Tag_shift;
+    probe30_i(0)          <= Load_CMD_Reg_i;
+    probe31_i(0)          <= Jump_condition_Mux;
+    probe32_i(8 downto 0) <= decoder1;
+    probe33_i(2 downto 0) <= decoder2;
+    probe34_i(0)          <= Cond_Wait;
+    probe35_i(0)          <= Wait_condition_Mux;
+    probe36_i(0)          <= LC_Equal_LR_latch;
+    probe37_i(0)          <= LC_Equal_LR_extend;
+    probe38_i(0)          <= Mux1(0);
+    probe39_i(0)          <= Mux1(1);
+    probe40_i(0)          <= PEC_Ready;
+    probe41_i(0)          <= CMD_FF;
+    probe42_i(0)          <= PCIe_ready;
+    probe43_i(0)          <= Load_RM_as_gen_i;
+    probe44_i(0)          <= Load_PEC_Reg_i;
+    probe45_i(0)          <= Load_PEC_Reg_i;
+    probe46_i(0)          <= Load_PCIe_CMD_Reg_i;
+    probe47_i(0)          <= Load_Req_reg_i;
+    probe48_i(0)          <= En_PCIe_ctrl_i;
+    probe49_i(0)          <= Set_PEC_FF2_i;
+    probe50_i(0)          <= En_NOC_Transfer_i;
+    probe51_i(0)          <= En_RM_i;
+    probe52_i(0)          <= En_RM_i;
+    probe53_i(0)          <= R_W_RM_i;
+    probe54_i(0)          <= R_W_PCIe_i;
+    probe55_i(0)          <= Step_BC_i;
+    probe56_i(0)          <= Load_Mux_Reg_i;
+    probe57_i(0)          <= Reset;
+    probe58_i(11 downto 0)<= Opcode;
+    probe59_i(4 downto 0) <= BC;
+    probe60_i(15 downto 0)<= TS;
+
+    	
     Ila_NOC : ila_2
     port map(
-	clk => clk,
-	probe0 => probe0, 
-	probe1 => probe1, 
-	probe2 => probe2, 
-	probe3 => probe3, 
-	probe4 => probe4, 
-	probe5 => probe5, 
-	probe6 => probe6, 
-	probe7 => probe7, 
-	probe8 => probe8, 
-	probe9 => probe9, 
-	probe10 => probe10, 
-	probe11 => probe11, 
-	probe12 => probe12, 
-	probe13 => probe13, 
-	probe14 => probe14, 
-	probe15 => probe15, 
-	probe16 => probe16, 
-	probe17 => probe17, 
-	probe18 => probe18, 
-	probe19 => probe19, 
-	probe20 => probe20, 
-	probe21 => probe21, 
-	probe22 => probe22, 
-	probe23 => probe23, 
-	probe24 => probe24, 
-	probe25 => probe25, 
-	probe26 => probe26, 
-	probe27 => probe27, 
-	probe28 => probe28, 
-	probe29 => probe29, 
-	probe30 => probe30, 
-	probe31 => probe31, 
-	probe32 => probe32, 
-	probe33 => probe33, 
-	probe34 => probe34, 
-	probe35 => probe35, 
-	probe36 => probe36, 
-	probe37 => probe37, 
-	probe38 => probe38,
-	probe39 => probe39,
-	probe40 => probe40, 
-	probe41 => probe41, 
-	probe42 => probe42, 
-	probe43 => probe43, 
-	probe44 => probe44, 
-	probe45 => probe45, 
-	probe46 => probe46, 
-	probe47 => probe47, 
-	probe48 => probe48,
-	probe49 => probe49,
-	probe50 => probe50, 
-	probe51 => probe51, 
-	probe52 => probe52, 
-	probe53 => probe53, 
-	probe54 => probe54, 
-	probe55 => probe55, 
-	probe56 => probe56, 
-	probe57 => probe57, 
-	probe58 => probe58,
-	probe59 => probe59,
-	probe60 => probe60			
+	clk 	=> clk,
+    probe0  => probe0_i, 
+	probe1  => probe1_i, 
+	probe2  => probe2_i, 
+	probe3  => probe3_i, 
+	probe4  => probe4_i, 
+	probe5  => probe5_i, 
+	probe6  => probe6_i, 
+	probe7  => probe7_i, 
+	probe8  => probe8_i, 
+	probe9  => probe9_i, 
+	probe10 => probe10_i,
+	probe11 => probe11_i,
+	probe12 => probe12_i,
+	probe13 => probe13_i,
+	probe14 => probe14_i,
+	probe15 => probe15_i,
+	probe16 => probe16_i,
+	probe17 => probe17_i,
+	probe18 => probe18_i,
+	probe19 => probe19_i,
+	probe20 => probe20_i,
+	probe21 => probe21_i,
+	probe22 => probe22_i,
+	probe23 => probe23_i,
+	probe24 => probe24_i,
+	probe25 => probe25_i,
+	probe26 => probe26_i,
+	probe27 => probe27_i,
+	probe28 => probe28_i,
+	probe29 => probe29_i,
+	probe30 => probe30_i,
+	probe31 => probe31_i, 
+	probe32 => probe32_i, 
+	probe33 => probe33_i, 
+	probe34 => probe34_i, 
+	probe35 => probe35_i, 
+	probe36 => probe36_i, 
+	probe37 => probe37_i, 
+	probe38 => probe38_i,
+	probe39 => probe39_i,
+	probe40 => probe40_i, 
+	probe41 => probe41_i, 
+	probe42 => probe42_i, 
+	probe43 => probe43_i, 
+	probe44 => probe44_i, 
+	probe45 => probe45_i, 
+	probe46 => probe46_i, 
+	probe47 => probe47_i, 
+	probe48 => probe48_i,
+	probe49 => probe49_i,
+	probe50 => probe50_i, 
+	probe51 => probe51_i, 
+	probe52 => probe52_i, 
+	probe53 => probe53_i, 
+	probe54 => probe54_i, 
+	probe55 => probe55_i, 
+	probe56 => probe56_i, 
+	probe57 => probe57_i, 
+	probe58 => probe58_i,
+	probe59 => probe59_i,
+	probe60 => probe60_i			
 );
 
 end Behavioral;

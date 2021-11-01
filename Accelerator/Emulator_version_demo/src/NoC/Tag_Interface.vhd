@@ -56,38 +56,38 @@ begin
 
     process (clk, reset)
     begin  
-        if reset = '0' then
-                PEC_Reg         <= (others => '0');
-                PEC_CMD_Ready   <= '0';
-                PEC_Arg_Ready   <= '0';
-                Tag_shift_p     <= '0';
-                Tag_Line        <= '0';
+        if reset = '1' then
+            PEC_Reg         <= (others => '0');
+            PEC_CMD_Ready   <= '0';
+            PEC_Arg_Ready   <= '0';
+            Tag_shift_p     <= '0';
+            Tag_Line        <= '0';
         elsif rising_edge(clk) then
-           
-                Tag_shift_p     <= Tag_shift;           
-                if Load_TAG_Cmd_reg = '1' then
-                    PEC_Reg(36 downto 31)       <= PEC_CMD;  -- to add one cycle for CC command buffer
-                    PEC_Reg(30)                 <= '0';      -- to add one cycle for CC command buffer
-                    PEC_CMD_Ready               <= '1';
-                end if;
-    
-                if Load_TAG_Arg_reg = '1' then
-                    PEC_Reg(29 downto 15)       <= PEC_TS;
-                    PEC_Reg(14 downto 0)        <= PEC_AS;
-                    PEC_Arg_Ready               <= '1'; 
-                end if;    
-    
-                if Tag_shift = '1' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
-                    Tag_Line                    <= PEC_Reg(36); 
-                    PEC_Reg(36 downto 0)        <= PEC_Reg(35 downto 0) & '0';                
-                end if;
-    
-                if Tag_shift = '0' and Tag_shift_p = '1' then
-                    PEC_CMD_Ready               <= '0';
-                    PEC_Arg_Ready               <= '0';
-                    Tag_Line                    <= '0';
-                    PEC_Reg                     <= ( others => '0'); 
-                end if;       
-        end if;    
+
+            Tag_shift_p     <= Tag_shift;           
+            if Load_TAG_Cmd_reg = '1' then
+                PEC_Reg(36 downto 31)       <= PEC_CMD;  -- to add one cycle for CC command buffer
+                PEC_Reg(30)                 <= '0';      -- to add one cycle for CC command buffer
+                PEC_CMD_Ready               <= '1';
+            end if;
+
+            if Load_TAG_Arg_reg = '1' then
+                PEC_Reg(29 downto 15)       <= PEC_TS;
+                PEC_Reg(14 downto 0)        <= PEC_AS;
+                PEC_Arg_Ready               <= '1'; 
+            end if;    
+
+            if Tag_shift = '1' and PEC_CMD_Ready = '1' and PEC_Arg_Ready = '1' then
+                Tag_Line                    <= PEC_Reg(36); 
+                PEC_Reg(36 downto 0)        <= PEC_Reg(35 downto 0) & '0';                
+            end if;
+                         
+            if Tag_shift = '0' and Tag_shift_p = '1' then
+                PEC_CMD_Ready               <= '0';
+                PEC_Arg_Ready               <= '0';
+                Tag_Line                    <= '0';
+                PEC_Reg                     <= ( others => '0'); 
+            end if;
+        end if;
     end process;
 end;

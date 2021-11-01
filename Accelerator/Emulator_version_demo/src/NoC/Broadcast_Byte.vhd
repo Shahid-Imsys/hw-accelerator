@@ -51,19 +51,19 @@ architecture Behavioral of Broadcast_Byte is
 
 begin
 
-    process (clk, reset)
+    process (clk,reset)
     begin
-      if reset = '1' then
-        Counter <= (others => '0');
-      elsif rising_edge(clk) then
-        if Reset_BC = '1' then
-          Counter <= (others => '0');
-        elsif Step_BC = '1' then     
-          Counter <= Counter + '1';
-        else 
-          Counter <= (others => '0');
+        if reset = '1' then
+            Counter <= (others => '0');
+        elsif rising_edge(clk) then
+            if Reset_BC = '1' then
+               Counter <= (others => '0');
+            elsif Step_BC = '1' then     
+               Counter <= Counter + '1';
+            else 
+               Counter <= (others => '0');
+            end if;
         end if;
-      end if;
     end process;
     
     decoder <= "00000000000000000000000000000001"   when Counter = "00000" else
@@ -77,9 +77,9 @@ begin
                "00000000000000000000000100000000"   when Counter = "01000" else
                "00000000000000000000001000000000"   when Counter = "01001" else
                "00000000000000000000010000000000"   when Counter = "01010" else
-               "00000000000000000000100000000000"   when Counter = "01011" else               
-               "00000000000000000001000000000000"   when Counter = "01100" else               
-               "00000000000000000010000000000000"   when Counter = "01101" else                            
+               "00000000000000000000100000000000"   when Counter = "01011" else
+               "00000000000000000001000000000000"   when Counter = "01100" else
+               "00000000000000000010000000000000"   when Counter = "01101" else
                "00000000000000000100000000000000"   when Counter = "01110" else               
                "00000000000000001000000000000000"   when Counter = "01111" else               
                "00000000000000010000000000000000"   when Counter = "10000" else               
@@ -104,4 +104,3 @@ begin
     
     
 end Behavioral;
-

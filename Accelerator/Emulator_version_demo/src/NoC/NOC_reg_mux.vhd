@@ -35,6 +35,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity NOC_reg_mux is
   Port(
       clk               : in  std_logic;
+      reset             : in  std_logic;
       select_mux        : in  std_logic_vector(1 downto 0);
       Input_reg_data    : in  std_logic_vector(15 downto 0);
       Root_Memory_data  : in  std_logic_vector(15 downto 0);
@@ -46,9 +47,11 @@ end NOC_reg_mux;
 architecture Behavioral of NOC_reg_mux is
 
 begin
-	process (select_mux,Input_reg_data,Root_Memory_data,Mux_Demux_data)
+	process (select_mux,Input_reg_data,Root_Memory_data,Mux_Demux_data,reset)
 	begin
-	    if select_mux = "00" then
+        if reset = '1' then
+	        Dataout_mux     <= ( others => '0');
+	    elsif select_mux = "00" then
             Dataout_mux     <= x"000000000000000000000000000000000000000000000000000000000000" & Input_reg_data;
         elsif  select_mux = "01" then
             Dataout_mux     <= x"000000000000000000000000000000000000000000000000000000000000" & Root_Memory_data;

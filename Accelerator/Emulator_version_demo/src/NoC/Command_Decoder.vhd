@@ -68,27 +68,28 @@ begin
     process(clk, reset)
     begin
         if reset = '1' then
-          CMD_reg     <= (others => '0');
-          CMD_FF      <= '0';
+            CMD_reg     <= (others => '0');
+            CMD_FF      <= '0';
+			Adder		<= (others => '0');
+			PCIe_length <= (others => '0');
         elsif rising_edge(clk) then
-          if Load_CMD_reg = '1' then
-            CMD_reg <= Noc_data;
-          end if;
-            
-          CMD_FF   <= CMD_flag;
-          PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
-          PEC_FF1  <= PEC_Ready_In;
+            if Load_CMD_reg = '1' then
+                CMD_reg <= Noc_data;
+            end if;
+        
+            CMD_FF   <= CMD_flag;
+            PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
+            PEC_FF1  <= PEC_Ready_In;
+            Adder       <= CMD_reg(22 downto 16) + "0000011";
+            PCIe_length <= Adder(6 downto 2) + "11111";      --number of cache lines - 1               
         end if;
     end process;
 
     PEC_Ready_Out       <= PEC_FF1 and not(PEC_FF2);
 
-    Adder               <= CMD_reg(22 downto 16) + "0000011";
-    PCIe_length         <= Adder(6 downto 2) + "11111";
-
     Opcode              <= CMD_reg(11 downto 0);
     Switch_Ctrl         <= CMD_reg(15 downto 12);
-    Transfer_Size       <= CMD_reg(31 downto 16) + '1';  --for test with CC as CC is currently working with length zero for 1 word.
+    Transfer_Size       <= CMD_reg(31 downto 16);
     PEC_TS_REG          <= CMD_reg(30 downto 16);
     RM_Address          <= CMD_reg(47 downto 32);
     PEC_Address_reg     <= CMD_reg(62 downto 48);

@@ -80,7 +80,7 @@ begin
                     Address   <= Address + 1;
                 end if;
                 Enable_p      <= Enable;
-            end if;                
+            end if;
         end if;
     end process;
     

@@ -137,12 +137,15 @@ entity acore is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(127 downto 0); -- Data input bus --CJ
-    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus --CJ
+    ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus --CJ
+    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus --CJ
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o      : out std_logic_vector(3 downto 0) -- Clock enable
+    dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
+    -- CC interface signals
+    din_c       : in std_logic_vector(127 downto 0);
+    dout_c      : out std_logic_vector(31 downto 0)
 
     ); 
 
@@ -250,6 +253,7 @@ architecture struct of acore is
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
   signal latch        : std_logic_vector(7  downto 0);
+  signal cdfm_int     : std_logic_vector(7 downto 0); --Added by CJ
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -604,6 +608,7 @@ begin
       dfp           => dfp,
        --CJ added
        VE_OUT_D      => ve_out_d_int,
+       CDFM         => cdfm_int,
        --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
@@ -686,14 +691,14 @@ begin
       d_we        => dwe_o,              
       d_dqi       => ddq_i,             
       d_dqo       => ddq_o,
-      ve_data     => ve_in_int,             
+      --ve_data     => ve_in_int,             
       en_dqo      => ddq_en,
 	  ld_dqi_flash => std_logic'('0'), --'0',
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,
-      exe         => exe,    --Added by CJ 
-      LD_MPGM     => std_logic'('0'), --'0',
+      --exe         => exe,    --Added by CJ 
+      --LD_MPGM     => std_logic'('0'), --'0',
       
       --ddi_vld     => ddi_vld,  --Added by CJ        
       d_cke       => dcke_o); 
@@ -715,6 +720,27 @@ begin
       VE_IN       => ve_in_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM => ve_out_dtm_int
+      );
+---------------------------------------------------------------------
+-- CMDR
+---------------------------------------------------------------------
+--Interface of the core and cluster controller
+      cmdr: entity work.cmdr
+      port map(
+        CLK_P    => clk_p,
+        RST_EN   => rst_en_int,
+        CLK_E_NEG => clk_e_neg_int,
+        PL       => pl,
+        EXE      => exe,
+        DATA_VLD => ddi_vld,
+        DIN      => din_c,
+        DOUT     =>dout_c,
+        YBUS     =>ybus,
+        LD_MPGM  =>std_logic'('0'),
+        VE_DIN   =>ve_in_int,
+        DBUS_DATA=>cdfm_int,
+        MPGMM_IN =>open,
+        VE_DTMO  =>ve_out_dtm_int
       );    
 
     i_direct <= x"00"; 

@@ -1233,7 +1233,8 @@ architecture struct of p_top is
     signal c1_d_cas    : std_logic;  -- CAS to SDRAM
     signal c1_d_we     : std_logic;  -- WE to SDRAM
     signal c1_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor --CJ
-    signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from sdram
+    signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+    signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram  
     signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
 	signal c2_d_addr   : std_logic_vector(31 downto 0);
 	signal c2_d_cs     : std_logic;  -- CS to SDRAM
@@ -1242,6 +1243,8 @@ architecture struct of p_top is
     signal c2_d_we     : std_logic;  -- WE to SDRAM
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
+    signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram 
     
   signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
   signal c2_mprom_ce      : std_logic_vector(1 downto 0);  
@@ -2753,12 +2756,15 @@ begin
     dras_o        => c1_d_ras, --: out std_logic;  -- Row address strobe
     dcas_o        => c1_d_cas, --: out std_logic;  -- Column address strobe
     dwe_o         => c1_d_we,  --: out std_logic;  -- Write enable
-    ddq_i         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
-    ddq_o         => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
+    ddq_i         => c1_d_dqo_sd,
+    ddq_o         => c1_d_dqi_sd,
     ddq_en        => ddq_en, --: out std_logic;  -- Data output bus enable
     da_o          => da_o,   --: out std_logic_vector(13 downto 0);  -- Address
     dba_o         => dba_o,  --: out std_logic_vector(1 downto 0); -- Bank address
     dcke_o        => dcke_o, --: out std_logic_vector(3 downto 0); -- Clock enable
+    -- Cluster interface
+    din_c         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
+    dout_c        => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
     -- Port A
     pa_i          => pa_i(4 downto 0), --: in  std_logic_vector(4 downto 0);
 	--pl_out			  => pl_out,
@@ -2872,12 +2878,15 @@ begin
     dras_o        => c2_d_ras,
     dcas_o        => c2_d_cas,
     dwe_o         => c2_d_we,
-    ddq_i         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
-    ddq_o         => c2_d_dqi,   -- out std_logic_vector(31 downto 0); -- Data output bus
+    ddq_i         => c1_d_dqo_sd,
+    ddq_o         => c1_d_dqi_sd,
     ddq_en        => open,
     da_o          => open,
     dba_o         => open,
-    dcke_o        => open -- Clock enable
+    dcke_o        => open, -- Clock enable
+    -- Cluster interface
+    din_c         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
+    dout_c        => c2_d_dqi   -- out std_logic_vector(31 downto 0); -- Data output bus
 
     );  
 

@@ -238,12 +238,16 @@ entity core is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(127 downto 0); -- Ext memory data input bus
-    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus
+    ddq_i       : in  std_logic_vector(7 downto 0); -- Ext memory data input bus
+    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
     dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
+    --CC interface signals
+    din_c       : in std_logic_vector(127 downto 0);
+    dout_c      : out std_logic_vector(31 downto 0);
+    
     -- Port A
     pa_i        : in  std_logic_vector(4 downto 0);
 	--pl_out          : out std_logic_vector(79 downto 0);--maning
@@ -384,7 +388,7 @@ architecture struct of core is
   signal dbus_int     : std_logic_vector(7  downto 0);
   signal latch        : std_logic_vector(7  downto 0);
   signal ve_out_d_int : std_logic_vector(7 downto 0); --Added by CJ      
-  signal ve_out_dtm_int : std_logic_vector(127 downto 0); --Added by CJ     
+  signal cdfm_int     : std_logic_vector(7 downto 0); --Added by CJ     
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -446,6 +450,7 @@ architecture struct of core is
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);    
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -1009,6 +1014,7 @@ begin
       dfp           => dfp,
       --CJ added
       VE_OUT_D      => ve_out_d_int,
+      CDFM          => cdfm_int,
       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
@@ -1067,7 +1073,7 @@ begin
       t_rp        => t_rp,               
       fast_d      => fast_d_int, 
 	  short_cycle => short_cycle_int,
-	  exe         => exe, --CJ Added
+	  --exe         => exe, --CJ Added
       -- Data paths
       dbus        => dbus_int,             
       ybus        => ybus,             
@@ -1092,16 +1098,16 @@ begin
       d_we        => dwe_o,              
       d_dqi       => ddq_i,             
       d_dqo       => ddq_o,
-      ve_data     => ve_in_int,            
+      --ve_data     => ve_in_int,            
       en_dqo      => ddq_en,
       out_line    => out_line,
 	  ld_dqi_flash => ld_dqi_flash,
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,             
-      d_cke       => dcke_o,
-      MPGMM_IN     => mpgmin,
-      LD_MPGM     => ld_mpgm);  --CJ            
+      d_cke       => dcke_o);
+      --MPGMM_IN     => mpgmin,
+      --LD_MPGM     => ld_mpgm);  --CJ            
 
 ---------------------------------------------------------------------
 -- MPLL
@@ -1222,6 +1228,9 @@ begin
       iomem_q        => iomem_q);
 
       --CJ Added
+---------------------------------------------------------------------
+-- VE
+---------------------------------------------------------------------
       vector_engine : entity work.ve
       port map(
       CLK_P       => clk_p,
@@ -1236,6 +1245,27 @@ begin
       VE_IN       => ve_in_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM  => ve_out_dtm_int
+      );
+---------------------------------------------------------------------
+-- CMDR
+---------------------------------------------------------------------
+--Interface of the core and cluster controller
+      cmdr: entity work.cmdr
+      port map(
+        CLK_P    => clk_p,
+        RST_EN   => rst_en_int,
+        CLK_E_NEG => clk_e_neg_int,
+        PL       => pl,
+        EXE      => exe,
+        DATA_VLD => ddi_vld,
+        DIN      => din_c,
+        DOUT     =>dout_c,
+        YBUS     =>ybus,
+        LD_MPGM  =>ld_mpgm,
+        VE_DIN   =>ve_in_int,
+        DBUS_DATA=>cdfm_int,
+        MPGMM_IN =>mpgmin,
+        VE_DTMO  =>ve_out_dtm_int
       );
 end;
 

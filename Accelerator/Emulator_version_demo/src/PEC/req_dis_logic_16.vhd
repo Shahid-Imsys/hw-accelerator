@@ -64,7 +64,7 @@ entity req_dst_logic is
 end entity req_dst_logic;
 
 architecture rtl of req_dst_logic is
-COMPONENT fifo_generator_0
+COMPONENT fifo_generator_1
     PORT (
     clk : IN STD_LOGIC;
     srst : IN STD_LOGIC;
@@ -78,7 +78,9 @@ COMPONENT fifo_generator_0
     almost_empty : OUT STD_LOGIC;
     prog_empty : OUT STD_LOGIC;
     valid      : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(9 downto 0)
+    data_count : OUT STD_LOGIC_VECTOR(9 downto 0);
+    wr_rst_busy : OUT STD_LOGIC;
+    rd_rst_busy : OUT STD_LOGIC
   );
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
@@ -282,7 +284,7 @@ begin
     end if;
 end process;
 DATA_VLD_OUT <= data_vld_out_i; 
-request_fifo : fifo_generator_0
+request_fifo : fifo_generator_1
   PORT MAP (
     clk => clk_e,
     srst => reset,
@@ -296,6 +298,8 @@ request_fifo : fifo_generator_0
     almost_empty => almost_empty,
     prog_empty => prog_empty_i,
     valid      => FIFO_VLD,
-    data_count => data_in_fifo
+    data_count => data_in_fifo,
+    wr_rst_busy => open,
+    rd_rst_busy => open
   );
 end architecture;

@@ -69,7 +69,9 @@ architecture rtl of cmdr is
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    prog_full : OUT STD_LOGIC
+    prog_full : OUT STD_LOGIC;
+    wr_rst_busy : OUT STD_LOGIC;
+    rd_rst_busy : OUT STD_LOGIC
     );
     END COMPONENT;
 
@@ -203,7 +205,9 @@ begin
     dout => DOUT,
     full => open,
     empty => empty,
-    prog_full => open --asserts when 5 words inside
+    prog_full => open, --asserts when 5 words inside
+    wr_rst_busy => open,
+    rd_rst_busy => open
     );
 end architecture;
 

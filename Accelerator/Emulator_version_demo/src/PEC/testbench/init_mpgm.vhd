@@ -77,6 +77,10 @@ architecture Behavioral of init_mpgm is
    signal resume_i : std_logic;
    signal c1_input: std_logic_vector(127 downto 0);
    signal c1_data_vld : std_logic;
+   signal tmp : std_logic := '0';
+   signal tmp1 : std_logic;
+   signal tmp2 : std_logic;
+   signal rst : std_logic := '1';
    
    
 begin
@@ -140,13 +144,19 @@ begin
    wait for 15 ns;
    end process;
    
-   process
+   process(hclk_i)
+   --   variable count : integer := 1;
    begin
-   even_c_i <= '1';
-   wait for 30 ns;
-   even_c_i <= '0';
-   wait for 30 ns;
+      if rst = '1' then
+         rst <= '0';
+         tmp <= '0';
+      elsif hclk_i'event and hclk_i = '1' then
+         tmp <= not tmp;
+      end if;
+      tmp2 <= tmp; 
    end process;
+   --tmp2 <= tmp1;
+   even_c_i <= tmp2;
    
 
    

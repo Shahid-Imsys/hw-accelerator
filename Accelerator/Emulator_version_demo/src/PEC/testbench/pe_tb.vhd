@@ -41,7 +41,7 @@ entity pe_tb is
 end pe_tb;
 
 architecture struct of pe_tb is
-    component p_top
+    component PE_pair_top
         port (
             --Data interface --Added by CJ
             C1_REQ    : out std_logic;
@@ -189,7 +189,7 @@ begin  -- struct
   --MTEST <= '0';	
  --end process;
 
-  top0: p_top
+  top0: PE_pair_top
     port map (
         C1_REQ     => open,
         C2_REQ     => open,

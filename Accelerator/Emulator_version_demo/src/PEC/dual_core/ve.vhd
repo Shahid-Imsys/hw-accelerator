@@ -837,9 +837,10 @@ begin
             
             for i in 0 to 8 loop
                 delay3(i+1) <= delay3(i);
-            end loop;
+            end loop; 
+                ve_out_p <= delay3(9);
         end if;
-            ve_out_p <= delay3(9);
+           
     end if;
 end process;
 --Two modes

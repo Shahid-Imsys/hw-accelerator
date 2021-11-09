@@ -32,7 +32,7 @@ use work.cluster_pkg.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity Cluster_top is
+entity PEC_top is
   Port ( 
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
@@ -45,9 +45,9 @@ entity Cluster_top is
       DATA   : in std_logic_vector(7 downto 0);
       DATA_OUT  : out std_logic_vector(7 downto 0)
   );
-end Cluster_top;
+end PEC_top;
 
-architecture rtl of Cluster_top is
+architecture struct of PEC_top is
 
 component cluster_controller
 port(
@@ -279,7 +279,6 @@ port map(
 	DATA_VLD_OUT => data_vld_to_pe,
     PE_DATA_OUT   => pe_data_out_i
 );
-
 pe_pair_1: p_top
 port map(
 	C1_REQ     => req_sig_i(15),
@@ -520,4 +519,4 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0' 
 );
-end RTL;
+end struct;

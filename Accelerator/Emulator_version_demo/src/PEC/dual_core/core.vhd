@@ -589,7 +589,12 @@ begin
       pmem_ce_n   => pmem_ce_n);    
 
   --mprom_a     <= mpga; --deleted by CJ
-  mpram_d     <= mpgmin;
+  process(clk_p) --1 clk_e delay of input to microprogram memory
+  begin
+    if rising_edge(clk_p) and clk_e_pos_int = '0' then
+        mpram_d     <= mpgmin;
+    end if;
+  end process;
   mpram_we_n  <= not temp when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;

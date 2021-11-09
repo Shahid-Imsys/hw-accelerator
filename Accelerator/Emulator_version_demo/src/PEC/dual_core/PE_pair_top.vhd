@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use work.all;
 use work.gp_pkg.all;
 
-entity p_top is
+entity PE_pair_top is
   port (
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;
@@ -41,9 +41,9 @@ entity p_top is
     MWAKEUP_LP  : in    std_logic                    
 
   );
-end p_top;
+end PE_pair_top;
 
-architecture struct of p_top is
+architecture struct of PE_pair_top is
 
 
   ------------------------------------------------------

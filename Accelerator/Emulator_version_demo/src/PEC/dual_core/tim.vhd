@@ -188,7 +188,9 @@ architecture rtl of tim is
 	attribute syn_keep   : boolean;
 	signal pl_shin_pa_sig:  std_logic_vector(3 downto 0); -- Used for CALL SP & ACK SPREQ
 	signal pl_alud_sig   : std_logic; -- Only bit 2 used here
-	attribute syn_keep of held_e_int : signal is true;  
+	attribute syn_keep of held_e_int : signal is true;
+	signal clk_e_pos_i   : std_logic; -- Added by CJ
+	signal clk_e_neg_i   : std_logic; -- Added by CJ  
 begin
 ---------------------------------------------------------------------
 -- Reset generation &
@@ -332,8 +334,10 @@ begin
 	-- Generate din_e, this is the D input expression for the
 	-- FF in the clock block that generates clk_e. Also generate
 	-- gate_e, a copy of clk_e used for gating, not for clocking.
-	clk_e_neg <= not even_c or held_e_int or hold_flash;
-    clk_e_pos <= even_c or held_e_int or hold_flash;
+	clk_e_neg_i <= not even_c or held_e_int or hold_flash;
+    clk_e_pos_i <= even_c or held_e_int or hold_flash;
+	clk_e_neg <= clk_e_neg_i; --Added one delta delay by CJ
+	clk_e_pos <= clk_e_pos_i; --Added one delta delay by CJ
     --gate_e <= even_c or held_e_int;
 	
 	-- These FFs split clk_c by four and eight for clk_i generation.

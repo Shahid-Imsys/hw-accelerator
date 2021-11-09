@@ -33,6 +33,7 @@
 -- 2021-6-29             3.0         CJ         Add PE related logic and interface
 --                                              Added clk_p and clk_e_neg for generate signals at falling_edge
 -- 2021-8-9              3.1         CJ         Add even pulse signal generator
+-- 2021-11-2             3.2         CJ         Make broadcast request an independent process than unicast and write
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -152,6 +153,8 @@ end component;
   --Clock signals
   signal clk_m    : std_logic; --CM clock
   signal even_p_int   : std_logic; --even pulses of clk_p,should have the same phase as the even_c in PE
+  signal even_p_1  : std_logic; --delta delay signals
+  signal even_p_2  : std_logic; --delta delay signals 
   signal rst_i    : std_logic;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
@@ -179,6 +182,7 @@ end component;
   signal r_delay   :std_logic;  --First clock delay when read.
   signal pe_req_type : std_logic_vector(1 downto 0);
   signal cb_status  : std_logic;
+  signal req_bexe  : std_logic;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
   signal bc_i : std_logic;
@@ -238,7 +242,9 @@ begin
 		    even_p_int <= not even_p_int;
 	end if;
 end process;
-EVEN_P <= even_p_int;		  
+even_p_1 <= even_p_int;   --two delta delay to make sure the even_p comes later than clk_p to the processors.
+even_p_2 <= even_p_1;   --two delta delay to make sure the even_p comes later than clk_p to the processors.
+EVEN_P <= even_p_2;		  
 		  
   ------------------------------------------------------------------------------
   -- Reset
@@ -752,13 +758,13 @@ EVEN_P <= even_p_int;
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
                 bc_i <= '0';
-			elsif FIFO_VLD = '1' and req_exe = '0' and write_req = '0' and cb_status = '0'then 
+			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
  				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
-            elsif req_exe = '1' and len_ctr_p = "000000000" then
+            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000000" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
@@ -773,10 +779,11 @@ EVEN_P <= even_p_int;
 		if rising_edge(clk_e) then 
 			if noc_cmd = "01111" then
 				req_exe <= '0';
+				req_bexe <= '0';
 				cb_status <= '0';
 				b_cast_ctr <= (others => '0');
 				write_req <= '0';
-			elsif req_exe = '0' then
+			elsif req_exe = '0' and req_bexe = '0' then
 			    if pe_req_type = "01" then
 			    	if cb_status = '0' then
 			    		cb_status <= '1';
@@ -786,7 +793,7 @@ EVEN_P <= even_p_int;
 			    			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
 			    		elsif b_cast_ctr = "000000" then
 			    			if len_ctr_p /= "000000000" then
-			    				req_exe <= '1';
+			    				req_bexe <= '1';
 			    				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
 			    				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
 			    			end if;
@@ -804,11 +811,15 @@ EVEN_P <= even_p_int;
 			    		req_exe <= '1';
 			    	end if;
 			    end if;
-            elsif req_exe = '1' then  --Reset
+            elsif req_bexe = '1' then  --Reset broadcast signals
                 if len_ctr_p = "000000000" then
-                    req_exe <= '0';
+                    req_bexe <= '0';
 					cb_status <= '0';
                 end if;
+            elsif req_exe = '1' then --Reset unicast signals
+				if len_ctr_p = "000000000" then
+                    req_exe <= '0';
+				end if;
 
 				if write_count = "11" then
 					write_req<= '0';
@@ -826,7 +837,11 @@ EVEN_P <= even_p_int;
 				write_count <= "00";
 				pe_write <= '0';
 			elsif noc_reg_rdy = '0' then
-			    if req_exe = '1' then
+				if req_bexe = '1' then
+					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+					pe_read <= '1'; 
+			    elsif req_exe = '1' then
 					if write_req = '0' then
 					    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
 					    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));

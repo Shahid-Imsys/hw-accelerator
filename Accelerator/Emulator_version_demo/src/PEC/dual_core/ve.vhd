@@ -865,21 +865,21 @@ begin
             p_shifter_in <= acc_out_a;
         elsif ve_out_p = '1' then
             ve_out_c <= std_logic_vector(to_signed(to_integer(signed(ve_out_c))+1,3));
-            if ve_out_c = x"0" then
+            if ve_out_c = "000" then
                 p_shifter_in <= acc_out_0;
-            elsif ve_out_c = x"1" then
+            elsif ve_out_c = "001" then
                 p_shifter_in <= acc_out_1;
-            elsif ve_out_c = x"2" then
+            elsif ve_out_c = "010" then
                 p_shifter_in <= acc_out_2;
-            elsif ve_out_c = x"3" then
+            elsif ve_out_c = "011" then
                 p_shifter_in <= acc_out_3;
-            elsif ve_out_c = x"4" then
+            elsif ve_out_c = "100" then
                 p_shifter_in <= acc_out_4;
-            elsif ve_out_c = x"5" then
+            elsif ve_out_c = "101" then
                 p_shifter_in <= acc_out_5;
-            elsif ve_out_c = x"6" then
+            elsif ve_out_c = "110" then
                 p_shifter_in <= acc_out_6;
-            elsif ve_out_c = x"7" then
+            elsif ve_out_c = "111" then
                 p_shifter_in <= acc_out_7;
             end if;
         end if;

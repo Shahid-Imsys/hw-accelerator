@@ -245,7 +245,9 @@ end sendpedata;
 begin
 
 tag_in <= '0';
+RST_E <= '1';
 wait for 300 ns;
+RST_E <= '0';
 sendNOCcommand(RESET);
 wait for 300 ns;
 --sendNOCcommand(RESET);

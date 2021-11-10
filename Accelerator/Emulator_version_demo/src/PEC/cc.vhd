@@ -441,7 +441,7 @@ EVEN_P <= even_p_2;
 			elsif noc_cmd = "00110" then --exe command
 				exe_i<= '0';
 				if idle then
-					exe <= '1';
+					exe_i <= '1';
 					idle := false;
 				end if;
 			elsif noc_cmd = "01000" then --continue command

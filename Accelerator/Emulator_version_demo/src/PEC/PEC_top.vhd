@@ -186,6 +186,7 @@ signal rd_fifo_i    : std_logic;
 signal fifo_vld_i   : std_logic;
 signal req_sig_i    : std_logic_vector(15 downto 0);
 signal ack_sig_i    : std_logic_vector(15 downto 0);
+signal pe_rdy_reg   : std_logic_vector(15 downto 0);
 signal pe_req_in_i    : pe_req;
 signal pe_data_out_i  : pe_data;
 signal exe : std_logic;
@@ -231,22 +232,22 @@ port map(
 	exe      => exe,
 	resume   => resume,
     C_RDY     => C_RDY,
-    PE_RDY_0    => '0',--temp
-    PE_RDY_1    => '0',--temp
-    PE_RDY_2    => '0',--temp
-    PE_RDY_3    => '0',--temp
-    PE_RDY_4    => '0',--temp
-    PE_RDY_5    => '0',--temp
-    PE_RDY_6    => '0',--temp
-    PE_RDY_7    => '0',--temp
-    PE_RDY_8    => '0',--temp
-    PE_RDY_9    => '0',--temp
-    PE_RDY_10   => '0',--temp
-    PE_RDY_11   => '0',--temp
-    PE_RDY_12   => '0',--temp
-    PE_RDY_13   => '0',--temp
-    PE_RDY_14   => '0',--temp
-    PE_RDY_15   => '0',--temp        
+    PE_RDY_0    => pe_rdy_reg(0),--'0',--temp
+    PE_RDY_1    => pe_rdy_reg(1),--'0',--temp
+    PE_RDY_2    => pe_rdy_reg(2),--'0',--temp
+    PE_RDY_3    => pe_rdy_reg(3),--'0',--temp
+    PE_RDY_4    => pe_rdy_reg(4),--'0',--temp
+    PE_RDY_5    => pe_rdy_reg(5),--'0',--temp
+    PE_RDY_6    => pe_rdy_reg(6),--'0',--temp
+    PE_RDY_7    => pe_rdy_reg(7),--'0',--temp
+    PE_RDY_8    => pe_rdy_reg(8),--'0',--temp
+    PE_RDY_9    => pe_rdy_reg(9),--'0',--temp
+    PE_RDY_10   => pe_rdy_reg(10),--'0',--temp
+    PE_RDY_11   => pe_rdy_reg(11),--'0',--temp
+    PE_RDY_12   => pe_rdy_reg(12),--'0',--temp
+    PE_RDY_13   => pe_rdy_reg(13),--'0',--temp
+    PE_RDY_14   => pe_rdy_reg(14),--'0',--temp
+    PE_RDY_15   => pe_rdy_reg(15),--'0',--temp        
 	RST_R => rst_i,
 	REQ_IN     => req_in_i,
     REQ_FIFO   => req_fifo_i,
@@ -291,6 +292,8 @@ port map(
     C2_IN_D    => pe_data_out_i(2),
     C1_DDI_VLD => data_vld_to_pe(1),
     C2_DDI_VLD => data_vld_to_pe(2),
+    C1_RDY     => pe_rdy_reg(15),
+    C2_RDY     => pe_rdy_reg(14),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -321,6 +324,8 @@ port map(
     C2_IN_D    => pe_data_out_i(4),
     C1_DDI_VLD => data_vld_to_pe(3),
     C2_DDI_VLD => data_vld_to_pe(4),
+    C1_RDY     => pe_rdy_reg(13),
+    C2_RDY     => pe_rdy_reg(12),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -351,6 +356,8 @@ port map(
     C2_IN_D    => pe_data_out_i(6),
     C1_DDI_VLD => data_vld_to_pe(5),
     C2_DDI_VLD => data_vld_to_pe(6),
+    C1_RDY     => pe_rdy_reg(11),
+    C2_RDY     => pe_rdy_reg(10),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -381,6 +388,8 @@ port map(
     C2_IN_D    => pe_data_out_i(8),
     C1_DDI_VLD => data_vld_to_pe(7),
     C2_DDI_VLD => data_vld_to_pe(8),
+    C1_RDY     => pe_rdy_reg(9),
+    C2_RDY     => pe_rdy_reg(8),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -411,6 +420,8 @@ port map(
     C2_IN_D    => pe_data_out_i(10),
     C1_DDI_VLD => data_vld_to_pe(9),
     C2_DDI_VLD => data_vld_to_pe(10),
+    C1_RDY     => pe_rdy_reg(7),
+    C2_RDY     => pe_rdy_reg(6),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -441,6 +452,8 @@ port map(
     C2_IN_D    => pe_data_out_i(12),
     C1_DDI_VLD => data_vld_to_pe(11),
     C2_DDI_VLD => data_vld_to_pe(12),
+    C1_RDY     => pe_rdy_reg(5),
+    C2_RDY     => pe_rdy_reg(4),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -471,6 +484,8 @@ port map(
     C2_IN_D    => pe_data_out_i(14),
     C1_DDI_VLD => data_vld_to_pe(13),
     C2_DDI_VLD => data_vld_to_pe(14),
+    C1_RDY     => pe_rdy_reg(3),
+    C2_RDY     => pe_rdy_reg(2),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
@@ -501,6 +516,8 @@ port map(
     C2_IN_D    => pe_data_out_i(0),
     C1_DDI_VLD => data_vld_to_pe(15),
     C2_DDI_VLD => data_vld_to_pe(0),
+    C1_RDY     => pe_rdy_reg(1),
+    C2_RDY     => pe_rdy_reg(0),
     EXE        => exe,
     RESUME     => resume,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core

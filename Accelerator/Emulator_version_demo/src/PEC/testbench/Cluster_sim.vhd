@@ -196,7 +196,6 @@ end send15bits;
 
 procedure sendmemword (constant word : in mem_word)is
 begin
-  wait for 120 ns;
   data <= word(15);
   wait for 30 ns;
   data <= word(14);
@@ -246,7 +245,9 @@ end sendpedata;
 begin
 
 tag_in <= '0';
+RST_E <= '1';
 wait for 300 ns;
+RST_E <= '0';
 sendNOCcommand(RESET);
 wait for 300 ns;
 --sendNOCcommand(RESET);
@@ -257,6 +258,7 @@ send15bits(LENGTH1);
 send15bits(ADDRESS1);
 tag_in<= '0';
 progress <=2;
+wait for 120 ns;
 sendmemword(WORD1);
 sendmemword(WORD2);
 sendmemword(WORD3);

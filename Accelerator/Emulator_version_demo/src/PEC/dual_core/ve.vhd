@@ -233,7 +233,6 @@ END COMPONENT;
     signal acc_out_5  : std_logic_vector(31 downto 0);
     signal acc_out_6  : std_logic_vector(31 downto 0);
     signal acc_out_7  : std_logic_vector(31 downto 0);
-    --signal acc_out_8  : std_logic_vector(31 downto 0);
     signal acc_out_a  : std_logic_vector(31 downto 0);
     signal acc_reg_0  : std_logic_vector(31 downto 0);
     signal acc_reg_1  : std_logic_vector(31 downto 0);

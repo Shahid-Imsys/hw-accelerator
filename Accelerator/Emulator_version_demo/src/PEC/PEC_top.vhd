@@ -36,7 +36,7 @@ entity PEC_top is
   Port ( 
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
-      RST_P  : in std_logic;
+    --  RST_P  : in std_logic;
       RST_E  : in std_logic;
 	  clk_O  : out std_logic;
 	  TAG    : in std_logic;

@@ -130,7 +130,7 @@ component req_dst_logic
     );
 	end component;
 
-component p_top
+component pe_pair_top
 	port(
 
 	HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
@@ -279,7 +279,7 @@ port map(
 	DATA_VLD_OUT => data_vld_to_pe,
     PE_DATA_OUT   => pe_data_out_i
 );
-pe_pair_1: p_top
+pe_pair_1: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(15),
     C2_REQ     => req_sig_i(14),
@@ -309,7 +309,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0' 
 );
-pe_pair_2: p_top
+pe_pair_2: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(13),
     C2_REQ     => req_sig_i(12),
@@ -339,7 +339,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0'
 );
-pe_pair_3: p_top
+pe_pair_3: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(11),
     C2_REQ     => req_sig_i(10),
@@ -369,7 +369,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0' 
 );
-pe_pair_4: p_top
+pe_pair_4: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(9),
     C2_REQ     => req_sig_i(8),
@@ -399,7 +399,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0'
 );
-pe_pair_5: p_top
+pe_pair_5: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(7),
     C2_REQ     => req_sig_i(6),
@@ -429,7 +429,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0' 
 );
-pe_pair_6: p_top
+pe_pair_6: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(5),
     C2_REQ     => req_sig_i(4),
@@ -459,7 +459,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0' 
 );
-pe_pair_7: p_top
+pe_pair_7: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(3),
     C2_REQ     => req_sig_i(2),
@@ -489,7 +489,7 @@ port map(
     MLP_PWR_OK => '0',
     MWAKEUP_LP => '0'  
 );
-pe_pair_8: p_top
+pe_pair_8: pe_pair_top
 port map(
 	C1_REQ     => req_sig_i(1),
     C2_REQ     => req_sig_i(0),

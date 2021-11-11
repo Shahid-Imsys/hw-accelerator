@@ -236,7 +236,7 @@ begin
           
 even_p_generateor: process(rst_e,clk_p)
 begin
-	if rst_e = '1' then 
+	if rst_i = '0' then --if rst_e = '1' then
 		even_p_int <= '1';
 	elsif rising_edge(clk_p) then
 		    even_p_int <= not even_p_int;
@@ -307,10 +307,9 @@ EVEN_P <= even_p_2;
    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
 	if rising_edge(clk_e) then
-		if noc_cmd = "01111" then
+		if noc_cmd = "01111" or noc_cmd = "00110" then
 			sig_fin <= '0';
 			peci_busy <= '0';
-			sig_fin <= '0';
 	    elsif noc_reg_rdy= '1' and len_ctr = "000000000000000" then --Refresh when data transfer is finished
 			sig_fin <= '0';
 		elsif peci_busy = '0' then
@@ -439,16 +438,18 @@ EVEN_P <= even_p_2;
 				resume_i <= '0';
 				idle := true;
 			elsif noc_cmd = "00110" then --exe command
-				exe_i<= '0';
 				if idle then
 					exe_i <= '1';
 					idle := false;
+				else
+					exe_i <= '0';
 				end if;
 			elsif noc_cmd = "01000" then --continue command
-				resume_i<= '0';
 				if idle then
 					resume_i<= '1';
 					idle := false;
+				else
+					resume_i <= '0';
 				end if;
 			else
 			    exe_i <= '0';

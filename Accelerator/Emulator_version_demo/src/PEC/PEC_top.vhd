@@ -309,7 +309,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out  
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0' 
 );
 pe_pair_2: PE_pair_top
@@ -341,7 +341,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out  
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0'
 );
 pe_pair_3: PE_pair_top
@@ -373,7 +373,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out 
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0' 
 );
 pe_pair_4: PE_pair_top
@@ -405,7 +405,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out  
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0'
 );
 pe_pair_5: PE_pair_top
@@ -437,7 +437,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out 
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0' 
 );
 pe_pair_6: PE_pair_top
@@ -469,7 +469,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out 
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0' 
 );
 pe_pair_7: PE_pair_top
@@ -501,7 +501,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0'  
 );
 pe_pair_8: PE_pair_top
@@ -533,7 +533,7 @@ port map(
     -- SW debug=>                                             
     MSDIN      => '0',                 -- serial data in (debug)     
     MSDOUT     => open,                 -- serial data out 
-    MLP_PWR_OK => '0',
+    MLP_PWR_OK => '1',
     MWAKEUP_LP => '0' 
 );
 end struct;

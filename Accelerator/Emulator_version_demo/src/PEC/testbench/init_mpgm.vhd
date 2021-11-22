@@ -105,7 +105,7 @@ begin
   MLP_PWR_OK <= '0';
   wait for 60 ns;
   MLP_PWR_OK <= '1';
-  wait for 5905140 ns; --wait until 
+  wait for 3000 ns; --wait until 
   exe_i<= '1';
   wait for 60 ns;
   exe_i<= '0';
@@ -149,13 +149,13 @@ begin
    begin
       if rst = '1' then
          rst <= '0';
-         tmp <= '0';
-      elsif hclk_i'event and hclk_i = '1' then
+         tmp <= '1';
+      elsif rising_edge(hclk_i) then
          tmp <= not tmp;
       end if;
-      tmp2 <= tmp; 
+    --tmp2 <= tmp; 
    end process;
-   --tmp2 <= tmp1;
+   tmp2 <= tmp;
    even_c_i <= tmp2;
    
 

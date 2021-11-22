@@ -123,6 +123,8 @@ entity core is
     short_cycle : out std_logic;
     bmem_ce_n   : out  std_logic;
     -- CC signal
+    req_c1     : out std_logic;
+    ack_c1     : in std_logic;
     ddi_vld    : in std_logic; --Added by CJ
 	-- router control signals
 --	router_ir_en : out std_logic;    --delete by HYX, 20141027
@@ -441,10 +443,13 @@ architecture struct of core is
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
   -- Microprogram loading signal --CJ
+  signal req    : std_logic;
+  signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
-  signal temp        : std_logic; --Added by CJ. Used to latch vldl
+  signal temp         : std_logic;
+  signal temp1        : std_logic; --Added by CJ. Used to latch temp
   signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
@@ -470,28 +475,33 @@ begin
 ---------------------------------------------------------------------
 -- Microinstruction loading 
 ---------------------------------------------------------------------
-  exe_i <= exe; 
+  exe_i <= exe;
+  req_c1 <= req;
+  ack <= ACK_C1; 
   --ld_mpgm <= pl(100) and pl(98);
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
-      if rising_edge(clk_p) and clk_e_neg_int = '1' then
-        vldl <= ddi_vld;
-        --vldl <= mid;
+      if rising_edge(clk_p) then
+          vldl <= ddi_vld;
+          if clk_e_neg_int = '1' then --make sure vldl is generated later than clk_e_neg
+          temp <= ddi_vld;
+          --vldl <= mid;
+          end if;
       end if;
   end process;
-  --Two clock pulses delay generation
+  --Two clock e pulses delay generation
   process(clk_p)
   begin
     if rising_edge(clk_p) and clk_e_pos_int = '0'then --Falling_edge of clk_e
-      temp <= vldl;
-      ltwo <= temp;
+      temp1 <= temp;
+      ltwo <= temp1;
     end if;
   end process;
 
   mpgm_load : process(clk_p, vldl, ddi_vld)
   begin 
       if rising_edge(clk_p) and clk_e_neg_int = '0'then
-          if temp = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
+          if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
               ld_mpgm <= '0';
           else
               ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
@@ -1244,7 +1254,7 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => ddi_vld,
+      DDI_VLD     => vldl,
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
@@ -1263,6 +1273,8 @@ begin
         PL       => pl,
         EXE      => exe,
         DATA_VLD => ddi_vld,
+        REQ_OUT  => req,
+        ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,
         YBUS     =>ybus,

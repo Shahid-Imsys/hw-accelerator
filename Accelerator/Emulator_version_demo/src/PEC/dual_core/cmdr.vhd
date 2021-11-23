@@ -160,7 +160,7 @@ begin
     ld_dtm_v <= pl(88);
     fifo_push <= pl(114);
     pl_send_req <= pl(113);
-    init_mpgm_rq <= "01000111001111110000000000000000";
+    init_mpgm_rq <= "01000111111111110000000000000000";
     process(clk_p)
     begin
     if rising_edge(clk_p) then --
@@ -218,12 +218,16 @@ begin
         end if;
     end process;
 
-    process(clk_p)
+    process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
     begin
         if rising_edge(clk_p) and clk_e_neg = '1' then
-            if send_req = '1' and fb = '0' then
-                req <= '1';
-            else
+            if rst_en = '0' then
+                req <= '0';
+            elsif fb = '0' then 
+                if send_req = '1' then
+                    req <= '1';
+                end if;
+            elsif fb = '1' then
                 req <= '0';
             end if;
         end if;

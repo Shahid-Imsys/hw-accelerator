@@ -187,6 +187,8 @@ end component;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
   signal bc_i : std_logic;
+  signal cl_net_fifo_rd : std_logic;
+  signal rd_fifo_i : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in      : reg; --Input register to memory
@@ -737,11 +739,12 @@ EVEN_P <= even_p_2;
     process(clk_p)
         variable cmd_tr : std_logic; --Save 1 clock to handle the request
 	begin
-		if rising_edge(clk_p) and even_p_int = '1' then --RD_REQ raises at falling_edge of clk_e
+		if rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
                 cmd_tr := '0';
-            else
+				--rd_fifo_i <= '0';
+            elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
                 if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '0' then
                     cmd_tr := '1';
                 else
@@ -755,13 +758,17 @@ EVEN_P <= even_p_2;
 			    else
 			    	RD_FIFO <= '0';
 			    end if;
+                --rd_fifo_i <= cl_net_fifo_rd; --one clk_e delay
+			else
+				RD_FIFO <= '0';
             end if;
 		end if;
 	end process;
 
+
  	req_recording: process(clk_p)
  	begin
- 		if rising_edge(clk_p) and even_p_int = '1' then --0628 --falling_edge of clk_e
+ 		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
@@ -786,55 +793,57 @@ EVEN_P <= even_p_2;
     BC<= bc_i;
     process(clk_p) --Reset need to be added 
 	begin 
-		if rising_edge(clk_p) and even_p_int = '0' then 
+		if rising_edge(clk_p) then
 			if noc_cmd = "01111" then
 				req_exe <= '0';
 				req_bexe <= '0';
 				cb_status <= '0';
 				b_cast_ctr <= (others => '0');
 				write_req <= '0';
-			elsif req_exe = '0' and req_bexe = '0' then
-			    if pe_req_type = "01" then
-			    	if cb_status = '0' then
-			    		cb_status <= '1';
-			    		b_cast_ctr <= req_last;
-			    	elsif cb_status = '1' then
-			    		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
-			    			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
-			    		elsif b_cast_ctr = "000000" then
-			    			if len_ctr_p /= "000000000" then
-			    				req_bexe <= '1';
-			    				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
-			    				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
-			    			end if;
-			    		end if;
+			elsif even_p_int = '0' then 
+			    if req_exe = '0' and req_bexe = '0' then
+			        if pe_req_type = "01" then
+			        	if cb_status = '0' then
+			        		cb_status <= '1';
+			        		b_cast_ctr <= req_last;
+			        	elsif cb_status = '1' then
+			        		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
+			        			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
+			        		elsif b_cast_ctr = "000000" then
+			        			if len_ctr_p /= "000000000" then
+			        				req_bexe <= '1';
+			        				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
+			        				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
+			        			end if;
+			        		end if;
+			        	end if;
+			        elsif pe_req_type = "10" then
+			        	id_num <= req_last;
+			        	if len_ctr_p /= "000000000" then
+			        		req_exe <= '1';
+			        	end if;
+			        elsif pe_req_type = "11" then	
+			        	id_num <= req_last;
+                        write_req <= '1';
+			        	if len_ctr_p /= "000000000" then
+			        		req_exe <= '1';
+			        	end if;
+			        end if;
+                elsif req_bexe = '1' then  --Reset broadcast signals
+                    if len_ctr_p = "000000000" then
+                        req_bexe <= '0';
+			    		cb_status <= '0';
+                    end if;
+                elsif req_exe = '1' then --Reset unicast signals
+			    	if len_ctr_p = "000000000" then
+                        req_exe <= '0';
 			    	end if;
-			    elsif pe_req_type = "10" then
-			    	id_num <= req_last;
-			    	if len_ctr_p /= "000000000" then
-			    		req_exe <= '1';
+    
+			    	if write_count = "11" then
+			    		write_req<= '0';
 			    	end if;
-			    elsif pe_req_type = "11" then	
-			    	id_num <= req_last;
-                    write_req <= '1';
-			    	if len_ctr_p /= "000000000" then
-			    		req_exe <= '1';
-			    	end if;
-			    end if;
-            elsif req_bexe = '1' then  --Reset broadcast signals
-                if len_ctr_p = "000000000" then
-                    req_bexe <= '0';
-					cb_status <= '0';
                 end if;
-            elsif req_exe = '1' then --Reset unicast signals
-				if len_ctr_p = "000000000" then
-                    req_exe <= '0';
-				end if;
-
-				if write_count = "11" then
-					write_req<= '0';
-				end if;
-            end if;
+			end if;
 		end if;
 	end process;
     PE_UNIT <= id_num;
@@ -846,7 +855,10 @@ EVEN_P <= even_p_2;
 				len_ctr_p <= (others => '0');
 				write_count <= "00";
 				pe_write <= '0';
+				pe_read <= '0';
 			elsif noc_reg_rdy = '0' then
+				pe_read <= '0';
+				pe_write <= '0';
 				if req_bexe = '1' then
 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));

@@ -623,6 +623,7 @@ begin
 	-- the current stack word or the counter/register.
 	dsi_mux : process (ds_ctr, pl_map, sout, st_empty, rout, rin_int)
 	begin
+		dsi <= rin_int(7 downto 0);
 		if ds_ctr = '1' then 
 			case pl_map(3 downto 2) is
 				when DS_CSTACKL	=>	-- (0) DSOURCE CSTACKL
@@ -635,8 +636,6 @@ begin
 				--	dsi <= "0000" & rout(11 downto 8);
 				when others => null;
 			end case;
-		else
-			dsi <= rin_int(7 downto 0);
 		end if;
 	end process;
 

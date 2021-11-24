@@ -197,13 +197,15 @@ begin
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge
-            if EXE ='1'then
-                send_req_d <= '1';
-            else
-                send_req_d <= pl_send_req;
+        if rising_edge(clk_p) then
+            if clk_e_neg = '1' then --rising_edge
+                if EXE ='1'then
+                    send_req_d <= '1';
+                else
+                    send_req_d <= pl_send_req;
+                end if;
+                send_req <= send_req_d;
             end if;
-            send_req <= send_req_d;
         end if;
     end process;
 
@@ -220,15 +222,17 @@ begin
 
     process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
     begin
-        if rising_edge(clk_p) and clk_e_neg = '1' then
-            if rst_en = '0' then
-                req <= '0';
-            elsif fb = '0' then 
-                if send_req = '1' then
-                    req <= '1';
+        if rising_edge(clk_p) then
+            if clk_e_neg = '1' then
+                if rst_en = '0' then
+                    req <= '0';
+                elsif fb = '0' then 
+                    if send_req = '1' then
+                        req <= '1';
+                    end if;
+                elsif fb = '1' then
+                    req <= '0';
                 end if;
-            elsif fb = '1' then
-                req <= '0';
             end if;
         end if;
     end process;

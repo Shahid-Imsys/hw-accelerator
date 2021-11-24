@@ -450,6 +450,7 @@ architecture struct of core is
   signal mpgmin : std_logic_vector(127 downto 0);
   signal temp         : std_logic;
   signal temp1        : std_logic; --Added by CJ. Used to latch temp
+  --signal n_temp        : std_logic;
   signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
@@ -492,19 +493,23 @@ begin
   --Two clock e pulses delay generation
   process(clk_p)
   begin
-    if rising_edge(clk_p) and clk_e_pos_int = '0'then --Falling_edge of clk_e
-      temp1 <= temp;
-      ltwo <= temp1;
+    if rising_edge(clk_p) then
+      if  clk_e_pos_int = '0'then --Falling_edge of clk_e
+        temp1 <= temp;
+        ltwo <= temp1;
+      end if;
     end if;
   end process;
 
   mpgm_load : process(clk_p, vldl, ddi_vld)
   begin 
-      if rising_edge(clk_p) and clk_e_neg_int = '0'then
-          if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
-              ld_mpgm <= '0';
-          else
-              ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
+      if rising_edge(clk_p) then
+          if clk_e_neg_int = '0'then
+              if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
+                  ld_mpgm <= '0';
+              else
+                  ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
+              end if;
           end if;
       end if;
   end process;
@@ -601,10 +606,13 @@ begin
   --mprom_a     <= mpga; --deleted by CJ
   process(clk_p) --1 clk_e delay of input to microprogram memory
   begin
-    if rising_edge(clk_p) and clk_e_pos_int = '0' then
+    if rising_edge(clk_p) then
+      if clk_e_pos_int = '0' then
         mpram_d     <= mpgmin;
+      end if;
     end if;
   end process;
+  --n_temp <= not temp;
   mpram_we_n  <= not temp when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;

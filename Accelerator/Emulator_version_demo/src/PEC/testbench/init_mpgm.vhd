@@ -72,15 +72,13 @@ architecture Behavioral of init_mpgm is
    
    signal RAM : ram_type := init_ram_from_file("SequenceTest_F.data");
    signal hclk_i : std_logic;
-   signal even_c_i : std_logic;
+   signal even_c_i : std_logic:='1';
    signal exe_i : std_logic;
    signal resume_i : std_logic;
    signal c1_input: std_logic_vector(127 downto 0);
    signal c1_data_vld : std_logic;
-   signal tmp : std_logic := '0';
-   signal tmp1 : std_logic;
-   signal tmp2 : std_logic;
-   signal rst : std_logic := '1';
+   signal even_c_1 : std_logic;
+   signal even_c_2 : std_logic;
    
    
 begin
@@ -88,7 +86,7 @@ begin
    
    procedure sendmc (signal word: in std_logic_vector(127 downto 0))is
    begin
-   wait until rising_edge(hclk_i) and even_c_i = '1';
+   wait until rising_edge(hclk_i) and even_c_i = '0'; --rising_edge of clk_e
    --if rising_edge(hclk_i) and even_c_i = '1' then
    c1_input <= word;
    c1_data_vld <= '1';
@@ -97,6 +95,7 @@ begin
    end procedure;
    
   begin
+  --wait for 30 ns;
   MLP_PWR_OK <= '0';
   wait for 60 ns;
   MLP_PWR_OK <= '1';
@@ -145,24 +144,21 @@ begin
    end process;
    
    process(hclk_i)
-   --   variable count : integer := 1;
    begin
-      if rst = '1' then
-         rst <= '0';
-         tmp <= '1';
-      elsif rising_edge(hclk_i) then
-         tmp <= not tmp;
-      end if;
-    --tmp2 <= tmp; 
+   if rising_edge(hclk_i) then
+       even_c_i <= not even_c_i;
+   end if;
+   --wait for 30 ns;
+   --even_c_i <= '0';
+   --wait for 30 ns;
    end process;
-   tmp2 <= tmp;
-   even_c_i <= tmp2;
    
-
+even_c_1 <= even_c_i;
+even_c_2 <= even_c_1;
    
 
 HCLK <= hclk_i;
-EVEN_C <= even_c_i;
+EVEN_C <= even_c_2;
 EXE <= exe_i;
 RESUME <= resume_i;
 c1_in_data <= c1_input;

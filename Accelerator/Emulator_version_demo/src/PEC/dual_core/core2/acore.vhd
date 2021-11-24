@@ -124,6 +124,8 @@ entity acore is
     pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
     -- CC signal
+    req_c2    : out std_logic;
+    ack_c2    : in std_logic;
     ddi_vld   : in std_logic; --Added by CJ
     exe       : in std_logic; --CONT need to be added
     resume    : in std_logic;
@@ -137,12 +139,15 @@ entity acore is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(127 downto 0); -- Data input bus --CJ
-    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus --CJ
+    ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus --CJ
+    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus --CJ
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o      : out std_logic_vector(3 downto 0) -- Clock enable
+    dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
+    -- CC interface signals
+    din_c       : in std_logic_vector(127 downto 0);
+    dout_c      : out std_logic_vector(31 downto 0)
 
     ); 
 
@@ -249,7 +254,8 @@ architecture struct of acore is
   signal rd_crb       : std_logic;
   signal d_sign       : std_logic;                    
   signal dbus_int     : std_logic_vector(7  downto 0);
-  signal latch        : std_logic_vector(7  downto 0); 
+  signal latch        : std_logic_vector(7  downto 0);
+  signal cdfm_int     : std_logic_vector(7 downto 0); --Added by CJ
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -284,12 +290,14 @@ architecture struct of acore is
   signal i_direct   : std_logic_vector(7 downto 0);                  
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
+  signal req        : std_logic;
+  signal ack        : std_logic;
   --VE signals
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
-  signal ve_out_a_int : std_logic_vector(7 downto 0);
-  signal ve_out_sing_int : std_logic_vector(7 downto 0);
+  signal ve_out_d_int : std_logic_vector(7 downto 0);
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);
   signal vldl      : std_logic; --Added by CJ
   attribute syn_keep              : boolean;
   --attribute syn_keep of pend_i    : signal is true;
@@ -299,6 +307,8 @@ architecture struct of acore is
   attribute syn_keep of curr_mpga : signal is true;
   
 begin
+  req_c2 <= req;
+  ack    <= ack_c2;
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
@@ -323,7 +333,7 @@ begin
   -- it during execution.
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
-  --pl_out <= pl;
+  --pl_out <= pl
   pl_reg: process (clk_p, rst_en_int)
   begin 
     if rst_en_int = '0' then    
@@ -429,7 +439,7 @@ begin
       rst_en        => rst_en_int,               
       -- Microprogram fields
       pl            => pl,
-      ld_mpgm       => '0', 
+      ld_mpgm       => std_logic'('0'), --'0', 
       -- Static control inputs
       dbl_direct    => dbl_direct,            
       pup_irq       => pup_irq,           
@@ -442,10 +452,10 @@ begin
       irq0          => irq0,               
       irq1          => irq1, 
       --dfm_vld       => ddi_vld,  --Added by CJ
-      mp_vld        => '0',     --Added by CJ            
+      mp_vld        => std_logic'('0'), --'0',     --Added by CJ            
       -- Condition inputs
-      spreq_n       => '1',             
-      spack_n       => '1',             
+      spreq_n       => std_logic'('1'), --'1',             
+      spack_n       => std_logic'('1'), --'1',             
       d_sign      	=> d_sign,            
       y_bittst      => y_bittst,            
       flag_fn       => flag_fn,             
@@ -603,8 +613,9 @@ begin
       dtal          => dtal,             
       dfp           => dfp,
        --CJ added
-       VE_OUT_A      => ve_out_a_int,
-       VE_OUT_SING   => ve_out_sing_int,
+       VE_OUT_D      => ve_out_d_int,
+       CDFM         => cdfm_int,
+       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
       load_b        => open,       
@@ -685,14 +696,15 @@ begin
       d_cas       => dcas_o,             
       d_we        => dwe_o,              
       d_dqi       => ddq_i,             
-      d_dqo       => ddq_o,             
+      d_dqo       => ddq_o,
+      --ve_data     => ve_in_int,             
       en_dqo      => ddq_en,
-	  ld_dqi_flash => '0',
+	  ld_dqi_flash => std_logic'('0'), --'0',
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,
-      exe         => exe,    --Added by CJ 
-      LD_MPGM     => '0',
+      --exe         => exe,    --Added by CJ 
+      --LD_MPGM     => std_logic'('0'), --'0',
       
       --ddi_vld     => ddi_vld,  --Added by CJ        
       d_cke       => dcke_o); 
@@ -712,8 +724,31 @@ begin
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
-      VE_OUT_A    => ve_out_a_int,
-      VE_OUT_SING => ve_out_sing_int
+      VE_OUT_D    => ve_out_d_int,
+      VE_OUT_DTM => ve_out_dtm_int
+      );
+---------------------------------------------------------------------
+-- CMDR
+---------------------------------------------------------------------
+--Interface of the core and cluster controller
+      cmdr: entity work.acmdr
+      port map(
+        CLK_P    => clk_p,
+        RST_EN   => rst_en_int,
+        CLK_E_NEG => clk_e_neg_int,
+        PL       => pl,
+        --EXE      => exe,
+        DATA_VLD => ddi_vld,
+        REQ_OUT  => req,
+        ACK_IN   => ack,
+        DIN      => din_c,
+        DOUT     =>dout_c,
+        YBUS     =>ybus,
+        LD_MPGM  =>std_logic'('0'),
+        VE_DIN   =>ve_in_int,
+        DBUS_DATA=>cdfm_int,
+        MPGMM_IN =>open,
+        VE_DTMO  =>ve_out_dtm_int
       );    
 
     i_direct <= x"00"; 
@@ -722,8 +757,3 @@ begin
     dtcl <= x"00";
     clk_e_pos <= clk_e_pos_int;
 end;
-
-
-
-
-

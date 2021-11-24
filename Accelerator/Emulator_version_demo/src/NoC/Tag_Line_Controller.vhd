@@ -55,9 +55,9 @@ begin
     process (clk, reset)
     begin
         if reset = '1' then
-             Tag_Shift_Counter   <= (others => '0');
-             Start_Tag_Shift_pre <= '0';
-             TAG_shift           <= '0'; 
+           Tag_Shift_Counter   <= (others => '0');
+           Start_Tag_Shift_pre <= '0';
+           TAG_shift           <= '0';
         elsif rising_edge(clk) then
             if Load_Tag_Shift_Counter = '1' then
                 Tag_Shift_Counter <= Shift_Count + '1';  -- to add one cycle for CC command buffer original was Tag_Shift_Counter <= Shift_Count;
@@ -73,4 +73,4 @@ begin
             end if;
         end if;
     end process;
-end; 
+end;

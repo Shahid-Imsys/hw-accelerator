@@ -19,7 +19,7 @@
 -- Company    : Imsys Technologies AB
 -- Date       : 
 -------------------------------------------------------------------------------
--- Description: Memory Data Register
+-- Description: 
 --              
 -------------------------------------------------------------------------------
 -- TO-DO list :
@@ -32,12 +32,10 @@
 -- 2014-07-18       3.0             MN          Add out of line indicator for flash by detecting both the state machine and the adl
 -- 2014-06-15       3.1             MN          One line of flash is changed to 4x4=16 bytes
 -- 2015-08-12       3.2             MN          add page_changed flag
--- 2021-06-18       4.1             CJ          Expand DTM register to 32 bits. Can be filled byte by byte in 4 clk_e cycles.
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
 use work.mpgmfield_lib.all;
 
 --*******************************************************************     
@@ -67,13 +65,12 @@ entity mmr is
     t_rp:       in  std_logic_vector(1 downto 0); -- tRP timing of SDRAM
     fast_d:     in  std_logic;  -- 1 => clk_d = clk_c, 0 => clk_d = not even_c
     short_cycle : in std_logic;
-    exe:        in std_logic;
     -- Data paths
     dbus:       in  std_logic_vector(7 downto 0);  -- D bus, from DSL
     ybus:       in  std_logic_vector(7 downto 0);  -- Y bus, from ALU
     g_direct:   in  std_logic_vector(7 downto 0); -- Direct data bus from GMEM
     i_direct:   in  std_logic_vector(7 downto 0); -- Direct data bus from IOMEM
-    dfm:        out std_logic_vector(7 downto 0); -- Data from memory to DSL --CJ
+    dfm:        out std_logic_vector(7 downto 0); -- Data from memory to DSL
     direct:     out std_logic_vector(7 downto 0); -- Direct bus to GMEM,IOMEM 
     -- Outputs
     use_direct: out std_logic;  -- Set when the direct bus is used
@@ -84,27 +81,21 @@ entity mmr is
     lmpen:      out std_logic;
     adl_cy:     out std_logic;
     hold_e:     out std_logic;  -- Set high by this block to delay clk_e
-    --dfm_dst:    out std_logic_vector(1 downto 0); --Added by CJ
     -- SDRAM signals
     d_addr:     out std_logic_vector(31 downto 0);
     d_cs:       out std_logic;  -- CS to SDRAM
     d_ras:      out std_logic;  -- RAS to SDRAM
     d_cas:      out std_logic;  -- CAS to SDRAM
     d_we:       out std_logic;  -- WE to SDRAM
-    --d_dqi:      in  std_logic_vector(7 downto 0); -- Data in from SDRAM
-    --d_dqo:      out std_logic_vector(7 downto 0); -- Data out to SDRAM
-    d_dqi:      in  std_logic_vector(127 downto 0);  --CJ
-    d_dqo:      out std_logic_vector(31 downto 0);   --CJ
+    d_dqi:      in  std_logic_vector(7 downto 0); -- Data in from SDRAM
+    d_dqo:      out std_logic_vector(7 downto 0); -- Data out to SDRAM
     en_dqo:     out std_logic;  -- Output enable to SDRAM data bus
     out_line:   out std_logic;  -- one line is 8x4 = 32 bytes
 	  ld_dqi_flash:  in std_logic;
     d_a:        out std_logic_vector(13 downto 0);
     d_ba:       out std_logic_vector(1 downto 0);
     d_dqm:      out std_logic_vector(7 downto 0);
-    d_cke:      out std_logic_vector(3 downto 0);
-    --Control Store signal
-    MPGMM_IN :  out std_logic_vector(127 downto 0);
-    LD_MPGM  :  in std_logic);
+    d_cke:      out std_logic_vector(3 downto 0));
 end;          
 
 architecture rtl of mmr is
@@ -123,7 +114,6 @@ architecture rtl of mmr is
   signal pl_memcp_sig:   std_logic_vector(1 downto 0); -- MEMCP field of u-instruction
   signal pl_pc_sig:      std_logic_vector(3 downto 0);  --from the microprogram word
   signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
-  signal pl_sel_dfm_dst  : std_logic_vector(1 downto 0); --select dfm destination, same as mpgm_ld in clc
 
   -- Introducing 'inv_col' to differ clock and combinational usage of 'col',
   -- in order to avoid Synplify ASIC generates a high fan_out on 'col'.
@@ -876,34 +866,22 @@ begin
     signal held_ff      : std_logic;
     signal dfm_kept     : std_logic;
     signal odd_kept     : std_logic;
-    signal dfm_field    : std_logic_vector(3 downto 0);
     -- DFM registers
-    signal dfm_keep     : std_logic_vector(127 downto 0); --CJ
-    signal odd_keep     : std_logic_vector(127 downto 0); --CJ
-    signal dfm_odd      : std_logic_vector(127 downto 0); --CJ
-    signal m_direct     : std_logic_vector(7 downto 0); --CJ
-    signal dfm_reg      : std_logic_vector(127 downto 0);--CJ
-    signal ve_in_reg    : std_logic_vector(63 downto 0); --CJ
-    signal pl_dfm_byte     : std_logic_vector(3 downto 0);
+    signal dfm_keep     : std_logic_vector(7 downto 0);
+    signal odd_keep     : std_logic_vector(7 downto 0);
+    signal dfm_odd      : std_logic_vector(7 downto 0);
+    signal m_direct     : std_logic_vector(7 downto 0);
     -- Signals to control DTM
     signal ld_dtm       : std_logic;
     signal sely_d       : std_logic;
-    signal dtm_mux_sel  : std_logic_vector(1 downto 0);
     -- DTM registers
-    type dmx is array (3 downto 0) of std_logic_vector(7 downto 0); --CJ
-    signal dtm_mux          : std_logic_vector(7 downto 0);
+    signal dtm          : std_logic_vector(7 downto 0);
     signal dtm_even     : std_logic_vector(7 downto 0);
-    signal dtm_demux    : dmx; --used to collecting 4 bytes, added by CJ
-    signal init_mpgm_rq    : std_logic_vector(31 downto 0); --stores then initial loading microcode to cs.
 
-    -- Signals needed just because VHDL is stupid 
+    -- Signals needed just because VHDL is stupid
     signal dfm_int      : std_logic_vector(7 downto 0);
-    signal direct_int   : std_logic_vector(7 downto 0); 
-    signal fifo_push    : std_logic;   
+    signal direct_int   : std_logic_vector(7 downto 0);    
   begin  -- block dtmc
-    dtm_mux_sel <= pl(117 downto 116); --CJ Added
-    fifo_push <= pl(114);
-    init_mpgm_rq <= "01111111001111110000000000000000"; --initial request data, send to ddq_o when exe is high
     -- This process output signals held_ff, which is just the held_e
     -- input signal clocked by clk_d, and dfm_kept, which is set after
     -- ld_dqi and held_ff are both high and reset after held_ff goes
@@ -932,26 +910,26 @@ begin
     begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
-                dfm_keep <= (others => '0');
+                dfm_keep <= x"00";
             elsif ld_dqi = '1' and held_ff = '1' and clk_d_pos = '0' then
                 dfm_keep <= d_dqi;
             end if;
         end if;
     end process;
-    --CJ removed
+
     -- odd_keep is always loaded from memory if ld_dqi is set in the
     -- cycle after dfm_keep is loaded. It is used to hold odd address
     -- memory data that can't be put in dfm_odd yet when two-stepping.
-    --process (clk_p)
-    --begin
-    --    if rising_edge(clk_p) then
-    --        if rst_en = '0' then
-    --            odd_keep <= (others => '0');
-    --        elsif ld_dqi = '1' and dfm_kept = '1' and clk_d_pos = '0' then
-    --            odd_keep <= d_dqi;
-    --        end if;
-    --    end if;
-    --end process;
+    process (clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if rst_en = '0' then
+                odd_keep <= x"00";
+            elsif ld_dqi = '1' and dfm_kept = '1' and clk_d_pos = '0' then
+                odd_keep <= d_dqi;
+            end if;
+        end if;
+    end process;
 
     -- This is the DFM register. It is loaded with memory data when
     -- ld_dqi is set, or with stored data when dfm_kept is set.
@@ -959,78 +937,41 @@ begin
     begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
-                dfm_reg <= (others => '0');
+                dfm_int <= x"00";
             elsif clk_e_pos = '0' then
-                if ld_dqi = '1' or ld_mpgm = '1' then
-                    dfm_reg <= d_dqi;
+                if ld_dqi = '1' then
+                    dfm_int <= d_dqi;
                 elsif dfm_kept = '1' then
-                    dfm_reg <= dfm_keep;
+                    dfm_int <= dfm_keep;
                 end if;
             end if;
         end if;
     end process;
-    --CJ removed
+
     -- This is the dfm_odd register, the odd address part of the data
     -- bus when double-speed is used. It is always loaded if ld_dqi is set
     -- in the cycle after dfm is loaded, from memory or from odd_keep.
-    --process (clk_p)
-    --begin
-    --    if rising_edge(clk_p) then 
-    --        if rst_en = '0' then
-    --            dfm_odd <= (others => '0');
-    --        elsif clk_d_pos = '0' then
-    --            if ld_dqi = '1' and even_c = '1' and held_ff = '0' then
-    --                dfm_odd <= d_dqi;
-    --            elsif odd_kept = '1' then
-    --                dfm_odd <= odd_keep;
-    --            end if;
-    --        end if;
-    --    end if;
-    --end process;
-    -----CJ Added-----
-    -- This is the dfm demux. This block generates byte output to DSL 
-    -- and direct bus. And double-speed transfer under the control of 
-    -- dfm byte field in microcode to direct bus.
-    pl_dfm_byte <= pl(112 downto 109); --Use to select bytes in dfm --CJ
-    --pl_sel_dfm_dst <= pl(106) & pl(100); --Internal destination of dfm --CJ
-    process(clk_p)
+    process (clk_p)
     begin
-        if rising_edge(clk_p) then
-            --if pl_sel_dfm_dst = "00" then --Load data in dfm to demux register
-                if clk_e_neg = '1' and dbl_direct_int = '1' then
-                    dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
-                  --next byte of current selected byte by microinsteuctions
-                    m_direct <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)+1))+7 downto 8*(to_integer(unsigned(pl_dfm_byte)+1)));
-                else
-                  --Current selected byte
-                    m_direct <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
-                    --dfm_int <= dfm_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
+        if rising_edge(clk_p) then 
+            if rst_en = '0' then
+                dfm_odd <= x"00";
+            elsif clk_d_pos = '0' then
+                if ld_dqi = '1' and even_c = '1' and held_ff = '0' then
+                    dfm_odd <= d_dqi;
+                elsif odd_kept = '1' then
+                    dfm_odd <= odd_keep;
                 end if;
-            --elsif pl_sel_dfm_dst = "01" then --Load data in dfm to vector engine
-                if clk_e_neg = '1' then
-                    ve_in_reg <= dfm_reg(63 downto 0);
-                elsif clk_e_pos = '1' then
-                    ve_in_reg <= dfm_reg(127 downto 64);
-                end if;
-            --elsif pl_sel_dfm_dst = "10" then
-                if clk_e_pos = '1' then
-                    MPGMM_IN <= dfm_reg;
-                end if;
-            --else
-                --m_direct <= (others =>'Z');
-                --ve_in_reg <= (others => 'Z');
-                --MPGMM_IN <= (others => 'Z');
-                
             end if;
-        --end if;
-    end process;                    
-  -----CJ-----              
+        end if;
+    end process;
+
     -- m_direct is the direct data bus from memory. It will always be driven
     -- from the dfm register except when we are transferring two bytes per
     -- clk_e cycle over the direct bus and this is the second one. Then it
     -- will be driven from dfm_odd instead.
-    --m_direct <= dfm_odd when dbl_direct_int = '1' and gate_e = '0' else --Deleted by CJ
-                --dfm_int;                                                --Deleted by CJ
+    m_direct <= dfm_odd when dbl_direct_int = '1' and gate_e = '0' else
+                dfm_int;
 
     -- The direct data bus is driven from m_direct if sel_direct is 10 or 11,
     -- from i_direct (the direct data bus from IOMEM) if sel_direct is 01,
@@ -1048,19 +989,21 @@ begin
 
     -- This is the DTM register. It is loaded from direct, dbus or ybus
     -- when ld_dtm is set.
-    process (rst_en,ld_dtm,direct_int,ybus,dbus)
+    process (clk_p)
     begin
+        if rising_edge(clk_p) then
             if rst_en = '0' then
-                dtm_mux <= x"00"; --CJ
-            elsif ld_dtm = '1'  then
+                dtm <= x"00";
+            elsif ld_dtm = '1' and clk_e_pos = '0' then
                 if use_direct_int = '1' then
-                    dtm_mux <= direct_int;
+                    dtm <= direct_int;
                 elsif sely_d = '1' then
-                    dtm_mux <= ybus;--CJ
+                    dtm <= ybus;
                 else
-                    dtm_mux <= dbus;--CJ
+                    dtm <= dbus;
                 end if;
             end if;
+        end if;
     end process;
 
     -- This is the dtm_even register, the even address part of the data
@@ -1083,46 +1026,16 @@ begin
     -- register, except when we are transferring two bytes per
     -- clk_e cycle over the direct bus and this is the first one. Then it
     -- will be driven from dtm_even instead.
-    -----CJ-----
-    --dtm_demux <=  dtm_even when (dbl_direct_int = '1' and en_dqo_int = '1'
-    --                         and gate_e = '1') else
-    --          dtm_mux;
+    d_dqo <=  dtm_even when (dbl_direct_int = '1' and en_dqo_int = '1'
+                             and gate_e = '1') else
+              dtm;
     
-    process(clk_p,clk_e_pos,ld_dtm)
-    begin
-      if rising_edge(clk_p) then
-        if ld_dtm = '1' then
-          if dbl_direct_int = '1' then
-            if clk_e_pos = '1' then
-            dtm_demux(to_integer(unsigned(dtm_mux_sel))) <= dtm_even;
-            elsif clk_e_neg = '1' then
-            dtm_demux(to_integer(unsigned(dtm_mux_sel)+1)) <= dtm_mux;
-            end if;
-          elsif clk_e_pos = '0' then
-            dtm_demux(to_integer(unsigned(dtm_mux_sel))) <= dtm_mux;
-          end if;
-        end if;
-      end if; 
-    end process; 
-    process(clk_p,fifo_push)
-    begin
-      if rising_edge(clk_p) and clk_e_pos = '0' then
-        if fifo_push = '1' then
-          d_dqo <= dtm_demux(3) & dtm_demux(2) & dtm_demux(1) & dtm_demux(0);
-        elsif exe = '1' then
-          d_dqo <= init_mpgm_rq;
-        else --
-          d_dqo <= (others => '-');
-        end if;
-      end if;
-    end process;
-    -----CJ-----             
     -- Assignments needed just because VHDL is stupid
     dfm <= dfm_int;
     direct <= direct_int;  
   end block dtmc;
   en_dqo <= en_dqo_int;
-  --dfm_dst <= pl_sel_dfm_dst;
+  
   --line is changed if the page is changed or the line is changed
   
   out_line <= page_changed or line_changed;

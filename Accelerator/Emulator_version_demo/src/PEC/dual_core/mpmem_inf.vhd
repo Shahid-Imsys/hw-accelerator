@@ -144,12 +144,12 @@ BEGIN
 ----------------------------------------------------------------------------------------------------------------------------------------- 
     c1_mp_q_int <=  --ROM0_DO WHEN c1_mprom_oe(0) = '1' ELSE               
                     --ROM1_DO WHEN c1_mprom_oe(1) = '1' ELSE
-                    RAM0_DO WHEN c1_mpram_oe(0) = '1'; --ELSE
+                    RAM0_DO; --WHEN c1_mpram_oe(0) = '1'; --ELSE
                     --RAM1_DO WHEN c1_mpram_oe(1) = '1' ELSE  -- 
                     --ROM0_DO;
     c2_mp_q_int <=  --ROM0_DO WHEN c2_mprom_oe(0) = '1' ELSE               
                     --ROM1_DO WHEN c2_mprom_oe(1) = '1' ELSE
-                    RAM0_DO WHEN c2_mpram_oe(0) = '1';-- ELSE
+                    RAM0_DO; --WHEN c2_mpram_oe(0) = '1';-- ELSE
                     --RAM1_DO WHEN c2_mpram_oe(1) = '1' ELSE   -- 
                     --ROM0_DO;
                     --CJ

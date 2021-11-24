@@ -36,11 +36,11 @@ entity c_tb is
 end c_tb;
 
 architecture Behavioral of c_tb is
-component cluster_top
+component PEC_top
   Port ( 
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
-      RST_P  : in std_logic;
+      --RST_P  : in std_logic;
       RST_E  : in std_logic;
 	  clk_O  : out std_logic;
 	  TAG    : in std_logic;
@@ -78,11 +78,11 @@ DATA_OUT         : in std_logic_vector(7 downto 0)
  signal data_out_i : std_logic_vector( 7 downto 0);
  
 begin
-cluster: cluster_top
+cluster: PEC_top
 port map(
 clk_p => clk_p_i,
 clk_e => clk_e_i,
-rst_p => '0',
+--rst_p => '0',
 rst_e => rst_e_i,
 clk_o => clk_o_i,
 tag => tag_i,

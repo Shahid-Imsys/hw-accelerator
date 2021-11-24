@@ -354,7 +354,7 @@ begin
   -- operation.
   --pc(11 downto 0)  <= curr_mpga_int(11 downto 0) + 1;   -- Increment low 12
                                                         -- bits, wrap at 4k
-    pc(7 downto 0)  <= curr_mpga_int(7 downto 0) + 1; --CJ
+    pc <= curr_mpga_int + 1; --CJ
   --pc(13 downto 12) <= pl_sig18(1 downto 0) when selblk_pa = '1' else       --Deleted by CJ
   --                    pl_aux1(2 downto 1) when selblk_aux1 = '1' else     --Deleted by CJ
   --                    curr_mpga_int(13 downto 12);     --Deleted by CJ
@@ -483,7 +483,7 @@ begin
       when COND_DFM_RDY  =>sel_cond <= dfm_rdy; --Added by CJ
       when COND_FIFO_RDY =>sel_cond <= fifo_rdy; --Added by CJ
       when COND_CONT     =>sel_cond <= continue; --Added by CJ        
-      when others  => null;
+      when others  => sel_cond <= '0';
     end case;
   end process;
 

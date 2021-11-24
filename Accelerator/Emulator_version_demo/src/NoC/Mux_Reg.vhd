@@ -54,7 +54,7 @@ begin
     process(clk, reset)
     begin
         if reset = '1' then
-                Mux_register    <= (others => '0');
+            Mux_register    <= (others => '0');
         elsif rising_edge(clk) then
             if (Load_Mux_Reg = '1') then 
                 Mux_register    <=  Control_Data;

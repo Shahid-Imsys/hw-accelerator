@@ -124,6 +124,8 @@ entity acore is
     pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
     -- CC signal
+    req_c2    : out std_logic;
+    ack_c2    : in std_logic;
     ddi_vld   : in std_logic; --Added by CJ
     exe       : in std_logic; --CONT need to be added
     resume    : in std_logic;
@@ -288,6 +290,8 @@ architecture struct of acore is
   signal i_direct   : std_logic_vector(7 downto 0);                  
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
+  signal req        : std_logic;
+  signal ack        : std_logic;
   --VE signals
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
@@ -303,6 +307,8 @@ architecture struct of acore is
   attribute syn_keep of curr_mpga : signal is true;
   
 begin
+  req_c2 <= req;
+  ack    <= ack_c2;
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
@@ -327,7 +333,7 @@ begin
   -- it during execution.
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
-  --pl_out <= pl;
+  --pl_out <= pl
   pl_reg: process (clk_p, rst_en_int)
   begin 
     if rst_en_int = '0' then    
@@ -725,14 +731,16 @@ begin
 -- CMDR
 ---------------------------------------------------------------------
 --Interface of the core and cluster controller
-      cmdr: entity work.cmdr
+      cmdr: entity work.acmdr
       port map(
         CLK_P    => clk_p,
         RST_EN   => rst_en_int,
         CLK_E_NEG => clk_e_neg_int,
         PL       => pl,
-        EXE      => exe,
+        --EXE      => exe,
         DATA_VLD => ddi_vld,
+        REQ_OUT  => req,
+        ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,
         YBUS     =>ybus,

@@ -33,7 +33,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity cmdr is
+entity acmdr is
     port(
         --Clock and reset functions
         CLK_P     : in std_logic;
@@ -42,7 +42,7 @@ entity cmdr is
         --Microprogram control
         PL        : in std_logic_vector(127 downto 0);
         --Cluster data interface
-        EXE       : in std_logic;
+        --EXE       : in std_logic;
         DATA_VLD  : in std_logic;
         REQ_OUT   : out std_logic;
         ACK_IN    : in std_logic;
@@ -59,7 +59,7 @@ entity cmdr is
     );
 end; 
 
-architecture rtl of cmdr is
+architecture rtl of acmdr is
 
     COMPONENT fifo_generator_0
     PORT (
@@ -160,16 +160,16 @@ begin
     ld_dtm_v <= pl(88);
     fifo_push <= pl(114);
     pl_send_req <= pl(113);
-    init_mpgm_rq <= "01000111111111110000000000000000";
-    process(clk_p)
+    init_mpgm_rq <= "01000111001111110000000000000000";
+    process(rst_en,ld_dtm,clk_e_neg,ld_dtm_v)
     begin
-    if rising_edge(clk_p) then --
+    --if rising_edge(clk_p) then
         if rst_en = '0' then
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
-        elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq;
-            ve_in_cnt <= (others => '0');
+        --elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
+            --dtm_reg <= init_mpgm_rq;
+            --ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
             ve_in_cnt <= (others => '0');
@@ -177,13 +177,13 @@ begin
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
             ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         end if;
-    end if;
+    --end if;
     end process;
     --Fifo control signals
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
+            if fifo_push = '1' then --push data to fifo at falling edge of clock e.
                 if CLK_E_NEG = '0' then
                     fifo_wr_en <= '1';
                 else
@@ -198,11 +198,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge
-            if EXE ='1'then
-                send_req_d <= '1';
-            else
-                send_req_d <= pl_send_req;
-            end if;
+            send_req_d <= pl_send_req;
             send_req <= send_req_d;
         end if;
     end process;
@@ -218,25 +214,20 @@ begin
         end if;
     end process;
 
-    process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
+    process(clk_p)
     begin
         if rising_edge(clk_p) and clk_e_neg = '1' then
-            if rst_en = '0' then
-                req <= '0';
-            elsif fb = '0' then 
-                if send_req = '1' then
-                    req <= '1';
-                end if;
-            elsif fb = '1' then
+            if send_req = '1' and fb = '0' then
+                req <= '1';
+            else
                 req <= '0';
             end if;
         end if;
     end process;
     
     REQ_OUT <= req;
-    fb  <= ACK_IN;
     srst <= not rst_en;
-
+    fb <= ACK_IN;
     req_fifo : fifo_generator_0
     PORT MAP (
     clk => CLK_P,

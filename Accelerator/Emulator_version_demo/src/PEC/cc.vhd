@@ -45,8 +45,8 @@ use work.all;
 entity cluster_controller is
   port(
 --Clock inputs
-      CLK_P            : in std_logic;     --PE clock --0628
-	  CLK_E            : in std_logic;     --PE's execution clock 
+      CLK_P            : in std_logic;     --PE clock, clock from the oscillator --0628
+	  CLK_E            : in std_logic;     --NOC clock
 	  --CLK_E_NEG        : in std_logic;     --Inverted clk_e
 --Power reset input:
       --RST_P            : in std_logic;
@@ -155,6 +155,7 @@ end component;
   signal even_p_int   : std_logic; --even pulses of clk_p,should have the same phase as the even_c in PE
   signal even_p_1  : std_logic; --delta delay signals
   signal even_p_2  : std_logic; --delta delay signals 
+  signal even_p_3  : std_logic;
   signal rst_i    : std_logic;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
@@ -186,6 +187,8 @@ end component;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
   signal bc_i : std_logic;
+  signal cl_net_fifo_rd : std_logic;
+  signal rd_fifo_i : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in      : reg; --Input register to memory
@@ -233,17 +236,22 @@ end component;
   
  
 begin
-          
+----------------------------
+--Clock domains
+----------------------------
+--All interactions with NOC are synchronized with clk_e.
+--All transportations between CC and PEs are synchronized with even_p_int signal.   
 even_p_generateor: process(rst_e,clk_p)
 begin
 	if rst_i = '0' then --if rst_e = '1' then
-		even_p_int <= '1';
+		even_p_1 <= '1';
 	elsif rising_edge(clk_p) then
-		    even_p_int <= not even_p_int;
+		    even_p_1 <= not even_p_1;
 	end if;
 end process;
-even_p_1 <= even_p_int;   --two delta delay to make sure the even_p comes later than clk_p to the processors.
 even_p_2 <= even_p_1;   --two delta delay to make sure the even_p comes later than clk_p to the processors.
+even_p_3 <= even_p_2;   --two delta delay to make sure the even_p comes later than clk_p to the processors. Even_p uses this signal 
+even_p_int <= even_p_3;  --3 delta delay to make sure the processor signals comes later than clk_e inside PE, All PE interfaces use this signal
 EVEN_P <= even_p_2;		  
 		  
   ------------------------------------------------------------------------------
@@ -251,7 +259,7 @@ EVEN_P <= even_p_2;
   ------------------------------------------------------------------------------
 --  reset: process(clk_e, sig_fin)
 --  begin
---	if rising_edge(clk_e) then
+--	if rising_edge(clk_p) and even_p_int = '0' then
 --		if noc_cmd = "01111" then
 --	        peci_busy      <= '0';
 --	        sig_fin        <= '0';
@@ -303,10 +311,11 @@ EVEN_P <= even_p_2;
 		  rst_i <= '1';
 		end if;
   end process;
+
   cmd_activate : process(clk_e) --39 - 33 = 6 6 must be kept
    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
-	if rising_edge(clk_e) then
+	if rising_edge(clk_e)then
 		if noc_cmd = "01111" or noc_cmd = "00110" then
 			sig_fin <= '0';
 			peci_busy <= '0';
@@ -337,7 +346,7 @@ EVEN_P <= even_p_2;
 --	end if;
 --  end process;
   
-    tag_translate : process (peci_busy, clk_e, sig_fin)
+    tag_translate : process (clk_e)
     variable noc_cmd_ctr : integer :=5;
     begin
     	  if rising_edge (clk_e) then
@@ -371,7 +380,7 @@ EVEN_P <= even_p_2;
 --  variable tag_ctr_2 : integer;
 --  variable tag_ctr_3 : integer;   --Both to be described in define document
 --  begin
---	if rising_edge(clk_e) then
+--	if rising_edge(clk_p) and even_p_int = '0' then
 --		if noc_cmd = "01111" then
 --			tag_ctr_2 := 30;
 --			tag_ctr_3 := 38;
@@ -429,15 +438,16 @@ EVEN_P <= even_p_2;
 --	end if;
 --  end process; 
     
-    exe_and_resume: process(clk_e)
+    exe_and_resume: process(clk_p)
 		variable idle: boolean;
 	begin
-		if rising_edge(clk_e) then
+		if rising_edge(clk_p) and even_p_int = '0' then --use even_p_3 signal to make sure exe and resume comes later than even_p signal to PEs
 			if noc_cmd = "01111" then
 				exe_i <= '0';
 				resume_i <= '0';
 				idle := true;
 			elsif noc_cmd = "00110" then --exe command
+				resume_i <= '0';
 				if idle then
 					exe_i <= '1';
 					idle := false;
@@ -445,6 +455,7 @@ EVEN_P <= even_p_2;
 					exe_i <= '0';
 				end if;
 			elsif noc_cmd = "01000" then --continue command
+				exe_i <= '0';
 				if idle then
 					resume_i<= '1';
 					idle := false;
@@ -466,7 +477,7 @@ EVEN_P <= even_p_2;
   -- Data transfer
   ------------------------------------------------------------------------------  
 	
-	delay_count: process(clk_e, peci_busy, sig_fin)
+	delay_count: process(clk_e)
     
 	begin
 
@@ -533,7 +544,7 @@ EVEN_P <= even_p_2;
 	
 	--Byte counter calculation
 	    	  
-	byte_ctr_cal: process (clk_e, delay)
+	byte_ctr_cal: process (clk_e)
 	
 	begin
 		if rising_edge(clk_e) then
@@ -557,7 +568,7 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 
-	mem_activation : process(clk_e, byte_ctr, delay)
+	mem_activation : process(noc_cmd, byte_ctr, delay)
     begin
 		if noc_cmd = "01111" then
 			noc_reg_rdy <= '0';
@@ -617,7 +628,7 @@ EVEN_P <= even_p_2;
         end if;
 	end process;
     
-    memory_interaction : process (clk_e, noc_reg_rdy,delay)
+    memory_interaction : process (clk_e)
 	variable tag_ctr_2 : integer;
 	variable tag_ctr_3 : integer;  
     begin
@@ -728,11 +739,12 @@ EVEN_P <= even_p_2;
     process(clk_p)
         variable cmd_tr : std_logic; --Save 1 clock to handle the request
 	begin
-		if rising_edge(clk_p) and even_p_int = '1' then --RD_REQ raises at falling_edge of clk_e
+		if rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
                 cmd_tr := '0';
-            else
+				--rd_fifo_i <= '0';
+            elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
                 if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '0' then
                     cmd_tr := '1';
                 else
@@ -746,13 +758,17 @@ EVEN_P <= even_p_2;
 			    else
 			    	RD_FIFO <= '0';
 			    end if;
+                --rd_fifo_i <= cl_net_fifo_rd; --one clk_e delay
+			else
+				RD_FIFO <= '0';
             end if;
 		end if;
 	end process;
 
+
  	req_recording: process(clk_p)
  	begin
- 		if rising_edge(clk_p) and even_p_int = '1' then --0628 --falling_edge of clk_e
+ 		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
@@ -775,69 +791,74 @@ EVEN_P <= even_p_2;
  		end if;
  	end process;
     BC<= bc_i;
-    process(clk_e) --Reset need to be added 
+    process(clk_p) --Reset need to be added 
 	begin 
-		if rising_edge(clk_e) then 
+		if rising_edge(clk_p) then
 			if noc_cmd = "01111" then
 				req_exe <= '0';
 				req_bexe <= '0';
 				cb_status <= '0';
 				b_cast_ctr <= (others => '0');
 				write_req <= '0';
-			elsif req_exe = '0' and req_bexe = '0' then
-			    if pe_req_type = "01" then
-			    	if cb_status = '0' then
-			    		cb_status <= '1';
-			    		b_cast_ctr <= req_last;
-			    	elsif cb_status = '1' then
-			    		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
-			    			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
-			    		elsif b_cast_ctr = "000000" then
-			    			if len_ctr_p /= "000000000" then
-			    				req_bexe <= '1';
-			    				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
-			    				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
-			    			end if;
-			    		end if;
+			elsif even_p_int = '0' then 
+			    if req_exe = '0' and req_bexe = '0' then
+			        if pe_req_type = "01" then
+			        	if cb_status = '0' then
+			        		cb_status <= '1';
+			        		b_cast_ctr <= req_last;
+			        	elsif cb_status = '1' then
+			        		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
+			        			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
+			        		elsif b_cast_ctr = "000000" then
+			        			if len_ctr_p /= "000000000" then
+			        				req_bexe <= '1';
+			        				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
+			        				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
+			        			end if;
+			        		end if;
+			        	end if;
+			        elsif pe_req_type = "10" then
+			        	id_num <= req_last;
+			        	if len_ctr_p /= "000000000" then
+			        		req_exe <= '1';
+			        	end if;
+			        elsif pe_req_type = "11" then	
+			        	id_num <= req_last;
+                        write_req <= '1';
+			        	if len_ctr_p /= "000000000" then
+			        		req_exe <= '1';
+			        	end if;
+			        end if;
+                elsif req_bexe = '1' then  --Reset broadcast signals
+                    if len_ctr_p = "000000000" then
+                        req_bexe <= '0';
+			    		cb_status <= '0';
+                    end if;
+                elsif req_exe = '1' then --Reset unicast signals
+			    	if len_ctr_p = "000000000" then
+                        req_exe <= '0';
 			    	end if;
-			    elsif pe_req_type = "10" then
-			    	id_num <= req_last;
-			    	if len_ctr_p /= "000000000" then
-			    		req_exe <= '1';
+    
+			    	if write_count = "11" then
+			    		write_req<= '0';
 			    	end if;
-			    elsif pe_req_type = "11" then	
-			    	id_num <= req_last;
-                    write_req <= '1';
-			    	if len_ctr_p /= "000000000" then
-			    		req_exe <= '1';
-			    	end if;
-			    end if;
-            elsif req_bexe = '1' then  --Reset broadcast signals
-                if len_ctr_p = "000000000" then
-                    req_bexe <= '0';
-					cb_status <= '0';
                 end if;
-            elsif req_exe = '1' then --Reset unicast signals
-				if len_ctr_p = "000000000" then
-                    req_exe <= '0';
-				end if;
-
-				if write_count = "11" then
-					write_req<= '0';
-				end if;
-            end if;
+			end if;
 		end if;
 	end process;
     PE_UNIT <= id_num;
-	counting : process(clk_e)  
+	counting : process(clk_p)  
 	begin
-		if rising_edge(clk_e) then
+		if rising_edge(clk_p) and even_p_int = '0' then
 			if noc_cmd = "01111" then
 				addr_p <= (others => '0');
 				len_ctr_p <= (others => '0');
 				write_count <= "00";
 				pe_write <= '0';
+				pe_read <= '0';
 			elsif noc_reg_rdy = '0' then
+				pe_read <= '0';
+				pe_write <= '0';
 				if req_bexe = '1' then
 					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
 					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
@@ -870,9 +891,9 @@ EVEN_P <= even_p_2;
 
 
 --distribution network
-    process (clk_e)
+    process (clk_p)
     begin
-    	if rising_edge(clk_e) then 
+    	if rising_edge(clk_p) and even_p_int = '0' then 
             if pe_read = '1' then --Data valid asserts together with output data
     	        for i in 15 downto 0 loop
     	        	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
@@ -911,9 +932,9 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 --Output Latch
-    process(clk_e)
+    process(clk_p)
     begin
-        if rising_edge(clk_e) then
+        if rising_edge(clk_p) and even_p_int = '0' then
             if noc_delay = '1' then
                 noc_data_out <= data_core_int;
             end if;

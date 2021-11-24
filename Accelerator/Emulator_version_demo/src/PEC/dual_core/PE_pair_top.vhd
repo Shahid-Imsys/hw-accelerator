@@ -1232,6 +1232,8 @@ architecture struct of PE_pair_top is
     signal c1_d_ras    : std_logic;  -- RAS to SDRAM
     signal c1_d_cas    : std_logic;  -- CAS to SDRAM
     signal c1_d_we     : std_logic;  -- WE to SDRAM
+    signal c1_req_i    : std_logic;  -- Request signal of core1
+    signal c1_ack_i    : std_logic;
     signal c1_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor --CJ
     signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
     signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram  
@@ -1241,6 +1243,8 @@ architecture struct of PE_pair_top is
     signal c2_d_ras    : std_logic;  -- RAS to SDRAM
     signal c2_d_cas    : std_logic;  -- CAS to SDRAM
     signal c2_d_we     : std_logic;  -- WE to SDRAM
+    signal c2_req_i    : std_logic;  --Requset signal of core 2.
+    signal c2_ack_i    : std_logic;
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
     signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
@@ -1442,6 +1446,10 @@ begin
   pllout <= HCLK;
   ddi_vld_c1 <= C1_DDI_VLD;
   ddi_vld_c2 <= C2_DDI_VLD;
+  C1_REQ <= c1_req_i;
+  C2_req <= c2_req_i;
+  c1_ack_i <= C1_ACK;
+  c2_ack_i <= C2_ACK;
   C1_REQ_D <=c1_d_dqi;
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
@@ -2688,6 +2696,8 @@ begin
     -- RTC block signals
     exe => EXE,         --CJ
     resume => RESUME,   --CJ
+    req_c1 => c1_req_i,  --CJ
+    ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
     reset_core_n   => reset_core_n   ,
     reset_iso      => reset_iso      ,
@@ -2867,6 +2877,8 @@ begin
     pmem_ce_n     => c2_pmem_ce_n   ,  
     pmem_we_n     => c2_pmem_we_n   ,
     exe          => exe ,     --CJ
+    req_c2       => c2_req_i,
+    ack_c2       => C2_ACK,
      ddi_vld      =>ddi_vld_c2, --CJ 
      resume => RESUME,   --CJ
 ---------------------------------------------------------------------

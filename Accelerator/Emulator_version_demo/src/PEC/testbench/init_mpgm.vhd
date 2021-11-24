@@ -115,6 +115,7 @@ begin
   end loop;
   wait for 60 ns;
   c1_input <= (others => '0');
+  wait for 60 ns;
   c1_data_vld <= '0'; 
   wait for 1000ns;
   wait;

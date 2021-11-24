@@ -115,25 +115,27 @@ begin
     --Recognize the write request and hold the wr_req signal for 4 clock cycles.
     process(clk_p)
     begin
-        if rising_edge(clk_p) and EVEN_P = '0' then
-            if loop_c = 0 then
-                if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
-                    wr_req <= '1';
-                    loop_c <= 1;
-                else
-                    if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
-                        chain<= '1';
+        if rising_edge(clk_p) then 
+            if EVEN_P = '0' then
+                if loop_c = 0 then
+                    if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
+                        wr_req <= '1';
+                        loop_c <= 1;
                     else
-                        chain <= '0';
+                        if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
+                            chain<= '1';
+                        else
+                            chain <= '0';
+                        end if;
+                        wr_req <= '0';
+                        loop_c <= 0;
                     end if;
+                elsif loop_c = 4 then
                     wr_req <= '0';
                     loop_c <= 0;
+                else
+                    loop_c <= loop_c + 1;
                 end if;
-            elsif loop_c = 4 then
-                wr_req <= '0';
-                loop_c <= 0;
-            else
-                loop_c <= loop_c + 1;
             end if;
         end if;
     end process;
@@ -161,11 +163,13 @@ poll_act <= '0' when reset_i = '1' else
 
 process(clk_p)
 begin
-    if rising_edge (clk_p) and EVEN_P = '1'then
-        if req_sig /= (req_sig'range => '0') then
-        req_to_noc_i <= '1';
-        else
-        req_to_noc_i <= '0';
+    if rising_edge (clk_p) then
+        if EVEN_P = '1'then
+            if req_sig /= (req_sig'range => '0') then
+            req_to_noc_i <= '1';
+            else
+            req_to_noc_i <= '0';
+            end if;
         end if;
     end if;
 end process;
@@ -193,7 +197,11 @@ process(req_sig,id_num)
 variable sh_0, sh_1, sh_2, sh_3 : std_logic_vector(15 downto 0);
 begin
     --if poll_act = '1' then
-        
+    sh_3 := req_sig;
+    sh_2 := sh_3;
+    sh_1 := sh_2;
+    sh_0 := sh_1;  
+
     if id_num(3) = '0' then
         sh_3 := req_sig;
     elsif id_num(3) = '1' then
@@ -228,7 +236,7 @@ end process;
 process(poll_act,bs_out)
 variable cnt : integer := 0;
 begin
-    
+    add_in_2 <= (others => '0');
         if poll_act = '1' then
             cnt := 0;
             for i in 15 downto 0 loop
@@ -241,8 +249,8 @@ begin
                     exit;
                 end if;
             end loop;
-        else 
-            add_in_2 <= (others => '0');
+        --else 
+            --add_in_2 <= (others => '0');
         end if;
     
 end process;

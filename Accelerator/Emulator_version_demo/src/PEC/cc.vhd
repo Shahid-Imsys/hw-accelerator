@@ -186,7 +186,7 @@ end component;
   signal req_bexe  : std_logic;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
-  signal bc_i : std_logic;
+  signal bc_i : std_logic_vector(6 downto 0);
   signal cl_net_fifo_rd : std_logic;
   signal rd_fifo_i : std_logic;
   --Control registers
@@ -241,7 +241,7 @@ begin
 ----------------------------
 --All interactions with NOC are synchronized with clk_e.
 --All transportations between CC and PEs are synchronized with even_p_int signal.   
-even_p_generateor: process(rst_e,clk_p)
+even_p_generateor: process(rst_i,clk_p)
 begin
 	if rst_i = '0' then --if rst_e = '1' then
 		even_p_1 <= '1';
@@ -441,31 +441,33 @@ EVEN_P <= even_p_2;
     exe_and_resume: process(clk_p)
 		variable idle: boolean;
 	begin
-		if rising_edge(clk_p) and even_p_int = '0' then --use even_p_3 signal to make sure exe and resume comes later than even_p signal to PEs
-			if noc_cmd = "01111" then
-				exe_i <= '0';
-				resume_i <= '0';
-				idle := true;
-			elsif noc_cmd = "00110" then --exe command
-				resume_i <= '0';
-				if idle then
-					exe_i <= '1';
-					idle := false;
-				else
+		if rising_edge(clk_p) then
+			if even_p_int = '0' then --use even_p_3 signal to make sure exe and resume comes later than even_p signal to PEs
+				if noc_cmd = "01111" then
 					exe_i <= '0';
-				end if;
-			elsif noc_cmd = "01000" then --continue command
-				exe_i <= '0';
-				if idle then
-					resume_i<= '1';
-					idle := false;
-				else
 					resume_i <= '0';
+					idle := true;
+				elsif noc_cmd = "00110" then --exe command
+					resume_i <= '0';
+					if idle then
+						exe_i <= '1';
+						idle := false;
+					else
+						exe_i <= '0';
+					end if;
+				elsif noc_cmd = "01000" then --continue command
+					exe_i <= '0';
+					if idle then
+						resume_i<= '1';
+						idle := false;
+					else
+						resume_i <= '0';
+					end if;
+				else
+				    exe_i <= '0';
+				    resume_i <= '0';
+					idle := true;
 				end if;
-			else
-			    exe_i <= '0';
-			    resume_i <= '0';
-				idle := true;
 			end if;
 		end if;
 	end process;
@@ -570,6 +572,9 @@ EVEN_P <= even_p_2;
 
 	mem_activation : process(noc_cmd, byte_ctr, delay)
     begin
+		noc_reg_rdy <= '0';
+        noc_write <= '0';
+        noc_read <= '0';
 		if noc_cmd = "01111" then
 			noc_reg_rdy <= '0';
             noc_write <= '0';
@@ -596,14 +601,14 @@ EVEN_P <= even_p_2;
                 noc_write <= '0';
                 noc_read <= '0';   
 	        end if;
-		else 
-			noc_reg_rdy <='0'; 
-            noc_write <= '0';
-            noc_read <= '0';  
+		--else 
+			--noc_reg_rdy <='0'; 
+            --noc_write <= '0';
+            --noc_read <= '0';  
 		end if;
 	end process;
 	
-	data_write : process (noc_cmd, byte_ctr, delay)
+	data_write : process (noc_cmd, byte_ctr, delay, DATA)
 	begin
 		if noc_cmd = "01111" then
 			noc_data_in <=(others => (others => '0'));
@@ -618,7 +623,7 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 
-	data_read : process (noc_cmd, byte_ctr, rd_trig)
+	data_read : process (byte_ctr, rd_trig, noc_data_out)
 
     begin
 	    if rd_trig = '1' then
@@ -774,23 +779,26 @@ EVEN_P <= even_p_2;
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
-                bc_i <= '0';
+                bc_i <= (others => '0');
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
  				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
-                bc_i <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
+                bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
             elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000000" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
-                bc_i <= '0';
+                bc_i(0) <= '0';
  			end if;
+			for i in 0 to 5 loop
+				bc_i(i+1) <= bc_i(i);
+			end loop;
  		end if;
  	end process;
-    BC<= bc_i;
+    BC<= bc_i(6);
     process(clk_p) --Reset need to be added 
 	begin 
 		if rising_edge(clk_p) then
@@ -849,41 +857,43 @@ EVEN_P <= even_p_2;
     PE_UNIT <= id_num;
 	counting : process(clk_p)  
 	begin
-		if rising_edge(clk_p) and even_p_int = '0' then
-			if noc_cmd = "01111" then
-				addr_p <= (others => '0');
-				len_ctr_p <= (others => '0');
-				write_count <= "00";
-				pe_write <= '0';
-				pe_read <= '0';
-			elsif noc_reg_rdy = '0' then
-				pe_read <= '0';
-				pe_write <= '0';
-				if req_bexe = '1' then
-					addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
-					len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
-					pe_read <= '1'; 
-			    elsif req_exe = '1' then
-					if write_req = '0' then
-					    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
-					    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+		if rising_edge(clk_p) then 
+			if even_p_int = '0' then
+				if noc_cmd = "01111" then
+					addr_p <= (others => '0');
+					len_ctr_p <= (others => '0');
+					write_count <= "00";
+					pe_write <= '0';
+					pe_read <= '0';
+				elsif noc_reg_rdy = '0' then
+					pe_read <= '0';
+					pe_write <= '0';
+					if req_bexe = '1' then
+						addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+						len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
 						pe_read <= '1'; 
-					elsif write_req = '1' then
-						pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-                        pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-                        pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-                        pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-						write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2)); 
-						if write_count = "11" then
-							pe_write <= '1';
-							len_ctr_p <= (others => '0');
-						else
-							pe_write <= '0';
+				    elsif req_exe = '1' then
+						if write_req = '0' then
+						    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
+						    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
+							pe_read <= '1'; 
+						elsif write_req = '1' then
+							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
+            	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
+            	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
+            	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
+							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2)); 
+							if write_count = "11" then
+								pe_write <= '1';
+								len_ctr_p <= (others => '0');
+							else
+								pe_write <= '0';
+							end if;
 						end if;
+					else
+						addr_p <= req_addr_p;
+						len_ctr_p <= req_len_ctr_p;
 					end if;
-				else
-					addr_p <= req_addr_p;
-					len_ctr_p <= req_len_ctr_p;
 				end if;
 			end if;
 		end if;
@@ -893,22 +903,24 @@ EVEN_P <= even_p_2;
 --distribution network
     process (clk_p)
     begin
-    	if rising_edge(clk_p) and even_p_int = '0' then 
-            if pe_read = '1' then --Data valid asserts together with output data
-    	        for i in 15 downto 0 loop
-    	        	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
-    	        end loop;
-    	        	DATA_VLD <= not noc_reg_rdy;
-            else
-                DATA_TO_PE <= (others=>'0');
-                DATA_VLD <= '0';
-            end if;
+    	if rising_edge(clk_p) then 
+			if even_p_int = '0' then 
+            	if pe_read = '1' then --Data valid asserts together with output data
+    	    	    for i in 15 downto 0 loop
+    	    	    	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
+    	    	    end loop;
+    	    	    	DATA_VLD <= not noc_reg_rdy;
+            	else
+            	    DATA_TO_PE <= (others=>'0');
+            	    DATA_VLD <= '0';
+            	end if;
+			end if;
         end if;
     end process;
 
 
  --Address & trigger MUX
- process(noc_reg_rdy,addr_p)				
+ process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
  begin
  	if noc_reg_rdy = '1' then  --to be replaced with noc_enable (CM access arbiter)
  		addr_c <= addr_n;
@@ -923,21 +935,24 @@ EVEN_P <= even_p_2;
 
  --Data MUX
  --Input MUX
-    process(noc_reg_rdy)
+    process(noc_reg_rdy, pe_data_in, noc_data_in)
     begin
+		mem_in <= pe_data_in;
         if noc_reg_rdy = '1' then
             mem_in <= noc_data_in;
-        else
-            mem_in <= pe_data_in;
+        --else
+            --mem_in <= pe_data_in;
         end if;
     end process;
 --Output Latch
     process(clk_p)
     begin
-        if rising_edge(clk_p) and even_p_int = '0' then
-            if noc_delay = '1' then
-                noc_data_out <= data_core_int;
-            end if;
+        if rising_edge(clk_p) then
+			if even_p_int = '0' then
+            	if noc_delay = '1' then
+            	    noc_data_out <= data_core_int;
+            	end if;
+			end if;
         end if;
     end process;
 

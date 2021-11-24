@@ -364,84 +364,86 @@ begin
     --sram_in <= VE_IN;
     reg_write: process(clk_p)
     begin
-        if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge of clk_e
-            if RST = '0' then
-                re_saddr_l        <= (others => '0');
-                re_saddr_r        <= (others => '0');
-                re_loop_reg       <= (others => '0');
-                re_saddr_a        <= (others => '0'); 
-                re_saddr_b        <= (others => '0'); 
-                ve_saddr_l        <= (others => '0');
-                ve_saddr_r        <= (others => '0');
-                ve_loop_reg       <= (others => '0');
-                offset_l          <= (others => '0'); 
-                offset_r          <= '0'; 
-                depth_l           <= (others => '0'); 
-                jump_l            <= (others => '0'); 
-                --dfy_reg           <= (others =>(others => '0'));
-                ve_oloop_reg      <= (others => '0'); 
-                config            <= (others => '0'); 
-                ring_end_addr     <= (others => '0'); 
-                ring_start_addr   <= (others => '0'); 
-                --curr_ring_addr    <= (others => '0');
-                zp_data           <= (others => '0');
-                zp_weight         <= (others => '0');
-                scale             <= (others => '0'); 
-                pp_ctl            <= (others => '0');
-                bias_index_end    <= (others => '0');
-                bias_index_start  <= (others => '0');
-                mul_ctl           <= (others => '0'); 
-            elsif reg_in = CONS_RE_START_ADDR_L then
-                re_saddr_l <= YBUS;
-            elsif reg_in = CONS_RE_START_ADDR_R then
-                re_saddr_r <= YBUS;
-            elsif reg_in = CONS_RE_LC then
-                re_loop_reg <= YBUS;
-            elsif reg_in = CONS_DFY_ADDR_A then
-                re_saddr_a <= YBUS;
-            elsif reg_in = CONS_DFY_ADDR_B then
-                re_saddr_b <= YBUS;
-            elsif reg_in = CONS_VE_START_ADDR_L then
-                ve_saddr_l <= YBUS;
-            elsif reg_in = CONS_VE_START_ADDR_R then
-                ve_saddr_r <= YBUS;
-            elsif reg_in = CONS_VE_LC then
-                ve_loop_reg <= YBUS;
-            elsif reg_in = CONS_VE_OFFSET_L then
-                offset_l <= YBUS;
-            elsif reg_in = CONS_VE_OFFSET_R then
-                offset_r <= YBUS(0);
-            elsif reg_in = CONS_VE_DEPTH_L then
-                depth_l <= YBUS;
-            elsif reg_in = CONS_VE_JUMP_L then
-                jump_l <= YBUS;
-            --elsif reg_in = CONS_DFY_REG_SHIFT_IN then
-            --    dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
-            elsif reg_in = CONS_VE_OLC then
-                ve_oloop_reg <= YBUS;
-            elsif reg_in = CONS_CONFIG then
-                config <= YBUS;
-            elsif reg_in = CONS_RING_END then
-                ring_end_addr <= YBUS;
-            elsif reg_in = CONS_RING_START then
-                ring_start_addr <= YBUS;
-                --curr_ring_addr <= YBUS;
-            --elsif reg_in = ACC_CLR then
-               -- mul_ctl <= YBUS;
-            elsif reg_in = CONS_ZP_DATA then
-                zp_data <= YBUS;
-            elsif reg_in = CONS_ZP_WEIGHT then
-                zp_weight <= YBUS;
-            elsif reg_in = CONS_SCALE then
-                scale   <= YBUS(4 downto 0);
-            elsif reg_in = CONS_PP_CTL then
-                pp_ctl <= YBUS(4 downto 0);
-            elsif reg_in = CONS_BIAS_INDEX_END then
-                bias_index_end <= YBUS;
-            elsif reg_in = CONS_BIAS_INDEX_START then
-                bias_index_start <= YBUS;
-            elsif reg_in = CONS_MAC_SWITCH then
-                mul_ctl <= YBUS;
+        if rising_edge(clk_p) then
+            if clk_e_neg = '1' then --rising_edge of clk_e
+                if RST = '0' then
+                    re_saddr_l        <= (others => '0');
+                    re_saddr_r        <= (others => '0');
+                    re_loop_reg       <= (others => '0');
+                    re_saddr_a        <= (others => '0'); 
+                    re_saddr_b        <= (others => '0'); 
+                    ve_saddr_l        <= (others => '0');
+                    ve_saddr_r        <= (others => '0');
+                    ve_loop_reg       <= (others => '0');
+                    offset_l          <= (others => '0'); 
+                    offset_r          <= '0'; 
+                    depth_l           <= (others => '0'); 
+                    jump_l            <= (others => '0'); 
+                    --dfy_reg           <= (others =>(others => '0'));
+                    ve_oloop_reg      <= (others => '0'); 
+                    config            <= (others => '0'); 
+                    ring_end_addr     <= (others => '0'); 
+                    ring_start_addr   <= (others => '0'); 
+                    --curr_ring_addr    <= (others => '0');
+                    zp_data           <= (others => '0');
+                    zp_weight         <= (others => '0');
+                    scale             <= (others => '0'); 
+                    pp_ctl            <= (others => '0');
+                    bias_index_end    <= (others => '0');
+                    bias_index_start  <= (others => '0');
+                    mul_ctl           <= (others => '0'); 
+                elsif reg_in = CONS_RE_START_ADDR_L then
+                    re_saddr_l <= YBUS;
+                elsif reg_in = CONS_RE_START_ADDR_R then
+                    re_saddr_r <= YBUS;
+                elsif reg_in = CONS_RE_LC then
+                    re_loop_reg <= YBUS;
+                elsif reg_in = CONS_DFY_ADDR_A then
+                    re_saddr_a <= YBUS;
+                elsif reg_in = CONS_DFY_ADDR_B then
+                    re_saddr_b <= YBUS;
+                elsif reg_in = CONS_VE_START_ADDR_L then
+                    ve_saddr_l <= YBUS;
+                elsif reg_in = CONS_VE_START_ADDR_R then
+                    ve_saddr_r <= YBUS;
+                elsif reg_in = CONS_VE_LC then
+                    ve_loop_reg <= YBUS;
+                elsif reg_in = CONS_VE_OFFSET_L then
+                    offset_l <= YBUS;
+                elsif reg_in = CONS_VE_OFFSET_R then
+                    offset_r <= YBUS(0);
+                elsif reg_in = CONS_VE_DEPTH_L then
+                    depth_l <= YBUS;
+                elsif reg_in = CONS_VE_JUMP_L then
+                    jump_l <= YBUS;
+                --elsif reg_in = CONS_DFY_REG_SHIFT_IN then
+                --    dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
+                elsif reg_in = CONS_VE_OLC then
+                    ve_oloop_reg <= YBUS;
+                elsif reg_in = CONS_CONFIG then
+                    config <= YBUS;
+                elsif reg_in = CONS_RING_END then
+                    ring_end_addr <= YBUS;
+                elsif reg_in = CONS_RING_START then
+                    ring_start_addr <= YBUS;
+                    --curr_ring_addr <= YBUS;
+                --elsif reg_in = ACC_CLR then
+                   -- mul_ctl <= YBUS;
+                elsif reg_in = CONS_ZP_DATA then
+                    zp_data <= YBUS;
+                elsif reg_in = CONS_ZP_WEIGHT then
+                    zp_weight <= YBUS;
+                elsif reg_in = CONS_SCALE then
+                    scale   <= YBUS(4 downto 0);
+                elsif reg_in = CONS_PP_CTL then
+                    pp_ctl <= YBUS(4 downto 0);
+                elsif reg_in = CONS_BIAS_INDEX_END then
+                    bias_index_end <= YBUS;
+                elsif reg_in = CONS_BIAS_INDEX_START then
+                    bias_index_start <= YBUS;
+                elsif reg_in = CONS_MAC_SWITCH then
+                    mul_ctl <= YBUS;
+                end if;
             end if;
         end if;
     end process;
@@ -524,23 +526,25 @@ begin
     --addr_reload, modes are written in one microinstruction.
     pushback_addr_write : process(clk_p) --generate address counter a abd b
     begin
-        if rising_edge(clk_p) and clk_e_pos = '1'then --falling_edge of clock_e
-            if RST = '0' then
-                re_addr_a <= (others => '0');
-                re_addr_b <= (others => '0');
-            elsif re_source = '1' and addr_reload = '1' then
-                if mode_a = '1' then
-                    re_addr_a <= re_saddr_a;
-                elsif mode_b = '1' then
-                    re_addr_b <= re_saddr_b;
+        if rising_edge(clk_p) then
+            if clk_e_pos = '1'then --falling_edge of clock_e
+                if RST = '0' then
+                    re_addr_a <= (others => '0');
+                    re_addr_b <= (others => '0');
+                elsif re_source = '1' and addr_reload = '1' then
+                    if mode_a = '1' then
+                        re_addr_a <= re_saddr_a;
+                    elsif mode_b = '1' then
+                        re_addr_b <= re_saddr_b;
+                    end if;
+                elsif addr_reload = '0' and re_source = '1' and re_start = '1' then
+                    if mode_a = '1'  then 
+                        re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
+                    elsif mode_b = '1' then
+                        re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
+                    end if;
+    
                 end if;
-            elsif addr_reload = '0' and re_source = '1' and re_start = '1' then
-                if mode_a = '1'  then 
-                    re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
-                elsif mode_b = '1' then
-                    re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
-                end if;
-
             end if;
         end if;
     end process;
@@ -638,7 +642,8 @@ begin
     --**********************
     --Address_MUX
     --**********************
-    process(re_start_reg,re_source,mode_a_l,mode_b_l,ve_start,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r)
+    process(re_start,re_start_reg,re_source,mode_a_l,mode_b_l,ve_start,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r,mode_c,
+            curr_ring_addr,config,offset_l)
     begin
         if re_start = '1' or ve_start = '1' then --Not latched instructions.
             if mode_c = '1' then
@@ -675,13 +680,14 @@ begin
     --Write enable signal to srams
     --
     sram_l_we <= '1' when re_start = '1' and mode_c = '1' and clk_e_pos = '1' else
-    '1' when re_start_reg = '1' and mode_a_l = '1' and mode_b_l = '0' else 
-    '0';
+                 '1' when re_start_reg = '1' and mode_a_l = '1' and mode_b_l = '0' else 
+                 '0';
     
     sram_r_we <= '1' when re_start_reg = '1' and mode_b_l = '1' and mode_a_l = '0' else
-    '0' when re_start_reg = '0';
+                 '0';
     
-    addr_p_b <= bias_index_wr when sram_b_we = '1' else bias_index_rd(7 downto 2);
+    addr_p_b <= bias_index_wr when sram_b_we = '1' else 
+                bias_index_rd(7 downto 2);
 
     sram_b_we <= '1' when re_start_reg = '1' and mode_a_l = '1' and mode_b_l = '1' else '0';
 
@@ -797,16 +803,18 @@ end process;
 
 process(clk_p)
 begin 
-    if rising_edge(clk_p) and latch_ena = '1' then
-        acc_reg_0 <= acc_out_0;
-        acc_reg_1 <= acc_out_1;
-        acc_reg_2 <= acc_out_2;
-        acc_reg_3 <= acc_out_3;
-        acc_reg_4 <= acc_out_4;
-        acc_reg_5 <= acc_out_5;
-        acc_reg_6 <= acc_out_6;
-        acc_reg_7 <= acc_out_7;
-        acc_reg_a <= acc_out_a;
+    if rising_edge(clk_p) then
+        if latch_ena = '1' then
+            acc_reg_0 <= acc_out_0;
+            acc_reg_1 <= acc_out_1;
+            acc_reg_2 <= acc_out_2;
+            acc_reg_3 <= acc_out_3;
+            acc_reg_4 <= acc_out_4;
+            acc_reg_5 <= acc_out_5;
+            acc_reg_6 <= acc_out_6;
+            acc_reg_7 <= acc_out_7;
+            acc_reg_a <= acc_out_a;
+        end if;
     end if;
 end process;
 --Overall accumulator (Adder)
@@ -861,27 +869,29 @@ end process;
 
 process(clk_p)
 begin 
-    if rising_edge(clk_p) and o_mux_ena = '1' then
-        if ve_out_p = '0' then
-            p_shifter_in <= acc_out_a;
-        elsif ve_out_p = '1' then
-            ve_out_c <= std_logic_vector(to_signed(to_integer(signed(ve_out_c))+1,3));
-            if ve_out_c = "000" then
-                p_shifter_in <= acc_out_0;
-            elsif ve_out_c = "001" then
-                p_shifter_in <= acc_out_1;
-            elsif ve_out_c = "010" then
-                p_shifter_in <= acc_out_2;
-            elsif ve_out_c = "011" then
-                p_shifter_in <= acc_out_3;
-            elsif ve_out_c = "100" then
-                p_shifter_in <= acc_out_4;
-            elsif ve_out_c = "101" then
-                p_shifter_in <= acc_out_5;
-            elsif ve_out_c = "110" then
-                p_shifter_in <= acc_out_6;
-            elsif ve_out_c = "111" then
-                p_shifter_in <= acc_out_7;
+    if rising_edge(clk_p) then
+        if o_mux_ena = '1' then
+            if ve_out_p = '0' then
+                p_shifter_in <= acc_out_a;
+            elsif ve_out_p = '1' then
+                ve_out_c <= std_logic_vector(to_signed(to_integer(signed(ve_out_c))+1,3));
+                if ve_out_c = "000" then
+                    p_shifter_in <= acc_out_0;
+                elsif ve_out_c = "001" then
+                    p_shifter_in <= acc_out_1;
+                elsif ve_out_c = "010" then
+                    p_shifter_in <= acc_out_2;
+                elsif ve_out_c = "011" then
+                    p_shifter_in <= acc_out_3;
+                elsif ve_out_c = "100" then
+                    p_shifter_in <= acc_out_4;
+                elsif ve_out_c = "101" then
+                    p_shifter_in <= acc_out_5;
+                elsif ve_out_c = "110" then
+                    p_shifter_in <= acc_out_6;
+                elsif ve_out_c = "111" then
+                    p_shifter_in <= acc_out_7;
+                end if;
             end if;
         end if;
     end if;
@@ -899,45 +909,47 @@ shifter_ena <= pp_stage_1 and not pp_ctl(0);
 process(clk_p)
     variable sh0, sh1, sh2, sh3, sh4: std_logic_vector(31 downto 0);
 begin
-    if rising_edge(clk_p) and shifter_ena = '1' then --and shifter_on = '0'
-        if scale(4) = '0' then
-            sh4 := p_shifter_in;
-        elsif scale(4) = '1' then
-            sh4(31 downto 16) :=(others => p_shifter_in(31));
-            sh4(15 downto 0) := p_shifter_in(31 downto 16);
+    if rising_edge(clk_p) then
+        if shifter_ena = '1' then --and shifter_on = '0'
+            if scale(4) = '0' then
+                sh4 := p_shifter_in;
+            elsif scale(4) = '1' then
+                sh4(31 downto 16) :=(others => p_shifter_in(31));
+                sh4(15 downto 0) := p_shifter_in(31 downto 16);
+            end if;
+    
+            if scale(3) = '0' then
+                sh3 := sh4;
+            elsif scale(3) = '1' then
+                sh3(31 downto 24):=(others => sh4(31));
+                sh3(23 downto 0) := sh4(31 downto 8);
+            end if;
+    
+            if scale(2) = '0' then
+                sh2 := sh3;
+            elsif scale(2) = '1' then
+                sh2(31 downto 28):=(others => sh3(31));
+                sh2(27 downto 0) := sh3(31 downto 4);
+            end if;
+    
+            if scale(1) = '0' then
+                sh1 := sh2;
+            elsif scale(1) = '1' then
+                sh1(31 downto 30):=(others => sh2(31));
+                sh1(29 downto 0) := sh2(31 downto 2);
+            end if;
+    
+            if scale(0) = '0' then
+               sh0 := sh1;
+            elsif scale(0) = '1' then
+                sh0(31):= sh1(31);
+                sh0(30 downto 0) := sh1(31 downto 1) ;
+            end if;
+            
+            p_shifter_out <= sh0;
+                ---------------------------
+                ---------------------------
         end if;
-
-        if scale(3) = '0' then
-            sh3 := sh4;
-        elsif scale(3) = '1' then
-            sh3(31 downto 24):=(others => sh4(31));
-            sh3(23 downto 0) := sh4(31 downto 8);
-        end if;
-
-        if scale(2) = '0' then
-            sh2 := sh3;
-        elsif scale(2) = '1' then
-            sh2(31 downto 28):=(others => sh3(31));
-            sh2(27 downto 0) := sh3(31 downto 4);
-        end if;
-
-        if scale(1) = '0' then
-            sh1 := sh2;
-        elsif scale(1) = '1' then
-            sh1(31 downto 30):=(others => sh2(31));
-            sh1(29 downto 0) := sh2(31 downto 2);
-        end if;
-
-        if scale(0) = '0' then
-           sh0 := sh1;
-        elsif scale(0) = '1' then
-            sh0(31):= sh1(31);
-            sh0(30 downto 0) := sh1(31 downto 1) ;
-        end if;
-        
-        p_shifter_out <= sh0;
-            ---------------------------
-            ---------------------------
     end if;
 end process;
 --bias buffer --also activates at the clock cycle when shifter is activated, so shares the o_mux_ena signal
@@ -970,8 +982,10 @@ adder_ena <= pp_stage_2 and not pp_ctl(1);
 
 process(clk_p) 
 begin
-    if rising_edge(clk_p) and adder_ena = '1' then
-        p_adder_out <= std_logic_vector(to_signed(to_integer(signed(p_shifter_out))+to_integer(signed(bias_mux_out)),32));
+    if rising_edge(clk_p) then
+        if adder_ena = '1' then
+            p_adder_out <= std_logic_vector(to_signed(to_integer(signed(p_shifter_out))+to_integer(signed(bias_mux_out)),32));
+        end if;
     end if;
 end process;
 
@@ -983,17 +997,19 @@ begin
         clip_ena <= adder_ena;
     end if;
 end process; 
-process(clk_p)
+process(clk_p,p_adder_out)
     variable diff : std_logic_vector(31 downto 0);
 begin
     diff := std_logic_vector(to_signed(to_integer(signed(p_adder_out)) - 256,32));
-    if rising_edge(clk_p) and clip_ena = '1' then
-        if p_adder_out(31) = '1' then
-            p_clip_out <= (others => '0');
-        elsif diff(31) = '1' then
-            p_clip_out <= (others => '1');
-        else
-            p_clip_out <= p_adder_out(7 downto 0);
+    if rising_edge(clk_p) then
+        if clip_ena = '1' then
+            if p_adder_out(31) = '1' then
+                p_clip_out <= (others => '0');
+            elsif diff(31) = '1' then
+                p_clip_out <= (others => '1');
+            else
+                p_clip_out <= p_adder_out(7 downto 0);
+            end if;
         end if;
     end if;
 end process;
@@ -1200,7 +1216,7 @@ begin
     end if;
 end process;
 
-process(clk_p)
+process(clk_p,dtm_data_reg)
 begin
     if rising_edge(clk_p) then
         if RST = '0' then

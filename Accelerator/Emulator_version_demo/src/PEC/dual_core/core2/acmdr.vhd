@@ -161,9 +161,9 @@ begin
     fifo_push <= pl(114);
     pl_send_req <= pl(113);
     init_mpgm_rq <= "01000111001111110000000000000000";
-    process(rst_en,ld_dtm,clk_e_neg,ld_dtm_v)
+    process(clk_p)
     begin
-    --if rising_edge(clk_p) then
+    if rising_edge(clk_p) then
         if rst_en = '0' then
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
@@ -177,7 +177,7 @@ begin
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
             ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         end if;
-    --end if;
+    end if;
     end process;
     --Fifo control signals
     process(clk_p)
@@ -197,9 +197,11 @@ begin
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) and clk_e_neg = '1' then --rising_edge
-            send_req_d <= pl_send_req;
-            send_req <= send_req_d;
+        if rising_edge(clk_p) then
+            if clk_e_neg = '1' then --rising_edge
+                send_req_d <= pl_send_req;
+                send_req <= send_req_d;
+            end if;
         end if;
     end process;
 
@@ -216,11 +218,13 @@ begin
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) and clk_e_neg = '1' then
-            if send_req = '1' and fb = '0' then
-                req <= '1';
-            else
-                req <= '0';
+        if rising_edge(clk_p) then 
+            if clk_e_neg = '1' then
+                if send_req = '1' and fb = '0' then
+                    req <= '1';
+                else
+                    req <= '0';
+                end if;
             end if;
         end if;
     end process;

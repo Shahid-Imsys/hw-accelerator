@@ -457,6 +457,9 @@ architecture struct of core is
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
   signal ve_out_dtm_int : std_logic_vector(127 downto 0);    
+
+  attribute keep : string;
+  attribute keep of pl : signal is "true";
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -501,7 +504,7 @@ begin
     end if;
   end process;
 
-  mpgm_load : process(clk_p, vldl, ddi_vld)
+  mpgm_load : process(clk_p)
   begin 
       if rising_edge(clk_p) then
           if clk_e_neg_int = '0'then

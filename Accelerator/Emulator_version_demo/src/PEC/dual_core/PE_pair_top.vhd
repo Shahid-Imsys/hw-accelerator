@@ -1371,6 +1371,8 @@ architecture struct of PE_pair_top is
 --  signal RAM7_A          : std_logic_vector (9 downto 0);
 --  signal RAM7_WEB        : std_logic_vector(15 downto 0);
 --  signal RAM7_CS         : std_logic;   
+    attribute keep : string;
+    attribute keep of mp_RAM0_WEB : signal is "true";
 
 begin
 
@@ -1949,7 +1951,7 @@ begin
       WEB         => mp_RAM0_WEB,              
       CK          => clk_p,           
       CS          => mp_RAM0_CS,               
-      OE          => std_logic'('1') --'1'                
+      OE          => mp_RAM0_OE--std_logic'('1') --'1'                
       );
 
   --mpram11: SU180_2048X80X1BM1B

@@ -304,6 +304,10 @@ architecture struct of SU180_256X128X1BM1A is
 	signal do		: std_logic_vector(127 downto 0);
 	attribute ram_style					: string;
 	attribute ram_style of RAM	: signal is "block";
+	attribute keep : string;
+	attribute keep of di : signal is "true";
+	attribute keep of do : signal is "true";
+	attribute keep of addr : signal is "true";
 
 begin
 	--addr(10)	<= A10; 

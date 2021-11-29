@@ -350,13 +350,14 @@ begin
     dfy_dest_sel <= PL (118 downto 116); --DEST_BYTE
     re_start  <= PL(100);
     ve_start  <= PL(95); --VE_ST
-    acc_latch <= PL(94); --ACCTOREG
+    acc_latch <= PL(94); --ACCTOREG --To be removed
     re_source <= PL(96); --RE_DFY_SRC --
     reg_in    <= PL(105 downto 101);
     mode_a    <= PL(98);
     mode_b    <= PL(97);
     mode_c    <= PL(92);
-    addr_reload <= PL(99);
+    addr_reload <= PL(99); --re_addr_reload <= PL(99);
+                           --ve_addr_reload <= PL(107);
     ve_clr_acc <= PL(93);
     pl_ve_byte <= PL(112 downto 109);
     --
@@ -375,8 +376,8 @@ begin
                     ve_saddr_l        <= (others => '0');
                     ve_saddr_r        <= (others => '0');
                     ve_loop_reg       <= (others => '0');
-                    offset_l          <= (others => '0'); 
-                    offset_r          <= '0'; 
+                    offset_l          <= (others => '0');  --Be aware of step and offset and depth!! --1125
+                    offset_r          <= '0';              --Make it 8 bits -1125
                     depth_l           <= (others => '0'); 
                     jump_l            <= (others => '0'); 
                     --dfy_reg           <= (others =>(others => '0'));
@@ -388,7 +389,7 @@ begin
                     zp_data           <= (others => '0');
                     zp_weight         <= (others => '0');
                     scale             <= (others => '0'); 
-                    pp_ctl            <= (others => '0');
+                    pp_ctl            <= (others => '0');  --Make it 8 bits
                     bias_index_end    <= (others => '0');
                     bias_index_start  <= (others => '0');
                     mul_ctl           <= (others => '0'); 
@@ -605,7 +606,7 @@ begin
         end if;
     end process;
     
-    VE_RDY <= not ve_start_reg;
+    VE_RDY <= ve_start_reg;--remove revert --1125
     --********************************
     --Mode c. Shared by RE and VE
     --********************************
@@ -985,6 +986,8 @@ begin
     if rising_edge(clk_p) then
         if adder_ena = '1' then
             p_adder_out <= std_logic_vector(to_signed(to_integer(signed(p_shifter_out))+to_integer(signed(bias_mux_out)),32));
+        else
+            p_adder_out <= p_shifter_out;
         end if;
     end if;
 end process;

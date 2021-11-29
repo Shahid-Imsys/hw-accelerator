@@ -254,8 +254,8 @@ end component;
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
-  --signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
-  --signal delay_b      : std_logic_vector(37 downto 0);
+  signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
+  signal delay_b      : std_logic_vector(37 downto 0);
   signal rd_ena       : std_logic;
   
   signal one_c_delay :std_logic;
@@ -330,17 +330,19 @@ EVEN_P <= even_p_2;
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
-  rst : process(noc_cmd)
+  rst : process(clk_p)
   begin
+	if rising_edge(clk_p) then
 		if noc_cmd = "01111" then
 		  rst_i <= '0';
 		else
 		  rst_i <= '1';
 		end if;
+	end if;
   end process;
 
   cmd_activate : process(clk_e) --39 - 33 = 6 6 must be kept
-   variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
+    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
 	if rising_edge(clk_e)then
 		if noc_cmd = "01111" or noc_cmd = "00110" then
@@ -807,6 +809,7 @@ EVEN_P <= even_p_2;
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
                 bc_i <= (others => '0');
+
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
@@ -818,14 +821,18 @@ EVEN_P <= even_p_2;
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
+
                 bc_i(0) <= '0';
+
  			end if;
 			for i in 0 to 5 loop
 				bc_i(i+1) <= bc_i(i);
 			end loop;
  		end if;
  	end process;
+
     BC<= bc_i(6);
+
     process(clk_p) --Reset need to be added 
 	begin 
 		if rising_edge(clk_p) then

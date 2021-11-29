@@ -544,7 +544,7 @@ begin
       clk_p      => clk_p,              
       clk_e_pos   => clk_e_pos_int,
       clk_e_neg   => clk_e_neg_int,
-      gate_e     => clk_e_pos_int,          
+      --gate_e     => clk_e_pos_int,          
       held_e     => held_e,           
       -- Microprogram fields
       pl         => pl, 
@@ -659,7 +659,7 @@ begin
       clk_c2_pos      => odd_c,            
       clk_d_pos       => clk_d_pos,            
       clk_e_pos       => clk_e_pos_int,
-      gate_e      => clk_e_pos_int,          
+      --gate_e      => clk_e_pos_int,          
       even_c      => odd_c,
       held_e      => held_e,
       -- Microprogram control

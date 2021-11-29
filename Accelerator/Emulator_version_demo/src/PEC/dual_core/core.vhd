@@ -970,7 +970,7 @@ begin
       clk_p      => clk_p,              
       clk_e_pos   => clk_e_pos_int,
       clk_e_neg   => clk_e_neg_int,
-      gate_e     => clk_e_pos_int,          
+      --gate_e     => clk_e_pos_int,          
       held_e     => held_e,          
       -- Microprogram fields
       pl         => pl, 
@@ -1085,7 +1085,7 @@ begin
       clk_c2_pos      => even_c,            
       clk_d_pos       => clk_d_pos,            
       clk_e_pos       => clk_e_pos_int,
-      gate_e      => clk_e_pos_int,          
+      --gate_e      => clk_e_pos_int,          
       even_c      => even_c,
       held_e      => held_e,
       -- Microprogram control
@@ -1146,7 +1146,7 @@ begin
     clk_c2_pos  => even_c, 
     clk_e_neg   => clk_e_neg_int,
     clk_e_pos   => clk_e_pos_int,
-    gate_e      => clk_e_pos_int,          
+    --gate_e      => clk_e_pos_int,          
     wmlat       => wmlat,
     byte_sel    => byte_sel,
     dfsr        => dfsr,
@@ -1218,7 +1218,7 @@ begin
       clk_c2_pos         => even_c,
       clk_e_pos          => clk_e_pos_int,    
       clk_e_neg          => clk_e_neg_int,
-      gate_e         => clk_e_pos_int,          
+      --gate_e         => clk_e_pos_int,          
       clk_i_pos          => clk_i_pos,
       -- Microprogram fields
       pl             => pl,           

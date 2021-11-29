@@ -46,7 +46,7 @@ entity ios is
 --    even_c      : in    std_logic;      -- High during even clk_c cycles
     clk_e_pos       : in    std_logic;      -- Execution clock   
     clk_e_neg       : in    std_logic;      -- Execution clock     
-    gate_e      : in    std_logic;      -- Copy of execution clock used for gating 
+    --gate_e      : in    std_logic;      -- Copy of execution clock used for gating 
     clk_i_pos       : in    std_logic;      -- I/O clock
 --    gate_i      : in    std_logic;      -- Copy of clk_i used for gating 
     -- Microprogram fields
@@ -365,7 +365,7 @@ begin
 --      even_c       => even_c,
       clk_e_pos        => clk_e_pos,
       clk_e_neg        => clk_e_neg,
-      gate_e       => gate_e,
+      --gate_e       => gate_e,
       clk_i_pos        => clk_i_pos,
       use_direct   => use_direct,
       dbl_direct   => dbl_direct,

@@ -186,7 +186,7 @@ end component;
   signal req_bexe  : std_logic;
   signal req_exe   : std_logic;
   signal write_req : std_logic;
-  signal bc_i : std_logic;
+  signal bc_i : std_logic_vector(6 downto 0);
   signal cl_net_fifo_rd : std_logic;
   signal rd_fifo_i : std_logic;
   --Control registers
@@ -774,23 +774,27 @@ EVEN_P <= even_p_2;
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
-                bc_i <= '0';
+                bc_i <= (others => '0');
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
  				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
-                bc_i <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
+                bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
             elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000000" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
-                bc_i <= '0';
+                bc_i(0) <= '0';
  			end if;
+			
+			for i in 0 to 5 loop
+				bc_i(i+1) <= bc_i(i);
+			end loop;
  		end if;
  	end process;
-    BC<= bc_i;
+    BC<= bc_i(6);
     process(clk_p) --Reset need to be added 
 	begin 
 		if rising_edge(clk_p) then

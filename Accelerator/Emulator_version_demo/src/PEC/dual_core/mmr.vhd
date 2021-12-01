@@ -114,6 +114,7 @@ architecture rtl of mmr is
   signal pl_memcp_sig:   std_logic_vector(1 downto 0); -- MEMCP field of u-instruction
   signal pl_pc_sig:      std_logic_vector(3 downto 0);  --from the microprogram word
   signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
+  signal clk_e_neg_in :  std_logic;
 
   -- Introducing 'inv_col' to differ clock and combinational usage of 'col',
   -- in order to avoid Synplify ASIC generates a high fan_out on 'col'.
@@ -149,6 +150,7 @@ begin
     -- This is the combinatorial part of the state machine
     -- for the SDRAM timing logic.
 	pl_memcp_sig <= pl(2)&pl(36);
+  clk_e_neg_in <= clk_e_neg;
     mtl_next: process (state, pl_memcp_sig, held_e, allras)
     begin
       next_state <= state;

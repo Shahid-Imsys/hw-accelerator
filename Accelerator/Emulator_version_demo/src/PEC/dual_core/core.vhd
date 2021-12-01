@@ -452,6 +452,7 @@ architecture struct of core is
   signal temp1        : std_logic; --Added by CJ. Used to latch temp
   --signal n_temp        : std_logic;
   signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
+  signal init_ld   : std_logic;
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
@@ -460,6 +461,7 @@ architecture struct of core is
 
   attribute keep : string;
   attribute keep of pl : signal is "true";
+  attribute keep of init_ld : signal is "true";
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -482,15 +484,21 @@ begin
   exe_i <= exe;
   req_c1 <= req;
   ack <= ACK_C1; 
+  init_ld <= pl(100) and pl(106) and not pl(98) and not pl(97);
   --ld_mpgm <= pl(100) and pl(98);
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
       if rising_edge(clk_p) then
+        if rst_en_int = '0' then
+          vldl <= '0';
+          temp <= '0';        
+        else
           vldl <= ddi_vld;
           if clk_e_neg_int = '1' then --make sure vldl is generated later than clk_e_neg
           temp <= ddi_vld;
           --vldl <= mid;
           end if;
+        end if;
       end if;
   end process;
   --Two clock e pulses delay generation
@@ -511,12 +519,13 @@ begin
               if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
                   ld_mpgm <= '0';
               else
-                  ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
+                  ld_mpgm <= init_ld;--pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
               end if;
           end if;
       end if;
   end process;
 
+--init_ld and not clk_e_neg_int and not ltwo or ld_mpgm and clk_e_neg_int or init_ld and not clk_e_neg_int and temp1
   --init_load: process(clk_p)
   --begin
   --  if rising_edge(clk_p) then
@@ -610,7 +619,7 @@ begin
   process(clk_p) --1 clk_e delay of input to microprogram memory
   begin
     if rising_edge(clk_p) then
-      if clk_e_pos_int = '0' then
+      if clk_e_neg_int = '0' then--clk_e_pos_int = '0' then
         mpram_d     <= mpgmin;
       end if;
     end if;

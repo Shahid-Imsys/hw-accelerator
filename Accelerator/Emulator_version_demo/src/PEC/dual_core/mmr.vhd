@@ -50,7 +50,7 @@ entity mmr is
     clk_c2_pos:     in  std_logic;  -- 
     clk_d_pos:      in  std_logic;  -- SDRAM clock
     clk_e_pos:      in  std_logic;  -- Execution clock
-    gate_e:     in  std_logic; -- Copy of execution clock used for gating 
+    --gate_e:     in  std_logic; -- Copy of execution clock used for gating 
     even_c:     in  std_logic;  -- High on even (first of two) clk_c cycles
     held_e:     in  std_logic;  -- High when clk_e is held, multiple of 2 clk_c
     -- Microprogram control
@@ -114,6 +114,7 @@ architecture rtl of mmr is
   signal pl_memcp_sig:   std_logic_vector(1 downto 0); -- MEMCP field of u-instruction
   signal pl_pc_sig:      std_logic_vector(3 downto 0);  --from the microprogram word
   signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
+  signal clk_e_neg_in :  std_logic;
 
   -- Introducing 'inv_col' to differ clock and combinational usage of 'col',
   -- in order to avoid Synplify ASIC generates a high fan_out on 'col'.
@@ -149,6 +150,7 @@ begin
     -- This is the combinatorial part of the state machine
     -- for the SDRAM timing logic.
 	pl_memcp_sig <= pl(2)&pl(36);
+  clk_e_neg_in <= clk_e_neg;
     mtl_next: process (state, pl_memcp_sig, held_e, allras)
     begin
       next_state <= state;
@@ -742,7 +744,7 @@ begin
     col_addr(12 downto 11) <= lm_addr(11 downto 10);
     col_addr(10) <= '0';
     col_addr(9 downto 1) <= lm_addr(9 downto 1);
-    col_addr(0) <= lm_addr(0) xor (dbl_direct_int and not gate_e);
+    col_addr(0) <= lm_addr(0) xor (dbl_direct_int and not clk_e_pos);
 
     -- Row address
     -- 10 x 2to1, 1 x NOR3, 1 x NAND3, 3 x NOR2, 1 x AND2, 1 x OR2 =
@@ -970,7 +972,7 @@ begin
     -- from the dfm register except when we are transferring two bytes per
     -- clk_e cycle over the direct bus and this is the second one. Then it
     -- will be driven from dfm_odd instead.
-    m_direct <= dfm_odd when dbl_direct_int = '1' and gate_e = '0' else
+    m_direct <= dfm_odd when dbl_direct_int = '1' and clk_e_pos = '0' else
                 dfm_int;
 
     -- The direct data bus is driven from m_direct if sel_direct is 10 or 11,
@@ -1027,7 +1029,7 @@ begin
     -- clk_e cycle over the direct bus and this is the first one. Then it
     -- will be driven from dtm_even instead.
     d_dqo <=  dtm_even when (dbl_direct_int = '1' and en_dqo_int = '1'
-                             and gate_e = '1') else
+                             and clk_e_pos = '1') else
               dtm;
     
     -- Assignments needed just because VHDL is stupid

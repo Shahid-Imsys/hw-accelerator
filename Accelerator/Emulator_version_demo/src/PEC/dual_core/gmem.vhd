@@ -42,7 +42,7 @@ entity gmem is
 		clk_p           : in std_logic;
 		clk_e_pos   	: in std_logic;	-- Execution clock 
 		clk_e_neg        : in std_logic;
-		gate_e			: in std_logic;	-- Copy of execution clock used for gating 
+		--gate_e			: in std_logic;	-- Copy of execution clock used for gating 
         held_e			:	in std_logic;	-- High when clk_e is held, multiple of 2 clk_c
 		-- Microprogram fields
 		pl		: in std_logic_vector(127 downto 0); 
@@ -339,9 +339,9 @@ begin
 	end process hold_load;
 
 	wr_addr <=	hold_addr when dbl_direct = '0' else
-							pl_sig20 & gctr_dst(7 downto 1) & (gate_e xnor gctr_dst(0));
+							pl_sig20 & gctr_dst(7 downto 1) & (clk_e_pos xnor gctr_dst(0));
 
-	rd_addr <=	mp_gass & mp_gctr_src when dbl_direct = '0' or gate_e = '0' else
+	rd_addr <=	mp_gass & mp_gctr_src when dbl_direct = '0' or clk_e_pos = '0' else
 							pl_sig19 & gctr_src(7 downto 1) & (not gctr_src(0));
 
 	logic_addr <= wr_addr when gmem_we_nint = '0' else
@@ -352,10 +352,10 @@ begin
 								logic_addr(7) xor inv_psmsb;
 	gmem_a(6 downto 0) <= logic_addr(6 downto 0);
 	
-	gmem_we_nint <= not (((hold_we and gate_e) or (dbl_direct and wr_gmem)) and not held_e);
+	gmem_we_nint <= not (((hold_we and clk_e_pos) or (dbl_direct and wr_gmem)) and not held_e);
 	gmem_we_n <= gmem_we_nint;
 
-	gmem_re_n <= not ((rd_gmem and not gate_e) or (dbl_direct and hold_rd and gate_e and not held_e));
+	gmem_re_n <= not ((rd_gmem and not clk_e_pos) or (dbl_direct and hold_rd and clk_e_pos and not held_e));
 
 	gmem_ce_n <= gmem_we_nint and gmem_re_n;
 	

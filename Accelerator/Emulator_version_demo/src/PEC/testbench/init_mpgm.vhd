@@ -97,25 +97,35 @@ begin
   begin
   --wait for 30 ns;
   MLP_PWR_OK <= '0';
-  wait for 60 ns;
+  c1_data_vld <= '0';
+  wait for 20 ns;--60 ns;
   MLP_PWR_OK <= '1';
   MWAKEUP_LP <= '0';
-  wait for 6000 ns;
+  wait for 2000 ns;--6000 ns;
   MLP_PWR_OK <= '0';
-  wait for 60 ns;
+  wait for 20 ns;--60 ns;
   MLP_PWR_OK <= '1';
-  wait for 3000 ns; --wait until 
+  exe_i <= '0';
+  wait for 1000 ns;--3000 ns; --wait until 
+  wait until even_c_i = '1';
+  wait for 1.5 ns;
   exe_i<= '1';
-  wait for 60 ns;
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 5 ns;
   exe_i<= '0';
-  wait for 600 ns;
+  wait for 200 ns;--600 ns;
   for i in 0 to 255 loop
   --if rising_edge(hclk_i) and even_c_i = '1' then
   sendmc(RAM(i));
   end loop;
-  wait for 60 ns;
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 1 ns;
   c1_input <= (others => '0');
-  wait for 60 ns;
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 1 ns;
   c1_data_vld <= '0'; 
   wait for 1000ns;
   wait;
@@ -123,7 +133,7 @@ begin
   
   process
   begin
-  wait for 60 ns;
+  wait for 20 ns;--60 ns;
   --MSDIN <= '1';
   MTEST <= '1';	
   MRESET <= '1';
@@ -139,9 +149,9 @@ begin
    process
    begin
    hclk_i <= '1';
-   wait for 15 ns;
+   wait for 5 ns;
    hclk_i <= '0';
-   wait for 15 ns;
+   wait for 5 ns;
    end process;
    
    process(hclk_i)

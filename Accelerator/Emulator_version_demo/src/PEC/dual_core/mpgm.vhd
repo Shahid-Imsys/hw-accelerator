@@ -113,7 +113,7 @@ begin  -- rtl
 --             mpga;
 
 
-	process (even_c, held_e, patch_addr, lmpen, lmpwe_n, latch)
+	process (even_c, held_e)--, patch_addr, lmpen, lmpwe_n, latch)
 	begin
 		--mprom_ce_int	<= "00";  --Deleted by CJ
 		mpram_ce_int	<= "00";  

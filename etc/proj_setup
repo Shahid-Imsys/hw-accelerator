@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/bash 
 
 if [ -z "$1" ]; then
    lic="de"
@@ -63,7 +63,7 @@ fi
 if [ "$lic" = "de" ]; then
    SIM_FLAGS="-cover -gui -modelsimini $ETC_DIR_WIN/modelsim.ini"
 elif [ "$lic" = "vivado" ]; then
-   SIM_FLAGS=""
+   SIM_FLAGS="--gui"
 else
    SIM_FLAGS="-gui -modelsimini $ETC_DIR_WIN/modelsim.ini"
 fi

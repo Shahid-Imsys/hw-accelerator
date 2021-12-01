@@ -71,9 +71,9 @@ fi
 export SIM_FLAGS
 
 if [ "$lic" = "vivado" ]; then
-   export COMP_FLAGS=""
-   export COMP_RTL_FLAGS=""
-   export COMP_TB_FLAGS="$"
+   export COMP_FLAGS="--2008"
+   export COMP_RTL_FLAGS="$COMP_FLAGS"
+   export COMP_TB_FLAGS="$COMP_FLAGS"
    export COMP_SV_FLAGS=""
    export CREATE_WORK=""
 else

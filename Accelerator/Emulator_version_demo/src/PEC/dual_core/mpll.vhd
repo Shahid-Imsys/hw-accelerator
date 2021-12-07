@@ -41,7 +41,7 @@ entity mpll is
     clk_c2_pos  : in  std_logic;   -- 'clk_c / 2' clock
     clk_e_pos   : in std_logic;
     clk_e_neg      : in  std_logic;   -- execution clock 
-    gate_e     : in  std_logic;   -- Copy of execution clock used for gating, also the positive edge
+    --gate_e     : in  std_logic;   -- Copy of execution clock used for gating, also the positive edge
     -- From CPC (SP load)
     wmlat			 : in  std_logic;   -- load mpll pulse (1 'clk_s', active high)
     byte_sel   : in  std_logic_vector(3 downto 0);  -- byte select
@@ -119,7 +119,7 @@ begin
                   udo((i+1)*8 - 1 downto i*8) <= dfsr;
                 end if;
               end loop;
-            elsif lmpen = '1' and ldmp = '1' and gate_e = '0' then    
+            elsif lmpen = '1' and ldmp = '1' and clk_e_pos = '0' then    
               -- Self load
               if dbl_direct = '0' then
                                               -- Single byte transfer

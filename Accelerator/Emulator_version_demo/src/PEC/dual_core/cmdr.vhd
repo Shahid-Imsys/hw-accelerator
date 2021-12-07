@@ -104,6 +104,8 @@ architecture rtl of cmdr is
     signal fb          : std_logic;
     signal req         : std_logic;
     signal srst        : std_logic;
+    attribute keep : string;
+    attribute keep of mp_data_int : signal is "true";
 
 begin
 --*******************************************************************     

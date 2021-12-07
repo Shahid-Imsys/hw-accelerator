@@ -625,7 +625,7 @@ begin
     end if;
   end process;
   --n_temp <= not temp;
-  mpram_we_n  <= not temp when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
+  mpram_we_n  <= not temp1 when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;
 

@@ -149,33 +149,33 @@ component CMEM_32KX16 is
 		 );
 end component;
 
-component delay_count is
-	port(
-		 clk_e             :   in std_logic;
-         peci_busy         :   in std_logic;
-         sig_fin           :   in std_logic;
-         noc_cmd           :   in std_logic_vector(4 downto 0);
-         noc_reg_rdy       :   in std_logic;
-         len_ctr           :   in std_logic_vector(14 downto 0);
+--component delay_count is
+--	port(
+--		 clk_e             :   in std_logic;
+--         peci_busy         :   in std_logic;
+--         sig_fin           :   in std_logic;
+--         noc_cmd           :   in std_logic_vector(4 downto 0);
+--         noc_reg_rdy       :   in std_logic;
+--         len_ctr           :   in std_logic_vector(14 downto 0);
+--
+--         delay             :   out std_logic
+--        
+--		);
+--end component;
 
-         delay             :   out std_logic
-        
-		);
-end component;
-
-component mem_ctrl is
-	port(
-		clk_e           : in std_logic;
-        byte_ctr        : in std_logic_vector(3 downto 0);
-        delay           : in std_logic;
-        noc_cmd         : in std_logic_vector(4 downto 0);
-
-        noc_reg_rdy     : out std_logic;
-        noc_write       : out std_logic;
-        noc_read        : out std_logic
-
-		);
-end component;
+--component mem_ctrl is
+--	port(
+--		clk_e           : in std_logic;
+--        byte_ctr        : in std_logic_vector(3 downto 0);
+--        delay           : in std_logic;
+--        noc_cmd         : in std_logic_vector(4 downto 0);
+--
+--        noc_reg_rdy     : out std_logic;
+--        noc_write       : out std_logic;
+--        noc_read        : out std_logic
+--
+--		);
+--end component;
 
   --Clock signals
   signal clk_m    : std_logic; --CM clock
@@ -254,8 +254,8 @@ end component;
   --Delay signal
   --constant dn_c       : integer :=32  --Data delay for continous writing and reading
   --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
-  --signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
-  --signal delay_b      : std_logic_vector(37 downto 0);
+  signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
+  signal delay_b      : std_logic_vector(37 downto 0);
   signal rd_ena       : std_logic;
   
   signal one_c_delay :std_logic;
@@ -330,6 +330,7 @@ EVEN_P <= even_p_2;
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
+  --Reset signal
   rst : process(noc_cmd)
   begin
 		if noc_cmd = "01111" then
@@ -338,7 +339,7 @@ EVEN_P <= even_p_2;
 		  rst_i <= '1';
 		end if;
   end process;
-
+  --This process generates peci_busy and sig_fin flags to indicate that the current command is being executed
   cmd_activate : process(clk_e) --39 - 33 = 6 6 must be kept
    variable tag_ctr_1 : integer;  -- Reaction time, 38 clock cycles. To be replaced within define document
   begin 
@@ -372,7 +373,7 @@ EVEN_P <= even_p_2;
 --	    peci_busy <= '1';
 --	end if;
 --  end process;
-  
+	--This process translates the incoming data from tag line to command register
     tag_translate : process (clk_e)
     variable noc_cmd_ctr : integer :=5;
     begin
@@ -464,7 +465,8 @@ EVEN_P <= even_p_2;
 --
 --	end if;
 --  end process; 
-    
+    --Generate execution and resume signals. exe_i and resume_i only get one pulse 
+	--per command.
     exe_and_resume: process(clk_p)
 		variable idle: boolean;
 	begin
@@ -505,9 +507,10 @@ EVEN_P <= even_p_2;
   ------------------------------------------------------------------------------
   -- Data transfer
   ------------------------------------------------------------------------------  
-	
-	delay_count: process(clk_e)
-    
+	--This counter counts the number of clocks for the lenth counter data and
+	--the starting addres data to come from the tag line and asserts a delay 
+	--signal afterwards. 
+	delay_count: process(clk_e)  
 	begin
 
 		if rising_edge(clk_e) then
@@ -554,7 +557,8 @@ EVEN_P <= even_p_2;
 			end if;
 		end if;
 	end process;
-
+	--This process generates a the latched delay signals to control the behaviour 
+	--of some triggers.
 	rd_act : process(clk_e)
 	--variable two_cycle_delay: std_logic_vector(2 downto 0);
     begin
@@ -572,7 +576,8 @@ EVEN_P <= even_p_2;
 	
 	
 	--Byte counter calculation
-	    	  
+	--Byte counter is used to indicate which byte of the noc_data_in register
+	--and noc_data_out register is being activated. 	  
 	byte_ctr_cal: process (clk_e)
 	
 	begin
@@ -596,7 +601,8 @@ EVEN_P <= even_p_2;
 		    end if;
 		end if;
 	end process;
-
+	
+	--This process generates memory interaction signals to control the write or read.
 	mem_activation : process(noc_cmd, byte_ctr, delay)
     begin
 		noc_reg_rdy <= '0';
@@ -634,22 +640,25 @@ EVEN_P <= even_p_2;
             --noc_read <= '0';  
 		end if;
 	end process;
-	
-	data_write : process (noc_cmd, byte_ctr, delay, DATA)
+	--Write data from DATA port byte by byte to the noc_data_in register
+	data_write : process (clk_p)--(noc_cmd, byte_ctr, delay, DATA)
 	begin
-		if noc_cmd = "01111" then
-			noc_data_in <=(others => (others => '0'));
-		elsif delay = '1' then
-          if noc_cmd = "00011" or noc_cmd ="00101" then
-			--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
-				noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
-			--end if;
-		  --else 
-		  --noc_data_in <=(others => (others => 'Z'));
-		  end if;
+		if rising_edge(clk_p) then
+			if noc_cmd = "01111" then
+				noc_data_in <=(others => (others => '0'));
+			elsif delay = '1' and even_p_int = '1' then
+        	  if noc_cmd = "00011" or noc_cmd ="00101" then
+				--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
+					noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
+				--end if;
+			  --else 
+			  --noc_data_in <=(others => (others => 'Z'));
+			  end if;
+			end if;
 		end if;
 	end process;
 
+	--Read data to DATA_OUT port byte by byte from noc_data_out register.
 	data_read : process (byte_ctr, rd_trig, noc_data_out)
 
     begin
@@ -659,7 +668,9 @@ EVEN_P <= even_p_2;
 	           DATA_OUT <= (others => '0');
         end if;
 	end process;
-    
+    --This process writes lenth counter, noc address pointer counter, package
+	--counter and distance counter with data from tag line under the control of 
+	--noc_cmd register and trigger signals.
     memory_interaction : process (clk_e)
 	variable tag_ctr_2 : integer;
 	variable tag_ctr_3 : integer;  
@@ -797,7 +808,7 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 
-
+	--Treanslate the requests from PEs
  	req_recording: process(clk_p)
  	begin
  		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
@@ -826,6 +837,8 @@ EVEN_P <= even_p_2;
  		end if;
  	end process;
     BC<= bc_i(6);
+	--Generate activation signals of counters for PEs' requests. 
+	--Including broadcast request, unicast request and write request.
     process(clk_p) --Reset need to be added 
 	begin 
 		if rising_edge(clk_p) then
@@ -882,6 +895,7 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
     PE_UNIT <= id_num;
+	--Activation of the counters
 	counting : process(clk_p)  
 	begin
 		if rising_edge(clk_p) then 
@@ -1045,31 +1059,31 @@ CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;
 		DO15 => data_core_int(15)
         );		
 
-	delay_counter : delay_count
-	port map (
-		clk_e => clk_e,
-		peci_busy => peci_busy,
-		sig_fin => sig_fin,
-		noc_cmd => noc_cmd,
-		noc_reg_rdy => noc_reg_rdy,
-		len_ctr => len_ctr,
+	--delay_counter : delay_count
+	--port map (
+	--	clk_e => clk_e,
+	--	peci_busy => peci_busy,
+	--	sig_fin => sig_fin,
+	--	noc_cmd => noc_cmd,
+	--	noc_reg_rdy => noc_reg_rdy,
+	--	len_ctr => len_ctr,
+--
+	--	delay => delay
+--
+	--);
 
-		delay => delay
-
-	);
-
-	mem_control : mem_ctrl
-	port map (
-		clk_e => clk_e,
-        byte_ctr => byte_ctr,
-        delay => delay,
-        noc_cmd => noc_cmd,
-
-        noc_reg_rdy => noc_reg_rdy,
-        noc_write => noc_write,
-        noc_read => noc_read
-
-	);
+	--mem_control : mem_ctrl
+	--port map (
+	--	clk_e => clk_e,
+    --    byte_ctr => byte_ctr,
+    --    delay => delay,
+    --    noc_cmd => noc_cmd,
+--
+    --    noc_reg_rdy => noc_reg_rdy,
+    --    noc_write => noc_write,
+    --    noc_read => noc_read
+--
+	--);
 
 end architecture rtl; 
 

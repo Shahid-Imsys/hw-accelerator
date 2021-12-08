@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use work.all;
 use work.gp_pkg.all;
 
-entity p_top is
+entity PE_pair_top is
   port (
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;
@@ -41,9 +41,9 @@ entity p_top is
     MWAKEUP_LP  : in    std_logic                    
 
   );
-end p_top;
+end PE_pair_top;
 
-architecture struct of p_top is
+architecture struct of PE_pair_top is
 
 
   ------------------------------------------------------
@@ -1232,16 +1232,23 @@ architecture struct of p_top is
     signal c1_d_ras    : std_logic;  -- RAS to SDRAM
     signal c1_d_cas    : std_logic;  -- CAS to SDRAM
     signal c1_d_we     : std_logic;  -- WE to SDRAM
+    signal c1_req_i    : std_logic;  -- Request signal of core1
+    signal c1_ack_i    : std_logic;
     signal c1_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor --CJ
-    signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from sdram
+    signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+    signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram  
     signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
 	signal c2_d_addr   : std_logic_vector(31 downto 0);
 	signal c2_d_cs     : std_logic;  -- CS to SDRAM
     signal c2_d_ras    : std_logic;  -- RAS to SDRAM
     signal c2_d_cas    : std_logic;  -- CAS to SDRAM
     signal c2_d_we     : std_logic;  -- WE to SDRAM
+    signal c2_req_i    : std_logic;  --Requset signal of core 2.
+    signal c2_ack_i    : std_logic;
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
+    signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram 
     
   signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
   signal c2_mprom_ce      : std_logic_vector(1 downto 0);  
@@ -1439,6 +1446,10 @@ begin
   pllout <= HCLK;
   ddi_vld_c1 <= C1_DDI_VLD;
   ddi_vld_c2 <= C2_DDI_VLD;
+  C1_REQ <= c1_req_i;
+  C2_req <= c2_req_i;
+  c1_ack_i <= C1_ACK;
+  c2_ack_i <= C2_ACK;
   C1_REQ_D <=c1_d_dqi;
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
@@ -2685,6 +2696,8 @@ begin
     -- RTC block signals
     exe => EXE,         --CJ
     resume => RESUME,   --CJ
+    req_c1 => c1_req_i,  --CJ
+    ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
     reset_core_n   => reset_core_n   ,
     reset_iso      => reset_iso      ,
@@ -2753,12 +2766,15 @@ begin
     dras_o        => c1_d_ras, --: out std_logic;  -- Row address strobe
     dcas_o        => c1_d_cas, --: out std_logic;  -- Column address strobe
     dwe_o         => c1_d_we,  --: out std_logic;  -- Write enable
-    ddq_i         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
-    ddq_o         => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
+    ddq_i         => c1_d_dqo_sd,
+    ddq_o         => c1_d_dqi_sd,
     ddq_en        => ddq_en, --: out std_logic;  -- Data output bus enable
     da_o          => da_o,   --: out std_logic_vector(13 downto 0);  -- Address
     dba_o         => dba_o,  --: out std_logic_vector(1 downto 0); -- Bank address
     dcke_o        => dcke_o, --: out std_logic_vector(3 downto 0); -- Clock enable
+    -- Cluster interface
+    din_c         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
+    dout_c        => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
     -- Port A
     pa_i          => pa_i(4 downto 0), --: in  std_logic_vector(4 downto 0);
 	--pl_out			  => pl_out,
@@ -2861,6 +2877,8 @@ begin
     pmem_ce_n     => c2_pmem_ce_n   ,  
     pmem_we_n     => c2_pmem_we_n   ,
     exe          => exe ,     --CJ
+    req_c2       => c2_req_i,
+    ack_c2       => C2_ACK,
      ddi_vld      =>ddi_vld_c2, --CJ 
      resume => RESUME,   --CJ
 ---------------------------------------------------------------------
@@ -2872,12 +2890,15 @@ begin
     dras_o        => c2_d_ras,
     dcas_o        => c2_d_cas,
     dwe_o         => c2_d_we,
-    ddq_i         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
-    ddq_o         => c2_d_dqi,   -- out std_logic_vector(31 downto 0); -- Data output bus
+    ddq_i         => c1_d_dqo_sd,
+    ddq_o         => c1_d_dqi_sd,
     ddq_en        => open,
     da_o          => open,
     dba_o         => open,
-    dcke_o        => open -- Clock enable
+    dcke_o        => open, -- Clock enable
+    -- Cluster interface
+    din_c         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
+    dout_c        => c2_d_dqi   -- out std_logic_vector(31 downto 0); -- Data output bus
 
     );  
 

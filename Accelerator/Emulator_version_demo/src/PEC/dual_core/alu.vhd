@@ -337,7 +337,7 @@ begin
 		case pl_sig13 is
 			when CIN_0	=>							-- CARRYIN = 0
 				c_in <= '0';
-				if pl_sig11 = ALUF_S_PLUS_RE and pl_sig16 = "01110" then
+				if pl_sig11 = ALUF_S_PLUS_RE and pl_sig16 = "001110" then
 					c_in <= flag_pccy_int;	-- CARRYIN = PCCY (only on add with BDEST PCH (=reg# 0E))  
 				end if;
 			when CIN_1	=>							-- CARRYIN = 1

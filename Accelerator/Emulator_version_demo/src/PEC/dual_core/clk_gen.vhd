@@ -167,8 +167,8 @@ begin
   --clk_p_int		<= xout WHEN sel_pll = '0' AND clk_in_off = '0' ELSE       --delete by HYX, 20150706
 		--		   pllout WHEN sel_pll = '1' AND clk_in_off = '0' ELSE
 		--		   '0';
-    clk_p_int   <= clk_mux_out WHEN clk_in_off = '0' ELSE '0';
-    clk_p <=  clk_p_int;
+    clk_p_int   <= clk_mux_out WHEN clk_in_off = '0' ELSE '0'; 
+    clk_p <=  clk_p_int;--clk_mux_out WHEN clk_in_off = '0' ELSE '0';--Removed a delta delay of output clk_p
 
   -- PLL output is the source of clk_c except when the PLL
   -- is disabled, then clk_c is taken directly from the

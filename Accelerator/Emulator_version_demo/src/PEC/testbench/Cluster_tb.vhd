@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use std.textio.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -49,6 +50,32 @@ DATA_OUT         : in std_logic_vector(7 downto 0)
 end Cluster_sim;
 
 architecture Behavioral of Cluster_sim is
+    type mem_word is array (15 downto 0) of std_logic_vector(7 downto 0);
+   	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
+	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
+		FILE ram_file : text is in ram_file_name;
+		variable ram_file_line : line;
+		variable RAM_B : ram_type_b;
+		variable RAM :ram_type;
+		begin
+			--for i in rom_type'range loop
+			for i in 0 to 255 loop
+				readline(ram_file, ram_file_line);
+				read(ram_file_line, RAM_B(i));
+				RAM(i) := to_stdlogicvector(RAM_B(i));
+			end loop;
+		return RAM;
+	    end function;
+	    
+	    function conv_to_memword (ramword : std_logic_vector(127 downto 0)) return mem_word is
+	    variable mem : mem_word;
+	    begin
+	    for i in 0 to 15 loop
+	    mem(i) := ramword(8*i+7 downto 8*i);
+	    end loop;
+	    return mem;
+	    end function;
 --component cluster_controller
 --     port(
 ----Clock inputs
@@ -77,7 +104,7 @@ architecture Behavioral of Cluster_sim is
 --      --fb               : out std_logic
 --	  ); 
 --end component;
-type mem_word is array (15 downto 0) of std_logic_vector (7 downto 0);
+signal ucode : ram_type := init_ram_from_file("SequenceTest_F.data");
 signal clk_p_i : std_logic;
 signal clk_e_i : std_logic;
 signal clk_e_neg_i : std_logic;
@@ -93,6 +120,7 @@ signal pe_unit   : std_logic_vector(5 downto 0);
 signal rd_fifo   : std_logic;
 signal fifo_vld   : std_logic;
 signal bc        : std_logic;
+signal mem_in     : mem_word;
 --Progress
 signal progress : integer;
 --Constants
@@ -103,8 +131,10 @@ constant EXE   : std_logic_vector(5 downto 0) :="100110";
 constant RESUME : std_logic_vector(5 downto 0) :="101000";
 constant ADDRESS1 : std_logic_vector(14 downto 0) := "000000000000011";
 constant ADDRESS2 : std_logic_vector(14 downto 0) := "000000000000100";
+constant ADDRESS3 : std_logic_vector(14 downto 0) := (others => '0');
 constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";
-constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000001100";
+constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000100";
+constant LENGTH3 : std_logic_vector(14 downto 0) := "000000100000000";--256
 constant WORD1   : mem_word := (15 =>"11111111", others =>(others=>'0'));
 constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));
 constant WORD3   : mem_word := (15 =>"11111111", 14 => "00001111", 11=> "00001001", others =>(others=>'0'));
@@ -245,9 +275,7 @@ end sendpedata;
 begin
 
 tag_in <= '0';
-RST_E <= '1';
 wait for 300 ns;
-RST_E <= '0';
 sendNOCcommand(RESET);
 wait for 300 ns;
 --sendNOCcommand(RESET);
@@ -272,33 +300,56 @@ send15bits(LENGTH2);
 send15bits(ADDRESS2);
 tag_in <= '0';
 progress <= 4;
+--Transfer the complete microcode program
+wait until tag_fb = '0';
+wait for 120ns; --Added a delay here, to be researched in later
+--sendNOCcommand(RESET);
+wait for 300 ns;
+sendNOCcommand(WRITEC);
+send15bits(LENGTH3);
+send15bits(ADDRESS3);
+tag_in <= '0';
+wait for 120 ns;
+progress <=41;
+for i in 0 to 255 loop
+sendmemword(conv_to_memword(ucode(i)));
+end loop;
+data <= (others => '0');
+progress <=5;
+wait until tag_fb = '0';
+wait for 120 ns;
+sendNOCcommand(Exe);
+tag_in <= '0';
+progress <= 6;
+
 --Start testing on PE side(simulated data input)
 wait for 300 ns;
-req_in <= '1';
-sendpedata(RD_REQ1);
-sendpedata(RD_REQ1);
-sendpedata(RD_REQ1);
-sendpedata(WR_REQ1);
-sendpedata(DATA1);
-fifo_vld<='1';
-req_fifo<= DATA2;
-wait for 30 ns;
-req_fifo <= DATA3;
-wait for 30 ns;
-req_fifo<= DATA4;
-wait for 30 ns;
-fifo_vld <= '0';
-sendpedata(WR_REQ1);
-sendpedata(DATA2);
-fifo_vld<='1';
-req_fifo<= DATA4;
-wait for 30 ns;
-req_fifo <= DATA3;
-wait for 30 ns;
-req_fifo<= DATA1;
-wait for 30 ns;
-fifo_vld <= '0';
-sendpedata(PE_WAIT);
+
+--req_in <= '1';
+--sendpedata(RD_REQ1);
+--sendpedata(RD_REQ1);
+--sendpedata(RD_REQ1);
+--sendpedata(WR_REQ1);
+--sendpedata(DATA1);
+--fifo_vld<='1';
+--req_fifo<= DATA2;
+--wait for 30 ns;
+--req_fifo <= DATA3;
+--wait for 30 ns;
+--req_fifo<= DATA4;
+--wait for 30 ns;
+--fifo_vld <= '0';
+--sendpedata(WR_REQ1);
+--sendpedata(DATA2);
+--fifo_vld<='1';
+--req_fifo<= DATA4;
+--wait for 30 ns;
+--req_fifo <= DATA3;
+--wait for 30 ns;
+--req_fifo<= DATA1;
+--wait for 30 ns;
+--fifo_vld <= '0';
+--sendpedata(PE_WAIT);
 
 
 

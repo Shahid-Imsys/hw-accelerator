@@ -123,6 +123,8 @@ entity core is
     short_cycle : out std_logic;
     bmem_ce_n   : out  std_logic;
     -- CC signal
+    req_c1     : out std_logic;
+    ack_c1     : in std_logic;
     ddi_vld    : in std_logic; --Added by CJ
 	-- router control signals
 --	router_ir_en : out std_logic;    --delete by HYX, 20141027
@@ -238,12 +240,16 @@ entity core is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(127 downto 0); -- Ext memory data input bus
-    ddq_o       : out std_logic_vector(31 downto 0); -- Data output bus
+    ddq_i       : in  std_logic_vector(7 downto 0); -- Ext memory data input bus
+    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
     dba_o       : out std_logic_vector(1 downto 0); -- Bank address
     dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
+    --CC interface signals
+    din_c       : in std_logic_vector(127 downto 0);
+    dout_c      : out std_logic_vector(31 downto 0);
+    
     -- Port A
     pa_i        : in  std_logic_vector(4 downto 0);
 	--pl_out          : out std_logic_vector(79 downto 0);--maning
@@ -384,7 +390,7 @@ architecture struct of core is
   signal dbus_int     : std_logic_vector(7  downto 0);
   signal latch        : std_logic_vector(7  downto 0);
   signal ve_out_d_int : std_logic_vector(7 downto 0); --Added by CJ      
-  signal ve_out_dtm_int : std_logic_vector(127 downto 0); --Added by CJ     
+  signal cdfm_int     : std_logic_vector(7 downto 0); --Added by CJ     
   
   -- MBM signals
   signal mbmd       : std_logic_vector(7 downto 0);
@@ -437,15 +443,19 @@ architecture struct of core is
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
   -- Microprogram loading signal --CJ
+  signal req    : std_logic;
+  signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
-  signal temp        : std_logic; --Added by CJ. Used to latch vldl
+  signal temp         : std_logic;
+  signal temp1        : std_logic; --Added by CJ. Used to latch temp
   signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);    
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -465,28 +475,33 @@ begin
 ---------------------------------------------------------------------
 -- Microinstruction loading 
 ---------------------------------------------------------------------
-  exe_i <= exe; 
+  exe_i <= exe;
+  req_c1 <= req;
+  ack <= ACK_C1; 
   --ld_mpgm <= pl(100) and pl(98);
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
-      if rising_edge(clk_p) and clk_e_neg_int = '1' then
-        vldl <= ddi_vld;
-        --vldl <= mid;
+      if rising_edge(clk_p) then
+          vldl <= ddi_vld;
+          if clk_e_neg_int = '1' then --make sure vldl is generated later than clk_e_neg
+          temp <= ddi_vld;
+          --vldl <= mid;
+          end if;
       end if;
   end process;
-  --Two clock pulses delay generation
+  --Two clock e pulses delay generation
   process(clk_p)
   begin
     if rising_edge(clk_p) and clk_e_pos_int = '0'then --Falling_edge of clk_e
-      temp <= vldl;
-      ltwo <= temp;
+      temp1 <= temp;
+      ltwo <= temp1;
     end if;
   end process;
 
   mpgm_load : process(clk_p, vldl, ddi_vld)
   begin 
       if rising_edge(clk_p) and clk_e_neg_int = '0'then
-          if temp = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
+          if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
               ld_mpgm <= '0';
           else
               ld_mpgm <= pl(100) and pl(106) and not pl(98) and not pl(97); --Init mpgm load and receive_engine start and mod A & B off
@@ -584,7 +599,12 @@ begin
       pmem_ce_n   => pmem_ce_n);    
 
   --mprom_a     <= mpga; --deleted by CJ
-  mpram_d     <= mpgmin;
+  process(clk_p) --1 clk_e delay of input to microprogram memory
+  begin
+    if rising_edge(clk_p) and clk_e_pos_int = '0' then
+        mpram_d     <= mpgmin;
+    end if;
+  end process;
   mpram_we_n  <= not temp when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
   pmem_d      <= udo(1 downto 0);
   pmem_we_n   <= mpram_we_nint and lmpwe_n;
@@ -1009,6 +1029,7 @@ begin
       dfp           => dfp,
       --CJ added
       VE_OUT_D      => ve_out_d_int,
+      CDFM          => cdfm_int,
       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
@@ -1067,7 +1088,7 @@ begin
       t_rp        => t_rp,               
       fast_d      => fast_d_int, 
 	  short_cycle => short_cycle_int,
-	  exe         => exe, --CJ Added
+	  --exe         => exe, --CJ Added
       -- Data paths
       dbus        => dbus_int,             
       ybus        => ybus,             
@@ -1092,16 +1113,16 @@ begin
       d_we        => dwe_o,              
       d_dqi       => ddq_i,             
       d_dqo       => ddq_o,
-      ve_data     => ve_in_int,            
+      --ve_data     => ve_in_int,            
       en_dqo      => ddq_en,
       out_line    => out_line,
 	  ld_dqi_flash => ld_dqi_flash,
       d_a         => da_o,             
       d_ba        => dba_o,              
       d_dqm       => ddqm,             
-      d_cke       => dcke_o,
-      MPGMM_IN     => mpgmin,
-      LD_MPGM     => ld_mpgm);  --CJ            
+      d_cke       => dcke_o);
+      --MPGMM_IN     => mpgmin,
+      --LD_MPGM     => ld_mpgm);  --CJ            
 
 ---------------------------------------------------------------------
 -- MPLL
@@ -1222,6 +1243,9 @@ begin
       iomem_q        => iomem_q);
 
       --CJ Added
+---------------------------------------------------------------------
+-- VE
+---------------------------------------------------------------------
       vector_engine : entity work.ve
       port map(
       CLK_P       => clk_p,
@@ -1230,12 +1254,35 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => ddi_vld,
+      DDI_VLD     => vldl,
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM  => ve_out_dtm_int
+      );
+---------------------------------------------------------------------
+-- CMDR
+---------------------------------------------------------------------
+--Interface of the core and cluster controller
+      cmdr: entity work.cmdr
+      port map(
+        CLK_P    => clk_p,
+        RST_EN   => rst_en_int,
+        CLK_E_NEG => clk_e_neg_int,
+        PL       => pl,
+        EXE      => exe,
+        DATA_VLD => ddi_vld,
+        REQ_OUT  => req,
+        ACK_IN   => ack,
+        DIN      => din_c,
+        DOUT     =>dout_c,
+        YBUS     =>ybus,
+        LD_MPGM  =>ld_mpgm,
+        VE_DIN   =>ve_in_int,
+        DBUS_DATA=>cdfm_int,
+        MPGMM_IN =>mpgmin,
+        VE_DTMO  =>ve_out_dtm_int
       );
 end;
 

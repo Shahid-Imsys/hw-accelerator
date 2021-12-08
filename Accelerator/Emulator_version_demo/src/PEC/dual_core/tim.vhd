@@ -188,7 +188,7 @@ architecture rtl of tim is
 	attribute syn_keep   : boolean;
 	signal pl_shin_pa_sig:  std_logic_vector(3 downto 0); -- Used for CALL SP & ACK SPREQ
 	signal pl_alud_sig   : std_logic; -- Only bit 2 used here
-	attribute syn_keep of held_e_int : signal is true;  
+	attribute syn_keep of held_e_int : signal is true;
 begin
 ---------------------------------------------------------------------
 -- Reset generation &
@@ -255,7 +255,8 @@ begin
 --	rst_cn_off <= '1' when (mtest_i_int1 = '0' and rst_cn_cnt = "111111") or
 --						   (mtest_i_int1 = '1' and rst_cn_cnt(1 downto 0) = "11") or
 --						    rst_cn_cnt1 = "11111" else '0'; 
-	rst_cn_off <= '1' when rst_cn_cnt = "111" or rst_cn_cnt1 = "11111" else '0'; 	
+	--rst_cn_off <= '1' when rst_cn_cnt = "111" or rst_cn_cnt1 = "11111" else '0'; --Modified to reduce the simulation time by CJ 
+	rst_cn_off <= '1' when rst_cn_cnt = "001" or rst_cn_cnt1 = "11111" else '0';	
 	-- Generate rst_cn, releases when rst_cn_cnt has reached
 	-- its final state. mrstout is the same as rst_cn.
 	rst_cn_gen: process (clk_p, rst_nint)

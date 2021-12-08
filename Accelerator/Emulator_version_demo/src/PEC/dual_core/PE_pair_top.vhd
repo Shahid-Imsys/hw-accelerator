@@ -1371,6 +1371,9 @@ architecture struct of PE_pair_top is
 --  signal RAM7_A          : std_logic_vector (9 downto 0);
 --  signal RAM7_WEB        : std_logic_vector(15 downto 0);
 --  signal RAM7_CS         : std_logic;   
+    attribute keep : string;
+    attribute keep of mp_RAM0_WEB : signal is "true";
+    attribute keep of mp_RAM0_DO  : signal is "true";
 
 begin
 

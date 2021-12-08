@@ -40,7 +40,7 @@ component PEC_top
   Port ( 
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
-      RST_P  : in std_logic;
+      --RST_P  : in std_logic;
       RST_E  : in std_logic;
 	  clk_O  : out std_logic;
 	  TAG    : in std_logic;
@@ -82,7 +82,7 @@ cluster: PEC_top
 port map(
 clk_p => clk_p_i,
 clk_e => clk_e_i,
-rst_p => '0',
+--rst_p => '0',
 rst_e => rst_e_i,
 clk_o => clk_o_i,
 tag => tag_i,

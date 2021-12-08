@@ -72,15 +72,13 @@ architecture Behavioral of init_mpgm is
    
    signal RAM : ram_type := init_ram_from_file("SequenceTest_F.data");
    signal hclk_i : std_logic;
-   signal even_c_i : std_logic;
+   signal even_c_i : std_logic:='1';
    signal exe_i : std_logic;
    signal resume_i : std_logic;
    signal c1_input: std_logic_vector(127 downto 0);
    signal c1_data_vld : std_logic;
-   signal tmp : std_logic := '0';
-   signal tmp1 : std_logic;
-   signal tmp2 : std_logic;
-   signal rst : std_logic := '1';
+   signal even_c_1 : std_logic;
+   signal even_c_2 : std_logic;
    
    
 begin
@@ -88,7 +86,7 @@ begin
    
    procedure sendmc (signal word: in std_logic_vector(127 downto 0))is
    begin
-   wait until rising_edge(hclk_i) and even_c_i = '1';
+   wait until rising_edge(hclk_i) and even_c_i = '0'; --rising_edge of clk_e
    --if rising_edge(hclk_i) and even_c_i = '1' then
    c1_input <= word;
    c1_data_vld <= '1';
@@ -97,25 +95,37 @@ begin
    end procedure;
    
   begin
+  --wait for 30 ns;
   MLP_PWR_OK <= '0';
-  wait for 60 ns;
+  c1_data_vld <= '0';
+  wait for 20 ns;--60 ns;
   MLP_PWR_OK <= '1';
   MWAKEUP_LP <= '0';
-  wait for 6000 ns;
+  wait for 2000 ns;--6000 ns;
   MLP_PWR_OK <= '0';
-  wait for 60 ns;
+  wait for 20 ns;--60 ns;
   MLP_PWR_OK <= '1';
-  wait for 3000 ns; --wait until 
+  exe_i <= '0';
+  wait for 1000 ns;--3000 ns; --wait until 
+  wait until even_c_i = '1';
+  wait for 1.5 ns;
   exe_i<= '1';
-  wait for 60 ns;
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 5 ns;
   exe_i<= '0';
-  wait for 600 ns;
+  wait for 200 ns;--600 ns;
   for i in 0 to 255 loop
   --if rising_edge(hclk_i) and even_c_i = '1' then
   sendmc(RAM(i));
   end loop;
-  wait for 60 ns;
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 1 ns;
   c1_input <= (others => '0');
+  --wait for 60 ns;
+  wait until even_c_i = '1';
+  wait for 1 ns;
   c1_data_vld <= '0'; 
   wait for 1000ns;
   wait;
@@ -123,7 +133,7 @@ begin
   
   process
   begin
-  wait for 60 ns;
+  wait for 20 ns;--60 ns;
   --MSDIN <= '1';
   MTEST <= '1';	
   MRESET <= '1';
@@ -139,30 +149,27 @@ begin
    process
    begin
    hclk_i <= '1';
-   wait for 15 ns;
+   wait for 5 ns;
    hclk_i <= '0';
-   wait for 15 ns;
+   wait for 5 ns;
    end process;
    
    process(hclk_i)
-   --   variable count : integer := 1;
    begin
-      if rst = '1' then
-         rst <= '0';
-         tmp <= '1';
-      elsif rising_edge(hclk_i) then
-         tmp <= not tmp;
-      end if;
-    --tmp2 <= tmp; 
+   if rising_edge(hclk_i) then
+       even_c_i <= not even_c_i;
+   end if;
+   --wait for 30 ns;
+   --even_c_i <= '0';
+   --wait for 30 ns;
    end process;
-   tmp2 <= tmp;
-   even_c_i <= tmp2;
    
-
+even_c_1 <= even_c_i;
+even_c_2 <= even_c_1;
    
 
 HCLK <= hclk_i;
-EVEN_C <= even_c_i;
+EVEN_C <= even_c_2;
 EXE <= exe_i;
 RESUME <= resume_i;
 c1_in_data <= c1_input;

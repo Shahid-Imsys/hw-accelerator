@@ -44,7 +44,7 @@ entity ios_dma is
     clk_c2_pos  : in  std_logic;  -- clk_c / 2 
     clk_e_pos   : in  std_logic;  -- Execution clock        
     clk_e_neg   : in  std_logic;  -- Execution clock        
-    gate_e      : in  std_logic;  -- Copy of execution clock used for gating 
+    --gate_e      : in  std_logic;  -- Copy of execution clock used for gating 
     clk_i_pos       : in  std_logic;  -- I/O clock           
     -- Static control inputs
     use_direct  : in  std_logic;  -- Set when the direct bus is used
@@ -297,7 +297,7 @@ begin
   -- access the IOMEM, so pio_ce and pio_we are only active during the first
   -- half of an active (not held) clk_e cycle. pio_ce is active (high) on both
   -- read and write accesses, pio_we only on write accesses. 
-  pio_acc: process (ch_sel, pio_wr, pio_rd, gate_e, held_e)
+  pio_acc: process (ch_sel, pio_wr, pio_rd, clk_e_pos, held_e)
   begin
     piop_cnt <= (others => '0');
     pio_ce <= '0';
@@ -305,7 +305,7 @@ begin
     if pio_wr = '1' or pio_rd = '1' then
       if held_e = '0' then
         piop_cnt(conv_integer(ch_sel)) <= '1';
-        if gate_e = '1' then
+        if clk_e_pos = '1' then
           pio_ce <= '1';
           if pio_wr = '1' then
             pio_we <= '1';
@@ -566,6 +566,6 @@ begin
   -- i_direct bus outputs even data during the first half of the clk_e cycle
   -- and odd during the second when double-byte transfers are used, otherwise
   -- it outputs the half that was accessed.
-  i_dir_sel <= not gate_e when dbl_direct = '1' else out_sel;
+  i_dir_sel <= not clk_e_pos when dbl_direct = '1' else out_sel;
   i_direct <= even_out when i_dir_sel = '0' else odd_out;
 end rtl;

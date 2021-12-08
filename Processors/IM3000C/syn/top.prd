@@ -1,0 +1,13 @@
+#-- Synplicity, Inc.
+#-- Version      Synplify ASIC 2.4.1        
+#-- Project file D:\_Work\gp3000\syn\top.prd
+#-- Written on Tue May 30 20:10:28 2006
+
+#
+### Watch Implementation type ###
+#
+watch_impl -active
+#
+### Watch Implementation properties ###
+#
+watch_prop -clear

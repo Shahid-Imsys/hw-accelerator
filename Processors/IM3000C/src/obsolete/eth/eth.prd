@@ -1,0 +1,13 @@
+#-- Synplicity, Inc.
+#-- Version      Synplify ASIC 2.4.1        
+#-- Project file J:\gp3000\src\peri\eth\eth.prd
+#-- Written on Sat Jan 21 12:47:32 2006
+
+#
+### Watch Implementation type ###
+#
+watch_impl -active
+#
+### Watch Implementation properties ###
+#
+watch_prop -clear

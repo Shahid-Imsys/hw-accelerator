@@ -1,0 +1,10 @@
+ETH todo
+========
+
+* Relax interframe gap requirements, accept IFGs shorter than 96 bits
+* Change address filter so that RX fifo doesn't need to hold address
+* RMII changes
+* Interrupt out
+* FIFO sizing
+* I/O registers away?
+* Is there frame size checking on the receiver? Transmitter?

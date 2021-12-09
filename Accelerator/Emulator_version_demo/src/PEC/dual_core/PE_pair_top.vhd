@@ -2915,9 +2915,9 @@ begin
     -- rst_cn   => rst_cn,
     -- clk_e_pos  => clk_e_pos,
     -- clk_ea_pos   => clk_ea_pos,
-        c1_mprom_a     => c1_mprom_a     ,-- Address  
-        c1_mprom_ce    => c1_mprom_ce    ,-- Chip enable(active high) 
-        c1_mprom_oe    => c1_mprom_oe    ,--Output enable(active high)
+        --c1_mprom_a     => c1_mprom_a     ,-- Address  
+        --c1_mprom_ce    => c1_mprom_ce    ,-- Chip enable(active high) 
+        --c1_mprom_oe    => c1_mprom_oe    ,--Output enable(active high)
         -- MPRAM signals
         c1_mpram_a     => c1_mpram_a     ,-- Address  
         c1_mpram_d     => c1_mpram_d     ,-- Data to memory
@@ -2925,17 +2925,17 @@ begin
         c1_mpram_oe    => c1_mpram_oe    ,-- Output enable(active high)
         c1_mpram_we_n  => c1_mpram_we_n  ,-- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c1_pmem_a      => c1_pmem_a      ,
-        c1_pmem_d      => c1_pmem_d      ,
+        --c1_pmem_a      => c1_pmem_a      ,
+        --c1_pmem_d      => c1_pmem_d      ,
         c1_pmem_q      => c1_pmem_q      ,
-        c1_pmem_ce_n   => c1_pmem_ce_n   ,
-        c1_pmem_we_n   => c1_pmem_we_n   ,
+        --c1_pmem_ce_n   => c1_pmem_ce_n   ,
+        --c1_pmem_we_n   => c1_pmem_we_n   ,
                      
         c1_mp_q        => c1_mp_q        ,
         -- MPROM signals
-        c2_mprom_a     => c2_mprom_a     ,-- Address  
-        c2_mprom_ce    => c2_mprom_ce    ,-- Chip enable(active high) 
-        c2_mprom_oe    => c2_mprom_oe    ,--Output enable(active high)
+        --c2_mprom_a     => c2_mprom_a     ,-- Address  
+        --c2_mprom_ce    => c2_mprom_ce    ,-- Chip enable(active high) 
+        --c2_mprom_oe    => c2_mprom_oe    ,--Output enable(active high)
         -- MPRAM signals
         c2_mpram_a     => c2_mpram_a     ,-- Address  
         c2_mpram_d     => c2_mpram_d     ,-- Data to memory
@@ -2943,43 +2943,43 @@ begin
         c2_mpram_oe    => c2_mpram_oe    ,-- Output enable(active high)
         c2_mpram_we_n  => c2_mpram_we_n  ,-- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c2_pmem_a      => c2_pmem_a      ,
-        c2_pmem_d      => c2_pmem_d      ,
+        --c2_pmem_a      => c2_pmem_a      ,
+        --c2_pmem_d      => c2_pmem_d      ,
         c2_pmem_q      => c2_pmem_q      ,
-        c2_pmem_ce_n   => c2_pmem_ce_n   ,
-        c2_pmem_we_n   => c2_pmem_we_n   ,
+        --c2_pmem_ce_n   => c2_pmem_ce_n   ,
+        --c2_pmem_we_n   => c2_pmem_we_n   ,
                        
         c2_mp_q        => c2_mp_q        ,
         --memory interface
         --ROM0
-        ROM0_DO     => mp_ROM0_DO     ,-- in  std_logic_vector (79 downto 0); 
-        ROM0_A      => mp_ROM0_A      ,-- out std_logic_vector (13 downto 0);
-        ROM0_CS     => mp_ROM0_CS     ,-- out std_logic;
-        ROM0_OE     => mp_ROM0_OE     ,-- out std_logic; 
+      --  ROM0_DO     => mp_ROM0_DO     ,-- in  std_logic_vector (79 downto 0); 
+      --  ROM0_A      => mp_ROM0_A      ,-- out std_logic_vector (13 downto 0);
+      --  ROM0_CS     => mp_ROM0_CS     ,-- out std_logic;
+      --  ROM0_OE     => mp_ROM0_OE     ,-- out std_logic; 
         --ROM1
-        ROM1_DO     => mp_ROM1_DO     ,--: in  std_logic_vector (79 downto 0); 
-        ROM1_A      => mp_ROM1_A      ,--: out std_logic_vector (13 downto 0);
-        ROM1_CS     => mp_ROM1_CS     ,--: out std_logic;
-        ROM1_OE     => mp_ROM1_OE     ,--: out std_logic;
+      --  ROM1_DO     => mp_ROM1_DO     ,--: in  std_logic_vector (79 downto 0); 
+      --  ROM1_A      => mp_ROM1_A      ,--: out std_logic_vector (13 downto 0);
+      --  ROM1_CS     => mp_ROM1_CS     ,--: out std_logic;
+      --  ROM1_OE     => mp_ROM1_OE     ,--: out std_logic;
         --patch memory
         PM_DO       => mp_PM_DO      ,--: in  std_logic_vector (1 downto 0);
-        PM_DI       => mp_PM_DI      ,--: out std_logic_vector (1 downto 0);
-        PM_A        => mp_PM_A       ,--: out std_logic_vector (10 downto 0);
-        PM_WEB      => mp_PM_WEB     ,--: out std_logic;
-        PM_CSB      => mp_PM_CSB     ,--: out std_logic;
+      --  PM_DI       => mp_PM_DI      ,--: out std_logic_vector (1 downto 0);
+      --  PM_A        => mp_PM_A       ,--: out std_logic_vector (10 downto 0);
+      --  PM_WEB      => mp_PM_WEB     ,--: out std_logic;
+      --  PM_CSB      => mp_PM_CSB     ,--: out std_logic;
         --RAM0
         RAM0_DO     => mp_RAM0_DO     ,--: in  std_logic_vector (79 downto 0);
         RAM0_DI     => mp_RAM0_DI     ,--: out std_logic_vector (79 downto 0);
         RAM0_A      => mp_RAM0_A      ,--: out std_logic_vector (13 downto 0);
         RAM0_WEB    => mp_RAM0_WEB    ,--: out std_logic;
         RAM0_OE     => mp_RAM0_OE     ,
-        RAM0_CS     => mp_RAM0_CS     , --: out std_logic;
+        RAM0_CS     => mp_RAM0_CS      --: out std_logic;
         ----RAM1                          -- not included in the low-power version, deleted 2015-6-22, by HYX
-        RAM1_DO     => mp_RAM1_DO     ,--: in  std_logic_vector (79 downto 0);
-        RAM1_DI     => mp_RAM1_DI     ,--: out std_logic_vector (79 downto 0);
-        RAM1_A      => mp_RAM1_A      ,--: out std_logic_vector (13 downto 0);
-        RAM1_WEB    => mp_RAM1_WEB    ,--: out std_logic;
-        RAM1_CS     => mp_RAM1_CS    --: out std_logic
+      --  RAM1_DO     => mp_RAM1_DO     ,--: in  std_logic_vector (79 downto 0);
+      --  RAM1_DI     => mp_RAM1_DI     ,--: out std_logic_vector (79 downto 0);
+      --  RAM1_A      => mp_RAM1_A      ,--: out std_logic_vector (13 downto 0);
+      --  RAM1_WEB    => mp_RAM1_WEB    ,--: out std_logic;
+      --  RAM1_CS     => mp_RAM1_CS    --: out std_logic
     );
 
 

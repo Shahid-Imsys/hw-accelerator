@@ -646,6 +646,8 @@ begin
     process(re_start,re_start_reg,re_source,mode_a_l,mode_b_l,ve_start,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r,mode_c,
             curr_ring_addr,config,offset_l)
     begin
+        addr_p_l <= x"00";
+        addr_p_r <= x"00"; 
         if re_start = '1' or ve_start = '1' then --Not latched instructions.
             if mode_c = '1' then
                 addr_p_l <= curr_ring_addr;
@@ -984,7 +986,7 @@ adder_ena <= pp_stage_2 and not pp_ctl(1);
 process(clk_p) 
 begin
     if rising_edge(clk_p) then
-        if adder_ena = '1' then
+        if adder_ena = '1' then -------------- It is fine that p_adder_out being truncated --------------
             p_adder_out <= std_logic_vector(to_signed(to_integer(signed(p_shifter_out))+to_integer(signed(bias_mux_out)),32));
         else
             p_adder_out <= p_shifter_out;
@@ -1002,7 +1004,7 @@ begin
 end process; 
 process(clk_p,p_adder_out)
     variable diff : std_logic_vector(31 downto 0);
-begin
+begin       ---------------- Truncating here doesn't hurt ----------------
     diff := std_logic_vector(to_signed(to_integer(signed(p_adder_out)) - 256,32));
     if rising_edge(clk_p) then
         if clip_ena = '1' then

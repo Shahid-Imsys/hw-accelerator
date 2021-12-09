@@ -1,0 +1,3 @@
+This is the folder from where data was uploaded to Sondrels FTP site, so the
+files here also appear under the ..\download_last folder. The main reason to
+keep this folder is to keep the upload history (in SourceSafe).

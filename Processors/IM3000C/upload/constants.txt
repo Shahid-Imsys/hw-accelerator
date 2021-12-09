@@ -1,0 +1,526 @@
+# Force the PLL/XOUT mux to select PLL
+force timing constant {clk_gen0/xout_ff2_reg/Q} 0 -context /work/top/top
+force timing constant {clk_gen0/pllout_ff2_reg/Q} 1 -context /work/top/top
+
+# Force some I/O muxes to select the timing constrained paths
+force timing constant {core0/crb/en_eth_int_reg[0]/Q} 1 -context /work/top/top
+force timing constant {core0/crb/dqm_size_int_reg[1]/Q} 1 -context /work/top/top
+force timing constant {core0/crb/dqm_size_int_reg[0]/Q} 1 -context /work/top/top
+force timing constant {core0/crb/en_iobus_int_reg[1]/Q} 1 -context /work/top/top
+force timing constant {core0/crb/en_iobus_int_reg[0]/Q} 1 -context /work/top/top
+
+# Set DCLK and PJ7_ICLK as clock balance points
+force timing clockbalance {PJ7_ICLK:out} -context /work/top/top
+force timing clockbalance {DCLK} -context /work/top/top
+force timing break -from $m/pads0/PAD_PJ7_ICLK/I -to $m/pads0/PAD_PJ7_ICLK/O
+
+# Delay clock endpoints to DDQ input registers
+set endpoint_list [data find $m -type pin {core0/mmr/dfm_odd_reg\[*\]/CK}]
+foreach p $endpoint_list {
+  force timing clockbalance $p -context /work/top/top -latency 2000p
+}
+
+set endpoint_list [data find $m -type pin {core0/mmr/odd_keep_reg\[*\]/CK}]
+foreach p $endpoint_list {
+  force timing clockbalance $p -context /work/top/top -latency 2000p
+}
+
+set endpoint_list [data find $m -type pin {core0/mmr/dfm_keep_reg\[*\]/CK}]
+foreach p $endpoint_list {
+  force timing clockbalance $p -context /work/top/top -latency 2000p
+}
+
+set endpoint_list [data find $m -type pin {core0/mmr/dfm_int_reg\[*\]/CK}]
+foreach p $endpoint_list {
+  force timing clockbalance $p -context /work/top/top -latency 2000p
+}
+
+# This to not require 1 cycle hold time on 2-cycle paths
+config timing multicycle hold independent
+
+# Remove any previous latency
+clear timing all -type latency /work/top/top
+
+# New latencies
+force timing latency $m/pads0/PAD_DCLK/I 1000p -type network
+
+force timing latency clock:PF1_ETXCLK {-worst 1450p } -type network -context /work/top/top
+force timing latency clock:PF1_ETXCLK {-worst 1450p } -type io -context /work/top/top
+force timing latency clock:PF1_ETXCLK {-best 650p }  -type network -context /work/top/top
+force timing latency clock:PF1_ETXCLK {-best 650p } -type io -context /work/top/top
+force timing latency clock:clk_ETXCLK {-worst 1450p } -type network -context /work/top/top
+force timing latency clock:clk_ETXCLK {-worst 1450p } -type io -context /work/top/top
+force timing latency clock:clk_ETXCLK {-best 650p }  -type network -context /work/top/top
+force timing latency clock:clk_ETXCLK {-best 650p } -type io -context /work/top/top
+
+force timing latency clock:PG1_ERXCLK {-worst 1450p } -type network -context /work/top/top
+force timing latency clock:PG1_ERXCLK {-worst 1450p } -type io -context /work/top/top
+force timing latency clock:PG1_ERXCLK {-best 650p }  -type network -context /work/top/top
+force timing latency clock:PG1_ERXCLK {-best 650p } -type io -context /work/top/top
+force timing latency clock:clk_ERXCLK {-worst 1450p } -type network -context /work/top/top
+force timing latency clock:clk_ERXCLK {-worst 1450p } -type io -context /work/top/top
+force timing latency clock:clk_ERXCLK {-best 650p }  -type network -context /work/top/top
+force timing latency clock:clk_ERXCLK {-best 650p } -type io -context /work/top/top
+
+force timing latency clock:xtal_clk {-worst 4000p } -type network -context /work/top/top
+force timing latency clock:xtal_clk {-worst 4000p } -type io -context /work/top/top
+force timing latency clock:xtal_clk {-best 2000p }  -type network -context /work/top/top
+force timing latency clock:xtal_clk {-best 2000p } -type io -context /work/top/top
+
+force timing latency clock:pll_clk {-worst 4000p } -type network -context /work/top/top
+force timing latency clock:pll_clk {-worst 4000p } -type io -context /work/top/top
+force timing latency clock:pll_clk {-best 2000p }  -type network -context /work/top/top
+force timing latency clock:pll_clk {-best 2000p } -type io -context /work/top/top
+
+# Remove any previous uncertainty
+clear timing all -type margin /work/top/top
+
+# Model jitter + skew uncertainty
+force timing margin setup 100p -jitter -node {clk_gen0/clk_a_reg/Q pads0/PAD_MX1_CK/O clk_gen0/clk_e_reg/Q pll0/CKOUT clk_gen0/clk_i_reg/Q clk_gen0/clk_s_reg/Q clk_gen0/clk_u_reg/Q clk_gen0/even_c_reg/Q PJ7_ICLK:in PF1_ETXCLK:in PG1_ERXCLK:in DCLK} -context /work/top/top
+force timing margin hold 100p -jitter -node {clk_gen0/clk_a_reg/Q pads0/PAD_MX1_CK/O clk_gen0/clk_e_reg/Q pll0/CKOUT clk_gen0/clk_i_reg/Q clk_gen0/clk_s_reg/Q clk_gen0/clk_u_reg/Q clk_gen0/even_c_reg/Q PJ7_ICLK:in PF1_ETXCLK:in PG1_ERXCLK:in DCLK} -context /work/top/top
+force timing margin setup 100p -jitter -node {clock:clk_ETXCLK clock:clk_ERXCLK} -context /work/top/top
+force timing margin hold 100p -jitter -node {clock:clk_ETXCLK clock:clk_ERXCLK} -context /work/top/top
+
+force timing margin setup 500p -node {clk_gen0/clk_a_reg/Q pads0/PAD_MX1_CK/O clk_gen0/clk_e_reg/Q pll0/CKOUT clk_gen0/clk_i_reg/Q clk_gen0/clk_s_reg/Q clk_gen0/clk_u_reg/Q clk_gen0/even_c_reg/Q PJ7_ICLK:in PF1_ETXCLK:in PG1_ERXCLK:in DCLK} -context /work/top/top
+force timing margin setup 500p -node {clock:clk_ETXCLK clock:clk_ERXCLK} -context /work/top/top
+
+
+# DDQM - 2mA, fast
+force timing constant $m/pads0/PAD_PD0_DDQM0/E2 0
+force timing constant $m/pads0/PAD_PD0_DDQM0/E4 0
+force timing constant $m/pads0/PAD_PD0_DDQM0/SR 0
+#
+force timing constant $m/pads0/PAD_PD1_DDQM1/E2 0
+force timing constant $m/pads0/PAD_PD1_DDQM1/E4 0
+force timing constant $m/pads0/PAD_PD1_DDQM1/SR 0
+#
+force timing constant $m/pads0/PAD_PD2_DDQM2/E2 0
+force timing constant $m/pads0/PAD_PD2_DDQM2/E4 0
+force timing constant $m/pads0/PAD_PD2_DDQM2/SR 0
+#
+force timing constant $m/pads0/PAD_PD3_DDQM3/E2 0
+force timing constant $m/pads0/PAD_PD3_DDQM3/E4 0
+force timing constant $m/pads0/PAD_PD3_DDQM3/SR 0
+#
+force timing constant $m/pads0/PAD_PD4_DDQM4/E2 0
+force timing constant $m/pads0/PAD_PD4_DDQM4/E4 0
+force timing constant $m/pads0/PAD_PD4_DDQM4/SR 0
+#
+force timing constant $m/pads0/PAD_PD5_DDQM5/E2 0
+force timing constant $m/pads0/PAD_PD5_DDQM5/E4 0
+force timing constant $m/pads0/PAD_PD5_DDQM5/SR 0
+#
+force timing constant $m/pads0/PAD_PD6_DDQM6/E2 0
+force timing constant $m/pads0/PAD_PD6_DDQM6/E4 0
+force timing constant $m/pads0/PAD_PD6_DDQM6/SR 0
+#
+force timing constant $m/pads0/PAD_PD7_DDQM7/E2 0
+force timing constant $m/pads0/PAD_PD7_DDQM7/E4 0
+force timing constant $m/pads0/PAD_PD7_DDQM7/SR 0
+
+# INEXT, ILDOUT, ILIOA - 4mA, fast
+force timing constant $m/pads0/PAD_PJ4_INEXT/E2 1
+force timing constant $m/pads0/PAD_PJ4_INEXT/E4 0
+force timing constant $m/pads0/PAD_PJ4_INEXT/SR 0
+#
+force timing constant $m/pads0/PAD_PJ5_ILDOUT/E2 1
+force timing constant $m/pads0/PAD_PJ5_ILDOUT/E4 0
+force timing constant $m/pads0/PAD_PJ5_ILDOUT/SR 0
+#
+force timing constant $m/pads0/PAD_PJ6_ILIOA/E2 1
+force timing constant $m/pads0/PAD_PJ6_ILIOA/E4 0
+force timing constant $m/pads0/PAD_PJ6_ILIOA/SR 0
+
+# ICLK - 8mA, fast
+force timing constant $m/pads0/PAD_PJ7_ICLK/E2 1
+force timing constant $m/pads0/PAD_PJ7_ICLK/E4 1
+force timing constant $m/pads0/PAD_PJ7_ICLK/SR 0
+
+# ID - 4mA, fast
+force timing constant $m/pads0/PAD_PI0_ID0/E2 1
+force timing constant $m/pads0/PAD_PI0_ID0/E4 0
+force timing constant $m/pads0/PAD_PI0_ID0/SR 0
+#
+force timing constant $m/pads0/PAD_PI1_ID1/E2 1
+force timing constant $m/pads0/PAD_PI1_ID1/E4 0
+force timing constant $m/pads0/PAD_PI1_ID1/SR 0
+#
+force timing constant $m/pads0/PAD_PI2_ID2/E2 1
+force timing constant $m/pads0/PAD_PI2_ID2/E4 0
+force timing constant $m/pads0/PAD_PI2_ID2/SR 0
+#
+force timing constant $m/pads0/PAD_PI3_ID3/E2 1
+force timing constant $m/pads0/PAD_PI3_ID3/E4 0
+force timing constant $m/pads0/PAD_PI3_ID3/SR 0
+#
+force timing constant $m/pads0/PAD_PI4_ID4/E2 1
+force timing constant $m/pads0/PAD_PI4_ID4/E4 0
+force timing constant $m/pads0/PAD_PI4_ID4/SR 0
+#
+force timing constant $m/pads0/PAD_PI5_ID5/E2 1
+force timing constant $m/pads0/PAD_PI5_ID5/E4 0
+force timing constant $m/pads0/PAD_PI5_ID5/SR 0
+#
+force timing constant $m/pads0/PAD_PI6_ID6/E2 1
+force timing constant $m/pads0/PAD_PI6_ID6/E4 0
+force timing constant $m/pads0/PAD_PI6_ID6/SR 0
+#
+force timing constant $m/pads0/PAD_PI7_ID7/E2 1
+force timing constant $m/pads0/PAD_PI7_ID7/E4 0
+force timing constant $m/pads0/PAD_PI7_ID7/SR 0
+
+# IDACK - 4mA, fast
+force timing constant $m/pads0/PAD_PH4_IDACK0/E2 1
+force timing constant $m/pads0/PAD_PH4_IDACK0/E4 0
+force timing constant $m/pads0/PAD_PH4_IDACK0/SR 0
+#
+force timing constant $m/pads0/PAD_PH5_IDACK1/E2 1
+force timing constant $m/pads0/PAD_PH5_IDACK1/E4 0
+force timing constant $m/pads0/PAD_PH5_IDACK1/SR 0
+#
+force timing constant $m/pads0/PAD_PH6_IDACK2/E2 1
+force timing constant $m/pads0/PAD_PH6_IDACK2/E4 0
+force timing constant $m/pads0/PAD_PH6_IDACK2/SR 0
+#
+force timing constant $m/pads0/PAD_PH7_IDACK3/E2 1
+force timing constant $m/pads0/PAD_PH7_IDACK3/E4 0
+force timing constant $m/pads0/PAD_PH7_IDACK3/SR 0
+#
+force timing constant $m/pads0/PAD_PC4_IDACK4/E2 1
+force timing constant $m/pads0/PAD_PC4_IDACK4/E4 0
+force timing constant $m/pads0/PAD_PC4_IDACK4/SR 0
+#
+force timing constant $m/pads0/PAD_PC5_IDACK5/E2 1
+force timing constant $m/pads0/PAD_PC5_IDACK5/E4 0
+force timing constant $m/pads0/PAD_PC5_IDACK5/SR 0
+#
+force timing constant $m/pads0/PAD_PC6_IDACK6/E2 1
+force timing constant $m/pads0/PAD_PC6_IDACK6/E4 0
+force timing constant $m/pads0/PAD_PC6_IDACK6/SR 0
+#
+force timing constant $m/pads0/PAD_PC7_IDACK7/E2 1
+force timing constant $m/pads0/PAD_PC7_IDACK7/E4 0
+force timing constant $m/pads0/PAD_PC7_IDACK7/SR 0
+
+# IDREQ - 2mA, fast
+force timing constant $m/pads0/PAD_PH0_IDREQ0/E2 0
+force timing constant $m/pads0/PAD_PH0_IDREQ0/E4 0
+force timing constant $m/pads0/PAD_PH0_IDREQ0/SR 0
+#
+force timing constant $m/pads0/PAD_PH1_IDREQ1/E2 0
+force timing constant $m/pads0/PAD_PH1_IDREQ1/E4 0
+force timing constant $m/pads0/PAD_PH1_IDREQ1/SR 0
+#
+force timing constant $m/pads0/PAD_PH2_IDREQ2/E2 0
+force timing constant $m/pads0/PAD_PH2_IDREQ2/E4 0
+force timing constant $m/pads0/PAD_PH2_IDREQ2/SR 0
+#
+force timing constant $m/pads0/PAD_PH3_IDREQ3/E2 0
+force timing constant $m/pads0/PAD_PH3_IDREQ3/E4 0
+force timing constant $m/pads0/PAD_PH3_IDREQ3/SR 0
+#
+force timing constant $m/pads0/PAD_PC0_IDREQ4/E2 0
+force timing constant $m/pads0/PAD_PC0_IDREQ4/E4 0
+force timing constant $m/pads0/PAD_PC0_IDREQ4/SR 0
+#
+force timing constant $m/pads0/PAD_PC1_IDREQ5/E2 0
+force timing constant $m/pads0/PAD_PC1_IDREQ5/E4 0
+force timing constant $m/pads0/PAD_PC1_IDREQ5/SR 0
+#
+force timing constant $m/pads0/PAD_PC2_IDREQ6/E2 0
+force timing constant $m/pads0/PAD_PC2_IDREQ6/E4 0
+force timing constant $m/pads0/PAD_PC2_IDREQ6/SR 0
+#
+force timing constant $m/pads0/PAD_PC3_IDREQ7/E2 0
+force timing constant $m/pads0/PAD_PC3_IDREQ7/E4 0
+force timing constant $m/pads0/PAD_PC3_IDREQ7/SR 0
+
+# PJ/PE - 2mA, fast
+force timing constant $m/pads0/PAD_PJ0_UTX1/E2 0
+force timing constant $m/pads0/PAD_PJ0_UTX1/E4 0
+force timing constant $m/pads0/PAD_PJ0_UTX1/SR 0
+#
+force timing constant $m/pads0/PAD_PJ1_URX1/E2 0
+force timing constant $m/pads0/PAD_PJ1_URX1/E4 0
+force timing constant $m/pads0/PAD_PJ1_URX1/SR 0
+#
+force timing constant $m/pads0/PAD_PJ2_URTS1/E2 0
+force timing constant $m/pads0/PAD_PJ2_URTS1/E4 0
+force timing constant $m/pads0/PAD_PJ2_URTS1/SR 0
+#
+force timing constant $m/pads0/PAD_PJ3_UCTS1/E2 0
+force timing constant $m/pads0/PAD_PJ3_UCTS1/E4 0
+force timing constant $m/pads0/PAD_PJ3_UCTS1/SR 0
+#
+force timing constant $m/pads0/PAD_PE0_UTX2/E2 0
+force timing constant $m/pads0/PAD_PE0_UTX2/E4 0
+force timing constant $m/pads0/PAD_PE0_UTX2/SR 0
+#
+force timing constant $m/pads0/PAD_PE1_URX2/E2 0
+force timing constant $m/pads0/PAD_PE1_URX2/E4 0
+force timing constant $m/pads0/PAD_PE1_URX2/SR 0
+#
+force timing constant $m/pads0/PAD_PE2_URTS2/E2 0
+force timing constant $m/pads0/PAD_PE2_URTS2/E4 0
+force timing constant $m/pads0/PAD_PE2_URTS2/SR 0
+#
+force timing constant $m/pads0/PAD_PE3_UCTS2/E2 0
+force timing constant $m/pads0/PAD_PE3_UCTS2/E4 0
+force timing constant $m/pads0/PAD_PE3_UCTS2/SR 0
+#
+force timing constant $m/pads0/PAD_PE4_UTX3/E2 0
+force timing constant $m/pads0/PAD_PE4_UTX3/E4 0
+force timing constant $m/pads0/PAD_PE4_UTX3/SR 0
+#
+force timing constant $m/pads0/PAD_PE5_URX3/E2 0
+force timing constant $m/pads0/PAD_PE5_URX3/E4 0
+force timing constant $m/pads0/PAD_PE5_URX3/SR 0
+#
+force timing constant $m/pads0/PAD_PE6_URTS3/E2 0
+force timing constant $m/pads0/PAD_PE6_URTS3/E4 0
+force timing constant $m/pads0/PAD_PE6_URTS3/SR 0
+#
+force timing constant $m/pads0/PAD_PE7_UCTS3/E2 0
+force timing constant $m/pads0/PAD_PE7_UCTS3/E4 0
+force timing constant $m/pads0/PAD_PE7_UCTS3/SR 0
+
+# Ethernet - 2mA, fast
+force timing constant $m/pads0/PAD_PF0_ETXEN/E2 0
+force timing constant $m/pads0/PAD_PF0_ETXEN/E4 0
+force timing constant $m/pads0/PAD_PF0_ETXEN/SR 0
+#
+force timing constant $m/pads0/PAD_PF1_ETXCLK/E2 0
+force timing constant $m/pads0/PAD_PF1_ETXCLK/E4 0
+force timing constant $m/pads0/PAD_PF1_ETXCLK/SR 0
+#
+force timing constant $m/pads0/PAD_PF2_ETXD0/E2 0
+force timing constant $m/pads0/PAD_PF2_ETXD0/E4 0
+force timing constant $m/pads0/PAD_PF2_ETXD0/SR 0
+#
+force timing constant $m/pads0/PAD_PF3_ETXD1/E2 0
+force timing constant $m/pads0/PAD_PF3_ETXD1/E4 0
+force timing constant $m/pads0/PAD_PF3_ETXD1/SR 0
+#
+force timing constant $m/pads0/PAD_PF4_ERXDV/E2 0
+force timing constant $m/pads0/PAD_PF4_ERXDV/E4 0
+force timing constant $m/pads0/PAD_PF4_ERXDV/SR 0
+#
+force timing constant $m/pads0/PAD_PF5_ERXER/E2 0
+force timing constant $m/pads0/PAD_PF5_ERXER/E4 0
+force timing constant $m/pads0/PAD_PF5_ERXER/SR 0
+#
+force timing constant $m/pads0/PAD_PF6_ERXD0/E2 0
+force timing constant $m/pads0/PAD_PF6_ERXD0/E4 0
+force timing constant $m/pads0/PAD_PF6_ERXD0/SR 0
+#
+force timing constant $m/pads0/PAD_PF7_ERXD1/E2 0
+force timing constant $m/pads0/PAD_PF7_ERXD1/E4 0
+force timing constant $m/pads0/PAD_PF7_ERXD1/SR 0
+#
+force timing constant $m/pads0/PAD_PG0_ETXER/E2 0
+force timing constant $m/pads0/PAD_PG0_ETXER/E4 0
+force timing constant $m/pads0/PAD_PG0_ETXER/SR 0
+#
+force timing constant $m/pads0/PAD_PG1_ERXCLK/E2 0
+force timing constant $m/pads0/PAD_PG1_ERXCLK/E4 0
+force timing constant $m/pads0/PAD_PG1_ERXCLK/SR 0
+#
+force timing constant $m/pads0/PAD_PG2_ETXD2/E2 0
+force timing constant $m/pads0/PAD_PG2_ETXD2/E4 0
+force timing constant $m/pads0/PAD_PG2_ETXD2/SR 0
+#
+force timing constant $m/pads0/PAD_PG3_ETXD3/E2 0
+force timing constant $m/pads0/PAD_PG3_ETXD3/E4 0
+force timing constant $m/pads0/PAD_PG3_ETXD3/SR 0
+#
+force timing constant $m/pads0/PAD_PG4_ECOL/E2 0
+force timing constant $m/pads0/PAD_PG4_ECOL/E4 0
+force timing constant $m/pads0/PAD_PG4_ECOL/SR 0
+#
+force timing constant $m/pads0/PAD_PG5_ECRS/E2 0
+force timing constant $m/pads0/PAD_PG5_ECRS/E4 0
+force timing constant $m/pads0/PAD_PG5_ECRS/SR 0
+#
+force timing constant $m/pads0/PAD_PG6_ERXD2/E2 0
+force timing constant $m/pads0/PAD_PG6_ERXD2/E4 0
+force timing constant $m/pads0/PAD_PG6_ERXD2/SR 0
+#
+force timing constant $m/pads0/PAD_PG7_ERXD3/E2 0
+force timing constant $m/pads0/PAD_PG7_ERXD3/E4 0
+force timing constant $m/pads0/PAD_PG7_ERXD3/SR 0
+
+# PA/PB - 2mA, fast
+force timing constant $m/pads0/PAD_PA0/E2 0
+force timing constant $m/pads0/PAD_PA0/E4 0
+force timing constant $m/pads0/PAD_PA0/SR 0
+#
+force timing constant $m/pads0/PAD_PA1/E2 0
+force timing constant $m/pads0/PAD_PA1/E4 0
+force timing constant $m/pads0/PAD_PA1/SR 0
+#
+force timing constant $m/pads0/PAD_PA2/E2 0
+force timing constant $m/pads0/PAD_PA2/E4 0
+force timing constant $m/pads0/PAD_PA2/SR 0
+#
+force timing constant $m/pads0/PAD_PA3/E2 0
+force timing constant $m/pads0/PAD_PA3/E4 0
+force timing constant $m/pads0/PAD_PA3/SR 0
+#
+force timing constant $m/pads0/PAD_PA4/E2 0
+force timing constant $m/pads0/PAD_PA4/E4 0
+force timing constant $m/pads0/PAD_PA4/SR 0
+#
+force timing constant $m/pads0/PAD_PA5/E2 0
+force timing constant $m/pads0/PAD_PA5/E4 0
+force timing constant $m/pads0/PAD_PA5/SR 0
+#
+force timing constant $m/pads0/PAD_PA6/E2 0
+force timing constant $m/pads0/PAD_PA6/E4 0
+force timing constant $m/pads0/PAD_PA6/SR 0
+#
+force timing constant $m/pads0/PAD_PA7/E2 0
+force timing constant $m/pads0/PAD_PA7/E4 0
+force timing constant $m/pads0/PAD_PA7/SR 0
+#
+force timing constant $m/pads0/PAD_PB0/E2 0
+force timing constant $m/pads0/PAD_PB0/E4 0
+force timing constant $m/pads0/PAD_PB0/SR 0
+#
+force timing constant $m/pads0/PAD_PB1/E2 0
+force timing constant $m/pads0/PAD_PB1/E4 0
+force timing constant $m/pads0/PAD_PB1/SR 0
+#
+force timing constant $m/pads0/PAD_PB2/E2 0
+force timing constant $m/pads0/PAD_PB2/E4 0
+force timing constant $m/pads0/PAD_PB2/SR 0
+#
+force timing constant $m/pads0/PAD_PB3/E2 0
+force timing constant $m/pads0/PAD_PB3/E4 0
+force timing constant $m/pads0/PAD_PB3/SR 0
+#
+force timing constant $m/pads0/PAD_PB4/E2 0
+force timing constant $m/pads0/PAD_PB4/E4 0
+force timing constant $m/pads0/PAD_PB4/SR 0
+#
+force timing constant $m/pads0/PAD_PB5/E2 0
+force timing constant $m/pads0/PAD_PB5/E4 0
+force timing constant $m/pads0/PAD_PB5/SR 0
+#
+force timing constant $m/pads0/PAD_PB6/E2 0
+force timing constant $m/pads0/PAD_PB6/E4 0
+force timing constant $m/pads0/PAD_PB6/SR 0
+#
+force timing constant $m/pads0/PAD_PB7/E2 0
+force timing constant $m/pads0/PAD_PB7/E4 0
+force timing constant $m/pads0/PAD_PB7/SR 0
+
+# DDQ - 6mA, fast
+force timing constant $m/pads0/PAD_DDQ0/E4 1
+force timing constant $m/pads0/PAD_DDQ0/E8 0
+force timing constant $m/pads0/PAD_DDQ0/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ1/E4 1
+force timing constant $m/pads0/PAD_DDQ1/E8 0
+force timing constant $m/pads0/PAD_DDQ1/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ2/E4 1
+force timing constant $m/pads0/PAD_DDQ2/E8 0
+force timing constant $m/pads0/PAD_DDQ2/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ3/E4 1
+force timing constant $m/pads0/PAD_DDQ3/E8 0
+force timing constant $m/pads0/PAD_DDQ3/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ4/E4 1
+force timing constant $m/pads0/PAD_DDQ4/E8 0
+force timing constant $m/pads0/PAD_DDQ4/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ5/E4 1
+force timing constant $m/pads0/PAD_DDQ5/E8 0
+force timing constant $m/pads0/PAD_DDQ5/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ6/E4 1
+force timing constant $m/pads0/PAD_DDQ6/E8 0
+force timing constant $m/pads0/PAD_DDQ6/SR 0
+#
+force timing constant $m/pads0/PAD_DDQ7/E4 1
+force timing constant $m/pads0/PAD_DDQ7/E8 0
+force timing constant $m/pads0/PAD_DDQ7/SR 0
+
+# DCLK - 8mA, fast
+force timing constant $m/pads0/PAD_DCLK/E8 0
+force timing constant $m/pads0/PAD_DCLK/SR 0
+
+# DRAM control, address - 4mA, fast
+force timing constant $m/pads0/PAD_DCS/E4 0
+force timing constant $m/pads0/PAD_DCS/SR 0
+#
+force timing constant $m/pads0/PAD_DRAS/E4 0
+force timing constant $m/pads0/PAD_DRAS/SR 0
+#
+force timing constant $m/pads0/PAD_DCAS/E4 0
+force timing constant $m/pads0/PAD_DCAS/SR 0
+#
+force timing constant $m/pads0/PAD_DWE/E4 0
+force timing constant $m/pads0/PAD_DWE/SR 0
+#
+force timing constant $m/pads0/PAD_DBA0/E4 0
+force timing constant $m/pads0/PAD_DBA0/SR 0
+#
+force timing constant $m/pads0/PAD_DBA1/E4 0
+force timing constant $m/pads0/PAD_DBA1/SR 0
+#
+force timing constant $m/pads0/PAD_DA0/E4 0
+force timing constant $m/pads0/PAD_DA0/SR 0
+#
+force timing constant $m/pads0/PAD_DA1/E4 0
+force timing constant $m/pads0/PAD_DA1/SR 0
+#
+force timing constant $m/pads0/PAD_DA2/E4 0
+force timing constant $m/pads0/PAD_DA2/SR 0
+#
+force timing constant $m/pads0/PAD_DA3/E4 0
+force timing constant $m/pads0/PAD_DA3/SR 0
+#
+force timing constant $m/pads0/PAD_DA4/E4 0
+force timing constant $m/pads0/PAD_DA4/SR 0
+#
+force timing constant $m/pads0/PAD_DA5/E4 0
+force timing constant $m/pads0/PAD_DA5/SR 0
+#
+force timing constant $m/pads0/PAD_DA6/E4 0
+force timing constant $m/pads0/PAD_DA6/SR 0
+#
+force timing constant $m/pads0/PAD_DA7/E4 0
+force timing constant $m/pads0/PAD_DA7/SR 0
+#
+force timing constant $m/pads0/PAD_DA8/E4 0
+force timing constant $m/pads0/PAD_DA8/SR 0
+#
+force timing constant $m/pads0/PAD_DA9/E4 0
+force timing constant $m/pads0/PAD_DA9/SR 0
+#
+force timing constant $m/pads0/PAD_DA10/E4 0
+force timing constant $m/pads0/PAD_DA10/SR 0
+#
+force timing constant $m/pads0/PAD_DA11/E4 0
+force timing constant $m/pads0/PAD_DA11/SR 0
+#
+force timing constant $m/pads0/PAD_DA12/E4 0
+force timing constant $m/pads0/PAD_DA12/SR 0
+#
+force timing constant $m/pads0/PAD_DA13/E4 0
+force timing constant $m/pads0/PAD_DA13/SR 0
+#
+force timing constant $m/pads0/PAD_DCKE0/E4 0
+force timing constant $m/pads0/PAD_DCKE0/SR 0
+#
+force timing constant $m/pads0/PAD_DCKE1/E4 0
+force timing constant $m/pads0/PAD_DCKE1/SR 0
+#
+force timing constant $m/pads0/PAD_DCKE2/E4 0
+force timing constant $m/pads0/PAD_DCKE2/SR 0
+#
+force timing constant $m/pads0/PAD_DCKE3/E4 0
+force timing constant $m/pads0/PAD_DCKE3/SR 0
+

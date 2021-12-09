@@ -1,0 +1,59 @@
+#-- Synplicity, Inc.
+#-- Version      Synplify ASIC 2.4.1        
+#-- Project file J:\gp3000\src\peri\eth\eth.prj
+#-- Written on Sat Jan 21 12:47:32 2006
+
+
+#add_file options
+add_file -vhdl -lib work "J:/gp3000/src/gp_pkg.vhd"
+add_file -vhdl -lib work "eth_crc/eth_crc.vhd"
+add_file -vhdl -lib work "eth_rx/eth_rx.vhd"
+add_file -vhdl -lib work "eth_tx/eth_tx.vhd"
+add_file -vhdl -lib work "eth.vhd"
+add_file -constraint "eth.sdc"
+
+#reporting options
+
+
+#implementation: "rev_1"
+impl -add rev_1
+
+#device options
+
+#compilation/mapping options
+set_option -default_enum_encoding default
+set_option -symbolic_fsm_compiler 0
+set_option -resource_sharing 1
+set_option -tri_compatible 1
+
+#map options
+set_option -frequency 0.000
+set_option -disable_io_insertion 1
+set_option -resyn_cp 0
+set_option -prune_unused_regs 1
+set_option -no_time_gated_clock 0
+set_option -hier_mult 0
+set_option -auto_infer_blackbox 0
+set_option -use_scan_for_test 0
+set_option -map_tristate_to_mux 0
+set_option -reopt 0
+set_option -fix_hold 0
+set_option -no_sequential_opt 1
+
+#simulation options
+set_option -write_verilog 0
+set_option -write_vhdl 1
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+set_option -ovpl 1
+
+#set result format/file last
+project -result_file "rev_1/eth.vma"
+
+#implementation attributes
+set_option -tech_lib_path J:/gp3000/libraries/synplify/gp3000.syn
+set_option -operating_condition fsa0a_c_sc_wc.WCCOM
+set_option -wire_load_selection_group DEFAULT
+set_option -wire_load_mode enclosed
+impl -active "rev_1"

@@ -113,7 +113,7 @@ architecture struct of SP180_4096X80BM1B is
 		begin
 			for i in rom_type'range loop
 				readline(rom_file, rom_file_line);
-				read(rom_file_line, ROM(i));
+				read(rom_file_line, ROM(rom'length- 1 - i));
 			end loop;
 		return ROM;
 	end function;

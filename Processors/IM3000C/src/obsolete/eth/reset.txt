@@ -1,0 +1,17 @@
+if rst_en = '0' then				4i
+if rx_find_adr = '0' then			2rx
+if xreset = '1' then				6rx,3i
+if clear_rx_logic = '1' then			4rx,2i
+
+rx_find_adr	<= '1' when rx_state = FIND_ADR else '0';
+xreset		<= rx_reset or not rst_en;
+rx_reset	<= rx_reg(7);
+clear_rx_logic	<= '0';	-- RX control state machine.
+
+xreset		<- rst_en
+rx_find_adr	<- rst_en
+clear_rx_logic	<- xreset
+
+clear_rx_logic
+IFG->SFD
+FIND_ADR->IFG

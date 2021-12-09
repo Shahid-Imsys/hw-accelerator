@@ -107,15 +107,15 @@ architecture struct of SP180_4096X80BM1A is
 	type rom_type is array (4095 downto 0) of bit_vector(79 downto 0);
 
 	impure function init_rom_from_file (rom_file_name : in string) return rom_type is
-		FILE rom_file : text is in rom_file_name;
-		variable rom_file_line : line;
-		variable ROM : rom_type;
-		begin
-			for i in rom_type'range loop
-				readline(rom_file, rom_file_line);
-				read(rom_file_line, ROM(i));
-			end loop;
-		return ROM;
+          FILE rom_file : text is in rom_file_name;
+          variable rom_file_line : line;
+          variable ROM : rom_type;
+        begin
+          for i in rom'range loop
+            readline(rom_file, rom_file_line);
+            read(rom_file_line, ROM(rom'length - 1 - i));
+          end loop;
+          return ROM;
 	end function;
 
 	signal ROM	: rom_type := init_rom_from_file("mprom0.data");

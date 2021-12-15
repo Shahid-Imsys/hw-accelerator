@@ -306,19 +306,21 @@ rd       <= RD_FIFO;
 --Distribution network
 ----------------------------------------------------------------
 --PE Demux
-process(clk_e)  --Should internal destination listed here?
+process(clk_p)  --Should internal destination listed here?
 begin
-    if rising_edge(clk_e) then
-    data_vld_out_i<=( others => '0');
-    if B_CAST= '1' then
-        for i in 15 downto 0 loop
-            pe_data_out (i)<= DATA_NOC;
-            data_vld_out_i (i) <= DATA_VLD;
-        end loop;
-    else
-        data_vld_out_i(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
-        pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
-    end if;
+    if rising_edge(clk_p) then
+        if EVEN_P = '0' then
+            data_vld_out_i<=( others => '0');
+            if B_CAST= '1' then
+                for i in 15 downto 0 loop
+                    pe_data_out (i)<= DATA_NOC;
+                    data_vld_out_i (i) <= DATA_VLD;
+                end loop;
+            else
+                data_vld_out_i(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
+                pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
+            end if;
+        end if;
     end if;
 end process;
 DATA_VLD_OUT <= data_vld_out_i; 

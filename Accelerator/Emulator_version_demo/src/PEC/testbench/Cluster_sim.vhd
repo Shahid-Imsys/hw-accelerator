@@ -132,8 +132,8 @@ constant RESUME : std_logic_vector(5 downto 0) :="101000";
 constant ADDRESS1 : std_logic_vector(14 downto 0) := "000000000000011"; --3
 constant ADDRESS2 : std_logic_vector(14 downto 0) := "000000000000100"; --4
 constant ADDRESS3 : std_logic_vector(14 downto 0) := (others => '0');
-constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";  --3
-constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000010";  --
+constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";  --3 --write 4 words
+constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000010";  --2 --read 3 words
 constant LENGTH3 : std_logic_vector(14 downto 0) := "000000011111111";--255
 constant WORD1   : mem_word := (15 =>"11111111", 14 => x"fe", 13 => x"fd", 12 => x"fc", 11 => x"fb", 10 => x"fa", 0=> x"f0",others =>(others=>'0'));
 constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));

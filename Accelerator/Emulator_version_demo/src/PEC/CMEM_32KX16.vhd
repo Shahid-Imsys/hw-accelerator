@@ -124,22 +124,22 @@ begin
         end if;
     end process;
 
-        DO0 <= do(0); --when RD = '1' else (others => 'Z');
-        DO1 <= do(1); --when RD = '1' else (others => 'Z');
-        DO2 <= do(2); --when RD = '1' else (others => 'Z');
-        DO3 <= do(3); --when RD = '1' else (others => 'Z');
-        DO4 <= do(4); --when RD = '1' else (others => 'Z');
-        DO5 <= do(5); --when RD = '1' else (others => 'Z');
-        DO6 <= do(6); --when RD = '1' else (others => 'Z');
-        DO7 <= do(7); --when RD = '1' else (others => 'Z');
-        DO8 <= do(8); --when RD = '1' else (others => 'Z');
-        DO9 <= do(9); --when RD = '1' else (others => 'Z');
-        DO10 <= do(10); --when RD = '1' else (others => 'Z');
-        DO11 <= do(11); --when RD = '1' else (others => 'Z');
-        DO12 <= do(12); --when RD = '1' else (others => 'Z');
-        DO13 <= do(13); --when RD = '1' else (others => 'Z');
-        DO14 <= do(14); --when RD = '1' else (others => 'Z');
-        DO15 <= do(15); --when RD = '1' else (others => 'Z');
+        DO0 <= do(0);-- when RD = '1' else (others => 'Z');
+        DO1 <= do(1);-- when RD = '1' else (others => 'Z');
+        DO2 <= do(2);-- when RD = '1' else (others => 'Z');
+        DO3 <= do(3);-- when RD = '1' else (others => 'Z');
+        DO4 <= do(4);-- when RD = '1' else (others => 'Z');
+        DO5 <= do(5);-- when RD = '1' else (others => 'Z');
+        DO6 <= do(6);-- when RD = '1' else (others => 'Z');
+        DO7 <= do(7);-- when RD = '1' else (others => 'Z');
+        DO8 <= do(8);-- when RD = '1' else (others => 'Z');
+        DO9 <= do(9);-- when RD = '1' else (others => 'Z');
+        DO10 <= do(10);-- when RD = '1' else (others => 'Z');
+        DO11 <= do(11);-- when RD = '1' else (others => 'Z');
+        DO12 <= do(12);-- when RD = '1' else (others => 'Z');
+        DO13 <= do(13);-- when RD = '1' else (others => 'Z');
+        DO14 <= do(14);-- when RD = '1' else (others => 'Z');
+        DO15 <= do(15);-- when RD = '1' else (others => 'Z');
 
 
 end architecture struct;

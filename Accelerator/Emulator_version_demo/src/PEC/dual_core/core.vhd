@@ -141,12 +141,12 @@ entity core is
     nap_rec         : in std_logic;  -- will recover from nap mode
     halt_en         : out std_logic;
     nap_en          : out std_logic;
-    rst_rtc     : out std_logic;  -- Reset RTC counter byte
-    en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
-    fclk        : out std_logic;  -- Fast clock to RTC counter byte
+  --  rst_rtc     : out std_logic;  -- Reset RTC counter byte
+  --  en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
+  --  fclk        : out std_logic;  -- Fast clock to RTC counter byte
     ld_bmem     : out std_logic;  -- Latch enable to the en_bmem latch
-    rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
-    rtc_data    : in  std_logic_vector(7 downto 0);   -- RTC data
+  --  rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
+  --  rtc_data    : in  std_logic_vector(7 downto 0);   -- RTC data
     --  Signals to/from Peripheral block
     dfp         : in  std_logic_vector(7 downto 0); 
     dbus        : out std_logic_vector(7 downto 0);
@@ -755,12 +755,12 @@ begin
       nap_rec     => nap_rec     , -- will recover from nap mode
       halt_en     => halt_en     ,
       nap_en      => nap_en      ,
-      rst_rtc     => rst_rtc,      
-      en_fclk     => en_fclk,  
-      fclk        => fclk,     
-      ld_bmem     => ld_bmem,     
-      rtc_sel     => rtc_sel,    
-      rtc_data    => rtc_data);    
+    --  rst_rtc     => rst_rtc,      
+    --  en_fclk     => en_fclk,  
+    --  fclk        => fclk,     
+      ld_bmem     => ld_bmem);     
+    --  rtc_sel     => rtc_sel,    
+    --  rtc_data    => rtc_data);    
 
   fast_d		<= fast_d_int;   
 	dqm_size	<= dqm_size_int;

@@ -167,7 +167,7 @@ begin
   --clk_p_int		<= xout WHEN sel_pll = '0' AND clk_in_off = '0' ELSE       --delete by HYX, 20150706
 		--		   pllout WHEN sel_pll = '1' AND clk_in_off = '0' ELSE
 		--		   '0';
-    clk_p_int   <= clk_mux_out WHEN clk_in_off = '0' ELSE '0'; 
+    clk_p_int   <= clk_mux_out;-- WHEN clk_in_off = '0' ELSE '0'; 
     clk_p <=  clk_p_int;--clk_mux_out WHEN clk_in_off = '0' ELSE '0';--Removed a delta delay of output clk_p
 
   -- PLL output is the source of clk_c except when the PLL
@@ -315,7 +315,7 @@ begin
 	-- These buffers are needed for zero-timing simulation.
 	-- They should not affect synthesis.
 	--clk_p_int3 <= clk_p_int2;
-	clk_p <= clk_p_int;
+	--clk_p <= clk_p_int;
 	clk_c_en <= clk_c_int;
 	--clk_e_pos <= clk_e_int;
 	--clk_e_neg <= din_e;

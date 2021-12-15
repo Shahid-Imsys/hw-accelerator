@@ -617,6 +617,8 @@ architecture struct of top is
   end component;
   
   component SU180_2048X80X1BM1
+  generic (
+    g_file_name : string := "mpram0.data");
   port(
       A0                         :   IN   std_logic;
       A1                         :   IN   std_logic;
@@ -1720,8 +1722,11 @@ begin
       OE          => mp_ROM1_OE                
       );
 
-  mpram00: SU180_2048X80X1BM1
-  PORT MAP (
+    mpram00: SU180_2048X80X1BM1
+      generic map (
+        g_file_name => "mpram0.data"
+        )
+      PORT MAP (
       A0          => mp_RAM0_A(0),
       A1          => mp_RAM0_A(1),               
       A2          => mp_RAM0_A(2),              
@@ -1900,6 +1905,9 @@ begin
       );
 
   mpram11: SU180_2048X80X1BM1
+      generic map (
+        g_file_name =>  "mpram1.data"
+        )
   PORT MAP (
       A0          => mp_RAM1_A(0),
       A1          => mp_RAM1_A(1),               

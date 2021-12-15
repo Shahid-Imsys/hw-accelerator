@@ -120,7 +120,8 @@ architecture struct of SP180_4096X80BM1A is
 
 	signal ROM	: rom_type := init_rom_from_file("mprom0.data");
 	signal addr	: std_logic_vector(11 downto 0);
-	signal data	: std_logic_vector(79 downto 0);
+	signal data	: std_logic_vector(79 downto 0) := (others => '0');  --
+                                                                             --BSN
 	attribute rom_style					: string;
 	attribute rom_style of ROM	: signal is "block";
 
@@ -142,91 +143,91 @@ begin
 	begin
 		if rising_edge(CK) then
 			if CS = '1' then
-				data <= to_stdlogicvector(ROM(conv_integer(addr)));
+                          data <= to_stdlogicvector(ROM(conv_integer(addr)));
 			end if;
 		end if;
 	end process;
 
-	DO79	<= data(79) when OE = '1' else 'Z';
-	DO78	<= data(78) when OE = '1' else 'Z';
-	DO77	<= data(77) when OE = '1' else 'Z';
-	DO76	<= data(76) when OE = '1' else 'Z';
-	DO75	<= data(75) when OE = '1' else 'Z';
-	DO74	<= data(74) when OE = '1' else 'Z';
-	DO73	<= data(73) when OE = '1' else 'Z';
-	DO72	<= data(72) when OE = '1' else 'Z';
-	DO71	<= data(71) when OE = '1' else 'Z';
-	DO70	<= data(70) when OE = '1' else 'Z';
-	DO69	<= data(69) when OE = '1' else 'Z';
-	DO68	<= data(68) when OE = '1' else 'Z';
-	DO67	<= data(67) when OE = '1' else 'Z';
-	DO66	<= data(66) when OE = '1' else 'Z';
-	DO65	<= data(65) when OE = '1' else 'Z';
-	DO64	<= data(64) when OE = '1' else 'Z';
-	DO63	<= data(63) when OE = '1' else 'Z';
-	DO62	<= data(62) when OE = '1' else 'Z';
-	DO61	<= data(61) when OE = '1' else 'Z';
-	DO60	<= data(60) when OE = '1' else 'Z';
-	DO59	<= data(59) when OE = '1' else 'Z';
-	DO58	<= data(58) when OE = '1' else 'Z';
-	DO57	<= data(57) when OE = '1' else 'Z';
-	DO56	<= data(56) when OE = '1' else 'Z';
-	DO55	<= data(55) when OE = '1' else 'Z';
-	DO54	<= data(54) when OE = '1' else 'Z';
-	DO53	<= data(53) when OE = '1' else 'Z';
-	DO52	<= data(52) when OE = '1' else 'Z';
-	DO51	<= data(51) when OE = '1' else 'Z';
-	DO50	<= data(50) when OE = '1' else 'Z';
-	DO49	<= data(49) when OE = '1' else 'Z';
-	DO48	<= data(48) when OE = '1' else 'Z';
-	DO47	<= data(47) when OE = '1' else 'Z';
-	DO46	<= data(46) when OE = '1' else 'Z';
-	DO45	<= data(45) when OE = '1' else 'Z';
-	DO44	<= data(44) when OE = '1' else 'Z';
-	DO43	<= data(43) when OE = '1' else 'Z';
-	DO42	<= data(42) when OE = '1' else 'Z';
-	DO41	<= data(41) when OE = '1' else 'Z';
-	DO40	<= data(40) when OE = '1' else 'Z';
-	DO39	<= data(39) when OE = '1' else 'Z';
-	DO38	<= data(38) when OE = '1' else 'Z';
-	DO37	<= data(37) when OE = '1' else 'Z';
-	DO36	<= data(36) when OE = '1' else 'Z';
-	DO35	<= data(35) when OE = '1' else 'Z';
-	DO34	<= data(34) when OE = '1' else 'Z';
-	DO33	<= data(33) when OE = '1' else 'Z';
-	DO32	<= data(32) when OE = '1' else 'Z';
-	DO31	<= data(31) when OE = '1' else 'Z';
-	DO30	<= data(30) when OE = '1' else 'Z';
-	DO29	<= data(29) when OE = '1' else 'Z';
-	DO28	<= data(28) when OE = '1' else 'Z';
-	DO27	<= data(27) when OE = '1' else 'Z';
-	DO26	<= data(26) when OE = '1' else 'Z';
-	DO25	<= data(25) when OE = '1' else 'Z';
-	DO24	<= data(24) when OE = '1' else 'Z';
-	DO23	<= data(23) when OE = '1' else 'Z';
-	DO22	<= data(22) when OE = '1' else 'Z';
-	DO21	<= data(21) when OE = '1' else 'Z';
-	DO20	<= data(20) when OE = '1' else 'Z';
-	DO19	<= data(19) when OE = '1' else 'Z';
-	DO18	<= data(18) when OE = '1' else 'Z';
-	DO17	<= data(17) when OE = '1' else 'Z';
-	DO16	<= data(16) when OE = '1' else 'Z';
-	DO15	<= data(15) when OE = '1' else 'Z';
-	DO14	<= data(14) when OE = '1' else 'Z';
-	DO13	<= data(13) when OE = '1' else 'Z';
-	DO12	<= data(12) when OE = '1' else 'Z';
-	DO11	<= data(11) when OE = '1' else 'Z';
-	DO10	<= data(10) when OE = '1' else 'Z';
-	DO9		<= data(9) when OE = '1' else 'Z';
-	DO8		<= data(8) when OE = '1' else 'Z';
-	DO7		<= data(7) when OE = '1' else 'Z';
-	DO6		<= data(6) when OE = '1' else 'Z';
-	DO5		<= data(5) when OE = '1' else 'Z';
-	DO4		<= data(4) when OE = '1' else 'Z';
-	DO3		<= data(3) when OE = '1' else 'Z';
-	DO2		<= data(2) when OE = '1' else 'Z';
-	DO1		<= data(1) when OE = '1' else 'Z';
-	DO0		<= data(0) when OE = '1' else 'Z';
+	DO79	<= data(79) when OE = '1' else '0'; -- 'Z'
+	DO78	<= data(78) when OE = '1' else '0'; -- 'Z'
+	DO77	<= data(77) when OE = '1' else '0'; -- 'Z'
+	DO76	<= data(76) when OE = '1' else '0'; -- 'Z'
+	DO75	<= data(75) when OE = '1' else '0'; -- 'Z'
+	DO74	<= data(74) when OE = '1' else '0'; -- 'Z'
+	DO73	<= data(73) when OE = '1' else '0'; -- 'Z'
+	DO72	<= data(72) when OE = '1' else '0'; -- 'Z'
+	DO71	<= data(71) when OE = '1' else '0'; -- 'Z'
+	DO70	<= data(70) when OE = '1' else '0'; -- 'Z'
+	DO69	<= data(69) when OE = '1' else '0'; -- 'Z'
+	DO68	<= data(68) when OE = '1' else '0'; -- 'Z'
+	DO67	<= data(67) when OE = '1' else '0'; -- 'Z'
+	DO66	<= data(66) when OE = '1' else '0'; -- 'Z'
+	DO65	<= data(65) when OE = '1' else '0'; -- 'Z'
+	DO64	<= data(64) when OE = '1' else '0'; -- 'Z'
+	DO63	<= data(63) when OE = '1' else '0'; -- 'Z'
+	DO62	<= data(62) when OE = '1' else '0'; -- 'Z'
+	DO61	<= data(61) when OE = '1' else '0'; -- 'Z'
+	DO60	<= data(60) when OE = '1' else '0'; -- 'Z'
+	DO59	<= data(59) when OE = '1' else '0'; -- 'Z'
+	DO58	<= data(58) when OE = '1' else '0'; -- 'Z'
+	DO57	<= data(57) when OE = '1' else '0'; -- 'Z'
+	DO56	<= data(56) when OE = '1' else '0'; -- 'Z'
+	DO55	<= data(55) when OE = '1' else '0'; -- 'Z'
+	DO54	<= data(54) when OE = '1' else '0'; -- 'Z'
+	DO53	<= data(53) when OE = '1' else '0'; -- 'Z'
+	DO52	<= data(52) when OE = '1' else '0'; -- 'Z'
+	DO51	<= data(51) when OE = '1' else '0'; -- 'Z'
+	DO50	<= data(50) when OE = '1' else '0'; -- 'Z'
+	DO49	<= data(49) when OE = '1' else '0'; -- 'Z'
+	DO48	<= data(48) when OE = '1' else '0'; -- 'Z'
+	DO47	<= data(47) when OE = '1' else '0'; -- 'Z'
+	DO46	<= data(46) when OE = '1' else '0'; -- 'Z'
+	DO45	<= data(45) when OE = '1' else '0'; -- 'Z'
+	DO44	<= data(44) when OE = '1' else '0'; -- 'Z'
+	DO43	<= data(43) when OE = '1' else '0'; -- 'Z'
+	DO42	<= data(42) when OE = '1' else '0'; -- 'Z'
+	DO41	<= data(41) when OE = '1' else '0'; -- 'Z'
+	DO40	<= data(40) when OE = '1' else '0'; -- 'Z'
+	DO39	<= data(39) when OE = '1' else '0'; -- 'Z'
+	DO38	<= data(38) when OE = '1' else '0'; -- 'Z'
+	DO37	<= data(37) when OE = '1' else '0'; -- 'Z'
+	DO36	<= data(36) when OE = '1' else '0'; -- 'Z'
+	DO35	<= data(35) when OE = '1' else '0'; -- 'Z'
+	DO34	<= data(34) when OE = '1' else '0'; -- 'Z'
+	DO33	<= data(33) when OE = '1' else '0'; -- 'Z'
+	DO32	<= data(32) when OE = '1' else '0'; -- 'Z'
+	DO31	<= data(31) when OE = '1' else '0'; -- 'Z'
+	DO30	<= data(30) when OE = '1' else '0'; -- 'Z'
+	DO29	<= data(29) when OE = '1' else '0'; -- 'Z'
+	DO28	<= data(28) when OE = '1' else '0'; -- 'Z'
+	DO27	<= data(27) when OE = '1' else '0'; -- 'Z'
+	DO26	<= data(26) when OE = '1' else '0'; -- 'Z'
+	DO25	<= data(25) when OE = '1' else '0'; -- 'Z'
+	DO24	<= data(24) when OE = '1' else '0'; -- 'Z'
+	DO23	<= data(23) when OE = '1' else '0'; -- 'Z'
+	DO22	<= data(22) when OE = '1' else '0'; -- 'Z'
+	DO21	<= data(21) when OE = '1' else '0'; -- 'Z'
+	DO20	<= data(20) when OE = '1' else '0'; -- 'Z'
+	DO19	<= data(19) when OE = '1' else '0'; -- 'Z'
+	DO18	<= data(18) when OE = '1' else '0'; -- 'Z'
+	DO17	<= data(17) when OE = '1' else '0'; -- 'Z'
+	DO16	<= data(16) when OE = '1' else '0'; -- 'Z'
+	DO15	<= data(15) when OE = '1' else '0'; -- 'Z'
+	DO14	<= data(14) when OE = '1' else '0'; -- 'Z'
+	DO13	<= data(13) when OE = '1' else '0'; -- 'Z'
+	DO12	<= data(12) when OE = '1' else '0'; -- 'Z'
+	DO11	<= data(11) when OE = '1' else '0'; -- 'Z'
+	DO10	<= data(10) when OE = '1' else '0'; -- 'Z'
+	DO9		<= data(9) when OE = '1' else '0'; -- 'Z'
+	DO8		<= data(8) when OE = '1' else '0'; -- 'Z'
+	DO7		<= data(7) when OE = '1' else '0'; -- 'Z'
+	DO6		<= data(6) when OE = '1' else '0'; -- 'Z'
+	DO5		<= data(5) when OE = '1' else '0'; -- 'Z'
+	DO4		<= data(4) when OE = '1' else '0'; -- 'Z'
+	DO3		<= data(3) when OE = '1' else '0'; -- 'Z'
+	DO2		<= data(2) when OE = '1' else '0'; -- 'Z'
+	DO1		<= data(1) when OE = '1' else '0'; -- 'Z'
+	DO0		<= data(0) when OE = '1' else '0'; -- 'Z'
 end struct;
 
     

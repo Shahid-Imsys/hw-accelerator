@@ -182,12 +182,12 @@ entity crb is
     nap_rec     : in std_logic;  -- will recover from nap mode
     halt_en     : out std_logic;
     nap_en      : out std_logic;
-    rst_rtc     : out std_logic;  -- Reset RTC counter byte
-    en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
-    fclk        : out std_logic;  -- Fast clock to RTC counter byte
-    ld_bmem     : out std_logic;  -- Latch enable to the en_bmem latch
-    rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
-    rtc_data    : in  std_logic_vector(7 downto 0));  -- RTC data
+  --  rst_rtc     : out std_logic;  -- Reset RTC counter byte
+  --  en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
+  --  fclk        : out std_logic;  -- Fast clock to RTC counter byte
+    ld_bmem     : out std_logic);  -- Latch enable to the en_bmem latch
+  --  rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
+  --  rtc_data    : in  std_logic_vector(7 downto 0));  -- RTC data
 end;          
 
 architecture rtl of crb is
@@ -354,11 +354,11 @@ begin
       -- BMEM data
       bmem_d  <= x"00";
        -- RTC control
-      rst_rtc <= '0';
-      en_fclk <= '0';
-      fclk    <= '1';
+    --  rst_rtc <= '0';
+    --  en_fclk <= '0';
+    --  fclk    <= '1';
       ld_bmem <= '0';
-      rtc_sel <= "111";
+    --  rtc_sel <= "111";
 --  elsif clk_e = '0' then          -- Latch based implementation
     elsif rising_edge(clk_p) then   -- Register based implementation
       if ld_crb = '1' and clk_e_pos = '0' then
@@ -451,11 +451,11 @@ begin
           when "1101" => -- BMEM data
             bmem_d  <= dbus;
           when "1111" => -- RTC control
-            rst_rtc <= dbus(7);
-            en_fclk <= dbus(6);
-            fclk    <= dbus(5);
+          --  rst_rtc <= dbus(7);
+          --  en_fclk <= dbus(6);
+          --  fclk    <= dbus(5);
             ld_bmem <= dbus(4);
-            rtc_sel <= dbus(2 downto 0);
+          --  rtc_sel <= dbus(2 downto 0);
           when others =>
             NULL;
         end case;
@@ -585,7 +585,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, rtc_data, nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out <= x"00";
     case crb_sel is
@@ -672,8 +672,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(0)          <= bmem_a8_int;
       when "1101" => -- BMEM data
         crb_out             <= bmem_q;
-      when "1111" => -- RTC data
-        crb_out             <= rtc_data;
+      --when "1111" => -- RTC data
+      --  crb_out             <= rtc_data;
       when others =>
         NULL;
     end case;
@@ -689,7 +689,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, rtc_data,nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out_c2 <= x"00";
     case crb_sel_c2 is
@@ -776,8 +776,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(0)          <= bmem_a8_int;
       when "1101" => -- BMEM data
         crb_out_c2             <= bmem_q;
-      when "1111" => -- RTC data
-        crb_out_c2             <= rtc_data;
+      --when "1111" => -- RTC data
+      --  crb_out_c2             <= rtc_data;
       when others =>
         NULL;
     end case;

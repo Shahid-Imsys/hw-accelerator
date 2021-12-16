@@ -1324,11 +1324,11 @@ architecture struct of PE_pair_top is
   signal f3_DATA_IN    :std_logic_vector(31 downto 0);       
   signal f3_RBB        :std_logic; 
   --RAM0 
-  signal RAM0_DO         : std_logic_vector (7 downto 0); -- modify flag, 2015lp
-  signal RAM0_DI         : std_logic_vector (7 downto 0);
-  signal RAM0_A          : std_logic_vector (13 downto 0);
-  signal RAM0_WEB        : std_logic;
-  signal RAM0_CS         : std_logic;
+  --signal RAM0_DO         : std_logic_vector (7 downto 0); -- modify flag, 2015lp
+  --signal RAM0_DI         : std_logic_vector (7 downto 0);
+  --signal RAM0_A          : std_logic_vector (13 downto 0);
+  --signal RAM0_WEB        : std_logic;
+  --signal RAM0_CS         : std_logic;
         --RAM1 
   signal RAM1_DO         : std_logic_vector (7 downto 0);
   signal RAM1_DI         : std_logic_vector (7 downto 0);
@@ -2521,22 +2521,22 @@ begin
 --  -----------------------------------------------------------------------------
     rtc0: entity work.rtc 
      port map(
-      xout      => hclk_i,
+    --  xout      => hclk_i,
       pllout    => pllout,
-      sel_pll   => sel_pll,
-      xout_selected => xout_selected,
+    --  sel_pll   => sel_pll,
+    --  xout_selected => xout_selected,
       lp_pwr_ok => lp_pwr_ok,
-      rxout     => rxout,  -- 32KHz oscillator input         
-      mrxout_o  => mrxout_o,  -- 32KHz oscillator output or external wake
-      rst_rtc   => rst_rtc,  -- Reset RTC counter byte            
-      en_fclk   => en_fclk,  -- Enable fast clocking of RTC counter byte
-      fclk      => fclk,  -- Fast clock to RTC counter byte   
+    --  rxout     => rxout,  -- 32KHz oscillator input         
+    --  mrxout_o  => mrxout_o,  -- 32KHz oscillator output or external wake
+    --  rst_rtc   => rst_rtc,  -- Reset RTC counter byte            
+    --  en_fclk   => en_fclk,  -- Enable fast clocking of RTC counter byte
+    --  fclk      => fclk,  -- Fast clock to RTC counter byte   
       ld_bmem   => ld_bmem,  -- Latch enable to the dis_bmem latch   
-      rtc_sel   => rtc_sel,   -- RTC byte select
-      rtc_data  => rtc_data,   -- RTC data             
-      dis_bmem  => dis_bmem_int, 
+    --  rtc_sel   => rtc_sel,   -- RTC byte select
+    --  rtc_data  => rtc_data,   -- RTC data             
+    --  dis_bmem  => dis_bmem_int, 
       
-      reset_iso_clear=> reset_iso_clear,
+    --  reset_iso_clear=> reset_iso_clear,
 	  halt_en        => halt_en            ,    
       nap_en         => nap_en             ,    
       wakeup_lp      => wakeup_lp          ,    
@@ -2569,13 +2569,13 @@ begin
       bmem_q        =>  bmem_q,  
       bmem_d        =>  bmem_d,  
       bmem_we_n     =>  bmem_we_n,  
-      bmem_ce_n     =>  bmem_ce_n,
+      bmem_ce_n     =>  bmem_ce_n
 	  --RAM0 
-	  RAM0_DO       =>  RAM0_DO ,
-	  RAM0_DI       =>  RAM0_DI ,
-	  RAM0_A        =>  RAM0_A  ,
-	  RAM0_WEB      =>  RAM0_WEB,
-	  RAM0_CS       =>  RAM0_CS 
+	  --RAM0_DO       =>  RAM0_DO ,
+	  --RAM0_DI       =>  RAM0_DI ,
+	  --RAM0_A        =>  RAM0_A  ,
+	  --RAM0_WEB      =>  RAM0_WEB,
+	  --RAM0_CS       =>  RAM0_CS 
       ); 
 
     -- Disable power to BMEM 
@@ -2709,12 +2709,12 @@ begin
     nap_rec        => nap_rec        ,
     halt_en        => halt_en        ,
     nap_en         => nap_en         ,
-    rst_rtc       => rst_rtc,  --: out std_logic;  -- Reset RTC counter byte
-    en_fclk       => en_fclk,  --: out std_logic;  -- Enable fast clocking of RTC counter byte
-    fclk          => fclk,     --: out std_logic;  -- Fast clock to RTC counter byte
+  --  rst_rtc       => rst_rtc,  --: out std_logic;  -- Reset RTC counter byte
+  --  en_fclk       => en_fclk,  --: out std_logic;  -- Enable fast clocking of RTC counter byte
+  --  fclk          => fclk,     --: out std_logic;  -- Fast clock to RTC counter byte
     ld_bmem       => ld_bmem,  --: out std_logic;  -- Latch enable to the en_bmem latch
-    rtc_sel       => rtc_sel,  --: out std_logic_vector(2 downto 0);   -- RTC byte select
-    rtc_data      => rtc_data, --: in  std_logic_vector(7 downto 0);   -- RTC data
+  --  rtc_sel       => rtc_sel,  --: out std_logic_vector(2 downto 0);   -- RTC byte select
+  --  rtc_data      => rtc_data, --: in  std_logic_vector(7 downto 0);   -- RTC data
     --  Signals to/from Peripheral block
     dfp           => dfp,     --: in  std_logic_vector(7 downto 0); 
     dbus          => dbus,    --: out std_logic_vector(7 downto 0);

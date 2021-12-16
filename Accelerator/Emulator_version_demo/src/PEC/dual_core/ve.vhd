@@ -83,17 +83,16 @@ architecture rtl of ve is
 --END COMPONENT;
 
 
-COMPONENT c_accum_0
+COMPONENT accumulator
   PORT (
-    B : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    data : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
     CLK : IN STD_LOGIC;
     CE : IN STD_LOGIC;
-    BYPASS : IN STD_LOGIC;
-    SCLR : IN STD_LOGIC;
-    Q : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    reset : IN STD_LOGIC;
+    sum : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
   );
 END COMPONENT;
-COMPONENT mult_gen_0
+COMPONENT mul
   PORT (
     CLK : IN STD_LOGIC;
     CE  : IN STD_LOGIC;
@@ -102,22 +101,22 @@ COMPONENT mult_gen_0
     P : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
   );
 END COMPONENT;
-COMPONENT dist_mem_gen_0
+COMPONENT dist_ram0
   PORT (
-    a : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-    d : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    di : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
     clk : IN STD_LOGIC;
     we : IN STD_LOGIC;
-    spo : OUT STD_LOGIC_VECTOR(63 DOWNTO 0)
+    do : OUT STD_LOGIC_VECTOR(63 DOWNTO 0)
   );
 END COMPONENT;
-COMPONENT dist_mem_gen_1
+COMPONENT dist_ram1
   PORT (
-    a : IN STD_LOGIC_VECTOR(5 DOWNTO 0);
-    d : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    addr : IN STD_LOGIC_VECTOR(5 DOWNTO 0);
+    di : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
     clk : IN STD_LOGIC;
     we : IN STD_LOGIC;
-    spo : OUT STD_LOGIC_VECTOR(63 DOWNTO 0)
+    do : OUT STD_LOGIC_VECTOR(63 DOWNTO 0)
   );
 END COMPONENT;
 
@@ -1023,79 +1022,71 @@ end process;
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
 ---------------------------------------------------------------
-accu_0 : c_accum_0
+accu_0 : accumulator
   PORT MAP (
-    B => mul_out_0,
+    data => mul_out_0,
     CLK => CLK_P,
     CE => actl_0,
-    BYPASS => bypass, --NOT USED
-    SCLR => sclr_i,
-    Q => acc_out_0
+    reset => sclr_i,
+    sum => acc_out_0
   );
-  accu_1 : c_accum_0
+  accu_1 : accumulator
   PORT MAP (
-    B => mul_out_1,
+    data => mul_out_1,
     CLK => CLK_P,
     CE => actl_1,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_1
+    reset => sclr_i,
+    sum => acc_out_1
   );
-  accu_2 : c_accum_0
+  accu_2 : accumulator
   PORT MAP (
-    B => mul_out_2,
+    data => mul_out_2,
     CLK => CLK_P,
     CE => actl_2,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_2
+    reset => sclr_i,
+    sum => acc_out_2
   );
-  accu_3 : c_accum_0
+  accu_3 : accumulator
   PORT MAP (
-    B => mul_out_3,
+    data => mul_out_3,
     CLK => CLK_P,
     CE => actl_3,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_3
+    reset => sclr_i,
+    sum => acc_out_3
   );
-  accu_4 : c_accum_0
+  accu_4 : accumulator
   PORT MAP (
-    B => mul_out_4,
+    data => mul_out_4,
     CLK => CLK_P,
     CE => actl_4,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_4
+    reset => sclr_i,
+    sum => acc_out_4
   );
-  accu_5 : c_accum_0
+  accu_5 : accumulator
   PORT MAP (
-    B => mul_out_5,
+    data => mul_out_5,
     CLK => CLK_P,
     CE => actl_5,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_5
+    reset => sclr_i,
+    sum => acc_out_5
   );
-  accu_6 : c_accum_0
+  accu_6 : accumulator
   PORT MAP (
-    B => mul_out_6,
+    data => mul_out_6,
     CLK => CLK_P,
     CE => actl_6,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_6
+    reset => sclr_i,
+    sum => acc_out_6
   );
-  accu_7 : c_accum_0
+  accu_7 : accumulator
   PORT MAP (
-    B => mul_out_7,
+    data => mul_out_7,
     CLK => CLK_P,
     CE => actl_7,
-    BYPASS => BYPASS,
-    SCLR => sclr_i,
-    Q => acc_out_7
+    reset => sclr_i,
+    sum => acc_out_7
   );
-  mul_0 : mult_gen_0
+  mul_0 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_0,
@@ -1103,7 +1094,7 @@ accu_0 : c_accum_0
     B => mul_in_r_0,
     P => mul_out_0
   );
-  mul_1 : mult_gen_0
+  mul_1 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_1,
@@ -1111,7 +1102,7 @@ accu_0 : c_accum_0
     B => mul_in_r_1,
     P => mul_out_1
   );
-  mul_2 : mult_gen_0
+  mul_2 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_2,
@@ -1119,7 +1110,7 @@ accu_0 : c_accum_0
     B => mul_in_r_2,
     P => mul_out_2
   );
-  mul_3 : mult_gen_0
+  mul_3 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_3,
@@ -1127,7 +1118,7 @@ accu_0 : c_accum_0
     B => mul_in_r_3,
     P => mul_out_3
   );
-  mul_4 : mult_gen_0
+  mul_4 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_4,
@@ -1135,7 +1126,7 @@ accu_0 : c_accum_0
     B => mul_in_r_4,
     P => mul_out_4
   );
-  mul_5 : mult_gen_0
+  mul_5 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_5,
@@ -1143,7 +1134,7 @@ accu_0 : c_accum_0
     B => mul_in_r_5,
     P => mul_out_5
   );
-  mul_6 : mult_gen_0
+  mul_6 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_6,
@@ -1151,7 +1142,7 @@ accu_0 : c_accum_0
     B => mul_in_r_6,
     P => mul_out_6
   );
-  mul_7 : mult_gen_0
+  mul_7 : mul
   PORT MAP (
     CLK => CLK_P,
     CE  => mctl_7,
@@ -1184,29 +1175,29 @@ accu_0 : c_accum_0
   --  P => acc_out_7,
   --  PCOUT => open
   --);
-  buf_0 : dist_mem_gen_0
+  buf_0 : dist_ram0
   PORT MAP (
-    a => addr_p_l,
-    d => sram_in,
+    addr => addr_p_l,
+    di => sram_in,
     clk => clk_p,
     we => sram_l_we, --
-    spo => buf_out_l
+    do => buf_out_l
   );
-  buf_1 : dist_mem_gen_0
+  buf_1 : dist_ram0
   PORT MAP (
-    a =>addr_p_r,
-    d => sram_in,
+    addr =>addr_p_r,
+    di => sram_in,
     clk => clk_p,
     we => sram_r_we,
-    spo => buf_out_r
+    do => buf_out_r
   );
-  buf_bias : dist_mem_gen_1
+  buf_bias : dist_ram1
   PORT MAP (
     clk => clk_p,
-    a => addr_p_b,
-    spo => bias_buf_out,
+    addr => addr_p_b,
+    do => bias_buf_out,
     we => sram_b_we,
-    d => VE_IN
+    di => VE_IN
   );
 
 

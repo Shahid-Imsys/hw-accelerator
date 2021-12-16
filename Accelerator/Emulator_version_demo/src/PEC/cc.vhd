@@ -575,7 +575,7 @@ EVEN_P <= even_p_2;
 			--end loop;
 		end if;
 	end process; 
-	rd_trig <= (two_c_delay and three_c_delay);	
+	rd_trig <= (one_c_delay and two_c_delay and three_c_delay);	
 	
 	
 	--Byte counter calculation
@@ -664,14 +664,16 @@ EVEN_P <= even_p_2;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (byte_ctr, rd_trig, noc_data_out)
+	data_read : process (clk_e)
 
     begin
-	    if rd_trig = '1' then
-	        DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+3));
-	    else
-	           DATA_OUT <= (others => '0');
-        end if;
+		if rising_edge(clk_e) then
+	    	if rd_trig = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+3));
+	    	else
+	    	       DATA_OUT <= (others => '0');
+        	end if;
+		end if;
 	end process;
     --This process writes lenth counter, noc address pointer counter, package
 	--counter and distance counter with data from tag line under the control of 
@@ -994,14 +996,14 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 --Output Latch
-    process(clk_p)
+    process(clk_e)
     begin
-        if rising_edge(clk_p) then
-			if even_p_int = '0' then
-            	if noc_delay = '1' then
-            	    noc_data_out <= data_core_int;
-            	end if;
-			end if;
+        if rising_edge(clk_e) then
+			--if even_p_int = '0' then
+            if noc_delay = '1' then
+                noc_data_out <= data_core_int;
+            end if;
+			--end if;
         end if;
     end process;
 

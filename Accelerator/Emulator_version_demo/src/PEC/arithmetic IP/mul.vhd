@@ -44,6 +44,8 @@ entity mul is
 
         p       : out std_logic_vector(17 downto 0)
     );
+    attribute use_dsp : string;
+    attribute use_dsp of mul : entity is "yes";
 end entity;
 
 architecture behavioral of mul is 

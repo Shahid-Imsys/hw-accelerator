@@ -297,38 +297,38 @@ architecture rtl of rtc is
   end component; 
   
   --BMEM
-  component SY180_512X8X1CM8
-   port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      WEB                           :   IN   std_logic;
-      CK                            :   IN   std_logic;
-      CSB                           :   IN   std_logic
-      );
-  end component;
+  --component SY180_512X8X1CM8
+  -- port(
+  --    A0                         :   IN   std_logic;
+  --    A1                         :   IN   std_logic;
+  --    A2                         :   IN   std_logic;
+  --    A3                         :   IN   std_logic;
+  --    A4                         :   IN   std_logic;
+  --    A5                         :   IN   std_logic;
+  --    A6                         :   IN   std_logic;
+  --    A7                         :   IN   std_logic;
+  --    A8                         :   IN   std_logic;
+  --    DO0                        :   OUT   std_logic;
+  --    DO1                        :   OUT   std_logic;
+  --    DO2                        :   OUT   std_logic;
+  --    DO3                        :   OUT   std_logic;
+  --    DO4                        :   OUT   std_logic;
+  --    DO5                        :   OUT   std_logic;
+  --    DO6                        :   OUT   std_logic;
+  --    DO7                        :   OUT   std_logic;
+  --    DI0                        :   IN   std_logic;
+  --    DI1                        :   IN   std_logic;
+  --    DI2                        :   IN   std_logic;
+  --    DI3                        :   IN   std_logic;
+  --    DI4                        :   IN   std_logic;
+  --    DI5                        :   IN   std_logic;
+  --    DI6                        :   IN   std_logic;
+  --    DI7                        :   IN   std_logic;
+  --    WEB                           :   IN   std_logic;
+  --    CK                            :   IN   std_logic;
+  --    CSB                           :   IN   std_logic
+  --    );
+  --end component;
   
 -- application and microprogram shared memory
 --  component SU180_16384X8X1BM8
@@ -529,37 +529,37 @@ begin  -- rtl
 
 
   -- bmem  !!! SEPARATELY POWERED !!!
-  bmem: SY180_512X8X1CM8
-    port map ( 
-      A0   => dbus_iso_0(0),
-      A1   => dbus_iso_0(1),
-      A2   => dbus_iso_0(2),
-      A3   => dbus_iso_0(3),
-      A4   => dbus_iso_0(4),
-      A5   => dbus_iso_0(5),
-      A6   => dbus_iso_0(6),
-      A7   => dbus_iso_0(7),
-      A8   => bmem_a8_iso_0,
-      DO0  => bmem_q(0),
-      DO1  => bmem_q(1),
-      DO2  => bmem_q(2),
-      DO3  => bmem_q(3),
-      DO4  => bmem_q(4),
-      DO5  => bmem_q(5),
-      DO6  => bmem_q(6),
-      DO7  => bmem_q(7),
-      DI0  => bmem_d_iso_0(0),
-      DI1  => bmem_d_iso_0(1),
-      DI2  => bmem_d_iso_0(2),
-      DI3  => bmem_d_iso_0(3),
-      DI4  => bmem_d_iso_0(4),
-      DI5  => bmem_d_iso_0(5),
-      DI6  => bmem_d_iso_0(6),
-      DI7  => bmem_d_iso_0(7),
-      WEB  => bmem_we_n_iso_1,
-      CK   => clk_mux_out_iso_1,
-      CSB  => bmem_ce_n_iso_1
-      );
+  --bmem: SY180_512X8X1CM8
+  --  port map ( 
+  --    A0   => dbus_iso_0(0),
+  --    A1   => dbus_iso_0(1),
+  --    A2   => dbus_iso_0(2),
+  --    A3   => dbus_iso_0(3),
+  --    A4   => dbus_iso_0(4),
+  --    A5   => dbus_iso_0(5),
+  --    A6   => dbus_iso_0(6),
+  --    A7   => dbus_iso_0(7),
+  --    A8   => bmem_a8_iso_0,
+  --    DO0  => bmem_q(0),
+  --    DO1  => bmem_q(1),
+  --    DO2  => bmem_q(2),
+  --    DO3  => bmem_q(3),
+  --    DO4  => bmem_q(4),
+  --    DO5  => bmem_q(5),
+  --    DO6  => bmem_q(6),
+  --    DO7  => bmem_q(7),
+  --    DI0  => bmem_d_iso_0(0),
+  --    DI1  => bmem_d_iso_0(1),
+  --    DI2  => bmem_d_iso_0(2),
+  --    DI3  => bmem_d_iso_0(3),
+  --    DI4  => bmem_d_iso_0(4),
+  --    DI5  => bmem_d_iso_0(5),
+  --    DI6  => bmem_d_iso_0(6),
+  --    DI7  => bmem_d_iso_0(7),
+  --    WEB  => bmem_we_n_iso_1,
+  --    CK   => clk_mux_out_iso_1,
+  --    CSB  => bmem_ce_n_iso_1
+  --    );
 
 ---application memories
 --  ram0: SU180_16384X8X1BM8        -- need modification flag, 2015lp

@@ -46,6 +46,8 @@ entity accumulator is
         ------out-----
         sum     : out std_logic_vector(31 downto 0)
     );
+    attribute use_dsp : string;
+    attribute use_dsp of accumulator : entity is "yes";
 end entity;
 
 architecture behavioural of accumulator is 

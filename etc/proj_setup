@@ -1,0 +1,103 @@
+#!/usr/bin/bash 
+
+if [ -z "$1" ]; then
+   lic="de"
+elif [ "$1" = "no_lic" ]; then
+   lic="altera"
+elif [ "$1" = "vivado" ]; then
+    lic="vivado"
+else
+   lic="de"
+fi
+
+export SIM_LICENSE=$lic
+
+########################################################################################
+# Section with PATH to different tools on LINUX
+#######################################################################################
+
+# FPGA synthesiser.
+FPGA_SYNT_PATH=""
+
+#Simulation
+
+
+# ENV variables setup for this project
+export PROJECT_PATH=$(realpath ..)
+export PROJECT_PATH_WIN=""
+
+if [ ! -z "$(which wslpath 2>/dev/null)" ]; then
+  export PROJECT_PATH_WIN=$(wslpath -a -m $PROJECT_PATH)
+elif [ ! -z "$(which cygpath 2>/dev/null)" ]; then
+  export PROJECT_PATH_WIN=$(cygpath -a -m $PROJECT_PATH)
+else
+  echo "Warning: No Windows path available!"
+  export PROJECT_PATH_WIN=${PROJECT_PATH}
+fi
+
+export BLOCK_DIR=$PROJECT_PATH/
+export BLOCK_DIR_WIN=$PROJECT_PATH_WIN/
+export VER_DIR=$PROJECT_PATH/
+export VER_DIR_WIN=$PROJECT_PATH_WIN/
+export ETC_DIR=$PROJECT_PATH/etc
+export ETC_DIR_WIN=$PROJECT_PATH_WIN/etc
+
+#Settings for simulation
+
+echo "set Simulator"
+if [ "$lic" = "vivado" ]; then
+    echo "path vivado start"
+    source /cygdrive/e/Program/Xilinx/Vivado/2020.3/settings64.sh
+    export SIM=xsim
+    export COMP=xvhdl
+    export ELAB=xelab
+    export V_COMP=xvlog
+    export WORK_LIB=work
+else
+   export SIM=vsim
+   export COMP=vcom
+   export V_COMP=vlog
+   export WORK_LIB=work
+fi
+
+if [ "$lic" = "de" ]; then
+   SIM_FLAGS="-cover -gui -modelsimini $ETC_DIR_WIN/modelsim.ini"
+elif [ "$lic" = "vivado" ]; then
+   SIM_FLAGS="--gui"
+else
+   SIM_FLAGS="-gui -modelsimini $ETC_DIR_WIN/modelsim.ini"
+fi
+
+export SIM_FLAGS
+
+if [ "$lic" = "vivado" ]; then
+   export COMP_FLAGS="--2008"
+   export COMP_RTL_FLAGS="$COMP_FLAGS"
+   export COMP_TB_FLAGS="$COMP_FLAGS"
+   export COMP_SV_FLAGS=""
+   export CREATE_WORK=""
+else
+   if [ "$lic" = "de" ]; then
+      export COMP_FLAGS="+cover -modelsimini $ETC_DIR_WIN/modelsim.ini"
+   else
+       export COMP_FLAGS="-modelsimini $ETC_DIR_WIN/modelsim.ini"
+   fi
+   export COMP_RTL_FLAGS="-check_synthesis $COMP_FLAGS"
+   export COMP_TB_FLAGS="-modelsimini $ETC_DIR_WIN/modelsim.ini"
+   export COMP_SV_FLAGS="-sv $COMP_FLAGS"
+   export CREATE_WORK="vlib $WORK_LIB"
+fi
+
+if [ "$lic" = "de" ]; then
+   echo "DE start "
+   if [ "$OS" = "Windows_NT" ]; then
+       echo $MODELSIM_DE_WIN_PATH
+       export PATH=$MODELSIM_DE_WIN_PATH:$PATH:$MODELSIM_DE_WIN_PATH
+   else
+       export PATH=/usr/local/modelsim/modelsimDE_10_3/modelsim_dlx/linuxpe:/usr/local/modelsim/modelsimDE_10_7/modelsim_dlx/bin/:$PATH
+   fi
+   #elif [ "$lic" = "vivado" ]; then
+else
+   export PATH=$PATH  
+fi
+

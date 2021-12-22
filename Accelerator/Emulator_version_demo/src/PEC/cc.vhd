@@ -260,6 +260,7 @@ end component;
   
   signal one_c_delay :std_logic;
   signal two_c_delay :std_logic;
+  signal three_c_delay : std_logic;
   
  
 begin
@@ -330,9 +331,9 @@ EVEN_P <= even_p_2;
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
-  rst : process(clk_p)
+  rst : process(clk_e)
   begin
-	if rising_edge(clk_p) then
+	if rising_edge(clk_e) then
 		if noc_cmd = "01111" then
 		  rst_i <= '0';
 		else
@@ -529,7 +530,7 @@ EVEN_P <= even_p_2;
 		            for i in 0 to 32 loop--30 loop --28 loop
 			    		delay_c(i+1) <= delay_c(i);
 			    	end loop;
-					delay <= delay_c(33);--(31); --(29);
+					delay <= delay_c(32);--(31); --(29); --changed to assert one clock before data comes
 				end if;
 			elsif noc_cmd = "00101" then
 				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
@@ -568,12 +569,13 @@ EVEN_P <= even_p_2;
 			--two_cycle_delay(0) := delay;
 			one_c_delay <= delay;
 			two_c_delay <= one_c_delay;
+			three_c_delay <= two_c_delay;
             --for i in 0 to 1 loop
 			--	two_cycle_delay(i+1) := two_cycle_delay(i);
 			--end loop;
 		end if;
 	end process; 
-	rd_trig <= (one_c_delay and two_c_delay);	
+	rd_trig <= (one_c_delay and two_c_delay and three_c_delay);	
 	
 	
 	--Byte counter calculation
@@ -604,8 +606,9 @@ EVEN_P <= even_p_2;
 	end process;
 	
 	--This process generates memory interaction signals to control the write or read.
-	mem_activation : process(noc_cmd, byte_ctr, delay)
+	mem_activation : process(clk_e)
     begin
+		if rising_edge(clk_e) then
 		noc_reg_rdy <= '0';
         noc_write <= '0';
         noc_read <= '0';
@@ -640,14 +643,15 @@ EVEN_P <= even_p_2;
             --noc_write <= '0';
             --noc_read <= '0';  
 		end if;
+		end if;
 	end process;
 	--Write data from DATA port byte by byte to the noc_data_in register
-	data_write : process (clk_p)--(noc_cmd, byte_ctr, delay, DATA)
+	data_write : process (clk_e)--(noc_cmd, byte_ctr, delay, DATA)
 	begin
-		if rising_edge(clk_p) then
+		if rising_edge(clk_e) then
 			if noc_cmd = "01111" then
 				noc_data_in <=(others => (others => '0'));
-			elsif delay = '1' and even_p_int = '1' then
+			elsif delay = '1' then
         	  if noc_cmd = "00011" or noc_cmd ="00101" then
 				--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
 					noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
@@ -660,14 +664,16 @@ EVEN_P <= even_p_2;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (byte_ctr, rd_trig, noc_data_out)
+	data_read : process (clk_e)
 
     begin
-	    if rd_trig = '1' then
-	        DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+2));
-	    else
-	           DATA_OUT <= (others => '0');
-        end if;
+		if rising_edge(clk_e) then
+	    	if rd_trig = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+3));
+	    	else
+	    	       DATA_OUT <= (others => '0');
+        	end if;
+		end if;
 	end process;
     --This process writes lenth counter, noc address pointer counter, package
 	--counter and distance counter with data from tag line under the control of 
@@ -951,7 +957,7 @@ EVEN_P <= even_p_2;
     begin
     	if rising_edge(clk_p) then 
 			if even_p_int = '0' then 
-            	if pe_read = '1' then --Data valid asserts together with output data
+            	if pe_read ='1' then --Data valid asserts together with output data
     	    	    for i in 15 downto 0 loop
     	    	    	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
     	    	    end loop;
@@ -991,14 +997,14 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 --Output Latch
-    process(clk_p)
+    process(clk_e)
     begin
-        if rising_edge(clk_p) then
-			if even_p_int = '0' then
-            	if noc_delay = '1' then
-            	    noc_data_out <= data_core_int;
-            	end if;
-			end if;
+        if rising_edge(clk_e) then
+			--if even_p_int = '0' then
+            if noc_delay = '1' then
+                noc_data_out <= data_core_int;
+            end if;
+			--end if;
         end if;
     end process;
 

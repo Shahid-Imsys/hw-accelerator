@@ -52,7 +52,7 @@ entity rtc_iso is
       --fclk_iso_0      : out std_logic;
       ld_bmem_iso_0   : out std_logic;
       --rtc_sel_iso_0   : out std_logic_vector(2 downto 0);
-      reset_iso_clear_iso_0   : out std_logic;
+      --reset_iso_clear_iso_0   : out std_logic;
       halt_en_iso_0     : out std_logic;
       nap_en_iso_0      : out std_logic;
       

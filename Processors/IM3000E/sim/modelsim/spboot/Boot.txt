@@ -1,0 +1,658 @@
+'ROM BOOT LOADER
+( File: boot.mas       
+(
+( Copyright (C) 2006  Imsys AB.
+( All rights reserved.
+(
+( 05-01-09  PA	  Applied for GP3000
+( 06-06-02  PA	  SPI Mode 0 for serial FLASH appended
+(
+(===============================================================================
+(29 Jan 1998, 00:09
+(
+(
+(
+(			    +-------------------+
+(			    !			!
+(			    !	   B O O T	!
+(			    !			!
+(			    !  ROM Boot Loader	!
+(			    !			!
+(			    +-------------------+
+(
+(
+(
+(==========================================================================
+(		       R E V I S I O N	 H I S T O R Y :
+(
+(			       F I L E   B O O T
+(			     ---------------------
+(..DATE.. SIGN. VERS  .......SHORT DESCRIPTION............  ..SOLVE PROBL..
+(
+(99-12-20 cb	Revised
+(98-12-29 cb	Changed to time 3 everywhere, added fast versions of
+(		mpgm write routines
+(29 Jan 1998, 00:09 cb	Created
+(==========================================================================
+(
+(
+(=======(=======(===============================(===============================
+(LABEL	(ACTION (NEXT ADDRESS			(COMMENTS
+(=======(=======(===============================(===============================
+'
+#*0000:
+BOOT.TAB:
+(+0 No boot loading, mpgm already loaded
+(
+BOOT.DONE:
+	SELECT BLK0
+	$	UNC LGO TO START.CONT;		(Go to start address in RAM
+(----------------------------------------------
+(+1 Here when booting from DataFlash, SPI Mode 0
+(
+	DSOURCE LABEL MMPREADSPI0, PASS D, WRITE SB (Put read cmd first in SB
+	INCREMENT DSTCTR			(Bump SBCTR
+	RESET SPECIAL				(Select high clock after MOSI
+	$	UNC GO TO BOOT.SFLASH;
+(----------------------------------------------
+(+2 
+	$	UNC GO TO BOOT.DONE;
+(----------------------------------------------
+(+3 Here when booting from parallel EPROM or FLASH
+(
+	DSOURCE CONSTANT 00, LOAD DPORT H	(Reset address high part
+	DECR D TO W2				(Init W2 to FF
+	$	UNC GO TO BOOT.PEPROM;
+(----------------------------------------------
+(+4
+	$	UNC GO TO BOOT.DONE;
+(----------------------------------------------
+(+5 Here when booting from 25-series FLASH, SPI Mode 0
+(
+	DSOURCE LABEL FASTREAD, PASS D, WRITE SB (Put read cmd first in SB
+	INCREMENT DSTCTR			(Bump SBCTR
+	RESET SPECIAL				(Select high clock after MOSI
+	$	UNC GO TO BOOT.SFLASH;
+(----------------------------------------------
+(+6 Here when booting from MMC or SD
+(
+	$	UNC LGO TO MMCBOOT_SD;
+(----------------------------------------------
+(+7 Here when booting from MMC
+(
+	$	UNC LGO TO MMCBOOT;
+(==============================================
+BOOT:                                           (CLKSRC = clk, WDOG = off,
+	DSOURCE CONSTANT 00, LOAD CRB0          (WAKEUP = none, ICLK = off
+	PASS D, LOAD SBCTR
+	POP CSTACK				(Pop dummy return address
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT FF, LOAD CRB2         	(Set fast DRAM mode to make
+	LOAD CZNV FROM D			(Reset flipflops for gate simulation
+	BSOURCE W1, PASS B		        (internal transfers fast
+	$;
+(----------------------------------------------
+	PASS W1					(Rotate configuration byte back
+	RAMLEFT BDEST W1, ROTATE		(and save in W1 for future use
+		LVECTOR JUMP TO BOOT.TAB	(Decode bits 7-5, which control
+		PLUS MSHALF OF YREG		(the type of boot load
+	$	WITH BITMASK 0111;
+(==============================================
+'
+(==============================================
+BOOT.SFLASH:
+	DSOURCE CONSTANT 0, LOAD DPORT A       	(Make sure bits 0,5,6 of PA data is 0
+	PASS D, LOAD Q				(Init Q just to avoid X in simulation 
+	$;
+(----------------------------------------------
+	DSOURCE LABEL NRZEROS, PASS D TO W3	(Init W3 with nr of zeros to send
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 41, LOAD CPORT A       (Activate SCK,SIN
+	BSOURCE W3, DECR B
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 61
+	PASS D TO W4				(Init W4 to 61h (acc. time 3.0 us)
+	PUSH CSTACK				(Setup for NRZEROS loops
+	$	LOAD CTR FROM YREG;		(nr of zeroes to CTR
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE CONSTANT 61, LOAD CPORT A       (Activate chip select
+	ZERO, WRITE SB				(Init SB with NRZEROS zeros
+	INCREMENT DSTCTR                         
+	$	REPEAT CSTACK UNTIL CTR=0;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE CONSTANT 00, PASS D, LOAD SBCTR (Reset SBCTR to zero
+	$	UNC DO SB.TO.SF;                (Go send read sector command
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE CONSTANT 00, PASS D TO W3       (Zero to W3, read one byte
+	LOAD SBCTR				(Zero to SBCTR
+	$	UNC DO SF.TO.SB;                (Go read timing byte
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE CONSTANT FF, PASS D TO W3       (Always read 256 bytes to SB
+	DECREMENT SBCTR                         (SBCTR = 00
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W4                (Timing byte to W4
+	$	UNC DO SF.TO.SB;                (Go read 256 bytes to SB
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W2		(NrWords to W2
+	INCREMENT SRCCTR			(SBCTR = 01
+	$;
+(----------------------------------------------
+	DSOURCE SB, LOAD LATCH FROM D		(AddrH to LATCH
+	INCREMENT SRCCTR			(SBCTR = 02
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W1		(AddrL to W1
+	INCREMENT SRCCTR			(SBCTR = 03
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D, LOAD Q		(Put StartAddrL in Q
+	INCREMENT SRCCTR			(SBCTR = 04
+	$	UNC DO SB.TO.MP;                (Transfer from SB to MPGM
+(----------------------------------------------
+(----------------------------------------------
+BOOT.SFLASH.MMC:
+	DSOURCE CONSTANT 00, LOAD CPORT A	(Deactivate CS, SCK and SIN 
+	PASS Q TO W1                            (Transfer StartAddrL to W1
+	$	UNC GO TO BOOT.DECODE;          (Go jump to StartAddrL
+(==============================================
+'
+(==============================================
+BOOT.PEPROM:
+	DSOURCE CONSTANT FF, LOAD CPORT H	(Drive address high part
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT FF, LOAD CPORT I	(Drive address low part
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 00, LOAD DPORT A       (Make sure bit 5 of PA data is 0
+	PASS D TO W3, LOAD SBCTR		(Init W3,SBCTR to 00
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 20, LOAD CPORT A       (Activate chip select
+	NEG D TO W4				(Init W4 to E0h (acc. time 6.7 us)
+	$	UNC DO PE.TO.SB;                (Will read from EPROM to SB(0)
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE CONSTANT FE, PASS D TO W3	(Always read 255 bytes from SB
+	DECREMENT SBCTR				(SBCTR = 00
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W4                (Get timing byte from SB to W4
+	$;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+BOOT.PE.LOOP:
+	DSOURCE CONSTANT 00, PASS D TO W2	(W2 = 00
+	INCREMENT SBCTR				(SBCTR = 01
+	$	UNC DO PE.TO.SB;                (Go read 255 bytes to SB
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE CONSTANT 01, PASS D, LOAD SBCTR	(SBCTR = 01
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W2		(NrWords to W2
+	INCREMENT SRCCTR                    	(SBCTR = 02
+	$;
+(----------------------------------------------
+	DSOURCE SB, LOAD LATCH FROM D		(AddrH to LATCH
+	INCREMENT SRCCTR			(SBCTR = 03
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W1		(AddrL to W1
+	INCREMENT SRCCTR			(SBCTR = 04
+	$	UNC DO SB.TO.MP;                (Transfer from SB to MPGM
+(----------------------------------------------
+(----------------------------------------------
+	DSOURCE CONSTANT FE, PASS D, LOAD SBCTR	(SBCTR = FE
+	$;
+(----------------------------------------------
+	DSOURCE SB, TEST D, LOAD DPORT H	(Read and load NextEPAddrH
+	INCREMENT SRCCTR			(SBCTR = FF
+	$;
+(----------------------------------------------
+	DSOURCE SB, PASS D TO W1		(Read StartAddrL to W1
+	INCREMENT SRCCTR			(SBCTR = 00
+	$	GO TO BOOT.PE.LOOP IF NOT FZ;	(Load more if NextEPAddrH
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE CONSTANT 00, LOAD CPORT A	(Deactivate chip select 
+	BSOURCE W1, PASS B
+	$;
+(----------------------------------------------
+BOOT.DECODE:
+( Decode start address from YREG
+        SELECT BLK0
+	$	UNC YREGDECODE F;		(Jump to RAM
+(==============================================
+'
+(==============================================
+(This routine reads <N> bytes from an EPROM or
+(FLASH with access time below (<A>*12) ns, at
+(167MHz clock frequency.
+(The routine controls 8 address lines with port E,
+(and receives data through port B. Data is read
+(from address <R> and upwards (wrapping from FF
+(to 00) and placed in the string buffer from
+(location <W> and up.
+(
+(Entry:	W3 = <N>-1
+(	W4 = <A>
+(	W2 = <R>-1
+(	SBCTR = <W>
+(Exit:	W3 = Unchanged
+(	W4 = Unchanged
+(	W2 = <R>-1+<N>
+(	SBCTR = <W>+<N>
+(Destroys: W1, CTR, NEG, CARRY, ZERO
+(
+PE.TO.SB:
+	DECR B, BDEST W4, LOAD CZ ARI		(<A> = 0,1,>1 => CZ = 00,11,10
+	ASOURCE W3, RAMATOY		        (Set up for <N> loops
+	$;
+(----------------------------------------------
+	PUSH CSTACK
+	$	LOAD CTR FROM YREG;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	INCR B TO W2   				(Bump address
+	$;
+(----------------------------------------------
+	DSOURCE YREG, LOAD DPORT I		(Output address low part
+	$	GO TO PE2S.DATA IF NOT CARRY;   (Jump if <A> = 0
+(----------------------------------------------
+	DECR W4 TO W1                           (Set up delay loop counter
+	$	GO TO PE2S.DATA IF ZERO;	(Jump if <A> = 1
+(----------------------------------------------
+PE2S.DELAY:
+	DECREMENT W1                            (Decrement delay loop counter
+	$	GO TO PE2S.DELAY IF NOT FZ;     (Repeat loop until delay done
+(----------------------------------------------
+PE2S.DATA:
+	DSOURCE DPORT B, PASS D, WRITE SB       (Get data and write to SB
+	INCREMENT DSTCTR			(Bump SB counter
+	$	REPEAT CSTACK UNTIL CTR=0;      (Repeat until all bytes read 
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	INCREMENT W4                            (Restore W4 (1st cycle decs it)
+	$	UNC RETURN;
+(==============================================
+'
+(==============================================
+(This routine writes <N> bytes to a bit serial
+(destination with access time below (15+<A>*30) ns.
+(The routine controls the serial clock with port
+(A bit 6, and sends data through port A bit 0.
+(Data is sent with most significant bit first,
+(and is changed at the negative edge of the clock,
+(one access time before the positive edge. The
+(time between clock edges is also equal to the
+(access time.
+(Data is taken from the string buffer from location
+(<R> and up.
+(The SCK sequence is output data, down, wait, up,
+(wait (,down, wait). The actions in parenthesis
+(are only done if SPECIAL is set.
+(
+(Entry:	W3 = <N>-1
+(	W4 = <A> (must never be more than 80h!)
+(	SBCTR = <R>
+(	SPECIAL = 1: end low, 0: end high
+(Exit:	W3 = FFh
+(	W4 = Unchanged
+(	SBCTR = <W>+<N>
+(	SPECIAL = Unchanged
+(Destroys: W1, W2, W5, Q, CTR, NEG, CARRY, ZERO
+(	   All bit positions in port A that are not driving
+(
+SB.TO.SF:
+	DSOURCE DPORT A, PASS D	TO W2		(Get the present state of
+	$;                                      (port A to W2
+(----------------------------------------------
+	DSOURCE CONSTANT BE                     (Put the same but with SCK
+	ASOURCE W2, AND AD TO W2                (and SIN down in W2
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 40                     (Put the same but with SCK
+	ASOURCE W2, OR AD TO W5                 (up and SIN down in W5
+	$;                                      
+(----------------------------------------------
+	DECR W4, LOAD ZNV LOG			(<A> = 0,1,>1 => NZ = 10,01,00
+	$;                                      
+(----------------------------------------------
+S2SF.NEWBYTE:
+	DSOURCE SB                              (Get data byte to W1
+	PASS D, RAMLEFT BDEST W1, ROTATE	(Put first data bit in CARRY
+	LOAD C FROM SHIFT
+	INCREMENT SRCCTR
+	PUSH CSTACK        			(Set up for 8 loops
+	$	LOAD CTR WITH CONSTANT 07;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	ASOURCE W2, ADDCARRY A, CARRYIN = C     (SCK down, output CARRY as data
+	$;
+(----------------------------------------------
+	DSOURCE YREG, LOAD DPORT A
+	$	GO TO S2SF.UP IF NEG;           (Jump if <A> = 0
+(----------------------------------------------
+	DSOURCE CONSTANT 02
+	ASOURCE W4, SUB AD, LOAD Q              (Set up delay loop counter
+	$	GO TO S2SF.UP IF ZERO;	        (Jump if <A> = 1
+(----------------------------------------------
+S2SF.DELAY1:
+	DECREMENT Q                             (Decrement delay loop counter
+	$	GO TO S2SF.DELAY1 IF NOT FZ;    (Repeat loop until delay done
+(----------------------------------------------
+S2SF.UP:
+	ASOURCE W5, ADDCARRY A, CARRYIN = C     (SCK up, output CARRY as data
+        $;
+(----------------------------------------------
+	DSOURCE YREG, LOAD DPORT A
+	$	GO TO S2SF.DATA IF NEG;         (Jump if <A> = 0
+(----------------------------------------------
+	DSOURCE CONSTANT 02
+	ASOURCE W4, SUB AD, LOAD Q              (Set up delay loop counter
+	$	GO TO S2SF.DATA IF ZERO;	(Jump if <A> = 1
+(----------------------------------------------
+S2SF.DELAY2:
+	DECREMENT Q                             (Decrement delay loop counter
+	$	GO TO S2SF.DELAY2 IF NOT FZ;    (Repeat loop until delay done
+(----------------------------------------------
+S2SF.DATA:
+	PASS W1, RAMLEFT BDEST W1, ROTATE	(Put next data bit in CARRY
+	LOAD C FROM SHIFT
+	$	REPEAT CSTACK UNTIL CTR=0;      (Repeat until all bits sent 
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DECREMENT W3                            (Decrement byte counter
+	$;
+(----------------------------------------------
+	$	GO TO S2SF.NEWBYTE IF FC;	(Repeat until all bytes sent
+(----------------------------------------------
+	$	RETURN IF NOT SPECIAL;		(Done if end high is specified
+(----------------------------------------------
+	BSOURCE W2, PASS B                      (SCK down, output 0 as data
+	$;
+(----------------------------------------------
+	DSOURCE YREG, LOAD DPORT A
+	$	GO TO S2SF.DONE IF NEG;         (Jump if <A> = 0
+(----------------------------------------------
+	DSOURCE CONSTANT 02
+	ASOURCE W4, SUB AD, LOAD Q              (Set up delay loop counter
+	$	GO TO S2SF.DONE IF ZERO;	(Jump if <A> = 1
+(----------------------------------------------
+S2SF.DELAY3:
+	DECREMENT Q                             (Decrement delay loop counter
+	$	GO TO S2SF.DELAY3 IF NOT FZ;    (Repeat loop until delay done
+(----------------------------------------------
+S2SF.DONE:
+	$	UNC RETURN;                     (Done
+(==============================================
+'
+(==============================================
+(This routine reads <N> bytes from a bit serial
+(source with access time below (<A>*12) ns, at
+(167MHz clock frequency.
+(The routine controls the serial clock with port
+(A bit 6, and receives data through port A bit 7.
+(Data is assumed to come with most significant bit
+(first, and is sampled an access time after the
+(negative edge of the clock. The time between
+(clock edges is also equal to the access time.
+(Data is placed in the string buffer from location
+(<W> and up.
+(The SCK sequence is up, wait, down, wait, get data.
+(
+(Entry:	W3 = <N>-1
+(	W4 = <A> (must never be more than 80h!)
+(	SBCTR = <W>
+(Exit:	W3 = FFh
+(	W4 = Unchanged
+(	SBCTR = <W>+<N>
+(Destroys: W1, W2, W5, Q, CTR, NEG, ZERO, LATCH
+(	   All bit positions in port A that are not driving
+(
+SF.TO.SB:
+	DSOURCE DPORT A, PASS D	TO W2		(Get the present state of
+	$;                                      (port A to W2
+(----------------------------------------------
+	DSOURCE CONSTANT BF                     (Put the same but with SCK
+	ASOURCE W2, AND AD TO W2                (down in W2
+	$;
+(----------------------------------------------
+	DSOURCE CONSTANT 40                     (Put the same but with SCK
+	ASOURCE W2, OR AD TO W5                 (up in W5
+	LOAD LATCH FROM Y
+	$	UNC GO TO SF2S.ENTRY;
+(==============================================
+SF2S.NEWBYTE:
+	PASS Q, WRITE SB			(Write received byte in SB
+	INCREMENT SBCTR                         (Bump SBCTR
+	$	RETURN IF NOT FC;               (Return if all bytes received
+(----------------------------------------------
+SF2S.ENTRY:
+	DECR W4, LOAD ZNV LOG		(<A> = 0,1,>1 => NZ = 10,01,00
+	PUSH CSTACK        			(Set up for 8 loops
+	$	LOAD CTR WITH CONSTANT 07;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE LATCH, LOAD DPORT A		(LATCH=W5 => SCK up
+	BSOURCE W2, PASS B, LOAD LATCH FROM Y
+	$	GO TO SF2S.DOWN IF NEG;         (Jump if <A> = 0
+(----------------------------------------------
+	DSOURCE CONSTANT 02
+	ASOURCE W4, SUB AD TO W1                (Set up delay loop counter
+	$	GO TO SF2S.DOWN IF ZERO;	(Jump if <A> = 1
+(----------------------------------------------
+SF2S.DELAY1:
+	DECREMENT W1                            (Decrement delay loop counter
+	$	GO TO SF2S.DELAY1 IF NOT FZ;    (Repeat loop until delay done
+(----------------------------------------------
+SF2S.DOWN:
+	DSOURCE LATCH, LOAD DPORT A		(LATCH=W2 => SCK down
+	BSOURCE W5, PASS B, LOAD LATCH FROM Y
+	$	GO TO SF2S.DATA IF NEG;         (Jump if <A> = 0
+(----------------------------------------------
+	DSOURCE CONSTANT 02
+	ASOURCE W4, SUB AD TO W1                (Set up delay loop counter
+	$	GO TO SF2S.DATA IF ZERO;	(Jump if <A> = 1
+(----------------------------------------------
+SF2S.DELAY2:
+	DECREMENT W1                            (Decrement delay loop counter
+	$	GO TO SF2S.DELAY2 IF NOT FZ;    (Repeat loop until delay done
+(----------------------------------------------
+SF2S.DATA:
+	DSOURCE DPORT A, PASS D			(Get serial data
+	RAMQLEFT BDEST W1, ROTDOUBLE            (Shift it into Q (W1 trash)
+	$	REPEAT CSTACK UNTIL CTR=0;      (Repeat until all bits read 
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DECREMENT W3                            (Decrement byte counter
+	$	UNC GO TO SF2S.NEWBYTE;
+(==============================================
+'
+(==============================================
+(This routine transfers <N> micro program words from
+(the string buffer to the microprogram RAM.
+(Data is read from SB location <R> (must be even) and
+(upwards (wrapping from FF to 00) and placed in the
+(mpgm memory from address <W> and up (wrapping from
+(xxFF to xx00). Ten bytes are read from SB for each
+(mpgm word.
+(
+(Entry:	W2 = <N>
+(	W1 = <W> low
+(	LATCH = <W> high
+(	SBCTR = <R>
+(Exit:	W2 = 0
+(	W1 = <W>+<N> low
+(	LATCH = Unchanged
+(Destroys: CTR, SBCTR
+(
+SB.TO.MP:
+	$	LOAD CTR WITH CONSTANT 09;	(Init byte counter
+(----------------------------------------------
+	SET FAST TRANSFER FROM GMEM TO MPMEM	(Set up fast transfer
+	INCREMENT W2				(W2 must be <N>+1
+	$	UNC GO TO S2MP.LOOP.ENTRY;      (Jump to start of loop
+(==============================================
+S2MP.LOOP:
+	DSOURCE SB, LOAD MPGM			(Last load of word writes mem
+	ASOURCE W1, RAMATOY			(Output low part of address on Y
+	INCR B, BDEST W1                        (Bump address
+	INCREMENT SRCCTR
+	$	LOAD CTR WITH CONSTANT 09;      (Init byte counter
+(----------------------------------------------
+S2MP.LOOP.ENTRY:
+	DSOURCE LATCH               		(Output high part of address on D
+	DECREMENT W2                            (Decrement word counter
+	PUSH CSTACK & DECREMENT CTR             (Set up byte loop
+	$;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE SB, LOAD MPGM 			(Transfer from SB to MPMEM
+	TEST W2                                 (Just to keep FZ unchanged
+	INCREMENT SRCCTR 
+		IF FZ CONTINUE                  (Continue if all words done
+		ELSE IF CTR=0 GO TO S2MP.LOOP   (Go load last of word if CTR=0
+	$	ELSE REPEAT CSTACK;             (Repeat until last load of word
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	SET STEP +1                     	(Shut off fast transfer
+	POP CSTACK                              (Pop dummy
+	$	UNC GO TO BOOT.M-NOP;
+(==============================================
+'
+(==============================================
+(This routine transfers <N> micro program words from
+(memory to the microprogram RAM.
+(Data is read from address <R> (must be even) and
+(upwards (wrapping from xxxxFF to xxxx00) and placed
+(in the mpgm memory from address <W> and up (wrapping
+(from xxFF to xx00). Ten bytes are read from memory
+(for each mpgm word.
+(
+(Entry:	W2 = <N>
+(	W1 = <W> low
+(	LATCH = <W> high
+(	ADP,ADH,ADL = <R>
+(Exit:	W2 = 0
+(	W1 = <W>+<N> low
+(	LATCH = Unchanged
+(	ADP,ADH =  Unchanged
+(Destroys: CTR, ADL
+(
+D.TO.MP:
+	$M	LOAD CTR WITH CONSTANT 09;	(Init byte counter
+(----------------------------------------------
+	SET FAST TRANSFER FROM MUP TO MPMEM	(Set up fast transfer
+	INCREMENT W2				(W2 must be <N>+1
+	$R	UNC GO TO D2MP.LOOP.ENTRY;      (Jump to start of loop
+(==============================================
+D2MP.LOOP:
+	LOAD MPGM                     		(Load data from DRAM to MPLL
+	$C;
+(----------------------------------------------
+	LOAD MPGM                               (Last load of word writes mem
+	ASOURCE W1, RAMATOY			(Output low part of address on Y
+	INCR B, BDEST W1                        (Bump address
+	$C	LOAD CTR WITH CONSTANT 09;      (Init byte counter
+(----------------------------------------------
+D2MP.LOOP.ENTRY:
+	DSOURCE LATCH               		(Output high part of address on D
+	STEP ADL
+	DECREMENT CTR
+	$R;
+(----------------------------------------------
+	DECREMENT W2                            (Decrement word counter
+	STEP ADL
+	PUSH CSTACK & DECREMENT CTR   		(Set up byte loop
+	$R;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	TEST W2                                 (Just to keep FZ unchanged
+	STEP ADL, LOAD MPGM                     (Load data from DRAM to MPLL
+		IF FZ CONTINUE                  (Continue if all words done
+		ELSE IF CTR=0 GO TO D2MP.LOOP   (Go load last of word if CTR=0
+	$R	ELSE REPEAT CSTACK;             (Repeat until last load of word
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	SET STEP +1                     	(Shut off fast transfer
+	POP CSTACK                              (Pop dummy
+	$C	UNC GO TO BOOT.M-NOP;
+(==============================================
+BOOT.M-NOP:
+	$M	UNC RETURN;
+(==============================================
+'
+(==============================================
+(This routine transfers <N> * 8 patch words from
+(the string buffer to the patch memory. Each word
+(is two bits long, and the words are packed in SB. 
+(Data is read from SB location <R> (must be even) and
+(upwards (wrapping from FF to 00) and placed in the
+(patch memory from address <W> and up (wrapping from
+(xxFF to xx00). 1/4 bytes are read from SB for each
+(patch word.
+(
+(Entry:	W2 = <N>
+(	W1 = <W> low
+(	LATCH = <W> high
+(	SBCTR = <R>
+(Exit:	W2 = 0
+(	W1 = <W>+<N>*8 low
+(	LATCH = Unchanged
+(	SBCTR = <R>+<N>*2
+(Destroys: CTR, W3, W4
+(
+SB.TO.PMEM:
+	DSOURCE SB, PASS D TO W3
+	INCREMENT SRCCTR
+        $;
+(----------------------------------------------
+	DSOURCE SB, PASS D, LOAD Q
+	DECREMENT SRCCTR
+        $;
+(----------------------------------------------
+	DSOURCE CONSTANT 08, PASS D TO W4
+        $;
+(----------------------------------------------
+(----------------------------------------------
+S2P.LOOP:
+	PASS W3, BDEST W3, RAMQLEFT ROTDOUBLE
+        $;
+(----------------------------------------------
+	PASS W3, BDEST W3, RAMQLEFT ROTDOUBLE
+        $;
+(----------------------------------------------
+	PASS Q, WRITE SB
+	INCREMENT DSTCTR
+        $;
+(----------------------------------------------
+	PASS Q, WRITE SB
+	DECREMENT DSTCTR
+	$	LOAD CTR WITH CONSTANT 09;	(Init byte counter
+(----------------------------------------------
+	SET FAST TRANSFER FROM GMEM TO MPMEM	(Set up fast transfer
+	PUSH CSTACK
+        $;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE SB, LOAD MPGM 			(Last load of word writes mem
+	PASS W1					(Output low part of address on Y
+	$	REPEAT CSTACK UNTIL CTR=0;
+(=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	DSOURCE LATCH               		(Output high part of address on D
+	DECREMENT W4                            (Decrement inner counter
+        $;
+(----------------------------------------------
+	SET STEP +1                     	(Shut off fast transfer
+	INCREMENT W1                        	(Bump address
+        $	GO TO S2P.LOOP IF NOT FZ;
+(----------------------------------------------
+(----------------------------------------------
+	DECR B, BDEST W2                        (Decrement outer counter
+	ASOURCE W3, RAMATOY, WRITE SB
+	INCREMENT DSTCTR
+        $;
+(----------------------------------------------
+	PASS Q, WRITE SB
+	INCREMENT DSTCTR
+        $	GO TO SB.TO.PMEM IF NOT FZ;
+(----------------------------------------------
+	$	UNC RETURN;
+(==============================================
+

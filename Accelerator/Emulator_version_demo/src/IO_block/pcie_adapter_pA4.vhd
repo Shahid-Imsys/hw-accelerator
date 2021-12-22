@@ -349,8 +349,8 @@ begin
     
 --NOC
     ena_pcie_data_i                <= ENA_PCIE_DATA;
-    CMD_FLAG                       <= pcie_cmd_flag_i;  --PCIE_CMD_FLAG, use this when the command is written to read buffer
-    PCIE_RDY                       <= pcie_rdy_i_d;     --pcie_rdy_i;
+    CMD_FLAG                       <= pcie_cmd_flag_i;  --use this when the command is written to read buffer
+    PCIE_RDY                       <= pcie_rdy_i_d;
     PCIE_ACK                       <= pcie_ack_i;
     pcie_req_i                     <= PCIE_REQ;
     noc_rst_i                      <= NOC_RST;
@@ -359,25 +359,25 @@ begin
 --PCIe
     clk                            <= REF_CLK;
     PCIE_REQ_IF_CLK_O              <= pcie_req_if_clk_o_int; 
-    PCIE_WR_REQ_CTRL_WRS           <= pcie_wr_ctl_wrs_i;    --ENA_PCIE_CTL and RW_FLAG;  
-    PCIE_WR_REQ_CTRL_LENGTH        <= pcie_len_i;           --PCIE_LENGTH(4 downto 0);   
+    PCIE_WR_REQ_CTRL_WRS           <= pcie_wr_ctl_wrs_i;
+    PCIE_WR_REQ_CTRL_LENGTH        <= pcie_len_i; 
     PCIE_WR_REQ_CTRL_START_ADDR    <= down_address;              
-    PCIE_WR_REQ_DATA_WRS           <= pcie_wr_data_wrs_i;   --ENA_PCIE_DATA and RW_FLAG;
+    PCIE_WR_REQ_DATA_WRS           <= pcie_wr_data_wrs_i;
     PCIE_WR_REQ_DATA               <= pcie_wr_req_data_i;
-    PCIE_RD_REQ_WRS                <= pcie_rd_wrs_i;        --ENA_PCIE_CTL and not RW_FLAG;
+    PCIE_RD_REQ_WRS                <= pcie_rd_wrs_i;
     PCIE_RD_REQ_START_ADDR         <= up_address;                   
     PCIE_RD_REQ_LENGTH             <= pcie_len_i;      
-    fifo_data_i                    <= PCIE_RD_RESP_DATA;    --PCIE_RD_RESP_DATA_pre
+    fifo_data_i                    <= PCIE_RD_RESP_DATA;
     pcie_req_if_clk_o_int          <= REF_CLK;
---Read buffer
+    --Read buffer
     wr_clk_rb                      <= PCIE_RSP_IF_CLK_I;
     rd_clk_rb                      <= REF_CLK;
-    reset_rb                       <= reset_trig or reset_trig_d1 or reset_trig_d2; -- in datasheet of fifo it is mentioned that reset needs to be held at least 3 clk cycle of slowest clock --reset;    --reset_d or reset_d2; --PCIE_RSP_IF_RST_I;
+    reset_rb                       <= reset_trig or reset_trig_d1 or reset_trig_d2; -- in datasheet of fifo it is mentioned that reset needs to be held at least 3 clk cycle of slowest clock
     din_rb                         <= fifo_data_i;
-    wr_en_rb                       <= PCIE_RD_RESP_DATA_VLD; -- or PCIE_RD_RESP_DATA_VLD_d1;  --PCIE_RD_RESP_DATA_FIRST; --PCIE_RD_RESP_DATA_VLD(it is one for 2 clock) This is valid for writing a command to the fifo, but later for writing data in the fifo it needs to be PCIE_RD_RESP_DATA_VLD 
-    rd_en_rb                       <= fifo_read_en; --wr_ack_delay(12); -- and not wr_ack_delay(13) and not wr_ack_delay(14); --ena_pcie_data_i and not rw_flag;  --???
+    wr_en_rb                       <= PCIE_RD_RESP_DATA_VLD;  --it is one for 2 clock
+    rd_en_rb                       <= fifo_read_en;
     
-    REG1_USER_CLK                  <= clk; --REG1_REF_CLK;
+    REG1_USER_CLK                  <= clk;
     REG1_RDA                       <= REG1_RDA_i;
     REG1_AC                        <= REG1_AC_i;
     REG1_RDAV                      <= REG1_RDAV_i;
@@ -386,8 +386,6 @@ begin
     reset_out                      <= reset;
     PCIE_REQ_IF_RST_O              <= '0'; 
     
---    PCIE_LENGTH_FIFO               <= "0000" & (PCIE_LENGTH + 1) & '0';
-
     process(clk)
     begin
         if rising_edge(clk) then
@@ -395,8 +393,7 @@ begin
           end if;
     end process;           
                     
---    pcie_rdy_i <= PCIE_RD_RESP_DATA_VLD and PCIE_RD_RESP_DATA_LAST;
-    pcie_ack_i <= PCIe_req and (not PCIE_WR_REQ_DATA_AFU) and (not PCIE_WR_REQ_CTRL_AFU);  --ack and (not PCIE_WR_REQ_DATA_AFU) and (not almost_full_wb);
+    pcie_ack_i <= PCIe_req and (not PCIE_WR_REQ_DATA_AFU) and (not PCIE_WR_REQ_CTRL_AFU);
   
     process(PCIE_RSP_IF_CLK_I)
     begin
@@ -429,9 +426,9 @@ begin
     end process;         
         
 --Config and status interface
-    addr_reg : process(clk) --reg1_ref_clk)
+    addr_reg : process(clk)
     begin
-        if rising_edge(clk) then --(reg1_ref_clk) then
+        if rising_edge(clk) then
             if reg1_wea = '1' then 
                 if reg1_ada = x"0000" then
                     h2c_addr_h <= reg1_wda;     --Address that host stores commands. NOC will fetch the commands from this address in host's RAM
@@ -462,7 +459,6 @@ begin
             reset           <= reset_trig and not (reset_trig_d1 or reset_trig_d2 or reset_trig_d3 or reset_trig_d4 or reset_trig_d5 or reset_trig_d6); 
                                     
             if NOC_CMD_FLAG = '1' then
-            --if pcie_wr_ctl_wrs_i = '1' then
                 c2h_cmd             <= '1';
             end if;       
          
@@ -488,9 +484,9 @@ begin
     end process;
 
 
-    status_reg: process(clk) --(reg1_ref_clk)
+    status_reg: process(clk)
     begin
-        if rising_edge(clk) then --(reg1_ref_clk) then
+        if rising_edge(clk) then
             if REG1_REA = '1' then
                 if reg1_ada = x"0000" then      --0000
                     REG1_RDA_i <= h2c_addr_h;
@@ -570,7 +566,6 @@ begin
 --User cases
 -----------------------------------------------------
     u_case : process(clk,tr_case,reset)
-    --variable us1 : boolean:= true; 
     begin
         if rising_edge(clk) then                              
             --RESET
@@ -597,7 +592,7 @@ begin
                 fifo_has_data     <= '0';
             else
                 ena_pcie_ctl_p          <= ena_pcie_ctl;
-                pcie_cmd_flag_i         <= command_flag or command_flag_p1 or command_flag_p2 or command_flag_p3 or command_flag_p4 or command_flag_p5; --fifo_read_valid_delay(0) or fifo_read_valid_delay(1) or fifo_read_valid_delay(2) or fifo_read_valid_delay(3) or fifo_read_valid_delay(4);
+                pcie_cmd_flag_i         <= command_flag or command_flag_p1 or command_flag_p2 or command_flag_p3 or command_flag_p4 or command_flag_p5;
                 empty_rb_P              <= empty_rb;
                 send_command_to_host_P  <= send_command_to_host;
                 
@@ -614,12 +609,12 @@ begin
                         first           <= '1';
                     end if;    
                 elsif data_mode = '1' then
-                    if write_fifo_complete_d = '0' and write_fifo_complete_d_P = '1' then --and not(empty_rb) = '1' then  -- When write_fifo_complete_d deasserts then after one clock empty_rb goes low.
+                    if write_fifo_complete_d = '0' and write_fifo_complete_d_P = '1' then -- When write_fifo_complete_d deasserts then after one clock empty_rb goes low.
                         fifo_has_data   <= '1';
                     end if;    
                     if fifo_has_data = '1' then 
                         if empty_rb = '0' then  
-                            fifo_read_en    <= ena_pcie_data_i;   --'1';      --it reads fifo when NOC sets en_pcie_data to '1'
+                            fifo_read_en    <= ena_pcie_data_i;  --it reads fifo when NOC sets en_pcie_data to '1'
                             pcie_rdy_i_d    <= '1';
                          elsif empty_rb = '1' and empty_rb_P = '0' then
                             fifo_read_en    <= '0';
@@ -828,8 +823,8 @@ begin
     probe14_j(0)          <= c2h_cmd;
 
     probe0_i(255 downto 0)<= pcie_wr_req_data_i;      
-    probe1_i(57 downto 0) <= noc_data_i(57 downto 0);   --down_address    --58  PCIE_RD_REQ_START_ADDR 
-    probe2_i(0)           <= NOC_CMD_FLAG;  --us1;                           	
+    probe1_i(57 downto 0) <= noc_data_i(57 downto 0);
+    probe2_i(0)           <= NOC_CMD_FLAG;                       	
     probe3_i(0)           <= ena_pcie_ctl;                             
     probe4_i(0)           <= empty_rb;                   
     probe5_i(0)           <= write_fifo_complete_d;
@@ -843,8 +838,8 @@ begin
     probe13_i(0)          <= PCIE_WR_REQ_DATA_AFU;    
     probe14_i(0)          <= pcie_ack_i;
     probe15_i(0)          <= pcie_rd_wrs_i;             
-    probe16_i(255 downto 0)<= pcie_data_i; --dout_rb; 
-    probe17_i(4 downto 0) <= noc_cmd_reg(4 downto 0);   --pcie_len_i;
+    probe16_i(255 downto 0)<= pcie_data_i;
+    probe17_i(4 downto 0) <= noc_cmd_reg(4 downto 0);
     probe18_i(0)          <= h2c_cmd;                   
     probe19_i(0)          <= pcie_rdy_i_d;
     probe20_i(0)          <= last_data_word;

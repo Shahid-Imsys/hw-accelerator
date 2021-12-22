@@ -1,0 +1,112 @@
+#-- Synplicity, Inc.
+#-- Version      Synplify ASIC 2.4.1        
+#-- Project file D:\_Work\gp3000\syn\top.prj
+#-- Written on Tue May 30 20:10:28 2006
+
+
+#add_file options
+add_file -vhdl -lib work "G:/gp3000/src/mpgmfield_lib.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/gp_pkg.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/fgen/fgendec/fgendec.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/fgen/fgenhalf/fgenpart/fgenpart.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/fgen/fgenhalf/fgenhalf.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/fgen/fgen.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/ram32x8/ram32x8.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/alu/alu.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/clc/sct/sct.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/clc/stack9x14/stack9x14.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/clc/clc.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/cpc/debug_trace/debug_trace.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/cpc/cpc.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/crb/crb.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/dsl/dsl.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/gmem/gmem.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/ios/ios_dma/ios_dackgen/ios_dackgen.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/ios/ios_dma/ios_dmap/ios_dmap.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/ios/ios_dma/ios_dma.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/ios/ios.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/mbm/mbm.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/mmr/mmr.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/mpgm/mpgm.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/mpll/mpll.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/tim/tim.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/core/core.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/eth/eth_crc/eth_crc.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/eth/eth_rx/eth_rx.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/eth/eth_tx/eth_tx.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/eth/eth.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/io_mux/io_mux.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/pdi/pdi.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/port_mux/port_mux.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/ports/ports.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/tiu/tiu.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/uart/uart.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/adc/adc.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/dac/dac.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/peri/peri.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/clk_gen/clk_gen.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/pads/pads.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/rtc/rtc_iso/rtc_iso.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/rtc/rtc.vhd"
+add_file -vhdl -lib work "G:/gp3000/src/top.vhd"
+add_file -constraint "synthesis.sdc"
+
+#reporting options
+set_option -reporting_use_sdf 0
+set_option -reporting_library "library.v"
+set_option -reporting_verilog "top_ba.v"
+set_option -reporting_sdf "top_ba.sdf"
+set_option -reporting_sdf_timing_model "max"
+set_option -reporting_filter "-from {peri0.timer.ff\[0\]} "
+set_option -reporting_report_type setup
+set_option -reporting_number_paths 100
+set_option -reporting_margin -1.0
+set_option -reporting_filename "top.ta"
+set_option -reporting_netlist ""
+
+
+#implementation: "top"
+impl -add top
+
+#device options
+
+#compilation/mapping options
+set_option -default_enum_encoding default
+set_option -symbolic_fsm_compiler 0
+set_option -resource_sharing 1
+set_option -tri_compatible 1
+
+#map options
+set_option -frequency 0.000
+set_option -disable_io_insertion 1
+set_option -resyn_cp 0
+set_option -prune_unused_regs 1
+set_option -no_time_gated_clock 0
+set_option -hier_mult 0
+set_option -auto_infer_blackbox 0
+set_option -use_scan_for_test 0
+set_option -map_tristate_to_mux 0
+set_option -reopt 0
+set_option -fix_hold 0
+set_option -no_sequential_opt 1
+
+#simulation options
+set_option -write_verilog 0
+set_option -write_vhdl 1
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+set_option -ovpl 1
+
+#set result format/file last
+project -result_file "top/top.vma"
+
+#implementation attributes
+set_option -tech_lib_path D:/_Work/gp3000/libraries/synplify/gp3000.syn
+set_option -operating_condition fsa0a_c_sc_wc.WCCOM
+set_option -wire_load_model G50K
+set_option -wire_load_mode enclosed
+set_option -dup 0
+set_option -synthesis_onoff_pragma 0
+set_option -user_max_fanout ""
+impl -active "top"

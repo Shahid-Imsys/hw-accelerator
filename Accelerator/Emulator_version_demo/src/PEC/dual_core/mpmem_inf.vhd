@@ -19,9 +19,9 @@ ENTITY mpmem_inf IS
         --clk_e_pos     : in std_logic;
         --clk_ea_pos        : in std_logic;
         -- MPROM signals
-        c1_mprom_a     : in std_logic_vector(13 downto 0);-- Address  
-        c1_mprom_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high) 
-        c1_mprom_oe    : in std_logic_vector(1 downto 0); -- Output enable(active high)
+        --c1_mprom_a     : in std_logic_vector(13 downto 0);-- Address  
+        --c1_mprom_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high) 
+        --c1_mprom_oe    : in std_logic_vector(1 downto 0); -- Output enable(active high)
         -- MPRAM signals
         --c1_mpram_a     : in std_logic_vector(13 downto 0);-- Address   --modified by CJ
         --c1_mpram_d     : in std_logic_vector(79 downto 0);-- Data to memory --modified by CJ
@@ -31,17 +31,17 @@ ENTITY mpmem_inf IS
         c1_mpram_oe    : in std_logic_vector(1 downto 0); -- Output enable(active high)
         c1_mpram_we_n  : in std_logic;                    -- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c1_pmem_a      : in std_logic_vector(10 downto 0);
-        c1_pmem_d      : in std_logic_vector(1  downto 0);
+        --c1_pmem_a      : in std_logic_vector(10 downto 0);
+        --c1_pmem_d      : in std_logic_vector(1  downto 0);
         c1_pmem_q      : out std_logic_vector(1  downto 0);
-        c1_pmem_ce_n   : in std_logic;
-        c1_pmem_we_n   : in std_logic;
+        --c1_pmem_ce_n   : in std_logic;
+        --c1_pmem_we_n   : in std_logic;
         
         c1_mp_q        : out std_logic_vector(127 downto 0);
         -- MPROM signals
-        c2_mprom_a     : in std_logic_vector(13 downto 0);-- Address  
-        c2_mprom_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high) 
-        c2_mprom_oe    : in std_logic_vector(1 downto 0); --Output enable(active high)
+        --c2_mprom_a     : in std_logic_vector(13 downto 0);-- Address  
+        --c2_mprom_ce    : in std_logic_vector(1 downto 0); -- Chip enable(active high) 
+        --c2_mprom_oe    : in std_logic_vector(1 downto 0); --Output enable(active high)
         -- MPRAM signals
         c2_mpram_a     : in std_logic_vector(7 downto 0);  -- Address      --Modified by CJ
         c2_mpram_d     : in std_logic_vector(127 downto 0);-- Data to memory --CJ
@@ -49,30 +49,30 @@ ENTITY mpmem_inf IS
         c2_mpram_oe    : in std_logic_vector(1 downto 0); -- Output enable(active high)
         c2_mpram_we_n  : in std_logic;                    -- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c2_pmem_a      : in std_logic_vector(10 downto 0);
-        c2_pmem_d      : in std_logic_vector(1  downto 0);
+        --c2_pmem_a      : in std_logic_vector(10 downto 0);
+        --c2_pmem_d      : in std_logic_vector(1  downto 0);
         c2_pmem_q      : out std_logic_vector(1  downto 0);
-        c2_pmem_ce_n   : in std_logic;
-        c2_pmem_we_n   : in std_logic;
+        --c2_pmem_ce_n   : in std_logic;
+        --c2_pmem_we_n   : in std_logic;
         
         c2_mp_q        : out std_logic_vector(127 downto 0);
         --memory interface
         --ROM0
-        ROM0_DO     : in  std_logic_vector (79 downto 0); 
-        ROM0_A      : out std_logic_vector (13 downto 0);
-        ROM0_CS     : out std_logic;
-        ROM0_OE     : out std_logic; 
-        --ROM1
-        ROM1_DO     : in  std_logic_vector (79 downto 0); 
-        ROM1_A      : out std_logic_vector (13 downto 0);
-        ROM1_CS     : out std_logic;
-        ROM1_OE     : out std_logic;
+        --ROM0_DO     : in  std_logic_vector (79 downto 0);-------------------------------------------- 
+        --ROM0_A      : out std_logic_vector (13 downto 0);--------------------------------------------
+        --ROM0_CS     : out std_logic;                     -----                                 ------ 
+        --ROM0_OE     : out std_logic;                     -----                                 ------
+        --ROM1                                             -----removed by ZH, ROM not being used------
+        --ROM1_DO     : in  std_logic_vector (79 downto 0);-----                                 ------ 
+        --ROM1_A      : out std_logic_vector (13 downto 0);-----                                 ------
+        --ROM1_CS     : out std_logic;                     --------------------------------------------
+        --ROM1_OE     : out std_logic;                     --------------------------------------------
         --patch memory
         PM_DO      : in  std_logic_vector (1 downto 0);
-        PM_DI      : out std_logic_vector (1 downto 0);
-        PM_A       : out std_logic_vector (10 downto 0);
-        PM_WEB     : out std_logic;
-        PM_CSB     : out std_logic;
+        --PM_DI      : out std_logic_vector (1 downto 0);
+        --PM_A       : out std_logic_vector (10 downto 0);
+        --PM_WEB     : out std_logic;
+        --PM_CSB     : out std_logic;
 --        PM_CS      : out std_logic;
         --RAM0      becomes ROM in low power version
         RAM0_DO     : in  std_logic_vector (127 downto 0); --Modified by CJ
@@ -81,14 +81,14 @@ ENTITY mpmem_inf IS
         RAM0_WEB    : out std_logic;
 --        RAM0_CSB    : out std_logic;
         RAM0_OE     : out std_logic;
-        RAM0_CS     : out std_logic;
-        --RAM1             --                
-        RAM1_DO     : in  std_logic_vector (79 downto 0);
-        RAM1_DI     : out std_logic_vector (79 downto 0);
-        RAM1_A      : out std_logic_vector (13 downto 0);
-        RAM1_WEB    : out std_logic;
---        RAM1_CSB    : out std_logic
-        RAM1_CS    : out std_logic
+        RAM0_CS     : out std_logic
+        --RAM1             --                              --------------------------------------------
+        --RAM1_DO     : in  std_logic_vector (79 downto 0);--------------------------------------------
+        --RAM1_DI     : out std_logic_vector (79 downto 0);-----                                  -----
+        --RAM1_A      : out std_logic_vector (13 downto 0);-----removed by ZH, RAM1 not being used-----
+        --RAM1_WEB    : out std_logic;                     -----                                  -----
+--        RAM1_CSB    : out std_logic                      --------------------------------------------
+        --RAM1_CS    : out std_logic                       --------------------------------------------
         );
 END mpmem_inf;
 

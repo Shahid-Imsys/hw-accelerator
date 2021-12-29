@@ -621,6 +621,7 @@ EVEN_P <= even_p_2;
 		        if byte_ctr = "0000" then 
 		        	noc_reg_rdy <= '1';
                     noc_write <= '1';
+					noc_read <= '0';
 		        else
 		            noc_reg_rdy <= '0';
                     noc_write <= '0';
@@ -1017,15 +1018,22 @@ c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
 		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
 C_RDY <= c_rdy_i;
 ----------------------------------------------------------------------------------	
-process(noc_cmd)
-begin 
-if noc_cmd = "00100" then
-rd_ena <= '1';
-else
-rd_ena <= '0';
-end if;
+process(clk_e)
+begin
+	if rising_edge(clk_e) then
+		if noc_cmd = "00100" then
+		rd_ena <= '1';
+		else
+		rd_ena <= '0';
+		end if;
+	end if;
 end process;
-CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;	
+process(clk_e)
+begin
+	if rising_edge(clk_e) then
+		CLK_O <= (delay or rd_trig) and rd_ena;	
+	end if;
+end process;
 				
 	--Memory blocks
     clustermem : CMEM_32KX16

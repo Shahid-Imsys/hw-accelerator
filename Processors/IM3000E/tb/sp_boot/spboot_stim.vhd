@@ -143,7 +143,7 @@ architecture behav of spboot_stim is
   signal Progress	: integer := -1;
 
 begin  -- behav
-	PA(7 downto 5) <= "000";	-- This is read by ROM bootloader
+	--PA(7 downto 5) <= "000";	-- This is read by ROM bootloader
 	PA(4 downto 3) <= "01";		-- Set SP communication at /2 speed
 	PA(2 downto 1) <= "01";		-- Set PLL multiplier to 4
 	PA(0) <= '1';							-- Set PLL divider to 1
@@ -419,7 +419,9 @@ begin  -- behav
     MRESET <= '0';
     wait for 10 ns;
     load_mpgm_file;
-		Progress <= 0;
+    
+    PA(7 downto 5) <= "000";	-- This is read by ROM bootloader
+    Progress <= 0;
     
     ---------------------------------------------------------------------------
     -- POWER-ON SEQUENCE
@@ -512,7 +514,7 @@ begin  -- behav
       wrCmd1(WTIMC, SSCU);	-- Write word in memory and execute Continue
     end loop;
 		Progress <= 5;
-
+    
     -- Set up for loading patch data at address 0x0100 (in PMEM)
     wrCmd1(WCDAP, SRTOPL); -- open data path to PL from MPLL
     sendWord(Jump00FF);    -- Load MPLL with Jump00FF word    
@@ -650,7 +652,9 @@ begin  -- behav
     -- for i in 1 to 40 loop   -- Send four words, ten bytes per word
     --   sendMpgmByte;         -- Send a microprogram byte as a SPREQ 
     -- end loop;
-                Progress <= 11;
+    -- Set PÅ so the core2 boots from cortrect memory.
+    PA(7 downto 5) <= "001";	-- This is read by ROM bootloader
+    Progress <= 11;
     ---------------------------------------------------------------------------
     -- CONTINUE COMMUNICATE WITH TEST MICROPROGRAM
     ---------------------------------------------------------------------------
@@ -661,32 +665,38 @@ begin  -- behav
     
     RdDbus(CPpar);
     wrCmd1(WTIMC, AKCC);    
-    if CPpar /= x"00" then
-      assert false
-        report "Error: Hardware failure detected -" severity warning;
+    if CPpar /= x"00" and CPpar /= x"A4"  then
+      
+        assert false
+          report "Error: Hardware failure detected -" severity warning;
+      
       if CPpar <= x"40" then
-        --assert false report "Error in GPU. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "Error in GPU" severity note;
+        assert false report "Error in GPU. CPpar: " & to_hstring(CPpar) severity note;
+        -- assert false report "Error in GPU" severity note;
       elsif CPpar >= x"41" and CPpar <= x"4F" then
-        --assert false report "Error in map memory. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "Error in map memory" severity note;
+        assert false report "Error in map memory. CPpar: " & to_hstring(CPpar) severity note;
+        -- assert false report "Error in map memory" severity note;
       elsif CPpar >= x"81" and CPpar <= x"8F" then
-        --assert false report "Error in primary memory. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "Error in primary memory" severity note; 
+        assert false report "Error in primary memory. CPpar: " & to_hstring(CPpar) severity note;
+        -- assert false report "Error in primary memory" severity note; 
       elsif CPpar >= x"90" and CPpar <= x"9F" then
-        -- assert false report "Error in ADL stepping. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "Error in ADL stepping" severity note;
+        assert false report "Error in ADL stepping. CPpar: " & to_hstring(CPpar) severity note;
+        --assert false report "Error in ADL stepping" severity note;
       elsif CPpar >= x"A0" and CPpar <= x"AF" then
-        -- assert false report "Error in PC FIFO. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "Error in PC FIFO." severity note;
+        assert false report "Error in PC FIFO. CPpar: " & to_hstring(CPpar) severity note;
+        -- assert false report "Error in PC FIFO." severity note;
       elsif CPpar = x"FF" then
-        -- assert false report "uProgram derailed. CPpar: " & to_hstring(CPpar) severity note;
-        assert false report "uProgram derailed." severity note;
+        assert false report "uProgram derailed. CPpar: " & to_hstring(CPpar) severity note;
+        -- assert false report "uProgram derailed." severity note;
       else
         -- assert false report "Unknown GPU error. CPpar: " & to_hstring(CPpar) severity note; 
         assert false report "Unknown GPU error." severity note;      
       end if;    
     else
+      if CPpar = x"A4" then
+        write(l, string'("Test of core2 Complete"));
+        writeline(output, l);
+      end if;
       assert false report "Test OK!" severity note;
     end if;
                     Progress <= 12;

@@ -87,14 +87,14 @@ begin
 		end if;
 	end process;
 
-	DO7		<= do(7) when OE = '1' else 'Z';
-	DO6		<= do(6) when OE = '1' else 'Z';
-	DO5		<= do(5) when OE = '1' else 'Z';
-	DO4		<= do(4) when OE = '1' else 'Z';
-	DO3		<= do(3) when OE = '1' else 'Z';
-	DO2		<= do(2) when OE = '1' else 'Z';
-	DO1		<= do(1) when OE = '1' else 'Z';
-	DO0		<= do(0) when OE = '1' else 'Z';
+	DO7		<= do(7) when OE = '1' else '0';
+	DO6		<= do(6) when OE = '1' else '0';
+	DO5		<= do(5) when OE = '1' else '0';
+	DO4		<= do(4) when OE = '1' else '0';
+	DO3		<= do(3) when OE = '1' else '0';
+	DO2		<= do(2) when OE = '1' else '0';
+	DO1		<= do(1) when OE = '1' else '0';
+	DO0		<= do(0) when OE = '1' else '0';
 end struct;
 
     

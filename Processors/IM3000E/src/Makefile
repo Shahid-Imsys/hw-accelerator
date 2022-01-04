@@ -42,6 +42,19 @@ gpp_rtl:
 			 	  $(GPP_DIR_WIN)/mpmem_inf.vhd \
 			 	  $(GPP_DIR_WIN)/sdram_inf.vhd \
 			 	  $(GPP_DIR_WIN)/flash_inf.vhd \
+			 	  $(GPP_DIR_WIN)/peri/pdi.vhd \
+			 	  $(GPP_DIR_WIN)/peri/tiu.vhd \
+			 	  $(GPP_DIR_WIN)/peri/ports.vhd \
+			 	  $(GPP_DIR_WIN)/peri/port_mux.vhd \
+			 	  $(GPP_DIR_WIN)/peri/io_mux.vhd \
+			 	  $(GPP_DIR_WIN)/peri/uart.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_crc.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_rx.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_tx.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth.vhd \
+			 	  $(GPP_DIR_WIN)/peri/adc.vhd \
+			 	  $(GPP_DIR_WIN)/peri/dac.vhd \
+			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
 			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \

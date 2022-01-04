@@ -2787,7 +2787,8 @@ begin
     
     crb_sel       => c2_crb_sel,
     --  Signals to/from Peripheral block
-    dfp           => dfp          , 
+    --dfp           => dfp     -- BSV
+    dfp           => "00100000", -- BSV          , 
     --dbus        : out std_logic_vector(7 downto 0);
     --rst_en      : out std_logic;
     --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
@@ -3054,25 +3055,89 @@ begin
   -----------------------------------------------------------------------------
   -- Peripherals
   -----------------------------------------------------------------------------
-
-	erxclk <= '0';
-	etxclk <= '0';
-	din_a <= '0';
-	dfp <= "00000000";
-	iden <= '0';
-	idreq <= "11111111";
-	idi <= "00000000";
-	irq0 <= '1';
-	irq1 <= '1';
-	pa_en <= "00000000";
-	pb_en <= "00000000";
-	pc_en <= "00000000";
-	pd_en <= "00000000";
-	pe_en <= "00000000";
-	pf_en <= "00000000";
-	pg_en <= "00000000";
-	ph_en <= "00000000";
-	pi_en <= "00000000";
-	pj_en <= "00000000";
-
+peri01: entity work.peri
+	port map(
+	  clk_p         => clk_p,
+    clk_c_en      => clk_c_en,
+    clk_e_pos     => clk_e_pos,
+    clk_e_neg     => clk_e_neg,
+    clk_i     	  => clk_i,
+    clk_i_pos     => clk_i_pos,
+    clk_u_pos     => clk_u_pos,
+    clk_rx        => clk_rx,
+    clk_tx        => clk_tx,
+    clk_a_pos     => clk_a_pos,
+    erxclk        => erxclk,
+    etxclk        => etxclk, 
+    din_a         => din_a,
+    dbus          => dbus,
+    dfp           => dfp,
+    rst_en        => rst_en,
+    --rst_en2     => rst_en2,
+    pl_pd         => pd_s,
+    pl_aaddr      => aaddr,
+    idack         => idack,
+    ios_iden      => ios_iden,
+    ios_ido       => ios_ido,
+    ilioa         => ilioa,
+    ildout        => ildout,
+    inext         => inext,
+    iden          => iden,
+    --dqm_size      => dqm_size,
+    en_uart1      => en_uart1,
+    en_uart2      => en_uart2,
+    en_uart3      => en_uart3,
+    en_eth        => en_eth,
+    en_tiu        => en_tiu,
+    run_tiu       => run_tiu,
+    en_iobus      => en_iobus,
+    --ddqm          => ddqm,
+    idreq         => idreq,
+    idi           => idi,
+    irq0          => irq0,
+    irq1          => irq1,
+    tstamp        => tstamp,
+    tiu_tstamp    => tiu_tstamp,
+    ach_sel       => ach_sel,
+    --adc_bits      => '0',--adc_bits,
+    adc_bits      => adc_bits_int,  -- modified by HYX, 20141205
+    adc_extref    => adc_extref,
+    adc_diff      => adc_diff,
+    adc_en        => adc_en,
+    dac_bits  	  => dac_bits,
+    dac_en    	  => dac_en,
+    mirq0_i   	  => mirq0_i,
+    mirq1_i   	  => mirq1_i,
+    pa_i      	  => pa_i,
+    pa_en     	  => pa_en,
+    pa_o      	  => pa_o,
+    pb_i      	  => pb_i,
+    pb_en     	  => pb_en,
+    pb_o      	  => pb_o,
+    pc_i      	  => pc_i,
+    pc_en     	  => pc_en,
+    pc_o      	  => pc_o,
+    pd_i      	  => pd_i,
+    pd_en     	  => pd_en,
+    pd_o      	  => pd_o,
+    pe_i      	  => pe_i,
+    pe_en     	  => pe_en,
+    pe_o      	  => pe_o,
+    pf_i      	  => pf_i,
+    pf_en     	  => pf_en,
+    pf_o      	  => pf_o,
+    pg_i      	  => pg_i,
+    pg_en     	  => pg_en,
+    pg_o      	  => pg_o,
+    ph_i      	  => ph_i,
+    ph_en     	  => ph_en,
+    ph_o      	  => ph_o,
+    pi_i      	  => pi_i,
+    pi_en     	  => pi_en,
+    pi_o      	  => pi_o,
+    pj_i      	  => pj_i,
+    pj_en     	  => pj_en,
+    pj_o      	  => pj_o
+		);  
+	
 end;

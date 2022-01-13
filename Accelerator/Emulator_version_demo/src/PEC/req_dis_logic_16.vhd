@@ -175,7 +175,7 @@ begin
 end process;
 REQ_TO_NOC <= not empty or req_to_noc_i;
 --ID Number Register and write controller
-process(clk_p,reset_i,poll_act,id_num)
+process(reset_i,poll_act,id_num)
 begin
     --if rising_edge(clk_p) then
     if reset_i = '1' then

@@ -50,32 +50,66 @@ DATA_OUT         : in std_logic_vector(7 downto 0)
 end Cluster_sim;
 
 architecture Behavioral of Cluster_sim is
-    type mem_word is array (15 downto 0) of std_logic_vector(7 downto 0);
-   	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
+  type mem_word is array (15 downto 0) of std_logic_vector(7 downto 0);
+  type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
 	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
-		FILE ram_file : text is in ram_file_name;
-		variable ram_file_line : line;
-		variable RAM_B : ram_type_b;
-		variable RAM :ram_type;
-		begin
-			--for i in rom_type'range loop
-			for i in 0 to 255 loop
-				readline(ram_file, ram_file_line);
-				read(ram_file_line, RAM_B(i));
-				RAM(i) := to_stdlogicvector(RAM_B(i));
-			end loop;
-		return RAM;
-	    end function;
-	    
-	    function conv_to_memword (ramword : std_logic_vector(127 downto 0)) return mem_word is
-	    variable mem : mem_word;
-	    begin
-	    for i in 0 to 15 loop
-	    mem(i) := ramword(8*i+7 downto 8*i);
-	    end loop;
-	    return mem;
-	    end function;
+  type data_type is array (287 downto 0) of std_logic_vector(127 downto 0);
+  type data_type_b is array (287 downto 0) of bit_vector(127 downto 0);
+  type kernel_type is array (215 downto 0) of std_logic_vector(127 downto 0);
+  type kernel_type_b is array (215 downto 0) of bit_vector(127 downto 0);
+  --Load microporgram file
+	impure function init_ram_from_file (ram_file_name : in string) return ram_type is
+	FILE ram_file : text is in ram_file_name;
+	variable ram_file_line : line;
+	variable RAM_B : ram_type_b;
+	variable RAM :ram_type;
+	begin
+		--for i in rom_type'range loop
+		for i in 0 to 255 loop
+			readline(ram_file, ram_file_line);
+			read(ram_file_line, RAM_B(i));
+			RAM(i) := to_stdlogicvector(RAM_B(i));
+		end loop;
+	return RAM;
+	end function;
+  
+  --Load data file
+  function init_data_from_file(data_file_name: in string) return data_type is
+      FILE data_file : text is in data_file_name;
+      variable data_file_line : line;
+      variable binary_data_b : data_type_b;
+      variable binary_data : data_type;
+  begin
+      for i in 0 to 287 loop
+          readline(data_file,data_file_line);
+          read(data_file_line,binary_data_b(i));
+          binary_data(i) := to_stdlogicvector(binary_data_b(i));
+      end loop;
+      return binary_data;
+  end function;
+
+  function init_kernel_from_file(kernel_file_name: in string) return kernel_type is
+    FILE kernel_file : text is in kernel_file_name;
+    variable kernel_file_line : line;
+    variable binary_kernel_b : kernel_type_b;
+    variable binary_kernel : kernel_type;
+  begin
+    for i in 0 to 215 loop
+        readline(kernel_file,kernel_file_line);
+        read(kernel_file_line,binary_kernel_b(i));
+        binary_kernel(i) := to_stdlogicvector(binary_kernel_b(i));
+    end loop;
+    return binary_kernel;
+  end function;
+	  
+	function conv_to_memword (ramword : std_logic_vector(127 downto 0)) return mem_word is
+	variable mem : mem_word;
+	begin
+	for i in 0 to 15 loop
+	mem(i) := ramword(8*i+7 downto 8*i);
+	end loop;
+	return mem;
+	end function;
 --component cluster_controller
 --     port(
 ----Clock inputs
@@ -104,7 +138,11 @@ architecture Behavioral of Cluster_sim is
 --      --fb               : out std_logic
 --	  ); 
 --end component;
-signal ucode : ram_type := init_ram_from_file("SequenceTest_F.data");
+signal ucode_seq : ram_type := init_ram_from_file("SequenceTest_F.data");
+signal ucode_ve  : ram_type := init_ram_from_file("program_0x000.ascii");
+signal input_data : data_type := init_data_from_file("input_0x400.ascii");
+signal input_kernel : kernel_type := init_kernel_from_file("kernel_0x100.ascii");
+--signal data_range_1 : ve_sram_type; --:= init_data_from_file("");
 signal clk_p_i : std_logic;
 signal clk_e_i : std_logic;
 signal clk_e_neg_i : std_logic;
@@ -132,9 +170,13 @@ constant RESUME : std_logic_vector(5 downto 0) :="101000";
 constant ADDRESS1 : std_logic_vector(14 downto 0) := "000000000000011"; --3
 constant ADDRESS2 : std_logic_vector(14 downto 0) := "000000000000100"; --4
 constant ADDRESS3 : std_logic_vector(14 downto 0) := (others => '0');
+constant ADDRESS4_DATA : std_logic_vector(14 downto 0) := "000"&x"400"; --Input data address
+constant ADDRESS5_KERNEL : std_logic_vector(14 downto 0) := "000"&x"100"; --Kernel address
 constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";  --3 --write 4 words
 constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000010";  --2 --read 3 words
 constant LENGTH3 : std_logic_vector(14 downto 0) := "000000011111111";--255
+constant LENGTH4 : std_logic_vector(14 downto 0) := "000"&x"11F"; --287
+constant LENGTH5 : std_logic_vector(14 downto 0) := "000"&x"0D7"; --215
 constant WORD1   : mem_word := (15 =>"11111111", 14 => x"fe", 13 => x"fd", 12 => x"fc", 11 => x"fb", 10 => x"fa", 0=> x"f0",others =>(others=>'0'));
 constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));
 constant WORD3   : mem_word := (15 =>"11111111", 14 => "00001111", 11=> "00001001", others =>(others=>'0'));
@@ -405,11 +447,49 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 progress <=41;
 for i in 0 to 255 loop
-sendmemword(conv_to_memword(ucode(i)));
+--sendmemword(conv_to_memword(ucode_seq(i))); --send sequence test microcode
+sendmemword(conv_to_memword(ucode_ve(i))); --send ve pointwise test microcode
 end loop;
 data <= (others => '0');
 progress <=5;
-wait until tag_fb = '0';
+wait until tag_fb = '0'; 
+sendNOCcommand(WRITEC); --send input data
+send15bits(LENGTH4);
+send15bits(ADDRESS4_DATA);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+for i in 0 to 287 loop
+  sendmemword(conv_to_memword(input_data(i))); --send ve pointwise test microcode
+end loop;
+data <= (others => '0');
+progress <=6;
+wait until tag_fb = '0'; 
+sendNOCcommand(WRITEC); --send input data
+send15bits(LENGTH5);
+send15bits(ADDRESS5_KERNEL);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+for i in 0 to 215 loop
+  sendmemword(conv_to_memword(input_kernel(i))); --send ve pointwise test microcode
+end loop;
+data <= (others => '0');
+progress <=7;
+wait until tag_fb = '0'; 
+
 --wait for 120 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
@@ -421,10 +501,11 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 sendNOCcommand(Exe);
 tag_in <= '0';
-progress <= 6;
+progress <= 8;
+
 
 --Start testing on PE side(simulated data input)
-wait for 300 ns;
+wait for 301 ns;
 
 --req_in <= '1';
 --sendpedata(RD_REQ1);

@@ -98,6 +98,8 @@ entity core is
     exe         : in std_logic;
     resume      : in std_logic; 
     ready       : out std_logic;
+    -- ID 
+    id_number   : in std_logic_vector(5 downto 0);   --Added by CJ
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -1050,6 +1052,7 @@ begin
       --CJ added
       VE_OUT_D      => ve_out_d_int,
       CDFM          => cdfm_int,
+      ID_NUM        => id_number,
       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      

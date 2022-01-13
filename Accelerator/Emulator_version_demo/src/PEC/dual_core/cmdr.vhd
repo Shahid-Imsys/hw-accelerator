@@ -100,6 +100,7 @@ architecture rtl of cmdr is
     signal fifo_wr_en  : std_logic;
     signal fifo_rd_en  : std_logic;
     signal init_mpgm_rq : std_logic_vector(31 downto 0);
+    signal init_mpgm_rq_single : std_logic_vector(31 downto 0);
     signal empty       : std_logic;
     signal fb          : std_logic;
     signal req         : std_logic;
@@ -162,7 +163,8 @@ begin
     ld_dtm_v <= pl(88);
     fifo_push <= pl(114);
     pl_send_req <= pl(113);
-    init_mpgm_rq <= "01000111111111110000000000000000";
+    init_mpgm_rq <= "01000111111111110000000000000000"; --Broadcast request for 7 PEs.
+    init_mpgm_rq_single <= "01000000111111110000000000000000"; --Broadcast request for 1 PE.
     process(clk_p)
     begin
     if rising_edge(clk_p) then --
@@ -170,7 +172,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq;
+            dtm_reg <= init_mpgm_rq_single;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;

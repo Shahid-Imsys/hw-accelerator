@@ -92,10 +92,9 @@ entity cluster_controller is
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
 	  BC               : out std_logic; --Broadcast handshake
 	  RD_FIFO          : out std_logic;
-	  FIFO_VLD         : in std_logic;
+	  FIFO_VLD         : in std_logic
 	  --FOUR_WD_LEFT     : in std_logic 
---PE's ID information
-      ID               : out ID_TYPE
+
 
 	  ); 
 end entity cluster_controller;
@@ -267,7 +266,7 @@ end component;
   signal two_c_delay :std_logic;
   signal three_c_delay : std_logic;
   --PE's ID
-  signal id_int  : ID_TYPE;
+  --signal id_int  : ID_TYPE;
  
 begin
 ----------------------------
@@ -1109,34 +1108,8 @@ end process;
     --    noc_read => noc_read
 --
 	--);
+	
 
--------------------------------------------------------
---PE ID
--------------------------------------------------------
-process(clk_e)
-begin
-	if rising_edge(clk_e) then --only 16 PEs inside one cluster
-		if rst_i = '0' then
-			id_int(0) <= "000000";
-			id_int(1) <= "000001";
-			id_int(2) <= "000010";
-			id_int(3) <= "000011";
-			id_int(4) <= "000100";
-			id_int(5) <= "000101";
-			id_int(6) <= "000110";
-			id_int(7) <= "000111";
-			id_int(8) <= "001000";
-			id_int(9) <= "001001";
-			id_int(10) <= "001010";
-			id_int(11) <= "001011";
-			id_int(12) <= "001100";
-			id_int(13) <= "001101";
-			id_int(14) <= "001110";
-			id_int(15) <= "001111";
-		end if;
-	end if;
-end process;
-ID <= id_int;
 end architecture rtl; 
 
 -----------------------------------------------------------

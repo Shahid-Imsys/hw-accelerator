@@ -881,7 +881,7 @@ process(clk_p) --Enable control signal, synchronized by the data flow
 begin
     if rising_edge(clk_p) then
         delay0 <= ve_start_reg;
-        mult_delay <= delay0;
+        mult_delay <= ve_start_reg;
     end if;
 end process;
  mctl_0 <= not mul_ctl(0) and ve_start_reg and mult_delay and mul_inn_ctl;
@@ -1007,7 +1007,7 @@ begin
     if rising_edge(clk_p) then
         --if latch_ena = '1' then
             --o_mux_ena <= '1';
-        if a_delay = '0' and delay0 = '1' and acc_inn_ctl = '1' and (ve_start_reg = '0' or mult_delay = '0' or mul_inn_ctl = '0') then
+        if a_delay = '1' and delay0 = '1' and acc_inn_ctl = '1' and (ve_start_reg = '0' or mult_delay = '0' or mul_inn_ctl = '0') then
             o_mux_ena <= '1';
         elsif ve_out_p = '0' then --11 clock delay of config(7)
             o_mux_ena <= '0';
@@ -1022,7 +1022,7 @@ begin
     if rising_edge(clk_p) then
         if rst = '0' then
             ve_out_c <= (others => '0');
-        if o_mux_ena = '1' then
+        elsif o_mux_ena = '1' then
             if ve_out_p = '0' then
                 p_shifter_in <= acc_out_a;
             elsif ve_out_p = '1' then
@@ -1046,7 +1046,7 @@ begin
                 end if;
             end if;
         end if;
-        end if;
+        --end if;
     end if;
 end process;
                 
@@ -1363,7 +1363,7 @@ accu_0 : c_accum_0
 
 ------------------------------------------------------------------------------
  --Output 
- ------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 process(clk_p)
 begin
     if rising_edge(clk_p) then

@@ -193,7 +193,7 @@ signal pe_req_in_i    : pe_req;
 signal pe_data_out_i  : pe_data;
 signal exe : std_logic;
 signal resume : std_logic;
-signal id : ID_TYPE;
+--signal id : ID_TYPE;
 
 begin
     ------------------IO interface-------------------
@@ -299,8 +299,8 @@ port map(
     C2_RDY     => pe_rdy_reg(14),
     EXE        => exe,
     RESUME     => resume,
-    C1_ID      => id(0),
-    C2_ID      => id(1),
+    C1_ID      => ID_NUM_0,
+    C2_ID      => ID_NUM_1,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -333,8 +333,8 @@ port map(
     C2_RDY     => pe_rdy_reg(12),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(2),
-    C2_ID      => id(3),
+    C1_ID      => ID_NUM_2,
+    C2_ID      => ID_NUM_3,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -367,8 +367,8 @@ port map(
     C2_RDY     => pe_rdy_reg(10),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(4),
-    C2_ID      => id(5),
+    C1_ID      => ID_NUM_4,
+    C2_ID      => ID_NUM_5,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -401,8 +401,8 @@ port map(
     C2_RDY     => pe_rdy_reg(8),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(6),
-    C2_ID      => id(7),
+    C1_ID      => ID_NUM_6,
+    C2_ID      => ID_NUM_7,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -435,8 +435,8 @@ port map(
     C2_RDY     => pe_rdy_reg(6),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(8),
-    C2_ID      => id(9),
+    C1_ID      => ID_NUM_8,
+    C2_ID      => ID_NUM_9,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -469,8 +469,8 @@ port map(
     C2_RDY     => pe_rdy_reg(4),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(10),
-    C2_ID      => id(11),
+    C1_ID      => ID_NUM_10,
+    C2_ID      => ID_NUM_11,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -503,8 +503,8 @@ port map(
     C2_RDY     => pe_rdy_reg(2),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(12),
-    C2_ID      => id(13),
+    C1_ID      => ID_NUM_12,
+    C2_ID      => ID_NUM_13,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active
@@ -537,8 +537,8 @@ port map(
     C2_RDY     => pe_rdy_reg(0),
     EXE        => '0',--exe,      --Block
     RESUME     => resume,
-    C1_ID      => id(14),
-    C2_ID      => id(15),
+    C1_ID      => ID_NUM_14,
+    C2_ID      => ID_NUM_15,
 	HCLK       => clk_p,                 -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     => even_p_i,
     MRESET     => rst_i,                 -- system reset               low active

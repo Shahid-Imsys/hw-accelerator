@@ -449,6 +449,7 @@ architecture struct of core is
   signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
+  signal vldl_2  : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
   signal temp         : std_logic;
   signal temp1        : std_logic; --Added by CJ. Used to latch temp
@@ -503,6 +504,13 @@ begin
         end if;
       end if;
   end process;
+  data_vld_latch_2 : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      vldl_2 <=vldl;
+    end if;
+  end process;
+
   --Two clock e pulses delay generation
   process(clk_p)
   begin
@@ -1277,7 +1285,7 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => vldl,
+      DDI_VLD     => vldl_2,
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,

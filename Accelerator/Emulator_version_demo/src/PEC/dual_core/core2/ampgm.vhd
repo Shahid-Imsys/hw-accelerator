@@ -98,7 +98,8 @@ begin  -- rtl
 
 --  mpram_a <= latch(5 downto 0) & y_reg when lmpen = '1' else
 --             mpga;
-
+	ram_addr <= mpga; 
+	mpram_a <= ram_addr;
 
 	process (even_c, held_e, patch_addr,core2_en)
 	begin

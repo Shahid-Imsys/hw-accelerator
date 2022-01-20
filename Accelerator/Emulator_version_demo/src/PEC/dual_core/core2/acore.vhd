@@ -165,7 +165,8 @@ architecture struct of acore is
   signal mp_ds      : std_logic_vector(3 downto 0);
   signal mp_alud    : std_logic;  
   signal mp_shin_pa : std_logic_vector(3 downto 0);  
-  signal mp_gass    : std_logic_vector(1 downto 0);         
+  signal mp_gass    : std_logic_vector(1 downto 0);
+  signal mpgmin     : std_logic_vector(127 downto 0);         
 
   signal odd_c      : std_logic;
   signal clk_e_pos_int  : std_logic;  -- Execution clock
@@ -309,6 +310,7 @@ architecture struct of acore is
 begin
   req_c2 <= req;
   ack    <= ack_c2;
+  ready  <= pl(121);
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
@@ -392,7 +394,7 @@ begin
       pmem_ce_n   => pmem_ce_n);    
 
   --mprom_a     <= mpga;
-  mpram_d     <= (others => '1');
+  mpram_d     <= mpgmin;--(others => '1');
   mpram_we_n  <= '1';
   pmem_d      <= "11";
   pmem_we_n   <= '1';
@@ -747,7 +749,7 @@ begin
         LD_MPGM  =>std_logic'('0'),
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
-        MPGMM_IN =>open,
+        MPGMM_IN =>mpgmin,
         VE_DTMO  =>ve_out_dtm_int
       );    
 

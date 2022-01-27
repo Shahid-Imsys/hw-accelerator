@@ -469,7 +469,6 @@ signal short_cycle   : std_logic;
 -- to PADS
 signal mirqout_o     : std_logic;                       
 signal mckout1_o     : std_logic;   
-signal mckout1_o_en  : std_logic;                    
 signal msdout_o      : std_logic;                       
 signal mrstout_o     : std_logic;                       
 signal mexec_o       : std_logic;                       
@@ -717,8 +716,8 @@ begin
 mmcm_inst : clk_wiz_0
    port map ( 
   -- Clock out ports  
-   clk_out1 => clk_gen, --180MHz
-   clk_out2 => CLK_P,   --Fast clock 360MHz
+   clk_out1 => clk_gen, --150MHz
+   clk_out2 => CLK_P,   --Fast clock 300MHz
 
   -- Status and control signals                
    reset => Reset,

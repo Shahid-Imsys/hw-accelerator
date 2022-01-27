@@ -169,26 +169,26 @@ port (
 );
 end component;
 
-component ila_5
-port (
-	clk        : in std_logic;
-	probe0     : in std_logic_vector(0 downto 0);  
-	probe1     : in std_logic_vector(31 downto 0); 
-	probe2     : in std_logic_vector(15 downto 0); 
-	probe3     : in std_logic_vector(0 downto 0);  
-	probe4     : in std_logic_vector(31 downto 0); 
-	probe5     : in std_logic_vector(0 downto 0); 
-	probe6     : in std_logic_vector(0 downto 0); 
-	probe7     : in std_logic_vector(31 downto 0); 
-	probe8     : in std_logic_vector(31 downto 0); 
-	probe9     : in std_logic_vector(31 downto 0); 
-	probe10    : in std_logic_vector(31 downto 0); 
-	probe11    : in std_logic_vector(0 downto 0); 
-	probe12    : in std_logic_vector(0 downto 0); 
-	probe13    : in std_logic_vector(0 downto 0); 
-	probe14    : in std_logic_vector(0 downto 0)
-);
-end component;
+--component ila_5
+--port (
+--	clk        : in std_logic;
+--	probe0     : in std_logic_vector(0 downto 0);  
+--	probe1     : in std_logic_vector(31 downto 0); 
+--	probe2     : in std_logic_vector(15 downto 0); 
+--	probe3     : in std_logic_vector(0 downto 0);  
+--	probe4     : in std_logic_vector(31 downto 0); 
+--	probe5     : in std_logic_vector(0 downto 0); 
+--	probe6     : in std_logic_vector(0 downto 0); 
+--	probe7     : in std_logic_vector(31 downto 0); 
+--	probe8     : in std_logic_vector(31 downto 0); 
+--	probe9     : in std_logic_vector(31 downto 0); 
+--	probe10    : in std_logic_vector(31 downto 0); 
+--	probe11    : in std_logic_vector(0 downto 0); 
+--	probe12    : in std_logic_vector(0 downto 0); 
+--	probe13    : in std_logic_vector(0 downto 0); 
+--	probe14    : in std_logic_vector(0 downto 0)
+--);
+--end component;
 
     --pcie-noc IO
     signal clk                          : std_logic;
@@ -334,7 +334,8 @@ end component;
     signal PCIE_RD_RESP_DATA_LAST_P     : std_logic;
     signal send_rsp_to_host             : std_logic;
     signal send_command_to_host         : std_logic;
-    signal send_command_to_host_P       : std_logic; 
+    signal send_command_to_host_P       : std_logic;
+    signal PCIE_LENGTH_ext              : std_logic_vector(5 downto 0); 
    
                          
 begin
@@ -384,12 +385,14 @@ begin
     REG1_USER_RST                  <= '0';
     
     reset_out                      <= reset;
-    PCIE_REQ_IF_RST_O              <= '0'; 
+    PCIE_REQ_IF_RST_O              <= '0';
+    
+    PCIE_LENGTH_ext                <= "0" & PCIE_LENGTH;  
     
     process(clk)
     begin
         if rising_edge(clk) then
-            PCIE_LENGTH_FIFO               <= "0000" & (PCIE_LENGTH + 1) & '0';
+            PCIE_LENGTH_FIFO               <= "000" & (PCIE_LENGTH_ext + 1) & '0';  --PCIE_LENGTH is number of cachelines -1.  PCIE_LENGTH_FIFO is number of 32 bytes data
           end if;
     end process;           
                     
@@ -806,21 +809,21 @@ begin
         end if;
     end process;
     
-    probe0_j(0)           <= REG1_WEA;
-    probe1_j(31 downto 0) <= REG1_WDA;
-    probe2_j(15 downto 0) <= REG1_ADA;
-    probe3_j(0)           <= REG1_REA;
-    probe4_j(31 downto 0) <= REG1_RDA_i;
-    probe5_j(0)           <= REG1_RDAV_i;
-    probe6_j(0)           <= REG1_AC_i;
-    probe7_j(31 downto 0) <= h2c_addr_h;
-    probe8_j(31 downto 0) <= h2c_addr_l;
-    probe9_j(31 downto 0) <= c2h_addr_h;
-    probe10_j(31 downto 0)<= c2h_addr_l;
-    probe11_j(0)          <= h2c_cmd;
-    probe12_j(0)          <= ack;    
-    probe13_j(0)          <= reset_trig;
-    probe14_j(0)          <= c2h_cmd;
+--    probe0_j(0)           <= REG1_WEA;
+--    probe1_j(31 downto 0) <= REG1_WDA;
+--    probe2_j(15 downto 0) <= REG1_ADA;
+--    probe3_j(0)           <= REG1_REA;
+--    probe4_j(31 downto 0) <= REG1_RDA_i;
+--    probe5_j(0)           <= REG1_RDAV_i;
+--    probe6_j(0)           <= REG1_AC_i;
+--    probe7_j(31 downto 0) <= h2c_addr_h;
+--    probe8_j(31 downto 0) <= h2c_addr_l;
+--    probe9_j(31 downto 0) <= c2h_addr_h;
+--    probe10_j(31 downto 0)<= c2h_addr_l;
+--    probe11_j(0)          <= h2c_cmd;
+--    probe12_j(0)          <= ack;    
+--    probe13_j(0)          <= reset_trig;
+--    probe14_j(0)          <= c2h_cmd;
 
     probe0_i(255 downto 0)<= pcie_wr_req_data_i;      
     probe1_i(57 downto 0) <= noc_data_i(57 downto 0);
@@ -917,25 +920,25 @@ begin
 	probe30    => probe30_i			
 );
 
-  ILA_REG : ila_5
-  port map (
-	clk => clk,
-	probe0     => probe0_j, 
-	probe1     => probe1_j, 
-    probe2     => probe2_j, 
-	probe3     => probe3_j, 
-	probe4     => probe4_j, 
-	probe5     => probe5_j, 
-	probe6     => probe6_j, 
-	probe7     => probe7_j, 
-	probe8     => probe8_j, 
-	probe9     => probe9_j, 
-	probe10    => probe10_j, 
-	probe11    => probe11_j, 
-	probe12    => probe12_j, 
-	probe13    => probe13_j,
-	probe14    => probe14_j
-);
+--  ILA_REG : ila_5
+--  port map (
+--	clk => clk,
+--	probe0     => probe0_j, 
+--	probe1     => probe1_j, 
+--    probe2     => probe2_j, 
+--	probe3     => probe3_j, 
+--	probe4     => probe4_j, 
+--	probe5     => probe5_j, 
+--	probe6     => probe6_j, 
+--	probe7     => probe7_j, 
+--	probe8     => probe8_j, 
+--	probe9     => probe9_j, 
+--	probe10    => probe10_j, 
+--	probe11    => probe11_j, 
+--	probe12    => probe12_j, 
+--	probe13    => probe13_j,
+--	probe14    => probe14_j
+--);
 
   ILA_PCIE_RESP : ila_4
   port map (

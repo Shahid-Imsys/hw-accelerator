@@ -103,11 +103,13 @@ begin
 		for i in 0 to 31 loop
 			if decoder(i) ='1' then
 				switch_bus <= switch_mux_In(i);
+--			else 
+--			 	switch_bus <= (others => '0');  --for removing inferring latch
 			end if;
 		end loop;
 	end process;
 	
-	process (switch_mux,switch_bus,switch_mux_In)
+	process (switch_mux,switch_bus,switch_mux_In,reset)
 	begin
         if reset = '1' then
 	        mux_out(0) <=(others => '0');
@@ -140,4 +142,46 @@ begin
 	NOC_bus    <= (mux_out(1) &  mux_out(0)) when switch_Out_en = '0' else (others => '0');
 	switch_Out <= mux_out(1) &  mux_out(0);
 	
+--	process (switch_mux,switch_bus,switch_In)
+--	begin
+--		for i in 0 to 1 loop
+--			if switch_mux = "0000" then
+--				mux_out(i) <= switch_In(i);
+--			elsif switch_mux = "0001" then
+--				mux_out(i) <= switch_bus; ------------------------if it is changing at the same time it may be unstabel??
+--			elsif switch_mux = "0010" then
+--				if (i > 0) then
+--					mux_out(i) <= switch_In(i-1);
+--				else
+--					mux_out(i) <=(others => '0');
+--				end if;
+--			elsif switch_mux = "0011" then
+--			    mux_out(i) <= switch_In(i+1);
+--			elsif switch_mux = "0100" then
+--				mux_out(i) <=(others => '0');
+--			elsif switch_mux = "0101" then
+--				mux_out(i) <=(others => '0');
+--			elsif switch_mux = "0110" then
+--			    mux_out(i) <= switch_In(i+4);
+--			elsif switch_mux = "0111" then
+--				mux_out(i) <= switch_In(i+8);
+--		    elsif switch_mux = "1000" then
+--		        if (i = 0) then 
+--		    	    mux_out(i) <= switch_In(i+1);
+--		    	else
+--		    	    mux_out(i) <= switch_In(i-1);
+--		    	end if;
+--		    elsif switch_mux = "1001" then	
+--		        mux_out(i) <= switch_In(i+2);
+--		    elsif switch_mux = "1010" then	
+--		        mux_out(i) <= switch_In(i+4);
+--		    elsif switch_mux = "1011" then	
+--		        mux_out(i) <= switch_In(i+8);	
+--		    elsif switch_mux = "1100" then	
+--		        mux_out(i) <= switch_In(i+16);
+--		    else 
+--		        mux_out(i) <= (others => '0');	        	        		        	
+--			end if;
+--		end loop;		
+--	end process;		
 end;

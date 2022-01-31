@@ -101,6 +101,7 @@ architecture structure of Noc_Top is
     component Root_Memory is
     Port (
         clk               : in  std_logic;
+        reset             : in  std_logic;
         Write_Read_Mode   : in  std_logic;
         Enable            : in  std_logic;
         Load_Add_Gen      : in  std_logic;
@@ -168,7 +169,6 @@ architecture structure of Noc_Top is
         Step_MDC            : out std_logic;           
         En_NOC_Transfer     : out std_logic;
         En_RM               : out std_logic;                        --root memory
-        EN_EM               : out std_logic;                        --ext memory
         R_W_RM              : out std_logic;                        --root memory
         R_W_PCIe            : out std_logic;                        --ext memory 
         Start_Tag_Shift     : out std_logic;                        --Tag Line Controller 
@@ -296,7 +296,7 @@ PORT (
 	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
 	probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
 	probe9 : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
-	probe10 : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+	probe10 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
     probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
 	probe12 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
 	probe13 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
@@ -304,7 +304,9 @@ PORT (
 	probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
 	probe16 : IN STD_LOGIC_VECTOR(12 DOWNTO 0); 
 	probe17 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-	probe18 : IN STD_LOGIC_VECTOR(15 DOWNTO 0)	
+	probe18 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	probe19 : in STD_LOGIC_VECTOR (31 DOWNTO 0);
+	probe20 : in STD_LOGIC_VECTOR (255 DOWNTO 0)	
 );
 END COMPONENT  ;
 
@@ -316,7 +318,6 @@ END COMPONENT  ;
     signal  Load_Tag_Shift_Counter      : std_logic;
     signal  Load_PEC_Reg                : std_logic;
     signal  En_RM                       : std_logic;
-    signal  EN_EM                       : std_logic;
     signal  R_W_RM                      : std_logic;
     signal  Step_BC                     : std_logic;
     signal  Reset_BC                    : std_logic;      
@@ -382,7 +383,7 @@ END COMPONENT  ;
     signal probe7_i                     : std_logic_vector(0 downto 0);
     signal probe8_i                     : std_logic_vector(0 downto 0);
     signal probe9_i                     : std_logic_vector(255 downto 0);
-    signal probe10_i                    : std_logic_vector(255 downto 0);
+    signal probe10_i                    : std_logic_vector(63 downto 0);
     signal probe11_i                    : std_logic_vector(0 downto 0);
     signal probe12_i                    : std_logic_vector(7 downto 0);
     signal probe13_i                    : std_logic_vector(0 downto 0);
@@ -390,7 +391,9 @@ END COMPONENT  ;
     signal probe15_i                    : std_logic_vector(0 downto 0);
     signal probe16_i                    : std_logic_vector(12 downto 0);
     signal probe17_i                    : std_logic_vector(15 downto 0);
-    signal probe18_i                    : std_logic_vector(15 downto 0);    
+    signal probe18_i                    : std_logic_vector(15 downto 0);
+    signal probe19_i                    : std_logic_vector(31 downto 0);
+    signal probe20_i                    : std_logic_vector(255 downto 0);
     				 
 begin
 
@@ -434,7 +437,6 @@ begin
             Step_MDC            => Step_MDC,              
             En_NOC_Transfer     => En_NOC_Transfer,
             En_RM               => En_RM,
-            EN_EM               => EN_EM,
             R_W_RM              => R_W_RM,
             R_W_PCIe            => R_W_PCIe,
             Start_Tag_Shift     => Start_Tag_Shift,
@@ -578,6 +580,7 @@ begin
     Root_Memory_Inst: Root_Memory
     Port map(
             clk                 => clk,
+            reset               => reset,
             Write_Read_Mode     => R_W_RM,
             Enable              => En_RM,
             Load_Add_Gen        => Load_RM_address,
@@ -609,13 +612,14 @@ begin
     probe1_i(15 downto 0) <= NoC_Input_reg_Out;   
     probe2_i(1 downto 0)  <= NoC_Reg_Mux_Select;                       	
     probe3_i(15 downto 0) <= Noc_reg_DataIn(15 downto 0);                             
-    probe4_i(15 downto 0) <= Noc_reg_DataOut(15 downto 0);                   
+    probe4_i(15 downto 0) <= NOC_bus_Output; --Noc_reg_DataOut(15 downto 0);                   
     probe5_i(3 downto 0)  <= Switch_Ctrl;
     probe6_i(15 downto 0) <= Noc_Switch_Out;                           
     probe7_i(0)           <= Gated_clk_from_PEC; --Load_MD_Reg;
     probe8_i(0)           <= PCIedata_Switch;       
-    probe9_i(255 downto 0)<= Noc_data_Mux_Demux;       
-    probe10_i(255 downto 0)<= Noc_data_i;
+    probe9_i(255 downto 0)<= Noc_reg_DataOut; --Noc_reg_mux_data; --Noc_data_Mux_Demux;       
+    --probe10_i(255 downto 0)<= Noc_data_i;
+    probe10_i(63 downto 0) <= Noc_data_i(63 downto 0); --PCIe_data(63 downto 0);
     probe11_i(0)           <= Load_NOC_reg;
     probe12_i(7 downto 0)  <= Address_Counter_t;
     probe13_i(0)           <= R_W_RM;
@@ -624,6 +628,8 @@ begin
     probe16_i(11 downto 0) <= RM_Address(11 downto 0);
     probe17_i(15 downto 0) <= RM_DataIn;
     probe18_i(15 downto 0) <= RM_DataOut;
+    probe19_i(31 downto 0) <= decoder;
+    probe20_i(255 downto 0)<= PCIe_data;
         
         
     ILA_NOC_TOP : ila_7
@@ -647,7 +653,10 @@ begin
         probe15    => probe15_i, 
         probe16    => probe16_i, 
         probe17    => probe17_i, 
-        probe18    => probe18_i    
+        probe18    => probe18_i,
+        probe19    => probe19_i,
+        probe20    => probe20_i
     );
 
 end structure;
+

@@ -61,7 +61,6 @@ entity Noc_State_Machine is
         Step_MDC                : out std_logic;
         En_NOC_Transfer         : out std_logic;
         En_RM                   : out std_logic;                        --root memory
-        EN_EM                   : out std_logic;                        --ext memory
         R_W_RM                  : out std_logic;                        --root memory
         R_W_PCIe                : out std_logic;                        --ext memory
         Start_Tag_Shift         : out std_logic;                        --Tag Line Controller 
@@ -120,7 +119,7 @@ architecture Behavioral of Noc_State_Machine is
         probe21 : in std_logic_vector(0 downto 0); 
         probe22 : in std_logic_vector(0 downto 0); 
         probe23 : in std_logic_vector(19 downto 0); 
-        probe24 : in std_logic_vector(0 downto 0); 
+        probe24 : in std_logic_vector(0 downto 0);
         probe25 : in std_logic_vector(0 downto 0); 
         probe26 : in std_logic_vector(0 downto 0); 
         probe27 : in std_logic_vector(0 downto 0); 
@@ -200,7 +199,6 @@ architecture Behavioral of Noc_State_Machine is
     signal  Mux1,Mux2               : std_logic_vector(7 downto 0);
     signal  LC_Equal_LR_latch       : std_logic; 
     signal  LC_Equal_LR_extend      : std_logic;
-    signal  TC_Mux                  : std_logic_vector(15 downto 0);
     --internal signals
 	signal  En_PCIe_Data_i          : std_logic;
 	signal  Load_CMD_Reg_i          : std_logic;
@@ -220,7 +218,6 @@ architecture Behavioral of Noc_State_Machine is
 	signal  Set_PEC_FF2_i           : std_logic;
 	signal  En_NOC_Transfer_i       : std_logic;
 	signal  En_RM_i                 : std_logic;
-	signal  EN_EM_i                 : std_logic;
 	signal  R_W_RM_i                : std_logic;
 	signal  R_W_PCIe_i              : std_logic;
 	signal  Step_BC_i               : std_logic;
@@ -309,7 +306,6 @@ begin
     Set_PEC_FF2           <= Set_PEC_FF2_i;
     En_NOC_Transfer       <= En_NOC_Transfer_i;
     En_RM                 <= En_RM_i;
-    EN_EM                 <= EN_EM_i;
     R_W_RM                <= R_W_RM_i;
     R_W_PCIe              <= R_W_PCIe_i;
     Step_BC               <= Step_BC_i;
@@ -327,9 +323,8 @@ begin
     );
 
     Mem_Out                     <= Program_Mem_Out;
-    TSx16                       <= TS & "0000";
+    TSx16                       <= Transfer_Counter & "0000"; --TC_Mux & "0000";     --TS & "0000";
     Loop_Mux                    <= x"000" & Control_Data  when Mode_Reg(6)= '0' else (TSx16);
-    TC_Mux                      <= TS                     when Shift_TC_i = '0' else '0' & TS(15 downto 1);
     Jump_condition_Mux          <= CMD_FF               when Mode_Reg(2 downto 0) = "000" else 
                                    PEC_Ready            when Mode_Reg(2 downto 0) = "001" else 
                                    not(PCIe_ack)        when Mode_Reg(2 downto 0) = "011" else 
@@ -346,7 +341,7 @@ begin
     Mux1                        <= Mux2                 when Mem_Out(21 downto 20) = "00" else
                                    Mem_Out(7 downto 0)  when Mem_Out(21 downto 20) = "01" else
                                    Return_Reg1          when Mem_Out(21 downto 20) = "10" else
-                                   Return_Reg2          when Mem_Out(21 downto 20) = "11";                             
+                                   Return_Reg2          when Mem_Out(21 downto 20) = "11" else (others => '0');                      
     Mux2                        <= Return_Reg2          when Jump_condition_Mux = '1' else Return_Reg1;
 
     Cond_Jump                   <= '1' when Mem_Out(23 downto 20) = "0101" or Mem_Out(23 downto 20) = "0111" or Mem_Out(23 downto 20) = "1000" else '0';
@@ -479,7 +474,11 @@ begin
             end if;
             
             if Load_TC = '1' then
-                Transfer_Counter <= TC_Mux; --TS;
+                if Shift_TC_i = '1' then
+                    Transfer_Counter <= '0' & TS(15 downto 1);
+                else
+                    Transfer_Counter <= TS;
+                end if;       
             elsif Decr_TC ='1' then
                 Transfer_Counter <= Transfer_Counter - '1';
             end if;

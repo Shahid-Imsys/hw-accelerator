@@ -460,7 +460,10 @@ architecture struct of core is
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
-  signal ve_out_dtm_int : std_logic_vector(127 downto 0);    
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);
+  signal ve_dtm_rdy_int : std_logic;
+  signal ve_push_dtm_int : std_logic;
+  signal ve_auto_send_int : std_logic;    
 
   attribute keep : string;
   attribute keep of pl : signal is "true";
@@ -1289,6 +1292,9 @@ begin
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
+      VE_DTM_RDY  => ve_dtm_rdy_int,
+      VE_PUSH_DTM => ve_push_dtm_int,
+      VE_AUTO_SEND => ve_auto_send_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM  => ve_out_dtm_int
       );
@@ -1313,7 +1319,10 @@ begin
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
-        VE_DTMO  =>ve_out_dtm_int
+        VE_DTMO  =>ve_out_dtm_int,
+        VE_DTM_RDY => ve_dtm_rdy_int,
+        VE_PUSH_DTM => ve_push_dtm_int,
+        VE_AUTO_SEND => ve_auto_send_int
       );
 end;
 

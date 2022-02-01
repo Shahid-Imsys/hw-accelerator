@@ -54,7 +54,10 @@ entity cmdr is
         VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
-        VE_DTMO   : in std_logic_vector(127 downto 0)  --output DTM data from VE;
+        VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
+        VE_DTM_RDY : in std_logic;
+        VE_PUSH_DTM : in std_logic;
+        VE_AUTO_SEND : in std_logic
         
     );
 end; 
@@ -102,6 +105,7 @@ architecture rtl of cmdr is
     signal init_mpgm_rq : std_logic_vector(31 downto 0);
     signal init_mpgm_rq_single : std_logic_vector(31 downto 0);
     signal empty       : std_logic;
+    signal fifo_full   : std_logic;
     signal fb          : std_logic;
     signal req         : std_logic;
     signal srst        : std_logic;
@@ -177,6 +181,9 @@ begin
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
             ve_in_cnt <= (others => '0');
+        elsif ve_dtm_rdy = '1' then
+            dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
+            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         elsif ld_dtm_v = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
             ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
@@ -193,6 +200,8 @@ begin
                 else
                     fifo_wr_en <= '0';
                 end if;
+            elsif ve_push_dtm = '1' then
+                fifo_wr_en <= '1';
             else
                 fifo_wr_en <= '0';
             end if;
@@ -205,8 +214,10 @@ begin
             if clk_e_neg = '1' then --rising_edge
                 if EXE ='1'then
                     send_req_d <= '1';
-                else
-                    send_req_d <= pl_send_req;
+                elsif empty = '1' then
+                    send_req_d <= '0';
+                elsif (ve_auto_send = '1' and fifo_full = '1') or pl_send_req = '1' then
+                    send_req_d <= '1';
                 end if;
                 send_req <= send_req_d;
             end if;
@@ -255,7 +266,7 @@ begin
     dout => DOUT,
     full => open,
     empty => empty,
-    prog_full => open, --asserts when 5 words inside
+    prog_full => fifo_full, --asserts when 5 words inside
     wr_rst_busy => open,
     rd_rst_busy => open
     );

@@ -54,6 +54,10 @@ entity ve is
         VE_RDY    :            out std_logic; --Vector engine ready. Activates when ve_loop is zero.
         --Data inputs
         VE_IN     :            in std_logic_vector(63 downto 0); --DFM input
+        --Control outputs
+        VE_DTM_RDY :           out std_logic;
+        VE_PUSH_DTM :          out std_logic;
+        VE_AUTO_SEND :         out std_logic;
         --Data outputs
         VE_OUT_D    :          out std_logic_vector(7 downto 0);  --Output to DSL
         VE_OUT_DTM  :          out std_logic_vector(127 downto 0)  --Output to MMR Block
@@ -307,6 +311,11 @@ END COMPONENT;
     signal output_c : std_logic_vector(3 downto 0); --output byte counter 
     signal sclr_i_delay : std_logic;
     signal mode_c_l : std_logic;
+    --output control signals
+    signal load_dtm_out : std_logic;
+    signal send_req_d : std_logic;
+    signal set_fifo_push : std_logic;
+    --signal ve_push_dtm : std_logic; --0126
     --------------------------------
     --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
     --------------------------------
@@ -1397,6 +1406,13 @@ begin
                 VE_OUT_D <= p_clip_out;
             end if;
         end if;
+
+        if pp_ctl(4 downto 3) = "10" and output_c(1 downto 0) = "11" and output_ena = '1' then
+            load_dtm_out <= '1';
+        else
+            load_dtm_out <= '0';
+        end if;
+        set_fifo_push <= load_dtm_out;
     end if;
     --output to dtm
     for i in 0 to 15 loop
@@ -1404,6 +1420,22 @@ begin
     end loop;
 end process;
 
+dtm_ctl_out: process(pp_ctl,load_dtm_out,set_fifo_push)
+begin
+    if pp_ctl(5) = '1' then
+        ve_dtm_rdy <= load_dtm_out;
+    else
+        ve_dtm_rdy <= '0';
+    end if;
+
+    if pp_ctl(6) = '1' then
+        ve_push_dtm <= load_dtm_out;
+    else
+        ve_push_dtm <= '0';
+    end if;
+
+    ve_auto_send <= pp_ctl(7);
+end process;
 
 end architecture;  
                     

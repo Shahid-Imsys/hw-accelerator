@@ -47,7 +47,7 @@ export ETC_DIR_WIN=$PROJECT_PATH_WIN/etc
 echo "set Simulator"
 if [ "$lic" = "vivado" ]; then
     echo "path vivado start"
-    source /cygdrive/e/Program/Xilinx/Vivado/2020.3/settings64.sh
+    source /usr/local/bin/use_vivado_20201
     export SIM=xsim
     export COMP=xvhdl
     export ELAB=xelab
@@ -98,6 +98,11 @@ if [ "$lic" = "de" ]; then
    fi
    #elif [ "$lic" = "vivado" ]; then
 else
-   export PATH=$PATH  
+   echo "NCSIM start"
+   if [ "$OS" = "Windows_NT" ]; then
+       export PATH=$MODELSIM_ASE_WIN_PATH:$PATH
+   else
+       export PATH=/usr/local/intelFPGA/18.1/modelsim_ase/linux:$PATH
+   fi 
 fi
 

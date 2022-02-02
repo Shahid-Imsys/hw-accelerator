@@ -100,7 +100,7 @@ end entity;
 architecture rtl of pcie_a is
 
 
-component fifo_generator_1
+component fifo_generator_2
   port (
     rst             : in  std_logic;
     wr_clk          : in  std_logic;
@@ -121,53 +121,53 @@ component fifo_generator_1
   );
 end component;
 
-component ila_3
-port (
-	clk        : in  std_logic;
-	probe0     : in std_logic_vector(255 downto 0); 
-	probe1     : in std_logic_vector(57 downto 0); 
-	probe2     : in std_logic_vector(0 downto 0); 
-	probe3     : in std_logic_vector(0 downto 0); 
-	probe4     : in std_logic_vector(0 downto 0); 
-	probe5     : in std_logic_vector(0 downto 0); 
-	probe6     : in std_logic_vector(0 downto 0); 
-	probe7     : in std_logic_vector(0 downto 0); 
-	probe8     : in std_logic_vector(0 downto 0); 
-	probe9     : in std_logic_vector(0 downto 0); 
-	probe10    : in std_logic_vector(0 downto 0);
-	probe11    : in std_logic_vector(0 downto 0);
-	probe12    : in std_logic_vector(0 downto 0);
-	probe13    : in std_logic_vector(0 downto 0);
-	probe14    : in std_logic_vector(0 downto 0);	
-	probe15    : in std_logic_vector(0 downto 0);
-    probe16    : in std_logic_vector(255 downto 0);
-    probe17    : in std_logic_vector(4 downto 0); 
-	probe18    : in std_logic_vector(0 downto 0);
-	probe19    : in std_logic_vector(0 downto 0);
-	probe20    : in std_logic_vector(0 downto 0);
-	probe21    : in std_logic_vector(0 downto 0);
-	probe22    : in std_logic_vector(0 downto 0);
-	probe23    : in std_logic_vector(0 downto 0);
-	probe24    : in std_logic_vector(0 downto 0);	
-	probe25    : in std_logic_vector(0 downto 0);
-	probe26    : in std_logic_vector(0 downto 0);
-	probe27    : in std_logic_vector(0 downto 0);	
-	probe28    : in std_logic_vector(9 downto 0);
-	probe29    : in std_logic_vector(9 downto 0);
-	probe30    : in std_logic_vector(1 downto 0)
-);
-end component;
+ component ila_3
+ port (
+	 clk        : in  std_logic;
+	 probe0     : in std_logic_vector(255 downto 0); 
+	 probe1     : in std_logic_vector(57 downto 0); 
+	 probe2     : in std_logic_vector(0 downto 0); 
+	 probe3     : in std_logic_vector(0 downto 0); 
+	 probe4     : in std_logic_vector(0 downto 0); 
+	 probe5     : in std_logic_vector(0 downto 0); 
+	 probe6     : in std_logic_vector(0 downto 0); 
+	 probe7     : in std_logic_vector(0 downto 0); 
+	 probe8     : in std_logic_vector(0 downto 0); 
+	 probe9     : in std_logic_vector(0 downto 0); 
+	 probe10    : in std_logic_vector(0 downto 0);
+	 probe11    : in std_logic_vector(0 downto 0);
+	 probe12    : in std_logic_vector(0 downto 0);
+	 probe13    : in std_logic_vector(0 downto 0);
+	 probe14    : in std_logic_vector(0 downto 0);	
+	 probe15    : in std_logic_vector(0 downto 0);
+     probe16    : in std_logic_vector(255 downto 0);
+     probe17    : in std_logic_vector(4 downto 0); 
+	 probe18    : in std_logic_vector(0 downto 0);
+	 probe19    : in std_logic_vector(0 downto 0);
+	 probe20    : in std_logic_vector(0 downto 0);
+	 probe21    : in std_logic_vector(0 downto 0);
+	 probe22    : in std_logic_vector(0 downto 0);
+	 probe23    : in std_logic_vector(0 downto 0);
+	 probe24    : in std_logic_vector(0 downto 0);	
+	 probe25    : in std_logic_vector(0 downto 0);
+	 probe26    : in std_logic_vector(0 downto 0);
+	 probe27    : in std_logic_vector(0 downto 0);	
+	 probe28    : in std_logic_vector(9 downto 0);
+	 probe29    : in std_logic_vector(9 downto 0);
+	 probe30    : in std_logic_vector(1 downto 0)
+ );
+ end component;
 
-component ila_4
-port (
-	clk        : in std_logic; 
-	probe0     : in std_logic_vector(0 downto 0); 
-	probe1     : in std_logic_vector(0 downto 0); 
-	probe2     : in std_logic_vector(0 downto 0); 
-	probe3     : in std_logic_vector(0 downto 0);
-	probe4     : in std_logic_vector(255 downto 0)
-);
-end component;
+-- component ila_4
+-- port (
+	-- clk        : in std_logic; 
+	-- probe0     : in std_logic_vector(0 downto 0); 
+	-- probe1     : in std_logic_vector(0 downto 0); 
+	-- probe2     : in std_logic_vector(0 downto 0); 
+	-- probe3     : in std_logic_vector(0 downto 0);
+	-- probe4     : in std_logic_vector(255 downto 0)
+-- );
+-- end component;
 
 --component ila_5
 --port (
@@ -236,58 +236,58 @@ end component;
     signal pcie_rd_wrs_i                : std_logic;
     signal pcie_wr_req_data_i           : std_logic_vector(255 downto 0);
     signal pcie_req_if_clk_o_int        : std_logic;  
-    --ILA signals
-    signal probe0_i                     : std_logic_vector(255 downto 0);         
-    signal probe1_i                     : std_logic_vector(57 downto 0);
-    signal probe2_i                     : std_logic_vector(0 downto 0);
-    signal probe3_i                     : std_logic_vector(0 downto 0);
-    signal probe4_i                     : std_logic_vector(0 downto 0);
-    signal probe5_i                     : std_logic_vector(0 downto 0);
-    signal probe6_i                     : std_logic_vector(0 downto 0);
-    signal probe7_i                     : std_logic_vector(0 downto 0);
-    signal probe8_i                     : std_logic_vector(0 downto 0);
-    signal probe9_i                     : std_logic_vector(0 downto 0);
-    signal probe10_i                    : std_logic_vector(0 downto 0);
-    signal probe11_i                    : std_logic_vector(0 downto 0);
-    signal probe12_i                    : std_logic_vector(0 downto 0);
-    signal probe13_i                    : std_logic_vector(0 downto 0);
-    signal probe14_i                    : std_logic_vector(0 downto 0);
-    signal probe15_i                    : std_logic_vector(0 downto 0);    
-    signal probe16_i                    : std_logic_vector(255 downto 0);  
-    signal probe17_i                    : std_logic_vector(4 downto 0);
-    signal probe18_i                    : std_logic_vector(0 downto 0);
-    signal probe19_i                    : std_logic_vector(0 downto 0);
-    signal probe20_i                    : std_logic_vector(0 downto 0);
-    signal probe21_i                    : std_logic_vector(0 downto 0);
-    signal probe22_i                    : std_logic_vector(0 downto 0);
-    signal probe23_i                    : std_logic_vector(0 downto 0);
-    signal probe24_i                    : std_logic_vector(0 downto 0);
-    signal probe25_i                    : std_logic_vector(0 downto 0);    
-    signal probe26_i                    : std_logic_vector(0 downto 0);  
-    signal probe27_i                    : std_logic_vector(0 downto 0);
-    signal probe28_i                    : std_logic_vector(9 downto 0);
-    signal probe29_i                    : std_logic_vector(9 downto 0); 
-    signal probe30_i                    : std_logic_vector(1 downto 0);    
-    signal probe0_l                     : std_logic_vector(0 downto 0);
-    signal probe1_l                     : std_logic_vector(0 downto 0);
-    signal probe2_l                     : std_logic_vector(0 downto 0);
-    signal probe3_l                     : std_logic_vector(0 downto 0);
-    signal probe4_l                     : std_logic_vector(255 downto 0);
-    signal probe0_j                     : std_logic_vector(0 downto 0);  
-	signal probe1_j                     : std_logic_vector(31 downto 0); 
-	signal probe2_j                     : std_logic_vector(15 downto 0); 
-	signal probe3_j                     : std_logic_vector(0 downto 0);  
-	signal probe4_j                     : std_logic_vector(31 downto 0); 
-	signal probe5_j                     : std_logic_vector(0 downto 0); 
-	signal probe6_j                     : std_logic_vector(0 downto 0); 
-	signal probe7_j                     : std_logic_vector(31 downto 0); 
-	signal probe8_j                     : std_logic_vector(31 downto 0); 
-	signal probe9_j                     : std_logic_vector(31 downto 0); 
-	signal probe10_j                    : std_logic_vector(31 downto 0); 
-	signal probe11_j                    : std_logic_vector(0 downto 0); 
-	signal probe12_j                    : std_logic_vector(0 downto 0); 
-	signal probe13_j                    : std_logic_vector(0 downto 0); 
-	signal probe14_j                    : std_logic_vector(0 downto 0);
+    -- ILA signals
+     signal probe0_i                     : std_logic_vector(255 downto 0);         
+     signal probe1_i                     : std_logic_vector(57 downto 0);
+     signal probe2_i                     : std_logic_vector(0 downto 0);
+     signal probe3_i                     : std_logic_vector(0 downto 0);
+     signal probe4_i                     : std_logic_vector(0 downto 0);
+     signal probe5_i                     : std_logic_vector(0 downto 0);
+     signal probe6_i                     : std_logic_vector(0 downto 0);
+     signal probe7_i                     : std_logic_vector(0 downto 0);
+     signal probe8_i                     : std_logic_vector(0 downto 0);
+     signal probe9_i                     : std_logic_vector(0 downto 0);
+     signal probe10_i                    : std_logic_vector(0 downto 0);
+     signal probe11_i                    : std_logic_vector(0 downto 0);
+     signal probe12_i                    : std_logic_vector(0 downto 0);
+     signal probe13_i                    : std_logic_vector(0 downto 0);
+     signal probe14_i                    : std_logic_vector(0 downto 0);
+     signal probe15_i                    : std_logic_vector(0 downto 0);    
+     signal probe16_i                    : std_logic_vector(255 downto 0);  
+     signal probe17_i                    : std_logic_vector(4 downto 0);
+     signal probe18_i                    : std_logic_vector(0 downto 0);
+     signal probe19_i                    : std_logic_vector(0 downto 0);
+     signal probe20_i                    : std_logic_vector(0 downto 0);
+     signal probe21_i                    : std_logic_vector(0 downto 0);
+     signal probe22_i                    : std_logic_vector(0 downto 0);
+     signal probe23_i                    : std_logic_vector(0 downto 0);
+     signal probe24_i                    : std_logic_vector(0 downto 0);
+     signal probe25_i                    : std_logic_vector(0 downto 0);    
+     signal probe26_i                    : std_logic_vector(0 downto 0);  
+     signal probe27_i                    : std_logic_vector(0 downto 0);
+     signal probe28_i                    : std_logic_vector(9 downto 0);
+     signal probe29_i                    : std_logic_vector(9 downto 0); 
+     signal probe30_i                    : std_logic_vector(1 downto 0);    
+     signal probe0_l                     : std_logic_vector(0 downto 0);
+     signal probe1_l                     : std_logic_vector(0 downto 0);
+     signal probe2_l                     : std_logic_vector(0 downto 0);
+     signal probe3_l                     : std_logic_vector(0 downto 0);
+     signal probe4_l                     : std_logic_vector(255 downto 0);
+     signal probe0_j                     : std_logic_vector(0 downto 0);  
+	 signal probe1_j                     : std_logic_vector(31 downto 0); 
+	 signal probe2_j                     : std_logic_vector(15 downto 0); 
+	 signal probe3_j                     : std_logic_vector(0 downto 0);  
+	 signal probe4_j                     : std_logic_vector(31 downto 0); 
+	 signal probe5_j                     : std_logic_vector(0 downto 0); 
+	 signal probe6_j                     : std_logic_vector(0 downto 0); 
+	 signal probe7_j                     : std_logic_vector(31 downto 0); 
+	 signal probe8_j                     : std_logic_vector(31 downto 0); 
+	 signal probe9_j                     : std_logic_vector(31 downto 0); 
+	 signal probe10_j                    : std_logic_vector(31 downto 0); 
+	 signal probe11_j                    : std_logic_vector(0 downto 0); 
+	 signal probe12_j                    : std_logic_vector(0 downto 0); 
+	 signal probe13_j                    : std_logic_vector(0 downto 0); 
+	 signal probe14_j                    : std_logic_vector(0 downto 0);
 	   
     signal pcie_rdy_i_d                 : std_logic;   
     signal fifo_read_valid              : std_logic;
@@ -332,6 +332,8 @@ end component;
     signal write_fifo_complete_d_P      : std_logic;
     signal fifo_has_data                : std_logic;
     signal PCIE_RD_RESP_DATA_LAST_P     : std_logic;
+    signal PCIE_RD_RESP_DATA_LAST_P2    : std_logic;
+    signal PCIE_RD_RESP_DATA_LAST_P3    : std_logic;
     signal send_rsp_to_host             : std_logic;
     signal send_command_to_host         : std_logic;
     signal send_command_to_host_P       : std_logic;
@@ -398,14 +400,18 @@ begin
                     
     pcie_ack_i <= PCIe_req and (not PCIE_WR_REQ_DATA_AFU) and (not PCIE_WR_REQ_CTRL_AFU);
   
+    -- CLOCK DOMAIN CROSSING
     process(PCIE_RSP_IF_CLK_I)
     begin
         if rising_edge(PCIE_RSP_IF_CLK_I) then  
             PCIE_RD_RESP_DATA_LAST_P    <= PCIE_RD_RESP_DATA_LAST;
+            PCIE_RD_RESP_DATA_LAST_P2   <= PCIE_RD_RESP_DATA_LAST_P;
+            PCIE_RD_RESP_DATA_LAST_P3   <= PCIE_RD_RESP_DATA_LAST_P2;            
         end if;
     end process;
     
-    write_fifo_complete_extended        <= PCIE_RD_RESP_DATA_LAST or PCIE_RD_RESP_DATA_LAST_P; 
+    -- Extended the signal for 4 clock cycles not to miss the signal is destination clock domain. PCIE_RSP_IF_CLK_I= 250MHz, clk is 123.8 MHz.
+    write_fifo_complete_extended        <= PCIE_RD_RESP_DATA_LAST or PCIE_RD_RESP_DATA_LAST_P or PCIE_RD_RESP_DATA_LAST_P2 or PCIE_RD_RESP_DATA_LAST_P3; 
     
     process(clk)
     begin
@@ -666,7 +672,7 @@ begin
                         send_req_data_to_host   <= '1';
                         first                   <= '0';
                     end if;
-                    if send_req_data_to_host = '1' then      --send data request to host
+                    if send_req_data_to_host = '1' then      --send data request to host and receiving data from host
                         command_mode    <= '0';
                         data_mode       <= '1';
                         up_address      <= x"00000000" & PCIE_ADDRESS(31 downto 6);
@@ -825,46 +831,46 @@ begin
 --    probe13_j(0)          <= reset_trig;
 --    probe14_j(0)          <= c2h_cmd;
 
-    probe0_i(255 downto 0)<= pcie_wr_req_data_i;      
-    probe1_i(57 downto 0) <= noc_data_i(57 downto 0);
-    probe2_i(0)           <= NOC_CMD_FLAG;                       	
-    probe3_i(0)           <= ena_pcie_ctl;                             
-    probe4_i(0)           <= empty_rb;                   
-    probe5_i(0)           <= write_fifo_complete_d;
-    probe6_i(0)           <= c2h_cmd;                           
-    probe7_i(0)           <= ena_pcie_data_i;
-    probe8_i(0)           <= pcie_wr_data_wrs_i;       
-    probe9_i(0)           <= pcie_wr_ctl_wrs_i;       
-    probe10_i(0)          <= pcie_cmd_flag_i;         
-    probe11_i(0)          <= fifo_read_valid;          
-    probe12_i(0)          <= send_req_data_to_host;            
-    probe13_i(0)          <= PCIE_WR_REQ_DATA_AFU;    
-    probe14_i(0)          <= pcie_ack_i;
-    probe15_i(0)          <= pcie_rd_wrs_i;             
-    probe16_i(255 downto 0)<= pcie_data_i;
-    probe17_i(4 downto 0) <= noc_cmd_reg(4 downto 0);
-    probe18_i(0)          <= h2c_cmd;                   
-    probe19_i(0)          <= pcie_rdy_i_d;
-    probe20_i(0)          <= last_data_word;
-    probe21_i(0)          <= send_command_to_host;
-    probe22_i(0)          <= send_data_to_host;
-    probe23_i(0)          <= command_mode;
-    probe24_i(0)          <= command_flag;
-    probe25_i(0)          <= data_mode;
-    probe26_i(0)          <= fifo_read_en;
-    probe27_i(0)          <= send_rsp_to_host;
-    probe28_i(9 downto 0) <= data_counter;
-    probe29_i(9 downto 0) <= PCIE_LENGTH_FIFO; 
-    probe30_i(1 downto 0) <= tr_case; 
+     probe0_i(255 downto 0)<= pcie_wr_req_data_i;      
+     probe1_i(57 downto 0) <= noc_data_i(57 downto 0);
+     probe2_i(0)           <= NOC_CMD_FLAG;                       	
+     probe3_i(0)           <= ena_pcie_ctl;                             
+     probe4_i(0)           <= empty_rb;                   
+     probe5_i(0)           <= write_fifo_complete_d;
+     probe6_i(0)           <= c2h_cmd;                           
+     probe7_i(0)           <= ena_pcie_data_i;
+     probe8_i(0)           <= pcie_wr_data_wrs_i;       
+     probe9_i(0)           <= pcie_wr_ctl_wrs_i;       
+     probe10_i(0)          <= pcie_cmd_flag_i;         
+     probe11_i(0)          <= fifo_read_valid;          
+     probe12_i(0)          <= send_req_data_to_host;            
+     probe13_i(0)          <= PCIE_WR_REQ_DATA_AFU;    
+     probe14_i(0)          <= pcie_ack_i;
+     probe15_i(0)          <= pcie_rd_wrs_i;             
+     probe16_i(255 downto 0)<= pcie_data_i;
+     probe17_i(4 downto 0) <= noc_cmd_reg(4 downto 0);
+     probe18_i(0)          <= h2c_cmd;                   
+     probe19_i(0)          <= pcie_rdy_i_d;
+     probe20_i(0)          <= last_data_word;
+     probe21_i(0)          <= send_command_to_host;
+     probe22_i(0)          <= send_data_to_host;
+     probe23_i(0)          <= command_mode;
+     probe24_i(0)          <= command_flag;
+     probe25_i(0)          <= data_mode;
+     probe26_i(0)          <= fifo_read_en;
+     probe27_i(0)          <= send_rsp_to_host;
+     probe28_i(9 downto 0) <= data_counter;
+     probe29_i(9 downto 0) <= PCIE_LENGTH_FIFO; 
+     probe30_i(1 downto 0) <= tr_case; 
             
-    probe0_l(0)           <= PCIE_RD_RESP_DATA_VLD;
-    probe1_l(0)           <= PCIE_RD_RESP_DATA_FIRST;     
-    probe2_l(0)           <= wr_ack; 
-    probe3_l(0)           <= PCIE_RD_RESP_DATA_LAST;
-    probe4_l(255 downto 0)<= PCIE_RD_RESP_DATA;
+    -- probe0_l(0)           <= PCIE_RD_RESP_DATA_VLD;
+    -- probe1_l(0)           <= PCIE_RD_RESP_DATA_FIRST;     
+    -- probe2_l(0)           <= wr_ack; 
+    -- probe3_l(0)           <= PCIE_RD_RESP_DATA_LAST;
+    -- probe4_l(255 downto 0)<= PCIE_RD_RESP_DATA;
 
   
-  rd_buffer : fifo_generator_1
+  rd_buffer : fifo_generator_2
   port map (
     rst             => reset_rb,
     wr_clk          => wr_clk_rb,
@@ -884,41 +890,41 @@ begin
     rd_rst_busy     => rd_rst_busy_rb
   );
     
-  ILA_PCIE : ila_3
-  port map (
-	clk        => clk,
-	probe0     => probe0_i, 
-	probe1     => probe1_i, 
-	probe2     => probe2_i, 
-	probe3     => probe3_i, 
-	probe4     => probe4_i, 
-	probe5     => probe5_i, 
-	probe6     => probe6_i, 
-	probe7     => probe7_i, 
-	probe8     => probe8_i, 
-	probe9     => probe9_i, 
-	probe10    => probe10_i,
-	probe11    => probe11_i,
-	probe12    => probe12_i,
-	probe13    => probe13_i,
-	probe14    => probe14_i,
-	probe15    => probe15_i,
-	probe16    => probe16_i,
-	probe17    => probe17_i,
-	probe18    => probe18_i,
-	probe19    => probe19_i,
-	probe20    => probe20_i,
-	probe21    => probe21_i,
-	probe22    => probe22_i,
-	probe23    => probe23_i,
-	probe24    => probe24_i,
-	probe25    => probe25_i,
-	probe26    => probe26_i,
-	probe27    => probe27_i,
-	probe28    => probe28_i,
-	probe29    => probe29_i,
-	probe30    => probe30_i			
-);
+   ILA_PCIE : ila_3
+   port map (
+	 clk        => clk,
+	 probe0     => probe0_i, 
+	 probe1     => probe1_i, 
+	 probe2     => probe2_i, 
+	 probe3     => probe3_i, 
+	 probe4     => probe4_i, 
+	 probe5     => probe5_i, 
+	 probe6     => probe6_i, 
+	 probe7     => probe7_i, 
+	 probe8     => probe8_i, 
+	 probe9     => probe9_i, 
+	 probe10    => probe10_i,
+	 probe11    => probe11_i,
+	 probe12    => probe12_i,
+	 probe13    => probe13_i,
+	 probe14    => probe14_i,
+	 probe15    => probe15_i,
+	 probe16    => probe16_i,
+	 probe17    => probe17_i,
+	 probe18    => probe18_i,
+	 probe19    => probe19_i,
+	 probe20    => probe20_i,
+	 probe21    => probe21_i,
+	 probe22    => probe22_i,
+	 probe23    => probe23_i,
+	 probe24    => probe24_i,
+	 probe25    => probe25_i,
+	 probe26    => probe26_i,
+	 probe27    => probe27_i,
+	 probe28    => probe28_i,
+	 probe29    => probe29_i,
+	 probe30    => probe30_i			
+ );
 
 --  ILA_REG : ila_5
 --  port map (
@@ -940,14 +946,14 @@ begin
 --	probe14    => probe14_j
 --);
 
-  ILA_PCIE_RESP : ila_4
-  port map (
-	clk        => PCIE_RSP_IF_CLK_I,
-	probe0     => probe0_l, 
-	probe1     => probe1_l, 
-	probe2     => probe2_l, 
-	probe3     => probe3_l,
-	probe4     => probe4_l
-);
+  -- ILA_PCIE_RESP : ila_4
+  -- port map (
+	-- clk        => PCIE_RSP_IF_CLK_I,
+	-- probe0     => probe0_l, 
+	-- probe1     => probe1_l, 
+	-- probe2     => probe2_l, 
+	-- probe3     => probe3_l,
+	-- probe4     => probe4_l
+-- );
    
 end architecture rtl;

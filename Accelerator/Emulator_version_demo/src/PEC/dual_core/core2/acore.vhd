@@ -737,7 +737,7 @@ begin
       port map(
         CLK_P    => clk_p,
         RST_EN   => rst_en_int,
-        CLK_E_NEG => clk_e_neg_int,
+        CLK_E_POS => clk_e_pos_int,
         PL       => pl,
         --EXE      => exe,
         DATA_VLD => ddi_vld,

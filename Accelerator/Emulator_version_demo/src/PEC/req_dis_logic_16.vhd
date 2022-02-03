@@ -145,21 +145,21 @@ begin
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
---process (clk_p)
---begin
---    if rising_edge(clk_p) then
---        if reset_i = '1' then
---                poll_act <= '0'; 
---        elsif fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
---                poll_act <= '1'; 
---        else
---                poll_act <= '0';
---        end if;
---    end if;
---end process;
-poll_act <= '0' when reset_i = '1' else
-            '1' when fifo_rdy = '0' and req_sig /= (req_sig'range => '0') else
-            '0'; 
+process (clk_p,reset_i)
+begin
+    if reset_i = '1' then
+        poll_act <= '0'; 
+    elsif rising_edge(clk_p) then
+        if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+            poll_act <= '1'; 
+        else
+            poll_act <= '0';
+        end if;
+    end if;
+end process;
+--poll_act <= '0' when reset_i = '1' else
+--            '1' when fifo_rdy = '0' and req_sig /= (req_sig'range => '0') else
+--            '0'; 
 
 process(clk_p)
 begin
@@ -257,9 +257,11 @@ end process;
 
 --Adder
 add_in_1 <= id_num;
-process(clk_p)--add_in_2,wr_req,chain)
+process(clk_p,poll_act)--add_in_2,wr_req,chain)
 begin
-    if rising_edge(clk_p) then
+    if poll_act = '0' then--------------TBD
+        id_num <= (others => '0'); 
+    elsif rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
             if wr_req = '1' or chain = '1' then
                 id_num <= add_in_1;

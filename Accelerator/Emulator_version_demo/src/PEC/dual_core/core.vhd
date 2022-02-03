@@ -288,6 +288,7 @@ architecture struct of core is
   -- Microinstruction pipeline register
   signal pl         : std_logic_vector(127 downto 0);
   constant init_mpgm : std_logic_vector(127 downto 0) := (106 => '1', 100 => '1', 98 => '0', 97 => '0', 42 => '0', 74 => '0', 15 => '1', 5 => '0', 34 => '1',others => '-');--TBA--CJ
+                                                          --45 => '0', 50 => '1', 23 => '1', 68 => '1', 6 => '1', 54 => '1', 27 => '0', 49 => '0',others => '0');--core2 enable--ZH
 
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;

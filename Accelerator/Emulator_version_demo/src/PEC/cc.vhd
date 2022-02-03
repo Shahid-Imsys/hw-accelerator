@@ -964,22 +964,22 @@ EVEN_P <= even_p_2;
 	end process;
 
 --pipeline data
-process(clk_p)
-begin
-	if rising_edge(clk_p) then
-		data_core_int_e <= data_core_int;
-		data_core_int_e_1 <= data_core_int_e;
-	end if;
-end process;
+--process(clk_p)
+--begin
+--	if rising_edge(clk_p) then
+--		data_core_int_e <= data_core_int;
+--		data_core_int_e_1 <= data_core_int_e;
+--	end if;
+--end process;
 
 --distribution network
     process (clk_p)
     begin
     	if rising_edge(clk_p) then 
 			if even_p_int = '0' then 
-            	if pe_read_e_d ='1' then --Data valid asserts together with output data
+            	if pe_read ='1' then --Data valid asserts together with output data
     	    	    for i in 15 downto 0 loop
-    	    	    	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int_e_1(i);
+    	    	    	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
     	    	    end loop;
     	    	    	DATA_VLD <= not noc_reg_rdy;
             	else
@@ -991,20 +991,20 @@ end process;
     end process;
 
  ---pipeline signal
- process(clk_e)
- begin
-	if rising_edge(clk_e) then
-		addr_p_e <= addr_p;
-		addr_p_e_1 <= addr_p_e;
-		pe_write_e <= pe_write;
-		pe_write_e_1 <= pe_write_e;
-		pe_read_e <= pe_read;
-		pe_read_e_1 <= pe_read_e;
-		pe_read_e_d <= pe_read_e_1;
-		pe_data_in_e <= pe_data_in;
-		pe_data_in_e_1 <= pe_data_in_e;
-	end if;
- end process;	
+-- process(clk_e)
+-- begin
+--	if rising_edge(clk_e) then
+--		addr_p_e <= addr_p;
+--		addr_p_e_1 <= addr_p_e;
+--		pe_write_e <= pe_write;
+--		pe_write_e_1 <= pe_write_e;
+--		pe_read_e <= pe_read;
+--		pe_read_e_1 <= pe_read_e;
+--		pe_read_e_d <= pe_read_e_1;
+--		pe_data_in_e <= pe_data_in;
+--		pe_data_in_e_1 <= pe_data_in_e;
+--	end if;
+-- end process;	
 
  --Address & trigger MUX
  process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
@@ -1014,9 +1014,9 @@ end process;
 		wr_i <= noc_write;
 		rd_i <= noc_read;
  	elsif noc_reg_rdy /= '1' then
- 		addr_c <= addr_p_e_1;
-		wr_i <= pe_write_e_1;
-		rd_i <= pe_read_e_1;
+ 		addr_c <= addr_p;
+		wr_i <= pe_write;
+		rd_i <= pe_read;
  	end if;
  end process;
 
@@ -1024,7 +1024,7 @@ end process;
  --Input MUX
     process(noc_reg_rdy, pe_data_in, noc_data_in)
     begin
-		mem_in <= pe_data_in_e_1;
+		mem_in <= pe_data_in;
         if noc_reg_rdy = '1' then
             mem_in <= noc_data_in;
         --else
@@ -1047,10 +1047,14 @@ TAG_FB <= sig_fin or delay;
 ---------------------------------------------
 --Cluster ready indecator
 ---------------------------------------------
-c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
-           PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
-		   PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
-		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+c_rdy_i <= --PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
+           --PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
+		   --PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
+		   --PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+		   PE_RDY_1 and PE_RDY_3 and 
+           PE_RDY_5 and PE_RDY_7 and
+		   PE_RDY_9 and PE_RDY_11 and
+		   PE_RDY_13 and PE_RDY_15 ;
 C_RDY <= c_rdy_i;
 ----------------------------------------------------------------------------------	
 process(clk_e)
@@ -1076,7 +1080,7 @@ end process;
 		addr_c => addr_c, 
 		CK => clk_e,
 		WR => wr_i, --To be written as one write ff instead of 2 ffs
-		RD => rd_i,
+		RD => rd_i, --unused
         DI0 => mem_in(0),
 		DI1 => mem_in(1),
 		DI2 => mem_in(2),

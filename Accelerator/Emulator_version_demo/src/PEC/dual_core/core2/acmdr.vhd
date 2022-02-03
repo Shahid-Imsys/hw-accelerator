@@ -38,7 +38,7 @@ entity acmdr is
         --Clock and reset functions
         CLK_P     : in std_logic;
         RST_EN    : in std_logic;
-        CLK_E_NEG : in std_logic;   
+        CLK_E_POS : in std_logic;   
         --Microprogram control
         PL        : in std_logic_vector(127 downto 0);
         --Cluster data interface
@@ -132,9 +132,9 @@ begin
                 dbus_reg <= (others => '0');
             elsif DATA_VLD = '1' then 
                 mp_data_int <= DIN;           --input to microprogram data
-                if CLK_E_NEG = '0' then
+                if CLK_E_POS = '0' then
                     ve_data_int <= DIN(63 downto 0); --input lower half to vector engine at falling edge of clk_e
-                elsif CLK_E_NEG = '1' then
+                elsif CLK_E_POS = '1' then
                     ve_data_int <= DIN(127 downto 64); --input upper half to vector engine at rising edge of clk_e
                 end if;
                 if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
@@ -170,10 +170,10 @@ begin
         --elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
             --dtm_reg <= init_mpgm_rq;
             --ve_in_cnt <= (others => '0');
-        elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
+        elsif ld_dtm = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
             ve_in_cnt <= (others => '0');
-        elsif ld_dtm_v = '1' and CLK_E_NEG = '1' then --rising_edge
+        elsif ld_dtm_v = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
             ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         end if;
@@ -184,7 +184,7 @@ begin
     begin
         if rising_edge(clk_p) then
             if fifo_push = '1' then --push data to fifo at falling edge of clock e.
-                if CLK_E_NEG = '0' then
+                if CLK_E_POS = '0' then
                     fifo_wr_en <= '1';
                 else
                     fifo_wr_en <= '0';
@@ -198,7 +198,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if clk_e_neg = '1' then --rising_edge
+            if clk_e_pos = '1' then --rising_edge
                 send_req_d <= pl_send_req;
                 send_req <= send_req_d;
             end if;
@@ -208,7 +208,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if send_req = '1' and CLK_E_NEG = '0' and empty = '0'then
+            if send_req = '1' and CLK_E_POS = '0' and empty = '0'then
                 fifo_rd_en <= '1';
             else
                 fifo_rd_en <= '0';
@@ -219,7 +219,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then 
-            if clk_e_neg = '1' then
+            if clk_e_pos = '1' then
                 if send_req = '1' and fb = '0' then
                     req <= '1';
                 else

@@ -157,7 +157,7 @@ architecture Behavioral of Cluster_sim is
 --end component;
 signal ucode : ram_type := init_ram_from_file("SequenceTest_F.data");
 --signal ucode_ve : ram_type := init_ram_from_file("program_0x000_o.ascii");
---signal ucode_uc : ram_type := init_ram_from_file("unicast_BE_F.data");
+--signal ucode_uc : ram_type := init_ram_from_file("unicast_plus_core_2_BE_F.data");--("unicast_BE_F.data");
 signal input_0 : ram_type_vc := init_input_from_file("input_0x400.ascii");
 signal kernel_0 : ram_type_vd := init_kernel_from_file("kernel_0x100.ascii");
 signal unicast_data : ram_type_uc := init_unicast_from_file("unicastdata.ascii");
@@ -570,7 +570,7 @@ tag_in <= '0';
 progress <= 6;
 
 --Start testing on PE side(simulated data input)
---wait for 300 ns;
+--wait for 13000 ns;
 wait until rising_edge(C_RDY);
 
 sendNOCcommand(Exe);

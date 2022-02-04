@@ -343,7 +343,7 @@ begin
       core2_en_buf <= '0';
     elsif rising_edge(clk_p) then--rising_edge(clk_e)   
         core2_en_buf <= core2_en;
-        if clk_e_pos_int = '0' then
+        if clk_e_neg_int = '0' then
 --          if plsel_n = '1' then
             pl <= mp_q;
 --          elsif plcpe_n = '0' then

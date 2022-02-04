@@ -1046,14 +1046,14 @@ TAG_FB <= sig_fin or delay;
 ---------------------------------------------
 --Cluster ready indecator
 ---------------------------------------------
-c_rdy_i <= --PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
-           --PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
-		   --PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
-		   --PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
-		   PE_RDY_1 and PE_RDY_3 and 
-           PE_RDY_5 and PE_RDY_7 and
-		   PE_RDY_9 and PE_RDY_11 and
-		   PE_RDY_13 and PE_RDY_15 ;
+c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
+           PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
+		   PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
+		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+		   --PE_RDY_1 and PE_RDY_3 and 
+           --PE_RDY_5 and PE_RDY_7 and
+		   --PE_RDY_9 and PE_RDY_11 and
+		   --PE_RDY_13 and PE_RDY_15 ;
 C_RDY <= c_rdy_i;
 ----------------------------------------------------------------------------------	
 process(clk_e)

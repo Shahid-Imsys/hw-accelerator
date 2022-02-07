@@ -20,6 +20,8 @@ entity PE_pair_top is
     C2_RDY     : out std_logic;
     EXE        : in std_logic;
     RESUME     : in std_logic;
+    C1_ID      : in std_logic_vector(5 downto 0);
+    C2_ID      : in std_logic_vector(5 downto 0);
 
 
     -- clocks and control signals
@@ -2697,6 +2699,7 @@ begin
     -- RTC block signals
     exe => EXE,         --CJ
     resume => RESUME,   --CJ
+    id_number => c1_ID,  --CJ
     req_c1 => c1_req_i,  --CJ
     ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
@@ -2824,6 +2827,7 @@ begin
     rst_cn        => c2_core2_en,       --reset core2 if disabled
     rsc_n         => c2_rsc_n,
     clkreq_gen    => std_logic'('0'), --'0',
+    id_number     => c2_ID,
     core2_en      => c2_core2_en     ,
     crb_out       => c2_crb_out      ,
     en_pmem       => c2_en_pmem      ,

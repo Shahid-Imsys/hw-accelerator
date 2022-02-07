@@ -376,7 +376,7 @@ end sendpedata;
 begin
 
 tag_in <= '0';
---wait for 300 ns;
+--wait for 150 ns;
 wait until rising_edge(clk_e_i);
 wait for 5ns;
 wait until rising_edge(clk_e_i);
@@ -388,7 +388,7 @@ wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
 sendNOCcommand(RESET);
---wait for 300 ns;
+--wait for 150 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
@@ -403,8 +403,8 @@ wait for 5 ns;
 --wait until tag_out= '0';--RESET DONE
 sendNOCcommand(WRITEC);
 progress <= 1;
-send15bits(LENGTH1);
-send15bits(ADDRESS1);
+send15bits(LENGTH1); --3
+send15bits(ADDRESS1);--3
 tag_in<= '0';
 progress <=2;
 --wait for 120 ns;
@@ -535,8 +535,8 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 --
 sendNOCcommand(WRITEC);
-send15bits(LENGTH3);
-send15bits(ADDRESS3);
+send15bits(LENGTH3);--255
+send15bits(ADDRESS3);--0
 tag_in <= '0';
 --wait for 120 ns;
 wait until rising_edge(clk_e_i);
@@ -555,7 +555,44 @@ sendmemword(conv_to_memword(ucode(i)));
 end loop;
 data <= (others => '0');
 progress <=5;
-wait until tag_fb = '0';
+wait until tag_fb = '0'; 
+sendNOCcommand(WRITEC); --send input data
+send15bits(LENGTH4);
+send15bits(ADDRESS4_DATA);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+for i in 0 to 31 loop
+  sendmemword(conv_to_memword(input_data(i))); --send ve pointwise test microcode
+end loop;
+data <= (others => '0');
+progress <=6;
+wait until tag_fb = '0'; 
+sendNOCcommand(WRITEC); --send input data
+send15bits(LENGTH5);
+send15bits(ADDRESS5_KERNEL);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+for i in 0 to 215 loop
+  sendmemword(conv_to_memword(input_kernel(i))); --send ve pointwise test microcode
+end loop;
+data <= (others => '0');
+progress <=7;
+wait until tag_fb = '0'; 
+
 --wait for 120 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
@@ -567,7 +604,8 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 sendNOCcommand(Exe);
 tag_in <= '0';
-progress <= 6;
+progress <= 8;
+
 
 --Start testing on PE side(simulated data input)
 --wait for 13000 ns;

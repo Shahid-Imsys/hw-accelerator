@@ -260,10 +260,10 @@ begin
 	    if rst_nint = '0' then 
 		    rst_cn_int <= '0';
 	    elsif falling_edge(clk_p) then--change to falling edge
-		    if rst_cn_off = '1' then
-				rst_cn_int <= '1';
-			end if;      
-		end if;
+              if rst_cn_off = '1' then
+                rst_cn_int <= '1';
+              end if;      
+            end if;
 	end process rst_cn_gen;
 	rst_cn  <= rst_cn_int;
 	mrstout <= rst_cn_int;

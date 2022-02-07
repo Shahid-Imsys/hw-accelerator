@@ -45,8 +45,6 @@ use ieee.std_logic_unsigned.all;
 --use work.all;
 
 entity rtc is
-  generic (
-    asic : boolean := true);
   port (
     --gmem1
     c1_gmem_a    : in  std_logic_vector(9 downto 0);
@@ -162,10 +160,10 @@ architecture rtl of rtc is
   signal lp_rst_cnt_off_int    : std_logic;
   signal pwr_on_rst_n          : std_logic;
 
-  type states is (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
-  signal next_state    : states;
-  signal current_state : states;
---      
+  TYPE states IS (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
+  SIGNAL next_state : states;
+  SIGNAL current_state : states;
+--	
 --  signal state  : std_logic_vector(1 downto 0);
 --  signal next_state  : std_logic_vector(1 downto 0);
 --  constant s0   : std_logic_vector(1 downto 0) := "00";
@@ -663,68 +661,68 @@ begin  -- rtl
 
   pwr_mode_next : process (current_state, halt_en_iso_0, nap_en_iso_0, wakeup_lp, lp_rst_cnt_off_int)
   begin
-    case current_state is
-      when INIT =>
-        next_state <= ACT;
-
-      when ACT =>
-        if halt_en_iso_0 = '1' then
-          next_state <= HALTP;
-        elsif nap_en_iso_0 = '1' then
-          next_state <= NAPP;
-        else
-          next_state <= ACT;
-        end if;
-
-      when HALTP =>
-        next_state <= HALTP2;
-
-      when HALTP2 =>
-        next_state <= HALTPC;
-
-      when HALTPC =>
-        next_state <= HALT;
-
-      when HALT =>
-        if wakeup_lp = '1' then
-          next_state <= HALTR;
-        else
-          next_state <= HALT;
-        end if;
-
-      when HALTR =>
-        if lp_rst_cnt_off_int = '1' then
-          next_state <= ACT;
-        else
-          next_state <= HALTR;
-        end if;
-
-      when NAPP =>
-        next_state <= NAPP2;
-
-      when NAPP2 =>
-        next_state <= NAPPC;
-
-      when NAPPC =>
-        next_state <= NAP;
-
-      when NAP =>
-        if wakeup_lp = '1' then
-          next_state <= NAPR;
-        else
-          next_state <= NAP;
-        end if;
-
-      when NAPR =>
-        if lp_rst_cnt_off_int = '1' then
-          next_state <= ACT;
-        else
-          next_state <= NAPR;
-        end if;
-
-      when others =>
+    CASE current_state IS
+		WHEN INIT 		=> 
+		    next_state <= ACT;
+		    
+        WHEN ACT 		=> 	    	    
+		    IF halt_en_iso_0 = '1' THEN
+		        next_state <= HALTP;
+		    ELSIF nap_en_iso_0 = '1' THEN
+		        next_state <= NAPP;
+		    ELSE
+		        next_state <= ACT;
+		    END IF;   
+		                 
+		WHEN HALTP 		=> 
+		    next_state <= HALTP2;
+		
+		WHEN HALTP2		=> 
+		    next_state <= HALTPC;
+		
+		WHEN HALTPC		=> 
+		    next_state <= HALT;
+		
+		WHEN HALT 		=> 
+		    IF wakeup_lp = '1' THEN
+		        next_state <= HALTR;
+		    ELSE
+		        next_state <= HALT;
+		    END IF;  
+		
+		WHEN HALTR 		=> 
+		    IF lp_rst_cnt_off_int = '1' THEN
+		        next_state <= ACT;
+		    ELSE
+		        next_state <= HALTR;
+		    END IF; 
+		
+		WHEN NAPP 		=> 
+		    next_state <= NAPP2;
+		
+		WHEN NAPP2 		=> 
+		    next_state <= NAPPC;
+		
+		WHEN NAPPC 		=> 
+		    next_state <= NAP;
+		
+		WHEN NAP 		=> 
+		    IF wakeup_lp = '1' THEN
+		        next_state <= NAPR;
+		    ELSE
+		        next_state <= NAP;
+		    END IF;  
+		
+		WHEN NAPR 		=> 
+		    IF lp_rst_cnt_off_int = '1' THEN
+		        next_state <= ACT;
+		    ELSE
+		        next_state <= NAPR;
+		    END IF;
+		
+		WHEN OTHERS 	=> 
         next_state <= INIT;
-    end case;
+	END CASE;
   end process pwr_mode_next;
 
 --make all the control signals to be regestered
@@ -738,44 +736,44 @@ begin  -- rtl
       reset_core_n <= '0';
       nap_rec      <= '0';
     elsif rising_edge(clk_mux_out_int) then
-      if next_state = HALT then
-        pmic_core_en <= '0';
-      elsif wakeup_lp = '1' then
-        pmic_core_en <= '1';
-      end if;
+        IF next_state = HALT THEN
+            pmic_core_en    <= '0';
+        ELSIF wakeup_lp = '1' THEN
+            pmic_core_en    <= '1';
+        END IF;
+        
+        IF next_state = HALT or next_state = NAP THEN
+            pmic_io_en    <= '0';
+        ELSIF wakeup_lp = '1' THEN
+            pmic_io_en    <= '1';
+        END IF;     
 
-      if next_state = HALT or next_state = NAP then
-        pmic_io_en <= '0';
-      elsif wakeup_lp = '1' then
-        pmic_io_en <= '1';
-      end if;
+        IF next_state = ACT THEN
+            core_iso    <= '0';
+        ELSE
+            core_iso    <= '1';
+        END IF;  
+            
+        IF next_state = ACT or next_state = HALTP or next_state = HALTP2 or next_state = NAPP or next_state = NAPP2 THEN
+            clk_iso    <= '0';
+        ELSE
+            clk_iso    <= '1';
+        END IF;      
 
-      if next_state = ACT then
-        core_iso <= '0';
-      else
-        core_iso <= '1';
-      end if;
+        IF next_state = HALTR THEN
+            reset_core_n    <= '0';
+        ELSIF next_state = ACT THEN
+            reset_core_n    <= '1';
+        END IF;
+        
+        IF next_state = NAPR THEN
+            nap_rec    <= '1';
+        ELSE
+            nap_rec    <= '0';
+        END IF; 
 
-      if next_state = ACT or next_state = HALTP or next_state = HALTP2 or next_state = NAPP or next_state = NAPP2 then
-        clk_iso <= '0';
-      else
-        clk_iso <= '1';
-      end if;
-
-      if next_state = HALTR then
-        reset_core_n <= '0';
-      elsif next_state = ACT then
-        reset_core_n <= '1';
-      end if;
-
-      if next_state = NAPR then
-        nap_rec <= '1';
-      else
-        nap_rec <= '0';
-      end if;
-
-    end if;
-
+	END IF;
+    
   end process pwr_mode_signals;
 
   io_iso <= core_iso;
@@ -851,9 +849,8 @@ begin  -- rtl
 -- power-on detection part
 -------------------------------------------------------------------------------
 
-  for_ASIC_g : if asic generate
 
-    -- The ripple counter clocks. For setting counter more efficiently, the
+-- The ripple counter clocks. For setting counter more efficiently, the
     -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
     cp_gen : process (qn, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
     begin
@@ -904,11 +901,5 @@ begin  -- rtl
 
   -- MRXOUT is now only an external wake-up signal, RTC
   -- oscillator test is done on another pin.
-  end generate for_ASIC_g;
-  for_fpga_g: if asic = false generate
-    
-    rtc_data <= (others => '0');
-
-  end generate for_fpga_g;
   mrxout_o <= qn(46);
 end rtl;

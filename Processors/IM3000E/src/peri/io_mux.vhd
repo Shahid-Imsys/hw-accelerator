@@ -71,16 +71,13 @@ entity io_mux is
 end io_mux;
 
 architecture rtl of io_mux is
-  signal test_vector : std_logic_vector(4 downto 0);
 begin  -- rtl
   -- Gate together all iden signals.
   iden <= ios_iden or uart1_iden or uart2_iden or uart3_iden or
   				eth_iden or pdi_iden;
          
   -- Mux out ido, IOS drives when none else does.
-  test_vector <= pdi_iden & eth_iden & uart3_iden & uart2_iden & uart1_iden;
-  --with std_logic_vector'(pdi_iden, eth_iden, uart3_iden, uart2_iden, uart1_iden)
-  with test_vector 
+  with std_logic_vector'(pdi_iden, eth_iden, uart3_iden, uart2_iden, uart1_iden)
   select ido <= uart1_ido when "00001",
                 uart2_ido when "00010",
                 uart3_ido when "00100",

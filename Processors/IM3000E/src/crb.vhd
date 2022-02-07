@@ -296,25 +296,15 @@ begin
       -- PLLM register
       pll_frange_int  <= '1';
       pll_n_int(4)    <= '0';
-      -- BSV Changed for synthesis
-      -- pll_n_int(3)    <= pa_i(2);
-      -- pll_n_int(2)    <= pa_i(1);
-      pll_n_int(3)    <= '0';
-      pll_n_int(2)    <= '1';
-      -- BSV end of change
+      pll_n_int(3)    <= pa_i(2);
+      pll_n_int(2)    <= pa_i(1);
       pll_n_int(1)    <= '0';
       pll_n_int(0)    <= '0';
       pll_m_int(1)    <= '0';
-      -- BSV  Changed for synthesis
-      -- pll_m_int(0)    <= pa_i(0);
-      pll_m_int(0)    <= '1';
-      --  BSV end of change
+      pll_m_int(0)    <= pa_i(0);
       -- SECC register
       en_s_int      <= '1';
-      -- BSV  Changed for synthesis
-      -- speed_s_int   <= pa_i(4 downto 3);
-      speed_s_int   <= "01";
-      --  BSV end of change
+      speed_s_int   <= pa_i(4 downto 3);
       security      <= '0';
       stick(2)      <= '0';
       -- PMXC register

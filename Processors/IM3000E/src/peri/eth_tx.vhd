@@ -365,22 +365,18 @@ begin
 
 	-- Read counter and fifo read.
 	process (clk_tx, rst_tx2, fifo_reset)
-          variable tx_rctr_v : std_logic_vector(TX_SIZE-1 downto 0);
 	begin
 		if fifo_reset = '1' then
 			tx_rctr <= (others => '0');
 		elsif rising_edge(clk_tx) then
                   if clken = '1' then
-                    tx_rctr_v := tx_rctr;
                     if tx_read = '1' then					-- Read one nibble
-                      tx_rctr_v := tx_rctr + 1;			
+                      tx_rctr <= tx_rctr + 1;			
                     end if;
-                    tx_dout <= tx_fifo(conv_integer(tx_rctr_v));
-                    tx_rctr <= tx_rctr_v;
                   end if;
 		end if;
 	end process;
-	--tx_dout <= tx_fifo(conv_integer(tx_rctr));
+	tx_dout <= tx_fifo(conv_integer(tx_rctr));
 
 	-- Level counter and fifo flags, counts bytes, synchronized to clk_i.
 	process (clk_p)

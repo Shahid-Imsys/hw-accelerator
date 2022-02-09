@@ -155,7 +155,7 @@ architecture Behavioral of Cluster_sim is
 --      --fb               : out std_logic
 --	  ); 
 --end component;
-signal ucode : ram_type := init_ram_from_file("SequenceTest_F.data");
+signal ucode : ram_type := init_ram_from_file("SequenceTest_F_Core2en.data");--("SequenceTest_F.data");
 --signal ucode_ve : ram_type := init_ram_from_file("program_0x000_o.ascii");
 --signal ucode_uc : ram_type := init_ram_from_file("unicast_plus_core_2_BE_F.data");--("unicast_BE_F.data");
 signal input_0 : ram_type_vc := init_input_from_file("input_0x400.ascii");
@@ -556,42 +556,42 @@ end loop;
 data <= (others => '0');
 progress <=5;
 wait until tag_fb = '0'; 
-sendNOCcommand(WRITEC); --send input data
-send15bits(LENGTH4);
-send15bits(ADDRESS4_DATA);
-tag_in <= '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-for i in 0 to 31 loop
-  sendmemword(conv_to_memword(input_data(i))); --send ve pointwise test microcode
-end loop;
-data <= (others => '0');
-progress <=6;
-wait until tag_fb = '0'; 
-sendNOCcommand(WRITEC); --send input data
-send15bits(LENGTH5);
-send15bits(ADDRESS5_KERNEL);
-tag_in <= '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-for i in 0 to 215 loop
-  sendmemword(conv_to_memword(input_kernel(i))); --send ve pointwise test microcode
-end loop;
-data <= (others => '0');
-progress <=7;
-wait until tag_fb = '0'; 
+--sendNOCcommand(WRITEC); --send input data
+--send15bits(LENGTH4);
+--send15bits(ADDRESS4_DATA);
+--tag_in <= '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--for i in 0 to 31 loop
+--  sendmemword(conv_to_memword(input_data(i))); --send ve pointwise test microcode
+--end loop;
+--data <= (others => '0');
+--progress <=6;
+--wait until tag_fb = '0'; 
+--sendNOCcommand(WRITEC); --send input data
+--send15bits(LENGTH5);
+--send15bits(ADDRESS5_KERNEL);
+--tag_in <= '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--for i in 0 to 215 loop
+--  sendmemword(conv_to_memword(input_kernel(i))); --send ve pointwise test microcode
+--end loop;
+--data <= (others => '0');
+--progress <=7;
+--wait until tag_fb = '0'; 
 
 --wait for 120 ns;
 wait until rising_edge(clk_e_i);

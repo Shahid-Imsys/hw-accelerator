@@ -169,7 +169,8 @@ entity crb is
     -- BMEM block interface
     core2_en    : out std_logic;
     crb_out_c2  : out std_logic_vector(7 downto 0); -- CRB output, to DSL in core2_en
-    crb_sel_c2  : in std_logic_vector(3 downto 0); -- CRB output select, from core2    
+    crb_sel_c2  : in std_logic_vector(3 downto 0); -- CRB output select, from core2
+    c2_ready    : in std_logic; -- core2 ready signal, from core2    
     short_cycle : out std_logic;
     --ram_partition   : out std_logic_vector(3 downto 0); 
     bmem_a8     : out  std_logic;  --change to core2_en by maning 2013-01-17 14:31:27
@@ -439,8 +440,15 @@ begin
 --      west_en_int <= dbus(4);            --delete by HYX, 20141027
 --      east_en_int <= dbus(3);            --delete by HYX, 20141027
 --      router_clk_en_int <= dbus(2);      --delete by HYX, 20141027
-
+          if dbus(7) = '0' then
+            if c2_ready = '1' then
+              core2_en_int <= dbus(7);
+            else 
+              core2_en_int <= core2_en_int;
+            end if;
+          else
             core2_en_int <= dbus(7);
+          end if;
 --            ram_partition_int <= dbus(6 downto 3);
             halt_en_int <= dbus(3);           -- added bu HYX, 20150707
             short_cycle_int <= dbus(2);

@@ -105,6 +105,7 @@ entity core is
     c2_rsc_n       : out std_logic;
     c2_clkreq_gen  : out std_logic;
     --c2_even_c      : out std_logic;
+    c2_ready       : in std_logic;
     c2_crb_sel     : in  std_logic_vector(3 downto 0);
     c2_crb_out     : out std_logic_vector(7 downto 0);
     c2_en_pmem     : out  std_logic;
@@ -660,7 +661,8 @@ begin
       pl          => pl,             
       -- Other control inputs 
       ld_crb      => ld_crb,             
-      rd_crb      => rd_crb,             
+      rd_crb      => rd_crb,
+      c2_ready    => c2_ready,             
       mwake_i     => mwake_i,  
       pa_i        => pa_i,
       -- Data paths
@@ -963,7 +965,8 @@ begin
       clk_e_pos     => clk_e_pos_int, 
 	  rst_n	  		=> rst_en_int,
       -- Microprogram fields
-      pl            => pl,  
+      pl            => pl,
+      init_load       => init_ld,  
       --Data inputs
       dbus          => dbus_int,           
       -- Flags

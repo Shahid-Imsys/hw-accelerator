@@ -34,10 +34,12 @@
 --                                              Added clk_p and clk_e_neg for generate signals at falling_edge
 -- 2021-8-9              3.1         CJ         Add even pulse signal generator
 -- 2021-11-2             3.2         CJ         Make broadcast request an independent process than unicast and write
+-- 2022-01-12            3.3         CJ         Add ID data to PEs
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.cluster_pkg.all;
 use work.all;
 
 --use work.defines.all;
@@ -91,7 +93,9 @@ entity cluster_controller is
 	  BC               : out std_logic; --Broadcast handshake
 	  RD_FIFO          : out std_logic;
 	  FIFO_VLD         : in std_logic
-	  --FOUR_WD_LEFT     : in std_logic 	  
+	  --FOUR_WD_LEFT     : in std_logic 
+
+
 	  ); 
 end entity cluster_controller;
 	   
@@ -273,6 +277,8 @@ end component;
   signal pe_data_in_e_1 : reg;
   signal data_core_int_e : reg;
   signal data_core_int_e_1 : reg;
+  --PE's ID
+  --signal id_int  : ID_TYPE;
  
 begin
 ----------------------------
@@ -1141,6 +1147,7 @@ end process;
     --    noc_read => noc_read
 --
 	--);
+	
 
 end architecture rtl; 
 

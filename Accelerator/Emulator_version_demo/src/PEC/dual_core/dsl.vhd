@@ -66,11 +66,10 @@ entity dsl is
     gdata         : in  std_logic_vector(7 downto 0);
     dtal          : in  std_logic_vector(7 downto 0);
     dfp           : in  std_logic_vector(7 downto 0);
-    --CJ START ADDED
+    --CJ ADDED
     VE_OUT_D    :          in std_logic_vector(7 downto 0);  
     CDFM        :          in std_logic_vector(7 downto 0); 
-    --ID_NUM      :           in std_logic_vector(7 downto 0); 
-    --CJ END
+    ID_NUM      :           in std_logic_vector(5 downto 0); 
 
     -- Control Output
     flag_yeqneg   : out std_logic;  
@@ -160,6 +159,8 @@ begin
           d_int <= VE_OUT_D; --Overall accumulator from VE; --Added by CJ
         when "10001" =>
           d_int <= CDFM;     --Cluster memory DFM register --Added by CJ
+        when "10010" =>      
+          d_int <= "00" & ID_NUM;       --ID number register --Added by CJ
         when others => 
           d_int <= x"00";
       end case;

@@ -66,6 +66,8 @@ entity acore is
     --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
     --rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     --din_e       : out std_logic;  -- D input to FF generating clk_e
+    --ID
+    id_number    : in std_logic_vector(5 downto 0); --Added by CJ
     -- signals from the master core
     core2_en    : in  std_logic;  -- core2 enable
     rst_cn          : in std_logic;
@@ -160,6 +162,10 @@ architecture struct of acore is
   -- Microinstruction pipeline register
   signal pl         : std_logic_vector(127 downto 0);
   signal core2_en_buf : std_logic;
+  signal vldl       : std_logic;
+  signal vldl_2     : std_logic;
+  signal temp       : std_logic;
+  signal ready_1    : std_logic;
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
   signal mp_ds      : std_logic_vector(3 downto 0);
@@ -299,7 +305,10 @@ architecture struct of acore is
   signal re_rdy_int : std_logic;
   signal ve_out_d_int : std_logic_vector(7 downto 0);
   signal ve_out_dtm_int : std_logic_vector(127 downto 0);
-  signal vldl      : std_logic; --Added by CJ
+  signal ve_dtm_rdy_int : std_logic;
+  signal ve_push_dtm_int : std_logic;
+  signal ve_auto_send_int : std_logic; 
+
   attribute syn_keep              : boolean;
   --attribute syn_keep of pend_i    : signal is true;
   -- To easy gate-level simulation
@@ -310,7 +319,7 @@ architecture struct of acore is
 begin
   req_c2 <= req;
   ack    <= ack_c2;
-  ready  <= pl(121);
+  ready_1  <= pl(121);
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
@@ -336,6 +345,39 @@ begin
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
   --pl_out <= pl
+  ready_delay: process(clk_p)
+  begin
+    if rst_en_int = '0' then
+      ready <= '0';
+    else
+      if rising_edge(clk_p) then
+        ready <= ready_1;
+      end if;
+    end if;
+  end process;
+
+  data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
+  begin
+      if rising_edge(clk_p) then
+        if rst_en_int = '0' then
+          vldl <= '0';
+          temp <= '0';        
+        else
+          vldl <= ddi_vld;
+          if clk_e_neg_int = '1' then --make sure vldl is generated later than clk_e_neg
+          temp <= ddi_vld;
+          --vldl <= mid;
+          end if;
+        end if;
+      end if;
+  end process;
+  data_vld_latch_2 : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      vldl_2 <=vldl;
+    end if;
+  end process;
+
   pl_reg: process (clk_p, rst_en_int)
   begin 
     if rst_en_int = '0' then    
@@ -343,12 +385,8 @@ begin
       core2_en_buf <= '0';
     elsif rising_edge(clk_p) then--rising_edge(clk_e)   
         core2_en_buf <= core2_en;
-        if clk_e_neg_int = '0' then
---          if plsel_n = '1' then
+        if clk_e_pos_int = '0' then
             pl <= mp_q;
---          elsif plcpe_n = '0' then
---            pl <= udo;
---          end if;
         end if;
     end if;
   end process pl_reg;
@@ -441,7 +479,7 @@ begin
       rst_en        => rst_en_int,               
       -- Microprogram fields
       pl            => pl,
-      ld_mpgm       => std_logic'('0'), --'0', 
+      ld_mpgm       => std_logic'('0'), 
       -- Static control inputs
       dbl_direct    => dbl_direct,            
       pup_irq       => pup_irq,           
@@ -454,7 +492,7 @@ begin
       irq0          => irq0,               
       irq1          => irq1, 
       --dfm_vld       => ddi_vld,  --Added by CJ
-      mp_vld        => std_logic'('0'), --'0',     --Added by CJ            
+      mp_vld        => std_logic'('0'),     --Added by CJ            
       -- Condition inputs
       spreq_n       => std_logic'('1'), --'1',             
       spack_n       => std_logic'('1'), --'1',             
@@ -515,7 +553,8 @@ begin
       clk_e_pos     => clk_e_pos_int, 
 	    rst_n	  		=> rst_en_int,
       -- Microprogram fields
-      pl            => pl,  
+      pl            => pl,
+      init_load     => std_logic'('0'),  
       --Data inputs
       dbus          => dbus_int,           
       -- Flags
@@ -617,6 +656,7 @@ begin
        --CJ added
        VE_OUT_D      => ve_out_d_int,
        CDFM         => cdfm_int,
+       ID_NUM       => id_number,
        --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
@@ -722,10 +762,13 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => ddi_vld,
+      DDI_VLD     => vldl_2,
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
+      VE_DTM_RDY  => ve_dtm_rdy_int,
+      VE_PUSH_DTM => ve_push_dtm_int,
+      VE_AUTO_SEND => ve_auto_send_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM => ve_out_dtm_int
       );

@@ -20,6 +20,8 @@ entity PE_pair_top is
     C2_RDY     : out std_logic;
     EXE        : in std_logic;
     RESUME     : in std_logic;
+    C1_ID      : in std_logic_vector(5 downto 0);
+    C2_ID      : in std_logic_vector(5 downto 0);
 
 
     -- clocks and control signals
@@ -1248,7 +1250,8 @@ architecture struct of PE_pair_top is
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
     signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
-    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram 
+    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
+    signal core2_rdy   : std_logic;  
     
   signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
   signal c2_mprom_ce      : std_logic_vector(1 downto 0);  
@@ -1455,6 +1458,7 @@ begin
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
   c2_d_dqo <= C2_IN_D;
+  C2_RDY   <= core2_rdy;
   --process
   --begin
   --  lp_pwr_ok <= '0';
@@ -2668,6 +2672,7 @@ begin
     c2_rsc_n      => c2_rsc_n,
     c2_clkreq_gen => c2_clkreq_gen,
     --c2_even_c     => c2_even_c,
+    c2_ready      => core2_rdy     ,
     c2_crb_sel    => c2_crb_sel    ,
     c2_crb_out    => c2_crb_out    ,
     c2_en_pmem    => c2_en_pmem    ,
@@ -2697,6 +2702,7 @@ begin
     -- RTC block signals
     exe => EXE,         --CJ
     resume => RESUME,   --CJ
+    id_number => c1_ID,  --CJ
     req_c1 => c1_req_i,  --CJ
     ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
@@ -2812,7 +2818,7 @@ begin
     clk_p         => clk_p  ,      
     clk_c_en      => clk_c_en  ,
     even_c        => even_c, 
-    ready         => C2_RDY,    
+    ready         => core2_rdy,    
     --clk_c2_pos  => clk_c2a_pos,
     clk_e_pos     => clk_ea_pos,
     --clk_e_neg   => clk_ea_neg,
@@ -2824,6 +2830,7 @@ begin
     rst_cn        => c2_core2_en,       --reset core2 if disabled
     rsc_n         => c2_rsc_n,
     clkreq_gen    => std_logic'('0'), --'0',
+    id_number     => c2_ID,
     core2_en      => c2_core2_en     ,
     crb_out       => c2_crb_out      ,
     en_pmem       => c2_en_pmem      ,

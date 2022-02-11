@@ -345,7 +345,7 @@ begin
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
   --pl_out <= pl
-  ready_delay: process(clk_p)
+  ready_delay: process(clk_p, rst_en_int)
   begin
     if rst_en_int = '0' then
       ready <= '0';

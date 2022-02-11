@@ -622,8 +622,10 @@ begin
                 end if;
             elsif ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0')then --when outer loop is not 0, do self reload.
                 --if ve_loop = (ve_loop'range => '0') then --acts when ve's inner loop counter goes to 0,
+                mul_inn_ctl <= '1';
                 if ve_loop = x"01" then --acts when ve's inner loop counter goes to 1, by Jonny,1210
                     ve_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_oloop))-1,8));
+                    mul_inn_ctl <= '0';
                 end if;
 
                 if ve_loop = (ve_loop'range => '0') then
@@ -636,12 +638,12 @@ begin
                     if config(3) = '1' then
                     ve_addr_r <= ve_saddr_r;
                     end if;
-                    mul_inn_ctl <= '0';
+                    --mul_inn_ctl <= '0';
                 elsif ve_loop /= (ve_loop'range => '0') then
                     ve_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_loop))-1,8));
                     ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
                     ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
-                    mul_inn_ctl <= '1';
+                    --mul_inn_ctl <= '1';
                 end if;
             
             elsif ve_start_reg = '1' and ve_oloop = (ve_oloop'range => '0') then --outer loop is 0. Last loop without self reloading process.
@@ -724,30 +726,30 @@ begin
         elsif re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
             if mode_a_l = '1' and mode_b_l = '0' then
                 addr_p_l <= re_addr_l;
-                addr_p_r <= (others => 'X');
+                addr_p_r <= (others => '0');
             elsif mode_b_l = '1' and mode_a_l = '0' then
                 addr_p_r <= re_addr_r;
-                addr_p_l <= (others => 'X');
+                addr_p_l <= (others => '0');
             elsif mode_c_l = '1' then
                 addr_p_l <= curr_ring_addr;
-                addr_p_r <= (others => 'X');
+                addr_p_r <= (others => '0');
             else
-                addr_p_l <= (others => 'X');
-                addr_p_r <= (others => 'X');
+                addr_p_l <= (others => '0');
+                addr_p_r <= (others => '0');
             end if;
         
         elsif re_start_reg = '1' and re_source = '1' then --Use receive engine's address counter a and b --mode c added --2.0
-            addr_p_r <= (others => 'X');
+            addr_p_r <= (others => '0');
             if mode_a_l = '1' then
                 addr_p_l <= re_addr_a;
             elsif mode_b_l = '1' then
                 addr_p_l <= re_addr_b;
             else
-                addr_p_l <= (others => 'X');
+                addr_p_l <= (others => '0');
             end if;
         else
-            addr_p_l <= (others => 'X');
-            addr_p_r <= (others => 'X');
+            addr_p_l <= (others => '0');
+            addr_p_r <= (others => '0');
         end if;
     end process;
 
@@ -841,7 +843,7 @@ begin
     begin 
         if rising_edge(clk_p) then
             sclr_i_delay <= '0';
-            if ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0') and ve_loop = (ve_loop'range => '0') then
+            if ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0') and ve_loop = x"01" then--(ve_loop'range => '0') then
                 sclr_i_delay <= config(1);
             end if;
         end if;

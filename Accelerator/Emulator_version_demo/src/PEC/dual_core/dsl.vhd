@@ -112,7 +112,7 @@ begin
   pl_sig4 <= pl(45);
   D_source_selector : process (pl_sig4, pl_sig5, pl_sig6, alu_flags,
                                latch_int, y_reg, mbmd, gctr, crb_out, dfm,
-                               dfio, dsi, gdata, dtal, dfp, yprio, d_sign_int,ve_out_d,cdfm)
+                               dfio, dsi, gdata, dtal, dfp, yprio, d_sign_int,ve_out_d,cdfm, ID_NUM)
   begin
     if pl_sig4 = '0' then	--CONSTANT
       d_int <= pl_sig5(3 downto 0) & pl_sig6;

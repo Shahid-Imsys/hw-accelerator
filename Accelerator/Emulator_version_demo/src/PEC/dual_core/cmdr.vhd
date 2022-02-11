@@ -91,6 +91,7 @@ architecture rtl of cmdr is
     signal pl_send_req   : std_logic;
     signal send_req_d    : std_logic;
     signal send_req      : std_logic;
+    signal requesting    : std_logic;
 
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
@@ -166,7 +167,12 @@ begin
     dtm_mux_sel <= pl(117 downto 116);
     ld_dtm_v <= pl(88);
     fifo_push <= pl(114);
-    pl_send_req <= pl(113);
+    process(clk_p)--delay a clock cycle.
+    begin
+        if rising_edge(clk_p) then
+            pl_send_req <= pl(113);
+        end if;
+    end process;
     init_mpgm_rq <= "01000111111111110000000000000000"; --Broadcast request for 7 PEs.
     init_mpgm_rq_single <= "01000000111111110000000000000000"; --Broadcast request for 1 PE.
     process(clk_p)
@@ -176,7 +182,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq_single;
+            dtm_reg <= init_mpgm_rq;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
@@ -210,14 +216,21 @@ begin
 
     process(clk_p)
     begin
+        if rising_edge(clk_p) then 
+            requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+        end if;
+    end process;
+
+    process(clk_p)
+    begin
         if rising_edge(clk_p) then
             if clk_e_neg = '1' then --rising_edge
                 if EXE ='1'then
                     send_req_d <= '1';
                 elsif empty = '1' then
                     send_req_d <= '0';
-                elsif (ve_auto_send = '1' and fifo_full = '1') or pl_send_req = '1' then
-                    send_req_d <= '1';
+                else
+                    send_req_d <= requesting;
                 end if;
                 send_req <= send_req_d;
             end if;

@@ -257,6 +257,7 @@ END COMPONENT;
     signal p_clip_out : std_logic_vector(7 downto 0); --clip logic output
     signal bypass     : std_logic;
     signal sram_in    : std_logic_vector(63 downto 0);
+    signal bias_in    : std_logic_vector(63 downto 0);
     --signal pb_reg      : std_logic_vector(63 downto 0); --pushback register
     signal mode_a_l  : std_logic;
     signal mode_b_l  : std_logic;
@@ -599,7 +600,7 @@ begin
                 ve_addr_r <= (others => '0');
                 ve_loop <= (others => '0');
                 ve_oloop <= (others => '0');
-                mul_inn_ctl <= '1';
+                mul_inn_ctl <= '0';
             --Add reload function without starting the engine, 1210
             elsif ve_addr_reload = '1' and clk_e_pos = '1' then
                 ve_loop <= ve_loop_reg;
@@ -612,11 +613,16 @@ begin
                 end if;
             --1210
             elsif ve_start = '1' and ve_addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+                mul_inn_ctl <= '1';
                 if mode_a = '1' or mode_b = '1' then
                     ve_oloop <= ve_oloop_reg;
                     ve_loop  <= ve_loop_reg;
-                    ve_addr_l <= ve_saddr_l;
-                    ve_addr_r <= ve_saddr_r;
+                    if mode_a = '1' then                --- reload depending on mode.
+                        ve_addr_l <= ve_saddr_l;
+                    end if;
+                    if mode_b = '1' then
+                        ve_addr_r <= ve_saddr_r;
+                    end if;
                 elsif mode_c = '1' then
                     ve_loop <= x"09"; --TBD
                 end if;
@@ -661,7 +667,7 @@ begin
     begin
         if rising_edge(clk_p) then
             if clk_e_pos = '0' then
-                VE_RDY <= ve_start_reg;--remove revert --1125 
+                VE_RDY <= not ve_start_reg;--remove revert --1125 
             end if;
         end if;
     end process;
@@ -753,14 +759,12 @@ begin
         end if;
     end process;
 
-    bias_address_pointer: process(clk_p)
+    bias_address_pointer: process(sram_b_we, bias_index_wr, bias_index_rd)
     begin
-        if rising_edge(clk_p) then
-            if sram_b_we = '1' then
-                addr_p_b <= bias_index_wr;
-            else
-                addr_p_b <= bias_index_rd(7 downto 2);
-            end if;
+        if sram_b_we = '1' then
+            addr_p_b <= bias_index_wr;
+        else
+            addr_p_b <= bias_index_rd(7 downto 2);
         end if;
     end process;
 
@@ -843,7 +847,7 @@ begin
     begin 
         if rising_edge(clk_p) then
             sclr_i_delay <= '0';
-            if ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0') and ve_loop = x"01" then--(ve_loop'range => '0') then
+            if ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0') and ve_loop = (ve_loop'range => '0') then
                 sclr_i_delay <= config(1);
             end if;
         end if;
@@ -869,6 +873,7 @@ data_input: process(clk_p)
 begin
     if rising_edge(clk_p) then
         sram_in <= ve_in;
+        bias_in <= ve_in; --Bias buffer --Always VE_IN
         if re_source = '1' then
             sram_in(7 downto 0) <= dfy_reg(0);
             sram_in(15 downto 8) <= dfy_reg(1);
@@ -1123,6 +1128,7 @@ begin
             bias_index_rd <= YBUS;
         elsif o_mux_ena = '1' then
             bias_mux <= bias_index_rd (1 downto 0);
+        elsif adder_ena = '1' then
             if bias_index_rd = bias_index_end then
                 bias_index_rd <= bias_index_start;
             else
@@ -1358,7 +1364,7 @@ accu_0 : accumulator
     addr => addr_p_b,
     do => bias_buf_out,
     we => sram_b_we,
-    di => VE_IN
+    di => bias_in
   );
 
 

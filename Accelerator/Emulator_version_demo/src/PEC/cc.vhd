@@ -945,7 +945,9 @@ EVEN_P <= even_p_2;
 						if write_req = '0' then
 						    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
 						    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
-							pe_read <= '1'; 
+							if pe_write = '0' then
+								pe_read <= '1';
+							end if; 
 						elsif write_req = '1' then
 							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
             	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);

@@ -52,17 +52,21 @@ end Cluster_sim;
 architecture Behavioral of Cluster_sim is
     type mem_word is array (15 downto 0) of std_logic_vector(7 downto 0);
    	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
-    type ram_type_vc is array (286 downto 0) of std_logic_vector(127 downto 0);
-    type ram_type_vd is array (214 downto 0) of std_logic_vector(127 downto 0);
+    type ram_type_vc is array (31 downto 0) of std_logic_vector(127 downto 0);--(286 downto 0) of std_logic_vector(127 downto 0);
+    type ram_type_vd is array (215 downto 0) of std_logic_vector(127 downto 0);
+    type ram_type_bias is array (17 downto 0) of std_logic_vector(127 downto 0);
     type ram_type_uc is array (7 downto 0) of std_logic_vector(127 downto 0);
     type ram_type_ld is array (1 downto 0) of std_logic_vector(127 downto 0);
     type ram_type_lk is array (23 downto 0) of std_logic_vector(127 downto 0);
+    type ram_type_out is array (143 downto 0) of std_logic_vector(127 downto 0);
 	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-    type ram_type_c is array (286 downto 0) of bit_vector(127 downto 0);
-    type ram_type_d is array (214 downto 0) of bit_vector(127 downto 0);
+    type ram_type_c is array (31 downto 0) of bit_vector(127 downto 0);--(286 downto 0) of bit_vector(127 downto 0);
+    type ram_type_d is array (215 downto 0) of bit_vector(127 downto 0);
+    type ram_type_pb is array (17 downto 0) of bit_vector(127 downto 0);
     type ram_type_e is array (7 downto 0) of bit_vector(127 downto 0);
     type ram_type_ld0 is array (1 downto 0) of bit_vector(127 downto 0);
     type ram_type_lk0 is array (23 downto 0) of bit_vector(127 downto 0);
+    type ram_type_o is array (143 downto 0) of bit_vector(127 downto 0);
 		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
 		FILE ram_file : text is in ram_file_name;
 		variable ram_file_line : line;
@@ -85,7 +89,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM :ram_type_vc;
         begin
           --while not endfile(ram_file) loop
-          for i in 0 to 286 loop
+          for i in 0 to 31 loop--286 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -100,7 +104,22 @@ architecture Behavioral of Cluster_sim is
         variable RAM :ram_type_vd;
         begin
           --while not endfile(ram_file) loop
-          for i in 0 to 214 loop
+          for i in 0 to 215 loop
+            readline(ram_file, ram_file_line);
+            read(ram_file_line, RAM_B(i));
+            RAM(i) := to_stdlogicvector(RAM_B(i));
+          end loop;
+        return RAM;
+      end function;
+
+      impure function init_pwbias_from_file (ram_file_name : in string) return ram_type_bias is
+        FILE ram_file : text is in ram_file_name;
+        variable ram_file_line : line;
+        variable RAM_B : ram_type_pb;
+        variable RAM :ram_type_bias;
+        begin
+          --while not endfile(ram_file) loop
+          for i in 0 to 17 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -152,6 +171,21 @@ architecture Behavioral of Cluster_sim is
           end loop;
         return RAM;
       end function;
+
+      impure function init_out_from_file(ram_file_name : in string) return ram_type_out is
+        FILE ram_file : text is in ram_file_name;
+        variable ram_file_line : line;
+        variable RAM_B : ram_type_o;
+        variable RAM :ram_type_out;
+        begin
+          --while not endfile(ram_file) loop
+          for i in 0 to 143 loop
+            readline(ram_file, ram_file_line);
+            read(ram_file_line, RAM_B(i));
+            RAM(i) := to_stdlogicvector(RAM_B(i));
+          end loop;
+        return RAM;
+      end function;
 	    
 	    function conv_to_memword (ramword : std_logic_vector(127 downto 0)) return mem_word is
 	    variable mem : mem_word;
@@ -165,12 +199,15 @@ architecture Behavioral of Cluster_sim is
 --signal ucode : ram_type := init_ram_from_file("SequenceTest_F_Core2en.data");--("SequenceTest_F.data");
 --signal ucode_ve : ram_type := init_ram_from_file("program_0x000_o.ascii");
 --signal ucode_uc : ram_type := init_ram_from_file("unicast_plus_core_2_BE_F.data");--("unicast_BE_F.data");
-signal ucode_lm: ram_type := init_ram_from_file("load_mult_BE_F.data");
-signal input_0 : ram_type_vc := init_input_from_file("input_0x400.ascii");
-signal kernel_0 : ram_type_vd := init_kernel_from_file("kernel_0x100.ascii");
+signal ucode_pw: ram_type := init_ram_from_file("Pointwise_expand_all_4x4_outer_F.ascii");
+--signal ucode_lm: ram_type := init_ram_from_file("load_mult_BE_F.data");
+signal input_0 : ram_type_vc := init_input_from_file("input_data.ascii");--("input_0x400.ascii");
+signal kernel_0 : ram_type_vd := init_kernel_from_file("kernels.ascii");--("kernel_0x100.ascii");
 signal unicast_data : ram_type_uc := init_unicast_from_file("unicastdata.ascii");
+signal bias_pw : ram_type_bias := init_pwbias_from_file("bias.ascii");
 signal lm_data : ram_type_ld := init_lmdata_from_file("data.ascii");
 signal lm_kernel : ram_type_lk := init_lmkernel_from_file("kernel.ascii");
+signal standard_o : ram_type_out := init_out_from_file("output_data.ascii");
 signal clk_p_i : std_logic;
 signal clk_e_i : std_logic;
 signal clk_e_neg_i : std_logic;
@@ -198,18 +235,18 @@ constant RESUME : std_logic_vector(5 downto 0) :="101000";
 constant ADDRESS1 : std_logic_vector(14 downto 0) := "000000000000011"; --3
 constant ADDRESS2 : std_logic_vector(14 downto 0) := "000000000000100"; --4
 constant ADDRESS3 : std_logic_vector(14 downto 0) := (others => '0'); --microcode start address in CM
-constant ADDRESS4 : std_logic_vector(14 downto 0) := "000000100000000";
-constant ADDRESS5 : std_logic_vector(14 downto 0) := "000001000011111";
+constant ADDRESS4 : std_logic_vector(14 downto 0) := "000000100000000"; --0x100, start address of kernels
+constant ADDRESS5 : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of bias
 constant ADDRESS6 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000010000000000"; --ADDR HEX 400, UNICAST DATA START ADDR
 constant address7 : std_logic_vector(14 downto 0) := "100000000000000"; --0x4000, load and mul test data start address in CM
 constant address8 : std_logic_vector(14 downto 0) := "101000000000000"; --0x5000, load and mul test kernel start address in CM
 constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";  --3 --write 4 words
 constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000010";  --2 --read 3 words
 constant LENGTH3 : std_logic_vector(14 downto 0) := "000000011111111";--255, 256 words--microcode
-CONSTANT LENGTH4 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000100011110";--286, 287 words--INPUT data
-CONSTANT LENGTH5 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000011010110";--214, 215 words--KERNEL
+CONSTANT LENGTH4 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000000011111";--31
+CONSTANT LENGTH5 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000011010111";--215
 constant LENGTH6 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000000000111";--7 ---8 WORDS
-constant length7 : std_logic_vector(14 downto 0) := "000000000000001";--1 --2 words --load and mul test data length in cm
+constant length7 : std_logic_vector(14 downto 0) := "000000000010001";--1 --2 words --load and mul test data length in cm
 constant length8 : std_logic_vector(14 downto 0) := "000000000010111";--23 --24 words --load and mul test kernel length in cm
 constant WORD1   : mem_word := (15 =>"11111111", 14 => x"fe", 13 => x"fd", 12 => x"fc", 11 => x"fb", 10 => x"fa", 0=> x"f0",others =>(others=>'0'));
 constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));
@@ -469,7 +506,7 @@ wait for 5 ns;
 --input
 sendNOCcommand(WRITEC);
 send15bits(LENGTH4);
-send15bits(ADDRESS4);
+send15bits(ADDRESS6);--0x400
 tag_in <= '0';
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
@@ -479,8 +516,8 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
-progress <=8;
-for i in 0 to 286 loop
+progress <=31;
+for i in 0 to 31 loop
   sendmemword(conv_to_memword(input_0(i)));
 end loop;
 progress <=7;
@@ -496,7 +533,7 @@ wait for 5 ns;
 --kernel
 sendNOCcommand(WRITEC);
 send15bits(LENGTH5);
-send15bits(ADDRESS5);
+send15bits(ADDRESS4);--0x100
 tag_in <= '0';
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
@@ -506,11 +543,37 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
-progress <=9;
-for i in 0 to 214 loop
+progress <=215;
+for i in 0 to 215 loop
   sendmemword(conv_to_memword(kernel_0(i)));
 end loop;
-progress <=11;
+progress <=8;
+wait until tag_fb = '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+sendNOCcommand(WRITEC);
+send15bits(LENGTH7);
+send15bits(ADDRESS5);--200
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+progress <=17;
+for i in 0 to 17 loop
+  sendmemword(conv_to_memword(bias_pw(i)));
+end loop;
+progress <=9;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
@@ -521,86 +584,86 @@ wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
 --unicast data
-sendNOCcommand(WRITEC);
-send15bits(LENGTH6);
-send15bits(ADDRESS6);
-tag_in <= '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-progress <=10;
-for i in 0 to 7 loop
-  sendmemword(conv_to_memword(unicast_data(i)));
-end loop;
-progress <=13;
-wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
+--sendNOCcommand(WRITEC);
+--send15bits(LENGTH6);
+--send15bits(ADDRESS6);
+--tag_in <= '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--progress <=10;
+--for i in 0 to 7 loop
+--  sendmemword(conv_to_memword(unicast_data(i)));
+--end loop;
+--progress <=13;
+--wait until tag_fb = '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
 --lm_data 
-sendNOCcommand(WRITEC);
-send15bits(LENGTH7);
-send15bits(ADDRESS7);
-tag_in <= '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-progress <=1;
-for i in 0 to 1 loop
-  sendmemword(conv_to_memword(lm_data(i)));
-end loop;
-progress <=13;
-wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
---lm_kernel
-sendNOCcommand(WRITEC);
-send15bits(LENGTH8);
-send15bits(ADDRESS8);
-tag_in <= '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-progress <=23;
-for i in 0 to 23 loop
-  sendmemword(conv_to_memword(lm_kernel(i)));
-end loop;
-progress <=13;
-wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
-wait until rising_edge(clk_e_i);
-wait for 5 ns;
+--sendNOCcommand(WRITEC);
+--send15bits(LENGTH7);
+--send15bits(ADDRESS7);
+--tag_in <= '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--progress <=1;
+--for i in 0 to 1 loop
+--  sendmemword(conv_to_memword(lm_data(i)));
+--end loop;
+--progress <=13;
+--wait until tag_fb = '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+----lm_kernel
+--sendNOCcommand(WRITEC);
+--send15bits(LENGTH8);
+--send15bits(ADDRESS8);
+--tag_in <= '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--progress <=23;
+--for i in 0 to 23 loop
+--  sendmemword(conv_to_memword(lm_kernel(i)));
+--end loop;
+--progress <=13;
+--wait until tag_fb = '0';
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
+--wait until rising_edge(clk_e_i);
+--wait for 5 ns;
 --
 sendNOCcommand(WRITEC);
 send15bits(LENGTH3);--255
@@ -620,47 +683,12 @@ for i in 0 to 255 loop
 --sendmemword(conv_to_memword(ucode(i)));
 --sendmemword(conv_to_memword(ucode_ve(i)));
 --sendmemword(conv_to_memword(ucode_uc(i)));
-sendmemword(conv_to_memword(ucode_lm(i)));
+--sendmemword(conv_to_memword(ucode_lm(i)));
+sendmemword(conv_to_memword(ucode_pw(i)));
 end loop;
 data <= (others => '0');
 progress <=5;
 wait until tag_fb = '0'; 
---sendNOCcommand(WRITEC); --send input data
---send15bits(LENGTH4);
---send15bits(ADDRESS4_DATA);
---tag_in <= '0';
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---for i in 0 to 31 loop
---  sendmemword(conv_to_memword(input_data(i))); --send ve pointwise test microcode
---end loop;
---data <= (others => '0');
---progress <=6;
---wait until tag_fb = '0'; 
---sendNOCcommand(WRITEC); --send input data
---send15bits(LENGTH5);
---send15bits(ADDRESS5_KERNEL);
---tag_in <= '0';
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---for i in 0 to 215 loop
---  sendmemword(conv_to_memword(input_kernel(i))); --send ve pointwise test microcode
---end loop;
---data <= (others => '0');
---progress <=7;
---wait until tag_fb = '0'; 
 
 --wait for 120 ns;
 wait until rising_edge(clk_e_i);

@@ -141,9 +141,9 @@ begin
             elsif DATA_VLD = '1' then 
                 mp_data_int <= DIN;           --input to microprogram data
                 if CLK_E_NEG = '0' then
-                    ve_data_int <= DIN(63 downto 0); --input lower half to vector engine at falling edge of clk_e
+                    ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
                 elsif CLK_E_NEG = '1' then
-                    ve_data_int <= DIN(127 downto 64); --input upper half to vector engine at rising edge of clk_e
+                    ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
                 end if;
                 if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
                     dbus_reg <= DIN;
@@ -229,8 +229,8 @@ begin
                     send_req_d <= '1';
                 elsif empty = '1' then
                     send_req_d <= '0';
-                else
-                    send_req_d <= requesting;
+                elsif requesting = '1' then
+                    send_req_d <= '1';--requesting;
                 end if;
                 send_req <= send_req_d;
             end if;

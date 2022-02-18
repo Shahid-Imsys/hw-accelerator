@@ -182,7 +182,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq;
+            dtm_reg <= init_mpgm_rq_single;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;

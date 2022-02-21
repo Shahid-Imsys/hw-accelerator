@@ -137,70 +137,7 @@ begin
           end case;
 
         when short_message_1 =>
-          decode_error_code("core1", received_byte);
-          
-          case received_byte is
-            when 1 =>
-              write(l, string'("Simulation finshed OK"));
-              writeline(output, l);
-              std.env.stop(0);
-            when 2 =>
-              report "Simulation FAILED" severity failure;
-            when 3 =>
-              write(l, string'("Error in GPU"));
-              writeline(output, l);
-            when 4 =>
-              write(l, string'("Error in map memory"));
-              writeline(output, l);
-            when 5 =>
-              write(l, string'("Error in primary memory"));
-              writeline(output, l);
-            when 6 =>
-              write(l, string'("Error in ADL stepping"));
-              writeline(output, l);
-            when 7 =>
-              write(l, string'("Error PC FIFO"));
-              writeline(output, l);
-            when 8 =>
-              write(l, string'("uProgram derailed"));
-              writeline(output, l);
-            when 9 =>
-              write(l, string'("Unknown GPU error"));
-              writeline(output, l);
-            when 100 =>
-              write(l, string'("Test 0 done"));
-              writeline(output, l);
-            when 101 =>
-              write(l, string'("Test 1 done"));
-              writeline(output, l);
-            when 102 =>
-              write(l, string'("Test 2 done"));
-              writeline(output, l);
-            when 103 =>
-              write(l, string'("Test 3 done"));
-              writeline(output, l);
-            when 104 =>
-              write(l, string'("Test 4 done"));
-              writeline(output, l);
-            when 105 =>
-              write(l, string'("Test 5 done"));
-              writeline(output, l);
-            when 106 =>
-              write(l, string'("Test 6 done"));
-              writeline(output, l);
-            when 107 =>
-              write(l, string'("Test 7 done"));
-              writeline(output, l);
-            when 108 =>
-              write(l, string'("Test 8 done"));
-              writeline(output, l);
-            when 109 =>
-              write(l, string'("Test 9 done"));
-              writeline(output, l);
-            when others =>
-              write(l, string'("Faulty parameter for write short message"));
-              writeline(output, l);
-          end case;
+          decode_error_code("core1", received_byte );
           state <= wait_on_adress;
 
         when short_message_2 =>

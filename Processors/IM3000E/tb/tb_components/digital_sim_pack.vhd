@@ -103,10 +103,10 @@ package body digital_top_sim_pack is
       when 16#70# => write_code(core, "SP_LOAD_ERR");
       when 16#71# => write_code(core, "SELF_LOAD_ERR");
 
-                     --when 16#8#1 => write_code(core, "DRAM_TST1");
-                     --when 16#82# => write_code(core, "DRAM_TST2");
-                     --when 16#83# => write_code(core, "DRAM_TST3");
-                     --when 16#83# => write_code(core, "DRAM_TST4");
+      when 16#81# => write_code(core, "DRAM_TST1");
+      when 16#82# => write_code(core, "DRAM_TST2");
+      when 16#83# => write_code(core, "DRAM_TST3");
+      when 16#84# => write_code(core, "DRAM_TST4");
 
       --RAM aaddress steping error: mmr.vhd  
       when 16#90# => write_code(core, "ADHP_ERR");
@@ -141,16 +141,41 @@ package body digital_top_sim_pack is
 
 
       --Memory test error label:
+      when 16#B0# => write_code(core, "SB_ERR "); 
       when 16#B1# => write_code(core, "GR_ERR");  --G memory GR part read/write error
-      when 16#B2# => write_code(core, "SB_ERR");  --G memory SB part read/write error 
-      --when 16#B2# => write_code(core, "MS_ERR");  --G memory MSTACK part read/write error
+     --when 16#B2# => write_code(core, "SB_ERR");  --G memory SB part read/write error 
+      when 16#B2# => write_code(core, "MS_ERR");  --G memory MSTACK part read/write error
       when 16#B5# => write_code(core, "PS_ERR");  --G memory PSTACK part read/write error 
       when 16#B6# => write_code(core, "BMEM_ERR");  --Bettery memory read/write error 
       when 16#B7# => write_code(core, "RAM0_ERR");  --RAM0 read/write error 
       when 16#BB# => write_code(core, "RAM_ERR");   --RAM1-4 read/write error 
       when 16#C2# => write_code(core, "IOMEM_ERR");  --IO memory read/write error 
+      
+      --Memory test status code
+      when 16#C1# => write_code(core, "GMEM_TASK_END");  
+      when 16#C3# => write_code(core, "BMEM_TASK_END");  --G memory PSTACK part read/write error 
+      when 16#C4# => write_code(core, "RAM0_TASK_END");  --Bettery memory read/write error 
+      when 16#C5# => write_code(core, "RAM_TASK_END");  --RAM0 read/write error 
+      --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error 
+    
 
-      when others => write_code(core, "Unknown message!");
+      when 16#D0# => write_code(core, "Test 0 done");
+      when 16#D1# => write_code(core, "Test 1 done");
+      when 16#D2# => write_code(core, "Test 2 done");
+      when 16#D3# => write_code(core, "Test 3 done");
+      when 16#D4# => write_code(core, "Test 4 done");
+      when 16#D5# => write_code(core, "Test 5 done");
+      when 16#D6# => write_code(core, "Test 6 done");
+      when 16#D7# => write_code(core, "Test 7 done");
+      when 16#D8# => write_code(core, "Test 8 done");
+      when 16#D9# => write_code(core, "Test 9 done");
+        
+      when 16#DE# =>
+        write_code(core, "Simulation finshed OK");
+        std.env.stop(0);
+      when 16#DF# => report "Simulation FAILED" severity failure;
+                     
+      when others => write_code(core, "Unknown message!" & integer'image(error_code));
     end case;
   end procedure decode_error_code;
 

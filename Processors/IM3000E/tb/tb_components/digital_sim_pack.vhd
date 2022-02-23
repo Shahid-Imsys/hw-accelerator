@@ -151,16 +151,36 @@ package body digital_top_sim_pack is
       when 16#BB# => write_code(core, "RAM_ERR");   --RAM1-4 read/write error 
       when 16#C2# => write_code(core, "IOMEM_ERR");  --IO memory read/write error 
       
-      --Memory test status code
-      when 16#C1# => write_code(core, "GMEM_TASK_END");  
-      when 16#C3# => write_code(core, "BMEM_TASK_END");  --G memory PSTACK part read/write error 
-      when 16#C4# => write_code(core, "RAM0_TASK_END");  --Bettery memory read/write error 
-      when 16#C5# => write_code(core, "RAM_TASK_END");  --RAM0 read/write error 
-      --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error 
-    
+      when 16#B8# => write_code(core, "GR_ERR_INC "); 
+      when 16#B9# => write_code(core, "SB_ERR_INC");  
+      when 16#BA# => write_code(core, "MS_ERR_INC");  
+      when 16#BC# => write_code(core, "PS_ERR_INC");  
+      when 16#BD# => write_code(core, "BMEM_ERR_INC");  
 
-      when 16#D0# => write_code(core, "Test 0 done");
-      when 16#D1# => write_code(core, "Test 1 done");
+      when 16#BE# => write_code(core, "GR_ERR_CB "); 
+      when 16#BF# => write_code(core, "SB_ERR_CB");  
+      when 16#C7# => write_code(core, "MS_ERR_CB");  
+      when 16#C8# => write_code(core, "PS_ERR_CB");  
+      when 16#C9# => write_code(core, "BMEM_ERR_CB");  
+
+      --Memory test status code
+      when 16#C1# => write_code(core, "GMEM: all test task end");  
+      when 16#C3# => write_code(core, "BMEM: all test task end");   
+      when 16#C4# => write_code(core, "RAM0: all test task end");  
+      when 16#C5# => write_code(core, "RAM: all test task end");  
+      --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error 
+
+      when 16#CA# => write_code(core, "GMEM zero-one test begin");  
+      when 16#CB# => write_code(core, "GMEM checkerboard test begin");   
+      when 16#CC# => write_code(core, "GMEM increment test begin");   
+      when 16#CD# => write_code(core, "BMEM zero-one test begin");  
+      when 16#CE# => write_code(core, "BMEM checkerboard test begin");  
+      when 16#CF# => write_code(core, "BMEM increment test begin");   
+
+      
+
+      when 16#D0# => write_code(core, "Core test done");
+      when 16#D1# => write_code(core, "Memory Test done");
       when 16#D2# => write_code(core, "Test 2 done");
       when 16#D3# => write_code(core, "Test 3 done");
       when 16#D4# => write_code(core, "Test 4 done");

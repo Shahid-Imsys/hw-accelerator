@@ -141,9 +141,8 @@ package body digital_top_sim_pack is
 
 
       --Memory test error label:
-      when 16#B0# => write_code(core, "SB_ERR "); 
+      when 16#B0# => write_code(core, "SB_ERR "); --G memory SB part read/write error 
       when 16#B1# => write_code(core, "GR_ERR");  --G memory GR part read/write error
-     --when 16#B2# => write_code(core, "SB_ERR");  --G memory SB part read/write error 
       when 16#B2# => write_code(core, "MS_ERR");  --G memory MSTACK part read/write error
       when 16#B5# => write_code(core, "PS_ERR");  --G memory PSTACK part read/write error 
       when 16#B6# => write_code(core, "BMEM_ERR");  --Bettery memory read/write error 
@@ -175,7 +174,10 @@ package body digital_top_sim_pack is
       when 16#CC# => write_code(core, "GMEM increment test begin");   
       when 16#CD# => write_code(core, "BMEM zero-one test begin");  
       when 16#CE# => write_code(core, "BMEM checkerboard test begin");  
-      when 16#CF# => write_code(core, "BMEM increment test begin");   
+      when 16#CF# => write_code(core, "BMEM increment test begin"); 
+      when 16#F0# => write_code(core, "RAM0 test begin");  
+      when 16#F1# => write_code(core, "RAM test begin");   
+  
 
       
 

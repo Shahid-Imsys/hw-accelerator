@@ -1,0 +1,4 @@
+#!/bin/bash
+PATH=$PATH:/tools/Xilinx/Vivado/2021.2/bin
+# /usr/local/xilinx/Vivado/2020.1/bin
+export PATH

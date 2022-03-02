@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 
 -- Uncomment the following library declaration if using
@@ -51,6 +52,7 @@ end Cluster_sim;
 
 architecture Behavioral of Cluster_sim is
     type mem_word is array (15 downto 0) of std_logic_vector(7 downto 0);
+    type out_word is array (2303 downto 0) of std_logic_vector(7 downto 0);
    	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
     type ram_type_vc is array (31 downto 0) of std_logic_vector(127 downto 0);--(286 downto 0) of std_logic_vector(127 downto 0);
     type ram_type_vd is array (215 downto 0) of std_logic_vector(127 downto 0);
@@ -67,6 +69,7 @@ architecture Behavioral of Cluster_sim is
     type ram_type_ld0 is array (1 downto 0) of bit_vector(127 downto 0);
     type ram_type_lk0 is array (23 downto 0) of bit_vector(127 downto 0);
     type ram_type_o is array (143 downto 0) of bit_vector(127 downto 0);
+    type out_flag_a is array (143 downto 0) of std_logic;
 		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
 		FILE ram_file : text is in ram_file_name;
 		variable ram_file_line : line;
@@ -223,7 +226,10 @@ signal pe_unit   : std_logic_vector(5 downto 0);
 signal rd_fifo   : std_logic;
 signal fifo_vld   : std_logic;
 signal bc        : std_logic;
+signal O_correct : out_flag_a;
 signal mem_in     : mem_word;
+signal outword    :  out_word;
+signal out_ram    : ram_type_out;
 --Progress
 signal progress : integer;
 --Constants
@@ -240,6 +246,7 @@ constant ADDRESS5 : std_logic_vector(14 downto 0) := "000001000000000"; --0x200,
 constant ADDRESS6 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000010000000000"; --ADDR HEX 400, UNICAST DATA START ADDR
 constant address7 : std_logic_vector(14 downto 0) := "100000000000000"; --0x4000, load and mul test data start address in CM
 constant address8 : std_logic_vector(14 downto 0) := "101000000000000"; --0x5000, load and mul test kernel start address in CM
+constant pw_out_a : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
 constant LENGTH1 : std_logic_vector(14 downto 0) := "000000000000011";  --3 --write 4 words
 constant LENGTH2 : std_logic_vector(14 downto 0) := "000000000000010";  --2 --read 3 words
 constant LENGTH3 : std_logic_vector(14 downto 0) := "000000011111111";--255, 256 words--microcode
@@ -248,6 +255,7 @@ CONSTANT LENGTH5 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000011010111";--215
 constant LENGTH6 : STD_LOGIC_VECTOR(14 DOWNTO 0) := "000000000000111";--7 ---8 WORDS
 constant length7 : std_logic_vector(14 downto 0) := "000000000010001";--1 --2 words --load and mul test data length in cm
 constant length8 : std_logic_vector(14 downto 0) := "000000000010111";--23 --24 words --load and mul test kernel length in cm
+constant pw_out_l: std_logic_vector(14 downto 0) := "000000010001111";--143, 144 output channels.
 constant WORD1   : mem_word := (15 =>"11111111", 14 => x"fe", 13 => x"fd", 12 => x"fc", 11 => x"fb", 10 => x"fa", 0=> x"f0",others =>(others=>'0'));
 constant WORD2   : mem_word := (15 =>"11111111", 12=> "00001000", others =>(others=>'0'));
 constant WORD3   : mem_word := (15 =>"11111111", 14 => "00001111", 11=> "00001001", others =>(others=>'0'));
@@ -410,6 +418,22 @@ wait for 5ns;
   wait until rising_edge(clk_e_i);
 wait for 5ns;
 end sendmemword;
+
+procedure readmemword (signal outword : out out_word) is
+begin
+  for i in 0 to 2303 loop
+  outword(i) <= data_out;
+  wait until rising_edge(clk_e_i);
+wait for 5ns;
+  end loop;
+end readmemword;
+
+procedure compare (signal outram : in std_logic_vector(127 downto 0);
+                   signal standardo : in std_logic_vector(127 downto 0);
+                   signal correct : out std_logic) is
+begin
+  correct <= '1' when outram = standardo else '0'; 
+end compare;
 
 procedure sendpedata (constant word: in std_logic_vector(31 downto 0)) is
 begin
@@ -705,8 +729,48 @@ progress <= 8;
 
 
 --Start testing on PE side(simulated data input)
-wait for 13000 ns;
+wait for 280000 ns;
 --wait until rising_edge(C_RDY);
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+sendNOCcommand(READ);
+send15bits(pw_out_l);
+send15bits(pw_out_a);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+progress <= 2303; 
+  readmemword(outword);
+  for i in 0 to 143 loop
+    out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
+                  outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
+                  outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
+                  outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
+    compare(out_ram(i), standard_o(i), O_correct(i));
+  end loop;
+
+  --  for i in 0 to 143 loop
+  --    O_correct(i) <= '1' when out_ram(i) = standard_o(i) else '0';
+  --  end loop;
+
+  progress <=5;
+  wait until tag_fb = '0';
 
 --sendNOCcommand(Exe);
 --tag_in <= '0';

@@ -146,15 +146,17 @@ begin
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
-process (clk_p,reset_i)
-begin
-    if reset_i = '1' then
-        poll_act <= '0'; 
-    elsif rising_edge(clk_p) then
-        if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
-            poll_act <= '1'; 
-        else
+process (clk_p)
+begin 
+    if rising_edge(clk_p) then
+        if reset_i = '1' then
             poll_act <= '0';
+        else
+            if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+                poll_act <= '1'; 
+            else
+                poll_act <= '0';
+            end if;
         end if;
     end if;
 end process;
@@ -283,8 +285,8 @@ begin
     if rising_edge(clk_p) then 
         if EVEN_P = '0' then--rising_edge (clk_e)
             pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
-        else
-            pe_mux_out <= pe_mux_out;--(others => '0');
+        --else
+        --    pe_mux_out <= (others => '0');
         end if;
     end if;
 end process;
@@ -293,7 +295,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if (poll_act = '1' and EVEN_P = '0') then--or (wr_req = '1' and EVEN_P = '0')then
+        if (poll_act = '1' and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';

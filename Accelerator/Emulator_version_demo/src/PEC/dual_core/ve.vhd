@@ -614,17 +614,15 @@ begin
             --1210
             elsif ve_start = '1' and ve_addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
                 mul_inn_ctl <= '1';
+                ve_oloop <= ve_oloop_reg;
+                ve_loop  <= ve_loop_reg;
                 if mode_a = '1' or mode_b = '1' then
-                    ve_oloop <= ve_oloop_reg;
-                    ve_loop  <= ve_loop_reg;
                     if mode_a = '1' then                --- reload depending on mode.
                         ve_addr_l <= ve_saddr_l;
                     end if;
                     if mode_b = '1' then
                         ve_addr_r <= ve_saddr_r;
                     end if;
-                elsif mode_c = '1' then
-                    ve_loop <= x"09"; --TBD
                 end if;
             elsif ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0')then --when outer loop is not 0, do self reload.
                 --if ve_loop = (ve_loop'range => '0') then --acts when ve's inner loop counter goes to 0,
@@ -658,6 +656,9 @@ begin
                     ve_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_l)+1),8));
                     ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8)); --calculate right address;
                     mul_inn_ctl <= '1';
+                    if ve_loop = x"01" then
+                        mul_inn_ctl <= '0';
+                    end if;
                 end if;   
             end if;
         end if;
@@ -676,29 +677,30 @@ begin
     --Mode c. Shared by RE and VE
     --********************************
     --How to control the right address?
+    next_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+ to_integer(unsigned(offset_l)),8));
+
     mode_c_addr: process(clk_p)
     begin
         if rising_edge(clk_p) then
-            next_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+ to_integer(unsigned(offset_l)),8));
             if RST = '0' then
                 curr_ring_addr <= (others => '0');
             elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
                 curr_ring_addr <= YBUS;
+            elsif ve_addr_reload = '1' then
+                curr_ring_addr <= curr_ring_addr;
             --elsif re_start = '1' and mode_c = '1' and clk_e_pos = '1' then --clk_e synchronized
-            elsif (re_start_reg = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '1') then --make this an automatic process --1215
-                if curr_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
+            elsif (re_start_reg = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
+                if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
                     curr_ring_addr <= ring_start_addr;
-                elsif re_source = '0' and re_loop /= (re_loop'range => '0') and ddi_vld = '1' then
-                    curr_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))
-                                                       +to_integer(unsigned(offset_l)),8));
+                elsif (re_source = '0' and re_loop /= (re_loop'range => '0') and ddi_vld = '1') or re_source = '1' then
+                    curr_ring_addr <= next_ring_addr;
                 end if;
             --elsif ve_start_reg = '1' and config(6) = '1' then
             elsif ve_start_reg = '1' and mode_c_l = '1' then
-                if curr_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
+                if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
                     curr_ring_addr <= ring_start_addr;
                 elsif ve_loop /=(ve_loop'range => '0') then
-                    curr_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))
-                                                       +to_integer(unsigned(offset_l)),8));
+                    curr_ring_addr <= next_ring_addr;
                 end if;
                 --ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8));
             --else   --The two signals are also used in other processes
@@ -997,25 +999,26 @@ acc_out_a <= std_logic_vector(to_unsigned
 --Post processing block
 ---------------------------------------------------------------
 --Output source selector
-process(clk_p) --create a 11 clock_delay for pp to pick up output words after vector engine finishes its execution.
-begin
-    if rising_edge (clk_p) then
-        if rst = '0' then
-            ve_out_p <= '0';
-            delay3 <= (others => '0');
-        else
-            if  ve_start_reg = '1' and ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then
-            delay3(0) <= config(7);
-            end if;
-            
-            for i in 0 to 8 loop
-                delay3(i+1) <= delay3(i);
-            end loop; 
-                ve_out_p <= delay3(9);
-        end if;
-           
-    end if;
-end process;
+ve_out_p <= pp_ctl(0);
+--process(clk_p) --create a 11 clock_delay for pp to pick up output words after vector engine finishes its execution.
+--begin
+--    if rising_edge (clk_p) then
+--        if rst = '0' then
+--            ve_out_p <= '0';
+--            delay3 <= (others => '0');
+--        else
+--            if  ve_start_reg = '1' and ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then
+--            delay3(0) <= config(7);
+--            end if;
+--            
+--            for i in 0 to 8 loop
+--                delay3(i+1) <= delay3(i);
+--            end loop; 
+--                ve_out_p <= delay3(9);
+--        end if;
+--           
+--    end if;
+--end process;
 --Two modes
 --For output from overall accumulator latch, this selector activates one clock.
 --For output from unique accumulator latches, this mux activates eight clocks and select one accumulator latch in each clock cycle.

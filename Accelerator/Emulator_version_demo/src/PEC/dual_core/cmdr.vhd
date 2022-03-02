@@ -267,7 +267,16 @@ begin
     
     REQ_OUT <= req;
     fb  <= ACK_IN;
-    srst <= not rst_en;
+    --srst <= not rst_en;
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            srst <= not rst_en;
+            if CLK_E_NEG = '0' and ld_dtm ='1' and empty = '1' then 
+                srst <= '1';
+            end if;
+        end if;
+    end process;
 
     req_fifo : fifo_generator_0
     PORT MAP (

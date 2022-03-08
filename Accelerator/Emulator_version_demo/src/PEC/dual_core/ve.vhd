@@ -761,13 +761,19 @@ begin
         end if;
     end process;
 
-    bias_address_pointer: process(sram_b_we, bias_index_wr, bias_index_rd, pp_stage_1)
+    bias_address_pointer: process(clk_p)--sram_b_we, bias_index_wr, bias_index_rd, pp_stage_1)
     begin
-        if sram_b_we = '1' then
-            addr_p_b <= bias_index_wr;
-        else
-            if pp_stage_1 = '1' then
-                addr_p_b <= bias_index_rd(7 downto 2);
+        if rising_edge(clk_p) then
+            if rst = '0' then
+                addr_p_b <= (others => '0');
+            else
+                if sram_b_we = '1' then
+                    addr_p_b <= bias_index_wr;
+                else
+                    if o_mux_ena = '1' then
+                        addr_p_b <= bias_index_rd(7 downto 2);
+                    end if;
+                end if;
             end if;
         end if;
     end process;
@@ -796,12 +802,14 @@ begin
         end if;
     end process;
 
-    write_enable_bias: process(re_start_reg,ddi_vld,mode_a_l,mode_b_l)
+    write_enable_bias: process(clk_p)--re_start_reg,ddi_vld,mode_a_l,mode_b_l)
     begin
-        if re_start_reg = '1' and ddi_vld = '1' and mode_a_l = '1' and mode_b_l = '1' then
-            sram_b_we <= '1';
-        else
-            sram_b_we <= '0';
+        if rising_edge(clk_p) then 
+            if re_start_reg = '1' and ddi_vld = '1' and mode_a_l = '1' and mode_b_l = '1' then
+                sram_b_we <= '1';
+            else
+                sram_b_we <= '0';
+            end if;
         end if;
     end process;
 
@@ -877,7 +885,7 @@ data_input: process(clk_p)
 begin
     if rising_edge(clk_p) then
         sram_in <= ve_in;
-        bias_in <= ve_in; --Bias buffer --Always VE_IN
+        bias_in <= sram_in; --Bias buffer --Always VE_IN
         if re_source = '1' then
             sram_in(7 downto 0) <= dfy_reg(0);
             sram_in(15 downto 8) <= dfy_reg(1);

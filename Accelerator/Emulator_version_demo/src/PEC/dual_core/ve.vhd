@@ -72,19 +72,6 @@ entity ve is
 end entity ve;
 
 architecture rtl of ve is
---COMPONENT xbip_multadd_0
---  PORT (
---    CLK : IN STD_LOGIC;
---    CE : IN STD_LOGIC;
---    SCLR : IN STD_LOGIC;
---    A : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
---    B : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
---    C : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
---    SUBTRACT : IN STD_LOGIC;
---    P : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
---    PCOUT : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
---  );
---END COMPONENT;
 
 
 COMPONENT accumulator
@@ -353,6 +340,28 @@ END COMPONENT;
     signal delay0 : std_logic; --
     signal delay1 : std_logic;
     signal delay3 : std_logic_vector(9 downto 0);
+
+    attribute dont_touch : string;
+    attribute dont_touch of p_shifter_in : signal is "true";
+    attribute dont_touch of p_shifter_out : signal is "true";
+    attribute dont_touch of p_adder_out : signal is "true";
+    attribute dont_touch of p_clip_out : signal is "true";
+    attribute dont_touch of mul_in_l_0 : signal is "true";
+    attribute dont_touch of mul_in_l_1 : signal is "true";
+    attribute dont_touch of mul_in_l_2 : signal is "true";
+    attribute dont_touch of mul_in_l_3 : signal is "true";
+    attribute dont_touch of mul_in_l_4 : signal is "true";
+    attribute dont_touch of mul_in_l_5 : signal is "true";
+    attribute dont_touch of mul_in_l_6 : signal is "true";
+    attribute dont_touch of mul_in_l_7 : signal is "true";
+    attribute dont_touch of mul_in_r_0 : signal is "true";
+    attribute dont_touch of mul_in_r_1 : signal is "true";
+    attribute dont_touch of mul_in_r_2 : signal is "true";
+    attribute dont_touch of mul_in_r_3 : signal is "true";
+    attribute dont_touch of mul_in_r_4 : signal is "true";
+    attribute dont_touch of mul_in_r_5 : signal is "true";
+    attribute dont_touch of mul_in_r_6 : signal is "true";
+    attribute dont_touch of mul_in_r_7 : signal is "true";
 
 
 begin
@@ -993,15 +1002,15 @@ begin
     end if;
 end process;
 --Overall accumulator (Adder)
-acc_out_a <= std_logic_vector(to_unsigned
-                             (to_integer(unsigned(acc_out_0))+ 
-                              to_integer(unsigned(acc_out_1))+
-                              to_integer(unsigned(acc_out_2))+
-                              to_integer(unsigned(acc_out_3))+
-                              to_integer(unsigned(acc_out_4))+
-                              to_integer(unsigned(acc_out_5))+
-                              to_integer(unsigned(acc_out_6))+
-                              to_integer(unsigned(acc_out_7)),32));
+acc_out_a <= std_logic_vector(
+                              unsigned(acc_out_0)+ 
+                              unsigned(acc_out_1)+
+                              unsigned(acc_out_2)+
+                              unsigned(acc_out_3)+
+                              unsigned(acc_out_4)+
+                              unsigned(acc_out_5)+
+                              unsigned(acc_out_6)+
+                              unsigned(acc_out_7));
 
 ---------------------------------------------------------------
 --Post processing block

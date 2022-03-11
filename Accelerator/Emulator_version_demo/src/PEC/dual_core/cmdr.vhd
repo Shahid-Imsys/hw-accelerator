@@ -131,29 +131,42 @@ begin
             end if;
         end if;
     end process;
-    process(clk_p)
+
+    process(CLK_E_NEG, DIN, DATA_VLD, RST_EN)
     begin
-        if rising_edge(clk_p) then
-            if RST_EN = '0' then
-                ve_data_int <= (others => '0');
-                mp_data_int <= (others => '0');
-                dbus_reg <= (others => '0');
-            elsif DATA_VLD = '1' then 
-                mp_data_int <= DIN;           --input to microprogram data
-                if CLK_E_NEG = '0' then
+        if RST_EN = '0' then
+            ve_data_int <= (others => '0');
+        else
+            if DATA_VLD = '1' then
+                if CLK_E_NEG = '1' then
                     ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
-                elsif CLK_E_NEG = '1' then
+                else
                     ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
                 end if;
-                if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
-                    dbus_reg <= DIN;
-                end if;
+            else
+                ve_data_int <= (others => '0');
             end if;
         end if;
     end process;
 
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if RST_EN = '0' then
+                VE_DIN <= (others => '0');
+                mp_data_int <= (others => '0');
+                dbus_reg <= (others => '0');
+            elsif DATA_VLD = '1' then 
+                mp_data_int <= DIN;           --input to microprogram data
+                if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
+                    dbus_reg <= DIN;
+                end if;
+            end if;
+            VE_DIN <= ve_data_int;
+        end if;
+    end process;
+
     dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
-    VE_DIN <= ve_data_int;
     MPGMM_IN <= mp_data_int;
     DBUS_DATA <= dbus_int;
 

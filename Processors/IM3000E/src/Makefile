@@ -1,7 +1,7 @@
 GPP_DIR=$(PROJECT_PATH)/Processors/IM3000E/src
 GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
-gpp_rtl: 
+gpp_rtl: mem_comp
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \
 			 	  $(GPP_DIR_WIN)/gp_pkg.vhd \
 			 	  $(GPP_DIR_WIN)/fgendec.vhd \
@@ -56,6 +56,7 @@ gpp_rtl:
 			 	  $(GPP_DIR_WIN)/peri/dac.vhd \
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
@@ -66,7 +67,9 @@ gpp_rtl:
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1A.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_1024X8X1CM8.vhd
 
-
+mem_comp:
+	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v \
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_2Kx80_fast_func.v
 
 
 #include $(GPP_DIR)/pads/Makefile

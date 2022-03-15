@@ -143,4 +143,15 @@ begin  -- architecture tb
       reg_to_block   =>  reg_to_block,
       reg_from_block =>  x"00"
       );
+
+  -- i_octo_spi : entity work.octo_memory_bfm is
+    
+  --   port map (
+  --     cs => ,
+  --     ck => ,
+  --     rwds => ,
+  --     dq => ,
+  --     reset_n => MRESET
+  --     );
+
 end architecture tb;

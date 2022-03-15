@@ -46,12 +46,6 @@ export ETC_DIR_WIN=$PROJECT_PATH_WIN/etc
 
 echo "set Simulator"
 if [ "$lic" = "vivado" ]; then
-    echo "path vivado start"
-    if [ "$HOSTNAME" = "valhall" ]; then
-        source /cygdrive/e/Program/Xilinx/Vivado/2020.3/settings64.sh
-    else
-        export PATH=$PATH:/tools/Xilinx/Vivado/2021.2/bin
-    fi
     export SIM=xsim
     export COMP=xvhdl
     export ELAB=xelab
@@ -100,7 +94,13 @@ if [ "$lic" = "de" ]; then
    else
        export PATH=/usr/local/modelsim/modelsimDE_10_3/modelsim_dlx/linuxpe:/usr/local/modelsim/modelsimDE_10_7/modelsim_dlx/bin/:$PATH
    fi
-   #elif [ "$lic" = "vivado" ]; then
+elif [ "$lic" = "vivado" ]; then
+    echo "path vivado start"
+    if [ "$HOSTNAME" = "valhall.shortlink.local" ]; then
+        source /usr/local/bin/use_vivado_20201
+    else
+        export PATH=$PATH:/tools/Xilinx/Vivado/2021.2/bin
+    fi
 else
    echo "NCSIM start"
    if [ "$OS" = "Windows_NT" ]; then

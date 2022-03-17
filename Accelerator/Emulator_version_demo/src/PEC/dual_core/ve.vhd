@@ -779,7 +779,7 @@ begin
                 if sram_b_we = '1' then
                     addr_p_b <= bias_index_wr;
                 else
-                    if o_mux_ena = '1' then
+                    if pp_stage_1 = '1' then
                         addr_p_b <= bias_index_rd(7 downto 2);
                     end if;
                 end if;
@@ -1148,9 +1148,9 @@ begin
     if rising_edge(clk_p) then
         if reg_in = CONS_BIAS_INDEX_START then
             bias_index_rd <= YBUS;
-        elsif o_mux_ena = '1' then
-            bias_mux <= bias_index_rd (1 downto 0);
+--        elsif o_mux_ena = '1' then         
         elsif pp_stage_1 = '1' then
+            bias_mux <= bias_index_rd (1 downto 0);
             if bias_index_rd = bias_index_end then
                 bias_index_rd <= bias_index_start;
             else

@@ -138,7 +138,9 @@ package body digital_top_sim_pack is
                      --when 16#C0# => write_code(core, "ADL-1GWSTEP");
                      --when 16#20# => write_code(core, "ADL+2STEP");
                      --when 16#60# => write_code(core, "ADL-2STEP");
-
+      --OSPI Memory test error label:
+      when 16#A5# => write_code(core, "SET_LATENCY_ERR");  --G memory GR part read/write error
+      when 16#A6# => write_code(core, "OSPI_RW_ERR"); --G memory SB part read/write error 
 
       --Memory test error label:
       when 16#B0# => write_code(core, "GR_ERR");  --G memory GR part read/write error

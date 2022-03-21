@@ -43,8 +43,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 --use work.all;
+use work.gp_pkg.all;
 
 entity rtc is
+  generic (
+    g_memory_type : memory_type_t := referens);
   port (
     --gmem1
     c1_gmem_a    : in  std_logic_vector(9 downto 0);
@@ -160,10 +163,10 @@ architecture rtl of rtc is
   signal lp_rst_cnt_off_int    : std_logic;
   signal pwr_on_rst_n          : std_logic;
 
-  TYPE states IS (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
-  SIGNAL next_state : states;
-  SIGNAL current_state : states;
---	
+  type states is (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
+  signal next_state    : states;
+  signal current_state : states;
+--      
 --  signal state  : std_logic_vector(1 downto 0);
 --  signal next_state  : std_logic_vector(1 downto 0);
 --  constant s0   : std_logic_vector(1 downto 0) := "00";
@@ -261,116 +264,45 @@ architecture rtl of rtc is
       );
   end component;
 
-  -- gmem
-  component SY180_1024X8X1CM8
-    port(
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic;
-      A4  : in  std_logic;
-      A5  : in  std_logic;
-      A6  : in  std_logic;
-      A7  : in  std_logic;
-      A8  : in  std_logic;
-      A9  : in  std_logic;
-      DO0 : out std_logic;
-      DO1 : out std_logic;
-      DO2 : out std_logic;
-      DO3 : out std_logic;
-      DO4 : out std_logic;
-      DO5 : out std_logic;
-      DO6 : out std_logic;
-      DO7 : out std_logic;
-      DI0 : in  std_logic;
-      DI1 : in  std_logic;
-      DI2 : in  std_logic;
-      DI3 : in  std_logic;
-      DI4 : in  std_logic;
-      DI5 : in  std_logic;
-      DI6 : in  std_logic;
-      DI7 : in  std_logic;
-      WEB : in  std_logic;
-      CK  : in  std_logic;
-      CSB : in  std_logic
+  component ram_memory is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      clk     : in  std_logic;
+      address : in  std_logic_vector(13 downto 0);
+      ram_di  : in  std_logic_vector(7 downto 0);
+      ram_do  : out std_logic_vector(7 downto 0);
+      we_n    : in  std_logic;
+      cs      : in  std_logic
       );
+
   end component;
 
-  --BMEM
-  component SY180_512X8X1CM8
-    port(
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic;
-      A4  : in  std_logic;
-      A5  : in  std_logic;
-      A6  : in  std_logic;
-      A7  : in  std_logic;
-      A8  : in  std_logic;
-      DO0 : out std_logic;
-      DO1 : out std_logic;
-      DO2 : out std_logic;
-      DO3 : out std_logic;
-      DO4 : out std_logic;
-      DO5 : out std_logic;
-      DO6 : out std_logic;
-      DO7 : out std_logic;
-      DI0 : in  std_logic;
-      DI1 : in  std_logic;
-      DI2 : in  std_logic;
-      DI3 : in  std_logic;
-      DI4 : in  std_logic;
-      DI5 : in  std_logic;
-      DI6 : in  std_logic;
-      DI7 : in  std_logic;
-      WEB : in  std_logic;
-      CK  : in  std_logic;
-      CSB : in  std_logic
-      );
+  component memory_1024x8 is 
+    generic (
+      g_memory_type : memory_type_t := referens);  
+    port (
+      address : in std_logic_vector(9 downto 0);
+      ram_di  : in std_logic_vector(7 downto 0);
+      ram_do  : out std_logic_vector(7 downto 0);
+      we_n    : in  std_logic;
+      clk     : in  std_logic;
+      cs      : in  std_logic);
   end component;
-
--- application and microprogram shared memory
-  component SU180_16384X8X1BM8
-    port(
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic;
-      A4  : in  std_logic;
-      A5  : in  std_logic;
-      A6  : in  std_logic;
-      A7  : in  std_logic;
-      A8  : in  std_logic;
-      A9  : in  std_logic;
-      A10 : in  std_logic;
-      A11 : in  std_logic;
-      A12 : in  std_logic;
-      A13 : in  std_logic;
-      DO0 : out std_logic;
-      DO1 : out std_logic;
-      DO2 : out std_logic;
-      DO3 : out std_logic;
-      DO4 : out std_logic;
-      DO5 : out std_logic;
-      DO6 : out std_logic;
-      DO7 : out std_logic;
-      DI0 : in  std_logic;
-      DI1 : in  std_logic;
-      DI2 : in  std_logic;
-      DI3 : in  std_logic;
-      DI4 : in  std_logic;
-      DI5 : in  std_logic;
-      DI6 : in  std_logic;
-      DI7 : in  std_logic;
-      WEB : in  std_logic;
-      CK  : in  std_logic;
-      CS  : in  std_logic;
-      OE  : in  std_logic
+  
+  component b_memory is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      clk     : in  std_logic;
+      address : in  std_logic_vector(8 downto 0);
+      ram_di  : in  std_logic_vector(7 downto 0);
+      ram_do  : out std_logic_vector(7 downto 0);
+      we_n    : in  std_logic;
+      cs      : in  std_logic
       );
+
   end component;
-
-
 
   component clk_mux
     port (
@@ -459,147 +391,57 @@ begin  -- rtl
 
   -- gmem
   -- gmem1
-  gmem1 : SY180_1024X8X1CM8
+  gmem1 : memory_1024x8
+      generic map (
+         g_memory_type => g_memory_type
+        )
+      port map (
+        address => c1_gmem_a_iso_0,
+        ram_di  => c1_gmem_d_iso_0,
+        ram_do  => c1_gmem_q,
+        we_n    => c1_gmem_we_n_iso_1,
+        clk     => clk_mux_out_iso_1,
+        cs      => c1_gmem_ce_n_iso_1
+        );
+   
+  -- gmem2 
+  gmem2 : memory_1024x8
+      generic map (
+         g_memory_type => g_memory_type
+        )
+      port map (
+        address => c2_gmem_a_iso_0,
+        ram_di  => c2_gmem_d_iso_0,
+        ram_do  => c2_gmem_q,
+        we_n    => c2_gmem_we_n_iso_1,
+        clk     => clk_mux_out_iso_1,
+        cs      => c2_gmem_ce_n_iso_1
+        );
+ 
+  bmem : b_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => c1_gmem_a_iso_0(0),
-      A1  => c1_gmem_a_iso_0(1),
-      A2  => c1_gmem_a_iso_0(2),
-      A3  => c1_gmem_a_iso_0(3),
-      A4  => c1_gmem_a_iso_0(4),
-      A5  => c1_gmem_a_iso_0(5),
-      A6  => c1_gmem_a_iso_0(6),
-      A7  => c1_gmem_a_iso_0(7),
-      A8  => c1_gmem_a_iso_0(8),
-      A9  => c1_gmem_a_iso_0(9),
-      DO0 => c1_gmem_q(0),
-      DO1 => c1_gmem_q(1),
-      DO2 => c1_gmem_q(2),
-      DO3 => c1_gmem_q(3),
-      DO4 => c1_gmem_q(4),
-      DO5 => c1_gmem_q(5),
-      DO6 => c1_gmem_q(6),
-      DO7 => c1_gmem_q(7),
-      DI0 => c1_gmem_d_iso_0(0),
-      DI1 => c1_gmem_d_iso_0(1),
-      DI2 => c1_gmem_d_iso_0(2),
-      DI3 => c1_gmem_d_iso_0(3),
-      DI4 => c1_gmem_d_iso_0(4),
-      DI5 => c1_gmem_d_iso_0(5),
-      DI6 => c1_gmem_d_iso_0(6),
-      DI7 => c1_gmem_d_iso_0(7),
-      WEB => c1_gmem_we_n_iso_1,
-      CK  => clk_mux_out_iso_1,
-      CSB => c1_gmem_ce_n_iso_1
-      );
-
-
--- gmem2
-  gmem2 : SY180_1024X8X1CM8
-    port map (
-      A0  => c2_gmem_a_iso_0(0),
-      A1  => c2_gmem_a_iso_0(1),
-      A2  => c2_gmem_a_iso_0(2),
-      A3  => c2_gmem_a_iso_0(3),
-      A4  => c2_gmem_a_iso_0(4),
-      A5  => c2_gmem_a_iso_0(5),
-      A6  => c2_gmem_a_iso_0(6),
-      A7  => c2_gmem_a_iso_0(7),
-      A8  => c2_gmem_a_iso_0(8),
-      A9  => c2_gmem_a_iso_0(9),
-      DO0 => c2_gmem_q(0),
-      DO1 => c2_gmem_q(1),
-      DO2 => c2_gmem_q(2),
-      DO3 => c2_gmem_q(3),
-      DO4 => c2_gmem_q(4),
-      DO5 => c2_gmem_q(5),
-      DO6 => c2_gmem_q(6),
-      DO7 => c2_gmem_q(7),
-      DI0 => c2_gmem_d_iso_0(0),
-      DI1 => c2_gmem_d_iso_0(1),
-      DI2 => c2_gmem_d_iso_0(2),
-      DI3 => c2_gmem_d_iso_0(3),
-      DI4 => c2_gmem_d_iso_0(4),
-      DI5 => c2_gmem_d_iso_0(5),
-      DI6 => c2_gmem_d_iso_0(6),
-      DI7 => c2_gmem_d_iso_0(7),
-      WEB => c2_gmem_we_n_iso_1,
-      CK  => clk_mux_out_iso_1,
-      CSB => c2_gmem_ce_n_iso_1
-      );
-
-
-  -- bmem  !!! SEPARATELY POWERED !!!
-  bmem : SY180_512X8X1CM8
-    port map (
-      A0  => dbus_iso_0(0),
-      A1  => dbus_iso_0(1),
-      A2  => dbus_iso_0(2),
-      A3  => dbus_iso_0(3),
-      A4  => dbus_iso_0(4),
-      A5  => dbus_iso_0(5),
-      A6  => dbus_iso_0(6),
-      A7  => dbus_iso_0(7),
-      A8  => bmem_a8_iso_0,
-      DO0 => bmem_q(0),
-      DO1 => bmem_q(1),
-      DO2 => bmem_q(2),
-      DO3 => bmem_q(3),
-      DO4 => bmem_q(4),
-      DO5 => bmem_q(5),
-      DO6 => bmem_q(6),
-      DO7 => bmem_q(7),
-      DI0 => bmem_d_iso_0(0),
-      DI1 => bmem_d_iso_0(1),
-      DI2 => bmem_d_iso_0(2),
-      DI3 => bmem_d_iso_0(3),
-      DI4 => bmem_d_iso_0(4),
-      DI5 => bmem_d_iso_0(5),
-      DI6 => bmem_d_iso_0(6),
-      DI7 => bmem_d_iso_0(7),
-      WEB => bmem_we_n_iso_1,
-      CK  => clk_mux_out_iso_1,
-      CSB => bmem_ce_n_iso_1
+      clk                 => clk_mux_out_iso_1,
+      address(7 downto 0) => dbus_iso_0(7 downto 0),
+      address(8)          => bmem_a8_iso_0,
+      ram_di              => bmem_d_iso_0,
+      ram_do              => bmem_q,
+      we_n                => bmem_we_n_iso_1,
+      cs                  => bmem_ce_n_iso_1
       );
 
 ---application memories
-  ram0 : SU180_16384X8X1BM8             -- need modification flag, 2015lp
+  ram0 : ram_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => RAM0_A_iso_0(0),
-      A1  => RAM0_A_iso_0(1),
-      A2  => RAM0_A_iso_0(2),
-      A3  => RAM0_A_iso_0(3),
-      A4  => RAM0_A_iso_0(4),
-      A5  => RAM0_A_iso_0(5),
-      A6  => RAM0_A_iso_0(6),
-      A7  => RAM0_A_iso_0(7),
-      A8  => RAM0_A_iso_0(8),
-      A9  => RAM0_A_iso_0(9),
-      A10 => RAM0_A_iso_0(10),
-      A11 => RAM0_A_iso_0(11),
-      A12 => RAM0_A_iso_0(12),
-      A13 => RAM0_A_iso_0(13),
-      DO0 => RAM0_DO(0),
-      DO1 => RAM0_DO(1),
-      DO2 => RAM0_DO(2),
-      DO3 => RAM0_DO(3),
-      DO4 => RAM0_DO(4),
-      DO5 => RAM0_DO(5),
-      DO6 => RAM0_DO(6),
-      DO7 => RAM0_DO(7),
-      DI0 => RAM0_DI_iso_0(0),
-      DI1 => RAM0_DI_iso_0(1),
-      DI2 => RAM0_DI_iso_0(2),
-      DI3 => RAM0_DI_iso_0(3),
-      DI4 => RAM0_DI_iso_0(4),
-      DI5 => RAM0_DI_iso_0(5),
-      DI6 => RAM0_DI_iso_0(6),
-      DI7 => RAM0_DI_iso_0(7),
-      WEB => RAM0_WEB_iso_1,
-      CK  => clk_mux_out_iso_1,
-      CS  => RAM0_CS_iso_0,
-      OE  => '1'
-      );
-
+      clk     => clk_mux_out_iso_1,
+      address => RAM0_A_iso_0,
+      ram_di  => RAM0_DI_iso_0,
+      ram_do  => RAM0_DO,
+      we_n    => RAM0_WEB_iso_1,
+      cs      => RAM0_CS_iso_0);
 
   --Clock switching logic, designed to handle asynchronous clocks.
   clk_mux_1 : clk_mux
@@ -661,68 +503,68 @@ begin  -- rtl
 
   pwr_mode_next : process (current_state, halt_en_iso_0, nap_en_iso_0, wakeup_lp, lp_rst_cnt_off_int)
   begin
-    CASE current_state IS
-		WHEN INIT 		=> 
-		    next_state <= ACT;
-		    
-        WHEN ACT 		=> 	    	    
-		    IF halt_en_iso_0 = '1' THEN
-		        next_state <= HALTP;
-		    ELSIF nap_en_iso_0 = '1' THEN
-		        next_state <= NAPP;
-		    ELSE
-		        next_state <= ACT;
-		    END IF;   
-		                 
-		WHEN HALTP 		=> 
-		    next_state <= HALTP2;
-		
-		WHEN HALTP2		=> 
-		    next_state <= HALTPC;
-		
-		WHEN HALTPC		=> 
-		    next_state <= HALT;
-		
-		WHEN HALT 		=> 
-		    IF wakeup_lp = '1' THEN
-		        next_state <= HALTR;
-		    ELSE
-		        next_state <= HALT;
-		    END IF;  
-		
-		WHEN HALTR 		=> 
-		    IF lp_rst_cnt_off_int = '1' THEN
-		        next_state <= ACT;
-		    ELSE
-		        next_state <= HALTR;
-		    END IF; 
-		
-		WHEN NAPP 		=> 
-		    next_state <= NAPP2;
-		
-		WHEN NAPP2 		=> 
-		    next_state <= NAPPC;
-		
-		WHEN NAPPC 		=> 
-		    next_state <= NAP;
-		
-		WHEN NAP 		=> 
-		    IF wakeup_lp = '1' THEN
-		        next_state <= NAPR;
-		    ELSE
-		        next_state <= NAP;
-		    END IF;  
-		
-		WHEN NAPR 		=> 
-		    IF lp_rst_cnt_off_int = '1' THEN
-		        next_state <= ACT;
-		    ELSE
-		        next_state <= NAPR;
-		    END IF;
-		
-		WHEN OTHERS 	=> 
+    case current_state is
+      when INIT =>
+        next_state <= ACT;
+
+      when ACT =>
+        if halt_en_iso_0 = '1' then
+          next_state <= HALTP;
+        elsif nap_en_iso_0 = '1' then
+          next_state <= NAPP;
+        else
+          next_state <= ACT;
+        end if;
+
+      when HALTP =>
+        next_state <= HALTP2;
+
+      when HALTP2 =>
+        next_state <= HALTPC;
+
+      when HALTPC =>
+        next_state <= HALT;
+
+      when HALT =>
+        if wakeup_lp = '1' then
+          next_state <= HALTR;
+        else
+          next_state <= HALT;
+        end if;
+
+      when HALTR =>
+        if lp_rst_cnt_off_int = '1' then
+          next_state <= ACT;
+        else
+          next_state <= HALTR;
+        end if;
+
+      when NAPP =>
+        next_state <= NAPP2;
+
+      when NAPP2 =>
+        next_state <= NAPPC;
+
+      when NAPPC =>
+        next_state <= NAP;
+
+      when NAP =>
+        if wakeup_lp = '1' then
+          next_state <= NAPR;
+        else
+          next_state <= NAP;
+        end if;
+
+      when NAPR =>
+        if lp_rst_cnt_off_int = '1' then
+          next_state <= ACT;
+        else
+          next_state <= NAPR;
+        end if;
+
+      when others =>
         next_state <= INIT;
-	END CASE;
+    end case;
   end process pwr_mode_next;
 
 --make all the control signals to be regestered
@@ -736,44 +578,44 @@ begin  -- rtl
       reset_core_n <= '0';
       nap_rec      <= '0';
     elsif rising_edge(clk_mux_out_int) then
-        IF next_state = HALT THEN
-            pmic_core_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_core_en    <= '1';
-        END IF;
-        
-        IF next_state = HALT or next_state = NAP THEN
-            pmic_io_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_io_en    <= '1';
-        END IF;     
+      if next_state = HALT then
+        pmic_core_en <= '0';
+      elsif wakeup_lp = '1' then
+        pmic_core_en <= '1';
+      end if;
 
-        IF next_state = ACT THEN
-            core_iso    <= '0';
-        ELSE
-            core_iso    <= '1';
-        END IF;  
-            
-        IF next_state = ACT or next_state = HALTP or next_state = HALTP2 or next_state = NAPP or next_state = NAPP2 THEN
-            clk_iso    <= '0';
-        ELSE
-            clk_iso    <= '1';
-        END IF;      
+      if next_state = HALT or next_state = NAP then
+        pmic_io_en <= '0';
+      elsif wakeup_lp = '1' then
+        pmic_io_en <= '1';
+      end if;
 
-        IF next_state = HALTR THEN
-            reset_core_n    <= '0';
-        ELSIF next_state = ACT THEN
-            reset_core_n    <= '1';
-        END IF;
-        
-        IF next_state = NAPR THEN
-            nap_rec    <= '1';
-        ELSE
-            nap_rec    <= '0';
-        END IF; 
+      if next_state = ACT then
+        core_iso <= '0';
+      else
+        core_iso <= '1';
+      end if;
 
-	END IF;
-    
+      if next_state = ACT or next_state = HALTP or next_state = HALTP2 or next_state = NAPP or next_state = NAPP2 then
+        clk_iso <= '0';
+      else
+        clk_iso <= '1';
+      end if;
+
+      if next_state = HALTR then
+        reset_core_n <= '0';
+      elsif next_state = ACT then
+        reset_core_n <= '1';
+      end if;
+
+      if next_state = NAPR then
+        nap_rec <= '1';
+      else
+        nap_rec <= '0';
+      end if;
+
+    end if;
+
   end process pwr_mode_signals;
 
   io_iso <= core_iso;
@@ -851,53 +693,53 @@ begin  -- rtl
 
 
 -- The ripple counter clocks. For setting counter more efficiently, the
-    -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
-    cp_gen : process (qn, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
-    begin
-      -- Normal clocking. All FF:s in one long ripple counter chain.
-      cp(0) <= rxout;
-      for i in 1 to 46 loop
-        cp(i) <= qn(i - 1);
-      end loop;
-      -- Fast clocking. The selected byte is clocked by fclk_ok.
-      if en_fclk_iso_0 = '1' then
-        if rtc_sel_iso_0 = 0 then
-          cp(0) <= fclk_iso_0;
-        end if;
-        for i in 1 to 5 loop
-          if rtc_sel_iso_0 = i then
-            cp((i*8)-1) <= fclk_iso_0;
-          end if;
-        end loop;
+  -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
+  cp_gen : process (qn, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
+  begin
+    -- Normal clocking. All FF:s in one long ripple counter chain.
+    cp(0) <= rxout;
+    for i in 1 to 46 loop
+      cp(i) <= qn(i - 1);
+    end loop;
+    -- Fast clocking. The selected byte is clocked by fclk_ok.
+    if en_fclk_iso_0 = '1' then
+      if rtc_sel_iso_0 = 0 then
+        cp(0) <= fclk_iso_0;
       end if;
-    end process cp_gen;
+      for i in 1 to 5 loop
+        if rtc_sel_iso_0 = i then
+          cp((i*8)-1) <= fclk_iso_0;
+        end if;
+      end loop;
+    end if;
+  end process cp_gen;
 
-    -- The 47 bits ripple counter.
-    async_ripple_counter : for i in 0 to 46 generate
-      d_ff : block
-      begin  -- block d_ff
-        process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
-        begin  -- process
-          if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
-            qn(i) <= '1';
-          elsif rising_edge(cp(i)) then
-            qn(i) <= not qn(i);
-          end if;
-        end process;
-      end block d_ff;
-    end generate async_ripple_counter;
+  -- The 47 bits ripple counter.
+  async_ripple_counter : for i in 0 to 46 generate
+    d_ff : block
+    begin  -- block d_ff
+      process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
+      begin  -- process
+        if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
+          qn(i) <= '1';
+        elsif rising_edge(cp(i)) then
+          qn(i) <= not qn(i);
+        end if;
+      end process;
+    end block d_ff;
+  end generate async_ripple_counter;
 
-    -- Mux for the output data. All six bytes of the counter can be read,
-    -- the other two rtc_sel_ok combinations output test data.
-    with rtc_sel_iso_0 select
-      rtc_data <= not qn(6 downto 0) & '0'                                      when "000",
-      not qn(14 downto 7)                                                       when "001",
-      not qn(22 downto 15)                                                      when "010",
-      not qn(30 downto 23)                                                      when "011",
-      not qn(38 downto 31)                                                      when "100",
-      not qn(46 downto 39)                                                      when "101",
-      rst_rtc_iso_0 & en_fclk_iso_0 & fclk_iso_0 & ld_bmem_iso_0 &
-      rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) when others;
+  -- Mux for the output data. All six bytes of the counter can be read,
+  -- the other two rtc_sel_ok combinations output test data.
+  with rtc_sel_iso_0 select
+    rtc_data <= not qn(6 downto 0) & '0'                                      when "000",
+    not qn(14 downto 7)                                                       when "001",
+    not qn(22 downto 15)                                                      when "010",
+    not qn(30 downto 23)                                                      when "011",
+    not qn(38 downto 31)                                                      when "100",
+    not qn(46 downto 39)                                                      when "101",
+    rst_rtc_iso_0 & en_fclk_iso_0 & fclk_iso_0 & ld_bmem_iso_0 &
+    rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) when others;
 
   -- MRXOUT is now only an external wake-up signal, RTC
   -- oscillator test is done on another pin.

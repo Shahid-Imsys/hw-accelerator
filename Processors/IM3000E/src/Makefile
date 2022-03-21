@@ -57,6 +57,9 @@ gpp_rtl: mem_comp
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/ram_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \
+			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
@@ -69,7 +72,10 @@ gpp_rtl: mem_comp
 
 mem_comp:
 	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_2Kx80_fast_func.v
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_2Kx80_fast_func.v \
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_16Kx8_fast_func.v \
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_1024x8_fast_func.v \
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_512x8_fast_func.v
 
 
 #include $(GPP_DIR)/pads/Makefile

@@ -45,13 +45,13 @@ package gp_pkg is
 -- RTC controller commands
 -----------------------------------------------------------------------------
   constant RD_RTC_CNT      : std_logic_vector(7 downto 0) := x"10";
-                                              -- Read RTC counter
+                                        -- Read RTC counter
   constant WR_RTC_CNT      : std_logic_vector(7 downto 0) := x"11";
-                                              -- Write RTC counter  
+                                        -- Write RTC counter  
   constant STOP_RTC_CMD    : std_logic_vector(7 downto 0) := x"12";
-                                              -- Stop a RTC rd/wr command
+                                        -- Stop a RTC rd/wr command
   constant START_RTC_CLOCK : std_logic_vector(7 downto 0) := x"13";
-                                              -- Start/resume RTC clock
+                                        -- Start/resume RTC clock
 
   -----------------------------------------------------------------------------
   -- DMA controller commands
@@ -83,51 +83,51 @@ package gp_pkg is
                                         -- Read/write DMA buffer
 
   -- DMA parameters
-  constant DMA_CHANNELS : integer := 8; -- Number of DMA channels
-  constant DMA_CHBITS   : integer := 3; -- Bits needed to enumerate the DMA
-                                        -- channels
-  constant IOMEM_ADDR_WIDTH : integer := 11; -- I/O memory address width (5-11)
-  
+  constant DMA_CHANNELS     : integer := 8;  -- Number of DMA channels
+  constant DMA_CHBITS       : integer := 3;  -- Bits needed to enumerate the DMA
+                                             -- channels
+  constant IOMEM_ADDR_WIDTH : integer := 11;  -- I/O memory address width (5-11)
+
   --Ethernet registers reserved up to 0x27
-  constant Rx_ctl_addr            : std_logic_vector(7 downto 0) := x"20";
-  constant Rx_sts_addr            : std_logic_vector(7 downto 0) := x"20";
-  constant Rx_da_addr             : std_logic_vector(7 downto 0) := x"21";
-  constant Rx_frame_sts_addr      : std_logic_vector(7 downto 0) := x"22";
-  constant Tx_ctl_addr            : std_logic_vector(7 downto 0) := x"23";
-  constant Tx_sts_addr            : std_logic_vector(7 downto 0) := x"23";
-  constant Rx_ctl_addr_2          : std_logic_vector(7 downto 0) := x"24";
-  constant Rx_sts_addr_2          : std_logic_vector(7 downto 0) := x"24";
-  constant Rx_da_addr_2           : std_logic_vector(7 downto 0) := x"25";
-  constant Rx_frame_sts_addr_2    : std_logic_vector(7 downto 0) := x"26";
+  constant Rx_ctl_addr         : std_logic_vector(7 downto 0) := x"20";
+  constant Rx_sts_addr         : std_logic_vector(7 downto 0) := x"20";
+  constant Rx_da_addr          : std_logic_vector(7 downto 0) := x"21";
+  constant Rx_frame_sts_addr   : std_logic_vector(7 downto 0) := x"22";
+  constant Tx_ctl_addr         : std_logic_vector(7 downto 0) := x"23";
+  constant Tx_sts_addr         : std_logic_vector(7 downto 0) := x"23";
+  constant Rx_ctl_addr_2       : std_logic_vector(7 downto 0) := x"24";
+  constant Rx_sts_addr_2       : std_logic_vector(7 downto 0) := x"24";
+  constant Rx_da_addr_2        : std_logic_vector(7 downto 0) := x"25";
+  constant Rx_frame_sts_addr_2 : std_logic_vector(7 downto 0) := x"26";
 
   --UART 1 (RS232)
-  constant com1_reg_address       : std_logic_vector(7 downto 0) :=  x"28";
-  constant com1_prescaler_address : std_logic_vector(7 downto 0) :=  x"29";
-  constant com1_flag_address      : std_logic_vector(7 downto 0) :=  x"2A";
-  constant com1_fx_address        : std_logic_vector(7 downto 0) :=  x"2B";
+  constant com1_reg_address       : std_logic_vector(7 downto 0) := x"28";
+  constant com1_prescaler_address : std_logic_vector(7 downto 0) := x"29";
+  constant com1_flag_address      : std_logic_vector(7 downto 0) := x"2A";
+  constant com1_fx_address        : std_logic_vector(7 downto 0) := x"2B";
 
   --UART 2 (RS232)
-  constant com2_reg_address       : std_logic_vector(7 downto 0) :=  x"2C";
-  constant com2_prescaler_address : std_logic_vector(7 downto 0) :=  x"2D";
-  constant com2_flag_address      : std_logic_vector(7 downto 0) :=  x"2E";
-  constant com2_fx_address        : std_logic_vector(7 downto 0) :=  x"2F";
-  
+  constant com2_reg_address       : std_logic_vector(7 downto 0) := x"2C";
+  constant com2_prescaler_address : std_logic_vector(7 downto 0) := x"2D";
+  constant com2_flag_address      : std_logic_vector(7 downto 0) := x"2E";
+  constant com2_fx_address        : std_logic_vector(7 downto 0) := x"2F";
+
   --UART 3 (RS232)
-  constant com3_reg_address       : std_logic_vector(7 downto 0) :=  x"30";
-  constant com3_prescaler_address : std_logic_vector(7 downto 0) :=  x"31";
-  constant com3_flag_address      : std_logic_vector(7 downto 0) :=  x"32";
-  constant com3_fx_address        : std_logic_vector(7 downto 0) :=  x"33";
-  
+  constant com3_reg_address       : std_logic_vector(7 downto 0) := x"30";
+  constant com3_prescaler_address : std_logic_vector(7 downto 0) := x"31";
+  constant com3_flag_address      : std_logic_vector(7 downto 0) := x"32";
+  constant com3_fx_address        : std_logic_vector(7 downto 0) := x"33";
+
   --DAC
-	constant DAC_CHANNELS	: integer := 2;
-	constant DAC_HBITS		: integer := 8;
-	constant DAC_LBITS		: integer := 8;
-	constant DAC_BITS			: integer := DAC_HBITS + DAC_LBITS;
-	type dac_data_type is array (0 to DAC_CHANNELS-1) of std_logic_vector(DAC_BITS-1 downto 0);
+  constant DAC_CHANNELS : integer := 2;
+  constant DAC_HBITS    : integer := 8;
+  constant DAC_LBITS    : integer := 8;
+  constant DAC_BITS     : integer := DAC_HBITS + DAC_LBITS;
+  type dac_data_type is array (0 to DAC_CHANNELS-1) of std_logic_vector(DAC_BITS-1 downto 0);
 
   --application ram or rom
   --added by maning for dual core processor
-    constant MEMNUM         : integer := 6;
+  constant MEMNUM     : integer                       := 6;
 --    constant ROM0_ADDR0     : std_logic_vector(17 downto 0) :=  "000000000000000000";--16KB
 --    constant ROM0_ADDR1     : std_logic_vector(17 downto 0) :=  "000000000000000001";--16KB
 --    constant ROM0_ADDR2     : std_logic_vector(17 downto 0) :=  "000000000000000010";--16KB
@@ -144,28 +144,38 @@ package gp_pkg is
 --    constant ROM3_ADDR1     : std_logic_vector(17 downto 0) :=  "000000000000001101";--16KB
 --    constant ROM3_ADDR2     : std_logic_vector(17 downto 0) :=  "000000000000001110";--16KB
 --    constant ROM3_ADDR3     : std_logic_vector(17 downto 0) :=  "000000000000001111";--16KB     ROM3 total 64 KB
-    constant FLSH_ADDR0    : std_logic_vector(17 downto 0) :=  "000000100000000000";--16KB     
-    constant FLSH_ADDR1    : std_logic_vector(17 downto 0) :=  "000000100000000001";--16KB     
-    constant FLSH_ADDR2    : std_logic_vector(17 downto 0) :=  "000000100000000010";--16KB     
-    constant FLSH_ADDR3    : std_logic_vector(17 downto 0) :=  "000000100000000011";--16KB     
-	constant FLSH_ADDR4    : std_logic_vector(17 downto 0) :=  "000000100000000100";--16KB     
-    constant FLSH_ADDR5    : std_logic_vector(17 downto 0) :=  "000000100000000101";--16KB
-    constant FLSH_ADDR6    : std_logic_vector(17 downto 0) :=  "000000100000000110";--16KB
-    constant FLSH_ADDR7    : std_logic_vector(17 downto 0) :=  "000000100000000111";--16KB    Flash total 128 KB 
-    constant RAM0_ADDR     : std_logic_vector(17 downto 0) :=  "000000000000000000";--16KB    RAM0 16 KB
-    constant RAM1_ADDR     : std_logic_vector(17 downto 0) :=  "000000000000000001";--16KB    RAM1 16 KB
-    constant RAM2_ADDR     : std_logic_vector(17 downto 0) :=  "000000000000000010";--16KB    RAM2 16 KB
-    constant RAM3_ADDR     : std_logic_vector(17 downto 0) :=  "000000000000000011";--16KB    RAM3 16 KB 
-    constant RAM4_ADDR     : std_logic_vector(17 downto 0) :=  "000000000000000100";--16KB    RAM4 16 KB  
+  constant FLSH_ADDR0 : std_logic_vector(17 downto 0) := "000000100000000000";  --16KB     
+  constant FLSH_ADDR1 : std_logic_vector(17 downto 0) := "000000100000000001";  --16KB     
+  constant FLSH_ADDR2 : std_logic_vector(17 downto 0) := "000000100000000010";  --16KB     
+  constant FLSH_ADDR3 : std_logic_vector(17 downto 0) := "000000100000000011";  --16KB     
+  constant FLSH_ADDR4 : std_logic_vector(17 downto 0) := "000000100000000100";  --16KB     
+  constant FLSH_ADDR5 : std_logic_vector(17 downto 0) := "000000100000000101";  --16KB
+  constant FLSH_ADDR6 : std_logic_vector(17 downto 0) := "000000100000000110";  --16KB
+  constant FLSH_ADDR7 : std_logic_vector(17 downto 0) := "000000100000000111";  --16KB    Flash total 128 KB 
+  constant RAM0_ADDR  : std_logic_vector(17 downto 0) := "000000000000000000";  --16KB    RAM0 16 KB
+  constant RAM1_ADDR  : std_logic_vector(17 downto 0) := "000000000000000001";  --16KB    RAM1 16 KB
+  constant RAM2_ADDR  : std_logic_vector(17 downto 0) := "000000000000000010";  --16KB    RAM2 16 KB
+  constant RAM3_ADDR  : std_logic_vector(17 downto 0) := "000000000000000011";  --16KB    RAM3 16 KB 
+  constant RAM4_ADDR  : std_logic_vector(17 downto 0) := "000000000000000100";  --16KB    RAM4 16 KB  
 
 --    constant RAM2_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000000101";--16KB     RAM5 16 KB
 --    constant RAM1_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000000110";--16KB     RAM6 16 KB
 --    constant RAM0_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000000111";--16KB     RAM7 16 KB
---	constant RAM8_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000011000";--16KB     RAM8 16 KB
+--      constant RAM8_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000011000";--16KB     RAM8 16 KB
 --    constant RAM9_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000011001";--16KB     RAM9 16 KB
-    
-    
-	
+
+  type OSPI_InterfaceOut_t is record
+    RESET_n : std_logic;
+    CK_p    : std_logic;
+    CK_n    : std_logic;
+    CS_n    : std_logic;
+  end record;
+
+--  type OSPI_InterfaceBidir_t is record
+--    DQ   : std_logic_vector(7 downto 0);
+--    RWDS : std_logic;
+--  end record;
+  
 end gp_pkg;
 
 package body gp_pkg is

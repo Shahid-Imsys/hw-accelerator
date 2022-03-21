@@ -71,6 +71,9 @@ use work.gp_pkg.all;
 
 
 entity top is
+  generic (
+    g_memory_type : memory_type_t := asic
+    );
   port (
     -- clocks and control signals
     HCLK       : in    std_logic;                  -- clk input   
@@ -679,8 +682,6 @@ architecture struct of top is
       );
  end component;
 
-  constant g_memory_type : memory_type_t := asic;
-  --constant g_memory_type : memory_type_t := referens;
 
   -----------------------------------------------------------------------------
   -- Internal signals driven by (i.e. "output" from) each block 

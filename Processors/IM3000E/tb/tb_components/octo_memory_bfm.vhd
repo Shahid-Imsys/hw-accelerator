@@ -22,7 +22,7 @@ architecture bfm of octo_memory_bfm is
   constant id0_register_c   : std_logic_vector(15 downto 0) := x"0C81";
   constant id1_register_c   : std_logic_vector(15 downto 0) := x"0001";
   constant cr0_init_value_c : std_logic_vector(15 downto 0) := x"012F";
-  constant cr1_init_value_c : std_logic_vector(15 downto 0) := x"FC1";
+  constant cr1_init_value_c : std_logic_vector(15 downto 0) := x"FFC1";
 
   signal cr0 : std_logic_vector(15 downto 0) := cr0_init_value_c;
   signal cr1 : std_logic_vector(15 downto 0) := cr1_init_value_c;
@@ -47,7 +47,7 @@ architecture bfm of octo_memory_bfm is
   type reg_t is array (17 downto 0) of std_logic_vector(15 downto 0);
   signal reg : reg_t;
 
-  type memory_array_t is array (1023 downto 0) of std_logic_vector(8 downto 0);
+  type memory_array_t is array (1023 downto 0) of std_logic_vector(7 downto 0);
   signal memory_low  : memory_array_t;
   signal memory_high : memory_array_t;
 
@@ -57,12 +57,13 @@ begin  -- architecture bfm
 
   p_deep_power_down : process (all) is
   begin  -- process s
-    if reset_n = '1' then
+    if (reset_n = '1') or (state = command_state_1 and command = x"99" and reset_enable) then
       deep_power_down_state <= normal;
       deep_power_down       <= false;
     else
       case deep_power_down_state is
         when normal =>
+          deep_power_down <= false;
           if (state = command_state_2 and command = x"09") or cr0(15) = '1' then
             deep_power_down_state <= start;
             deep_power_down       <= true;
@@ -81,6 +82,7 @@ begin  -- architecture bfm
             deep_power_down       <= false;
           end if;
       end case;
+
     end if;
   end process;
 
@@ -97,7 +99,6 @@ begin  -- architecture bfm
       writeline(output, l);
       command         <= x"00";
       reset_enable    <= false;
-      deep_power_down <= false;
       state           <= command_state_1;
       dq              <= (others => 'Z');
       rwds            <= 'Z';
@@ -132,7 +133,6 @@ begin  -- architecture bfm
                 write(l, string'("Octo_spi reset command"));
                 writeline(output, l);
                 reset_enable    <= false;
-                deep_power_down <= false;
                 state           <= wait_on_cs;
                 rwds            <= 'Z';
               end if;
@@ -140,21 +140,13 @@ begin  -- architecture bfm
               write(l, string'("Commando read ID not implemnted"));
               writeline(output, l);
               state <= wait_on_cs;
-            when x"EE" | x"DE" |         -- Read/write memory array 
-                       x"65" | x"71" =>  -- Read/write memory array 
-              state <= latency_wait;
-              -- old_latency is invers from RWDS.
-              if old_latency = '1' then
-                counter <= latency_length;
-              else
-                counter <= latency_length * 2;
-              end if;
+           
             when x"06" =>
               write_enable <= true;
             when x"04" =>
               write_enable <= false;
-            when x"EE" | x"DE" |         -- Read/write memory array 
-                       x"65" | x"71" =>  -- Read register
+            when  x"EE" | x"DE" |         -- Read/write memory array 
+                  x"65" | x"71"    =>  -- Read register
               state   <= get_address;
               counter <= 3;
             when others =>
@@ -164,7 +156,7 @@ begin  -- architecture bfm
 
         when get_address =>
           if counter = 0 then
-            if command = x"EE" or command = x"DE" or command = x"71" then
+            if command = x"EE" or command = x"DE" or command = x"65" then
               state <= latency_wait;
               -- old_latency is invers from RWDS.
               if old_latency = '1' then
@@ -250,7 +242,7 @@ begin  -- architecture bfm
           else
             if command = x"EE" and ck = '0' then
               state <= read_ddr;
-            elsif command = x"71" and ck = '0' then
+            elsif command = x"65" and ck = '0' then
               state   <= read_register;
               counter <= 1;
             else
@@ -315,7 +307,7 @@ begin  -- architecture bfm
           rwds <= '1';
           if address = x"000000" then   -- ID0 register
             if counter = 1 then
-              dq      <= id0_register_c(15 downto 7);
+              dq      <= id0_register_c(15 downto 8);
               rwds    <= '1';
               counter <= 0;
             elsif counter = 0 then
@@ -326,7 +318,7 @@ begin  -- architecture bfm
 
           elsif address = x"000002" then  -- ID1 register
             if counter = 1 then
-              dq      <= id1_register_c(15 downto 7);
+              dq      <= id1_register_c(15 downto 8);
               rwds    <= '1';
               counter <= 0;
             elsif counter = 0 then

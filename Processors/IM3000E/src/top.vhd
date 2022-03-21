@@ -143,25 +143,30 @@ entity top is
     PG : inout std_logic_vector(7 downto 0);  -- port G, added by HYX, 20141115
     PH : inout std_logic_vector(7 downto 0);  -- port H /DMA ctrl
     PI : inout std_logic_vector(7 downto 0);  -- port I /ID
-    PJ : inout std_logic_vector(7 downto 0)  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0) 
+    PJ : inout std_logic_vector(7 downto 0);  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0)
+
+    -- Temp code
+    OSPI_Out   : out   OSPI_InterfaceOut_t;
+    OSPI_DQ    : inout std_logic_vector(7 downto 0);
+    OSPI_RWDS  : inout std_logic    
     );
 -- MPG RAM signals
 end top;
 
 architecture struct of top is
 
-  COMPONENT dist_mem_gen_0
-  PORT (
-    a : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
-    d : IN STD_LOGIC_VECTOR(79 DOWNTO 0);
-    clk : IN STD_LOGIC;
-    we : IN STD_LOGIC;
-    i_ce : IN STD_LOGIC;
-    qspo_ce : IN STD_LOGIC;
-    qspo : OUT STD_LOGIC_VECTOR(79 DOWNTO 0)
-  );
-  END COMPONENT;
-  
+  component dist_mem_gen_0
+    port (
+      a       : in  std_logic_vector(10 downto 0);
+      d       : in  std_logic_vector(79 downto 0);
+      clk     : in  std_logic;
+      we      : in  std_logic;
+      i_ce    : in  std_logic;
+      qspo_ce : in  std_logic;
+      qspo    : out std_logic_vector(79 downto 0)
+      );
+  end component;
+
   --PLL
   component FXPLL031HA0A_APGD
     port (
@@ -873,8 +878,7 @@ architecture struct of top is
       );
   end component;
 
-  --constant asic : boolean := false;
-  constant asic : boolean := true;
+  constant asic : boolean := false;
 
   -----------------------------------------------------------------------------
   -- Internal signals driven by (i.e. "output" from) each block 
@@ -1343,6 +1347,8 @@ architecture struct of top is
 --  signal RAM7_CS         : std_logic;   
 
 begin
+
+    
   --pads
   iopads_inst : entity work.iopads
     port map(
@@ -2108,25 +2114,25 @@ begin
   g_fpga : if not asic generate
     mpram00 : dist_mem_gen_0
       port map (
-      a       => mp_RAM0_A(10 downto 0),              -- input wire [10 : 0] a
-      d       => mp_RAM0_DI,            -- input wire [79 : 0] d
-      clk     => clk_p,                 -- input wire clk
-      we      => not mp_RAM0_WEB,       -- input wire we
-      i_ce    => mp_RAM0_CS,            -- input wire i_ce
-      qspo_ce => '1',                   -- input wire qspo_ce
-      qspo    => mp_RAM0_DO                     -- output wire [79 : 0] qspo
-      );
+        a       => mp_RAM0_A(10 downto 0),  -- input wire [10 : 0] a
+        d       => mp_RAM0_DI,              -- input wire [79 : 0] d
+        clk     => clk_p,                   -- input wire clk
+        we      => not mp_RAM0_WEB,         -- input wire we
+        i_ce    => mp_RAM0_CS,              -- input wire i_ce
+        qspo_ce => '1',                     -- input wire qspo_ce
+        qspo    => mp_RAM0_DO               -- output wire [79 : 0] qspo
+        );
 
-    mpram11 : dist_mem_gen_0 
+    mpram11 : dist_mem_gen_0
       port map (
-      a       => mp_RAM1_A(10 downto 0),              -- input wire [10 : 0] a
-      d       => mp_RAM1_DI,            -- input wire [79 : 0] d
-      clk     => clk_p,                 -- input wire clk
-      we      => not mp_RAM1_WEB,       -- input wire we
-      i_ce    => mp_RAM1_CS,            -- input wire i_ce
-      qspo_ce => '1',                   -- input wire qspo_ce
-      qspo    => mp_RAM1_DO                     -- output wire [79 : 0] qspo
-      );
+        a       => mp_RAM1_A(10 downto 0),  -- input wire [10 : 0] a
+        d       => mp_RAM1_DI,              -- input wire [79 : 0] d
+        clk     => clk_p,                   -- input wire clk
+        we      => not mp_RAM1_WEB,         -- input wire we
+        i_ce    => mp_RAM1_CS,              -- input wire i_ce
+        qspo_ce => '1',                     -- input wire qspo_ce
+        qspo    => mp_RAM1_DO               -- output wire [79 : 0] qspo
+        );
   end generate g_fpga;
 
 --  -- iomem0, iomem1
@@ -2581,19 +2587,19 @@ begin
   core1 : entity work.core
     port map(
       -- Clocks to/from clock block
-      clk_p        => clk_p,            --: in  std_logic;  -- PLL clock
-      clk_c_en     => clk_c_en,         --: in  std_logic;  -- CP clock
+      clk_p        => clk_p,  --: in  std_logic;  -- PLL clock
+      clk_c_en     => clk_c_en,  --: in  std_logic;  -- CP clock
       even_c       => even_c,
       --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2 
-      clk_e_pos    => clk_e_pos,        --: out  std_logic;  -- Execution clock
-      clk_e_neg    => clk_e_neg,        --: out  std_logic;  -- Execution clock
-      clk_i_pos    => clk_i_pos,        --: in  std_logic;  -- I/O clock
-      clk_d_pos    => clk_d_pos,        --: in  std_logic;  -- DRAM clock
-      clk_s_pos    => clk_s_pos,        --: in  std_logic;  -- SP clock
+      clk_e_pos    => clk_e_pos,  --: out  std_logic;  -- Execution clock
+      clk_e_neg    => clk_e_neg,  --: out  std_logic;  -- Execution clock
+      clk_i_pos    => clk_i_pos,  --: in  std_logic;  -- I/O clock
+      clk_d_pos    => clk_d_pos,  --: in  std_logic;  -- DRAM clock
+      clk_s_pos    => clk_s_pos,  --: in  std_logic;  -- SP clock
       -- Control outputs to the clock block
       rst_n        => rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
       rst_cn       => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-      en_d         => en_d,             --: out std_logic;  -- Enable clk_d
+      en_d         => en_d,  --: out std_logic;  -- Enable clk_d
       fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select 
       --din_e       => din_e,   --: out std_logic;  -- D input to FF generating clk_e
       din_i        => din_i,  --: out std_logic;  -- D input to FF generating clk_i
@@ -2613,10 +2619,10 @@ begin
       pll_frange   => pll_frange,  --: out std_logic;  -- Frequency range select
       pll_n        => pll_n,  --: out std_logic_vector(5 downto 0);   -- Multiplier
       pll_m        => pll_m,  --: out std_logic_vector(2 downto 0);   -- Divider
-      en_xosc      => en_xosc,          --: out std_logic;  -- Enable XOSC 
-      en_pll       => en_pll,           --: out std_logic;  -- Enable PLL 
+      en_xosc      => en_xosc,  --: out std_logic;  -- Enable XOSC 
+      en_pll       => en_pll,  --: out std_logic;  -- Enable PLL 
       sel_pll      => sel_pll,  --: out std_logic;  -- Select PLL as clock source
-      test_pll     => test_pll,         --: out std_logic;  -- PLL in test mode
+      test_pll     => test_pll,  --: out std_logic;  -- PLL in test mode
       xout         => hclk_i,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
       -- Power on signal
       pwr_ok       => pwr_ok,  --pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
@@ -2639,8 +2645,8 @@ begin
       gmem_a       => c1_gmem_a,        --: out std_logic_vector(9 downto 0);  
       gmem_d       => c1_gmem_d,        --: out std_logic_vector(7 downto 0);  
       gmem_q       => c1_gmem_q,        --: in  std_logic_vector(7 downto 0);
-      gmem_ce_n    => c1_gmem_ce_n,   --: out std_logic;                      
-      gmem_we_n    => c1_gmem_we_n,   --: out std_logic;                      
+      gmem_ce_n    => c1_gmem_ce_n,  --: out std_logic;                      
+      gmem_we_n    => c1_gmem_we_n,  --: out std_logic;                      
       -- IOMEM signals
       iomem_a      => iomem_a,          --: out std_logic_vector(9 downto 0);
       iomem_d      => iomem_d,          --: out std_logic_vector(15 downto 0);
@@ -2712,7 +2718,7 @@ begin
       pd              => pd_s,  --: out std_logic_vector(2 downto 0);  -- pl_pd
       aaddr           => aaddr,  --: out std_logic_vector(4 downto 0);  -- pl_aaddr
       idreq           => idreq,         --: in  std_logic_vector(7 downto 0);
-      idi             => idi,   --: in  std_logic_vector(7 downto 0);     
+      idi             => idi,    --: in  std_logic_vector(7 downto 0);     
       idack           => idack,  --: out std_logic_vector(7 downto 0);                   
       ios_iden        => ios_iden,      --: out std_logic;                   
       ios_ido         => ios_ido,  --: out std_logic_vector(7 downto 0);                  
@@ -2730,7 +2736,7 @@ begin
       run_tiu         => run_tiu,       --: out std_logic;
       en_tstamp       => en_tstamp,     --: out std_logic_vector(1 downto 0);
       en_iobus        => en_iobus,      --: out std_logic_vector(1 downto 0);
-      ddqm            => ddqm,  --: out std_logic_vector(7  downto 0);   
+      ddqm            => ddqm,   --: out std_logic_vector(7  downto 0);   
       irq0            => irq0,  --: in  std_logic;  -- Interrupt request 0   
       irq1            => irq1,  --: in  std_logic;  -- Interrupt request 1   
       adc_ref2v       => adc_ref2v,  --: out  std_logic;      -- Select 2V internal ADC reference (1V)
@@ -2744,20 +2750,20 @@ begin
       mckout1_o       => mckout1_o,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_o_en,
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
-      msdout_o        => msdout_o,      --: out std_logic;  -- Serial data out
-      mrstout_o       => mrstout_o,     --: out std_logic;  -- Reset out
+      msdout_o        => msdout_o,  --: out std_logic;  -- Serial data out
+      mrstout_o       => mrstout_o,  --: out std_logic;  -- Reset out
       mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
-      mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---
-      mbypass_i       => mbypass_i,     --: in  std_logic;  -- bypass PLL
-      mwake_i         => '0',           --: in  std_logic;  -- wake up
+      mtest_i         => mtest_i,  --: in  std_logic;  -- Test mode---
+      mbypass_i       => mbypass_i,  --: in  std_logic;  -- bypass PLL
+      mwake_i         => '0',  --: in  std_logic;  -- wake up
       -- DRAM signals
       en_pmem2        => en_pmem2,
       d_addr          => c1_d_addr,     --to internal sram block
-      dcs_o           => c1_d_cs,       --: out std_logic;  -- Chip select
+      dcs_o           => c1_d_cs,  --: out std_logic;  -- Chip select
       dras_o          => c1_d_ras,  --: out std_logic;  -- Row address strobe
       dcas_o          => c1_d_cas,  --: out std_logic;  -- Column address strobe
-      dwe_o           => c1_d_we,       --: out std_logic;  -- Write enable
+      dwe_o           => c1_d_we,  --: out std_logic;  -- Write enable
       ddq_i           => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus
       ddq_o           => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus
       ddq_en          => ddq_en,  --: out std_logic;  -- Data output bus enable
@@ -3099,7 +3105,7 @@ begin
   -- Peripherals
   -----------------------------------------------------------------------------
 
-  g_asic_peri : if asic generate
+  g_asic_peri : if true generate
     peri01 : entity work.peri
       port map(
         clk_p      => clk_p,
@@ -3182,7 +3188,12 @@ begin
         pi_o       => pi_o,
         pj_i       => pj_i,
         pj_en      => pj_en,
-        pj_o       => pj_o
+        pj_o       => pj_o,
+
+        -- Temp code
+        OSPI_Out   => OSPI_Out,
+        OSPI_DQ    => OSPI_DQ,
+        OSPI_RWDS  => OSPI_RWDS
         );
 
   end generate g_asic_peri;

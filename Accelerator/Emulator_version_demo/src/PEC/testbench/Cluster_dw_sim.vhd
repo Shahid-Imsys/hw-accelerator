@@ -54,12 +54,12 @@ architecture Behavioral of Cluster_sim is
     type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
     type out_word   is array (2591 downto 0) of std_logic_vector(7 downto 0);
    	type ram_type   is array (255 downto 0) of std_logic_vector(127 downto 0);
-    type data_in    is array (255 downto 0) of std_logic_vector(127 downto 0);
+    type data_in    is array (359 downto 0) of std_logic_vector(127 downto 0);
     type kernels_in is array (80 downto 0) of std_logic_vector(127 downto 0);
     type bias_in    is array (17 downto 0) of std_logic_vector(127 downto 0);
     type result_out is array (161 downto 0) of std_logic_vector(127 downto 0);
-	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-    type data_in_b  is array (255 downto 0) of bit_vector(127 downto 0);
+	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+    type data_in_b  is array (359 downto 0) of bit_vector(127 downto 0);
     type kernels_b  is array (80 downto 0) of bit_vector(127 downto 0);
     type bias_in_b  is array (17 downto 0) of bit_vector(127 downto 0);
     type res_out_b  is array (161 downto 0) of bit_vector(127 downto 0);
@@ -84,7 +84,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM_B : data_in_b;
         variable RAM :data_in;
         begin
-          for i in 0 to 255 loop
+          for i in 0 to 359 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -143,7 +143,7 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_dw  : ram_type := init_ram_from_file("microprogram.ascii");
+signal ucode_dw  : ram_type := init_ram_from_file("microprogram.ascii");--("microprogram_id.ascii");
 signal data_dw   : data_in := init_input_from_file("data_dw.ascii");
 signal kernel_dw : kernels_in := init_kernel_from_file("kernels_dw.ascii");
 signal bias_dw   : bias_in := init_bias_from_file("bias_dw.ascii");
@@ -182,7 +182,7 @@ constant dw_out_a   : std_logic_vector(14 downto 0) := "100010000000000"; --0x44
 constant ucode_len  : std_logic_vector(14 downto 0) := "000000011111111";--255, 256 words--microcode
 constant kernels_len: std_logic_vector(14 DOWNTO 0) := "000000001010000";--80, 81 words
 constant bias_len   : std_logic_vector(14 DOWNTO 0) := "000000000010001";--17, 18 words
-constant data_len   : std_logic_vector(14 DOWNTO 0) := "000000011111111";--255, 256 WORDS
+constant data_len   : std_logic_vector(14 DOWNTO 0) := "000000101100111";--359, 360 WORDS
 constant dw_out_len : std_logic_vector(14 downto 0) := "000000010100001";--161, 162 output channels.
 
 begin 
@@ -400,7 +400,7 @@ wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
 progress <=31;
-for i in 0 to 255 loop
+for i in 0 to 359 loop
   sendmemword(conv_to_memword(data_dw(i)));
 end loop;
 progress <=7;
@@ -503,7 +503,7 @@ progress <= 8;
 
 
 --Start testing on PE side(simulated data input)
-wait for 480000 ns;
+wait for 220000 ns;
 --wait until rising_edge(C_RDY);
 wait until rising_edge(clk_e_i);
 wait for 5 ns;

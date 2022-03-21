@@ -202,7 +202,7 @@ architecture Behavioral of Cluster_sim is
 --signal ucode : ram_type := init_ram_from_file("SequenceTest_F_Core2en.data");--("SequenceTest_F.data");
 --signal ucode_ve : ram_type := init_ram_from_file("program_0x000_o.ascii");
 --signal ucode_uc : ram_type := init_ram_from_file("unicast_plus_core_2_BE_F.data");--("unicast_BE_F.data");
-signal ucode_pw: ram_type := init_ram_from_file("Pointwise_expand_all_4x4_outer_F.ascii");
+signal ucode_pw: ram_type := init_ram_from_file("pw_microprogram_id.ascii");
 --signal ucode_lm: ram_type := init_ram_from_file("load_mult_BE_F.data");
 signal input_0 : ram_type_vc := init_input_from_file("input_data.ascii");--("input_0x400.ascii");
 signal kernel_0 : ram_type_vd := init_kernel_from_file("kernels.ascii");--("kernel_0x100.ascii");

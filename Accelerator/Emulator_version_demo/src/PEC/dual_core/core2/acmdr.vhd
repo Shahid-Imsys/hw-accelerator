@@ -54,7 +54,10 @@ entity acmdr is
         VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
-        VE_DTMO   : in std_logic_vector(127 downto 0)  --output DTM data from VE;
+        VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
+        VE_DTM_RDY : in std_logic;
+        VE_PUSH_DTM : in std_logic;
+        VE_AUTO_SEND : in std_logic
         
     );
 end; 
@@ -88,6 +91,7 @@ architecture rtl of acmdr is
     signal pl_send_req   : std_logic;
     signal send_req_d    : std_logic;
     signal send_req      : std_logic;
+    signal requesting    : std_logic;
 
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
@@ -101,6 +105,7 @@ architecture rtl of acmdr is
     signal fifo_rd_en  : std_logic;
     signal init_mpgm_rq : std_logic_vector(31 downto 0);
     signal empty       : std_logic;
+    signal fifo_full   : std_logic;
     signal fb          : std_logic;
     signal req         : std_logic;
     signal srst        : std_logic;
@@ -123,24 +128,38 @@ begin
             end if;
         end if;
     end process;
+
+    process(CLK_E_POS, DIN, DATA_VLD, RST_EN)
+    begin
+        if RST_EN = '0' then
+            ve_data_int <= (others => '0');
+        else
+            if DATA_VLD = '1' then
+                if CLK_E_POS = '0' then
+                    ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
+                else
+                    ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
+                end if;
+            else
+                ve_data_int <= (others => '0');
+            end if;
+        end if;
+    end process;
+
     process(clk_p)
     begin
         if rising_edge(clk_p) then
             if RST_EN = '0' then
-                ve_data_int <= (others => '0');
+                VE_DIN <= (others => '0');
                 mp_data_int <= (others => '0');
                 dbus_reg <= (others => '0');
             elsif DATA_VLD = '1' then 
                 mp_data_int <= DIN;           --input to microprogram data
-                if CLK_E_POS = '0' then
-                    ve_data_int <= DIN(63 downto 0); --input lower half to vector engine at falling edge of clk_e
-                elsif CLK_E_POS = '1' then
-                    ve_data_int <= DIN(127 downto 64); --input upper half to vector engine at rising edge of clk_e
-                end if;
                 if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
                     dbus_reg <= DIN;
                 end if;
             end if;
+            VE_DIN <= ve_data_int;
         end if;
     end process;
 
@@ -159,7 +178,12 @@ begin
     dtm_mux_sel <= pl(117 downto 116);
     ld_dtm_v <= pl(88);
     fifo_push <= pl(114);
-    pl_send_req <= pl(113);
+    process(clk_p)--delay a clock cycle.
+    begin
+        if rising_edge(clk_p) then
+            pl_send_req <= pl(113);
+        end if;
+    end process;
     init_mpgm_rq <= "01000111001111110000000000000000";
     process(clk_p)
     begin
@@ -173,6 +197,9 @@ begin
         elsif ld_dtm = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
             ve_in_cnt <= (others => '0');
+        elsif ve_dtm_rdy = '1' then
+            dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
+            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         elsif ld_dtm_v = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
             ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
@@ -189,6 +216,8 @@ begin
                 else
                     fifo_wr_en <= '0';
                 end if;
+            elsif ve_push_dtm = '1' then
+                fifo_wr_en <= '1';
             else
                 fifo_wr_en <= '0';
             end if;
@@ -197,13 +226,25 @@ begin
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if clk_e_pos = '1' then --rising_edge
-                send_req_d <= pl_send_req;
-                send_req <= send_req_d;
-            end if;
+        if rising_edge(clk_p) then 
+            requesting <= (ve_auto_send and fifo_full) or pl_send_req;
         end if;
     end process;
+
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if clk_e_pos = '1' then --rising_edge
+                send_req_d <= '1';
+                if empty = '1' then
+                    send_req_d <= '0';
+                elsif requesting = '1' then
+                    send_req_d <= '1';--requesting;
+                end if;
+            end if;
+            send_req <= send_req_d;
+        end if;
+end process;
 
     process(clk_p)
     begin
@@ -216,13 +257,17 @@ begin
         end if;
     end process;
 
-    process(clk_p)
+    process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
     begin
-        if rising_edge(clk_p) then 
+        if rising_edge(clk_p) then
             if clk_e_pos = '1' then
-                if send_req = '1' and fb = '0' then
-                    req <= '1';
-                else
+                if rst_en = '0' then
+                    req <= '0';
+                elsif fb = '0' then 
+                    if send_req = '1' then
+                        req <= '1';
+                    end if;
+                elsif fb = '1' then
                     req <= '0';
                 end if;
             end if;
@@ -230,8 +275,18 @@ begin
     end process;
     
     REQ_OUT <= req;
-    srst <= not rst_en;
-    fb <= ACK_IN;
+    fb  <= ACK_IN;
+    --srst <= not rst_en;
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            srst <= not rst_en;
+            if CLK_E_POS = '0' and ld_dtm ='1' and empty = '1' then 
+                srst <= '1';
+            end if;
+        end if;
+    end process;
+    
     req_fifo : fifo_generator_0
     PORT MAP (
     clk => CLK_P,
@@ -242,7 +297,7 @@ begin
     dout => DOUT,
     full => open,
     empty => empty,
-    prog_full => open, --asserts when 5 words inside
+    prog_full => fifo_full, --asserts when 5 words inside
     wr_rst_busy => open,
     rd_rst_busy => open
     );

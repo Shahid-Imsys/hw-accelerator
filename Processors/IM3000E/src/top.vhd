@@ -18,14 +18,14 @@
 -- File       : top.vhd
 -- Author     : Xing Zhao
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
--- Description: Top level model which instantiates the core, memories 
+-- Description: Top level model which instantiates the core, memories
 --              and other blocks as well as pad blocks.
---              
+--
 -------------------------------------------------------------------------------
 -- TO-DO list :
---              
+--
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date                                 Version         Author  Description
@@ -72,20 +72,23 @@ use work.gp_pkg.all;
 --LIBRARY dist_mem_gen_v8_0_13;
 
 entity top is
+  generic (
+    g_memory_type : memory_type_t := referens
+    );
   port (
     -- clocks and control signals
-    HCLK    : in  std_logic;            -- clk input   
+    HCLK    : in  std_logic;            -- clk input
     MRESET  : in  std_logic;  -- system reset               low active
-    MIRQOUT : out std_logic;            -- interrupt request output    
+    MIRQOUT : out std_logic;            -- interrupt request output
     MCKOUT0 : out std_logic;            --for trace adapter
     MCKOUT1 : out std_logic;            --programable clock out
-    MTEST   : in  std_logic;  --                            high active                 
+    MTEST   : in  std_logic;  --                            high active
     MBYPASS : in  std_logic;
     MIRQ0   : in  std_logic;  --                            low active
     MIRQ1   : in  std_logic;  --                            low active
-    -- SW debug                                                               
-    MSDIN   : in  std_logic;            -- serial data in (debug)     
-    MSDOUT  : out std_logic;            -- serial data out    
+    -- SW debug
+    MSDIN   : in  std_logic;            -- serial data in (debug)
+    MSDOUT  : out std_logic;            -- serial data out
 
     MWAKEUP_LP : in    std_logic;       --                          high active
     MLP_PWR_OK : in    std_logic;
@@ -106,24 +109,24 @@ entity top is
     D_CKE      : out   std_logic_vector(3 downto 0);
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
-    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)  
-    vdd_bmem   : in  std_logic;         -- Power for the BMEM block  
-    VCC18LP    : in  std_logic;         -- Power for the RTC block  
-    rxout      : in  std_logic;         -- RTC oscillator output  
-    ach_sel0   : out std_logic;         -- ADC channel select, bit 0  
-    ach_sel1   : out std_logic;         -- ADC channel select, bit 1  
-    ach_sel2   : out std_logic;         -- ADC channel select, bit 2  
+    pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
+    vdd_bmem   : in  std_logic;         -- Power for the BMEM block
+    VCC18LP    : in  std_logic;         -- Power for the RTC block
+    rxout      : in  std_logic;         -- RTC oscillator output
+    ach_sel0   : out std_logic;         -- ADC channel select, bit 0
+    ach_sel1   : out std_logic;         -- ADC channel select, bit 1
+    ach_sel2   : out std_logic;         -- ADC channel select, bit 2
     adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
     adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
     adc_extref : out std_logic;  -- Select external ADC reference (internal)
     adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
-    dac1_bits  : out std_logic;         -- Bitstream to DAC1 
+    dac1_bits  : out std_logic;         -- Bitstream to DAC1
     dac0_en    : out std_logic;         -- Enable for DAC0
-    dac1_en    : out std_logic;         -- Enable for DAC1 
-    clk_a      : out std_logic;         -- Clock to the DAC's and ADC 
+    dac1_en    : out std_logic;         -- Enable for DAC1
+    clk_a      : out std_logic;         -- Clock to the DAC's and ADC
 
     -- PLL
     -- VCC18A  : in   std_logic;
@@ -131,12 +134,12 @@ entity top is
     -- VCC18D  : in   std_logic;
     -- GND18D  : in   std_logic;
     -- VCCK    : in   std_logic;
-    -- GNDK    : in   std_logic; 
+    -- GNDK    : in   std_logic;
 
     -- PORT
-    PA : inout std_logic_vector(7 downto 0);  -- port A 
-    PB : inout std_logic_vector(7 downto 0);  -- port B 
-    PC : inout std_logic_vector(7 downto 0);  -- port C 
+    PA : inout std_logic_vector(7 downto 0);  -- port A
+    PB : inout std_logic_vector(7 downto 0);  -- port B
+    PC : inout std_logic_vector(7 downto 0);  -- port C
     PD : inout std_logic_vector(7 downto 0);  -- port D /DDQM, connect to TYA(7..0) and to DDQM(7..0)
     PE : inout std_logic_vector(7 downto 0);
     PF : inout std_logic_vector(7 downto 0);  -- port F ethernet 1
@@ -145,29 +148,16 @@ entity top is
     PI : inout std_logic_vector(7 downto 0);  -- port I /ID
     PJ : inout std_logic_vector(7 downto 0);  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0)
 
-    -- Temp code
+    -- OSPI interface
     OSPI_Out   : out   OSPI_InterfaceOut_t;
     OSPI_DQ    : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS  : inout std_logic    
+    OSPI_RWDS  : inout std_logic
     );
 -- MPG RAM signals
 end top;
 
 architecture struct of top is
-
-  component dist_mem_gen_0
-    port (
-      a       : in  std_logic_vector(10 downto 0);
-      d       : in  std_logic_vector(79 downto 0);
-      clk     : in  std_logic;
-      we      : in  std_logic;
-      i_ce    : in  std_logic;
-      qspo_ce : in  std_logic;
-      qspo    : out std_logic_vector(79 downto 0)
-      );
-  end component;
-
-  --PLL
+ --PLL
   component FXPLL031HA0A_APGD
     port (
       CKOUT  : out std_logic;           -- PLL output to clock buffer
@@ -192,40 +182,6 @@ architecture struct of top is
       MS5    : in  std_logic);
   end component;
 
-  -- iomem
-  component SY180_1024X8X1CM8
-    port(
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic;
-      A4  : in  std_logic;
-      A5  : in  std_logic;
-      A6  : in  std_logic;
-      A7  : in  std_logic;
-      A8  : in  std_logic;
-      A9  : in  std_logic;
-      DO0 : out std_logic;
-      DO1 : out std_logic;
-      DO2 : out std_logic;
-      DO3 : out std_logic;
-      DO4 : out std_logic;
-      DO5 : out std_logic;
-      DO6 : out std_logic;
-      DO7 : out std_logic;
-      DI0 : in  std_logic;
-      DI1 : in  std_logic;
-      DI2 : in  std_logic;
-      DI3 : in  std_logic;
-      DI4 : in  std_logic;
-      DI5 : in  std_logic;
-      DI6 : in  std_logic;
-      DI7 : in  std_logic;
-      WEB : in  std_logic;
-      CK  : in  std_logic;
-      CSB : in  std_logic
-      );
-  end component;
   -- trcmem
   component SY180_256X32X1CM4
     port(
@@ -635,188 +591,18 @@ architecture struct of top is
       );
   end component;
 
-  component SU180_2048X80X1BM1
+  component mpram_memory is
     generic (
-      g_file_name : string := "mpram0.data");
-    port(
-      A0   : in  std_logic;
-      A1   : in  std_logic;
-      A2   : in  std_logic;
-      A3   : in  std_logic;
-      A4   : in  std_logic;
-      A5   : in  std_logic;
-      A6   : in  std_logic;
-      A7   : in  std_logic;
-      A8   : in  std_logic;
-      A9   : in  std_logic;
-      A10  : in  std_logic;
-      DO0  : out std_logic;
-      DO1  : out std_logic;
-      DO2  : out std_logic;
-      DO3  : out std_logic;
-      DO4  : out std_logic;
-      DO5  : out std_logic;
-      DO6  : out std_logic;
-      DO7  : out std_logic;
-      DO8  : out std_logic;
-      DO9  : out std_logic;
-      DO10 : out std_logic;
-      DO11 : out std_logic;
-      DO12 : out std_logic;
-      DO13 : out std_logic;
-      DO14 : out std_logic;
-      DO15 : out std_logic;
-      DO16 : out std_logic;
-      DO17 : out std_logic;
-      DO18 : out std_logic;
-      DO19 : out std_logic;
-      DO20 : out std_logic;
-      DO21 : out std_logic;
-      DO22 : out std_logic;
-      DO23 : out std_logic;
-      DO24 : out std_logic;
-      DO25 : out std_logic;
-      DO26 : out std_logic;
-      DO27 : out std_logic;
-      DO28 : out std_logic;
-      DO29 : out std_logic;
-      DO30 : out std_logic;
-      DO31 : out std_logic;
-      DO32 : out std_logic;
-      DO33 : out std_logic;
-      DO34 : out std_logic;
-      DO35 : out std_logic;
-      DO36 : out std_logic;
-      DO37 : out std_logic;
-      DO38 : out std_logic;
-      DO39 : out std_logic;
-      DO40 : out std_logic;
-      DO41 : out std_logic;
-      DO42 : out std_logic;
-      DO43 : out std_logic;
-      DO44 : out std_logic;
-      DO45 : out std_logic;
-      DO46 : out std_logic;
-      DO47 : out std_logic;
-      DO48 : out std_logic;
-      DO49 : out std_logic;
-      DO50 : out std_logic;
-      DO51 : out std_logic;
-      DO52 : out std_logic;
-      DO53 : out std_logic;
-      DO54 : out std_logic;
-      DO55 : out std_logic;
-      DO56 : out std_logic;
-      DO57 : out std_logic;
-      DO58 : out std_logic;
-      DO59 : out std_logic;
-      DO60 : out std_logic;
-      DO61 : out std_logic;
-      DO62 : out std_logic;
-      DO63 : out std_logic;
-      DO64 : out std_logic;
-      DO65 : out std_logic;
-      DO66 : out std_logic;
-      DO67 : out std_logic;
-      DO68 : out std_logic;
-      DO69 : out std_logic;
-      DO70 : out std_logic;
-      DO71 : out std_logic;
-      DO72 : out std_logic;
-      DO73 : out std_logic;
-      DO74 : out std_logic;
-      DO75 : out std_logic;
-      DO76 : out std_logic;
-      DO77 : out std_logic;
-      DO78 : out std_logic;
-      DO79 : out std_logic;
-      DI0  : in  std_logic;
-      DI1  : in  std_logic;
-      DI2  : in  std_logic;
-      DI3  : in  std_logic;
-      DI4  : in  std_logic;
-      DI5  : in  std_logic;
-      DI6  : in  std_logic;
-      DI7  : in  std_logic;
-      DI8  : in  std_logic;
-      DI9  : in  std_logic;
-      DI10 : in  std_logic;
-      DI11 : in  std_logic;
-      DI12 : in  std_logic;
-      DI13 : in  std_logic;
-      DI14 : in  std_logic;
-      DI15 : in  std_logic;
-      DI16 : in  std_logic;
-      DI17 : in  std_logic;
-      DI18 : in  std_logic;
-      DI19 : in  std_logic;
-      DI20 : in  std_logic;
-      DI21 : in  std_logic;
-      DI22 : in  std_logic;
-      DI23 : in  std_logic;
-      DI24 : in  std_logic;
-      DI25 : in  std_logic;
-      DI26 : in  std_logic;
-      DI27 : in  std_logic;
-      DI28 : in  std_logic;
-      DI29 : in  std_logic;
-      DI30 : in  std_logic;
-      DI31 : in  std_logic;
-      DI32 : in  std_logic;
-      DI33 : in  std_logic;
-      DI34 : in  std_logic;
-      DI35 : in  std_logic;
-      DI36 : in  std_logic;
-      DI37 : in  std_logic;
-      DI38 : in  std_logic;
-      DI39 : in  std_logic;
-      DI40 : in  std_logic;
-      DI41 : in  std_logic;
-      DI42 : in  std_logic;
-      DI43 : in  std_logic;
-      DI44 : in  std_logic;
-      DI45 : in  std_logic;
-      DI46 : in  std_logic;
-      DI47 : in  std_logic;
-      DI48 : in  std_logic;
-      DI49 : in  std_logic;
-      DI50 : in  std_logic;
-      DI51 : in  std_logic;
-      DI52 : in  std_logic;
-      DI53 : in  std_logic;
-      DI54 : in  std_logic;
-      DI55 : in  std_logic;
-      DI56 : in  std_logic;
-      DI57 : in  std_logic;
-      DI58 : in  std_logic;
-      DI59 : in  std_logic;
-      DI60 : in  std_logic;
-      DI61 : in  std_logic;
-      DI62 : in  std_logic;
-      DI63 : in  std_logic;
-      DI64 : in  std_logic;
-      DI65 : in  std_logic;
-      DI66 : in  std_logic;
-      DI67 : in  std_logic;
-      DI68 : in  std_logic;
-      DI69 : in  std_logic;
-      DI70 : in  std_logic;
-      DI71 : in  std_logic;
-      DI72 : in  std_logic;
-      DI73 : in  std_logic;
-      DI74 : in  std_logic;
-      DI75 : in  std_logic;
-      DI76 : in  std_logic;
-      DI77 : in  std_logic;
-      DI78 : in  std_logic;
-      DI79 : in  std_logic;
-      WEB  : in  std_logic;
-      CK   : in  std_logic;
-      CS   : in  std_logic;
-      OE   : in  std_logic
-      );
-  end component;
-
+      g_file_name : string := "mpram0.data";
+      g_memory_type : memory_type_t := referens);
+    port (
+      address : in  std_logic_vector(10 downto 0);
+      ram_di  : in  std_logic_vector(79 downto 0);
+      ram_do  : out std_logic_vector(79 downto 0);
+      we_n    : in  std_logic;
+      clk     : in  std_logic;
+      cs      : in  std_logic);
+  end component mpram_memory;
 
   component u180flag2256k32lv
     port(
@@ -836,6 +622,30 @@ architecture struct of top is
       DO     : out std_logic_vector(31 downto 0);
       RBB    : out std_logic
       );
+  end component;
+
+  component ram_memory is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      address : in std_logic_vector(13 downto 0);
+      ram_di  : in std_logic_vector(7 downto 0);
+      ram_do  : out std_logic_vector(7 downto 0);
+      we_n    : in  std_logic;
+      clk     : in  std_logic;
+      cs      : in  std_logic);
+  end component;
+
+  component memory_1024x8 is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      address : in std_logic_vector(9 downto 0);
+      ram_di  : in std_logic_vector(7 downto 0);
+      ram_do  : out std_logic_vector(7 downto 0);
+      we_n    : in  std_logic;
+      clk     : in  std_logic;
+      cs      : in  std_logic);
   end component;
 
 -- application and microprogram shared memory
@@ -878,11 +688,10 @@ architecture struct of top is
       );
   end component;
 
-  constant asic : boolean := false;
 
   -----------------------------------------------------------------------------
-  -- Internal signals driven by (i.e. "output" from) each block 
-  -----------------------------------------------------------------------------  
+  -- Internal signals driven by (i.e. "output" from) each block
+  -----------------------------------------------------------------------------
   signal hclk_i    : std_logic;
   signal msdin_i   : std_logic;
   signal pd_i      : std_logic_vector(7 downto 0);
@@ -901,10 +710,10 @@ architecture struct of top is
   signal pg_i      : std_logic_vector(7 downto 0);
   signal pa_i      : std_logic_vector(7 downto 0);
   signal pb_i      : std_logic_vector(7 downto 0);
---  signal mpordis_i    : std_logic;                                                
+--  signal mpordis_i    : std_logic;
 
 -- PLL
-  -- PLL                                           
+  -- PLL
   signal pllout  : std_logic;
   signal tcko    : std_logic;
   signal const_0 : std_logic;
@@ -915,7 +724,7 @@ architecture struct of top is
   signal clk_d_pos   : std_logic;
   signal clk_da_pos  : std_logic;
   signal clk_c_en    : std_logic;
-  --signal clk_c2_pos : std_logic;  
+  --signal clk_c2_pos : std_logic;
   signal clk_s       : std_logic;
   signal clk_s_pos   : std_logic;
   signal clk_u_pos   : std_logic;
@@ -939,7 +748,7 @@ architecture struct of top is
   signal halt_en         : std_logic;   --high active, will go to halt state
   signal nap_en          : std_logic;   --high active, will go to nap state
   signal wakeup_lp       : std_logic;   -- From wakeup_lp input IO
-  signal poweron_finish  : std_logic;   -- 
+  signal poweron_finish  : std_logic;   --
   signal reset_iso       : std_logic;   -- to isolate the core reset
   signal reset_iso_clear : std_logic;   --clear reset isolate
   signal reset_core_n    : std_logic;   -- to reset core, low active
@@ -969,7 +778,7 @@ architecture struct of top is
   -- signal pll_gnd18d   : std_logic;
   -- signal pll_vcck     : std_logic;
   -- signal pll_gndk     : std_logic;
---  signal test_pll_temp     : std_logic;  --added by HYX 
+--  signal test_pll_temp     : std_logic;  --added by HYX
   signal pll_pdn       : std_logic;     --added by HYX,20141115
   signal erxclk        : std_logic;
   signal etxclk        : std_logic;
@@ -999,7 +808,7 @@ architecture struct of top is
   signal bmem_d        : std_logic_vector(7 downto 0);
   signal bmem_ce_n     : std_logic;
   signal bmem_we_n     : std_logic;
---  signal ram_partition : std_logic_vector(3 downto 0); 
+--  signal ram_partition : std_logic_vector(3 downto 0);
   signal rst_rtc       : std_logic;
   signal en_fclk       : std_logic;
   signal fclk          : std_logic;
@@ -1068,7 +877,7 @@ architecture struct of top is
 --  signal south_en        : std_logic;     --delete by HYX, 20141027
 --  signal west_en         : std_logic;      --delete by HYX, 20141027
 --  signal east_en         : std_logic;      --delete by HYX, 20141027
---  signal router_clk_en : std_logic;   --delete by HYX, 20141027  
+--  signal router_clk_en : std_logic;   --delete by HYX, 20141027
   signal mirqout_o     : std_logic;
   signal mckout1_o     : std_logic;
   signal mckout1_o_en  : std_logic;
@@ -1110,19 +919,19 @@ architecture struct of top is
   signal p2_sr : std_logic;
   signal p3_hi : std_logic;
   signal p3_sr : std_logic;
-  -- signal pc_hi         : std_logic;                       
-  -- signal pc_lo_n       : std_logic;                       
-  -- signal ph_hi         : std_logic;                       
-  -- signal ph_lo_n       : std_logic;                       
-  -- signal pi_hi         : std_logic;                       
-  -- signal pi_lo_n       : std_logic;                                          
-  -- signal pel_hi        : std_logic;                       
-  -- signal peh_hi        : std_logic;                       
-  -- signal pdll_hi       : std_logic;                       
-  -- signal pdlh_hi       : std_logic;                       
-  -- signal pdh_hi        : std_logic;                                             
-  -- signal pf_hi         : std_logic;                       
-  -- signal pg_hi         : std_logic;                       
+  -- signal pc_hi         : std_logic;
+  -- signal pc_lo_n       : std_logic;
+  -- signal ph_hi         : std_logic;
+  -- signal ph_lo_n       : std_logic;
+  -- signal pi_hi         : std_logic;
+  -- signal pi_lo_n       : std_logic;
+  -- signal pel_hi        : std_logic;
+  -- signal peh_hi        : std_logic;
+  -- signal pdll_hi       : std_logic;
+  -- signal pdlh_hi       : std_logic;
+  -- signal pdh_hi        : std_logic;
+  -- signal pf_hi         : std_logic;
+  -- signal pg_hi         : std_logic;
 
   -----------------------------------------------------------------------------
   -- signals between core and peri
@@ -1155,7 +964,7 @@ architecture struct of top is
   signal idi       : std_logic_vector(7 downto 0);
   signal irq0      : std_logic;
   signal irq1      : std_logic;
-  --- signal declrations for memory selector jameel--  
+  --- signal declrations for memory selector jameel--
   -- signal dout_rom0_sig : std_logic_vector(79 downto 0);
   -- signal dout_ram0_sig : std_logic_vector(79 downto 0);
   -- signal dout_rom1_sig : std_logic_vector(79 downto 0);
@@ -1177,7 +986,7 @@ architecture struct of top is
   -- TRCMEM
   signal trcmem_q : std_logic_vector(31 downto 0);
 
-  -- PMEM (Patch memory)  
+  -- PMEM (Patch memory)
   signal c1_pmem_q : std_logic_vector(1 downto 0);
   signal c2_pmem_q : std_logic_vector(1 downto 0);
   -- BMEM (battery backed memory)
@@ -1189,7 +998,7 @@ architecture struct of top is
 --  signal clk_i_r : STD_LOGIC;                                          --delete by HYX, 20141027
 --  signal clk_p_r : STD_LOGIC;                                           --delete by HYX, 20141027
 --      signal  north_ack_s_in          : STD_LOGIC_VECTOR (1 downto 0);         --delete by HYX, 20141027
---      signal  north_data_s_in         : STD_LOGIC_VECTOR (3 downto 0);          --delete by HYX, 20141027 
+--      signal  north_data_s_in         : STD_LOGIC_VECTOR (3 downto 0);          --delete by HYX, 20141027
 --      signal  north_ack_s_out         :  STD_LOGIC_VECTOR (1 downto 0);          --delete by HYX, 20141027
 --      signal  north_data_s_out        :  STD_LOGIC_VECTOR (3 downto 0);            --delete by HYX, 20141027
 --      signal  south_ack_s_in          : STD_LOGIC_VECTOR (1 downto 0);             --delete by HYX, 20141027
@@ -1270,9 +1079,9 @@ architecture struct of top is
 
   signal f_addr_in  : std_logic_vector(16 downto 0);
   signal f_rd_in    : std_logic;        -- low active
-  signal f_wr_in    : std_logic;        -- low active        
+  signal f_wr_in    : std_logic;        -- low active
   signal f_data_in  : std_logic_vector(7 downto 0);  -- Data in from processor
-  signal f_data_out : std_logic_vector(7 downto 0);  -- Data out to processor   
+  signal f_data_out : std_logic_vector(7 downto 0);  -- Data out to processor
   signal f_CE       : std_logic;
   signal f_ADDR     : std_logic_vector(12 downto 0);
   signal f_WRONLY   : std_logic;
@@ -1297,58 +1106,58 @@ architecture struct of top is
   signal f3_ALE     : std_logic;
   signal f3_DATA_IN : std_logic_vector(31 downto 0);
   signal f3_RBB     : std_logic;
-  --RAM0 
+  --RAM0
   signal RAM0_DO    : std_logic_vector (7 downto 0);  -- modify flag, 2015lp
   signal RAM0_DI    : std_logic_vector (7 downto 0);
   signal RAM0_A     : std_logic_vector (13 downto 0);
   signal RAM0_WEB   : std_logic;
   signal RAM0_CS    : std_logic;
-  --RAM1 
+  --RAM1
   signal RAM1_DO    : std_logic_vector (7 downto 0);
   signal RAM1_DI    : std_logic_vector (7 downto 0);
   signal RAM1_A     : std_logic_vector (13 downto 0);
   signal RAM1_WEB   : std_logic;
   signal RAM1_CS    : std_logic;
-  --RAM2 
+  --RAM2
   signal RAM2_DO    : std_logic_vector (7 downto 0);
   signal RAM2_DI    : std_logic_vector (7 downto 0);
   signal RAM2_A     : std_logic_vector (13 downto 0);
   signal RAM2_WEB   : std_logic;
   signal RAM2_CS    : std_logic;
-  --RAM3 
+  --RAM3
   signal RAM3_DO    : std_logic_vector (7 downto 0);
   signal RAM3_DI    : std_logic_vector (7 downto 0);
   signal RAM3_A     : std_logic_vector (13 downto 0);
   signal RAM3_WEB   : std_logic;
   signal RAM3_CS    : std_logic;
-  --RAM4 
+  --RAM4
   signal RAM4_DO    : std_logic_vector (7 downto 0);
   signal RAM4_DI    : std_logic_vector (7 downto 0);
   signal RAM4_A     : std_logic_vector (13 downto 0);
   signal RAM4_WEB   : std_logic;
   signal RAM4_CS    : std_logic;
---         --RAM5 
+--         --RAM5
 --  signal RAM5_DO         : std_logic_vector (127 downto 0);
 --  signal RAM5_DI         : std_logic_vector (127 downto 0);
 --  signal RAM5_A          : std_logic_vector (9 downto 0);
 --  signal RAM5_WEB        : std_logic_vector(15 downto 0);
 --  signal RAM5_CS         : std_logic;
---         --RAM6 
+--         --RAM6
 --  signal RAM6_DO         : std_logic_vector (127 downto 0);
 --  signal RAM6_DI         : std_logic_vector (127 downto 0);
 --  signal RAM6_A          : std_logic_vector (9 downto 0);
 --  signal RAM6_WEB        : std_logic_vector(15 downto 0);
 --  signal RAM6_CS         : std_logic;
---         --RAM7 
+--         --RAM7
 --  signal RAM7_DO         : std_logic_vector (127 downto 0);
 --  signal RAM7_DI         : std_logic_vector (127 downto 0);
 --  signal RAM7_A          : std_logic_vector (9 downto 0);
 --  signal RAM7_WEB        : std_logic_vector(15 downto 0);
---  signal RAM7_CS         : std_logic;   
+--  signal RAM7_CS         : std_logic;
 
 begin
 
-    
+
   --pads
   iopads_inst : entity work.iopads
     port map(
@@ -1359,7 +1168,7 @@ begin
       MPMIC_CORE => MPMIC_CORE,
       MPMIC_IO   => MPMIC_IO,
 
-      --RTCCLK_FEB      => RTCCLK_FEB       ,        
+      --RTCCLK_FEB      => RTCCLK_FEB       ,
       MRESET  => MRESET,
       MIRQOUT => MIRQOUT,
       --MCKOUT          => MCKOUT           ,
@@ -1372,7 +1181,7 @@ begin
       MBYPASS => MBYPASS,
       MIRQ0   => MIRQ0,
       MIRQ1   => MIRQ1,
-      -- SW debug                                                                
+      -- SW debug
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
 
@@ -1502,11 +1311,11 @@ begin
      -- pdlh_hi         => pdlh_hi          ,
      -- pdh_hi          => pdh_hi           ,
      -- pf_hi           => pf_hi            ,
-     -- pg_hi           => pg_hi            
+     -- pg_hi           => pg_hi
       );
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
-  -----------------------------------------------------------------------------            
+  -----------------------------------------------------------------------------
 
   rom0_addr_sig <= mp_ROM0_A(12) & mp_ROM0_A(10 downto 0);
   -----------------------------------------------------------------------------
@@ -1744,465 +1553,62 @@ begin
       OE   => mp_ROM1_OE
       );
 
-  g_asic : if asic generate
-    mpram00 : SU180_2048X80X1BM1
+    mpram00 : mpram_memory
       generic map (
-        g_file_name => "mpram0.data"
+        g_file_name => "mpram0.data",
+        g_memory_type => g_memory_type
         )
       port map (
-        A0   => mp_RAM0_A(0),
-        A1   => mp_RAM0_A(1),
-        A2   => mp_RAM0_A(2),
-        A3   => mp_RAM0_A(3),
-        A4   => mp_RAM0_A(4),
-        A5   => mp_RAM0_A(5),
-        A6   => mp_RAM0_A(6),
-        A7   => mp_RAM0_A(7),
-        A8   => mp_RAM0_A(8),
-        A9   => mp_RAM0_A(9),
-        A10  => mp_RAM0_A(10),
-        DO0  => mp_RAM0_DO(0),
-        DO1  => mp_RAM0_DO(1),
-        DO2  => mp_RAM0_DO(2),
-        DO3  => mp_RAM0_DO(3),
-        DO4  => mp_RAM0_DO(4),
-        DO5  => mp_RAM0_DO(5),
-        DO6  => mp_RAM0_DO(6),
-        DO7  => mp_RAM0_DO(7),
-        DO8  => mp_RAM0_DO(8),
-        DO9  => mp_RAM0_DO(9),
-        DO10 => mp_RAM0_DO(10),
-        DO11 => mp_RAM0_DO(11),
-        DO12 => mp_RAM0_DO(12),
-        DO13 => mp_RAM0_DO(13),
-        DO14 => mp_RAM0_DO(14),
-        DO15 => mp_RAM0_DO(15),
-        DO16 => mp_RAM0_DO(16),
-        DO17 => mp_RAM0_DO(17),
-        DO18 => mp_RAM0_DO(18),
-        DO19 => mp_RAM0_DO(19),
-        DO20 => mp_RAM0_DO(20),
-        DO21 => mp_RAM0_DO(21),
-        DO22 => mp_RAM0_DO(22),
-        DO23 => mp_RAM0_DO(23),
-        DO24 => mp_RAM0_DO(24),
-        DO25 => mp_RAM0_DO(25),
-        DO26 => mp_RAM0_DO(26),
-        DO27 => mp_RAM0_DO(27),
-        DO28 => mp_RAM0_DO(28),
-        DO29 => mp_RAM0_DO(29),
-        DO30 => mp_RAM0_DO(30),
-        DO31 => mp_RAM0_DO(31),
-        DO32 => mp_RAM0_DO(32),
-        DO33 => mp_RAM0_DO(33),
-        DO34 => mp_RAM0_DO(34),
-        DO35 => mp_RAM0_DO(35),
-        DO36 => mp_RAM0_DO(36),
-        DO37 => mp_RAM0_DO(37),
-        DO38 => mp_RAM0_DO(38),
-        DO39 => mp_RAM0_DO(39),
-        DO40 => mp_RAM0_DO(40),
-        DO41 => mp_RAM0_DO(41),
-        DO42 => mp_RAM0_DO(42),
-        DO43 => mp_RAM0_DO(43),
-        DO44 => mp_RAM0_DO(44),
-        DO45 => mp_RAM0_DO(45),
-        DO46 => mp_RAM0_DO(46),
-        DO47 => mp_RAM0_DO(47),
-        DO48 => mp_RAM0_DO(48),
-        DO49 => mp_RAM0_DO(49),
-        DO50 => mp_RAM0_DO(50),
-        DO51 => mp_RAM0_DO(51),
-        DO52 => mp_RAM0_DO(52),
-        DO53 => mp_RAM0_DO(53),
-        DO54 => mp_RAM0_DO(54),
-        DO55 => mp_RAM0_DO(55),
-        DO56 => mp_RAM0_DO(56),
-        DO57 => mp_RAM0_DO(57),
-        DO58 => mp_RAM0_DO(58),
-        DO59 => mp_RAM0_DO(59),
-        DO60 => mp_RAM0_DO(60),
-        DO61 => mp_RAM0_DO(61),
-        DO62 => mp_RAM0_DO(62),
-        DO63 => mp_RAM0_DO(63),
-        DO64 => mp_RAM0_DO(64),
-        DO65 => mp_RAM0_DO(65),
-        DO66 => mp_RAM0_DO(66),
-        DO67 => mp_RAM0_DO(67),
-        DO68 => mp_RAM0_DO(68),
-        DO69 => mp_RAM0_DO(69),
-        DO70 => mp_RAM0_DO(70),
-        DO71 => mp_RAM0_DO(71),
-        DO72 => mp_RAM0_DO(72),
-        DO73 => mp_RAM0_DO(73),
-        DO74 => mp_RAM0_DO(74),
-        DO75 => mp_RAM0_DO(75),
-        DO76 => mp_RAM0_DO(76),
-        DO77 => mp_RAM0_DO(77),
-        DO78 => mp_RAM0_DO(78),
-        DO79 => mp_RAM0_DO(79),
-        DI0  => mp_RAM0_DI(0),
-        DI1  => mp_RAM0_DI(1),
-        DI2  => mp_RAM0_DI(2),
-        DI3  => mp_RAM0_DI(3),
-        DI4  => mp_RAM0_DI(4),
-        DI5  => mp_RAM0_DI(5),
-        DI6  => mp_RAM0_DI(6),
-        DI7  => mp_RAM0_DI(7),
-        DI8  => mp_RAM0_DI(8),
-        DI9  => mp_RAM0_DI(9),
-        DI10 => mp_RAM0_DI(10),
-        DI11 => mp_RAM0_DI(11),
-        DI12 => mp_RAM0_DI(12),
-        DI13 => mp_RAM0_DI(13),
-        DI14 => mp_RAM0_DI(14),
-        DI15 => mp_RAM0_DI(15),
-        DI16 => mp_RAM0_DI(16),
-        DI17 => mp_RAM0_DI(17),
-        DI18 => mp_RAM0_DI(18),
-        DI19 => mp_RAM0_DI(19),
-        DI20 => mp_RAM0_DI(20),
-        DI21 => mp_RAM0_DI(21),
-        DI22 => mp_RAM0_DI(22),
-        DI23 => mp_RAM0_DI(23),
-        DI24 => mp_RAM0_DI(24),
-        DI25 => mp_RAM0_DI(25),
-        DI26 => mp_RAM0_DI(26),
-        DI27 => mp_RAM0_DI(27),
-        DI28 => mp_RAM0_DI(28),
-        DI29 => mp_RAM0_DI(29),
-        DI30 => mp_RAM0_DI(30),
-        DI31 => mp_RAM0_DI(31),
-        DI32 => mp_RAM0_DI(32),
-        DI33 => mp_RAM0_DI(33),
-        DI34 => mp_RAM0_DI(34),
-        DI35 => mp_RAM0_DI(35),
-        DI36 => mp_RAM0_DI(36),
-        DI37 => mp_RAM0_DI(37),
-        DI38 => mp_RAM0_DI(38),
-        DI39 => mp_RAM0_DI(39),
-        DI40 => mp_RAM0_DI(40),
-        DI41 => mp_RAM0_DI(41),
-        DI42 => mp_RAM0_DI(42),
-        DI43 => mp_RAM0_DI(43),
-        DI44 => mp_RAM0_DI(44),
-        DI45 => mp_RAM0_DI(45),
-        DI46 => mp_RAM0_DI(46),
-        DI47 => mp_RAM0_DI(47),
-        DI48 => mp_RAM0_DI(48),
-        DI49 => mp_RAM0_DI(49),
-        DI50 => mp_RAM0_DI(50),
-        DI51 => mp_RAM0_DI(51),
-        DI52 => mp_RAM0_DI(52),
-        DI53 => mp_RAM0_DI(53),
-        DI54 => mp_RAM0_DI(54),
-        DI55 => mp_RAM0_DI(55),
-        DI56 => mp_RAM0_DI(56),
-        DI57 => mp_RAM0_DI(57),
-        DI58 => mp_RAM0_DI(58),
-        DI59 => mp_RAM0_DI(59),
-        DI60 => mp_RAM0_DI(60),
-        DI61 => mp_RAM0_DI(61),
-        DI62 => mp_RAM0_DI(62),
-        DI63 => mp_RAM0_DI(63),
-        DI64 => mp_RAM0_DI(64),
-        DI65 => mp_RAM0_DI(65),
-        DI66 => mp_RAM0_DI(66),
-        DI67 => mp_RAM0_DI(67),
-        DI68 => mp_RAM0_DI(68),
-        DI69 => mp_RAM0_DI(69),
-        DI70 => mp_RAM0_DI(70),
-        DI71 => mp_RAM0_DI(71),
-        DI72 => mp_RAM0_DI(72),
-        DI73 => mp_RAM0_DI(73),
-        DI74 => mp_RAM0_DI(74),
-        DI75 => mp_RAM0_DI(75),
-        DI76 => mp_RAM0_DI(76),
-        DI77 => mp_RAM0_DI(77),
-        DI78 => mp_RAM0_DI(78),
-        DI79 => mp_RAM0_DI(79),
-        WEB  => mp_RAM0_WEB,
-        CK   => clk_p,
-        CS   => mp_RAM0_CS,
-        OE   => '1'
+        address => mp_RAM0_A(10 downto 0),
+        ram_di  => mp_RAM0_DI,
+        ram_do  => mp_RAM0_DO,
+        we_n    => mp_RAM0_WEB,
+        clk     => clk_p,
+        cs      => mp_RAM0_CS
         );
 
-    mpram11 : SU180_2048X80X1BM1
+    mpram11 : mpram_memory
       generic map (
-        g_file_name => "mpram1.data"
+        g_file_name => "mpram1.data",
+        g_memory_type => g_memory_type
         )
       port map (
-        A0   => mp_RAM1_A(0),
-        A1   => mp_RAM1_A(1),
-        A2   => mp_RAM1_A(2),
-        A3   => mp_RAM1_A(3),
-        A4   => mp_RAM1_A(4),
-        A5   => mp_RAM1_A(5),
-        A6   => mp_RAM1_A(6),
-        A7   => mp_RAM1_A(7),
-        A8   => mp_RAM1_A(8),
-        A9   => mp_RAM1_A(9),
-        A10  => mp_RAM1_A(10),
-        DO0  => mp_RAM1_DO(0),
-        DO1  => mp_RAM1_DO(1),
-        DO2  => mp_RAM1_DO(2),
-        DO3  => mp_RAM1_DO(3),
-        DO4  => mp_RAM1_DO(4),
-        DO5  => mp_RAM1_DO(5),
-        DO6  => mp_RAM1_DO(6),
-        DO7  => mp_RAM1_DO(7),
-        DO8  => mp_RAM1_DO(8),
-        DO9  => mp_RAM1_DO(9),
-        DO10 => mp_RAM1_DO(10),
-        DO11 => mp_RAM1_DO(11),
-        DO12 => mp_RAM1_DO(12),
-        DO13 => mp_RAM1_DO(13),
-        DO14 => mp_RAM1_DO(14),
-        DO15 => mp_RAM1_DO(15),
-        DO16 => mp_RAM1_DO(16),
-        DO17 => mp_RAM1_DO(17),
-        DO18 => mp_RAM1_DO(18),
-        DO19 => mp_RAM1_DO(19),
-        DO20 => mp_RAM1_DO(20),
-        DO21 => mp_RAM1_DO(21),
-        DO22 => mp_RAM1_DO(22),
-        DO23 => mp_RAM1_DO(23),
-        DO24 => mp_RAM1_DO(24),
-        DO25 => mp_RAM1_DO(25),
-        DO26 => mp_RAM1_DO(26),
-        DO27 => mp_RAM1_DO(27),
-        DO28 => mp_RAM1_DO(28),
-        DO29 => mp_RAM1_DO(29),
-        DO30 => mp_RAM1_DO(30),
-        DO31 => mp_RAM1_DO(31),
-        DO32 => mp_RAM1_DO(32),
-        DO33 => mp_RAM1_DO(33),
-        DO34 => mp_RAM1_DO(34),
-        DO35 => mp_RAM1_DO(35),
-        DO36 => mp_RAM1_DO(36),
-        DO37 => mp_RAM1_DO(37),
-        DO38 => mp_RAM1_DO(38),
-        DO39 => mp_RAM1_DO(39),
-        DO40 => mp_RAM1_DO(40),
-        DO41 => mp_RAM1_DO(41),
-        DO42 => mp_RAM1_DO(42),
-        DO43 => mp_RAM1_DO(43),
-        DO44 => mp_RAM1_DO(44),
-        DO45 => mp_RAM1_DO(45),
-        DO46 => mp_RAM1_DO(46),
-        DO47 => mp_RAM1_DO(47),
-        DO48 => mp_RAM1_DO(48),
-        DO49 => mp_RAM1_DO(49),
-        DO50 => mp_RAM1_DO(50),
-        DO51 => mp_RAM1_DO(51),
-        DO52 => mp_RAM1_DO(52),
-        DO53 => mp_RAM1_DO(53),
-        DO54 => mp_RAM1_DO(54),
-        DO55 => mp_RAM1_DO(55),
-        DO56 => mp_RAM1_DO(56),
-        DO57 => mp_RAM1_DO(57),
-        DO58 => mp_RAM1_DO(58),
-        DO59 => mp_RAM1_DO(59),
-        DO60 => mp_RAM1_DO(60),
-        DO61 => mp_RAM1_DO(61),
-        DO62 => mp_RAM1_DO(62),
-        DO63 => mp_RAM1_DO(63),
-        DO64 => mp_RAM1_DO(64),
-        DO65 => mp_RAM1_DO(65),
-        DO66 => mp_RAM1_DO(66),
-        DO67 => mp_RAM1_DO(67),
-        DO68 => mp_RAM1_DO(68),
-        DO69 => mp_RAM1_DO(69),
-        DO70 => mp_RAM1_DO(70),
-        DO71 => mp_RAM1_DO(71),
-        DO72 => mp_RAM1_DO(72),
-        DO73 => mp_RAM1_DO(73),
-        DO74 => mp_RAM1_DO(74),
-        DO75 => mp_RAM1_DO(75),
-        DO76 => mp_RAM1_DO(76),
-        DO77 => mp_RAM1_DO(77),
-        DO78 => mp_RAM1_DO(78),
-        DO79 => mp_RAM1_DO(79),
-        DI0  => mp_RAM1_DI(0),
-        DI1  => mp_RAM1_DI(1),
-        DI2  => mp_RAM1_DI(2),
-        DI3  => mp_RAM1_DI(3),
-        DI4  => mp_RAM1_DI(4),
-        DI5  => mp_RAM1_DI(5),
-        DI6  => mp_RAM1_DI(6),
-        DI7  => mp_RAM1_DI(7),
-        DI8  => mp_RAM1_DI(8),
-        DI9  => mp_RAM1_DI(9),
-        DI10 => mp_RAM1_DI(10),
-        DI11 => mp_RAM1_DI(11),
-        DI12 => mp_RAM1_DI(12),
-        DI13 => mp_RAM1_DI(13),
-        DI14 => mp_RAM1_DI(14),
-        DI15 => mp_RAM1_DI(15),
-        DI16 => mp_RAM1_DI(16),
-        DI17 => mp_RAM1_DI(17),
-        DI18 => mp_RAM1_DI(18),
-        DI19 => mp_RAM1_DI(19),
-        DI20 => mp_RAM1_DI(20),
-        DI21 => mp_RAM1_DI(21),
-        DI22 => mp_RAM1_DI(22),
-        DI23 => mp_RAM1_DI(23),
-        DI24 => mp_RAM1_DI(24),
-        DI25 => mp_RAM1_DI(25),
-        DI26 => mp_RAM1_DI(26),
-        DI27 => mp_RAM1_DI(27),
-        DI28 => mp_RAM1_DI(28),
-        DI29 => mp_RAM1_DI(29),
-        DI30 => mp_RAM1_DI(30),
-        DI31 => mp_RAM1_DI(31),
-        DI32 => mp_RAM1_DI(32),
-        DI33 => mp_RAM1_DI(33),
-        DI34 => mp_RAM1_DI(34),
-        DI35 => mp_RAM1_DI(35),
-        DI36 => mp_RAM1_DI(36),
-        DI37 => mp_RAM1_DI(37),
-        DI38 => mp_RAM1_DI(38),
-        DI39 => mp_RAM1_DI(39),
-        DI40 => mp_RAM1_DI(40),
-        DI41 => mp_RAM1_DI(41),
-        DI42 => mp_RAM1_DI(42),
-        DI43 => mp_RAM1_DI(43),
-        DI44 => mp_RAM1_DI(44),
-        DI45 => mp_RAM1_DI(45),
-        DI46 => mp_RAM1_DI(46),
-        DI47 => mp_RAM1_DI(47),
-        DI48 => mp_RAM1_DI(48),
-        DI49 => mp_RAM1_DI(49),
-        DI50 => mp_RAM1_DI(50),
-        DI51 => mp_RAM1_DI(51),
-        DI52 => mp_RAM1_DI(52),
-        DI53 => mp_RAM1_DI(53),
-        DI54 => mp_RAM1_DI(54),
-        DI55 => mp_RAM1_DI(55),
-        DI56 => mp_RAM1_DI(56),
-        DI57 => mp_RAM1_DI(57),
-        DI58 => mp_RAM1_DI(58),
-        DI59 => mp_RAM1_DI(59),
-        DI60 => mp_RAM1_DI(60),
-        DI61 => mp_RAM1_DI(61),
-        DI62 => mp_RAM1_DI(62),
-        DI63 => mp_RAM1_DI(63),
-        DI64 => mp_RAM1_DI(64),
-        DI65 => mp_RAM1_DI(65),
-        DI66 => mp_RAM1_DI(66),
-        DI67 => mp_RAM1_DI(67),
-        DI68 => mp_RAM1_DI(68),
-        DI69 => mp_RAM1_DI(69),
-        DI70 => mp_RAM1_DI(70),
-        DI71 => mp_RAM1_DI(71),
-        DI72 => mp_RAM1_DI(72),
-        DI73 => mp_RAM1_DI(73),
-        DI74 => mp_RAM1_DI(74),
-        DI75 => mp_RAM1_DI(75),
-        DI76 => mp_RAM1_DI(76),
-        DI77 => mp_RAM1_DI(77),
-        DI78 => mp_RAM1_DI(78),
-        DI79 => mp_RAM1_DI(79),
-        WEB  => mp_RAM1_WEB,
-        CK   => clk_p,
-        CS   => mp_RAM1_CS,
-        OE   => '1'
+        address => mp_RAM1_A(10 downto 0),
+        ram_di  => mp_RAM1_DI,
+        ram_do  => mp_RAM1_DO,
+        we_n    => mp_RAM1_WEB,
+        clk     => clk_p,
+        cs      => mp_RAM1_CS
         );
-
-  end generate g_asic;
-
-  g_fpga : if not asic generate
-    mpram00 : dist_mem_gen_0
-      port map (
-        a       => mp_RAM0_A(10 downto 0),  -- input wire [10 : 0] a
-        d       => mp_RAM0_DI,              -- input wire [79 : 0] d
-        clk     => clk_p,                   -- input wire clk
-        we      => not mp_RAM0_WEB,         -- input wire we
-        i_ce    => mp_RAM0_CS,              -- input wire i_ce
-        qspo_ce => '1',                     -- input wire qspo_ce
-        qspo    => mp_RAM0_DO               -- output wire [79 : 0] qspo
-        );
-
-    mpram11 : dist_mem_gen_0
-      port map (
-        a       => mp_RAM1_A(10 downto 0),  -- input wire [10 : 0] a
-        d       => mp_RAM1_DI,              -- input wire [79 : 0] d
-        clk     => clk_p,                   -- input wire clk
-        we      => not mp_RAM1_WEB,         -- input wire we
-        i_ce    => mp_RAM1_CS,              -- input wire i_ce
-        qspo_ce => '1',                     -- input wire qspo_ce
-        qspo    => mp_RAM1_DO               -- output wire [79 : 0] qspo
-        );
-  end generate g_fpga;
 
 --  -- iomem0, iomem1
-  --  iomem0
-  iomem0 : SY180_1024X8X1CM8
-    port map (
-      A0  => iomem_a(0),
-      A1  => iomem_a(1),
-      A2  => iomem_a(2),
-      A3  => iomem_a(3),
-      A4  => iomem_a(4),
-      A5  => iomem_a(5),
-      A6  => iomem_a(6),
-      A7  => iomem_a(7),
-      A8  => iomem_a(8),
-      A9  => iomem_a(9),
-      DO0 => iomem_q(0),
-      DO1 => iomem_q(1),
-      DO2 => iomem_q(2),
-      DO3 => iomem_q(3),
-      DO4 => iomem_q(4),
-      DO5 => iomem_q(5),
-      DO6 => iomem_q(6),
-      DO7 => iomem_q(7),
-      DI0 => iomem_d(0),
-      DI1 => iomem_d(1),
-      DI2 => iomem_d(2),
-      DI3 => iomem_d(3),
-      DI4 => iomem_d(4),
-      DI5 => iomem_d(5),
-      DI6 => iomem_d(6),
-      DI7 => iomem_d(7),
-      WEB => iomem_we_n,
-      CK  => clk_p,
-      CSB => iomem_ce_n(0)
-      );
+    --  iomem0
+  iomem0: memory_1024x8
+      generic map (
+         g_memory_type => g_memory_type
+        )
+      port map (
+        address => iomem_a,
+        ram_di  => iomem_d(7 downto 0),
+        ram_do  => iomem_q(7 downto 0),
+        we_n    => iomem_we_n,
+        clk     => clk_p,
+        cs      => iomem_ce_n(0)
+        );
 
-  --   iomem1: 
-  iomem1 : SY180_1024X8X1CM8
-    port map (
-      A0  => iomem_a(0),
-      A1  => iomem_a(1),
-      A2  => iomem_a(2),
-      A3  => iomem_a(3),
-      A4  => iomem_a(4),
-      A5  => iomem_a(5),
-      A6  => iomem_a(6),
-      A7  => iomem_a(7),
-      A8  => iomem_a(8),
-      A9  => iomem_a(9),
-      DO0 => iomem_q(8),
-      DO1 => iomem_q(9),
-      DO2 => iomem_q(10),
-      DO3 => iomem_q(11),
-      DO4 => iomem_q(12),
-      DO5 => iomem_q(13),
-      DO6 => iomem_q(14),
-      DO7 => iomem_q(15),
-      DI0 => iomem_d(8),
-      DI1 => iomem_d(9),
-      DI2 => iomem_d(10),
-      DI3 => iomem_d(11),
-      DI4 => iomem_d(12),
-      DI5 => iomem_d(13),
-      DI6 => iomem_d(14),
-      DI7 => iomem_d(15),
-      WEB => iomem_we_n,
-      CK  => clk_p,
-      CSB => iomem_ce_n(1)
-      );
+  --   iomem1:
+  iomem1: memory_1024x8
+      generic map (
+         g_memory_type => g_memory_type
+        )
+      port map (
+        address => iomem_a,
+        ram_di  => iomem_d(15 downto 8),
+        ram_do  => iomem_q(15 downto 8),
+        we_n    => iomem_we_n,
+        clk     => clk_p,
+        cs      => iomem_ce_n(1)
+        );
 
 --  -- pmem
   --    mppmem
@@ -2310,158 +1716,50 @@ begin
 
 
 
-  ram1 : SU180_16384X8X1BM8             -- need modification flag, 2015lp
+---application memories
+  ram1 : ram_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => RAM1_A(0),
-      A1  => RAM1_A(1),
-      A2  => RAM1_A(2),
-      A3  => RAM1_A(3),
-      A4  => RAM1_A(4),
-      A5  => RAM1_A(5),
-      A6  => RAM1_A(6),
-      A7  => RAM1_A(7),
-      A8  => RAM1_A(8),
-      A9  => RAM1_A(9),
-      A10 => RAM1_A(10),
-      A11 => RAM1_A(11),
-      A12 => RAM1_A(12),
-      A13 => RAM1_A(13),
-      DO0 => RAM1_DO(0),
-      DO1 => RAM1_DO(1),
-      DO2 => RAM1_DO(2),
-      DO3 => RAM1_DO(3),
-      DO4 => RAM1_DO(4),
-      DO5 => RAM1_DO(5),
-      DO6 => RAM1_DO(6),
-      DO7 => RAM1_DO(7),
-      DI0 => RAM1_DI(0),
-      DI1 => RAM1_DI(1),
-      DI2 => RAM1_DI(2),
-      DI3 => RAM1_DI(3),
-      DI4 => RAM1_DI(4),
-      DI5 => RAM1_DI(5),
-      DI6 => RAM1_DI(6),
-      DI7 => RAM1_DI(7),
-      WEB => RAM1_WEB,
-      CK  => clk_p,
-      CS  => RAM1_CS,
-      OE  => '1'
-      );
+      clk     => clk_p,
+      address => RAM1_A,
+      ram_di  => RAM1_DI,
+      ram_do  => RAM1_DO,
+      we_n    => RAM1_WEB,
+      cs      => RAM1_CS);
 
-  ram2 : SU180_16384X8X1BM8             -- need modification flag, 2015lp
+  ram2 : ram_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => RAM2_A(0),
-      A1  => RAM2_A(1),
-      A2  => RAM2_A(2),
-      A3  => RAM2_A(3),
-      A4  => RAM2_A(4),
-      A5  => RAM2_A(5),
-      A6  => RAM2_A(6),
-      A7  => RAM2_A(7),
-      A8  => RAM2_A(8),
-      A9  => RAM2_A(9),
-      A10 => RAM2_A(10),
-      A11 => RAM2_A(11),
-      A12 => RAM2_A(12),
-      A13 => RAM2_A(13),
-      DO0 => RAM2_DO(0),
-      DO1 => RAM2_DO(1),
-      DO2 => RAM2_DO(2),
-      DO3 => RAM2_DO(3),
-      DO4 => RAM2_DO(4),
-      DO5 => RAM2_DO(5),
-      DO6 => RAM2_DO(6),
-      DO7 => RAM2_DO(7),
-      DI0 => RAM2_DI(0),
-      DI1 => RAM2_DI(1),
-      DI2 => RAM2_DI(2),
-      DI3 => RAM2_DI(3),
-      DI4 => RAM2_DI(4),
-      DI5 => RAM2_DI(5),
-      DI6 => RAM2_DI(6),
-      DI7 => RAM2_DI(7),
-      WEB => RAM2_WEB,
-      CK  => clk_p,
-      CS  => RAM2_CS,
-      OE  => '1'
-      );
+      clk     => clk_p,
+      address => RAM2_A,
+      ram_di  => RAM2_DI,
+      ram_do  => RAM2_DO,
+      we_n    => RAM2_WEB,
+      cs      => RAM2_CS);
 
-  ram3 : SU180_16384X8X1BM8             -- need modification flag, 2015lp
+  ram3 : ram_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => RAM3_A(0),
-      A1  => RAM3_A(1),
-      A2  => RAM3_A(2),
-      A3  => RAM3_A(3),
-      A4  => RAM3_A(4),
-      A5  => RAM3_A(5),
-      A6  => RAM3_A(6),
-      A7  => RAM3_A(7),
-      A8  => RAM3_A(8),
-      A9  => RAM3_A(9),
-      A10 => RAM3_A(10),
-      A11 => RAM3_A(11),
-      A12 => RAM3_A(12),
-      A13 => RAM3_A(13),
-      DO0 => RAM3_DO(0),
-      DO1 => RAM3_DO(1),
-      DO2 => RAM3_DO(2),
-      DO3 => RAM3_DO(3),
-      DO4 => RAM3_DO(4),
-      DO5 => RAM3_DO(5),
-      DO6 => RAM3_DO(6),
-      DO7 => RAM3_DO(7),
-      DI0 => RAM3_DI(0),
-      DI1 => RAM3_DI(1),
-      DI2 => RAM3_DI(2),
-      DI3 => RAM3_DI(3),
-      DI4 => RAM3_DI(4),
-      DI5 => RAM3_DI(5),
-      DI6 => RAM3_DI(6),
-      DI7 => RAM3_DI(7),
-      WEB => RAM3_WEB,
-      CK  => clk_p,
-      CS  => RAM3_CS,
-      OE  => '1'
-      );
+      clk     => clk_p,
+      address => RAM3_A,
+      ram_di  => RAM3_DI,
+      ram_do  => RAM3_DO,
+      we_n    => RAM3_WEB,
+      cs      => RAM3_CS);
 
-  ram4 : SU180_16384X8X1BM8             -- need modification flag, 2015lp
+  ram4 : ram_memory
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0  => RAM4_A(0),
-      A1  => RAM4_A(1),
-      A2  => RAM4_A(2),
-      A3  => RAM4_A(3),
-      A4  => RAM4_A(4),
-      A5  => RAM4_A(5),
-      A6  => RAM4_A(6),
-      A7  => RAM4_A(7),
-      A8  => RAM4_A(8),
-      A9  => RAM4_A(9),
-      A10 => RAM4_A(10),
-      A11 => RAM4_A(11),
-      A12 => RAM4_A(12),
-      A13 => RAM4_A(13),
-      DO0 => RAM4_DO(0),
-      DO1 => RAM4_DO(1),
-      DO2 => RAM4_DO(2),
-      DO3 => RAM4_DO(3),
-      DO4 => RAM4_DO(4),
-      DO5 => RAM4_DO(5),
-      DO6 => RAM4_DO(6),
-      DO7 => RAM4_DO(7),
-      DI0 => RAM4_DI(0),
-      DI1 => RAM4_DI(1),
-      DI2 => RAM4_DI(2),
-      DI3 => RAM4_DI(3),
-      DI4 => RAM4_DI(4),
-      DI5 => RAM4_DI(5),
-      DI6 => RAM4_DI(6),
-      DI7 => RAM4_DI(7),
-      WEB => RAM4_WEB,
-      CK  => clk_p,
-      CS  => RAM4_CS,
-      OE  => '1'
-      );
-
+      clk     => clk_p,
+      address => RAM4_A,
+      ram_di  => RAM4_DI,
+      ram_do  => RAM4_DO,
+      we_n    => RAM4_WEB,
+      cs      => RAM4_CS);
 
   -----------------------------------------------------------------------------
   -- Clock generation block
@@ -2520,21 +1818,21 @@ begin
 --  -----------------------------------------------------------------------------
   rtc0 : entity work.rtc
     generic map (
-      asic => false)
+      g_memory_type => g_memory_type)
     port map(
       xout          => hclk_i,
       pllout        => pllout,
       sel_pll       => sel_pll,
       xout_selected => xout_selected,
       lp_pwr_ok     => lp_pwr_ok,
-      rxout         => rxout,           -- 32KHz oscillator input         
+      rxout         => rxout,           -- 32KHz oscillator input
       mrxout_o      => mrxout_o,  -- 32KHz oscillator output or external wake
-      rst_rtc       => rst_rtc,         -- Reset RTC counter byte            
+      rst_rtc       => rst_rtc,         -- Reset RTC counter byte
       en_fclk       => en_fclk,   -- Enable fast clocking of RTC counter byte
-      fclk          => fclk,            -- Fast clock to RTC counter byte   
-      ld_bmem       => ld_bmem,   -- Latch enable to the dis_bmem latch   
+      fclk          => fclk,            -- Fast clock to RTC counter byte
+      ld_bmem       => ld_bmem,   -- Latch enable to the dis_bmem latch
       rtc_sel       => rtc_sel,         -- RTC byte select
-      rtc_data      => rtc_data,        -- RTC data             
+      rtc_data      => rtc_data,        -- RTC data
       dis_bmem      => dis_bmem_int,
 
       reset_iso_clear => reset_iso_clear,
@@ -2571,7 +1869,7 @@ begin
       bmem_d    => bmem_d,
       bmem_we_n => bmem_we_n,
       bmem_ce_n => bmem_ce_n,
-      --RAM0 
+      --RAM0
       RAM0_DO   => RAM0_DO,
       RAM0_DI   => RAM0_DI,
       RAM0_A    => RAM0_A,
@@ -2579,7 +1877,7 @@ begin
       RAM0_CS   => RAM0_CS
       );
 
-  -- Disable power to BMEM 
+  -- Disable power to BMEM
   dis_bmem <= dis_bmem_int;
   -----------------------------------------------------------------------------
   -- core
@@ -2590,7 +1888,7 @@ begin
       clk_p        => clk_p,  --: in  std_logic;  -- PLL clock
       clk_c_en     => clk_c_en,  --: in  std_logic;  -- CP clock
       even_c       => even_c,
-      --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2 
+      --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2
       clk_e_pos    => clk_e_pos,  --: out  std_logic;  -- Execution clock
       clk_e_neg    => clk_e_neg,  --: out  std_logic;  -- Execution clock
       clk_i_pos    => clk_i_pos,  --: in  std_logic;  -- I/O clock
@@ -2600,7 +1898,7 @@ begin
       rst_n        => rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
       rst_cn       => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
       en_d         => en_d,  --: out std_logic;  -- Enable clk_d
-      fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select 
+      fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select
       --din_e       => din_e,   --: out std_logic;  -- D input to FF generating clk_e
       din_i        => din_i,  --: out std_logic;  -- D input to FF generating clk_i
       din_u        => din_u,  --: out std_logic;  -- D input to FF generating clk_u
@@ -2619,8 +1917,8 @@ begin
       pll_frange   => pll_frange,  --: out std_logic;  -- Frequency range select
       pll_n        => pll_n,  --: out std_logic_vector(5 downto 0);   -- Multiplier
       pll_m        => pll_m,  --: out std_logic_vector(2 downto 0);   -- Divider
-      en_xosc      => en_xosc,  --: out std_logic;  -- Enable XOSC 
-      en_pll       => en_pll,  --: out std_logic;  -- Enable PLL 
+      en_xosc      => en_xosc,  --: out std_logic;  -- Enable XOSC
+      en_pll       => en_pll,  --: out std_logic;  -- Enable PLL
       sel_pll      => sel_pll,  --: out std_logic;  -- Select PLL as clock source
       test_pll     => test_pll,  --: out std_logic;  -- PLL in test mode
       xout         => hclk_i,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
@@ -2630,11 +1928,11 @@ begin
       -- Memory signals
       ---------------------------------------------------------------------
       -- MPROM signals
-      mprom_a      => c1_mprom_a,  --: out std_logic_vector(13 downto 0);-- Address  
-      mprom_ce     => c1_mprom_ce,  --: out std_logic_vector(1 downto 0); -- Chip enable(active high) 
+      mprom_a      => c1_mprom_a,  --: out std_logic_vector(13 downto 0);-- Address
+      mprom_ce     => c1_mprom_ce,  --: out std_logic_vector(1 downto 0); -- Chip enable(active high)
       mprom_oe     => c1_mprom_oe,  --: out std_logic_vector(1 downto 0); --Output enable(active high)
       -- MPRAM signals
-      mpram_a      => c1_mpram_a,  --: out std_logic_vector(13 downto 0);-- Address  
+      mpram_a      => c1_mpram_a,  --: out std_logic_vector(13 downto 0);-- Address
       mpram_d      => c1_mpram_d,  --: out std_logic_vector(79 downto 0);-- Data to memory
       mpram_ce     => c1_mpram_ce,  --: out std_logic_vector(1 downto 0); -- Chip enable(active high)
       mpram_oe     => c1_mpram_oe,  --: out std_logic_vector(1 downto 0); -- Output enable(active high)
@@ -2642,28 +1940,28 @@ begin
       -- MPROM/MPRAM data out bus
       mp_q         => c1_mp_q,  --: in  std_logic_vector(79 downto 0);-- Data from MPROM/MPRAM
       -- GMEM signals
-      gmem_a       => c1_gmem_a,        --: out std_logic_vector(9 downto 0);  
-      gmem_d       => c1_gmem_d,        --: out std_logic_vector(7 downto 0);  
+      gmem_a       => c1_gmem_a,        --: out std_logic_vector(9 downto 0);
+      gmem_d       => c1_gmem_d,        --: out std_logic_vector(7 downto 0);
       gmem_q       => c1_gmem_q,        --: in  std_logic_vector(7 downto 0);
-      gmem_ce_n    => c1_gmem_ce_n,  --: out std_logic;                      
-      gmem_we_n    => c1_gmem_we_n,  --: out std_logic;                      
+      gmem_ce_n    => c1_gmem_ce_n,  --: out std_logic;
+      gmem_we_n    => c1_gmem_we_n,  --: out std_logic;
       -- IOMEM signals
       iomem_a      => iomem_a,          --: out std_logic_vector(9 downto 0);
       iomem_d      => iomem_d,          --: out std_logic_vector(15 downto 0);
       iomem_q      => iomem_q,          --: in  std_logic_vector(15 downto 0);
-      iomem_ce_n   => iomem_ce_n,       --: out std_logic_vector(1 downto 0); 
+      iomem_ce_n   => iomem_ce_n,       --: out std_logic_vector(1 downto 0);
       iomem_we_n   => iomem_we_n,       --: out std_logic;
       -- TRCMEM signals (Trace memory)
       trcmem_a     => trcmem_a,         --: out std_logic_vector(7 downto 0);
       trcmem_d     => trcmem_d,         --: out std_logic_vector(31 downto 0);
       trcmem_q     => trcmem_q,         --: in  std_logic_vector(31 downto 0);
-      trcmem_ce_n  => trcmem_ce_n,      --: out std_logic; 
+      trcmem_ce_n  => trcmem_ce_n,      --: out std_logic;
       trcmem_we_n  => trcmem_we_n,      --: out std_logic;
       -- PMEM signals (Patch memory)
       pmem_a       => c1_pmem_a,        --: out std_logic_vector(10 downto 0);
       pmem_d       => c1_pmem_d,        --: out std_logic_vector(1  downto 0);
       pmem_q       => c1_pmem_q,        --: in  std_logic_vector(1  downto 0);
-      pmem_ce_n    => c1_pmem_ce_n,     --: out std_logic;  
+      pmem_ce_n    => c1_pmem_ce_n,     --: out std_logic;
       pmem_we_n    => c1_pmem_we_n,
 
       c2_core2_en     => c2_core2_en,
@@ -2711,19 +2009,19 @@ begin
       rtc_sel         => rtc_sel,  --: out std_logic_vector(2 downto 0);   -- RTC byte select
       rtc_data        => rtc_data,  --: in  std_logic_vector(7 downto 0);   -- RTC data
       --  Signals to/from Peripheral block
-      dfp             => dfp,           --: in  std_logic_vector(7 downto 0); 
+      dfp             => dfp,           --: in  std_logic_vector(7 downto 0);
       dbus            => dbus,          --: out std_logic_vector(7 downto 0);
       rst_en          => rst_en,        --: out std_logic;
       --rst_en2     => rst_en2, --: out std_logic;
       pd              => pd_s,  --: out std_logic_vector(2 downto 0);  -- pl_pd
       aaddr           => aaddr,  --: out std_logic_vector(4 downto 0);  -- pl_aaddr
       idreq           => idreq,         --: in  std_logic_vector(7 downto 0);
-      idi             => idi,    --: in  std_logic_vector(7 downto 0);     
-      idack           => idack,  --: out std_logic_vector(7 downto 0);                   
-      ios_iden        => ios_iden,      --: out std_logic;                   
-      ios_ido         => ios_ido,  --: out std_logic_vector(7 downto 0);                  
-      ilioa           => ilioa,         --: out std_logic;                   
-      ildout          => ildout,        --: out std_logic;                   
+      idi             => idi,    --: in  std_logic_vector(7 downto 0);
+      idack           => idack,  --: out std_logic_vector(7 downto 0);
+      ios_iden        => ios_iden,      --: out std_logic;
+      ios_ido         => ios_ido,  --: out std_logic_vector(7 downto 0);
+      ilioa           => ilioa,         --: out std_logic;
+      ildout          => ildout,        --: out std_logic;
       inext           => inext,         --: out std_logic;
       iden            => iden,          --: in  std_logic;
       dqm_size        => dqm_size,      --: out std_logic_vector(1 downto 0);
@@ -2736,20 +2034,20 @@ begin
       run_tiu         => run_tiu,       --: out std_logic;
       en_tstamp       => en_tstamp,     --: out std_logic_vector(1 downto 0);
       en_iobus        => en_iobus,      --: out std_logic_vector(1 downto 0);
-      ddqm            => ddqm,   --: out std_logic_vector(7  downto 0);   
-      irq0            => irq0,  --: in  std_logic;  -- Interrupt request 0   
-      irq1            => irq1,  --: in  std_logic;  -- Interrupt request 1   
+      ddqm            => ddqm,   --: out std_logic_vector(7  downto 0);
+      irq0            => irq0,  --: in  std_logic;  -- Interrupt request 0
+      irq1            => irq1,  --: in  std_logic;  -- Interrupt request 1
       adc_ref2v       => adc_ref2v,  --: out  std_logic;      -- Select 2V internal ADC reference (1V)
 ---------------------------------------------------------------------
       -- PADS
 ---------------------------------------------------------------------
       -- Misc. signals
       --mpordis_i     => '1',--MPORDIS, --: in  std_logic;  -- 'power on' from pad
-      mreset_i        => mreset_i,  --: in  std_logic;  -- Asynchronous reset input 
-      mirqout_o       => mirqout_o,  --: out std_logic;  -- Interrupt  request output 
+      mreset_i        => mreset_i,  --: in  std_logic;  -- Asynchronous reset input
+      mirqout_o       => mirqout_o,  --: out std_logic;  -- Interrupt  request output
       mckout1_o       => mckout1_o,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_o_en,
-      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
+      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug)
       msdout_o        => msdout_o,  --: out std_logic;  -- Serial data out
       mrstout_o       => mrstout_o,  --: out std_logic;  -- Reset out
       mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
@@ -2837,14 +2135,14 @@ begin
       crb_sel    => c2_crb_sel,
       --  Signals to/from Peripheral block
       --dfp           => dfp     -- BSV
-      dfp        => "00100000",         -- BSV          , 
+      dfp        => "00100000",         -- BSV          ,
       --dbus        : out std_logic_vector(7 downto 0);
       --rst_en      : out std_logic;
       --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
       --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
       ddqm       => open,
-      irq0       => '1',                -- Interrupt request 0   
-      irq1       => '1',                -- Interrupt request 1   
+      irq0       => '1',                -- Interrupt request 0
+      irq1       => '1',                -- Interrupt request 1
 ---------------------------------------------------------------------
       -- Memory signals
 ---------------------------------------------------------------------
@@ -2853,7 +2151,7 @@ begin
       mprom_ce   => c2_mprom_ce,
       mprom_oe   => c2_mprom_oe,
       -- MPRAM signals
-      mpram_a    => c2_mpram_a,         -- Address  
+      mpram_a    => c2_mpram_a,         -- Address
       mpram_d    => c2_mpram_d,         -- Data to memory
       mpram_ce   => c2_mpram_ce,        -- Chip enable(active high)
       mpram_oe   => c2_mpram_oe,        -- Output enable(active high)
@@ -2875,7 +2173,7 @@ begin
 ---------------------------------------------------------------------
       -- PADS
 ---------------------------------------------------------------------
-      -- DRAM signals     
+      -- DRAM signals
       d_addr     => c2_d_addr,
       dcs_o      => c2_d_cs,
       dras_o     => c2_d_ras,
@@ -2900,11 +2198,11 @@ begin
       -- rst_cn   => rst_cn,
       -- clk_e_pos  => clk_e_pos,
       -- clk_ea_pos   => clk_ea_pos,
-      c1_mprom_a    => c1_mprom_a,      -- Address  
-      c1_mprom_ce   => c1_mprom_ce,     -- Chip enable(active high) 
+      c1_mprom_a    => c1_mprom_a,      -- Address
+      c1_mprom_ce   => c1_mprom_ce,     -- Chip enable(active high)
       c1_mprom_oe   => c1_mprom_oe,     --Output enable(active high)
       -- MPRAM signals
-      c1_mpram_a    => c1_mpram_a,      -- Address  
+      c1_mpram_a    => c1_mpram_a,      -- Address
       c1_mpram_d    => c1_mpram_d,      -- Data to memory
       c1_mpram_ce   => c1_mpram_ce,     -- Chip enable(active high)
       c1_mpram_oe   => c1_mpram_oe,     -- Output enable(active high)
@@ -2918,11 +2216,11 @@ begin
 
       c1_mp_q       => c1_mp_q,
       -- MPROM signals
-      c2_mprom_a    => c2_mprom_a,      -- Address  
-      c2_mprom_ce   => c2_mprom_ce,     -- Chip enable(active high) 
+      c2_mprom_a    => c2_mprom_a,      -- Address
+      c2_mprom_ce   => c2_mprom_ce,     -- Chip enable(active high)
       c2_mprom_oe   => c2_mprom_oe,     --Output enable(active high)
       -- MPRAM signals
-      c2_mpram_a    => c2_mpram_a,      -- Address  
+      c2_mpram_a    => c2_mpram_a,      -- Address
       c2_mpram_d    => c2_mpram_d,      -- Data to memory
       c2_mpram_ce   => c2_mpram_ce,     -- Chip enable(active high)
       c2_mpram_oe   => c2_mpram_oe,     -- Output enable(active high)
@@ -2937,12 +2235,12 @@ begin
       c2_mp_q  => c2_mp_q,
       --memory interface
       --ROM0
-      ROM0_DO  => mp_ROM0_DO,           -- in  std_logic_vector (79 downto 0); 
+      ROM0_DO  => mp_ROM0_DO,           -- in  std_logic_vector (79 downto 0);
       ROM0_A   => mp_ROM0_A,            -- out std_logic_vector (13 downto 0);
       ROM0_CS  => mp_ROM0_CS,           -- out std_logic;
-      ROM0_OE  => mp_ROM0_OE,           -- out std_logic; 
+      ROM0_OE  => mp_ROM0_OE,           -- out std_logic;
       --ROM1
-      ROM1_DO  => mp_ROM1_DO,   --: in  std_logic_vector (79 downto 0); 
+      ROM1_DO  => mp_ROM1_DO,   --: in  std_logic_vector (79 downto 0);
       ROM1_A   => mp_ROM1_A,            --: out std_logic_vector (13 downto 0);
       ROM1_CS  => mp_ROM1_CS,           --: out std_logic;
       ROM1_OE  => mp_ROM1_OE,           --: out std_logic;
@@ -3001,7 +2299,7 @@ begin
       f_data_in   => f_data_in,
       f_data_out  => f_data_out,
       --SRAM interface
-      --RAM0 
+      --RAM0
       RAM0_DO     => RAM0_DO,
       RAM0_DI     => RAM0_DI,
       RAM0_A      => RAM0_A,
@@ -3083,20 +2381,20 @@ begin
       f3_RBB     => f3_RBB              --,
 --        f4_ALE      => f4_ALE      ,
 --        --f4_PVPP   => --f4_PVPP   ,
---        f4_DATA_IN  => f4_DATA_IN  ,       
+--        f4_DATA_IN  => f4_DATA_IN  ,
 --        f4_RBB      => f4_RBB      ,
 --        f5_ALE      => f5_ALE      ,
 --        --f5_PVPP   => --f5_PVPP   ,
---        f5_DATA_IN  => f5_DATA_IN  ,       
+--        f5_DATA_IN  => f5_DATA_IN  ,
 --        f5_RBB      => f5_RBB      ,
 --        f6_ALE      => f6_ALE      ,
 --        --f6_PVPP   => --f6_PVPP   ,
---        f6_DATA_IN  => f6_DATA_IN  ,       
+--        f6_DATA_IN  => f6_DATA_IN  ,
 --        f6_RBB      => f6_RBB      ,
 --        f7_ALE      => f7_ALE      ,
 --        --f7_PVPP   => --f7_PVPP   ,
---        f7_DATA_IN  => f7_DATA_IN  ,       
---        f7_RBB      => f7_RBB      
+--        f7_DATA_IN  => f7_DATA_IN  ,
+--        f7_RBB      => f7_RBB
 
       );
 
@@ -3105,7 +2403,6 @@ begin
   -- Peripherals
   -----------------------------------------------------------------------------
 
-  g_asic_peri : if true generate
     peri01 : entity work.peri
       port map(
         clk_p      => clk_p,
@@ -3189,16 +2486,12 @@ begin
         pj_i       => pj_i,
         pj_en      => pj_en,
         pj_o       => pj_o,
-
-        -- Temp code
         OSPI_Out   => OSPI_Out,
         OSPI_DQ    => OSPI_DQ,
         OSPI_RWDS  => OSPI_RWDS
         );
 
-  end generate g_asic_peri;
-
-  g_fpga_peri : if not asic generate
+  g_fpga_peri : if g_memory_type = fpga generate
     erxclk <= '0';
     etxclk <= '0';
     din_a  <= '0';

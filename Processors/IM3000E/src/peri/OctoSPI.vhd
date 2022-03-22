@@ -90,11 +90,11 @@ architecture rtl of OctoSPI is
   signal flags_wr   : std_logic;                     -- Flags   write strobe
   signal latency_wr : std_logic;                     -- Latency write strobe
   --
-  signal cmd_rd     : std_logic;                     -- Command read strobe
-  signal addr_rd    : std_logic;                     -- Address read strobe
+  -- signal cmd_rd     : std_logic;                     -- Command read strobe
+  -- signal addr_rd    : std_logic;                     -- Address read strobe
   signal data_rd    : std_logic;                     -- Data read strobe
-  signal flags_rd   : std_logic;                     -- Flags   read strobe
-  signal latency_rd : std_logic;                     -- Latency read strobe
+  -- signal flags_rd   : std_logic;                     -- Flags   read strobe
+  -- signal latency_rd : std_logic;                     -- Latency read strobe
   --
   signal flags_out  : std_logic_vector(7 downto 0);  -- Data out register
 
@@ -138,6 +138,9 @@ architecture rtl of OctoSPI is
 
 begin
 
+-- DMA
+  idreq <= '1'; -- Active low
+
 -- I/O bus current statements
   ido <= flags_out            when flags_sel = '1' else
          addr_reg(7 downto 0) when addr_sel = '1' else
@@ -170,6 +173,7 @@ begin
     if rst_n = '0' then
       cmd_sel     <= '0';
       addr_sel    <= '0';
+      data_sel    <= '0';
       flags_sel   <= '0';
       latency_sel <= '0';
       --
@@ -177,7 +181,7 @@ begin
 
     elsif rising_edge(clk_p) then
 
-      if data_rd = '1' then
+      if data_rd = '1' and (iobus_rdindex /= 127) then
         iobus_rdindex <= iobus_rdindex + 1;
       end if;
 
@@ -206,7 +210,7 @@ begin
         end if;
         --
         if idi = ospi_latency_address then
-          addr_sel <= '1';
+          latency_sel <= '1';
         end if;
       --
       end if;  -- ilioa

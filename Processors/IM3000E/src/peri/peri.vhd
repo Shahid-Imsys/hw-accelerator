@@ -17,13 +17,13 @@
 -- File       : peri.vhd
 -- Author     : Xing Zhao
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
--- Description: 
---              
+-- Description:
+--
 -------------------------------------------------------------------------------
 -- TO-DO list :
---              
+--
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date                                 Version         Author  Description
@@ -50,8 +50,8 @@ entity peri is
     clk_c_en   : in  std_logic;
     clk_e_pos  : in  std_logic;         -- Execution clock
     clk_e_neg  : in  std_logic;         -- Execution clock
-    clk_i      : in  std_logic;         -- I/O clock    
-    clk_i_pos  : in  std_logic;         -- I/O clock    
+    clk_i      : in  std_logic;         -- I/O clock
+    clk_i_pos  : in  std_logic;         -- I/O clock
     clk_u_pos  : in  std_logic;         -- UART clock
     clk_rx     : in  std_logic;         -- ERx clock
     clk_tx     : in  std_logic;         -- ETx clock
@@ -224,7 +224,7 @@ end component;
   signal idi_int   : std_logic_vector(7 downto 0);
   signal idreq_int : std_logic_vector(7 downto 0);
 
-  -- IO_MUX 
+  -- IO_MUX
   signal iden_int  : std_logic;
   signal ido       : std_logic_vector(7 downto 0);
   signal rx1_idack : std_logic;
@@ -278,7 +278,6 @@ end component;
   signal din_a_int : std_logic;
 
   -- Octo SPI
-  signal clk_n        : std_logic;
   signal clk_ospi     : std_logic;
   signal ospi_ido     : std_logic_vector(7 downto 0);
   signal ospi_iden    : std_logic;
@@ -380,10 +379,10 @@ begin  -- struct
       pjen       => pj_en,
       pjo        => pjo,
       pji        => pji,
-      -- interrupt signals to core                                       
+      -- interrupt signals to core
       irq0       => irq0,
       irq1       => irq1,
-      -- interrupt sources                                       
+      -- interrupt sources
       mirq0_i    => mirq0_i,
       mirq1_i    => mirq1_i,
       uart1_irq  => uart1_irq,
@@ -525,6 +524,8 @@ begin  -- struct
       eth_ido    => eth_ido,
       pdi_iden   => pdi_iden,
       pdi_ido    => pdi_ido,
+      ospi_ido   => ospi_ido,
+      ospi_iden  => ospi_iden,
       iden       => iden_int,
       ido        => ido,
       -- IDREQ
@@ -717,8 +718,8 @@ begin  -- struct
       dac_data  => dac_data,
       dac_bits  => dac_bits);
 
+  ospi_idack <= '1'; -- No DMA support at this time
 
-  clk_n <= not clk_p;
   ospi : OctoSPI
     port map (
       clk_p      => clk_p,

@@ -17,15 +17,15 @@
 -- File       : io_mux.vhd
 -- Author     : Xing Zhao
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
 -- Description: This block multiplexes the 'idi', 'ido' buses from 'UARTs' and
 --              'Ethernet' to 'IOS'. It also selects the external 'idreq'
 --              and 'Eth' 'idreq' to 'IOS' as well as 'IOS's 'idack' to 'Eth'.
---              
+--
 -------------------------------------------------------------------------------
 -- TO-DO list :
---              
+--
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date					Version		Author	Description
@@ -52,10 +52,12 @@ entity io_mux is
     eth_ido       : in  std_logic_vector(7 downto 0);
     pdi_iden      : in  std_logic;
     pdi_ido       : in  std_logic_vector(7 downto 0);
+    ospi_iden     : in  std_logic;
+    ospi_ido      : in  std_logic_vector(7 downto 0);
     iden          : out std_logic;
     ido           : out std_logic_vector(7 downto 0);
     -- IDREQ
-    idreq         : in  std_logic_vector(7 downto 0);  -- external 'idreq' 
+    idreq         : in  std_logic_vector(7 downto 0);  -- external 'idreq'
     rx1_idreq     : in  std_logic;                     -- ETH 'idreq'
     rx2_idreq     : in  std_logic;                     -- ETH 'idreq'
     tx_idreq      : in  std_logic;                     -- ETH 'idreq'
@@ -71,21 +73,21 @@ entity io_mux is
 end io_mux;
 
 architecture rtl of io_mux is
-  signal test_vector : std_logic_vector(4 downto 0);
+  signal test_vector : std_logic_vector(5 downto 0);
 begin  -- rtl
   -- Gate together all iden signals.
   iden <= ios_iden or uart1_iden or uart2_iden or uart3_iden or
-  				eth_iden or pdi_iden;
-         
+  				eth_iden or pdi_iden or ospi_iden;
+
   -- Mux out ido, IOS drives when none else does.
-  test_vector <= pdi_iden & eth_iden & uart3_iden & uart2_iden & uart1_iden;
-  --with std_logic_vector'(pdi_iden, eth_iden, uart3_iden, uart2_iden, uart1_iden)
-  with test_vector 
-  select ido <= uart1_ido when "00001",
-                uart2_ido when "00010",
-                uart3_ido when "00100",
-                eth_ido   when "01000",
-                pdi_ido   when "10000",
+  test_vector <= pdi_iden & eth_iden & uart3_iden & uart2_iden & uart1_iden & ospi_iden;
+  with test_vector
+  select ido <= ospi_ido  when "000001",
+                uart1_ido when "000010",
+                uart2_ido when "000100",
+                uart3_ido when "001000",
+                eth_ido   when "010000",
+                pdi_ido   when "100000",
                 ios_ido   when others;
 
   -- Mux out 'idreq' to IOS, priority is eth > pdi > external.(?)
@@ -100,5 +102,5 @@ begin  -- rtl
   rx2_idack <= idack(2) when en_eth = "11" else '1';
   tx_idack  <= idack(3) when en_eth /= "00" else '1';
   pdi_idack <= idack(4) when en_pdi = '1' else '1';
-  
+
 end rtl;

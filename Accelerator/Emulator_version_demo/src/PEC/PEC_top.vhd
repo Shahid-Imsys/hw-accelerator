@@ -331,7 +331,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(3),
     C1_RDY     => pe_rdy_reg(13),
     C2_RDY     => pe_rdy_reg(12),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_2,
     C2_ID      => ID_NUM_3,
@@ -365,7 +365,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(5),
     C1_RDY     => pe_rdy_reg(11),
     C2_RDY     => pe_rdy_reg(10),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_4,
     C2_ID      => ID_NUM_5,
@@ -399,7 +399,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(7),
     C1_RDY     => pe_rdy_reg(9),
     C2_RDY     => pe_rdy_reg(8),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_6,
     C2_ID      => ID_NUM_7,
@@ -433,7 +433,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(9),
     C1_RDY     => pe_rdy_reg(7),
     C2_RDY     => pe_rdy_reg(6),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_8,
     C2_ID      => ID_NUM_9,
@@ -467,7 +467,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(11),
     C1_RDY     => pe_rdy_reg(5),
     C2_RDY     => pe_rdy_reg(4),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_10,
     C2_ID      => ID_NUM_11,
@@ -501,7 +501,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(13),
     C1_RDY     => pe_rdy_reg(3),
     C2_RDY     => pe_rdy_reg(2),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_12,
     C2_ID      => ID_NUM_13,
@@ -535,7 +535,7 @@ port map(
     C2_DDI_VLD => data_vld_to_pe(15),
     C1_RDY     => pe_rdy_reg(1),
     C2_RDY     => pe_rdy_reg(0),
-    EXE        => '0',--exe,      --Block
+    EXE        => exe,      --Block
     RESUME     => resume,
     C1_ID      => ID_NUM_14,
     C2_ID      => ID_NUM_15,

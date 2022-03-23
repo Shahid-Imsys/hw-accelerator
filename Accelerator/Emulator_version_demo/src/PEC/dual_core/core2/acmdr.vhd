@@ -135,7 +135,7 @@ begin
             ve_data_int <= (others => '0');
         else
             if DATA_VLD = '1' then
-                if CLK_E_POS = '0' then
+                if CLK_E_POS = '1' then
                     ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
                 else
                     ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
@@ -164,7 +164,6 @@ begin
     end process;
 
     dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
-    VE_DIN <= ve_data_int;
     MPGMM_IN <= mp_data_int;
     DBUS_DATA <= dbus_int;
 

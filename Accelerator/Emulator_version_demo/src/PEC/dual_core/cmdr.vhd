@@ -276,11 +276,17 @@ begin
                 elsif requesting = '1' then
                     send_req_d <= '1';--requesting;
                 elsif transfer_type = "11" then
-                    if transfer_cnt = x"01" then
+                    if fb = '1' then
+                        send_req_d <= '0';
+                    elsif transfer_cnt = x"01" then
                         send_req_d <= '0';
                     end if;
                 end if;
                 send_req <= send_req_d;
+            else
+                if fb = '1' then
+                    send_req <= '0'; 
+                end if;
             end if;
         end if;
     end process;
@@ -303,9 +309,16 @@ begin
                 if rst_en = '0' then
                     req <= '0';
                 elsif fb = '0' then 
-                    if send_req = '1' then
-                        req <= '1';
-                    end if;
+                    case transfer_type is 
+                        when "11" =>
+                            if send_req = '1' and transfer_cnt = x"04" then
+                                req <= '1';
+                             end if;
+                        when others => 
+                            if send_req = '1' then
+                                req <= '1';
+                            end if;
+                    end case;
                 elsif fb = '1' then
                     req <= '0';
                 end if;

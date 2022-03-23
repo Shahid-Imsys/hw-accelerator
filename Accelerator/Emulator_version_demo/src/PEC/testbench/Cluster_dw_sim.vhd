@@ -143,7 +143,7 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_dw  : ram_type := init_ram_from_file("microprogram.ascii");--("microprogram_id.ascii");
+signal ucode_dw  : ram_type := init_ram_from_file("microprogram_id.ascii");--("microprogram.ascii");
 signal data_dw   : data_in := init_input_from_file("data_dw.ascii");
 signal kernel_dw : kernels_in := init_kernel_from_file("kernels_dw.ascii");
 signal bias_dw   : bias_in := init_bias_from_file("bias_dw.ascii");

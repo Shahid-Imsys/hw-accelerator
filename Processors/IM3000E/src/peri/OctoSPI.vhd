@@ -436,7 +436,7 @@ begin
             rd_trig                   := false;
           end if;
 
-          if OSPI_RWDS xor ospi_rwds_p then
+          if OSPI_RWDS /= ospi_rwds_p then
             rd_trig := true;
           end if;
 

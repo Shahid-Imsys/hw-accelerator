@@ -53,8 +53,24 @@ architecture bfm of octo_memory_bfm is
 
   signal burst_length : integer := 0;
 
+  signal found_error : boolean := false;
+  
 begin  -- architecture bfm
 
+  assert rwds /= 'X' report "[Octo_bfm] Double driving on RWDS" severity warning;
+  
+  check_double_drive_dq: process (dq) is
+    variable no_dd : boolean := true;
+  begin  -- process check_double_drive_dq
+    for i in dq'range loop
+      if dq(i) = 'X' then
+        no_dd := false;
+      end if;
+    end loop;  -- i
+
+    assert no_dd report "[Octo_bfm] double driving on signal dq" severity warning;
+  end process check_double_drive_dq;
+  
   p_deep_power_down : process (all) is
   begin  -- process s
     if (reset_n = '1') or (state = command_state_1 and command = x"99" and reset_enable) then
@@ -92,8 +108,26 @@ begin  -- architecture bfm
                   32;
 
   process (ck, cs, reset_n, deep_power_down) is
+
+    procedure check_for_z is
+      variable no_z : boolean := true;
+    begin  -- procedure check_double_drive_dq
+      for i in dq'range loop
+        if dq(i) = 'Z' then
+          no_z := false;
+        end if;
+      end loop;  -- i
+
+      assert no_z
+        report "[Octo_bfm] No drivig on dq in state " & state_t'image(state)
+        severity warning;
+    end procedure check_for_z;
+
     variable l : line;
   begin  -- process
+
+    found_error <= false;
+
     if reset_n = '0' then
       write(l, string'("Octo_spi reset pin"));
       writeline(output, l);
@@ -105,8 +139,18 @@ begin  -- architecture bfm
     elsif cs = '1' then                 -- wait_on_cs state
       command <= x"00";
       state   <= command_state_1;
+      if state /= command_state_1 and state /= wait_on_cs and state /= write_ddr then
+        write(l, string'("[Octo_bfm] Warning, BFM in state "));
+        write(l, state_t'image(state));
+        write(l, string'(" when cs is high"));
+        writeline(output, l);
+        found_error <= true;
+      end if;
       dq      <= (others => 'Z');
       rwds    <= 'Z';
+    elsif falling_edge(cs) then      
+      rwds        <= old_latency;
+      old_latency <= not old_latency;
     elsif deep_power_down then
       reg <= (others => (others => 'X'));
       cr0 <= cr0_init_value_c;
@@ -115,8 +159,6 @@ begin  -- architecture bfm
         when command_state_1 =>
           command     <= dq;
           state       <= command_state_2;
-          rwds        <= old_latency;
-          old_latency <= not old_latency;
           dq          <= (others => 'Z');
         when command_state_2 =>
           assert command = dq report "cmd is not repeated in second byte" severity error;
@@ -143,10 +185,11 @@ begin  -- architecture bfm
            
             when x"06" =>
               write_enable <= true;
+              state <= wait_on_cs;
             when x"04" =>
               write_enable <= false;
-            when  x"EE" | x"DE" |         -- Read/write memory array 
-                  x"65" | x"71"    =>  -- Read register
+            when  x"EE" | x"DE" |      -- Read/write memory array 
+                  x"65" | x"71"    =>  -- Read/write register
               state   <= get_address;
               counter <= 3;
             when others =>
@@ -169,9 +212,12 @@ begin  -- architecture bfm
               state   <= write_register;
               counter <= 1;
             end if;
+          else
+            counter                                      <= counter -1;
           end if;
           address((counter+1)*8 -1 downto counter * 8) <= unsigned(dq);
-          counter                                      <= counter -1;
+
+          check_for_z;
 
         -- State write register
         when write_register =>
@@ -181,6 +227,7 @@ begin  -- architecture bfm
               write(l, string'("[octo BFM] Register ID0 not writable: "));
               hwrite(l, address);
               writeline(output, l);
+              found_error <= true;
               counter <= 0;
             else
               rwds  <= '0';
@@ -191,12 +238,18 @@ begin  -- architecture bfm
               write(l, string'("[octo BFM] Register ID1 not writable: "));
               hwrite(l, address);
               writeline(output, l);
+              found_error <= true;
               counter <= 0;
             else
               rwds  <= '0';
               state <= wait_on_cs;
             end if;
 
+            check_for_z;
+            assert rwds /= 'Z'
+              report "no driving on RWDS in state write_register"
+              severity warning;
+              
           elsif address = x"000004" then  -- CR0 register
             if counter = 1 then
               cr0(15 downto 8) <= dq;
@@ -230,6 +283,7 @@ begin  -- architecture bfm
               write(l, string'("[octo BFM] Wrong register adress: "));
               hwrite(l, address);
               writeline(output, l);
+              found_error <= true;
               state <= wait_on_cs;
             end if;
           end if;
@@ -245,10 +299,15 @@ begin  -- architecture bfm
             elsif command = x"65" and ck = '0' then
               state   <= read_register;
               counter <= 1;
-            else
+            elsif ck = '0' then
               state <= write_ddr;
+              rwds <= 'Z';
               counter <= 0;
             end if;
+          end if;
+
+          if command = x"65" then
+            rwds <= 'Z';
           end if;
 
         -- State write_ddr, Writes content to emmory
@@ -261,6 +320,7 @@ begin  -- architecture bfm
             write(l, string'("[Octo_BFM] to many writes in a burst, max number is: "));
             write(l, burst_length);
             writeline(output, l);
+            found_error <= true;
             state <= wait_on_cs;
           elsif address(31 downto 10) = to_unsigned(0, 22) then
             memory_low(to_integer(address(9 downto 0))+counter) <= dq;
@@ -271,14 +331,20 @@ begin  -- architecture bfm
             hwrite(l, address);
             write(l, string'(" for memory write, this is a limitation in the BFM"));
             writeline(output, l);
+            found_error <= true;
           end if;
           
           counter <= counter + 1;
-          
+          check_for_z;         
+          assert rwds /= 'Z'
+            report "no driving on RWDS in state " & state_t'image(state)
+            severity warning;
+            
         -- State read_ddr, reads contens from memory.
         when read_ddr =>
           write(l, string'("[Octo_BFM] Read from memory not yet supported"));
-
+          writeline(output, l);         
+          found_error <= true;
           rwds <= not rwds;
           if cs = '1' then
             state <= command_state_1;
@@ -287,6 +353,7 @@ begin  -- architecture bfm
               write(l, string'("[Octo_BFM] to many writes in a burst, max number is: "));
               write(l, burst_length);
               writeline(output, l);
+              found_error <= true;
               state <= wait_on_cs;
               dq <= (others => 'Z');
           elsif address(31 downto 10) = to_unsigned(0, 22) then
@@ -298,6 +365,7 @@ begin  -- architecture bfm
             hwrite(l, address);
             write(l, string'(" for memory read, this is a limitation in the BFM"));
             writeline(output, l);
+            found_error <= true;
           end if;
 
           counter <= counter + 1;
@@ -362,6 +430,7 @@ begin  -- architecture bfm
               write(l, string'("[octo BFM] Wrong register adress: "));
               hwrite(l, address);
               writeline(output, l);
+              found_error <= true;
               state <= wait_on_cs;
             end if;
           end if;

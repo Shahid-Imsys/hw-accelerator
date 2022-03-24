@@ -306,8 +306,10 @@ begin  -- architecture bfm
             end if;
           end if;
 
-          if command = x"65" then
+          if command = x"DE" then
             rwds <= 'Z';
+          elsif command = x"EE" or command = x"65" then
+            rwds <= '0';
           end if;
 
         -- State write_ddr, Writes content to emmory
@@ -342,9 +344,6 @@ begin  -- architecture bfm
             
         -- State read_ddr, reads contens from memory.
         when read_ddr =>
-          write(l, string'("[Octo_BFM] Read from memory not yet supported"));
-          writeline(output, l);         
-          found_error <= true;
           rwds <= not rwds;
           if cs = '1' then
             state <= command_state_1;
@@ -366,6 +365,11 @@ begin  -- architecture bfm
             write(l, string'(" for memory read, this is a limitation in the BFM"));
             writeline(output, l);
             found_error <= true;
+            if counter mod 2 = 0 then
+              dq <= x"DE";
+            else
+              dq <= x"AD";
+            end if;
           end if;
 
           counter <= counter + 1;

@@ -1,0 +1,3 @@
+[submodule "fw-test-im3000e"]
+	path = fw-test-im3000e
+	url = https://imsystech@dev.azure.com/imsystech/Imsystech/_git/fw-test-im3000e

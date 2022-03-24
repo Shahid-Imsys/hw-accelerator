@@ -54,6 +54,7 @@ gpp_rtl: mem_comp
 			 	  $(GPP_DIR_WIN)/peri/eth.vhd \
 			 	  $(GPP_DIR_WIN)/peri/adc.vhd \
 			 	  $(GPP_DIR_WIN)/peri/dac.vhd \
+			 	  $(GPP_DIR_WIN)/peri/OctoSPI.vhd \
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \

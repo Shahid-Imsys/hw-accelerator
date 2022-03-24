@@ -145,7 +145,12 @@ entity top is
     PG      : inout std_logic_vector(7 downto 0);  -- port G, added by HYX, 20141115
     PH      : inout std_logic_vector(7 downto 0);  -- port H /DMA ctrl
     PI      : inout std_logic_vector(7 downto 0);  -- port I /ID
-    PJ      : inout std_logic_vector(7 downto 0)  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0) 
+    PJ : inout std_logic_vector(7 downto 0);  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0)
+
+    -- OSPI interface
+    OSPI_Out   : out   OSPI_InterfaceOut_t;
+    OSPI_DQ    : inout std_logic_vector(7 downto 0);
+    OSPI_RWDS  : inout std_logic
     );
     -- MPG RAM signals
  end top;
@@ -2476,7 +2481,10 @@ peri01: entity work.peri
     pi_o      	  => pi_o,
     pj_i      	  => pj_i,
     pj_en     	  => pj_en,
-    pj_o      	  => pj_o
+        pj_o       => pj_o,
+        OSPI_Out   => OSPI_Out,
+        OSPI_DQ    => OSPI_DQ,
+        OSPI_RWDS  => OSPI_RWDS
 		);  
 	
 end;

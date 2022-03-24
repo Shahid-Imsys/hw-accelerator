@@ -4,13 +4,15 @@ use work.all;
 use work.digital_top_sim_pack.all;
 use work.tb_components_pkg.all;
 
+use work.gp_pkg.all;
+
 entity main_tb is
 end main_tb;
 
 architecture tb of main_tb is
 
-  constant HALF_CLK_C_CYCLE : time                         := 16000 ps;
-  
+  constant HALF_CLK_C_CYCLE : time := 16000 ps;
+
   signal MX1_CK  : std_logic;
   signal MXOUT   : std_logic;
   signal MEXEC   : std_logic;
@@ -45,7 +47,11 @@ architecture tb of main_tb is
 
   signal xtal1_int : std_logic := '0';
   signal mx1_ck_int : std_logic := '0';
-  
+
+  signal OSPI_Out   : OSPI_InterfaceOut_t;
+  signal OSPI_DQ    : std_logic_vector(7 downto 0);
+  signal OSPI_RWDS  : std_logic;
+
 begin  -- architecture tb
 
 
@@ -59,7 +65,7 @@ begin  -- architecture tb
       MTEST   => MTEST,
       MIRQ0   => MIRQ0,
       MIRQ1   => MIRQ1,
-      -- SW debug                                                               
+      -- SW debug
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
 
@@ -88,6 +94,10 @@ begin  -- architecture tb
       MWAKEUP_LP => MWAKE,
       MLP_PWR_OK => MLP_PWR_OK,
 
+      OSPI_Out   => OSPI_Out,
+      OSPI_DQ    => OSPI_DQ,
+      OSPI_RWDS  => OSPI_RWDS,
+
       pwr_ok   => '1',
       vdd_bmem => '0',
       VCC18LP  => '1',
@@ -102,7 +112,7 @@ begin  -- architecture tb
 
   -- Reset the circuit for 10 ns;
   MRESET <= '0', '1' after 10 ns;
-  
+
   -- This emulates a 31.25 MHz crystal
   mx1_ck_int <= not mx1_ck_int after HALF_CLK_C_CYCLE;
   MX1_CK     <= mx1_ck_int;
@@ -121,10 +131,10 @@ begin  -- architecture tb
   MIRQ0 <= '1';
   MIRQ1 <= '1';
 
-  -- Connect MLP_PWR_OK to reset for simlicity. 
+  -- Connect MLP_PWR_OK to reset for simlicity.
   MLP_PWR_OK <= MRESET;
 
-  i_debug_interface_bfm : entity work.debug_interface_bfm 
+  i_debug_interface_bfm : entity work.debug_interface_bfm
     port map (
 
       MSDIN   => MSDIN,
@@ -144,14 +154,13 @@ begin  -- architecture tb
       reg_from_block =>  x"00"
       );
 
-  -- i_octo_spi : entity work.octo_memory_bfm is
-    
-  --   port map (
-  --     cs => ,
-  --     ck => ,
-  --     rwds => ,
-  --     dq => ,
-  --     reset_n => MRESET
-  --     );
+  i_octo_spi : entity work.octo_memory_bfm
+    port map (
+      ck      => OSPI_Out.CK_p,
+      cs      => OSPI_Out.CS_n,
+      rwds    => OSPI_RWDS,
+      dq      => OSPI_DQ,
+      reset_n => MRESET
+      );
 
 end architecture tb;

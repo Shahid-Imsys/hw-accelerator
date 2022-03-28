@@ -87,6 +87,8 @@ COMPONENT fifo_generator_1
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
     signal id_num   : std_logic_vector(3 downto 0):="0000";
+    signal id_syn   : std_logic_vector(3 downto 0);
+    signal id_syn_d : std_logic_vector(3 downto 0);
     signal poll_act : std_logic;
     signal fifo_rdy : std_logic; --active low
     signal add_in_1 : std_logic_vector(3 downto 0);
@@ -110,6 +112,7 @@ END COMPONENT;
     signal data_vld_out_i : std_logic_vector(15 downto 0);
     signal reset_i     : std_logic;
     signal req_to_noc_i : std_logic;
+    signal req_rd_reg   : std_logic_vector(15 downto 0) := (others => '0');
 
 
 begin
@@ -169,7 +172,7 @@ process(clk_p)
 begin
     if rising_edge (clk_p) then
         if EVEN_P = '1'then
-            if req_sig /= (req_sig'range => '0') then
+            if req_rd_reg /= (req_rd_reg'range => '0') then
             req_to_noc_i <= '1';
             else
             req_to_noc_i <= '0';
@@ -277,6 +280,22 @@ begin
     
 end process;
 
+------synchronize id with request data-------
+process(clk_p)
+begin
+    if rising_edge(clk_p) then
+        if reset_i = '1' then 
+            id_syn <= "0000";
+            id_syn_d <= "0000";
+        else
+            if EVEN_P = '1' then
+                id_syn <= id_num;
+            end if;
+            id_syn_d <= id_syn;
+        end if;
+    end if;
+end process;
+
 ----------------------------------------------------------------
 --Request Buffer
 ----------------------------------------------------------------
@@ -284,9 +303,13 @@ end process;
 process(clk_p)
 begin
     if rising_edge(clk_p) then 
-        if EVEN_P = '0' then--rising_edge (clk_e)
-            pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
-        --else
+        if reset_i = '1' then
+            pe_mux_out <= (others => '0');
+            req_rd_reg <= (others => '0');
+        elsif EVEN_P = '0' then--rising_edge (clk_e)
+            pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_syn_d))); --PE req in comes the same clock cycle when req_sig is raised
+            req_rd_reg <= REQ_RD_IN;
+            --else
         --    pe_mux_out <= (others => '0');
         end if;
     end if;
@@ -296,7 +319,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if (REQ_RD_IN /= (REQ_RD_IN'range => '0') and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
+        if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';

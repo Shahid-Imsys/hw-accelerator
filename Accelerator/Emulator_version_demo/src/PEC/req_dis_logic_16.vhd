@@ -47,6 +47,7 @@ entity req_dst_logic is
         --Requet logic
         REQ_TO_NOC : out std_logic;
         REQ_SIG   : in std_logic_vector(15 downto 0);
+        REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
         OUTPUT    : out std_logic_vector(31 downto 0); --Output to CC
@@ -260,7 +261,7 @@ end process;
 
 --Adder
 add_in_1 <= id_num;
-process(clk_p,poll_act)--add_in_2,wr_req,chain)
+process(clk_p,poll_act)--add_in_2,wr_req,chain,EVEN_P)
 begin
     if poll_act = '0' then--------------TBD
         id_num <= (others => '0'); 
@@ -295,7 +296,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if (poll_act = '1' and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
+        if (REQ_RD_IN /= (REQ_RD_IN'range => '0') and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';

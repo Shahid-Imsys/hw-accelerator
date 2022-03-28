@@ -277,6 +277,7 @@ end component;
   signal pe_data_in_e_1 : reg;
   signal data_core_int_e : reg;
   signal data_core_int_e_1 : reg;
+  signal standby : std_logic;
   --PE's ID
   --signal id_int  : ID_TYPE;
  
@@ -805,26 +806,25 @@ EVEN_P <= even_p_2;
 
  -- Fetch data from req_fifo
     process(clk_p)
-        variable cmd_tr : std_logic; --Save 1 clock to handle the request
+         --Save 1 clock to handle the request
 	begin
 		if rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
-                cmd_tr := '0';
+                standby <= '1';
 				--rd_fifo_i <= '0';
             elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
-                if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '0' then
-                    cmd_tr := '1';
-                else
-                    cmd_tr := '0';
-                end if;
+                
 
-			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '1' then --normal case
+			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
+					standby <= '0';
 			    elsif req_exe = '1' and write_req = '1' then --write case
 			    	RD_FIFO <= '1';
+				elsif req_exe = '1' or cb_status = '1' then
+                    standby <= '1';
 			    else
-			    	RD_FIFO <= '0';
+					RD_FIFO <= '0';
 			    end if;
                 --rd_fifo_i <= cl_net_fifo_rd; --one clk_e delay
 			else

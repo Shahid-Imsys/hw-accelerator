@@ -45,6 +45,7 @@ entity acmdr is
         --EXE       : in std_logic;
         DATA_VLD  : in std_logic;
         REQ_OUT   : out std_logic;
+        REQ_RD_OUT: out std_logic;
         ACK_IN    : in std_logic;
         DIN       : in std_logic_vector(127 downto 0);
         DOUT      : out std_logic_vector(31 downto 0);
@@ -92,6 +93,9 @@ architecture rtl of acmdr is
     signal send_req_d    : std_logic;
     signal send_req      : std_logic;
     signal requesting    : std_logic;
+    signal transfer_cnt  : unsigned(7 downto 0);
+    signal cnt_reg       : unsigned(7 downto 0);
+    signal transfer_type : std_logic_vector(1 downto 0);
 
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
@@ -107,7 +111,8 @@ architecture rtl of acmdr is
     signal empty       : std_logic;
     signal fifo_full   : std_logic;
     signal fb          : std_logic;
-    signal req         : std_logic;
+    signal req         : std_logic := '0';
+    signal rd_trig     : std_logic;
     signal srst        : std_logic;
 
 begin
@@ -225,30 +230,78 @@ begin
 
     process(clk_p)
     begin
+        if rising_edge(clk_p) then
+            if rst_en = '0' then 
+                transfer_cnt <= (others => '0');
+                cnt_reg <= (others => '0');
+                transfer_type <= "00";
+            else
+                if fifo_push = '1' then
+                    transfer_type <= dtm_reg(31 downto 30);
+                    if dtm_reg (31 downto 30) = "11" then
+                        cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
+                        if fifo_rd_en = '1' then
+                            transfer_cnt <= transfer_cnt -1;
+                        end if;
+                    end if;
+                elsif clk_e_pos = '1' and transfer_cnt = (transfer_cnt'range => '0') then
+                    transfer_cnt <= cnt_reg;
+                else
+                    if fifo_rd_en = '1' and transfer_type = "11" then
+                        transfer_cnt <= transfer_cnt -1;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clk_p)
+    begin
         if rising_edge(clk_p) then 
-            requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+            if rst_en = '0' then
+                requesting <= '0';
+            else
+                requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+            end if;
         end if;
     end process;
 
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if clk_e_pos = '1' then --rising_edge
-                send_req_d <= '1';
-                if empty = '1' then
-                    send_req_d <= '0';
-                elsif requesting = '1' then
-                    send_req_d <= '1';--requesting;
+            if rst_en = '0' then
+                send_req_d <= '0';
+                send_req <= '0';
+                rd_trig <= '0';
+            else
+                if clk_e_pos = '1' then --rising_edge
+                    if fb = '1' then            -- if got feedback from cluster net, start to read the fifo and stop send request.
+                        rd_trig <= '1';
+                        send_req <= '0';
+                        send_req_d <= '0';
+                    else
+                        if requesting = '1' then
+                            send_req_d <= '1';--requesting;
+                        else
+                            case transfer_type is
+                                when "11" =>
+                                    if transfer_cnt = x"01" then
+                                        rd_trig <= '0';
+                                    end if;
+                                when others => rd_trig <= '0';
+                            end case;
+                        end if;
+                        send_req <= send_req_d;
+                    end if;
                 end if;
             end if;
-            send_req <= send_req_d;
         end if;
-end process;
+    end process;
 
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if send_req = '1' and CLK_E_POS = '0' and empty = '0'then
+            if rd_trig = '1' and CLK_E_POS = '0' and empty = '0'then
                 fifo_rd_en <= '1';
             else
                 fifo_rd_en <= '0';
@@ -274,6 +327,7 @@ end process;
     end process;
     
     REQ_OUT <= req;
+    REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
     --srst <= not rst_en;
     process(clk_p)

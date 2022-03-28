@@ -127,6 +127,7 @@ entity acore is
     pmem_we_n   : out std_logic;
     -- CC signal
     req_c2    : out std_logic;
+    req_rd_c2 : out std_logic;
     ack_c2    : in std_logic;
     ddi_vld   : in std_logic; --Added by CJ
     exe       : in std_logic; --CONT need to be added
@@ -298,6 +299,7 @@ architecture struct of acore is
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
   signal req        : std_logic;
+  signal req_rd     : std_logic;
   signal ack        : std_logic;
   --VE signals
   signal ve_in_int  : std_logic_vector(63 downto 0);
@@ -318,6 +320,7 @@ architecture struct of acore is
   
 begin
   req_c2 <= req;
+  req_rd_c2 <= req_rd;
   ack    <= ack_c2;
   ready_1  <= pl(121);
 ---------------------------------------------------------------------
@@ -785,6 +788,7 @@ begin
         --EXE      => exe,
         DATA_VLD => ddi_vld,
         REQ_OUT  => req,
+        REQ_RD_OUT => req_rd,
         ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,

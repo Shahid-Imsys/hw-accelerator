@@ -127,6 +127,7 @@ entity core is
     bmem_ce_n   : out  std_logic;
     -- CC signal
     req_c1     : out std_logic;
+    req_rd_c1  : out std_logic;
     ack_c1     : in std_logic;
     ddi_vld    : in std_logic; --Added by CJ
 	-- router control signals
@@ -448,6 +449,7 @@ architecture struct of core is
   attribute syn_keep of curr_mpga : signal is true;
   -- Microprogram loading signal --CJ
   signal req    : std_logic;
+  signal req_rd : std_logic;
   signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
@@ -492,6 +494,7 @@ begin
 ---------------------------------------------------------------------
   exe_i <= exe;
   req_c1 <= req;
+  req_rd_c1 <= req_rd;
   ack <= ACK_C1; 
   init_ld <= pl(100) and pl(106) and not pl(98) and not pl(97);
   --ld_mpgm <= pl(100) and pl(98);
@@ -1316,6 +1319,7 @@ begin
         EXE      => exe,
         DATA_VLD => ddi_vld,
         REQ_OUT  => req,
+        REQ_RD_OUT => req_rd,
         ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,

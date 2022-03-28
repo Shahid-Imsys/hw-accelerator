@@ -114,6 +114,7 @@ component req_dst_logic
         --Requet logic
         REQ_TO_NOC : out std_logic;
         REQ_SIG   : in std_logic_vector(15 downto 0);
+        REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
         OUTPUT    : out std_logic_vector(31 downto 0);
@@ -148,7 +149,9 @@ component PE_pair_top
     MSDOUT     : out   std_logic ;                   -- serial data out  
 	-- Cluster interface
 	C1_REQ    : out std_logic;
+    C1_REQ_RD : out std_logic;
     C2_REQ    : out std_logic;
+    C2_REQ_RD : out std_logic;
     C1_ACK    : in std_logic;
     C2_ACK    : in std_logic;
     C1_REQ_D  : out std_logic_vector(31 downto 0);
@@ -187,6 +190,7 @@ signal bc_i         : std_logic;
 signal rd_fifo_i    : std_logic;
 signal fifo_vld_i   : std_logic;
 signal req_sig_i    : std_logic_vector(15 downto 0);
+signal req_rd_i     : std_logic_vector(15 downto 0);
 signal ack_sig_i    : std_logic_vector(15 downto 0);
 signal pe_rdy_reg   : std_logic_vector(15 downto 0);
 signal pe_req_in_i    : pe_req;
@@ -271,6 +275,7 @@ port map(
     RESET      =>rst_i,
     REQ_TO_NOC =>req_in_i,
     REQ_SIG    =>req_sig_i,
+    REQ_RD_IN  =>req_rd_i,
     ACK_SIG    =>ack_sig_i,
     PE_REQ_IN  =>pe_req_in_i,
     OUTPUT     =>req_fifo_i,
@@ -286,7 +291,9 @@ port map(
 pe_pair_1: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(15),
+    C1_REQ_RD  => req_rd_i(15),
     C2_REQ     => req_sig_i(14),
+    C2_REQ_RD  => req_rd_i(14),
     C1_ACK     => ack_sig_i(0),
     C2_ACK     => ack_sig_i(1),
     C1_REQ_D   => pe_req_in_i(0),
@@ -320,7 +327,9 @@ port map(
 pe_pair_2: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(13),
+    C1_REQ_RD  => req_rd_i(13),
     C2_REQ     => req_sig_i(12),
+    C2_REQ_RD  => req_rd_i(12),
     C1_ACK     => ack_sig_i(2),
     C2_ACK     => ack_sig_i(3),
     C1_REQ_D   => pe_req_in_i(2),
@@ -354,7 +363,9 @@ port map(
 pe_pair_3: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(11),
+    C1_REQ_RD  => req_rd_i(11),
     C2_REQ     => req_sig_i(10),
+    C2_REQ_RD  => req_rd_i(10),
     C1_ACK     => ack_sig_i(4),
     C2_ACK     => ack_sig_i(5),
     C1_REQ_D   => pe_req_in_i(4),
@@ -388,7 +399,9 @@ port map(
 pe_pair_4: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(9),
+    C1_REQ_RD  => req_rd_i(9),
     C2_REQ     => req_sig_i(8),
+    C2_REQ_RD  => req_rd_i(8),
     C1_ACK     => ack_sig_i(6),
     C2_ACK     => ack_sig_i(7),
     C1_REQ_D   => pe_req_in_i(6),
@@ -422,7 +435,9 @@ port map(
 pe_pair_5: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(7),
+    C1_REQ_RD  => req_rd_i(7),
     C2_REQ     => req_sig_i(6),
+    C2_REQ_RD  => req_rd_i(6),
     C1_ACK     => ack_sig_i(8),
     C2_ACK     => ack_sig_i(9),
     C1_REQ_D   => pe_req_in_i(8),
@@ -456,7 +471,9 @@ port map(
 pe_pair_6: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(5),
+    C1_REQ_RD  => req_rd_i(5),
     C2_REQ     => req_sig_i(4),
+    C2_REQ_RD  => req_rd_i(4),
     C1_ACK     => ack_sig_i(10),
     C2_ACK     => ack_sig_i(11),
     C1_REQ_D   => pe_req_in_i(10),
@@ -490,7 +507,9 @@ port map(
 pe_pair_7: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(3),
+    C1_REQ_RD  => req_rd_i(3),
     C2_REQ     => req_sig_i(2),
+    C2_REQ_RD  => req_rd_i(2),
     C1_ACK     => ack_sig_i(12),
     C2_ACK     => ack_sig_i(13),
     C1_REQ_D   => pe_req_in_i(12),
@@ -524,7 +543,9 @@ port map(
 pe_pair_8: PE_pair_top
 port map(
 	C1_REQ     => req_sig_i(1),
+    C1_REQ_RD  => req_rd_i(1),
     C2_REQ     => req_sig_i(0),
+    C2_REQ_RD  => req_rd_i(0),
     C1_ACK     => ack_sig_i(14),
     C2_ACK     => ack_sig_i(15),
     C1_REQ_D   => pe_req_in_i(14),

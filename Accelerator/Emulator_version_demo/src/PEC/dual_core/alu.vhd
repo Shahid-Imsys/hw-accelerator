@@ -43,6 +43,7 @@ entity alu is
 		rst_n				: in std_logic;		-- reset input added by maning
 		-- Microprogram fields
 		pl          	    : in std_logic_vector(127 downto 0);	-- uProg word field
+		init_load			: in std_logic; 
 		--Data inputs
 		dbus				: in std_logic_vector(7 downto 0);	-- D bus
 		-- Flags
@@ -390,60 +391,69 @@ begin
 			    flag_pccy_int <= '0';
 			    flag_link_int <= '0';
 		    elsif clk_e_pos = '0' then
-			    case pl_sig14 is
-			    	when FF_LZNVLOG =>							
-			    		flag_oflow			<= '0';    
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz;
-			    	when FF_LCZNVARI =>							
-			    		flag_oflow			<= flag_yav;    
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz;
-			    		flag_carry_int	<= flag_yac;
-			    	when FF_RESPCCY =>							
-			    		flag_pccy_int		<= '0';
-			    	when FF_LCNVARI =>							
-			    		flag_oflow			<= flag_yav;    
-			    		flag_neg				<= flag_yan;   
-			    		flag_carry_int	<= flag_yac;
-			    	when FF_LLFSHIFT =>							
-			    		flag_link_int		<= shift_out; 
-			    	when FF_LCZNVARI16 =>						
-			    		flag_oflow			<= flag_yav;    
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz and flag_zero_int;
-			    		flag_carry_int	<= flag_yac;
-			    	when FF_LLFD =>								
-			    		flag_link_int		<= dbus(3);    
-			    	when FF_SETC =>								
-			    		flag_carry_int	<= '1';    
-			    	when FF_LCZNVLOG =>							
-			    		flag_oflow			<= '0';    
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz;
-			    		flag_carry_int	<= '0';
-			    	when FF_LCZNVFD =>							
-			    		flag_oflow			<= dbus(5);  
-			    		flag_neg				<= dbus(4);
-			    		flag_zero_int		<= dbus(2);
-			    		flag_carry_int	<= dbus(0);
-			    	when FF_LOADPCCY =>							
-			    		flag_pccy_int		<= flag_yac;    
-			    	when FF_LCFSHIFT =>							
-			    		flag_carry_int	<= shift_out; 
-			    	when FF_LZNLOG =>							
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz;
-			    	when FF_LZNLOG16 =>							
-			    		flag_neg				<= flag_yan;
-			    		flag_zero_int		<= flag_yaz and flag_zero_int;
-			    	when FF_NOP =>								 
-			    		null;
-			    	when FF_LCZARI =>							
-			    		flag_zero_int		<= flag_yaz;
-			    		flag_carry_int	<= flag_yac;
-			    	when others => null;         
-			    end case; 
+				if init_load = '1' then --- clear flags during initial loading
+					flag_oflow <= '0';
+			    	flag_neg <= '0';
+			    	flag_zero_int <= '0';
+			    	flag_carry_int <= '0';
+			    	flag_pccy_int <= '0';
+			    	flag_link_int <= '0';
+				else
+			    	case pl_sig14 is
+			    		when FF_LZNVLOG =>							
+			    			flag_oflow			<= '0';    
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz;
+			    		when FF_LCZNVARI =>							
+			    			flag_oflow			<= flag_yav;    
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz;
+			    			flag_carry_int	<= flag_yac;
+			    		when FF_RESPCCY =>							
+			    			flag_pccy_int		<= '0';
+			    		when FF_LCNVARI =>							
+			    			flag_oflow			<= flag_yav;    
+			    			flag_neg				<= flag_yan;   
+			    			flag_carry_int	<= flag_yac;
+			    		when FF_LLFSHIFT =>							
+			    			flag_link_int		<= shift_out; 
+			    		when FF_LCZNVARI16 =>						
+			    			flag_oflow			<= flag_yav;    
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz and flag_zero_int;
+			    			flag_carry_int	<= flag_yac;
+			    		when FF_LLFD =>								
+			    			flag_link_int		<= dbus(3);    
+			    		when FF_SETC =>								
+			    			flag_carry_int	<= '1';    
+			    		when FF_LCZNVLOG =>							
+			    			flag_oflow			<= '0';    
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz;
+			    			flag_carry_int	<= '0';
+			    		when FF_LCZNVFD =>							
+			    			flag_oflow			<= dbus(5);  
+			    			flag_neg				<= dbus(4);
+			    			flag_zero_int		<= dbus(2);
+			    			flag_carry_int	<= dbus(0);
+			    		when FF_LOADPCCY =>							
+			    			flag_pccy_int		<= flag_yac;    
+			    		when FF_LCFSHIFT =>							
+			    			flag_carry_int	<= shift_out; 
+			    		when FF_LZNLOG =>							
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz;
+			    		when FF_LZNLOG16 =>							
+			    			flag_neg				<= flag_yan;
+			    			flag_zero_int		<= flag_yaz and flag_zero_int;
+			    		when FF_NOP =>								 
+			    			null;
+			    		when FF_LCZARI =>							
+			    			flag_zero_int		<= flag_yaz;
+			    			flag_carry_int	<= flag_yac;
+			    		when others => null;         
+			    	end case; 
+				end if;
 			end if;
 		end if;
 	end process;

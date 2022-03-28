@@ -36,6 +36,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cluster_pkg.all;
 
+
 entity req_dst_logic is
     port(
         --Shared
@@ -145,21 +146,23 @@ begin
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
---process (clk_p)
---begin
---    if rising_edge(clk_p) then
---        if reset_i = '1' then
---                poll_act <= '0'; 
---        elsif fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
---                poll_act <= '1'; 
---        else
---                poll_act <= '0';
---        end if;
---    end if;
---end process;
-poll_act <= '0' when reset_i = '1' else
-            '1' when fifo_rdy = '0' and req_sig /= (req_sig'range => '0') else
-            '0'; 
+process (clk_p)
+begin 
+    if rising_edge(clk_p) then
+        if reset_i = '1' then
+            poll_act <= '0';
+        else
+            if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+                poll_act <= '1'; 
+            else
+                poll_act <= '0';
+            end if;
+        end if;
+    end if;
+end process;
+--poll_act <= '0' when reset_i = '1' else
+--            '1' when fifo_rdy = '0' and req_sig /= (req_sig'range => '0') else
+--            '0'; 
 
 process(clk_p)
 begin
@@ -175,7 +178,7 @@ begin
 end process;
 REQ_TO_NOC <= not empty or req_to_noc_i;
 --ID Number Register and write controller
-process(clk_p,reset_i,poll_act,id_num)
+process(reset_i,poll_act,id_num)
 begin
     --if rising_edge(clk_p) then
     if reset_i = '1' then
@@ -257,9 +260,11 @@ end process;
 
 --Adder
 add_in_1 <= id_num;
-process(clk_p)--add_in_2,wr_req,chain)
+process(clk_p,poll_act)--add_in_2,wr_req,chain)
 begin
-    if rising_edge(clk_p) then
+    if poll_act = '0' then--------------TBD
+        id_num <= (others => '0'); 
+    elsif rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
             if wr_req = '1' or chain = '1' then
                 id_num <= add_in_1;
@@ -280,8 +285,8 @@ begin
     if rising_edge(clk_p) then 
         if EVEN_P = '0' then--rising_edge (clk_e)
             pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
-        else
-            pe_mux_out <= (others => '0');
+        --else
+        --    pe_mux_out <= (others => '0');
         end if;
     end if;
 end process;
@@ -290,7 +295,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if poll_act = '1' and EVEN_P = '0' then
+        if (poll_act = '1' and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';
@@ -310,20 +315,20 @@ process(clk_p)  --Should internal destination listed here?
 begin
     if rising_edge(clk_p) then
         if EVEN_P = '0' then
-            data_vld_out_i<=( others => '0');
+            DATA_VLD_OUT<=( others => '0');
             if B_CAST= '1' then
                 for i in 15 downto 0 loop
                     pe_data_out (i)<= DATA_NOC;
-                    data_vld_out_i (i) <= DATA_VLD;
+                    DATA_VLD_OUT (i) <= DATA_VLD;
                 end loop;
             else
-                data_vld_out_i(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
+                DATA_VLD_OUT(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
                 pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
             end if;
         end if;
     end if;
 end process;
-DATA_VLD_OUT <= data_vld_out_i; 
+--DATA_VLD_OUT <= data_vld_out_i; 
 request_fifo : fifo_generator_1
   PORT MAP (
     clk => clk_p,

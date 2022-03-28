@@ -34,10 +34,12 @@
 --                                              Added clk_p and clk_e_neg for generate signals at falling_edge
 -- 2021-8-9              3.1         CJ         Add even pulse signal generator
 -- 2021-11-2             3.2         CJ         Make broadcast request an independent process than unicast and write
+-- 2022-01-12            3.3         CJ         Add ID data to PEs
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.cluster_pkg.all;
 use work.all;
 
 --use work.defines.all;
@@ -91,7 +93,9 @@ entity cluster_controller is
 	  BC               : out std_logic; --Broadcast handshake
 	  RD_FIFO          : out std_logic;
 	  FIFO_VLD         : in std_logic
-	  --FOUR_WD_LEFT     : in std_logic 	  
+	  --FOUR_WD_LEFT     : in std_logic 
+
+
 	  ); 
 end entity cluster_controller;
 	   
@@ -262,6 +266,19 @@ end component;
   signal two_c_delay :std_logic;
   signal three_c_delay : std_logic;
   
+  signal addr_p_e : std_logic_vector(14 downto 0);
+  signal addr_p_e_1 : std_logic_vector(14 downto 0);
+  signal pe_write_e : std_logic;
+  signal pe_write_e_1 : std_logic;
+  signal pe_read_e : std_logic;
+  signal pe_read_e_1 : std_logic;
+  signal pe_read_e_d : std_logic;
+  signal pe_data_in_e : reg;
+  signal pe_data_in_e_1 : reg;
+  signal data_core_int_e : reg;
+  signal data_core_int_e_1 : reg;
+  --PE's ID
+  --signal id_int  : ID_TYPE;
  
 begin
 ----------------------------
@@ -621,6 +638,7 @@ EVEN_P <= even_p_2;
 		        if byte_ctr = "0000" then 
 		        	noc_reg_rdy <= '1';
                     noc_write <= '1';
+					noc_read <= '0';
 		        else
 		            noc_reg_rdy <= '0';
                     noc_write <= '0';
@@ -928,7 +946,9 @@ EVEN_P <= even_p_2;
 						if write_req = '0' then
 						    addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));
 						    len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));
-							pe_read <= '1'; 
+							if pe_write = '0' then
+								pe_read <= '1';
+							end if; 
 						elsif write_req = '1' then
 							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
             	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
@@ -951,6 +971,14 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 
+--pipeline data
+--process(clk_p)
+--begin
+--	if rising_edge(clk_p) then
+--		data_core_int_e <= data_core_int;
+--		data_core_int_e_1 <= data_core_int_e;
+--	end if;
+--end process;
 
 --distribution network
     process (clk_p)
@@ -970,6 +998,21 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 
+ ---pipeline signal
+-- process(clk_e)
+-- begin
+--	if rising_edge(clk_e) then
+--		addr_p_e <= addr_p;
+--		addr_p_e_1 <= addr_p_e;
+--		pe_write_e <= pe_write;
+--		pe_write_e_1 <= pe_write_e;
+--		pe_read_e <= pe_read;
+--		pe_read_e_1 <= pe_read_e;
+--		pe_read_e_d <= pe_read_e_1;
+--		pe_data_in_e <= pe_data_in;
+--		pe_data_in_e_1 <= pe_data_in_e;
+--	end if;
+-- end process;	
 
  --Address & trigger MUX
  process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
@@ -1016,17 +1059,28 @@ c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
            PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
 		   PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
 		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+		   --PE_RDY_1 and PE_RDY_3 and 
+           --PE_RDY_5 and PE_RDY_7 and
+		   --PE_RDY_9 and PE_RDY_11 and
+		   --PE_RDY_13 and PE_RDY_15 ;
 C_RDY <= c_rdy_i;
 ----------------------------------------------------------------------------------	
-process(noc_cmd)
-begin 
-if noc_cmd = "00100" then
-rd_ena <= '1';
-else
-rd_ena <= '0';
-end if;
+process(clk_e)
+begin
+	if rising_edge(clk_e) then
+		if noc_cmd = "00100" then
+		rd_ena <= '1';
+		else
+		rd_ena <= '0';
+		end if;
+	end if;
 end process;
-CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;	
+process(clk_e)
+begin
+	if rising_edge(clk_e) then
+		CLK_O <= (delay or rd_trig) and rd_ena;	
+	end if;
+end process;
 				
 	--Memory blocks
     clustermem : CMEM_32KX16
@@ -1034,7 +1088,7 @@ CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;
 		addr_c => addr_c, 
 		CK => clk_e,
 		WR => wr_i, --To be written as one write ff instead of 2 ffs
-		RD => rd_i,
+		RD => rd_i, --unused
         DI0 => mem_in(0),
 		DI1 => mem_in(1),
 		DI2 => mem_in(2),
@@ -1095,6 +1149,7 @@ CLK_O <= CLK_E and (delay or rd_trig) and rd_ena;
     --    noc_read => noc_read
 --
 	--);
+	
 
 end architecture rtl; 
 

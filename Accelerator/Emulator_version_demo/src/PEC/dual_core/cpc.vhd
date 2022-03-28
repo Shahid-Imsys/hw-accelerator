@@ -79,6 +79,8 @@ entity cpc is
     trcmem_a    : out std_logic_vector(7 downto 0);  -- Trace memory address
     trcmem_ce_n : out std_logic;        -- Trace memory chip select(active low)
     trcmem_we_n : out std_logic);       -- Trace memory write enable(active low)
+    attribute dont_touch : string;
+    attribute dont_touch of cpc : entity is "yes";
 end cpc;
 
 architecture rtl of cpc is
@@ -539,10 +541,10 @@ begin
         d       => dbus,
         y       => ybus,
         i       => trcmem_q,
-        o       => trcmem_d,
+        o       => open,--trcmem_d,
         a       => trcmem_a,
         adsc_n  => trcmem_ce_n,       
-        gw_n    => trcmem_we_n,
+        gw_n    => open,--trcmem_we_n,
         oe_n    => open);
 --    go <= '0';
 --    rdata <= (others => '0');

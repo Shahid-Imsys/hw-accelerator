@@ -98,11 +98,14 @@ entity core is
     exe         : in std_logic;
     resume      : in std_logic; 
     ready       : out std_logic;
+    -- ID 
+    id_number   : in std_logic_vector(5 downto 0);   --Added by CJ
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
     c2_clkreq_gen  : out std_logic;
     --c2_even_c      : out std_logic;
+    c2_ready       : in std_logic;
     c2_crb_sel     : in  std_logic_vector(3 downto 0);
     c2_crb_out     : out std_logic_vector(7 downto 0);
     c2_en_pmem     : out  std_logic;
@@ -141,12 +144,12 @@ entity core is
     nap_rec         : in std_logic;  -- will recover from nap mode
     halt_en         : out std_logic;
     nap_en          : out std_logic;
-    rst_rtc     : out std_logic;  -- Reset RTC counter byte
-    en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
-    fclk        : out std_logic;  -- Fast clock to RTC counter byte
+  --  rst_rtc     : out std_logic;  -- Reset RTC counter byte
+  --  en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
+  --  fclk        : out std_logic;  -- Fast clock to RTC counter byte
     ld_bmem     : out std_logic;  -- Latch enable to the en_bmem latch
-    rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
-    rtc_data    : in  std_logic_vector(7 downto 0);   -- RTC data
+  --  rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
+  --  rtc_data    : in  std_logic_vector(7 downto 0);   -- RTC data
     --  Signals to/from Peripheral block
     dfp         : in  std_logic_vector(7 downto 0); 
     dbus        : out std_logic_vector(7 downto 0);
@@ -288,6 +291,7 @@ architecture struct of core is
   -- Microinstruction pipeline register
   signal pl         : std_logic_vector(127 downto 0);
   constant init_mpgm : std_logic_vector(127 downto 0) := (106 => '1', 100 => '1', 98 => '0', 97 => '0', 42 => '0', 74 => '0', 15 => '1', 5 => '0', 34 => '1',others => '-');--TBA--CJ
+                                                          --45 => '0', 50 => '1', 23 => '1', 68 => '1', 6 => '1', 54 => '1', 27 => '0', 49 => '0',others => '0');--core2 enable--ZH
 
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
@@ -447,6 +451,7 @@ architecture struct of core is
   signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
+  signal vldl_2  : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
   signal temp         : std_logic;
   signal temp1        : std_logic; --Added by CJ. Used to latch temp
@@ -457,7 +462,10 @@ architecture struct of core is
   signal ve_in_int  : std_logic_vector(63 downto 0);
   signal ve_rdy_int : std_logic;
   signal re_rdy_int : std_logic;
-  signal ve_out_dtm_int : std_logic_vector(127 downto 0);    
+  signal ve_out_dtm_int : std_logic_vector(127 downto 0);
+  signal ve_dtm_rdy_int : std_logic;
+  signal ve_push_dtm_int : std_logic;
+  signal ve_auto_send_int : std_logic;    
 
   attribute keep : string;
   attribute keep of pl : signal is "true";
@@ -478,6 +486,7 @@ begin
   dbus <= dbus_int;
   pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
   aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
+  ready <= pl(121);
 ---------------------------------------------------------------------
 -- Microinstruction loading 
 ---------------------------------------------------------------------
@@ -501,6 +510,13 @@ begin
         end if;
       end if;
   end process;
+  data_vld_latch_2 : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      vldl_2 <=vldl;
+    end if;
+  end process;
+
   --Two clock e pulses delay generation
   process(clk_p)
   begin
@@ -645,7 +661,8 @@ begin
       pl          => pl,             
       -- Other control inputs 
       ld_crb      => ld_crb,             
-      rd_crb      => rd_crb,             
+      rd_crb      => rd_crb,
+      c2_ready    => c2_ready,             
       mwake_i     => mwake_i,  
       pa_i        => pa_i,
       -- Data paths
@@ -755,12 +772,12 @@ begin
       nap_rec     => nap_rec     , -- will recover from nap mode
       halt_en     => halt_en     ,
       nap_en      => nap_en      ,
-      rst_rtc     => rst_rtc,      
-      en_fclk     => en_fclk,  
-      fclk        => fclk,     
-      ld_bmem     => ld_bmem,     
-      rtc_sel     => rtc_sel,    
-      rtc_data    => rtc_data);    
+    --  rst_rtc     => rst_rtc,      
+    --  en_fclk     => en_fclk,  
+    --  fclk        => fclk,     
+      ld_bmem     => ld_bmem);     
+    --  rtc_sel     => rtc_sel,    
+    --  rtc_data    => rtc_data);    
 
   fast_d		<= fast_d_int;   
 	dqm_size	<= dqm_size_int;
@@ -948,7 +965,8 @@ begin
       clk_e_pos     => clk_e_pos_int, 
 	  rst_n	  		=> rst_en_int,
       -- Microprogram fields
-      pl            => pl,  
+      pl            => pl,
+      init_load       => init_ld,  
       --Data inputs
       dbus          => dbus_int,           
       -- Flags
@@ -1050,6 +1068,7 @@ begin
       --CJ added
       VE_OUT_D      => ve_out_d_int,
       CDFM          => cdfm_int,
+      ID_NUM        => id_number,
       --VE_OUT_SING   => ve_out_sing_int,
       -- Control Output
       flag_yeqneg   => flag_yeqneg,      
@@ -1274,10 +1293,13 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => vldl,
+      DDI_VLD     => vldl_2,
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,
+      VE_DTM_RDY  => ve_dtm_rdy_int,
+      VE_PUSH_DTM => ve_push_dtm_int,
+      VE_AUTO_SEND => ve_auto_send_int,
       VE_OUT_D    => ve_out_d_int,
       VE_OUT_DTM  => ve_out_dtm_int
       );
@@ -1302,7 +1324,10 @@ begin
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
-        VE_DTMO  =>ve_out_dtm_int
+        VE_DTMO  =>ve_out_dtm_int,
+        VE_DTM_RDY => ve_dtm_rdy_int,
+        VE_PUSH_DTM => ve_push_dtm_int,
+        VE_AUTO_SEND => ve_auto_send_int
       );
 end;
 

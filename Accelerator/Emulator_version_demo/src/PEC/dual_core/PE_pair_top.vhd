@@ -20,6 +20,8 @@ entity PE_pair_top is
     C2_RDY     : out std_logic;
     EXE        : in std_logic;
     RESUME     : in std_logic;
+    C1_ID      : in std_logic_vector(5 downto 0);
+    C2_ID      : in std_logic_vector(5 downto 0);
 
 
     -- clocks and control signals
@@ -51,119 +53,119 @@ architecture struct of PE_pair_top is
   ------------------------------------------------------
   
   -- iomem
-  component SY180_1024X8X1CM8     
-    port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      WEB                        :   IN   std_logic;
-      CK                         :   IN   std_logic;
-      CSB                        :   IN   std_logic
-      );
-  end component; 
+  --component SY180_1024X8X1CM8     
+  --  port(
+  --    A0                         :   IN   std_logic;
+  --    A1                         :   IN   std_logic;
+  --    A2                         :   IN   std_logic;
+  --    A3                         :   IN   std_logic;
+  --    A4                         :   IN   std_logic;
+  --    A5                         :   IN   std_logic;
+  --    A6                         :   IN   std_logic;
+  --    A7                         :   IN   std_logic;
+  --    A8                         :   IN   std_logic;
+  --    A9                         :   IN   std_logic;
+  --    DO0                        :   OUT   std_logic;
+  --    DO1                        :   OUT   std_logic;
+  --    DO2                        :   OUT   std_logic;
+  --    DO3                        :   OUT   std_logic;
+  --    DO4                        :   OUT   std_logic;
+  --    DO5                        :   OUT   std_logic;
+  --    DO6                        :   OUT   std_logic;
+  --    DO7                        :   OUT   std_logic;
+  --    DI0                        :   IN   std_logic;
+  --    DI1                        :   IN   std_logic;
+  --    DI2                        :   IN   std_logic;
+  --    DI3                        :   IN   std_logic;
+  --    DI4                        :   IN   std_logic;
+  --    DI5                        :   IN   std_logic;
+  --    DI6                        :   IN   std_logic;
+  --    DI7                        :   IN   std_logic;
+  --    WEB                        :   IN   std_logic;
+  --    CK                         :   IN   std_logic;
+  --    CSB                        :   IN   std_logic
+  --    );
+  --end component; 
   -- trcmem
-  component SY180_256X32X1CM4
-  port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DO8                        :   OUT   std_logic;
-      DO9                        :   OUT   std_logic;
-      DO10                        :   OUT   std_logic;
-      DO11                        :   OUT   std_logic;
-      DO12                        :   OUT   std_logic;
-      DO13                        :   OUT   std_logic;
-      DO14                        :   OUT   std_logic;
-      DO15                        :   OUT   std_logic;
-      DO16                        :   OUT   std_logic;
-      DO17                        :   OUT   std_logic;
-      DO18                        :   OUT   std_logic;
-      DO19                        :   OUT   std_logic;
-      DO20                        :   OUT   std_logic;
-      DO21                        :   OUT   std_logic;
-      DO22                        :   OUT   std_logic;
-      DO23                        :   OUT   std_logic;
-      DO24                        :   OUT   std_logic;
-      DO25                        :   OUT   std_logic;
-      DO26                        :   OUT   std_logic;
-      DO27                        :   OUT   std_logic;
-      DO28                        :   OUT   std_logic;
-      DO29                        :   OUT   std_logic;
-      DO30                        :   OUT   std_logic;
-      DO31                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      DI8                        :   IN   std_logic;
-      DI9                        :   IN   std_logic;
-      DI10                        :   IN   std_logic;
-      DI11                        :   IN   std_logic;
-      DI12                        :   IN   std_logic;
-      DI13                        :   IN   std_logic;
-      DI14                        :   IN   std_logic;
-      DI15                        :   IN   std_logic;
-      DI16                        :   IN   std_logic;
-      DI17                        :   IN   std_logic;
-      DI18                        :   IN   std_logic;
-      DI19                        :   IN   std_logic;
-      DI20                        :   IN   std_logic;
-      DI21                        :   IN   std_logic;
-      DI22                        :   IN   std_logic;
-      DI23                        :   IN   std_logic;
-      DI24                        :   IN   std_logic;
-      DI25                        :   IN   std_logic;
-      DI26                        :   IN   std_logic;
-      DI27                        :   IN   std_logic;
-      DI28                        :   IN   std_logic;
-      DI29                        :   IN   std_logic;
-      DI30                        :   IN   std_logic;
-      DI31                        :   IN   std_logic;
-      WEB                         :   IN   std_logic;
-      CK                          :   IN   std_logic;
-      CSB                         :   IN   std_logic
-      );
-   end component;
+  --component SY180_256X32X1CM4
+  --port(
+  --    A0                         :   IN   std_logic;
+  --    A1                         :   IN   std_logic;
+  --    A2                         :   IN   std_logic;
+  --    A3                         :   IN   std_logic;
+  --    A4                         :   IN   std_logic;
+  --    A5                         :   IN   std_logic;
+  --    A6                         :   IN   std_logic;
+  --    A7                         :   IN   std_logic;
+  --    DO0                        :   OUT   std_logic;
+  --    DO1                        :   OUT   std_logic;
+  --    DO2                        :   OUT   std_logic;
+  --    DO3                        :   OUT   std_logic;
+  --    DO4                        :   OUT   std_logic;
+  --    DO5                        :   OUT   std_logic;
+  --    DO6                        :   OUT   std_logic;
+  --    DO7                        :   OUT   std_logic;
+  --    DO8                        :   OUT   std_logic;
+  --    DO9                        :   OUT   std_logic;
+  --    DO10                        :   OUT   std_logic;
+  --    DO11                        :   OUT   std_logic;
+  --    DO12                        :   OUT   std_logic;
+  --    DO13                        :   OUT   std_logic;
+  --    DO14                        :   OUT   std_logic;
+  --    DO15                        :   OUT   std_logic;
+  --    DO16                        :   OUT   std_logic;
+  --    DO17                        :   OUT   std_logic;
+  --    DO18                        :   OUT   std_logic;
+  --    DO19                        :   OUT   std_logic;
+  --    DO20                        :   OUT   std_logic;
+  --    DO21                        :   OUT   std_logic;
+  --    DO22                        :   OUT   std_logic;
+  --    DO23                        :   OUT   std_logic;
+  --    DO24                        :   OUT   std_logic;
+  --    DO25                        :   OUT   std_logic;
+  --    DO26                        :   OUT   std_logic;
+  --    DO27                        :   OUT   std_logic;
+  --    DO28                        :   OUT   std_logic;
+  --    DO29                        :   OUT   std_logic;
+  --    DO30                        :   OUT   std_logic;
+  --    DO31                        :   OUT   std_logic;
+  --    DI0                        :   IN   std_logic;
+  --    DI1                        :   IN   std_logic;
+  --    DI2                        :   IN   std_logic;
+  --    DI3                        :   IN   std_logic;
+  --    DI4                        :   IN   std_logic;
+  --    DI5                        :   IN   std_logic;
+  --    DI6                        :   IN   std_logic;
+  --    DI7                        :   IN   std_logic;
+  --    DI8                        :   IN   std_logic;
+  --    DI9                        :   IN   std_logic;
+  --    DI10                        :   IN   std_logic;
+  --    DI11                        :   IN   std_logic;
+  --    DI12                        :   IN   std_logic;
+  --    DI13                        :   IN   std_logic;
+  --    DI14                        :   IN   std_logic;
+  --    DI15                        :   IN   std_logic;
+  --    DI16                        :   IN   std_logic;
+  --    DI17                        :   IN   std_logic;
+  --    DI18                        :   IN   std_logic;
+  --    DI19                        :   IN   std_logic;
+  --    DI20                        :   IN   std_logic;
+  --    DI21                        :   IN   std_logic;
+  --    DI22                        :   IN   std_logic;
+  --    DI23                        :   IN   std_logic;
+  --    DI24                        :   IN   std_logic;
+  --    DI25                        :   IN   std_logic;
+  --    DI26                        :   IN   std_logic;
+  --    DI27                        :   IN   std_logic;
+  --    DI28                        :   IN   std_logic;
+  --    DI29                        :   IN   std_logic;
+  --    DI30                        :   IN   std_logic;
+  --    DI31                        :   IN   std_logic;
+  --    WEB                         :   IN   std_logic;
+  --    CK                          :   IN   std_logic;
+  --    CSB                         :   IN   std_logic
+  --    );
+  -- end component;
 
   -- pmem
   --component SY180_2048X2X1CM8
@@ -1248,7 +1250,8 @@ architecture struct of PE_pair_top is
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
     signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
-    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram 
+    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
+    signal core2_rdy   : std_logic;  
     
   signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
   signal c2_mprom_ce      : std_logic_vector(1 downto 0);  
@@ -1324,11 +1327,11 @@ architecture struct of PE_pair_top is
   signal f3_DATA_IN    :std_logic_vector(31 downto 0);       
   signal f3_RBB        :std_logic; 
   --RAM0 
-  signal RAM0_DO         : std_logic_vector (7 downto 0); -- modify flag, 2015lp
-  signal RAM0_DI         : std_logic_vector (7 downto 0);
-  signal RAM0_A          : std_logic_vector (13 downto 0);
-  signal RAM0_WEB        : std_logic;
-  signal RAM0_CS         : std_logic;
+  --signal RAM0_DO         : std_logic_vector (7 downto 0); -- modify flag, 2015lp
+  --signal RAM0_DI         : std_logic_vector (7 downto 0);
+  --signal RAM0_A          : std_logic_vector (13 downto 0);
+  --signal RAM0_WEB        : std_logic;
+  --signal RAM0_CS         : std_logic;
         --RAM1 
   signal RAM1_DO         : std_logic_vector (7 downto 0);
   signal RAM1_DI         : std_logic_vector (7 downto 0);
@@ -1371,10 +1374,8 @@ architecture struct of PE_pair_top is
 --  signal RAM7_A          : std_logic_vector (9 downto 0);
 --  signal RAM7_WEB        : std_logic_vector(15 downto 0);
 --  signal RAM7_CS         : std_logic;   
-    attribute keep : string;
-    attribute keep of mp_RAM0_WEB : signal is "true";
-    attribute keep of mp_RAM0_DO  : signal is "true";
-
+    
+    
 begin
 
   -- RJ start
@@ -1457,6 +1458,7 @@ begin
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
   c2_d_dqo <= C2_IN_D;
+  C2_RDY   <= core2_rdy;
   --process
   --begin
   --  lp_pwr_ok <= '0';
@@ -2138,72 +2140,72 @@ begin
 
 --  -- iomem0, iomem1
   --  iomem0
-  iomem0: SY180_1024X8X1CM8
-  PORT MAP (
-      A0          => iomem_a(0),
-      A1          => iomem_a(1),              
-      A2          => iomem_a(2),             
-      A3          => iomem_a(3),            
-      A4          => iomem_a(4),            
-      A5          => iomem_a(5),              
-      A6          => iomem_a(6),              
-      A7          => iomem_a(7),              
-      A8          => iomem_a(8),              
-      A9          => iomem_a(9),                             
-      DO0         => iomem_q(0),              
-      DO1         => iomem_q(1),              
-      DO2         => iomem_q(2),             
-      DO3         => iomem_q(3),              
-      DO4         => iomem_q(4),              
-      DO5         => iomem_q(5),              
-      DO6         => iomem_q(6),              
-      DO7         => iomem_q(7),                    
-      DI0         => iomem_d(0),           
-      DI1         => iomem_d(1),            
-      DI2         => iomem_d(2),           
-      DI3         => iomem_d(3),           
-      DI4         => iomem_d(4),          
-      DI5         => iomem_d(5),           
-      DI6         => iomem_d(6),          
-      DI7         => iomem_d(7),               
-      WEB         => iomem_we_n,             
-      CK          => clk_p,          
-      CSB         => iomem_ce_n(0)                               
-      ); 
+  --iomem0: SY180_1024X8X1CM8
+  --PORT MAP (
+  --    A0          => iomem_a(0),
+  --    A1          => iomem_a(1),              
+  --    A2          => iomem_a(2),             
+  --    A3          => iomem_a(3),            
+  --    A4          => iomem_a(4),            
+  --    A5          => iomem_a(5),              
+  --    A6          => iomem_a(6),              
+  --    A7          => iomem_a(7),              
+  --    A8          => iomem_a(8),              
+  --    A9          => iomem_a(9),                             
+  --    DO0         => iomem_q(0),              
+  --    DO1         => iomem_q(1),              
+  --    DO2         => iomem_q(2),             
+  --    DO3         => iomem_q(3),              
+  --    DO4         => iomem_q(4),              
+  --    DO5         => iomem_q(5),              
+  --    DO6         => iomem_q(6),              
+  --    DO7         => iomem_q(7),                    
+  --    DI0         => iomem_d(0),           
+  --    DI1         => iomem_d(1),            
+  --    DI2         => iomem_d(2),           
+  --    DI3         => iomem_d(3),           
+  --    DI4         => iomem_d(4),          
+  --    DI5         => iomem_d(5),           
+  --    DI6         => iomem_d(6),          
+  --    DI7         => iomem_d(7),               
+  --    WEB         => iomem_we_n,             
+  --    CK          => clk_p,          
+  --    CSB         => iomem_ce_n(0)                               
+  --    ); 
 
   --   iomem1: 
-  iomem1: SY180_1024X8X1CM8
-  PORT MAP (
-      A0          => iomem_a(0),
-      A1          => iomem_a(1),              
-      A2          => iomem_a(2),             
-      A3          => iomem_a(3),            
-      A4          => iomem_a(4),            
-      A5          => iomem_a(5),              
-      A6          => iomem_a(6),              
-      A7          => iomem_a(7),              
-      A8          => iomem_a(8),              
-      A9          => iomem_a(9),                             
-      DO0         => iomem_q(8),              
-      DO1         => iomem_q(9),              
-      DO2         => iomem_q(10),             
-      DO3         => iomem_q(11),              
-      DO4         => iomem_q(12),              
-      DO5         => iomem_q(13),              
-      DO6         => iomem_q(14),              
-      DO7         => iomem_q(15),                    
-      DI0         => iomem_d(8),         
-      DI1         => iomem_d(9),            
-      DI2         => iomem_d(10),           
-      DI3         => iomem_d(11),           
-      DI4         => iomem_d(12),           
-      DI5         => iomem_d(13),           
-      DI6         => iomem_d(14),        
-      DI7         => iomem_d(15),               
-      WEB         => iomem_we_n,            
-      CK          => clk_p,           
-      CSB         => iomem_ce_n(1)                               
-      );
+  --iomem1: SY180_1024X8X1CM8
+  --PORT MAP (
+  --    A0          => iomem_a(0),
+  --    A1          => iomem_a(1),              
+  --    A2          => iomem_a(2),             
+  --    A3          => iomem_a(3),            
+  --    A4          => iomem_a(4),            
+  --    A5          => iomem_a(5),              
+  --    A6          => iomem_a(6),              
+  --    A7          => iomem_a(7),              
+  --    A8          => iomem_a(8),              
+  --    A9          => iomem_a(9),                             
+  --    DO0         => iomem_q(8),              
+  --    DO1         => iomem_q(9),              
+  --    DO2         => iomem_q(10),             
+  --    DO3         => iomem_q(11),              
+  --    DO4         => iomem_q(12),              
+  --    DO5         => iomem_q(13),              
+  --    DO6         => iomem_q(14),              
+  --    DO7         => iomem_q(15),                    
+  --    DI0         => iomem_d(8),         
+  --    DI1         => iomem_d(9),            
+  --    DI2         => iomem_d(10),           
+  --    DI3         => iomem_d(11),           
+  --    DI4         => iomem_d(12),           
+  --    DI5         => iomem_d(13),           
+  --    DI6         => iomem_d(14),        
+  --    DI7         => iomem_d(15),               
+  --    WEB         => iomem_we_n,            
+  --    CK          => clk_p,           
+  --    CSB         => iomem_ce_n(1)                               
+  --    );
 
 --  -- pmem
  --    mppmem
@@ -2230,84 +2232,84 @@ begin
   --    );
 	   
 --  -- trcmem
-  trcmem: SY180_256X32X1CM4
-  PORT MAP (
-      A0          => trcmem_a(0),
-      A1          => trcmem_a(1),              
-      A2          => trcmem_a(2),             
-      A3          => trcmem_a(3),            
-      A4          => trcmem_a(4),            
-      A5          => trcmem_a(5),              
-      A6          => trcmem_a(6),              
-      A7          => trcmem_a(7),                                            
-      DO0         => trcmem_q(0),              
-      DO1         => trcmem_q(1),             
-      DO2         => trcmem_q(2),             
-      DO3         => trcmem_q(3),              
-      DO4         => trcmem_q(4),              
-      DO5         => trcmem_q(5),              
-      DO6         => trcmem_q(6),              
-      DO7         => trcmem_q(7),             
-      DO8         => trcmem_q(8),              
-      DO9         => trcmem_q(9),              
-      DO10        => trcmem_q(10),            
-      DO11        => trcmem_q(11),             
-      DO12        => trcmem_q(12),             
-      DO13        => trcmem_q(13),              
-      DO14        => trcmem_q(14),               
-      DO15        => trcmem_q(15),             
-      DO16        => trcmem_q(16),             
-      DO17        => trcmem_q(17),               
-      DO18        => trcmem_q(18),             
-      DO19        => trcmem_q(19),              
-      DO20        => trcmem_q(20),          
-      DO21        => trcmem_q(21),              
-      DO22        => trcmem_q(22),              
-      DO23        => trcmem_q(23),              
-      DO24        => trcmem_q(24),               
-      DO25        => trcmem_q(25),               
-      DO26        => trcmem_q(26),               
-      DO27        => trcmem_q(27),               
-      DO28        => trcmem_q(28),               
-      DO29        => trcmem_q(29),               
-      DO30        => trcmem_q(30),               
-      DO31        => trcmem_q(31),                       
-      DI0         => trcmem_d(0),            
-      DI1         => trcmem_d(1),             
-      DI2         => trcmem_d(2),            
-      DI3         => trcmem_d(3),            
-      DI4         => trcmem_d(4),           
-      DI5         => trcmem_d(5),            
-      DI6         => trcmem_d(6),           
-      DI7         => trcmem_d(7),         
-      DI8         => trcmem_d(8),           
-      DI9         => trcmem_d(9),           
-      DI10        => trcmem_d(10),              
-      DI11        => trcmem_d(11),              
-      DI12        => trcmem_d(12),              
-      DI13        => trcmem_d(13),             
-      DI14        => trcmem_d(14),           
-      DI15        => trcmem_d(15),            
-      DI16        => trcmem_d(16),          
-      DI17        => trcmem_d(17),               
-      DI18        => trcmem_d(18),               
-      DI19        => trcmem_d(19),              
-      DI20        => trcmem_d(20),               
-      DI21        => trcmem_d(21),               
-      DI22        => trcmem_d(22),              
-      DI23        => trcmem_d(23),                
-      DI24        => trcmem_d(24),             
-      DI25        => trcmem_d(25),              
-      DI26        => trcmem_d(26),                
-      DI27        => trcmem_d(27),               
-      DI28        => trcmem_d(28),              
-      DI29        => trcmem_d(29),           
-      DI30        => trcmem_d(30),               
-      DI31        => trcmem_d(31),                      
-      WEB         => trcmem_we_n,              
-      CK          => clk_p,            
-      CSB         => trcmem_ce_n                              
-      );
+  --trcmem: SY180_256X32X1CM4
+  --PORT MAP (
+  --    A0          => trcmem_a(0),
+  --    A1          => trcmem_a(1),              
+  --    A2          => trcmem_a(2),             
+  --    A3          => trcmem_a(3),            
+  --    A4          => trcmem_a(4),            
+  --    A5          => trcmem_a(5),              
+  --    A6          => trcmem_a(6),              
+  --    A7          => trcmem_a(7),                                            
+  --    DO0         => trcmem_q(0),              
+  --    DO1         => trcmem_q(1),             
+  --    DO2         => trcmem_q(2),             
+  --    DO3         => trcmem_q(3),              
+  --    DO4         => trcmem_q(4),              
+  --    DO5         => trcmem_q(5),              
+  --    DO6         => trcmem_q(6),              
+  --    DO7         => trcmem_q(7),             
+  --    DO8         => trcmem_q(8),              
+  --    DO9         => trcmem_q(9),              
+  --    DO10        => trcmem_q(10),            
+  --    DO11        => trcmem_q(11),             
+  --    DO12        => trcmem_q(12),             
+  --    DO13        => trcmem_q(13),              
+  --    DO14        => trcmem_q(14),               
+  --    DO15        => trcmem_q(15),             
+  --    DO16        => trcmem_q(16),             
+  --    DO17        => trcmem_q(17),               
+  --    DO18        => trcmem_q(18),             
+  --    DO19        => trcmem_q(19),              
+  --    DO20        => trcmem_q(20),          
+  --    DO21        => trcmem_q(21),              
+  --    DO22        => trcmem_q(22),              
+  --    DO23        => trcmem_q(23),              
+  --    DO24        => trcmem_q(24),               
+  --    DO25        => trcmem_q(25),               
+  --    DO26        => trcmem_q(26),               
+  --    DO27        => trcmem_q(27),               
+  --    DO28        => trcmem_q(28),               
+  --    DO29        => trcmem_q(29),               
+  --    DO30        => trcmem_q(30),               
+  --    DO31        => trcmem_q(31),                       
+  --    DI0         => trcmem_d(0),            
+  --    DI1         => trcmem_d(1),             
+  --    DI2         => trcmem_d(2),            
+  --    DI3         => trcmem_d(3),            
+  --    DI4         => trcmem_d(4),           
+  --    DI5         => trcmem_d(5),            
+  --    DI6         => trcmem_d(6),           
+  --    DI7         => trcmem_d(7),         
+  --    DI8         => trcmem_d(8),           
+  --    DI9         => trcmem_d(9),           
+  --    DI10        => trcmem_d(10),              
+  --    DI11        => trcmem_d(11),              
+  --    DI12        => trcmem_d(12),              
+  --    DI13        => trcmem_d(13),             
+  --    DI14        => trcmem_d(14),           
+  --    DI15        => trcmem_d(15),            
+  --    DI16        => trcmem_d(16),          
+  --    DI17        => trcmem_d(17),               
+  --    DI18        => trcmem_d(18),               
+  --    DI19        => trcmem_d(19),              
+  --    DI20        => trcmem_d(20),               
+  --    DI21        => trcmem_d(21),               
+  --    DI22        => trcmem_d(22),              
+  --    DI23        => trcmem_d(23),                
+  --    DI24        => trcmem_d(24),             
+  --    DI25        => trcmem_d(25),              
+  --    DI26        => trcmem_d(26),                
+  --    DI27        => trcmem_d(27),               
+  --    DI28        => trcmem_d(28),              
+  --    DI29        => trcmem_d(29),           
+  --    DI30        => trcmem_d(30),               
+  --    DI31        => trcmem_d(31),                      
+  --    WEB         => trcmem_we_n,              
+  --    CK          => clk_p,            
+  --    CSB         => trcmem_ce_n                              
+  --    );
 
 
 
@@ -2521,22 +2523,22 @@ begin
 --  -----------------------------------------------------------------------------
     rtc0: entity work.rtc 
      port map(
-      xout      => hclk_i,
+    --  xout      => hclk_i,
       pllout    => pllout,
-      sel_pll   => sel_pll,
-      xout_selected => xout_selected,
+    --  sel_pll   => sel_pll,
+    --  xout_selected => xout_selected,
       lp_pwr_ok => lp_pwr_ok,
-      rxout     => rxout,  -- 32KHz oscillator input         
-      mrxout_o  => mrxout_o,  -- 32KHz oscillator output or external wake
-      rst_rtc   => rst_rtc,  -- Reset RTC counter byte            
-      en_fclk   => en_fclk,  -- Enable fast clocking of RTC counter byte
-      fclk      => fclk,  -- Fast clock to RTC counter byte   
+    --  rxout     => rxout,  -- 32KHz oscillator input         
+    --  mrxout_o  => mrxout_o,  -- 32KHz oscillator output or external wake
+    --  rst_rtc   => rst_rtc,  -- Reset RTC counter byte            
+    --  en_fclk   => en_fclk,  -- Enable fast clocking of RTC counter byte
+    --  fclk      => fclk,  -- Fast clock to RTC counter byte   
       ld_bmem   => ld_bmem,  -- Latch enable to the dis_bmem latch   
-      rtc_sel   => rtc_sel,   -- RTC byte select
-      rtc_data  => rtc_data,   -- RTC data             
-      dis_bmem  => dis_bmem_int, 
+    --  rtc_sel   => rtc_sel,   -- RTC byte select
+    --  rtc_data  => rtc_data,   -- RTC data             
+    --  dis_bmem  => dis_bmem_int, 
       
-      reset_iso_clear=> reset_iso_clear,
+    --  reset_iso_clear=> reset_iso_clear,
 	  halt_en        => halt_en            ,    
       nap_en         => nap_en             ,    
       wakeup_lp      => wakeup_lp          ,    
@@ -2569,13 +2571,13 @@ begin
       bmem_q        =>  bmem_q,  
       bmem_d        =>  bmem_d,  
       bmem_we_n     =>  bmem_we_n,  
-      bmem_ce_n     =>  bmem_ce_n,
+      bmem_ce_n     =>  bmem_ce_n
 	  --RAM0 
-	  RAM0_DO       =>  RAM0_DO ,
-	  RAM0_DI       =>  RAM0_DI ,
-	  RAM0_A        =>  RAM0_A  ,
-	  RAM0_WEB      =>  RAM0_WEB,
-	  RAM0_CS       =>  RAM0_CS 
+	  --RAM0_DO       =>  RAM0_DO ,
+	  --RAM0_DI       =>  RAM0_DI ,
+	  --RAM0_A        =>  RAM0_A  ,
+	  --RAM0_WEB      =>  RAM0_WEB,
+	  --RAM0_CS       =>  RAM0_CS 
       ); 
 
     -- Disable power to BMEM 
@@ -2670,6 +2672,7 @@ begin
     c2_rsc_n      => c2_rsc_n,
     c2_clkreq_gen => c2_clkreq_gen,
     --c2_even_c     => c2_even_c,
+    c2_ready      => core2_rdy     ,
     c2_crb_sel    => c2_crb_sel    ,
     c2_crb_out    => c2_crb_out    ,
     c2_en_pmem    => c2_en_pmem    ,
@@ -2699,6 +2702,7 @@ begin
     -- RTC block signals
     exe => EXE,         --CJ
     resume => RESUME,   --CJ
+    id_number => c1_ID,  --CJ
     req_c1 => c1_req_i,  --CJ
     ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
@@ -2709,12 +2713,12 @@ begin
     nap_rec        => nap_rec        ,
     halt_en        => halt_en        ,
     nap_en         => nap_en         ,
-    rst_rtc       => rst_rtc,  --: out std_logic;  -- Reset RTC counter byte
-    en_fclk       => en_fclk,  --: out std_logic;  -- Enable fast clocking of RTC counter byte
-    fclk          => fclk,     --: out std_logic;  -- Fast clock to RTC counter byte
+  --  rst_rtc       => rst_rtc,  --: out std_logic;  -- Reset RTC counter byte
+  --  en_fclk       => en_fclk,  --: out std_logic;  -- Enable fast clocking of RTC counter byte
+  --  fclk          => fclk,     --: out std_logic;  -- Fast clock to RTC counter byte
     ld_bmem       => ld_bmem,  --: out std_logic;  -- Latch enable to the en_bmem latch
-    rtc_sel       => rtc_sel,  --: out std_logic_vector(2 downto 0);   -- RTC byte select
-    rtc_data      => rtc_data, --: in  std_logic_vector(7 downto 0);   -- RTC data
+  --  rtc_sel       => rtc_sel,  --: out std_logic_vector(2 downto 0);   -- RTC byte select
+  --  rtc_data      => rtc_data, --: in  std_logic_vector(7 downto 0);   -- RTC data
     --  Signals to/from Peripheral block
     dfp           => dfp,     --: in  std_logic_vector(7 downto 0); 
     dbus          => dbus,    --: out std_logic_vector(7 downto 0);
@@ -2814,7 +2818,7 @@ begin
     clk_p         => clk_p  ,      
     clk_c_en      => clk_c_en  ,
     even_c        => even_c, 
-    ready         => C2_RDY,    
+    ready         => core2_rdy,    
     --clk_c2_pos  => clk_c2a_pos,
     clk_e_pos     => clk_ea_pos,
     --clk_e_neg   => clk_ea_neg,
@@ -2826,6 +2830,7 @@ begin
     rst_cn        => c2_core2_en,       --reset core2 if disabled
     rsc_n         => c2_rsc_n,
     clkreq_gen    => std_logic'('0'), --'0',
+    id_number     => c2_ID,
     core2_en      => c2_core2_en     ,
     crb_out       => c2_crb_out      ,
     en_pmem       => c2_en_pmem      ,
@@ -2915,9 +2920,9 @@ begin
     -- rst_cn   => rst_cn,
     -- clk_e_pos  => clk_e_pos,
     -- clk_ea_pos   => clk_ea_pos,
-        c1_mprom_a     => c1_mprom_a     ,-- Address  
-        c1_mprom_ce    => c1_mprom_ce    ,-- Chip enable(active high) 
-        c1_mprom_oe    => c1_mprom_oe    ,--Output enable(active high)
+        --c1_mprom_a     => c1_mprom_a     ,-- Address  
+        --c1_mprom_ce    => c1_mprom_ce    ,-- Chip enable(active high) 
+        --c1_mprom_oe    => c1_mprom_oe    ,--Output enable(active high)
         -- MPRAM signals
         c1_mpram_a     => c1_mpram_a     ,-- Address  
         c1_mpram_d     => c1_mpram_d     ,-- Data to memory
@@ -2925,17 +2930,17 @@ begin
         c1_mpram_oe    => c1_mpram_oe    ,-- Output enable(active high)
         c1_mpram_we_n  => c1_mpram_we_n  ,-- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c1_pmem_a      => c1_pmem_a      ,
-        c1_pmem_d      => c1_pmem_d      ,
+        --c1_pmem_a      => c1_pmem_a      ,
+        --c1_pmem_d      => c1_pmem_d      ,
         c1_pmem_q      => c1_pmem_q      ,
-        c1_pmem_ce_n   => c1_pmem_ce_n   ,
-        c1_pmem_we_n   => c1_pmem_we_n   ,
+        --c1_pmem_ce_n   => c1_pmem_ce_n   ,
+        --c1_pmem_we_n   => c1_pmem_we_n   ,
                      
         c1_mp_q        => c1_mp_q        ,
         -- MPROM signals
-        c2_mprom_a     => c2_mprom_a     ,-- Address  
-        c2_mprom_ce    => c2_mprom_ce    ,-- Chip enable(active high) 
-        c2_mprom_oe    => c2_mprom_oe    ,--Output enable(active high)
+        --c2_mprom_a     => c2_mprom_a     ,-- Address  
+        --c2_mprom_ce    => c2_mprom_ce    ,-- Chip enable(active high) 
+        --c2_mprom_oe    => c2_mprom_oe    ,--Output enable(active high)
         -- MPRAM signals
         c2_mpram_a     => c2_mpram_a     ,-- Address  
         c2_mpram_d     => c2_mpram_d     ,-- Data to memory
@@ -2943,43 +2948,43 @@ begin
         c2_mpram_oe    => c2_mpram_oe    ,-- Output enable(active high)
         c2_mpram_we_n  => c2_mpram_we_n  ,-- Write enable(active low)
         -- PMEM signals (Patch memory)
-        c2_pmem_a      => c2_pmem_a      ,
-        c2_pmem_d      => c2_pmem_d      ,
+        --c2_pmem_a      => c2_pmem_a      ,
+        --c2_pmem_d      => c2_pmem_d      ,
         c2_pmem_q      => c2_pmem_q      ,
-        c2_pmem_ce_n   => c2_pmem_ce_n   ,
-        c2_pmem_we_n   => c2_pmem_we_n   ,
+        --c2_pmem_ce_n   => c2_pmem_ce_n   ,
+        --c2_pmem_we_n   => c2_pmem_we_n   ,
                        
         c2_mp_q        => c2_mp_q        ,
         --memory interface
         --ROM0
-        ROM0_DO     => mp_ROM0_DO     ,-- in  std_logic_vector (79 downto 0); 
-        ROM0_A      => mp_ROM0_A      ,-- out std_logic_vector (13 downto 0);
-        ROM0_CS     => mp_ROM0_CS     ,-- out std_logic;
-        ROM0_OE     => mp_ROM0_OE     ,-- out std_logic; 
+      --  ROM0_DO     => mp_ROM0_DO     ,-- in  std_logic_vector (79 downto 0); 
+      --  ROM0_A      => mp_ROM0_A      ,-- out std_logic_vector (13 downto 0);
+      --  ROM0_CS     => mp_ROM0_CS     ,-- out std_logic;
+      --  ROM0_OE     => mp_ROM0_OE     ,-- out std_logic; 
         --ROM1
-        ROM1_DO     => mp_ROM1_DO     ,--: in  std_logic_vector (79 downto 0); 
-        ROM1_A      => mp_ROM1_A      ,--: out std_logic_vector (13 downto 0);
-        ROM1_CS     => mp_ROM1_CS     ,--: out std_logic;
-        ROM1_OE     => mp_ROM1_OE     ,--: out std_logic;
+      --  ROM1_DO     => mp_ROM1_DO     ,--: in  std_logic_vector (79 downto 0); 
+      --  ROM1_A      => mp_ROM1_A      ,--: out std_logic_vector (13 downto 0);
+      --  ROM1_CS     => mp_ROM1_CS     ,--: out std_logic;
+      --  ROM1_OE     => mp_ROM1_OE     ,--: out std_logic;
         --patch memory
         PM_DO       => mp_PM_DO      ,--: in  std_logic_vector (1 downto 0);
-        PM_DI       => mp_PM_DI      ,--: out std_logic_vector (1 downto 0);
-        PM_A        => mp_PM_A       ,--: out std_logic_vector (10 downto 0);
-        PM_WEB      => mp_PM_WEB     ,--: out std_logic;
-        PM_CSB      => mp_PM_CSB     ,--: out std_logic;
+      --  PM_DI       => mp_PM_DI      ,--: out std_logic_vector (1 downto 0);
+      --  PM_A        => mp_PM_A       ,--: out std_logic_vector (10 downto 0);
+      --  PM_WEB      => mp_PM_WEB     ,--: out std_logic;
+      --  PM_CSB      => mp_PM_CSB     ,--: out std_logic;
         --RAM0
         RAM0_DO     => mp_RAM0_DO     ,--: in  std_logic_vector (79 downto 0);
         RAM0_DI     => mp_RAM0_DI     ,--: out std_logic_vector (79 downto 0);
         RAM0_A      => mp_RAM0_A      ,--: out std_logic_vector (13 downto 0);
         RAM0_WEB    => mp_RAM0_WEB    ,--: out std_logic;
         RAM0_OE     => mp_RAM0_OE     ,
-        RAM0_CS     => mp_RAM0_CS     , --: out std_logic;
+        RAM0_CS     => mp_RAM0_CS      --: out std_logic;
         ----RAM1                          -- not included in the low-power version, deleted 2015-6-22, by HYX
-        RAM1_DO     => mp_RAM1_DO     ,--: in  std_logic_vector (79 downto 0);
-        RAM1_DI     => mp_RAM1_DI     ,--: out std_logic_vector (79 downto 0);
-        RAM1_A      => mp_RAM1_A      ,--: out std_logic_vector (13 downto 0);
-        RAM1_WEB    => mp_RAM1_WEB    ,--: out std_logic;
-        RAM1_CS     => mp_RAM1_CS    --: out std_logic
+      --  RAM1_DO     => mp_RAM1_DO     ,--: in  std_logic_vector (79 downto 0);
+      --  RAM1_DI     => mp_RAM1_DI     ,--: out std_logic_vector (79 downto 0);
+      --  RAM1_A      => mp_RAM1_A      ,--: out std_logic_vector (13 downto 0);
+      --  RAM1_WEB    => mp_RAM1_WEB    ,--: out std_logic;
+      --  RAM1_CS     => mp_RAM1_CS    --: out std_logic
     );
 
 

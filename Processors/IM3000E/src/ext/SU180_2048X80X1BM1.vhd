@@ -190,6 +190,7 @@ architecture struct of SU180_2048X80X1BM1 is
 
   type ram_type is array (2047 downto 0) of std_logic_vector(79 downto 0);
 
+  -- pragma synthesis_off
   procedure init_ram_from_file (ram_file_name : in string; signal content : inout ram_type )is
     file ram_file          : text;
     variable status : file_open_status := status_error;
@@ -202,12 +203,10 @@ architecture struct of SU180_2048X80X1BM1 is
   begin
     file_open(status, ram_file, ram_file_name, read_mode);
     if status /= open_ok then
-      wait for 2 ns;
-      write(l, string'("[SU80_2048X80X1BM1] file ") & ram_file_name & " not open ok");
-      writeline(output, l);
       return;
     end if;
-                              
+
+    
     for i in 0 to 2047 loop
       readline(ram_file, ram_file_line);
       for i in row'range loop
@@ -222,16 +221,22 @@ architecture struct of SU180_2048X80X1BM1 is
       ram(i) := row;
       tst := i;
     end loop;
-
+    
+    wait for 2 ns;
+    write(l, string'("[SU80_2048X80X1BM1] file ") & ram_file_name & " loaded to RAM");
+    writeline(output, l);
+    
     file_close(ram_file);
     
     content <= ram;
   end procedure;
 
+  -- pragma synthesis_on
+  
   signal RAM                 : ram_type;
   signal addr                : std_logic_vector(10 downto 0);
   signal di                  : std_logic_vector(79 downto 0);
-  signal do                  : std_logic_vector(79 downto 0);
+  signal do                  : std_logic_vector(79 downto 0) := (others => '0');
   attribute ram_style        : string;
   attribute ram_style of RAM : signal is "block";
 
@@ -331,10 +336,11 @@ begin
 
   process
   begin
+  -- pragma synthesis_off
     wait for 10 ps;
     init_ram_from_file(g_file_name, ram);
-
-    loop  
+    loop 
+  -- pragma synthesis_on 
       wait on ck until ck = '1'; -- rising_edge(CK) then
       if CS = '1' then
         if WEB = '0' then
@@ -342,89 +348,91 @@ begin
         end if;
         do <= RAM(conv_integer(addr));
       end if;
+  -- pragma synthesis_off
     end loop;
+  -- pragma synthesis_on 
   end process;
 
-  DO79 <= do(79) when OE = '1' else 'Z';
-  DO78 <= do(78) when OE = '1' else 'Z';
-  DO77 <= do(77) when OE = '1' else 'Z';
-  DO76 <= do(76) when OE = '1' else 'Z';
-  DO75 <= do(75) when OE = '1' else 'Z';
-  DO74 <= do(74) when OE = '1' else 'Z';
-  DO73 <= do(73) when OE = '1' else 'Z';
-  DO72 <= do(72) when OE = '1' else 'Z';
-  DO71 <= do(71) when OE = '1' else 'Z';
-  DO70 <= do(70) when OE = '1' else 'Z';
-  DO69 <= do(69) when OE = '1' else 'Z';
-  DO68 <= do(68) when OE = '1' else 'Z';
-  DO67 <= do(67) when OE = '1' else 'Z';
-  DO66 <= do(66) when OE = '1' else 'Z';
-  DO65 <= do(65) when OE = '1' else 'Z';
-  DO64 <= do(64) when OE = '1' else 'Z';
-  DO63 <= do(63) when OE = '1' else 'Z';
-  DO62 <= do(62) when OE = '1' else 'Z';
-  DO61 <= do(61) when OE = '1' else 'Z';
-  DO60 <= do(60) when OE = '1' else 'Z';
-  DO59 <= do(59) when OE = '1' else 'Z';
-  DO58 <= do(58) when OE = '1' else 'Z';
-  DO57 <= do(57) when OE = '1' else 'Z';
-  DO56 <= do(56) when OE = '1' else 'Z';
-  DO55 <= do(55) when OE = '1' else 'Z';
-  DO54 <= do(54) when OE = '1' else 'Z';
-  DO53 <= do(53) when OE = '1' else 'Z';
-  DO52 <= do(52) when OE = '1' else 'Z';
-  DO51 <= do(51) when OE = '1' else 'Z';
-  DO50 <= do(50) when OE = '1' else 'Z';
-  DO49 <= do(49) when OE = '1' else 'Z';
-  DO48 <= do(48) when OE = '1' else 'Z';
-  DO47 <= do(47) when OE = '1' else 'Z';
-  DO46 <= do(46) when OE = '1' else 'Z';
-  DO45 <= do(45) when OE = '1' else 'Z';
-  DO44 <= do(44) when OE = '1' else 'Z';
-  DO43 <= do(43) when OE = '1' else 'Z';
-  DO42 <= do(42) when OE = '1' else 'Z';
-  DO41 <= do(41) when OE = '1' else 'Z';
-  DO40 <= do(40) when OE = '1' else 'Z';
-  DO39 <= do(39) when OE = '1' else 'Z';
-  DO38 <= do(38) when OE = '1' else 'Z';
-  DO37 <= do(37) when OE = '1' else 'Z';
-  DO36 <= do(36) when OE = '1' else 'Z';
-  DO35 <= do(35) when OE = '1' else 'Z';
-  DO34 <= do(34) when OE = '1' else 'Z';
-  DO33 <= do(33) when OE = '1' else 'Z';
-  DO32 <= do(32) when OE = '1' else 'Z';
-  DO31 <= do(31) when OE = '1' else 'Z';
-  DO30 <= do(30) when OE = '1' else 'Z';
-  DO29 <= do(29) when OE = '1' else 'Z';
-  DO28 <= do(28) when OE = '1' else 'Z';
-  DO27 <= do(27) when OE = '1' else 'Z';
-  DO26 <= do(26) when OE = '1' else 'Z';
-  DO25 <= do(25) when OE = '1' else 'Z';
-  DO24 <= do(24) when OE = '1' else 'Z';
-  DO23 <= do(23) when OE = '1' else 'Z';
-  DO22 <= do(22) when OE = '1' else 'Z';
-  DO21 <= do(21) when OE = '1' else 'Z';
-  DO20 <= do(20) when OE = '1' else 'Z';
-  DO19 <= do(19) when OE = '1' else 'Z';
-  DO18 <= do(18) when OE = '1' else 'Z';
-  DO17 <= do(17) when OE = '1' else 'Z';
-  DO16 <= do(16) when OE = '1' else 'Z';
-  DO15 <= do(15) when OE = '1' else 'Z';
-  DO14 <= do(14) when OE = '1' else 'Z';
-  DO13 <= do(13) when OE = '1' else 'Z';
-  DO12 <= do(12) when OE = '1' else 'Z';
-  DO11 <= do(11) when OE = '1' else 'Z';
-  DO10 <= do(10) when OE = '1' else 'Z';
-  DO9  <= do(9)  when OE = '1' else 'Z';
-  DO8  <= do(8)  when OE = '1' else 'Z';
-  DO7  <= do(7)  when OE = '1' else 'Z';
-  DO6  <= do(6)  when OE = '1' else 'Z';
-  DO5  <= do(5)  when OE = '1' else 'Z';
-  DO4  <= do(4)  when OE = '1' else 'Z';
-  DO3  <= do(3)  when OE = '1' else 'Z';
-  DO2  <= do(2)  when OE = '1' else 'Z';
-  DO1  <= do(1)  when OE = '1' else 'Z';
-  DO0  <= do(0)  when OE = '1' else 'Z';
+  DO79 <= do(79) when OE = '1' and WEB = '1' else '0';
+  DO78 <= do(78) when OE = '1' and WEB = '1' else '0';
+  DO77 <= do(77) when OE = '1' and WEB = '1' else '0';
+  DO76 <= do(76) when OE = '1' and WEB = '1' else '0';
+  DO75 <= do(75) when OE = '1' and WEB = '1' else '0';
+  DO74 <= do(74) when OE = '1' and WEB = '1' else '0';
+  DO73 <= do(73) when OE = '1' and WEB = '1' else '0';
+  DO72 <= do(72) when OE = '1' and WEB = '1' else '0';
+  DO71 <= do(71) when OE = '1' and WEB = '1' else '0';
+  DO70 <= do(70) when OE = '1' and WEB = '1' else '0';
+  DO69 <= do(69) when OE = '1' and WEB = '1' else '0';
+  DO68 <= do(68) when OE = '1' and WEB = '1' else '0';
+  DO67 <= do(67) when OE = '1' and WEB = '1' else '0';
+  DO66 <= do(66) when OE = '1' and WEB = '1' else '0';
+  DO65 <= do(65) when OE = '1' and WEB = '1' else '0';
+  DO64 <= do(64) when OE = '1' and WEB = '1' else '0';
+  DO63 <= do(63) when OE = '1' and WEB = '1' else '0';
+  DO62 <= do(62) when OE = '1' and WEB = '1' else '0';
+  DO61 <= do(61) when OE = '1' and WEB = '1' else '0';
+  DO60 <= do(60) when OE = '1' and WEB = '1' else '0';
+  DO59 <= do(59) when OE = '1' and WEB = '1' else '0';
+  DO58 <= do(58) when OE = '1' and WEB = '1' else '0';
+  DO57 <= do(57) when OE = '1' and WEB = '1' else '0';
+  DO56 <= do(56) when OE = '1' and WEB = '1' else '0';
+  DO55 <= do(55) when OE = '1' and WEB = '1' else '0';
+  DO54 <= do(54) when OE = '1' and WEB = '1' else '0';
+  DO53 <= do(53) when OE = '1' and WEB = '1' else '0';
+  DO52 <= do(52) when OE = '1' and WEB = '1' else '0';
+  DO51 <= do(51) when OE = '1' and WEB = '1' else '0';
+  DO50 <= do(50) when OE = '1' and WEB = '1' else '0';
+  DO49 <= do(49) when OE = '1' and WEB = '1' else '0';
+  DO48 <= do(48) when OE = '1' and WEB = '1' else '0';
+  DO47 <= do(47) when OE = '1' and WEB = '1' else '0';
+  DO46 <= do(46) when OE = '1' and WEB = '1' else '0';
+  DO45 <= do(45) when OE = '1' and WEB = '1' else '0';
+  DO44 <= do(44) when OE = '1' and WEB = '1' else '0';
+  DO43 <= do(43) when OE = '1' and WEB = '1' else '0';
+  DO42 <= do(42) when OE = '1' and WEB = '1' else '0';
+  DO41 <= do(41) when OE = '1' and WEB = '1' else '0';
+  DO40 <= do(40) when OE = '1' and WEB = '1' else '0';
+  DO39 <= do(39) when OE = '1' and WEB = '1' else '0';
+  DO38 <= do(38) when OE = '1' and WEB = '1' else '0';
+  DO37 <= do(37) when OE = '1' and WEB = '1' else '0';
+  DO36 <= do(36) when OE = '1' and WEB = '1' else '0';
+  DO35 <= do(35) when OE = '1' and WEB = '1' else '0';
+  DO34 <= do(34) when OE = '1' and WEB = '1' else '0';
+  DO33 <= do(33) when OE = '1' and WEB = '1' else '0';
+  DO32 <= do(32) when OE = '1' and WEB = '1' else '0';
+  DO31 <= do(31) when OE = '1' and WEB = '1' else '0';
+  DO30 <= do(30) when OE = '1' and WEB = '1' else '0';
+  DO29 <= do(29) when OE = '1' and WEB = '1' else '0';
+  DO28 <= do(28) when OE = '1' and WEB = '1' else '0';
+  DO27 <= do(27) when OE = '1' and WEB = '1' else '0';
+  DO26 <= do(26) when OE = '1' and WEB = '1' else '0';
+  DO25 <= do(25) when OE = '1' and WEB = '1' else '0';
+  DO24 <= do(24) when OE = '1' and WEB = '1' else '0';
+  DO23 <= do(23) when OE = '1' and WEB = '1' else '0';
+  DO22 <= do(22) when OE = '1' and WEB = '1' else '0';
+  DO21 <= do(21) when OE = '1' and WEB = '1' else '0';
+  DO20 <= do(20) when OE = '1' and WEB = '1' else '0';
+  DO19 <= do(19) when OE = '1' and WEB = '1' else '0';
+  DO18 <= do(18) when OE = '1' and WEB = '1' else '0';
+  DO17 <= do(17) when OE = '1' and WEB = '1' else '0';
+  DO16 <= do(16) when OE = '1' and WEB = '1' else '0';
+  DO15 <= do(15) when OE = '1' and WEB = '1' else '0';
+  DO14 <= do(14) when OE = '1' and WEB = '1' else '0';
+  DO13 <= do(13) when OE = '1' and WEB = '1' else '0';
+  DO12 <= do(12) when OE = '1' and WEB = '1' else '0';
+  DO11 <= do(11) when OE = '1' and WEB = '1' else '0';
+  DO10 <= do(10) when OE = '1' and WEB = '1' else '0';
+  DO9  <= do(9)  when OE = '1' and WEB = '1' else '0';
+  DO8  <= do(8)  when OE = '1' and WEB = '1' else '0';
+  DO7  <= do(7)  when OE = '1' and WEB = '1' else '0';
+  DO6  <= do(6)  when OE = '1' and WEB = '1' else '0';
+  DO5  <= do(5)  when OE = '1' and WEB = '1' else '0';
+  DO4  <= do(4)  when OE = '1' and WEB = '1' else '0';
+  DO3  <= do(3)  when OE = '1' and WEB = '1' else '0';
+  DO2  <= do(2)  when OE = '1' and WEB = '1' else '0';
+  DO1  <= do(1)  when OE = '1' and WEB = '1' else '0';
+  DO0  <= do(0)  when OE = '1' and WEB = '1' else '0';
 end struct;
 
 

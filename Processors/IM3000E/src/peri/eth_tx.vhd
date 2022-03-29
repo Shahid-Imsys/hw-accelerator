@@ -369,11 +369,11 @@ begin
 		if fifo_reset = '1' then
 			tx_rctr <= (others => '0');
 		elsif rising_edge(clk_tx) then
-			if clken = '1' then
-				if tx_read = '1' then					-- Read one nibble
-					tx_rctr <= tx_rctr + 1;			
-				end if;
-			end if;
+                  if clken = '1' then
+                    if tx_read = '1' then					-- Read one nibble
+                      tx_rctr <= tx_rctr + 1;			
+                    end if;
+                  end if;
 		end if;
 	end process;
 	tx_dout <= tx_fifo(conv_integer(tx_rctr));

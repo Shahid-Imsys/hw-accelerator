@@ -77,7 +77,7 @@ architecture rtl of debug_trace is
   -- Control signals
   signal reset      : std_logic;        -- Reset pulse caused by reset command
   signal i_byte_sel : std_logic_vector(1 downto 0);-- Trace memory byte select
-  signal trig_pt    : std_logic_vector(1 downto 0); -- Trigpoint placer  
+  signal trig_pt    : std_logic_vector(1 downto 0) := "00"; -- BSV -- Trigpoint placer  
   signal we_trig    : std_logic;
   signal go_sel : std_logic;
   signal set_sel : std_logic;  -- Enable loading into trigger/mask

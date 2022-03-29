@@ -112,7 +112,7 @@ end latch_based;
 -------------------------------------------------------------------------------
 architecture register_based of ram32x8 is
 	type mem_type is array (31 downto 0) of std_logic_vector(7 downto 0);
-	signal ram 			: mem_type;    
+	signal ram 			: mem_type;
 
 begin
 	-- This process handles write operations. When we_n is

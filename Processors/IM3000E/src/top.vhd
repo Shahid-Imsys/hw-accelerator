@@ -69,6 +69,7 @@ use work.gp_pkg.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+--LIBRARY dist_mem_gen_v8_0_13;
 
 entity top is
   generic (
@@ -184,105 +185,105 @@ architecture struct of top is
   -- trcmem
   component SY180_256X32X1CM4
   port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DO8                        :   OUT   std_logic;
-      DO9                        :   OUT   std_logic;
-      DO10                        :   OUT   std_logic;
-      DO11                        :   OUT   std_logic;
-      DO12                        :   OUT   std_logic;
-      DO13                        :   OUT   std_logic;
-      DO14                        :   OUT   std_logic;
-      DO15                        :   OUT   std_logic;
-      DO16                        :   OUT   std_logic;
-      DO17                        :   OUT   std_logic;
-      DO18                        :   OUT   std_logic;
-      DO19                        :   OUT   std_logic;
-      DO20                        :   OUT   std_logic;
-      DO21                        :   OUT   std_logic;
-      DO22                        :   OUT   std_logic;
-      DO23                        :   OUT   std_logic;
-      DO24                        :   OUT   std_logic;
-      DO25                        :   OUT   std_logic;
-      DO26                        :   OUT   std_logic;
-      DO27                        :   OUT   std_logic;
-      DO28                        :   OUT   std_logic;
-      DO29                        :   OUT   std_logic;
-      DO30                        :   OUT   std_logic;
-      DO31                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      DI8                        :   IN   std_logic;
-      DI9                        :   IN   std_logic;
-      DI10                        :   IN   std_logic;
-      DI11                        :   IN   std_logic;
-      DI12                        :   IN   std_logic;
-      DI13                        :   IN   std_logic;
-      DI14                        :   IN   std_logic;
-      DI15                        :   IN   std_logic;
-      DI16                        :   IN   std_logic;
-      DI17                        :   IN   std_logic;
-      DI18                        :   IN   std_logic;
-      DI19                        :   IN   std_logic;
-      DI20                        :   IN   std_logic;
-      DI21                        :   IN   std_logic;
-      DI22                        :   IN   std_logic;
-      DI23                        :   IN   std_logic;
-      DI24                        :   IN   std_logic;
-      DI25                        :   IN   std_logic;
-      DI26                        :   IN   std_logic;
-      DI27                        :   IN   std_logic;
-      DI28                        :   IN   std_logic;
-      DI29                        :   IN   std_logic;
-      DI30                        :   IN   std_logic;
-      DI31                        :   IN   std_logic;
-      WEB                         :   IN   std_logic;
-      CK                          :   IN   std_logic;
-      CSB                         :   IN   std_logic
+      A0   : in  std_logic;
+      A1   : in  std_logic;
+      A2   : in  std_logic;
+      A3   : in  std_logic;
+      A4   : in  std_logic;
+      A5   : in  std_logic;
+      A6   : in  std_logic;
+      A7   : in  std_logic;
+      DO0  : out std_logic;
+      DO1  : out std_logic;
+      DO2  : out std_logic;
+      DO3  : out std_logic;
+      DO4  : out std_logic;
+      DO5  : out std_logic;
+      DO6  : out std_logic;
+      DO7  : out std_logic;
+      DO8  : out std_logic;
+      DO9  : out std_logic;
+      DO10 : out std_logic;
+      DO11 : out std_logic;
+      DO12 : out std_logic;
+      DO13 : out std_logic;
+      DO14 : out std_logic;
+      DO15 : out std_logic;
+      DO16 : out std_logic;
+      DO17 : out std_logic;
+      DO18 : out std_logic;
+      DO19 : out std_logic;
+      DO20 : out std_logic;
+      DO21 : out std_logic;
+      DO22 : out std_logic;
+      DO23 : out std_logic;
+      DO24 : out std_logic;
+      DO25 : out std_logic;
+      DO26 : out std_logic;
+      DO27 : out std_logic;
+      DO28 : out std_logic;
+      DO29 : out std_logic;
+      DO30 : out std_logic;
+      DO31 : out std_logic;
+      DI0  : in  std_logic;
+      DI1  : in  std_logic;
+      DI2  : in  std_logic;
+      DI3  : in  std_logic;
+      DI4  : in  std_logic;
+      DI5  : in  std_logic;
+      DI6  : in  std_logic;
+      DI7  : in  std_logic;
+      DI8  : in  std_logic;
+      DI9  : in  std_logic;
+      DI10 : in  std_logic;
+      DI11 : in  std_logic;
+      DI12 : in  std_logic;
+      DI13 : in  std_logic;
+      DI14 : in  std_logic;
+      DI15 : in  std_logic;
+      DI16 : in  std_logic;
+      DI17 : in  std_logic;
+      DI18 : in  std_logic;
+      DI19 : in  std_logic;
+      DI20 : in  std_logic;
+      DI21 : in  std_logic;
+      DI22 : in  std_logic;
+      DI23 : in  std_logic;
+      DI24 : in  std_logic;
+      DI25 : in  std_logic;
+      DI26 : in  std_logic;
+      DI27 : in  std_logic;
+      DI28 : in  std_logic;
+      DI29 : in  std_logic;
+      DI30 : in  std_logic;
+      DI31 : in  std_logic;
+      WEB  : in  std_logic;
+      CK   : in  std_logic;
+      CSB  : in  std_logic
       );
    end component;
 
   -- pmem
   component SY180_2048X2X1CM8
   port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      A10                        :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      WEB                        :   IN   std_logic;
-      CK                         :   IN   std_logic;
-      CSB                         :   IN   std_logic
+      A0  : in  std_logic;
+      A1  : in  std_logic;
+      A2  : in  std_logic;
+      A3  : in  std_logic;
+      A4  : in  std_logic;
+      A5  : in  std_logic;
+      A6  : in  std_logic;
+      A7  : in  std_logic;
+      A8  : in  std_logic;
+      A9  : in  std_logic;
+      A10 : in  std_logic;
+      DO0 : out std_logic;
+      DO1 : out std_logic;
+      DI0 : in  std_logic;
+      DI1 : in  std_logic;
+      WEB : in  std_logic;
+      CK  : in  std_logic;
+      CSB : in  std_logic
       );
   end component;
 
@@ -290,101 +291,101 @@ architecture struct of top is
 --ROM0
   component SP180_4096X80BM1A
   port(
-      A0                            :   IN   std_logic;
-      A1                            :   IN   std_logic;
-      A2                            :   IN   std_logic;
-      A3                            :   IN   std_logic;
-      A4                            :   IN   std_logic;
-      A5                            :   IN   std_logic;
-      A6                            :   IN   std_logic;
-      A7                            :   IN   std_logic;
-      A8                            :   IN   std_logic;
-      A9                            :   IN   std_logic;
-      A10                            :   IN   std_logic;
-      A11                            :   IN   std_logic;
-      DO0                           :   OUT   std_logic;
-      DO1                           :   OUT   std_logic;
-      DO2                           :   OUT   std_logic;
-      DO3                           :   OUT   std_logic;
-      DO4                           :   OUT   std_logic;
-      DO5                           :   OUT   std_logic;
-      DO6                           :   OUT   std_logic;
-      DO7                           :   OUT   std_logic;
-      DO8                           :   OUT   std_logic;
-      DO9                           :   OUT   std_logic;
-      DO10                           :   OUT   std_logic;
-      DO11                           :   OUT   std_logic;
-      DO12                           :   OUT   std_logic;
-      DO13                           :   OUT   std_logic;
-      DO14                           :   OUT   std_logic;
-      DO15                           :   OUT   std_logic;
-      DO16                           :   OUT   std_logic;
-      DO17                           :   OUT   std_logic;
-      DO18                           :   OUT   std_logic;
-      DO19                           :   OUT   std_logic;
-      DO20                           :   OUT   std_logic;
-      DO21                           :   OUT   std_logic;
-      DO22                           :   OUT   std_logic;
-      DO23                           :   OUT   std_logic;
-      DO24                           :   OUT   std_logic;
-      DO25                           :   OUT   std_logic;
-      DO26                           :   OUT   std_logic;
-      DO27                           :   OUT   std_logic;
-      DO28                           :   OUT   std_logic;
-      DO29                           :   OUT   std_logic;
-      DO30                           :   OUT   std_logic;
-      DO31                           :   OUT   std_logic;
-      DO32                           :   OUT   std_logic;
-      DO33                           :   OUT   std_logic;
-      DO34                           :   OUT   std_logic;
-      DO35                           :   OUT   std_logic;
-      DO36                           :   OUT   std_logic;
-      DO37                           :   OUT   std_logic;
-      DO38                           :   OUT   std_logic;
-      DO39                           :   OUT   std_logic;
-      DO40                           :   OUT   std_logic;
-      DO41                           :   OUT   std_logic;
-      DO42                           :   OUT   std_logic;
-      DO43                           :   OUT   std_logic;
-      DO44                           :   OUT   std_logic;
-      DO45                           :   OUT   std_logic;
-      DO46                           :   OUT   std_logic;
-      DO47                           :   OUT   std_logic;
-      DO48                           :   OUT   std_logic;
-      DO49                           :   OUT   std_logic;
-      DO50                           :   OUT   std_logic;
-      DO51                           :   OUT   std_logic;
-      DO52                           :   OUT   std_logic;
-      DO53                           :   OUT   std_logic;
-      DO54                           :   OUT   std_logic;
-      DO55                           :   OUT   std_logic;
-      DO56                           :   OUT   std_logic;
-      DO57                           :   OUT   std_logic;
-      DO58                           :   OUT   std_logic;
-      DO59                           :   OUT   std_logic;
-      DO60                           :   OUT   std_logic;
-      DO61                           :   OUT   std_logic;
-      DO62                           :   OUT   std_logic;
-      DO63                           :   OUT   std_logic;
-      DO64                           :   OUT   std_logic;
-      DO65                           :   OUT   std_logic;
-      DO66                           :   OUT   std_logic;
-      DO67                           :   OUT   std_logic;
-      DO68                           :   OUT   std_logic;
-      DO69                           :   OUT   std_logic;
-      DO70                           :   OUT   std_logic;
-      DO71                           :   OUT   std_logic;
-      DO72                           :   OUT   std_logic;
-      DO73                           :   OUT   std_logic;
-      DO74                           :   OUT   std_logic;
-      DO75                           :   OUT   std_logic;
-      DO76                           :   OUT   std_logic;
-      DO77                           :   OUT   std_logic;
-      DO78                           :   OUT   std_logic;
-      DO79                           :   OUT   std_logic;
-      CK                               :   IN   std_logic;
-      CS                               :   IN   std_logic;
-      OE                               :   IN   std_logic
+      A0   : in  std_logic;
+      A1   : in  std_logic;
+      A2   : in  std_logic;
+      A3   : in  std_logic;
+      A4   : in  std_logic;
+      A5   : in  std_logic;
+      A6   : in  std_logic;
+      A7   : in  std_logic;
+      A8   : in  std_logic;
+      A9   : in  std_logic;
+      A10  : in  std_logic;
+      A11  : in  std_logic;
+      DO0  : out std_logic;
+      DO1  : out std_logic;
+      DO2  : out std_logic;
+      DO3  : out std_logic;
+      DO4  : out std_logic;
+      DO5  : out std_logic;
+      DO6  : out std_logic;
+      DO7  : out std_logic;
+      DO8  : out std_logic;
+      DO9  : out std_logic;
+      DO10 : out std_logic;
+      DO11 : out std_logic;
+      DO12 : out std_logic;
+      DO13 : out std_logic;
+      DO14 : out std_logic;
+      DO15 : out std_logic;
+      DO16 : out std_logic;
+      DO17 : out std_logic;
+      DO18 : out std_logic;
+      DO19 : out std_logic;
+      DO20 : out std_logic;
+      DO21 : out std_logic;
+      DO22 : out std_logic;
+      DO23 : out std_logic;
+      DO24 : out std_logic;
+      DO25 : out std_logic;
+      DO26 : out std_logic;
+      DO27 : out std_logic;
+      DO28 : out std_logic;
+      DO29 : out std_logic;
+      DO30 : out std_logic;
+      DO31 : out std_logic;
+      DO32 : out std_logic;
+      DO33 : out std_logic;
+      DO34 : out std_logic;
+      DO35 : out std_logic;
+      DO36 : out std_logic;
+      DO37 : out std_logic;
+      DO38 : out std_logic;
+      DO39 : out std_logic;
+      DO40 : out std_logic;
+      DO41 : out std_logic;
+      DO42 : out std_logic;
+      DO43 : out std_logic;
+      DO44 : out std_logic;
+      DO45 : out std_logic;
+      DO46 : out std_logic;
+      DO47 : out std_logic;
+      DO48 : out std_logic;
+      DO49 : out std_logic;
+      DO50 : out std_logic;
+      DO51 : out std_logic;
+      DO52 : out std_logic;
+      DO53 : out std_logic;
+      DO54 : out std_logic;
+      DO55 : out std_logic;
+      DO56 : out std_logic;
+      DO57 : out std_logic;
+      DO58 : out std_logic;
+      DO59 : out std_logic;
+      DO60 : out std_logic;
+      DO61 : out std_logic;
+      DO62 : out std_logic;
+      DO63 : out std_logic;
+      DO64 : out std_logic;
+      DO65 : out std_logic;
+      DO66 : out std_logic;
+      DO67 : out std_logic;
+      DO68 : out std_logic;
+      DO69 : out std_logic;
+      DO70 : out std_logic;
+      DO71 : out std_logic;
+      DO72 : out std_logic;
+      DO73 : out std_logic;
+      DO74 : out std_logic;
+      DO75 : out std_logic;
+      DO76 : out std_logic;
+      DO77 : out std_logic;
+      DO78 : out std_logic;
+      DO79 : out std_logic;
+      CK   : in  std_logic;
+      CS   : in  std_logic;
+      OE   : in  std_logic
       );
   end component;
 
@@ -392,201 +393,201 @@ architecture struct of top is
 -- ROM1
   component SP180_4096X80BM1B
   port(
-      A0                            :   IN   std_logic;
-      A1                            :   IN   std_logic;
-      A2                            :   IN   std_logic;
-      A3                            :   IN   std_logic;
-      A4                            :   IN   std_logic;
-      A5                            :   IN   std_logic;
-      A6                            :   IN   std_logic;
-      A7                            :   IN   std_logic;
-      A8                            :   IN   std_logic;
-      A9                            :   IN   std_logic;
-      A10                            :   IN   std_logic;
-      A11                            :   IN   std_logic;
-      DO0                           :   OUT   std_logic;
-      DO1                           :   OUT   std_logic;
-      DO2                           :   OUT   std_logic;
-      DO3                           :   OUT   std_logic;
-      DO4                           :   OUT   std_logic;
-      DO5                           :   OUT   std_logic;
-      DO6                           :   OUT   std_logic;
-      DO7                           :   OUT   std_logic;
-      DO8                           :   OUT   std_logic;
-      DO9                           :   OUT   std_logic;
-      DO10                           :   OUT   std_logic;
-      DO11                           :   OUT   std_logic;
-      DO12                           :   OUT   std_logic;
-      DO13                           :   OUT   std_logic;
-      DO14                           :   OUT   std_logic;
-      DO15                           :   OUT   std_logic;
-      DO16                           :   OUT   std_logic;
-      DO17                           :   OUT   std_logic;
-      DO18                           :   OUT   std_logic;
-      DO19                           :   OUT   std_logic;
-      DO20                           :   OUT   std_logic;
-      DO21                           :   OUT   std_logic;
-      DO22                           :   OUT   std_logic;
-      DO23                           :   OUT   std_logic;
-      DO24                           :   OUT   std_logic;
-      DO25                           :   OUT   std_logic;
-      DO26                           :   OUT   std_logic;
-      DO27                           :   OUT   std_logic;
-      DO28                           :   OUT   std_logic;
-      DO29                           :   OUT   std_logic;
-      DO30                           :   OUT   std_logic;
-      DO31                           :   OUT   std_logic;
-      DO32                           :   OUT   std_logic;
-      DO33                           :   OUT   std_logic;
-      DO34                           :   OUT   std_logic;
-      DO35                           :   OUT   std_logic;
-      DO36                           :   OUT   std_logic;
-      DO37                           :   OUT   std_logic;
-      DO38                           :   OUT   std_logic;
-      DO39                           :   OUT   std_logic;
-      DO40                           :   OUT   std_logic;
-      DO41                           :   OUT   std_logic;
-      DO42                           :   OUT   std_logic;
-      DO43                           :   OUT   std_logic;
-      DO44                           :   OUT   std_logic;
-      DO45                           :   OUT   std_logic;
-      DO46                           :   OUT   std_logic;
-      DO47                           :   OUT   std_logic;
-      DO48                           :   OUT   std_logic;
-      DO49                           :   OUT   std_logic;
-      DO50                           :   OUT   std_logic;
-      DO51                           :   OUT   std_logic;
-      DO52                           :   OUT   std_logic;
-      DO53                           :   OUT   std_logic;
-      DO54                           :   OUT   std_logic;
-      DO55                           :   OUT   std_logic;
-      DO56                           :   OUT   std_logic;
-      DO57                           :   OUT   std_logic;
-      DO58                           :   OUT   std_logic;
-      DO59                           :   OUT   std_logic;
-      DO60                           :   OUT   std_logic;
-      DO61                           :   OUT   std_logic;
-      DO62                           :   OUT   std_logic;
-      DO63                           :   OUT   std_logic;
-      DO64                           :   OUT   std_logic;
-      DO65                           :   OUT   std_logic;
-      DO66                           :   OUT   std_logic;
-      DO67                           :   OUT   std_logic;
-      DO68                           :   OUT   std_logic;
-      DO69                           :   OUT   std_logic;
-      DO70                           :   OUT   std_logic;
-      DO71                           :   OUT   std_logic;
-      DO72                           :   OUT   std_logic;
-      DO73                           :   OUT   std_logic;
-      DO74                           :   OUT   std_logic;
-      DO75                           :   OUT   std_logic;
-      DO76                           :   OUT   std_logic;
-      DO77                           :   OUT   std_logic;
-      DO78                           :   OUT   std_logic;
-      DO79                           :   OUT   std_logic;
-      CK                               :   IN   std_logic;
-      CS                               :   IN   std_logic;
-      OE                               :   IN   std_logic
+      A0   : in  std_logic;
+      A1   : in  std_logic;
+      A2   : in  std_logic;
+      A3   : in  std_logic;
+      A4   : in  std_logic;
+      A5   : in  std_logic;
+      A6   : in  std_logic;
+      A7   : in  std_logic;
+      A8   : in  std_logic;
+      A9   : in  std_logic;
+      A10  : in  std_logic;
+      A11  : in  std_logic;
+      DO0  : out std_logic;
+      DO1  : out std_logic;
+      DO2  : out std_logic;
+      DO3  : out std_logic;
+      DO4  : out std_logic;
+      DO5  : out std_logic;
+      DO6  : out std_logic;
+      DO7  : out std_logic;
+      DO8  : out std_logic;
+      DO9  : out std_logic;
+      DO10 : out std_logic;
+      DO11 : out std_logic;
+      DO12 : out std_logic;
+      DO13 : out std_logic;
+      DO14 : out std_logic;
+      DO15 : out std_logic;
+      DO16 : out std_logic;
+      DO17 : out std_logic;
+      DO18 : out std_logic;
+      DO19 : out std_logic;
+      DO20 : out std_logic;
+      DO21 : out std_logic;
+      DO22 : out std_logic;
+      DO23 : out std_logic;
+      DO24 : out std_logic;
+      DO25 : out std_logic;
+      DO26 : out std_logic;
+      DO27 : out std_logic;
+      DO28 : out std_logic;
+      DO29 : out std_logic;
+      DO30 : out std_logic;
+      DO31 : out std_logic;
+      DO32 : out std_logic;
+      DO33 : out std_logic;
+      DO34 : out std_logic;
+      DO35 : out std_logic;
+      DO36 : out std_logic;
+      DO37 : out std_logic;
+      DO38 : out std_logic;
+      DO39 : out std_logic;
+      DO40 : out std_logic;
+      DO41 : out std_logic;
+      DO42 : out std_logic;
+      DO43 : out std_logic;
+      DO44 : out std_logic;
+      DO45 : out std_logic;
+      DO46 : out std_logic;
+      DO47 : out std_logic;
+      DO48 : out std_logic;
+      DO49 : out std_logic;
+      DO50 : out std_logic;
+      DO51 : out std_logic;
+      DO52 : out std_logic;
+      DO53 : out std_logic;
+      DO54 : out std_logic;
+      DO55 : out std_logic;
+      DO56 : out std_logic;
+      DO57 : out std_logic;
+      DO58 : out std_logic;
+      DO59 : out std_logic;
+      DO60 : out std_logic;
+      DO61 : out std_logic;
+      DO62 : out std_logic;
+      DO63 : out std_logic;
+      DO64 : out std_logic;
+      DO65 : out std_logic;
+      DO66 : out std_logic;
+      DO67 : out std_logic;
+      DO68 : out std_logic;
+      DO69 : out std_logic;
+      DO70 : out std_logic;
+      DO71 : out std_logic;
+      DO72 : out std_logic;
+      DO73 : out std_logic;
+      DO74 : out std_logic;
+      DO75 : out std_logic;
+      DO76 : out std_logic;
+      DO77 : out std_logic;
+      DO78 : out std_logic;
+      DO79 : out std_logic;
+      CK   : in  std_logic;
+      CS   : in  std_logic;
+      OE   : in  std_logic
       );
   end component;
 
 -- 20kB ROM2
   component SP180_2048X80BM1A
   port(
-      A0                            :   IN   std_logic;
-      A1                            :   IN   std_logic;
-      A2                            :   IN   std_logic;
-      A3                            :   IN   std_logic;
-      A4                            :   IN   std_logic;
-      A5                            :   IN   std_logic;
-      A6                            :   IN   std_logic;
-      A7                            :   IN   std_logic;
-      A8                            :   IN   std_logic;
-      A9                            :   IN   std_logic;
-      A10                            :   IN   std_logic;
-      DO0                           :   OUT   std_logic;
-      DO1                           :   OUT   std_logic;
-      DO2                           :   OUT   std_logic;
-      DO3                           :   OUT   std_logic;
-      DO4                           :   OUT   std_logic;
-      DO5                           :   OUT   std_logic;
-      DO6                           :   OUT   std_logic;
-      DO7                           :   OUT   std_logic;
-      DO8                           :   OUT   std_logic;
-      DO9                           :   OUT   std_logic;
-      DO10                           :   OUT   std_logic;
-      DO11                           :   OUT   std_logic;
-      DO12                           :   OUT   std_logic;
-      DO13                           :   OUT   std_logic;
-      DO14                           :   OUT   std_logic;
-      DO15                           :   OUT   std_logic;
-      DO16                           :   OUT   std_logic;
-      DO17                           :   OUT   std_logic;
-      DO18                           :   OUT   std_logic;
-      DO19                           :   OUT   std_logic;
-      DO20                           :   OUT   std_logic;
-      DO21                           :   OUT   std_logic;
-      DO22                           :   OUT   std_logic;
-      DO23                           :   OUT   std_logic;
-      DO24                           :   OUT   std_logic;
-      DO25                           :   OUT   std_logic;
-      DO26                           :   OUT   std_logic;
-      DO27                           :   OUT   std_logic;
-      DO28                           :   OUT   std_logic;
-      DO29                           :   OUT   std_logic;
-      DO30                           :   OUT   std_logic;
-      DO31                           :   OUT   std_logic;
-      DO32                           :   OUT   std_logic;
-      DO33                           :   OUT   std_logic;
-      DO34                           :   OUT   std_logic;
-      DO35                           :   OUT   std_logic;
-      DO36                           :   OUT   std_logic;
-      DO37                           :   OUT   std_logic;
-      DO38                           :   OUT   std_logic;
-      DO39                           :   OUT   std_logic;
-      DO40                           :   OUT   std_logic;
-      DO41                           :   OUT   std_logic;
-      DO42                           :   OUT   std_logic;
-      DO43                           :   OUT   std_logic;
-      DO44                           :   OUT   std_logic;
-      DO45                           :   OUT   std_logic;
-      DO46                           :   OUT   std_logic;
-      DO47                           :   OUT   std_logic;
-      DO48                           :   OUT   std_logic;
-      DO49                           :   OUT   std_logic;
-      DO50                           :   OUT   std_logic;
-      DO51                           :   OUT   std_logic;
-      DO52                           :   OUT   std_logic;
-      DO53                           :   OUT   std_logic;
-      DO54                           :   OUT   std_logic;
-      DO55                           :   OUT   std_logic;
-      DO56                           :   OUT   std_logic;
-      DO57                           :   OUT   std_logic;
-      DO58                           :   OUT   std_logic;
-      DO59                           :   OUT   std_logic;
-      DO60                           :   OUT   std_logic;
-      DO61                           :   OUT   std_logic;
-      DO62                           :   OUT   std_logic;
-      DO63                           :   OUT   std_logic;
-      DO64                           :   OUT   std_logic;
-      DO65                           :   OUT   std_logic;
-      DO66                           :   OUT   std_logic;
-      DO67                           :   OUT   std_logic;
-      DO68                           :   OUT   std_logic;
-      DO69                           :   OUT   std_logic;
-      DO70                           :   OUT   std_logic;
-      DO71                           :   OUT   std_logic;
-      DO72                           :   OUT   std_logic;
-      DO73                           :   OUT   std_logic;
-      DO74                           :   OUT   std_logic;
-      DO75                           :   OUT   std_logic;
-      DO76                           :   OUT   std_logic;
-      DO77                           :   OUT   std_logic;
-      DO78                           :   OUT   std_logic;
-      DO79                           :   OUT   std_logic;
-      CK                               :   IN   std_logic;
-      CS                               :   IN   std_logic;
-      OE                               :   IN   std_logic
+      A0   : in  std_logic;
+      A1   : in  std_logic;
+      A2   : in  std_logic;
+      A3   : in  std_logic;
+      A4   : in  std_logic;
+      A5   : in  std_logic;
+      A6   : in  std_logic;
+      A7   : in  std_logic;
+      A8   : in  std_logic;
+      A9   : in  std_logic;
+      A10  : in  std_logic;
+      DO0  : out std_logic;
+      DO1  : out std_logic;
+      DO2  : out std_logic;
+      DO3  : out std_logic;
+      DO4  : out std_logic;
+      DO5  : out std_logic;
+      DO6  : out std_logic;
+      DO7  : out std_logic;
+      DO8  : out std_logic;
+      DO9  : out std_logic;
+      DO10 : out std_logic;
+      DO11 : out std_logic;
+      DO12 : out std_logic;
+      DO13 : out std_logic;
+      DO14 : out std_logic;
+      DO15 : out std_logic;
+      DO16 : out std_logic;
+      DO17 : out std_logic;
+      DO18 : out std_logic;
+      DO19 : out std_logic;
+      DO20 : out std_logic;
+      DO21 : out std_logic;
+      DO22 : out std_logic;
+      DO23 : out std_logic;
+      DO24 : out std_logic;
+      DO25 : out std_logic;
+      DO26 : out std_logic;
+      DO27 : out std_logic;
+      DO28 : out std_logic;
+      DO29 : out std_logic;
+      DO30 : out std_logic;
+      DO31 : out std_logic;
+      DO32 : out std_logic;
+      DO33 : out std_logic;
+      DO34 : out std_logic;
+      DO35 : out std_logic;
+      DO36 : out std_logic;
+      DO37 : out std_logic;
+      DO38 : out std_logic;
+      DO39 : out std_logic;
+      DO40 : out std_logic;
+      DO41 : out std_logic;
+      DO42 : out std_logic;
+      DO43 : out std_logic;
+      DO44 : out std_logic;
+      DO45 : out std_logic;
+      DO46 : out std_logic;
+      DO47 : out std_logic;
+      DO48 : out std_logic;
+      DO49 : out std_logic;
+      DO50 : out std_logic;
+      DO51 : out std_logic;
+      DO52 : out std_logic;
+      DO53 : out std_logic;
+      DO54 : out std_logic;
+      DO55 : out std_logic;
+      DO56 : out std_logic;
+      DO57 : out std_logic;
+      DO58 : out std_logic;
+      DO59 : out std_logic;
+      DO60 : out std_logic;
+      DO61 : out std_logic;
+      DO62 : out std_logic;
+      DO63 : out std_logic;
+      DO64 : out std_logic;
+      DO65 : out std_logic;
+      DO66 : out std_logic;
+      DO67 : out std_logic;
+      DO68 : out std_logic;
+      DO69 : out std_logic;
+      DO70 : out std_logic;
+      DO71 : out std_logic;
+      DO72 : out std_logic;
+      DO73 : out std_logic;
+      DO74 : out std_logic;
+      DO75 : out std_logic;
+      DO76 : out std_logic;
+      DO77 : out std_logic;
+      DO78 : out std_logic;
+      DO79 : out std_logic;
+      CK   : in  std_logic;
+      CS   : in  std_logic;
+      OE   : in  std_logic
       );
   end component;
 
@@ -605,27 +606,27 @@ architecture struct of top is
 
   component u180flag2256k32lv
   port(
-        CE      :   IN      std_logic;
-        ALE     :   IN      std_logic;
-        A       :   IN      std_logic_vector(12 downto 0);
-        DI      :   IN      std_logic_vector(31 downto 0);       
-        WRONLY  :   IN      std_logic;
-        PERASE  :   IN      std_logic;
-        SERASE  :   IN      std_logic;
-        MERASE  :   IN      std_logic;
-        PROG    :   IN      std_logic;
-        INF     :   IN      std_logic;
-        POR     :   IN      std_logic;
-        SAVEN   :   IN      std_logic;       
-        TM      :   IN      std_logic_vector(3 downto 0);
-        DO      :   OUT     std_logic_vector(31 downto 0);
-        RBB     :   OUT     std_logic
+      CE     : in  std_logic;
+      ALE    : in  std_logic;
+      A      : in  std_logic_vector(12 downto 0);
+      DI     : in  std_logic_vector(31 downto 0);
+      WRONLY : in  std_logic;
+      PERASE : in  std_logic;
+      SERASE : in  std_logic;
+      MERASE : in  std_logic;
+      PROG   : in  std_logic;
+      INF    : in  std_logic;
+      POR    : in  std_logic;
+      SAVEN  : in  std_logic;
+      TM     : in  std_logic_vector(3 downto 0);
+      DO     : out std_logic_vector(31 downto 0);
+      RBB    : out std_logic
     );
  end component;
 
-  component ram_memory is 
+  component ram_memory is
     generic (
-      g_memory_type : memory_type_t := referens);  
+      g_memory_type : memory_type_t := referens);
     port (
       address : in std_logic_vector(13 downto 0);
       ram_di  : in std_logic_vector(7 downto 0);
@@ -634,10 +635,10 @@ architecture struct of top is
       clk     : in  std_logic;
       cs      : in  std_logic);
   end component;
-  
-  component memory_1024x8 is 
+
+  component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);  
+      g_memory_type : memory_type_t := referens);
     port (
       address : in std_logic_vector(9 downto 0);
       ram_di  : in std_logic_vector(7 downto 0);
@@ -646,44 +647,44 @@ architecture struct of top is
       clk     : in  std_logic;
       cs      : in  std_logic);
   end component;
-  
+
 -- application and microprogram shared memory
   component SU180_16384X8X1BM8
   port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      A8                         :   IN   std_logic;
-      A9                         :   IN   std_logic;
-      A10                         :   IN   std_logic;
-      A11                         :   IN   std_logic;
-      A12                         :   IN   std_logic;
-      A13                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      WEB                       :   IN   std_logic;
-      CK                            :   IN   std_logic;
-      CS                           :   IN   std_logic;
-      OE                            :   IN   std_logic
+      A0  : in  std_logic;
+      A1  : in  std_logic;
+      A2  : in  std_logic;
+      A3  : in  std_logic;
+      A4  : in  std_logic;
+      A5  : in  std_logic;
+      A6  : in  std_logic;
+      A7  : in  std_logic;
+      A8  : in  std_logic;
+      A9  : in  std_logic;
+      A10 : in  std_logic;
+      A11 : in  std_logic;
+      A12 : in  std_logic;
+      A13 : in  std_logic;
+      DO0 : out std_logic;
+      DO1 : out std_logic;
+      DO2 : out std_logic;
+      DO3 : out std_logic;
+      DO4 : out std_logic;
+      DO5 : out std_logic;
+      DO6 : out std_logic;
+      DO7 : out std_logic;
+      DI0 : in  std_logic;
+      DI1 : in  std_logic;
+      DI2 : in  std_logic;
+      DI3 : in  std_logic;
+      DI4 : in  std_logic;
+      DI5 : in  std_logic;
+      DI6 : in  std_logic;
+      DI7 : in  std_logic;
+      WEB : in  std_logic;
+      CK  : in  std_logic;
+      CS  : in  std_logic;
+      OE  : in  std_logic
       );
  end component;
 
@@ -1155,9 +1156,11 @@ architecture struct of top is
 --  signal RAM7_CS         : std_logic;   
 
 begin
+
+
     --pads
     iopads_inst : entity work.iopads
-    port MAP(
+    port map(
         -- clocks and control signals
         HCLK            => HCLK             , 
         MWAKEUP_LP      => MWAKEUP_LP      ,
@@ -1350,7 +1353,7 @@ begin
   -- mprom0, mprom1
  --  mprom00
   mprom00: SP180_4096X80BM1A
-  PORT MAP (
+    port map (
       A0          => rom0_addr_sig(0),
       A1          => rom0_addr_sig(1),               
       A2          => rom0_addr_sig(2),              
@@ -1452,7 +1455,7 @@ begin
     
  --  mprom11
   mprom11: SP180_4096X80BM1B
-  PORT MAP (
+    port map (
       A0          => mp_ROM1_A(0),
       A1          => mp_ROM1_A(1),               
       A2          => mp_ROM1_A(2),              
@@ -1610,7 +1613,7 @@ begin
 --  -- pmem
  --    mppmem
   mppmem: SY180_2048X2X1CM8
-  PORT MAP (
+    port map (
       A0          => mp_PM_A(0),
       A1          => mp_PM_A(1),              
       A2          => mp_PM_A(2),             
@@ -1633,7 +1636,7 @@ begin
 	   
 --  -- trcmem
   trcmem: SY180_256X32X1CM4
-  PORT MAP (
+    port map (
       A0          => trcmem_a(0),
       A1          => trcmem_a(1),              
       A2          => trcmem_a(2),             
@@ -2188,7 +2191,7 @@ begin
 
     
     mpmem_inf_inst : entity work.mpmem_inf
-  PORT map(
+    port map(
        
       -- MPROM signals
     -- clk_p    => clk_p,
@@ -2264,7 +2267,7 @@ begin
 
 
   sdram_inf_inst : entity work.sdram_inf
-	PORT map(  
+    port map(
 	      clk_p       => clk_p       ,
 	      clk_d_pos   => clk_d_pos   ,
 	      clk_da_pos   => clk_da_pos   ,
@@ -2330,7 +2333,7 @@ begin
 
   --flash interface
   flash_inf_inst : entity work.flash_inf 
-	PORT MAP( 
+    port map(
 	    clk_p       => clk_p       ,
 		even_c		=> even_c		,
 	    rst_cn      => rst_n      ,
@@ -2399,6 +2402,7 @@ begin
   -----------------------------------------------------------------------------
   -- Peripherals
   -----------------------------------------------------------------------------
+
 peri01: entity work.peri
 	port map(
 	  clk_p         => clk_p,
@@ -2487,4 +2491,26 @@ peri01: entity work.peri
         OSPI_RWDS  => OSPI_RWDS
 		);  
 	
+  g_fpga_peri : if g_memory_type = fpga generate
+    erxclk <= '0';
+    etxclk <= '0';
+    din_a  <= '0';
+    dfp    <= "00000000";
+    iden   <= '0';
+    idreq  <= "11111111";
+    idi    <= "00000000";
+    irq0   <= '1';
+    irq1   <= '1';
+    pa_en  <= "00000000";
+    pb_en  <= "00000000";
+    pc_en  <= "00000000";
+    pd_en  <= "00000000";
+    pe_en  <= "00000000";
+    pf_en  <= "00000000";
+    pg_en  <= "00000000";
+    ph_en  <= "00000000";
+    pi_en  <= "00000000";
+    pj_en  <= "00000000";
+  end generate g_fpga_peri;
+
 end;

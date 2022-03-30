@@ -106,7 +106,7 @@ END COMPONENT;
     signal wr_req  : std_logic;
     signal ack_sig_i :std_logic_vector(15 downto 0); --Will be replaced with a DTM fifo signal.
     signal loop_c  : integer := 0;
-    signal chain   : std_logic;
+    signal chain   : std_logic; --reserved for later use
     signal data_in_fifo : std_logic_vector(9 downto 0);
     signal prog_empty_i : std_logic;
     signal data_vld_out_i : std_logic_vector(15 downto 0);
@@ -127,11 +127,11 @@ begin
                         wr_req <= '1';
                         loop_c <= 1;
                     else
-                        if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
-                            chain<= '1';
-                        else
-                            chain <= '0';
-                        end if;
+                        --if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
+                        --    chain<= '1';
+                        --else
+                        --    chain <= '0';
+                        --end if;
                         wr_req <= '0';
                         loop_c <= 0;
                     end if;
@@ -158,6 +158,9 @@ begin
         else
             if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
                 poll_act <= '1'; 
+                if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
+                    poll_act <= '0';
+                end if;
             else
                 poll_act <= '0';
             end if;
@@ -188,8 +191,12 @@ begin
     if reset_i = '1' then
         ack_sig_i <= (others => '0');
     elsif poll_act = '1' then
-        ack_sig_i <=(others => '0');
-        ack_sig_i(to_integer(unsigned(id_num))) <= '1';
+        ack_sig_i <=(others => '0'); ---handshake ?
+        if req_sig(to_integer(15 - unsigned(id_num))) = '1' then
+            ack_sig_i(to_integer(unsigned(id_num))) <= '1';
+        else
+            ack_sig_i(to_integer(unsigned(id_num))) <= '0';
+        end if;
     else
         ack_sig_i <=(others => '0');
     end if;
@@ -264,16 +271,16 @@ end process;
 
 --Adder
 add_in_1 <= id_num;
-process(clk_p,poll_act)--add_in_2,wr_req,chain,EVEN_P)
+process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
-    if poll_act = '0' then--------------TBD
-        id_num <= (others => '0'); 
-    elsif rising_edge(clk_p) then
+    if rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            if wr_req = '1' or chain = '1' then
+            if wr_req = '1' then
                 id_num <= add_in_1;
             else
+                if REQ_RD_IN = (REQ_RD_IN'range => '0') then
                 id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
+                end if;
             end if;
         end if;
     end if;

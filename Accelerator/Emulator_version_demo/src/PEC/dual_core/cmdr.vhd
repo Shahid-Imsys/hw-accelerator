@@ -55,6 +55,7 @@ entity cmdr is
         VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
+        DTM_FIFO_RDY : out std_logic;
         VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
         VE_DTM_RDY : in std_logic;
         VE_PUSH_DTM : in std_logic;
@@ -75,6 +76,7 @@ architecture rtl of cmdr is
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
+    data_count : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     prog_full : OUT STD_LOGIC;
     wr_rst_busy : OUT STD_LOGIC;
     rd_rst_busy : OUT STD_LOGIC
@@ -115,6 +117,7 @@ architecture rtl of cmdr is
     signal req         : std_logic := '0';
     signal rd_trig     : std_logic;
     signal srst        : std_logic;
+    signal fifo_d_cnt  : std_logic_vector(3 downto 0);
     attribute keep : string;
     attribute keep of mp_data_int : signal is "true";
 
@@ -240,7 +243,7 @@ begin
                 cnt_reg <= (others => '0');
                 transfer_type <= "00";
             else
-                if fifo_push = '1' then
+                if fifo_push = '1' or EXE = '1' then
                     transfer_type <= dtm_reg(31 downto 30);
                     if dtm_reg (31 downto 30) = "11" then
                         cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
@@ -266,6 +269,9 @@ begin
                 requesting <= '0';
             else
                 requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+                if rd_trig = '1' or fb = '1' then
+                    requesting  <= '0';
+                end if; 
             end if;
         end if;
     end process;
@@ -293,7 +299,7 @@ begin
                         else
                             case transfer_type is
                                 when "11" =>
-                                    if transfer_cnt = x"01" then
+                                    if transfer_cnt = x"00" then
                                         rd_trig <= '0';
                                     end if;
                                 when others => rd_trig <= '0';
@@ -309,7 +315,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0'then
+            if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
                 fifo_rd_en <= '1';
             else
                 fifo_rd_en <= '0';
@@ -355,6 +361,8 @@ begin
         end if;
     end process;
 
+    DTM_FIFO_RDY <= fifo_full;
+
     req_fifo : fifo_generator_0
     PORT MAP (
     clk => CLK_P,
@@ -365,6 +373,7 @@ begin
     dout => DOUT,
     full => open,
     empty => empty,
+    data_count => fifo_d_cnt,
     prog_full => fifo_full, --asserts when 5 words inside
     wr_rst_busy => open,
     rd_rst_busy => open

@@ -235,7 +235,7 @@ architecture str of mpram_memory is
 begin  -- architecture str
 
 
-  -- Use memories fro ASIC implementation
+  -- Use memories from ASIC implementation
   g_asic_memory : if g_memory_type = asic generate
 
     i_load_mpram : load_mpram

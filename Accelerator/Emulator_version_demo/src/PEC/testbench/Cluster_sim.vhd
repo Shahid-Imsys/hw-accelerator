@@ -730,6 +730,18 @@ progress <= 8;
 
 --Start testing on PE side(simulated data input)
 wait for 280000 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+sendNOCcommand(Exe);
+tag_in <= '0';
+progress <= 8;
+wait for 280000 ns;
 --wait until rising_edge(C_RDY);
 wait until rising_edge(clk_e_i);
 wait for 5 ns;

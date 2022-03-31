@@ -103,9 +103,9 @@ END COMPONENT;
     signal almost_full : std_logic;
     signal empty   : std_logic;
     signal almost_empty : std_logic;
-    signal wr_req  : std_logic;
+--    signal wr_req  : std_logic;
     signal ack_sig_i :std_logic_vector(15 downto 0); --Will be replaced with a DTM fifo signal.
-    signal loop_c  : integer := 0;
+--    signal loop_c  : integer := 0;
     signal chain   : std_logic; --reserved for later use
     signal data_in_fifo : std_logic_vector(9 downto 0);
     signal prog_empty_i : std_logic;
@@ -118,32 +118,32 @@ END COMPONENT;
 begin
     reset_i <= not RESET;
     --Recognize the write request and hold the wr_req signal for 4 clock cycles.
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then 
-            if EVEN_P = '0' then
-                if loop_c = 0 then
-                    if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
-                        wr_req <= '1';
-                        loop_c <= 1;
-                    else
-                        --if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
-                        --    chain<= '1';
-                        --else
-                        --    chain <= '0';
-                        --end if;
-                        wr_req <= '0';
-                        loop_c <= 0;
-                    end if;
-                elsif loop_c = 4 then
-                    wr_req <= '0';
-                    loop_c <= 0;
-                else
-                    loop_c <= loop_c + 1;
-                end if;
-            end if;
-        end if;
-    end process;
+--    process(clk_p)
+--    begin
+--        if rising_edge(clk_p) then 
+--            if EVEN_P = '0' then
+--                if loop_c = 0 then
+--                    if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
+--                        wr_req <= '1';
+--                        loop_c <= 1;
+--                    else
+--                        --if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
+--                        --    chain<= '1';
+--                        --else
+--                        --    chain <= '0';
+--                        --end if;
+--                        wr_req <= '0';
+--                        loop_c <= 0;
+--                    end if;
+--                elsif loop_c = 4 then
+--                    wr_req <= '0';
+--                    loop_c <= 0;
+--                else
+--                    loop_c <= loop_c + 1;
+--                end if;
+--            end if;
+--        end if;
+--    end process;
             
 
 -------------------------------------------------------------
@@ -275,13 +275,13 @@ process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
     if rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            if wr_req = '1' then
-                id_num <= add_in_1;
-            else
+            --if wr_req = '1' then
+            --    id_num <= add_in_1;
+            --else
                 if REQ_RD_IN = (REQ_RD_IN'range => '0') then
                 id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
                 end if;
-            end if;
+            --end if;
         end if;
     end if;
     
@@ -326,7 +326,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
+        if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then--or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';

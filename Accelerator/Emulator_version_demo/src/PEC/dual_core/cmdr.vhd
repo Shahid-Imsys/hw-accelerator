@@ -118,6 +118,7 @@ architecture rtl of cmdr is
     signal rd_trig     : std_logic;
     signal srst        : std_logic;
     signal fifo_d_cnt  : std_logic_vector(3 downto 0);
+    signal push_cnt    : integer;
     attribute keep : string;
     attribute keep of mp_data_int : signal is "true";
 
@@ -146,7 +147,7 @@ begin
             ve_data_int <= (others => '0');
         else
             if DATA_VLD = '1' then
-                if CLK_E_NEG = '0' then
+                if CLK_E_NEG = '1' then
                     ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
                 else
                     ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
@@ -203,7 +204,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq;
+            dtm_reg <= init_mpgm_rq_single;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
@@ -238,24 +239,48 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
+            if rst_en = '0' then
+                push_cnt <= 0;
+            else
+                if clk_e_neg = '0' then
+                    if VE_AUTO_SEND = '0' then
+                        if fifo_push = '1' then
+                            push_cnt <= push_cnt + 1;
+                            if push_cnt = 5 then
+                                push_cnt <= 0;
+                            end if; 
+                        end if;
+                    else 
+                        push_cnt <= 0;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
             if rst_en = '0' then 
                 transfer_cnt <= (others => '0');
                 cnt_reg <= (others => '0');
                 transfer_type <= "00";
             else
-                if fifo_push = '1' or EXE = '1' then
-                    transfer_type <= dtm_reg(31 downto 30);
-                    if dtm_reg (31 downto 30) = "11" then
-                        cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
-                        if fifo_rd_en = '1' then
+                if push_cnt = 0 then
+                    if fifo_push = '1' or EXE = '1' then
+                        transfer_type <= dtm_reg(31 downto 30);
+                        if dtm_reg (31 downto 30) = "11" then
+                            cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
+                            if fifo_rd_en = '1' then
+                                transfer_cnt <= transfer_cnt -1;
+                            end if;
+                        end if;
+                    elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
+                        transfer_cnt <= cnt_reg;
+                    else
+                        if fifo_rd_en = '1' and transfer_type = "11" then
                             transfer_cnt <= transfer_cnt -1;
                         end if;
-                    end if;
-                elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
-                    transfer_cnt <= cnt_reg;
-                else
-                    if fifo_rd_en = '1' and transfer_type = "11" then
-                        transfer_cnt <= transfer_cnt -1;
                     end if;
                 end if;
             end if;
@@ -350,16 +375,7 @@ begin
     REQ_OUT <= req;
     REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
-    --srst <= not rst_en;
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            srst <= not rst_en;
-            if CLK_E_NEG = '0' and ld_dtm ='1' and empty = '1' then 
-                srst <= '1';
-            end if;
-        end if;
-    end process;
+    srst <= not rst_en;
 
     DTM_FIFO_RDY <= fifo_full;
 

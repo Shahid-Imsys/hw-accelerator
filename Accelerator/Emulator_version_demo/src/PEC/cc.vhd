@@ -819,7 +819,7 @@ EVEN_P <= even_p_2;
 			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
 					standby <= '0';
-			    elsif req_exe = '1' and write_req = '1' then --write case
+			    elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
 			    	RD_FIFO <= '1';
 				elsif req_exe = '1' or cb_status = '1' then
                     standby <= '1';
@@ -928,14 +928,14 @@ EVEN_P <= even_p_2;
 	counting : process(clk_p)  
 	begin
 		if rising_edge(clk_p) then 
-			if even_p_int = '0' then
-				if noc_cmd = "01111" then
-					addr_p <= (others => '0');
-					len_ctr_p <= (others => '0');
-					write_count <= "00";
-					pe_write <= '0';
-					pe_read <= '0';
-				elsif noc_reg_rdy = '0' then
+			if noc_cmd = "01111" then
+				addr_p <= (others => '0');
+				len_ctr_p <= (others => '0');
+				write_count <= "00";
+				pe_write <= '0';
+				pe_read <= '0';
+			elsif even_p_int = '0' then	
+				if noc_reg_rdy = '0' then
 					pe_read <= '0';
 					pe_write <= '0';
 					if req_bexe = '1' then
@@ -949,7 +949,7 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' then
+						elsif write_req = '1' and fifo_vld = '1' then
 							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
             	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
             	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);

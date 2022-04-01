@@ -22,7 +22,7 @@ compileSW:
 	cmake -DIMSYS_IMTOOLS_DIR=/opt/tool-imtools ..; \
 	cmake --build .; \
 	pwd ; \
-	cp bin/Tmpgm.${TEST_CASE}test/* ../../Processors/IM3000E/sim/vivado/maintb/
+	cp bin/Tmpgm.${TEST_CASE}/* ../../Processors/IM3000E/sim/vivado/maintb/
 ls:
 	cd ../../../../../fw-test-im3000e/build/bin; \
 	ls Tmpgm*.lst

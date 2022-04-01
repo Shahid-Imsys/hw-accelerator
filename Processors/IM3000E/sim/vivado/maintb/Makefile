@@ -14,8 +14,7 @@ sim:
 work:
 	$(CREATE_WORK)
 
-compileHW:
-	work  rtl tb elab
+compileHW: work  rtl tb elab
 
 compileSW: 
 	cd ../../../../../fw-test-im3000e; \
@@ -24,7 +23,9 @@ compileSW:
 	cmake --build .; \
 	pwd ; \
 	cp bin/Tmpgm.${TEST_CASE}test/* ../../Processors/IM3000E/sim/vivado/maintb/
-
+ls:
+	cd ../../../../../fw-test-im3000e/build/bin; \
+	ls Tmpgm*.lst
 
 clean:
 	rm -rf $(WORK_LIB)

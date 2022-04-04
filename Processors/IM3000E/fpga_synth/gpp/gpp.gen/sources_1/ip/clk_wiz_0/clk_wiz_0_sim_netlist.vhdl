@@ -1,36 +1,37 @@
 -- Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
--- Date        : Wed Mar 30 15:35:58 2022
+-- Date        : Thu Mar 31 13:14:51 2022
 -- Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
--- Command     : write_vhdl -force -mode funcsim -rename_top clk_wiz_0 -prefix
---               clk_wiz_0_ clk_wiz_0_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               /home/markar/checkouts/ImSys/FPGA_syntheis_test/Processors/IM3000E/fpga_synth/gpp/gpp.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.vhdl
 -- Design      : clk_wiz_0
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
--- Device      : xcku5p-ffvb676-2-e
+-- Device      : xcvu9p-flga2104-2L-e
 -- --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity clk_wiz_0_clk_wiz_0_clk_wiz is
+entity clk_wiz_0_clk_wiz is
   port (
     clk_200M : out STD_LOGIC;
     clk_300M : out STD_LOGIC;
     clk_400M : out STD_LOGIC;
-    clk_in : in STD_LOGIC
+    clk_in1_p : in STD_LOGIC;
+    clk_in1_n : in STD_LOGIC
   );
-end clk_wiz_0_clk_wiz_0_clk_wiz;
+end clk_wiz_0_clk_wiz;
 
-architecture STRUCTURE of clk_wiz_0_clk_wiz_0_clk_wiz is
+architecture STRUCTURE of clk_wiz_0_clk_wiz is
   signal clk_200M_clk_wiz_0 : STD_LOGIC;
   signal clk_200M_clk_wiz_0_en_clk : STD_LOGIC;
   signal clk_300M_clk_wiz_0 : STD_LOGIC;
   signal clk_300M_clk_wiz_0_en_clk : STD_LOGIC;
   signal clk_400M_clk_wiz_0 : STD_LOGIC;
   signal clk_400M_clk_wiz_0_en_clk : STD_LOGIC;
-  signal clk_in_clk_wiz_0 : STD_LOGIC;
+  signal clk_in1_clk_wiz_0 : STD_LOGIC;
   signal clkfbout_clk_wiz_0 : STD_LOGIC;
   signal locked_int : STD_LOGIC;
   signal seq_reg1 : STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -67,13 +68,13 @@ architecture STRUCTURE of clk_wiz_0_clk_wiz_0_clk_wiz is
   attribute XILINX_LEGACY_PRIM of clkf_buf : label is "BUFG";
   attribute XILINX_TRANSFORM_PINMAP : string;
   attribute XILINX_TRANSFORM_PINMAP of clkf_buf : label is "VCC:CE";
-  attribute BOX_TYPE of clkin1_ibuf : label is "PRIMITIVE";
+  attribute BOX_TYPE of clkin1_ibufds : label is "PRIMITIVE";
   attribute CAPACITANCE : string;
-  attribute CAPACITANCE of clkin1_ibuf : label is "DONT_CARE";
+  attribute CAPACITANCE of clkin1_ibufds : label is "DONT_CARE";
   attribute IBUF_DELAY_VALUE : string;
-  attribute IBUF_DELAY_VALUE of clkin1_ibuf : label is "0";
+  attribute IBUF_DELAY_VALUE of clkin1_ibufds : label is "0";
   attribute IFD_DELAY_VALUE : string;
-  attribute IFD_DELAY_VALUE of clkin1_ibuf : label is "AUTO";
+  attribute IFD_DELAY_VALUE of clkin1_ibufds : label is "AUTO";
   attribute BOX_TYPE of clkout1_buf : label is "PRIMITIVE";
   attribute BOX_TYPE of clkout1_buf_en : label is "PRIMITIVE";
   attribute BOX_TYPE of clkout2_buf : label is "PRIMITIVE";
@@ -144,13 +145,15 @@ clkf_buf: unisim.vcomponents.BUFGCE
       I => clkfbout_clk_wiz_0,
       O => NLW_clkf_buf_O_UNCONNECTED
     );
-clkin1_ibuf: unisim.vcomponents.IBUF
+clkin1_ibufds: unisim.vcomponents.IBUFDS
     generic map(
+      DIFF_TERM => false,
       IOSTANDARD => "DEFAULT"
     )
         port map (
-      I => clk_in,
-      O => clk_in_clk_wiz_0
+      I => clk_in1_p,
+      IB => clk_in1_n,
+      O => clk_in1_clk_wiz_0
     );
 clkout1_buf: unisim.vcomponents.BUFGCE
     generic map(
@@ -291,7 +294,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       CLKFBOUT => clkfbout_clk_wiz_0,
       CLKFBOUTB => NLW_mmcme4_adv_inst_CLKFBOUTB_UNCONNECTED,
       CLKFBSTOPPED => NLW_mmcme4_adv_inst_CLKFBSTOPPED_UNCONNECTED,
-      CLKIN1 => clk_in_clk_wiz_0,
+      CLKIN1 => clk_in1_clk_wiz_0,
       CLKIN2 => '0',
       CLKINSEL => '1',
       CLKINSTOPPED => NLW_mmcme4_adv_inst_CLKINSTOPPED_UNCONNECTED,
@@ -595,7 +598,8 @@ entity clk_wiz_0 is
     clk_200M : out STD_LOGIC;
     clk_300M : out STD_LOGIC;
     clk_400M : out STD_LOGIC;
-    clk_in : in STD_LOGIC
+    clk_in1_p : in STD_LOGIC;
+    clk_in1_n : in STD_LOGIC
   );
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of clk_wiz_0 : entity is true;
@@ -603,11 +607,12 @@ end clk_wiz_0;
 
 architecture STRUCTURE of clk_wiz_0 is
 begin
-inst: entity work.clk_wiz_0_clk_wiz_0_clk_wiz
+inst: entity work.clk_wiz_0_clk_wiz
      port map (
       clk_200M => clk_200M,
       clk_300M => clk_300M,
       clk_400M => clk_400M,
-      clk_in => clk_in
+      clk_in1_n => clk_in1_n,
+      clk_in1_p => clk_in1_p
     );
 end STRUCTURE;

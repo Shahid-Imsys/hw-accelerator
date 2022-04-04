@@ -63,7 +63,7 @@
 //----------------------------------------------------------------------------
 // Input Clock   Freq (MHz)    Input Jitter (UI)
 //----------------------------------------------------------------------------
-// __primary_____________300____________0.010
+// __primary_________300.000____________0.010
 
 `timescale 1ps/1ps
 
@@ -76,7 +76,8 @@ module clk_wiz_0
   output        clk_300M,
   output        clk_400M,
  // Clock in ports
-  input         clk_in
+  input         clk_in1_p,
+  input         clk_in1_n
  );
 
   clk_wiz_0_clk_wiz inst
@@ -86,7 +87,8 @@ module clk_wiz_0
   .clk_300M(clk_300M),
   .clk_400M(clk_400M),
  // Clock in ports
-  .clk_in(clk_in)
+  .clk_in1_p(clk_in1_p),
+  .clk_in1_n(clk_in1_n)
   );
 
 endmodule

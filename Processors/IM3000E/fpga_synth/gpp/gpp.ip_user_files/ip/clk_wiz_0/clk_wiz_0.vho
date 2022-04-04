@@ -62,7 +62,7 @@
 ------------------------------------------------------------------------------
 -- Input Clock   Freq (MHz)    Input Jitter (UI)
 ------------------------------------------------------------------------------
--- __primary_____________300____________0.010
+-- __primary_________300.000____________0.010
 
 
 -- The following code must appear in the VHDL architecture header:
@@ -74,7 +74,8 @@ port
   clk_200M          : out    std_logic;
   clk_300M          : out    std_logic;
   clk_400M          : out    std_logic;
-  clk_in           : in     std_logic
+  clk_in1_p         : in     std_logic;
+  clk_in1_n         : in     std_logic
  );
 end component;
 
@@ -89,6 +90,7 @@ your_instance_name : clk_wiz_0
    clk_300M => clk_300M,
    clk_400M => clk_400M,
    -- Clock in ports
-   clk_in => clk_in
+   clk_in1_p => clk_in1_p,
+   clk_in1_n => clk_in1_n
  );
 -- INST_TAG_END ------ End INSTANTIATION Template ------------

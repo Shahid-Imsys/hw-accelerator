@@ -1,14 +1,14 @@
 // Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
-// Date        : Wed Mar 30 15:35:57 2022
+// Date        : Thu Mar 31 13:14:51 2022
 // Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
-// Command     : write_verilog -force -mode funcsim -rename_top clk_wiz_0 -prefix
-//               clk_wiz_0_ clk_wiz_0_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim
+//               /home/markar/checkouts/ImSys/FPGA_syntheis_test/Processors/IM3000E/fpga_synth/gpp/gpp.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.v
 // Design      : clk_wiz_0
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
-// Device      : xcku5p-ffvb676-2-e
+// Device      : xcvu9p-flga2104-2L-e
 // --------------------------------------------------------------------------------
 `timescale 1 ps / 1 ps
 
@@ -17,33 +17,39 @@ module clk_wiz_0
    (clk_200M,
     clk_300M,
     clk_400M,
-    clk_in);
+    clk_in1_p,
+    clk_in1_n);
   output clk_200M;
   output clk_300M;
   output clk_400M;
-  input clk_in;
+  input clk_in1_p;
+  input clk_in1_n;
 
   wire clk_200M;
   wire clk_300M;
   wire clk_400M;
-  (* IBUF_LOW_PWR *) wire clk_in;
+  (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_n;
+  (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_p;
 
-  clk_wiz_0_clk_wiz_0_clk_wiz inst
+  clk_wiz_0_clk_wiz inst
        (.clk_200M(clk_200M),
         .clk_300M(clk_300M),
         .clk_400M(clk_400M),
-        .clk_in(clk_in));
+        .clk_in1_n(clk_in1_n),
+        .clk_in1_p(clk_in1_p));
 endmodule
 
-module clk_wiz_0_clk_wiz_0_clk_wiz
+module clk_wiz_0_clk_wiz
    (clk_200M,
     clk_300M,
     clk_400M,
-    clk_in);
+    clk_in1_p,
+    clk_in1_n);
   output clk_200M;
   output clk_300M;
   output clk_400M;
-  input clk_in;
+  input clk_in1_p;
+  input clk_in1_n;
 
   wire clk_200M;
   wire clk_200M_clk_wiz_0;
@@ -54,8 +60,9 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   wire clk_400M;
   wire clk_400M_clk_wiz_0;
   wire clk_400M_clk_wiz_0_en_clk;
-  wire clk_in;
-  wire clk_in_clk_wiz_0;
+  wire clk_in1_clk_wiz_0;
+  wire clk_in1_n;
+  wire clk_in1_p;
   wire clkfbout_clk_wiz_0;
   wire locked_int;
   (* RTL_KEEP = "true" *) (* async_reg = "true" *) wire [7:0]seq_reg1;
@@ -93,11 +100,13 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   (* CAPACITANCE = "DONT_CARE" *) 
   (* IBUF_DELAY_VALUE = "0" *) 
   (* IFD_DELAY_VALUE = "AUTO" *) 
-  IBUF #(
+  IBUFDS #(
+    .DIFF_TERM("FALSE"),
     .IOSTANDARD("DEFAULT")) 
-    clkin1_ibuf
-       (.I(clk_in),
-        .O(clk_in_clk_wiz_0));
+    clkin1_ibufds
+       (.I(clk_in1_p),
+        .IB(clk_in1_n),
+        .O(clk_in1_clk_wiz_0));
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFGCE #(
     .CE_TYPE("SYNC"),
@@ -225,7 +234,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
         .CLKFBOUT(clkfbout_clk_wiz_0),
         .CLKFBOUTB(NLW_mmcme4_adv_inst_CLKFBOUTB_UNCONNECTED),
         .CLKFBSTOPPED(NLW_mmcme4_adv_inst_CLKFBSTOPPED_UNCONNECTED),
-        .CLKIN1(clk_in_clk_wiz_0),
+        .CLKIN1(clk_in1_clk_wiz_0),
         .CLKIN2(1'b0),
         .CLKINSEL(1'b1),
         .CLKINSTOPPED(NLW_mmcme4_adv_inst_CLKINSTOPPED_UNCONNECTED),

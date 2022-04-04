@@ -63,7 +63,7 @@
 //----------------------------------------------------------------------------
 // Input Clock   Freq (MHz)    Input Jitter (UI)
 //----------------------------------------------------------------------------
-// __primary_____________300____________0.010
+// __primary_________300.000____________0.010
 
 `timescale 1ps/1ps
 
@@ -74,15 +74,17 @@ module clk_wiz_0_clk_wiz
   output        clk_200M,
   output        clk_300M,
   output        clk_400M,
-  input         clk_in
+  input         clk_in1_p,
+  input         clk_in1_n
  );
   // Input buffering
   //------------------------------------
-wire clk_in_clk_wiz_0;
+wire clk_in1_clk_wiz_0;
 wire clk_in2_clk_wiz_0;
-  IBUF clkin1_ibuf
-   (.O (clk_in_clk_wiz_0),
-    .I (clk_in));
+  IBUFDS clkin1_ibufds
+   (.O  (clk_in1_clk_wiz_0),
+    .I  (clk_in1_p),
+    .IB (clk_in1_n));
 
 
 
@@ -177,7 +179,7 @@ wire clk_in2_clk_wiz_0;
     .CLKOUT6             (clkout6_unused),
      // Input clock control
     .CLKFBIN             (clkfbout_clk_wiz_0),
-    .CLKIN1              (clk_in_clk_wiz_0),
+    .CLKIN1              (clk_in1_clk_wiz_0),
     .CLKIN2              (1'b0),
      // Tied to always select the primary input clock
     .CLKINSEL            (1'b1),

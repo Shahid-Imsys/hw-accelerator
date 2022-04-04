@@ -56,7 +56,7 @@ entity fpga_top is
     ENET_MDIO : inout std_logic;
 
     ENET_RST_N : out std_logic;
-    
+
     ENET_TXCLK : in  std_logic;
     ENET_TXCTL : out std_logic;
     ENET_TXD0  : out std_logic;
@@ -78,7 +78,10 @@ entity fpga_top is
 
     TEST_OUTP : out std_logic_vector(15 downto 0);
 
-    LED : out std_logic_vector (7 downto 0)
+    -- VCU118
+    VCU118_Clk300M_p : in  std_logic;
+    VCU118_Clk300M_n : in  std_logic;
+    LED              : out std_logic_vector (7 downto 0)
     );
 end fpga_top;
 
@@ -86,11 +89,13 @@ architecture rtl of fpga_top is
 
   component clk_wiz_0
     port
-      (
-        clk_200M : out std_logic;
-        clk_300M : out std_logic;
-        clk_400M : out std_logic;
-        clk_in   : in  std_logic
+      (                                 -- Clock in ports
+        clk_in1_p : in  std_logic;
+        clk_in1_n : in  std_logic;
+        -- Clock out ports
+        clk_200M  : out std_logic;
+        clk_300M  : out std_logic;
+        clk_400M  : out std_logic
         );
   end component;
 
@@ -218,10 +223,10 @@ architecture rtl of fpga_top is
   signal clk_a      : std_logic;
 
   -- Inputs
-  signal vdd_bmem   : std_logic;
-  signal VCC18LP    : std_logic;
-  signal rxout      : std_logic;
-  signal adc_bits   : std_logic;
+  signal vdd_bmem : std_logic;
+  signal VCC18LP  : std_logic;
+  signal rxout    : std_logic;
+  signal adc_bits : std_logic;
 
   -- Ports
   signal PA : std_logic_vector(7 downto 0);
@@ -235,11 +240,10 @@ architecture rtl of fpga_top is
   signal PI : std_logic_vector(7 downto 0);
   signal PJ : std_logic_vector(7 downto 0);
 
-  signal HCLK           : std_logic;
-  signal clk_200m       : std_logic;
-  signal clk_300m       : std_logic;
-  signal clk_400m       : std_logic;
-  signal VCU118_Clk300M : std_logic;
+  signal HCLK     : std_logic;
+  signal clk_200m : std_logic;
+  signal clk_300m : std_logic;
+  signal clk_400m : std_logic;
 
   signal counter34 : unsigned(33 downto 0) := (others => '0');
 
@@ -258,29 +262,29 @@ begin
   PA0_SIN  <= PA(0);
 
   OE_CTR <= '1';                        -- Low tri-states levelshifter outputs
-  
+
   -- TODO
-  vdd_bmem   <= '0';
-  VCC18LP    <= '0';
-  rxout      <= '0';
-  adc_bits   <= '0';
+  vdd_bmem <= '0';
+  VCC18LP  <= '0';
+  rxout    <= '0';
+  adc_bits <= '0';
   -- URX <= 
   -- UTX <=  
 
-  process(VCU118_Clk300M)
+  LED_cnt_proc : process(HCLK)
   begin
-    if rising_edge(VCU118_Clk300M) then
+    if rising_edge(HCLK) then
       counter34 <= counter34 + 1;
     end if;
   end process;
 
   fpga_pll_inst : clk_wiz_0
     port map (
-
-      clk_200M => clk_200M,
-      clk_300M => clk_300M,
-      clk_400M => clk_400M,
-      clk_in   => VCU118_Clk300M
+      clk_in1_p => VCU118_Clk300M_p,
+      clk_in1_n => VCU118_Clk300M_n,
+      clk_200M  => clk_200M,
+      clk_300M  => clk_300M,
+      clk_400M  => clk_400M
       );
 
   HCLK <= clk_300m;

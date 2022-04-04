@@ -73,7 +73,7 @@ use work.gp_pkg.all;
 
 entity top is
   generic (
-    g_memory_type : memory_type_t := referens
+    g_memory_type : memory_type_t := asic
     );
   port (
     -- clocks and control signals
@@ -149,38 +149,14 @@ entity top is
     PJ : inout std_logic_vector(7 downto 0);  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0)
 
     -- OSPI interface
-    OSPI_Out   : out   OSPI_InterfaceOut_t;
-    OSPI_DQ    : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS  : inout std_logic
+    OSPI_Out  : out   OSPI_InterfaceOut_t;
+    OSPI_DQ   : inout std_logic_vector(7 downto 0);
+    OSPI_RWDS : inout std_logic
     );
 -- MPG RAM signals
 end top;
 
 architecture struct of top is
- --PLL
-  component FXPLL031HA0A_APGD
-    port (
-      CKOUT  : out std_logic;           -- PLL output to clock buffer
-      TCKO   : out std_logic;
-      CIN    : in  std_logic;           -- Feedback from clock buffer output
-      FREF   : in  std_logic;           -- Reference clock input
-      TEST   : in  std_logic;
-      FRANGE : in  std_logic;
-      PDN    : in  std_logic;           -- Power down PLL
-      TCKI   : in  std_logic;
-      NS0    : in  std_logic;           -- Frequency multiplier
-      NS1    : in  std_logic;
-      NS2    : in  std_logic;
-      NS3    : in  std_logic;
-      NS4    : in  std_logic;
-      NS5    : in  std_logic;
-      MS0    : in  std_logic;           -- Frequency divider
-      MS1    : in  std_logic;
-      MS2    : in  std_logic;
-      MS3    : in  std_logic;
-      MS4    : in  std_logic;
-      MS5    : in  std_logic);
-  end component;
 
   -- trcmem
   component SY180_256X32X1CM4
@@ -593,7 +569,7 @@ architecture struct of top is
 
   component mpram_memory is
     generic (
-      g_file_name : string := "mpram0.data";
+      g_file_name   : string        := "mpram0.data";
       g_memory_type : memory_type_t := referens);
     port (
       address : in  std_logic_vector(10 downto 0);
@@ -628,8 +604,8 @@ architecture struct of top is
     generic (
       g_memory_type : memory_type_t := referens);
     port (
-      address : in std_logic_vector(13 downto 0);
-      ram_di  : in std_logic_vector(7 downto 0);
+      address : in  std_logic_vector(13 downto 0);
+      ram_di  : in  std_logic_vector(7 downto 0);
       ram_do  : out std_logic_vector(7 downto 0);
       we_n    : in  std_logic;
       clk     : in  std_logic;
@@ -640,8 +616,8 @@ architecture struct of top is
     generic (
       g_memory_type : memory_type_t := referens);
     port (
-      address : in std_logic_vector(9 downto 0);
-      ram_di  : in std_logic_vector(7 downto 0);
+      address : in  std_logic_vector(9 downto 0);
+      ram_di  : in  std_logic_vector(7 downto 0);
       ram_do  : out std_logic_vector(7 downto 0);
       we_n    : in  std_logic;
       clk     : in  std_logic;
@@ -1078,10 +1054,10 @@ architecture struct of top is
   signal mp_RAM1_CS  : std_logic;
 
   signal f_addr_in  : std_logic_vector(16 downto 0);
-  signal f_rd_in    : std_logic;        -- low active
-  signal f_wr_in    : std_logic;        -- low active
-  signal f_data_in  : std_logic_vector(7 downto 0);  -- Data in from processor
-  signal f_data_out : std_logic_vector(7 downto 0);  -- Data out to processor
+  signal f_rd_in    : std_logic;                      -- low active
+  signal f_wr_in    : std_logic;                      -- low active
+  signal f_data_in  : std_logic_vector(7 downto 0);   -- Data in from processor
+  signal f_data_out : std_logic_vector(7 downto 0);   -- Data out to processor
   signal f_CE       : std_logic;
   signal f_ADDR     : std_logic_vector(12 downto 0);
   signal f_WRONLY   : std_logic;
@@ -1225,7 +1201,7 @@ begin
       sd_cke    => dcke_o,
       --to other module
 
-      hclk_i   => hclk_i,
+      hclk_i   => open,
       mreset_i => mreset_i,
       mtest_i  => mtest_i,
       mirq0_i  => mirq0_i,
@@ -1321,28 +1297,9 @@ begin
   -----------------------------------------------------------------------------
   -- PLL
   -----------------------------------------------------------------------------
-  pll0 : FXPLL031HA0A_APGD
-    port map (
-      FREF   => hclk_i,
-      FRANGE => pll_frange,
-      NS0    => pll_n(0),
-      NS1    => pll_n(1),
-      NS2    => pll_n(2),
-      NS3    => pll_n(3),
-      NS4    => pll_n(4),
-      NS5    => pll_n(5),
-      MS0    => pll_m(0),
-      MS1    => pll_m(1),
-      MS2    => pll_m(2),
-      MS3    => const_0,
-      MS4    => const_0,
-      MS5    => const_0,
-      PDN    => pll_pdn,
-      TCKO   => tcko,
-      TEST   => test_pll,
-      TCKI   => hclk_i,
-      CKOUT  => pllout,
-      CIN    => pllout);
+
+  --pllout <= hclk_i;
+  tcko    <= '0';
   pll_pdn <= en_pll or (not xout_selected);  --pll can only be reset when pll is not selected (xout is selected)
   const_0 <= '0';
 
@@ -1553,62 +1510,62 @@ begin
       OE   => mp_ROM1_OE
       );
 
-    mpram00 : mpram_memory
-      generic map (
-        g_file_name => "mpram0.data",
-        g_memory_type => g_memory_type
-        )
-      port map (
-        address => mp_RAM0_A(10 downto 0),
-        ram_di  => mp_RAM0_DI,
-        ram_do  => mp_RAM0_DO,
-        we_n    => mp_RAM0_WEB,
-        clk     => clk_p,
-        cs      => mp_RAM0_CS
-        );
+  mpram00 : mpram_memory
+    generic map (
+      g_file_name   => "mpram0.data",
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => mp_RAM0_A(10 downto 0),
+      ram_di  => mp_RAM0_DI,
+      ram_do  => mp_RAM0_DO,
+      we_n    => mp_RAM0_WEB,
+      clk     => clk_p,
+      cs      => mp_RAM0_CS
+      );
 
-    mpram11 : mpram_memory
-      generic map (
-        g_file_name => "mpram1.data",
-        g_memory_type => g_memory_type
-        )
-      port map (
-        address => mp_RAM1_A(10 downto 0),
-        ram_di  => mp_RAM1_DI,
-        ram_do  => mp_RAM1_DO,
-        we_n    => mp_RAM1_WEB,
-        clk     => clk_p,
-        cs      => mp_RAM1_CS
-        );
+  mpram11 : mpram_memory
+    generic map (
+      g_file_name   => "mpram1.data",
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => mp_RAM1_A(10 downto 0),
+      ram_di  => mp_RAM1_DI,
+      ram_do  => mp_RAM1_DO,
+      we_n    => mp_RAM1_WEB,
+      clk     => clk_p,
+      cs      => mp_RAM1_CS
+      );
 
 --  -- iomem0, iomem1
-    --  iomem0
-  iomem0: memory_1024x8
-      generic map (
-         g_memory_type => g_memory_type
-        )
-      port map (
-        address => iomem_a,
-        ram_di  => iomem_d(7 downto 0),
-        ram_do  => iomem_q(7 downto 0),
-        we_n    => iomem_we_n,
-        clk     => clk_p,
-        cs      => iomem_ce_n(0)
-        );
+  --  iomem0
+  iomem0 : memory_1024x8
+    generic map (
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => iomem_a,
+      ram_di  => iomem_d(7 downto 0),
+      ram_do  => iomem_q(7 downto 0),
+      we_n    => iomem_we_n,
+      clk     => clk_p,
+      cs      => iomem_ce_n(0)
+      );
 
   --   iomem1:
-  iomem1: memory_1024x8
-      generic map (
-         g_memory_type => g_memory_type
-        )
-      port map (
-        address => iomem_a,
-        ram_di  => iomem_d(15 downto 8),
-        ram_do  => iomem_q(15 downto 8),
-        we_n    => iomem_we_n,
-        clk     => clk_p,
-        cs      => iomem_ce_n(1)
-        );
+  iomem1 : memory_1024x8
+    generic map (
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => iomem_a,
+      ram_di  => iomem_d(15 downto 8),
+      ram_do  => iomem_q(15 downto 8),
+      we_n    => iomem_we_n,
+      clk     => clk_p,
+      cs      => iomem_ce_n(1)
+      );
 
 --  -- pmem
   --    mppmem
@@ -1768,11 +1725,11 @@ begin
     port map (
       --rst_n      => rst_n,
       rst_cn       => rst_cn,
-      --pllout     => pllout,
+      --pllout     => HCLK,
 --      pllout     => tcko,   -- added by HYX, 20141115, for pll test
       --xout       => hclk_i, -- 16.7mhz clk
 --      clk_mux_out => clk_mux_out,
-      clk_mux_out  => pllout,
+      clk_mux_out  => HCLK,
       erxclk       => erxclk,
       etxclk       => etxclk,
 --      en_eth     => en_eth,
@@ -1820,8 +1777,8 @@ begin
     generic map (
       g_memory_type => g_memory_type)
     port map(
-      xout          => hclk_i,
-      pllout        => pllout,
+      xout          => HCLK,
+      pllout        => HCLK,
       sel_pll       => sel_pll,
       xout_selected => xout_selected,
       lp_pwr_ok     => lp_pwr_ok,
@@ -1830,7 +1787,7 @@ begin
       rst_rtc       => rst_rtc,         -- Reset RTC counter byte
       en_fclk       => en_fclk,   -- Enable fast clocking of RTC counter byte
       fclk          => fclk,            -- Fast clock to RTC counter byte
-      ld_bmem       => ld_bmem,   -- Latch enable to the dis_bmem latch
+      ld_bmem       => ld_bmem,         -- Latch enable to the dis_bmem latch
       rtc_sel       => rtc_sel,         -- RTC byte select
       rtc_data      => rtc_data,        -- RTC data
       dis_bmem      => dis_bmem_int,
@@ -1885,19 +1842,19 @@ begin
   core1 : entity work.core
     port map(
       -- Clocks to/from clock block
-      clk_p        => clk_p,  --: in  std_logic;  -- PLL clock
-      clk_c_en     => clk_c_en,  --: in  std_logic;  -- CP clock
+      clk_p        => clk_p,            --: in  std_logic;  -- PLL clock
+      clk_c_en     => clk_c_en,         --: in  std_logic;  -- CP clock
       even_c       => even_c,
       --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2
-      clk_e_pos    => clk_e_pos,  --: out  std_logic;  -- Execution clock
-      clk_e_neg    => clk_e_neg,  --: out  std_logic;  -- Execution clock
-      clk_i_pos    => clk_i_pos,  --: in  std_logic;  -- I/O clock
-      clk_d_pos    => clk_d_pos,  --: in  std_logic;  -- DRAM clock
-      clk_s_pos    => clk_s_pos,  --: in  std_logic;  -- SP clock
+      clk_e_pos    => clk_e_pos,        --: out  std_logic;  -- Execution clock
+      clk_e_neg    => clk_e_neg,        --: out  std_logic;  -- Execution clock
+      clk_i_pos    => clk_i_pos,        --: in  std_logic;  -- I/O clock
+      clk_d_pos    => clk_d_pos,        --: in  std_logic;  -- DRAM clock
+      clk_s_pos    => clk_s_pos,        --: in  std_logic;  -- SP clock
       -- Control outputs to the clock block
       rst_n        => rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
       rst_cn       => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-      en_d         => en_d,  --: out std_logic;  -- Enable clk_d
+      en_d         => en_d,             --: out std_logic;  -- Enable clk_d
       fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select
       --din_e       => din_e,   --: out std_logic;  -- D input to FF generating clk_e
       din_i        => din_i,  --: out std_logic;  -- D input to FF generating clk_i
@@ -1917,11 +1874,11 @@ begin
       pll_frange   => pll_frange,  --: out std_logic;  -- Frequency range select
       pll_n        => pll_n,  --: out std_logic_vector(5 downto 0);   -- Multiplier
       pll_m        => pll_m,  --: out std_logic_vector(2 downto 0);   -- Divider
-      en_xosc      => en_xosc,  --: out std_logic;  -- Enable XOSC
-      en_pll       => en_pll,  --: out std_logic;  -- Enable PLL
+      en_xosc      => en_xosc,          --: out std_logic;  -- Enable XOSC
+      en_pll       => en_pll,           --: out std_logic;  -- Enable PLL
       sel_pll      => sel_pll,  --: out std_logic;  -- Select PLL as clock source
-      test_pll     => test_pll,  --: out std_logic;  -- PLL in test mode
-      xout         => hclk_i,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
+      test_pll     => test_pll,         --: out std_logic;  -- PLL in test mode
+      xout         => HCLK,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
       -- Power on signal
       pwr_ok       => pwr_ok,  --pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
       ---------------------------------------------------------------------
@@ -1943,8 +1900,8 @@ begin
       gmem_a       => c1_gmem_a,        --: out std_logic_vector(9 downto 0);
       gmem_d       => c1_gmem_d,        --: out std_logic_vector(7 downto 0);
       gmem_q       => c1_gmem_q,        --: in  std_logic_vector(7 downto 0);
-      gmem_ce_n    => c1_gmem_ce_n,  --: out std_logic;
-      gmem_we_n    => c1_gmem_we_n,  --: out std_logic;
+      gmem_ce_n    => c1_gmem_ce_n,     --: out std_logic;
+      gmem_we_n    => c1_gmem_we_n,     --: out std_logic;
       -- IOMEM signals
       iomem_a      => iomem_a,          --: out std_logic_vector(9 downto 0);
       iomem_d      => iomem_d,          --: out std_logic_vector(15 downto 0);
@@ -2016,10 +1973,10 @@ begin
       pd              => pd_s,  --: out std_logic_vector(2 downto 0);  -- pl_pd
       aaddr           => aaddr,  --: out std_logic_vector(4 downto 0);  -- pl_aaddr
       idreq           => idreq,         --: in  std_logic_vector(7 downto 0);
-      idi             => idi,    --: in  std_logic_vector(7 downto 0);
-      idack           => idack,  --: out std_logic_vector(7 downto 0);
+      idi             => idi,           --: in  std_logic_vector(7 downto 0);
+      idack           => idack,         --: out std_logic_vector(7 downto 0);
       ios_iden        => ios_iden,      --: out std_logic;
-      ios_ido         => ios_ido,  --: out std_logic_vector(7 downto 0);
+      ios_ido         => ios_ido,       --: out std_logic_vector(7 downto 0);
       ilioa           => ilioa,         --: out std_logic;
       ildout          => ildout,        --: out std_logic;
       inext           => inext,         --: out std_logic;
@@ -2034,7 +1991,7 @@ begin
       run_tiu         => run_tiu,       --: out std_logic;
       en_tstamp       => en_tstamp,     --: out std_logic_vector(1 downto 0);
       en_iobus        => en_iobus,      --: out std_logic_vector(1 downto 0);
-      ddqm            => ddqm,   --: out std_logic_vector(7  downto 0);
+      ddqm            => ddqm,          --: out std_logic_vector(7  downto 0);
       irq0            => irq0,  --: in  std_logic;  -- Interrupt request 0
       irq1            => irq1,  --: in  std_logic;  -- Interrupt request 1
       adc_ref2v       => adc_ref2v,  --: out  std_logic;      -- Select 2V internal ADC reference (1V)
@@ -2048,20 +2005,20 @@ begin
       mckout1_o       => mckout1_o,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_o_en,
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug)
-      msdout_o        => msdout_o,  --: out std_logic;  -- Serial data out
-      mrstout_o       => mrstout_o,  --: out std_logic;  -- Reset out
+      msdout_o        => msdout_o,      --: out std_logic;  -- Serial data out
+      mrstout_o       => mrstout_o,     --: out std_logic;  -- Reset out
       mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
-      mtest_i         => mtest_i,  --: in  std_logic;  -- Test mode---
-      mbypass_i       => mbypass_i,  --: in  std_logic;  -- bypass PLL
-      mwake_i         => '0',  --: in  std_logic;  -- wake up
+      mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---
+      mbypass_i       => mbypass_i,     --: in  std_logic;  -- bypass PLL
+      mwake_i         => '0',           --: in  std_logic;  -- wake up
       -- DRAM signals
       en_pmem2        => en_pmem2,
       d_addr          => c1_d_addr,     --to internal sram block
-      dcs_o           => c1_d_cs,  --: out std_logic;  -- Chip select
+      dcs_o           => c1_d_cs,       --: out std_logic;  -- Chip select
       dras_o          => c1_d_ras,  --: out std_logic;  -- Row address strobe
       dcas_o          => c1_d_cas,  --: out std_logic;  -- Column address strobe
-      dwe_o           => c1_d_we,  --: out std_logic;  -- Write enable
+      dwe_o           => c1_d_we,       --: out std_logic;  -- Write enable
       ddq_i           => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus
       ddq_o           => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus
       ddq_en          => ddq_en,  --: out std_logic;  -- Data output bus enable
@@ -2240,7 +2197,7 @@ begin
       ROM0_CS  => mp_ROM0_CS,           -- out std_logic;
       ROM0_OE  => mp_ROM0_OE,           -- out std_logic;
       --ROM1
-      ROM1_DO  => mp_ROM1_DO,   --: in  std_logic_vector (79 downto 0);
+      ROM1_DO  => mp_ROM1_DO,           --: in  std_logic_vector (79 downto 0);
       ROM1_A   => mp_ROM1_A,            --: out std_logic_vector (13 downto 0);
       ROM1_CS  => mp_ROM1_CS,           --: out std_logic;
       ROM1_OE  => mp_ROM1_OE,           --: out std_logic;
@@ -2403,93 +2360,93 @@ begin
   -- Peripherals
   -----------------------------------------------------------------------------
 
-    peri01 : entity work.peri
-      port map(
-        clk_p      => clk_p,
-        clk_c_en   => clk_c_en,
-        clk_e_pos  => clk_e_pos,
-        clk_e_neg  => clk_e_neg,
-        clk_i      => clk_i,
-        clk_i_pos  => clk_i_pos,
-        clk_u_pos  => clk_u_pos,
-        clk_rx     => clk_rx,
-        clk_tx     => clk_tx,
-        clk_a_pos  => clk_a_pos,
-        erxclk     => erxclk,
-        etxclk     => etxclk,
-        din_a      => din_a,
-        dbus       => dbus,
-        dfp        => dfp,
-        rst_en     => rst_en,
-        --rst_en2     => rst_en2,
-        pl_pd      => pd_s,
-        pl_aaddr   => aaddr,
-        idack      => idack,
-        ios_iden   => ios_iden,
-        ios_ido    => ios_ido,
-        ilioa      => ilioa,
-        ildout     => ildout,
-        inext      => inext,
-        iden       => iden,
-        --dqm_size      => dqm_size,
-        en_uart1   => en_uart1,
-        en_uart2   => en_uart2,
-        en_uart3   => en_uart3,
-        en_eth     => en_eth,
-        en_tiu     => en_tiu,
-        run_tiu    => run_tiu,
-        en_iobus   => en_iobus,
-        --ddqm          => ddqm,
-        idreq      => idreq,
-        idi        => idi,
-        irq0       => irq0,
-        irq1       => irq1,
-        tstamp     => tstamp,
-        tiu_tstamp => tiu_tstamp,
-        ach_sel    => ach_sel,
-        --adc_bits      => '0',--adc_bits,
-        adc_bits   => adc_bits_int,     -- modified by HYX, 20141205
-        adc_extref => adc_extref,
-        adc_diff   => adc_diff,
-        adc_en     => adc_en,
-        dac_bits   => dac_bits,
-        dac_en     => dac_en,
-        mirq0_i    => mirq0_i,
-        mirq1_i    => mirq1_i,
-        pa_i       => pa_i,
-        pa_en      => pa_en,
-        pa_o       => pa_o,
-        pb_i       => pb_i,
-        pb_en      => pb_en,
-        pb_o       => pb_o,
-        pc_i       => pc_i,
-        pc_en      => pc_en,
-        pc_o       => pc_o,
-        pd_i       => pd_i,
-        pd_en      => pd_en,
-        pd_o       => pd_o,
-        pe_i       => pe_i,
-        pe_en      => pe_en,
-        pe_o       => pe_o,
-        pf_i       => pf_i,
-        pf_en      => pf_en,
-        pf_o       => pf_o,
-        pg_i       => pg_i,
-        pg_en      => pg_en,
-        pg_o       => pg_o,
-        ph_i       => ph_i,
-        ph_en      => ph_en,
-        ph_o       => ph_o,
-        pi_i       => pi_i,
-        pi_en      => pi_en,
-        pi_o       => pi_o,
-        pj_i       => pj_i,
-        pj_en      => pj_en,
-        pj_o       => pj_o,
-        OSPI_Out   => OSPI_Out,
-        OSPI_DQ    => OSPI_DQ,
-        OSPI_RWDS  => OSPI_RWDS
-        );
+  peri01 : entity work.peri
+    port map(
+      clk_p      => clk_p,
+      clk_c_en   => clk_c_en,
+      clk_e_pos  => clk_e_pos,
+      clk_e_neg  => clk_e_neg,
+      clk_i      => clk_i,
+      clk_i_pos  => clk_i_pos,
+      clk_u_pos  => clk_u_pos,
+      clk_rx     => clk_rx,
+      clk_tx     => clk_tx,
+      clk_a_pos  => clk_a_pos,
+      erxclk     => erxclk,
+      etxclk     => etxclk,
+      din_a      => din_a,
+      dbus       => dbus,
+      dfp        => dfp,
+      rst_en     => rst_en,
+      --rst_en2     => rst_en2,
+      pl_pd      => pd_s,
+      pl_aaddr   => aaddr,
+      idack      => idack,
+      ios_iden   => ios_iden,
+      ios_ido    => ios_ido,
+      ilioa      => ilioa,
+      ildout     => ildout,
+      inext      => inext,
+      iden       => iden,
+      --dqm_size      => dqm_size,
+      en_uart1   => en_uart1,
+      en_uart2   => en_uart2,
+      en_uart3   => en_uart3,
+      en_eth     => en_eth,
+      en_tiu     => en_tiu,
+      run_tiu    => run_tiu,
+      en_iobus   => en_iobus,
+      --ddqm          => ddqm,
+      idreq      => idreq,
+      idi        => idi,
+      irq0       => irq0,
+      irq1       => irq1,
+      tstamp     => tstamp,
+      tiu_tstamp => tiu_tstamp,
+      ach_sel    => ach_sel,
+      --adc_bits      => '0',--adc_bits,
+      adc_bits   => adc_bits_int,       -- modified by HYX, 20141205
+      adc_extref => adc_extref,
+      adc_diff   => adc_diff,
+      adc_en     => adc_en,
+      dac_bits   => dac_bits,
+      dac_en     => dac_en,
+      mirq0_i    => mirq0_i,
+      mirq1_i    => mirq1_i,
+      pa_i       => pa_i,
+      pa_en      => pa_en,
+      pa_o       => pa_o,
+      pb_i       => pb_i,
+      pb_en      => pb_en,
+      pb_o       => pb_o,
+      pc_i       => pc_i,
+      pc_en      => pc_en,
+      pc_o       => pc_o,
+      pd_i       => pd_i,
+      pd_en      => pd_en,
+      pd_o       => pd_o,
+      pe_i       => pe_i,
+      pe_en      => pe_en,
+      pe_o       => pe_o,
+      pf_i       => pf_i,
+      pf_en      => pf_en,
+      pf_o       => pf_o,
+      pg_i       => pg_i,
+      pg_en      => pg_en,
+      pg_o       => pg_o,
+      ph_i       => ph_i,
+      ph_en      => ph_en,
+      ph_o       => ph_o,
+      pi_i       => pi_i,
+      pi_en      => pi_en,
+      pi_o       => pi_o,
+      pj_i       => pj_i,
+      pj_en      => pj_en,
+      pj_o       => pj_o,
+      OSPI_Out   => OSPI_Out,
+      OSPI_DQ    => OSPI_DQ,
+      OSPI_RWDS  => OSPI_RWDS
+      );
 
   g_fpga_peri : if g_memory_type = fpga generate
     erxclk <= '0';

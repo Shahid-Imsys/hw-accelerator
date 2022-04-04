@@ -135,8 +135,8 @@ begin
 	-- Register RAM with 32 x 8 bits words, adressed by AADDR and BADDR
 	-- fields.
 ----------------------------------------------------------------------
-	pl_sig15 <= pl(89)&pl(23)&pl(6)&pl(54)&pl(27)&pl(49); --Added one more bit --CJ
-	pl_sig16 <= pl(90)&pl(70)&pl(67)&pl(33)&pl(69)&pl(53); --Added one more bit --CJ
+	pl_sig15 <= pl(90)&pl(23)&pl(6)&pl(54)&pl(27)&pl(49); --Added one more bit --CJ
+	pl_sig16 <= pl(89)&pl(70)&pl(67)&pl(33)&pl(69)&pl(53); --Added one more bit --CJ
     ram64x81 : entity work.ram64x8(register_based)
 		port map (
 		    clk_p           => clk_p,

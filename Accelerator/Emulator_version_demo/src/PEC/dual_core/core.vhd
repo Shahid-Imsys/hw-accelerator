@@ -498,6 +498,7 @@ begin
   ack <= ACK_C1; 
   init_ld <= pl(100) and pl(106) and not pl(98) and not pl(97);
   --ld_mpgm <= pl(100) and pl(98);
+  dfm_rdy <= ddi_vld;
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
       if rising_edge(clk_p) then

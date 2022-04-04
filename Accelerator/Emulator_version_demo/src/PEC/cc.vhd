@@ -847,10 +847,10 @@ EVEN_P <= even_p_2;
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
- 				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
+ 				req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
-            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000000" then
+            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
@@ -907,12 +907,12 @@ EVEN_P <= even_p_2;
 			        	end if;
 			        end if;
                 elsif req_bexe = '1' then  --Reset broadcast signals
-                    if len_ctr_p = "000000000" then
+                    if len_ctr_p = "000000001" then
                         req_bexe <= '0';
 			    		cb_status <= '0';
                     end if;
                 elsif req_exe = '1' then --Reset unicast signals
-			    	if len_ctr_p = "000000000" then
+			    	if len_ctr_p = "000000001" then
                         req_exe <= '0';
 			    	end if;
     
@@ -954,10 +954,11 @@ EVEN_P <= even_p_2;
             	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
             	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
             	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2)); 
+							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
 							if write_count = "11" then
 								pe_write <= '1';
-								len_ctr_p <= (others => '0');
+								--len_ctr_p <= (others => '0');
 							else
 								pe_write <= '0';
 							end if;

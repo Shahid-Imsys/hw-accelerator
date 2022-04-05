@@ -882,7 +882,7 @@ EVEN_P <= even_p_2;
 			        if pe_req_type = "01" then
 			        	if cb_status = '0' then
 			        		cb_status <= '1';
-			        		b_cast_ctr <= req_last;
+			        		b_cast_ctr <= "000111";--req_last;
 			        	elsif cb_status = '1' then
 			        		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
 			        			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case

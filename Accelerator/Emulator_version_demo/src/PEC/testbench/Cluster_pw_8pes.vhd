@@ -357,7 +357,7 @@ end sendmemword;
 
 procedure readmemword (signal outword : out out_word) is
 begin
-  for i in 0 to 2591 loop
+  for i in 0 to 2303 loop
   outword(i) <= data_out;
   wait until rising_edge(clk_e_i);
 wait for 5ns;
@@ -550,55 +550,55 @@ progress <= 8;
 
 
 --Start testing on PE side(simulated data input)
---wait for 280000 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---sendNOCcommand(Exe);
---tag_in <= '0';
---progress <= 8;
-wait for 280000 ns;
+wait for 400000 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+sendNOCcommand(Exe);
+tag_in <= '0';
+progress <= 8;
+wait for 400000 ns;
 --wait until rising_edge(C_RDY);
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---sendNOCcommand(READ);
---send15bits(pw_out_len);
---send15bits(pw_out_a);
---tag_in <= '0';
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---wait until rising_edge(clk_e_i);
---wait for 5 ns;
---progress <= 2303; 
---  readmemword(outword);
---  for i in 0 to 143 loop
---    out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
---                  outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
---                  outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
---                  outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
---  end loop;
---
---  progress <=5;
---  wait until tag_fb = '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+sendNOCcommand(READ);
+send15bits(pw_out_len);
+send15bits(pw_out_a);
+tag_in <= '0';
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+wait until rising_edge(clk_e_i);
+wait for 5 ns;
+progress <= 2303; 
+  readmemword(outword);
+  for i in 0 to 143 loop
+    out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
+                  outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
+                  outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
+                  outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
+  end loop;
+
+  progress <=5;
+  wait until tag_fb = '0';
 
 
 

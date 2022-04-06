@@ -10,7 +10,7 @@ elab:
 	xelab --debug typical c_tb
 
 sim:
-	$(SIM) $(SIM_FLAGS) work.c_tb
+	$(SIM) $(SIM_FLAGS) work.c_tb --autoloadwcfg
 work:
 	$(CREATE_WORK)
 

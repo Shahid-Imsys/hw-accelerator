@@ -76,7 +76,6 @@ architecture rtl of cmdr is
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     prog_full : OUT STD_LOGIC;
     wr_rst_busy : OUT STD_LOGIC;
     rd_rst_busy : OUT STD_LOGIC
@@ -117,7 +116,6 @@ architecture rtl of cmdr is
     signal req         : std_logic := '0';
     signal rd_trig     : std_logic;
     signal srst        : std_logic;
-    signal fifo_d_cnt  : std_logic_vector(3 downto 0);
     signal push_cnt    : integer;
     attribute keep : string;
     attribute keep of mp_data_int : signal is "true";
@@ -403,7 +401,6 @@ begin
     dout => DOUT,
     full => open,
     empty => empty,
-    data_count => fifo_d_cnt,
     prog_full => fifo_full, --asserts when 5 words inside
     wr_rst_busy => open,
     rd_rst_busy => open

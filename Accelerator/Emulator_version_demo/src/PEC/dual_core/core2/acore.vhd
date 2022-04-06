@@ -774,7 +774,7 @@ begin
       VE_PUSH_DTM => ve_push_dtm_int,
       VE_AUTO_SEND => ve_auto_send_int,
       VE_OUT_D    => ve_out_d_int,
-      VE_OUT_DTM => ve_out_dtm_int
+      VE_OUT_DTM  => ve_out_dtm_int
       );
 ---------------------------------------------------------------------
 -- CMDR
@@ -798,6 +798,7 @@ begin
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
+        DTM_FIFO_RDY => dtm_fifo_rdy,
         VE_DTMO  =>ve_out_dtm_int,
         VE_DTM_RDY => ve_dtm_rdy_int,
         VE_PUSH_DTM => ve_push_dtm_int,

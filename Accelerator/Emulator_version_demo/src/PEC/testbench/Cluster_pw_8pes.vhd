@@ -159,7 +159,7 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_pw  : ram_type := init_ram_from_file("test_mp.ascii");
+signal ucode_pw  : ram_type := init_ram_from_file("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
 signal data_pw   : data_in := init_input_from_file("test_in.ascii");
 signal kernel_pw : kernels_in := init_kernel_from_file("test_k.ascii");
 signal bias_pw   : bias_in := init_bias_from_file("test_bias.ascii");
@@ -544,6 +544,7 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
+--first exe
 sendNOCcommand(Exe);
 tag_in <= '0';
 progress <= 8;
@@ -559,9 +560,10 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
-sendNOCcommand(Exe);
-tag_in <= '0';
-progress <= 8;
+--second exe
+--sendNOCcommand(Exe);
+--tag_in <= '0';
+--progress <= 8;
 wait for 400000 ns;
 --wait until rising_edge(C_RDY);
 wait until rising_edge(clk_e_i);
@@ -574,6 +576,7 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
+--read out result
 sendNOCcommand(READ);
 send15bits(pw_out_len);
 send15bits(pw_out_a);

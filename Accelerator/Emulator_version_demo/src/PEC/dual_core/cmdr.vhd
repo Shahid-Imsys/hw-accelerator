@@ -128,17 +128,19 @@ begin
 --*******************************************************************
     pl_dfm_byte  <= PL(112 downto 109);
     pl_dbus_s    <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44);
-    process(clk_p)
+    process(RST_EN, pl_dbus_s, DATA_VLD)
     begin 
-        if rising_edge(clk_p) then
+        --if rising_edge(clk_p) then
             if RST_EN = '0' then
                 ddfm_trig <= '0';
             elsif pl_dbus_s = "10001" then
                 ddfm_trig <= '1';
             elsif DATA_VLD = '1' then
                 ddfm_trig <= '0';
+            else
+                ddfm_trig <= '0';
             end if;
-        end if;
+        --end if;
     end process;
 
     process(CLK_E_NEG, DIN, DATA_VLD, RST_EN)
@@ -147,7 +149,7 @@ begin
             ve_data_int <= (others => '0');
         else
             if DATA_VLD = '1' then
-                if CLK_E_NEG = '1' then
+                if CLK_E_NEG = '0' then
                     ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
                 else
                     ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
@@ -166,16 +168,18 @@ begin
                 mp_data_int <= (others => '0');
                 dbus_reg <= (others => '0');
             elsif DATA_VLD = '1' then 
-                mp_data_int <= DIN;           --input to microprogram data
-                if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
-                    dbus_reg <= DIN;
-                end if;
+                mp_data_int <= DIN; 
+                dbus_reg <= DIN;          --input to microprogram data
+                --if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
+                    
+                --end if;
             end if;
             VE_DIN <= ve_data_int;
         end if;
     end process;
 
-    dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
+    dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte)))) when ddfm_trig = '1'
+                else (others => '0');
     MPGMM_IN <= mp_data_int;
     DBUS_DATA <= dbus_int;
 
@@ -204,7 +208,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq_single;
+            dtm_reg <= init_mpgm_rq;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
@@ -272,7 +276,11 @@ begin
                         if dtm_reg (31 downto 30) = "11" then
                             cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
                             if fifo_rd_en = '1' then
-                                transfer_cnt <= transfer_cnt -1;
+                                if transfer_cnt /= (transfer_cnt'range => '0') then
+                                    transfer_cnt <= transfer_cnt -1;
+                                else 
+                                    transfer_cnt <= cnt_reg;
+                                end if;
                             end if;
                         end if;
                     elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
@@ -376,8 +384,14 @@ begin
     REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
     srst <= not rst_en;
-
-    DTM_FIFO_RDY <= fifo_full;
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            --if clk_e_neg = '1' then
+                DTM_FIFO_RDY <= fifo_full;
+            --end if;
+        end if;
+    end process;
 
     req_fifo : fifo_generator_0
     PORT MAP (

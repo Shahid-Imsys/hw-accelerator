@@ -3,6 +3,9 @@ onerror {quit -f}
 
 vsim -lib xil_defaultlib dist_mem_gen_0_opt
 
+set NumericStdNoWarnings 1
+set StdArithNoWarnings 1
+
 do {wave.do}
 
 view wave

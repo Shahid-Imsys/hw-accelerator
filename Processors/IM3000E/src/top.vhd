@@ -79,6 +79,7 @@ entity top is
     -- clocks and control signals
     HCLK    : in  std_logic;            -- clk input
     MRESET  : in  std_logic;  -- system reset               low active
+    MRSTOUT : out std_logic;            -- Reset output
     MIRQOUT : out std_logic;            -- interrupt request output
     MCKOUT0 : out std_logic;            --for trace adapter
     MCKOUT1 : out std_logic;            --programable clock out
@@ -2361,6 +2362,8 @@ begin
   -----------------------------------------------------------------------------
 
   peri01 : entity work.peri
+    generic map (
+      g_build_type => g_memory_type)
     port map(
       clk_p      => clk_p,
       clk_c_en   => clk_c_en,
@@ -2448,26 +2451,26 @@ begin
       OSPI_RWDS  => OSPI_RWDS
       );
 
-  g_fpga_peri : if g_memory_type = fpga generate
-    erxclk <= '0';
-    etxclk <= '0';
-    din_a  <= '0';
-    dfp    <= "00000000";
-    iden   <= '0';
-    idreq  <= "11111111";
-    idi    <= "00000000";
-    irq0   <= '1';
-    irq1   <= '1';
-    pa_en  <= "00000000";
-    pb_en  <= "00000000";
-    pc_en  <= "00000000";
-    pd_en  <= "00000000";
-    pe_en  <= "00000000";
-    pf_en  <= "00000000";
-    pg_en  <= "00000000";
-    ph_en  <= "00000000";
-    pi_en  <= "00000000";
-    pj_en  <= "00000000";
-  end generate g_fpga_peri;
+--  g_fpga_peri : if g_memory_type = fpga generate
+--    erxclk <= '0';
+--    etxclk <= '0';
+--    din_a  <= '0';
+--    dfp    <= "00000000";
+--    iden   <= '0';
+--    idreq  <= "11111111";
+--    idi    <= "00000000";
+--    irq0   <= '1';
+--    irq1   <= '1';
+--    pa_en  <= "00000000";
+--    pb_en  <= "00000000";
+--    pc_en  <= "00000000";
+--    pd_en  <= "00000000";
+--    pe_en  <= "00000000";
+--    pf_en  <= "00000000";
+--    pg_en  <= "00000000";
+--    ph_en  <= "00000000";
+--    pi_en  <= "00000000";
+--    pj_en  <= "00000000";
+--  end generate g_fpga_peri;
 
 end;

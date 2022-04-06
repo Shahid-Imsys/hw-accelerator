@@ -52,10 +52,10 @@ entity fpga_top is
     UTX    : inout std_logic;
     OE_CTR : out   std_logic;
 
+    ENET_RST_N : out std_logic;
+
     ENET_MDC  : out   std_logic;
     ENET_MDIO : inout std_logic;
-
-    ENET_RST_N : out std_logic;
 
     ENET_TXCLK : in  std_logic;
     ENET_TXCTL : out std_logic;
@@ -107,6 +107,7 @@ architecture rtl of fpga_top is
       -- clocks and control signals
       HCLK    : in  std_logic;          -- clk input
       MRESET  : in  std_logic;  -- system reset               low active
+      MRSTOUT : out std_logic;          -- Reset output
       MIRQOUT : out std_logic;          -- interrupt request output
       MCKOUT0 : out std_logic;          --for trace adapter
       MCKOUT1 : out std_logic;          --programable clock out
@@ -181,7 +182,7 @@ architecture rtl of fpga_top is
       OSPI_DQ   : inout std_logic_vector(7 downto 0);
       OSPI_RWDS : inout std_logic
       );
--- MPG RAM signals
+  -- MPG RAM signals
   end component;
 
   -- SDRAM (remove)
@@ -196,15 +197,17 @@ architecture rtl of fpga_top is
   signal D_BA  : std_logic_vector(1 downto 0);
   signal D_CKE : std_logic_vector(3 downto 0);
 
+  signal MRSTOUT : std_logic;
+
   -- NC PINS!!!!
-  signal MCKOUT1    : std_logic;
-  signal MTEST      : std_logic;
-  signal MBYPASS    : std_logic;
-  signal MIRQ1      : std_logic;
-  signal MWAKEUP_LP : std_logic;
-  signal MLP_PWR_OK : std_logic;
-  signal MPMIC_CORE : std_logic;
-  signal MPMIC_IO   : std_logic;
+  signal MCKOUT1    : std_logic;        -- out
+  signal MTEST      : std_logic;        -- in
+  signal MBYPASS    : std_logic;        -- in
+  signal MIRQ1      : std_logic;        -- in
+  signal MWAKEUP_LP : std_logic;        -- in
+  signal MLP_PWR_OK : std_logic;        -- in
+  signal MPMIC_CORE : std_logic;        -- out
+  signal MPMIC_IO   : std_logic;        -- out
 
   -- Misc analog (also NC)
   signal dis_bmem   : std_logic;
@@ -263,13 +266,39 @@ begin
 
   OE_CTR <= '1';                        -- Low tri-states levelshifter outputs
 
+  -- Ethernet
+  ENET_RST_N <= MRSTOUT;
+ 
+  ENET_MDC  <= '0'; -- TODO
+  ENET_MDIO <= 'Z'; -- TODO
+  -- 
+  PF(1)      <= ENET_TXCLK;
+  ENET_TXCTL <= PF(0); -- RMII TX_EN to TX_CTL
+  ENET_TXD0  <= PF(2);
+  ENET_TXD1  <= PF(3);
+  ENET_TXD2  <= '0';   -- RMII Not used ( TODO GND or floating? )
+  ENET_TXD3  <= PG(0); -- RMII TX_ER to TXD3
+
+  PG(1) <= ENET_RXCLK;
+  PF(4) <= ENET_RXCTL; -- RMII DV to RX_CTL
+  PF(6) <= ENET_RXD0;
+  PF(7) <= ENET_RXD1;
+  --PG(6) <= ENET_RXD2; -- RMII Not used
+  PF(5) <= ENET_RXD3; -- RMII RX_ER to RXD3
+
   -- TODO
-  vdd_bmem <= '0';
-  VCC18LP  <= '0';
-  rxout    <= '0';
-  adc_bits <= '0';
+  vdd_bmem   <= '0';
+  VCC18LP    <= '0';
+  rxout      <= '0';
+  adc_bits   <= '0';
   -- URX <= 
   -- UTX <=  
+  MTEST      <= '0';
+  MBYPASS    <= '0';
+  MIRQ1      <= '0';
+  MWAKEUP_LP <= '0';
+  MLP_PWR_OK <= '0';
+
 
   LED_cnt_proc : process(HCLK)
   begin
@@ -296,6 +325,7 @@ begin
     port map (
       HCLK       => HCLK,
       MRESET     => MRESET,
+      MRSTOUT    => MRSTOUT,
       MIRQOUT    => MIRQOUT,
       MCKOUT0    => MCKOUT0,
       MCKOUT1    => MCKOUT1,

@@ -1,5 +1,5 @@
 
-create_generated_clock -name ld_bmem -divide_by 2 [get_pins {core1/crb/ld_bmem_reg/Q}] -source [get_ports HCLK]
+# create_generated_clock -name ld_bmem -divide_by 2 [get_pins {core1/crb/ld_bmem_reg/Q}] -source [get_ports HCLK]
 
 set_property PACKAGE_PIN AY9 [get_ports {OSPI_Out[CK_p]}]
 set_property PACKAGE_PIN BA9 [get_ports {OSPI_Out[CK_n]}]

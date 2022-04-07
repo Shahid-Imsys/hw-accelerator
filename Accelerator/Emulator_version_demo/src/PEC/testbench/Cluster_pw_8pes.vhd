@@ -23,6 +23,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
+use std.env.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -610,11 +611,12 @@ progress <= 2303;
             
             
   progress <=5;
-  wait until tag_fb = '0';
+ -- wait until tag_fb = '0';
 
 
-
-wait;
+            wait for 1000ns;
+  finish; --assert false report "Simulation End" severity Error;          
+--wait;
 
 end process;
 CLK_P<= clk_p_i;

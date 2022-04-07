@@ -62,6 +62,7 @@ gpp_rtl: mem_comp
 			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/trace_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SU180_16384X8X1BM8.vhd \

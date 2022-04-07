@@ -73,7 +73,8 @@ use work.gp_pkg.all;
 
 entity top is
   generic (
-    g_memory_type : memory_type_t := asic
+    g_memory_type : memory_type_t := asic;
+    g_clock_frequency : integer -- Frequency in MHz
     );
   port (
     -- clocks and control signals
@@ -1799,7 +1800,8 @@ begin
 --  -----------------------------------------------------------------------------
     rtc0: entity work.rtc 
     generic map (
-      g_memory_type => g_memory_type)
+      g_memory_type => g_memory_type,
+      g_clock_frequency => g_clock_frequency )
      port map(
       xout      => HCLK,
       pllout    => HCLK,

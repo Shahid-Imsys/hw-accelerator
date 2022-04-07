@@ -54,7 +54,7 @@ entity OctoSPI is
         idack     : in    std_logic;    -- I/O bus DMA Ack
         idreq     : out   std_logic;    -- I/O bus DMA Request
         OSPI_Out  : out   OSPI_InterfaceOut_t;  -- OSPI pins out to chip
-        OSPI_DQ   : inout std_logic_vector(7 downto 0); -- OSPI data bus
+        OSPI_DQ   : inout std_logic_vector(7 downto 0);       -- OSPI data bus
         OSPI_RWDS : inout std_logic     -- OSPI pins in/out from/to chip
         );
 end OctoSPI;
@@ -62,13 +62,13 @@ end OctoSPI;
 architecture rtl of OctoSPI is
 
   type OSPI_FSM_t is (
-    wr_cmd,       -- Write cmd bytes
-    wr_addr,      -- Write addr bytes
-    wait_latency, -- Wait for latency time
-    wr_data,      -- Write data bytes
-    rd_data,      -- Read data bytes
-    wait_idle,    -- Waiting for even clock out before going idle
-    idle);        -- Idle, no access
+    wr_cmd,                             -- Write cmd bytes
+    wr_addr,                            -- Write addr bytes
+    wait_latency,                       -- Wait for latency time
+    wr_data,                            -- Write data bytes
+    rd_data,                            -- Read data bytes
+    wait_idle,     -- Waiting for even clock out before going idle
+    idle);                              -- Idle, no access
 
   -- subtype OSPI_Cmd_t is std_logic_vector(7 downto 0);
 
@@ -97,6 +97,8 @@ architecture rtl of OctoSPI is
   -- signal latency_rd : std_logic;                     -- Latency read strobe
   --
   signal flags_out  : std_logic_vector(7 downto 0);  -- Data out register
+
+  signal clk_out_int : std_logic;       -- Chip clock
 
   ---------------------------------------------------------
   -- iobus_addr_dec_proc
@@ -181,8 +183,8 @@ begin
 
     elsif rising_edge(clk_p) then
 
-      if data_rd = '1'  and clk_i_pos = '0' and
-         (iobus_rdindex /= (ospi_rddata'length - 1)) then
+      if data_rd = '1' and clk_i_pos = '0' and
+        (iobus_rdindex /= (ospi_rddata'length - 1)) then
         iobus_rdindex <= iobus_rdindex + 1;
       end if;
 
@@ -229,10 +231,10 @@ begin
   begin
     if rst_n = '0' then
 
-      cmd_reg     <= (others     => '0');
-      addr_reg    <= (others     => '0');
-      flags_reg   <= (others     => '0');
-      latency_reg <= (2 downto 0 => "111", others => '0');
+      cmd_reg     <= (others => '0');
+      addr_reg    <= (others => '0');
+      flags_reg   <= (others => '0');
+      latency_reg <= x"07";
 
       ospi_wrdata <= (others => (others => '-'));
 
@@ -300,7 +302,8 @@ begin
   -- This process drives the OSPI HW interface
   --
   -- Process related consurrent statements
-  OSPI_Out.CK_n <= not OSPI_Out.CK_p;
+  OSPI_Out.CK_p <= clk_out_int;
+  OSPI_Out.CK_n <= not clk_out_int;
   --
   ospi_fsm_proc : process(clk_p, rst_n)
     variable rd_trig : boolean;
@@ -308,11 +311,12 @@ begin
   begin
     if rst_n = '0' then
       OSPI_Out.RESET_n <= '0';
-      OSPI_Out.CK_p    <= '0';
       OSPI_Out.CS_n    <= '1';
 
       OSPI_DQ   <= x"ZZ";
       OSPI_RWDS <= 'Z';
+
+      clk_out_int <= '0';
 
       ospi_fsm     <= idle;
       ospi_counter <= (others => '0');
@@ -336,10 +340,11 @@ begin
     elsif rising_edge(clk_p) then
 
       OSPI_Out.RESET_n <= '1';
-      OSPI_Out.CK_p    <= std_logic(ospi_counter(OSPI_CNTPOS_CLK));
       OSPI_Out.CS_n    <= '0';
       OSPI_DQ          <= x"ZZ";
       OSPI_RWDS        <= 'Z';
+
+      clk_out_int <= std_logic(ospi_counter(OSPI_CNTPOS_CLK));
 
       ospi_rwds_p <= OSPI_RWDS;
 
@@ -439,7 +444,7 @@ begin
 
         when rd_data =>
           -- Max burst len 127 => 7 bit comparitor
-          if ospi_counter(OSPI_CNTPOS_CLK - 1 downto 0) = (2 ** OSPI_CNTPOS_CLK) - 1 then -- Timing adjustment possible here
+          if ospi_counter(OSPI_CNTPOS_CLK - 1 downto 0) = (2 ** OSPI_CNTPOS_CLK) - 1 then  -- Timing adjustment possible here
 
             if ospi_rdindex = to_integer(ospi_length) then
               ospi_fsm     <= idle;
@@ -447,9 +452,9 @@ begin
             end if;
 
             if rd_trig then
-              rd_trig := false;
+              rd_trig                   := false;
               ospi_rddata(ospi_rdindex) <= OSPI_DQ;
-              ospi_rdindex <= ospi_rdindex + 1;
+              ospi_rdindex              <= ospi_rdindex + 1;
             end if;
           end if;
 

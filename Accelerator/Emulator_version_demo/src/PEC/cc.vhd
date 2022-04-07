@@ -278,6 +278,7 @@ end component;
   signal data_core_int_e : reg;
   signal data_core_int_e_1 : reg;
   signal standby : std_logic;
+  signal delay_p      : std_logic;
   --PE's ID
   --signal id_int  : ID_TYPE;
  
@@ -1060,11 +1061,8 @@ c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
            PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
 		   PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
 		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
-		   --PE_RDY_1 and PE_RDY_3 and 
-           --PE_RDY_5 and PE_RDY_7 and
-		   --PE_RDY_9 and PE_RDY_11 and
-		   --PE_RDY_13 and PE_RDY_15 ;
-C_RDY <= c_rdy_i;
+		   
+C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	
 process(clk_e)
 begin
@@ -1076,11 +1074,14 @@ begin
 		end if;
 	end if;
 end process;
+
+CLK_O <= (delay_p or rd_trig) and rd_ena;
+
 process(clk_e)
 begin
-	if rising_edge(clk_e) then
-		CLK_O <= (delay or rd_trig) and rd_ena;	
-	end if;
+if rising_edge(clk_e) then
+    delay_p <= delay;
+end if;
 end process;
 				
 	--Memory blocks

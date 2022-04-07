@@ -587,16 +587,25 @@ wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
-wait for 5 ns;
+            wait for 5 ns;
+
+assert false report "test" severity note;
 progress <= 2303; 
-  readmemword(outword);
+            readmemword(outword);
+
+              
   for i in 0 to 143 loop
     out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
                   outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
                   outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
                   outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
+    wait for 1 ns;
+    assert (out_ram(i) = ref_out(i)) report "Incorrect output data "&integer'image(i) severity warning;
+    --assert (out_ram(i) /= ref_out(i)) report "Correct output data "&integer'image(j) severity note;
   end loop;
 
+            
+            
   progress <=5;
   wait until tag_fb = '0';
 

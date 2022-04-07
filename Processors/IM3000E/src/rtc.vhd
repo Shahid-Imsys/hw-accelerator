@@ -116,9 +116,9 @@ architecture rtl of rtc is
   --constant rtc_clock_puls_length_c : integer := (g_clock_frequency * (10**6)) / 32768;
   constant rtc_clock_puls_length_c : integer := (g_clock_frequency * (10**6)) / 500000;
   
-  signal cp     : std_logic_vector(46 downto 0);
+  --signal cp     : std_logic_vector(46 downto 0);
   signal qn     : unsigned(46 downto 0);
-  signal qn_old : std_logic_vector(46 downto 0);
+  --signal qn_old : std_logic_vector(46 downto 0);
   signal rxout_old : std_logic;
   signal rxout_internal : std_logic;
 
@@ -702,6 +702,59 @@ begin  -- rtl
 -- power-on detection part
 -------------------------------------------------------------------------------
 
+  -----------------------------------------------------------------------------
+  -- This is the old RTC, going on the external rxout clock, the counter is a
+  -- ripple counter.
+  -----------------------------------------------------------------------------
+
+-- The ripple counter clocks. For setting counter more efficiently, the
+  -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
+  -- cp_gen : process (qn_old, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
+  -- begin
+  --   -- Normal clocking. All FF:s in one long ripple counter chain.
+  --   cp(0) <= rxout;
+  --   for i in 1 to 46 loop
+  --     cp(i) <= qn_old(i - 1);
+  --   end loop;
+  --   -- Fast clocking. The selected byte is clocked by fclk_ok.
+  --   if en_fclk_iso_0 = '1' then
+  --     if rtc_sel_iso_0 = 0 then
+  --       cp(0) <= fclk_iso_0;
+  --     end if;
+  --     for i in 1 to 5 loop 
+  --       if rtc_sel_iso_0 = i then
+  --         cp((i*8)-1) <= fclk_iso_0;
+  --       end if;
+  --     end loop;
+  --   end if;
+  -- end process cp_gen;
+
+  -- -- The 47 bits ripple counter.
+  -- async_ripple_counter : for i in 0 to 46 generate
+  --   d_ff : block
+  --   begin  -- block d_ff
+  --     process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
+  --     begin  -- process
+  --       if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
+  --         qn_old(i) <= '1';
+  --       elsif rising_edge(cp(i)) then
+  --         qn_old(i) <= not qn_old(i);
+  --       end if;
+  --     end process;
+  --   end block d_ff;
+  -- end generate async_ripple_counter;
+
+  
+  ----------------------------------------------------------------------------
+  -- For the testchip is the RTC driven on the system clock. This enahces the
+  -- power consumtion considerable, but for a testchip is this acceptable.
+  --
+  -- If this is going to be a real chip must the RTC be chnaged to go on the
+  -- exteranl 32 Khz crystal.
+  -----------------------------------------------------------------------------
+
+-- For the testchip is not  a eal 23 KHz crystal used, instead is the clock
+  -- generated from the system clock.
   p_gen_rx_out: process (pllout_iso_1, pwr_on_rst_n) is
     variable rx_counter : integer range 0 to 32767;
   begin  -- process p_gen_rx_out
@@ -718,43 +771,8 @@ begin  -- rtl
     end if;
   end process p_gen_rx_out;
 
--- The ripple counter clocks. For setting counter more efficiently, the
-  -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
-  cp_gen : process (qn_old, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
-  begin
-    -- Normal clocking. All FF:s in one long ripple counter chain.
-    cp(0) <= rxout;
-    for i in 1 to 46 loop
-      cp(i) <= qn_old(i - 1);
-    end loop;
-    -- Fast clocking. The selected byte is clocked by fclk_ok.
-    if en_fclk_iso_0 = '1' then
-      if rtc_sel_iso_0 = 0 then
-        cp(0) <= fclk_iso_0;
-      end if;
-      for i in 1 to 5 loop 
-        if rtc_sel_iso_0 = i then
-          cp((i*8)-1) <= fclk_iso_0;
-        end if;
-      end loop;
-    end if;
-  end process cp_gen;
 
-  -- The 47 bits ripple counter.
-  async_ripple_counter : for i in 0 to 46 generate
-    d_ff : block
-    begin  -- block d_ff
-      process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
-      begin  -- process
-        if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
-          qn_old(i) <= '1';
-        elsif rising_edge(cp(i)) then
-          qn_old(i) <= not qn_old(i);
-        end if;
-      end process;
-    end block d_ff;
-  end generate async_ripple_counter;
-
+  -- Syncgronous version of the RTC.
   synchronous_counter : process (pllout_iso_1, pwr_on_rst_n) is
   begin  -- process synchronous_counter
     if pwr_on_rst_n = '0' then            -- asynchronous reset (active low)

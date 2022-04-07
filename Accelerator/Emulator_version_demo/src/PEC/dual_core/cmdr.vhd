@@ -382,14 +382,14 @@ begin
     REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
     srst <= not rst_en;
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
+    --process(clk_p)
+    --begin
+        --if rising_edge(clk_p) then
             --if clk_e_neg = '1' then
-                DTM_FIFO_RDY <= fifo_full;
+                DTM_FIFO_RDY <= not empty;
             --end if;
-        end if;
-    end process;
+        --end if;
+    --end process;
 
     req_fifo : fifo_generator_0
     PORT MAP (

@@ -56,6 +56,9 @@ begin  -- architecture tb
 
 
   top0 : entity work.top
+    generic map (
+      g_clock_frequency => 31
+      )
     port map (
       HCLK    => MX1_CK,
       MRESET  => MRESET,

@@ -41,13 +41,16 @@
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
+--use ieee.std_logic_unsigned.all;
 --use work.all;
 use work.gp_pkg.all;
 
 entity rtc is
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := referens;
+    g_clock_frequency : integer -- Frequency in MHz
+    );
   port (
     --gmem1
     c1_gmem_a    : in  std_logic_vector(9 downto 0);
@@ -109,8 +112,15 @@ entity rtc is
 end rtc;
 
 architecture rtl of rtc is
-  signal cp : std_logic_vector(46 downto 0);
-  signal qn : std_logic_vector(46 downto 0);
+
+  --constant rtc_clock_puls_length_c : integer := (g_clock_frequency * (10**6)) / 32768;
+  constant rtc_clock_puls_length_c : integer := (g_clock_frequency * (10**6)) / 500000;
+  
+  signal cp     : std_logic_vector(46 downto 0);
+  signal qn     : unsigned(46 downto 0);
+  signal qn_old : std_logic_vector(46 downto 0);
+  signal rxout_old : std_logic;
+  signal rxout_internal : std_logic;
 
   -- These signals need to be kept through synthesis!
 
@@ -145,8 +155,9 @@ architecture rtl of rtc is
   signal rst_rtc_iso_0         : std_logic;
   signal en_fclk_iso_0         : std_logic;
   signal fclk_iso_0            : std_logic;
+  signal fclk_iso_0_old        : std_logic;
   signal ld_bmem_iso_0         : std_logic;
-  signal rtc_sel_iso_0         : std_logic_vector(2 downto 0);
+  signal rtc_sel_iso_0         : unsigned(2 downto 0);
   signal reset_iso_clear_iso_0 : std_logic;
   signal halt_en_iso_0         : std_logic;
   signal nap_en_iso_0          : std_logic;
@@ -157,7 +168,7 @@ architecture rtl of rtc is
 --  signal pwr_switch_on_int : std_logic_vector(3 downto 0);
   signal clk_mux_out_int       : std_logic;
   signal arst_n                : std_logic;
-  signal lp_rst_cnt            : std_logic_vector(4 downto 0);
+  signal lp_rst_cnt            : unsigned(4 downto 0);
   signal core_iso              : std_logic;
   signal clk_iso               : std_logic;
   signal lp_rst_cnt_off_int    : std_logic;
@@ -278,18 +289,18 @@ architecture rtl of rtc is
 
   end component;
 
-  component memory_1024x8 is 
+  component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);  
+      g_memory_type : memory_type_t := referens);
     port (
-      address : in std_logic_vector(9 downto 0);
-      ram_di  : in std_logic_vector(7 downto 0);
+      address : in  std_logic_vector(9 downto 0);
+      ram_di  : in  std_logic_vector(7 downto 0);
       ram_do  : out std_logic_vector(7 downto 0);
       we_n    : in  std_logic;
       clk     : in  std_logic;
       cs      : in  std_logic);
   end component;
-  
+
   component b_memory is
     generic (
       g_memory_type : memory_type_t := referens);
@@ -354,16 +365,16 @@ begin  -- rtl
       RAM0_WEB => RAM0_WEB,
       RAM0_CS  => RAM0_CS,
 
-      sel_pll_iso_0         => sel_pll_iso_0,
-      pllout_iso_1          => pllout_iso_1,
-      rst_rtc_iso_0         => rst_rtc_iso_0,
-      en_fclk_iso_0         => en_fclk_iso_0,
-      fclk_iso_0            => fclk_iso_0,
-      ld_bmem_iso_0         => ld_bmem_iso_0,
-      rtc_sel_iso_0         => rtc_sel_iso_0,
-      reset_iso_clear_iso_0 => reset_iso_clear_iso_0,
-      halt_en_iso_0         => halt_en_iso_0,
-      nap_en_iso_0          => nap_en_iso_0,
+      sel_pll_iso_0           => sel_pll_iso_0,
+      pllout_iso_1            => pllout_iso_1,
+      rst_rtc_iso_0           => rst_rtc_iso_0,
+      en_fclk_iso_0           => en_fclk_iso_0,
+      fclk_iso_0              => fclk_iso_0,
+      ld_bmem_iso_0           => ld_bmem_iso_0,
+      unsigned(rtc_sel_iso_0) => rtc_sel_iso_0,
+      reset_iso_clear_iso_0   => reset_iso_clear_iso_0,
+      halt_en_iso_0           => halt_en_iso_0,
+      nap_en_iso_0            => nap_en_iso_0,
 
 
       c1_gmem_a_iso_0   => c1_gmem_a_iso_0,
@@ -392,32 +403,32 @@ begin  -- rtl
   -- gmem
   -- gmem1
   gmem1 : memory_1024x8
-      generic map (
-         g_memory_type => g_memory_type
-        )
-      port map (
-        address => c1_gmem_a_iso_0,
-        ram_di  => c1_gmem_d_iso_0,
-        ram_do  => c1_gmem_q,
-        we_n    => c1_gmem_we_n_iso_1,
-        clk     => clk_mux_out_iso_1,
-        cs      => c1_gmem_ce_n_iso_1
-        );
-   
+    generic map (
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => c1_gmem_a_iso_0,
+      ram_di  => c1_gmem_d_iso_0,
+      ram_do  => c1_gmem_q,
+      we_n    => c1_gmem_we_n_iso_1,
+      clk     => clk_mux_out_iso_1,
+      cs      => c1_gmem_ce_n_iso_1
+      );
+
   -- gmem2 
   gmem2 : memory_1024x8
-      generic map (
-         g_memory_type => g_memory_type
-        )
-      port map (
-        address => c2_gmem_a_iso_0,
-        ram_di  => c2_gmem_d_iso_0,
-        ram_do  => c2_gmem_q,
-        we_n    => c2_gmem_we_n_iso_1,
-        clk     => clk_mux_out_iso_1,
-        cs      => c2_gmem_ce_n_iso_1
-        );
- 
+    generic map (
+      g_memory_type => g_memory_type
+      )
+    port map (
+      address => c2_gmem_a_iso_0,
+      ram_di  => c2_gmem_d_iso_0,
+      ram_do  => c2_gmem_q,
+      we_n    => c2_gmem_we_n_iso_1,
+      clk     => clk_mux_out_iso_1,
+      cs      => c2_gmem_ce_n_iso_1
+      );
+
   bmem : b_memory
     generic map (
       g_memory_type => g_memory_type)
@@ -691,22 +702,37 @@ begin  -- rtl
 -- power-on detection part
 -------------------------------------------------------------------------------
 
+  p_gen_rx_out: process (pllout_iso_1, pwr_on_rst_n) is
+    variable rx_counter : integer range 0 to 32767;
+  begin  -- process p_gen_rx_out
+    if pwr_on_rst_n = '0' then          -- asynchronous reset (active low)
+      rxout_internal <= '0';
+      rx_counter := 0;
+    elsif pllout_iso_1'event and pllout_iso_1 = '1' then  -- rising clock edge
+      if rx_counter >= rtc_clock_puls_length_c then
+        rxout_internal <= not rxout_internal;
+        rx_counter := 0;
+      else
+        rx_counter := rx_counter + 1;
+      end if;
+    end if;
+  end process p_gen_rx_out;
 
 -- The ripple counter clocks. For setting counter more efficiently, the
   -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
-  cp_gen : process (qn, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
+  cp_gen : process (qn_old, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
   begin
     -- Normal clocking. All FF:s in one long ripple counter chain.
     cp(0) <= rxout;
     for i in 1 to 46 loop
-      cp(i) <= qn(i - 1);
+      cp(i) <= qn_old(i - 1);
     end loop;
     -- Fast clocking. The selected byte is clocked by fclk_ok.
     if en_fclk_iso_0 = '1' then
       if rtc_sel_iso_0 = 0 then
         cp(0) <= fclk_iso_0;
       end if;
-      for i in 1 to 5 loop
+      for i in 1 to 5 loop 
         if rtc_sel_iso_0 = i then
           cp((i*8)-1) <= fclk_iso_0;
         end if;
@@ -721,23 +747,70 @@ begin  -- rtl
       process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
       begin  -- process
         if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
-          qn(i) <= '1';
+          qn_old(i) <= '1';
         elsif rising_edge(cp(i)) then
-          qn(i) <= not qn(i);
+          qn_old(i) <= not qn_old(i);
         end if;
       end process;
     end block d_ff;
   end generate async_ripple_counter;
 
+  synchronous_counter : process (pllout_iso_1, pwr_on_rst_n) is
+  begin  -- process synchronous_counter
+    if pwr_on_rst_n = '0' then            -- asynchronous reset (active low)
+      qn <= (others => '0');
+    elsif rising_edge(pllout_iso_1) then  -- rising clock edge
+      if rst_rtc_iso_0 = '1' then
+        case rtc_sel_iso_0 is
+          when to_unsigned(0, 3) =>
+            qn(7 downto 0) <= (others => '1');
+          when to_unsigned(1, 3) =>
+            qn(15 downto 8) <= (others => '1');
+          when to_unsigned(2, 3) =>
+            qn(23 downto 16) <= (others => '1');
+          when to_unsigned(3, 3) =>
+            qn(31 downto 24) <= (others => '1');
+          when to_unsigned(4, 3) =>
+            qn(39 downto 32) <= (others => '1');
+          when to_unsigned(5, 3) =>
+            qn(46 downto 40) <= (others => '1');
+          when others => null;
+        end case;
+      else
+        if (en_fclk_iso_0 = '1') and (fclk_iso_0 = '1') and (fclk_iso_0_old = '0') then
+           
+          case rtc_sel_iso_0 is
+            when "000" => qn(7 downto 0) <=  qn(7 downto 0) - 1;
+            when "001" => qn(15 downto 8) <=  qn(15 downto 8) - 1;
+            when "010" => qn(23 downto 16) <=  qn(23 downto 16) - 1;
+            when "011" => qn(31 downto 24) <=  qn(31 downto 24) - 1;
+            when "100" => qn(39 downto 32) <=  qn(39 downto 32) - 1;
+            when "101" => qn(46 downto 40) <=  qn(46 downto 40) - 1;
+            when others => null;
+          end case;
+        end if;
+        
+        if rxout_internal = '1' and rxout_old = '0' then
+          qn <= qn - 1;
+        end if;
+
+      end if;
+      
+      rxout_old <= rxout_internal;
+      fclk_iso_0_old <= fclk_iso_0;
+      
+    end if;
+  end process synchronous_counter;
+
   -- Mux for the output data. All six bytes of the counter can be read,
   -- the other two rtc_sel_ok combinations output test data.
   with rtc_sel_iso_0 select
-    rtc_data <= not qn(6 downto 0) & '0'                                      when "000",
-    not qn(14 downto 7)                                                       when "001",
-    not qn(22 downto 15)                                                      when "010",
-    not qn(30 downto 23)                                                      when "011",
-    not qn(38 downto 31)                                                      when "100",
-    not qn(46 downto 39)                                                      when "101",
+    rtc_data <= std_logic_vector(not qn(6 downto 0) & '0')                    when "000",
+    std_logic_vector(not qn(14 downto 7))                                     when "001",
+    std_logic_vector(not qn(22 downto 15))                                    when "010",
+    std_logic_vector(not qn(30 downto 23))                                    when "011",
+    std_logic_vector(not qn(38 downto 31))                                    when "100",
+    std_logic_vector(not qn(46 downto 39))                                    when "101",
     rst_rtc_iso_0 & en_fclk_iso_0 & fclk_iso_0 & ld_bmem_iso_0 &
     rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) when others;
 

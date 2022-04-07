@@ -1604,6 +1604,7 @@ begin
       CSB          => mp_PM_CSB                               
       );
 
+  -- trcmem
     trcmem: trace_memory
     generic map (
       g_memory_type => g_memory_type)
@@ -1615,88 +1616,6 @@ begin
       clk     => clk_p,
       cs_n    => trcmem_ce_n
       );
-
---  -- trcmem
-  -- trcmem_old: SY180_256X32X1CM4
-  --   port map (
-      -- A0          => trcmem_a(0),
-      -- A1          => trcmem_a(1),              
-      -- A2          => trcmem_a(2),             
-      -- A3          => trcmem_a(3),            
-      -- A4          => trcmem_a(4),            
-      -- A5          => trcmem_a(5),              
-      -- A6          => trcmem_a(6),              
-      -- A7          => trcmem_a(7),                                            
-      -- DO0         => trcmem_q(0),              
-      -- DO1         => trcmem_q(1),             
-      -- DO2         => trcmem_q(2),             
-      -- DO3         => trcmem_q(3),              
-      -- DO4         => trcmem_q(4),              
-      -- DO5         => trcmem_q(5),              
-      -- DO6         => trcmem_q(6),              
-      -- DO7         => trcmem_q(7),             
-      -- DO8         => trcmem_q(8),              
-      -- DO9         => trcmem_q(9),              
-      -- DO10        => trcmem_q(10),            
-      -- DO11        => trcmem_q(11),             
-      -- DO12        => trcmem_q(12),             
-      -- DO13        => trcmem_q(13),              
-      -- DO14        => trcmem_q(14),               
-      -- DO15        => trcmem_q(15),             
-      -- DO16        => trcmem_q(16),             
-      -- DO17        => trcmem_q(17),               
-      -- DO18        => trcmem_q(18),             
-      -- DO19        => trcmem_q(19),              
-      -- DO20        => trcmem_q(20),          
-      -- DO21        => trcmem_q(21),              
-      -- DO22        => trcmem_q(22),              
-      -- DO23        => trcmem_q(23),              
-      -- DO24        => trcmem_q(24),               
-      -- DO25        => trcmem_q(25),               
-      -- DO26        => trcmem_q(26),               
-      -- DO27        => trcmem_q(27),               
-      -- DO28        => trcmem_q(28),               
-      -- DO29        => trcmem_q(29),               
-      -- DO30        => trcmem_q(30),               
-      -- DO31        => trcmem_q(31),                       
-      -- DI0         => trcmem_d(0),            
-      -- DI1         => trcmem_d(1),             
-      -- DI2         => trcmem_d(2),            
-      -- DI3         => trcmem_d(3),            
-      -- DI4         => trcmem_d(4),           
-      -- DI5         => trcmem_d(5),            
-      -- DI6         => trcmem_d(6),           
-      -- DI7         => trcmem_d(7),         
-      -- DI8         => trcmem_d(8),           
-      -- DI9         => trcmem_d(9),           
-      -- DI10        => trcmem_d(10),              
-      -- DI11        => trcmem_d(11),              
-      -- DI12        => trcmem_d(12),              
-      -- DI13        => trcmem_d(13),             
-      -- DI14        => trcmem_d(14),           
-      -- DI15        => trcmem_d(15),            
-      -- DI16        => trcmem_d(16),          
-      -- DI17        => trcmem_d(17),               
-      -- DI18        => trcmem_d(18),               
-      -- DI19        => trcmem_d(19),              
-      -- DI20        => trcmem_d(20),               
-      -- DI21        => trcmem_d(21),               
-      -- DI22        => trcmem_d(22),              
-      -- DI23        => trcmem_d(23),                
-      -- DI24        => trcmem_d(24),             
-      -- DI25        => trcmem_d(25),              
-      -- DI26        => trcmem_d(26),                
-      -- DI27        => trcmem_d(27),               
-      -- DI28        => trcmem_d(28),              
-      -- DI29        => trcmem_d(29),           
-      -- DI30        => trcmem_d(30),               
-      -- DI31        => trcmem_d(31),                      
-      -- WEB         => trcmem_we_n,              
-      -- CK          => clk_p,            
-      -- CSB         => trcmem_ce_n                              
-      -- );
-
-
   
 ---application memories
   ram1 : ram_memory
@@ -2170,9 +2089,7 @@ begin
     dcke_o        => open -- Clock enable
 
     );  
-
-
-    
+   
     mpmem_inf_inst : entity work.mpmem_inf
     port map(
        
@@ -2473,27 +2390,5 @@ peri01: entity work.peri
         OSPI_DQ    => OSPI_DQ,
         OSPI_RWDS  => OSPI_RWDS
 		);  
-	
-  g_fpga_peri : if g_memory_type = fpga generate
-    erxclk <= '0';
-    etxclk <= '0';
-    din_a  <= '0';
-    dfp    <= "00000000";
-    iden   <= '0';
-    idreq  <= "11111111";
-    idi    <= "00000000";
-    irq0   <= '1';
-    irq1   <= '1';
-    pa_en  <= "00000000";
-    pb_en  <= "00000000";
-    pc_en  <= "00000000";
-    pd_en  <= "00000000";
-    pe_en  <= "00000000";
-    pf_en  <= "00000000";
-    pg_en  <= "00000000";
-    ph_en  <= "00000000";
-    pi_en  <= "00000000";
-    pj_en  <= "00000000";
-  end generate g_fpga_peri;
 
 end;

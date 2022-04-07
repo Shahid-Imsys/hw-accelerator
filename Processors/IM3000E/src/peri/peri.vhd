@@ -41,6 +41,9 @@ use IEEE.std_logic_unsigned.all;
 use work.all;
 
 entity peri is
+  generic (
+    g_build_type : memory_type_t := asic
+    );
   port (
 ---------------------------------------------------------------------
     -- Signals to/from other blocks
@@ -627,6 +630,7 @@ begin  -- struct
 -------------------------------------------------------------------------------
   eth : entity work.eth
     generic map(
+      g_build_type => g_build_type,
       TX_CTL_ADR   => Tx_ctl_addr,
       RX_CTL_ADR   => Rx_ctl_addr,
       RX_DA_ADR    => Rx_da_addr,

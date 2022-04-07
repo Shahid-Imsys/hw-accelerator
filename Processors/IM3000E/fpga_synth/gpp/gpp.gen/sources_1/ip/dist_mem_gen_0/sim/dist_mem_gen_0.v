@@ -72,7 +72,7 @@ input wire qspo_ce;
 output wire [79 : 0] qspo;
 
   dist_mem_gen_v8_0_13 #(
-    .C_FAMILY("kintexuplus"),
+    .C_FAMILY("virtexuplus"),
     .C_ADDR_WIDTH(11),
     .C_DEFAULT_DATA("0"),
     .C_DEPTH(2048),

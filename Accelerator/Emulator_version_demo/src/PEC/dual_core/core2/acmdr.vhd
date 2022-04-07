@@ -144,7 +144,7 @@ begin
             ve_data_int <= (others => '0');
         else
             if DATA_VLD = '1' then
-                if CLK_E_POS = '0' then
+                if CLK_E_POS = '1' then
                     ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
                 else
                     ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e

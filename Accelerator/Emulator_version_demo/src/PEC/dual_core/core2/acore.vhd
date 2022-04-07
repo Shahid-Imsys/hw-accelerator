@@ -127,6 +127,7 @@ entity acore is
     pmem_we_n   : out std_logic;
     -- CC signal
     req_c2    : out std_logic;
+    req_rd_c2 : out std_logic;
     ack_c2    : in std_logic;
     ddi_vld   : in std_logic; --Added by CJ
     exe       : in std_logic; --CONT need to be added
@@ -298,6 +299,7 @@ architecture struct of acore is
   signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
   signal req        : std_logic;
+  signal req_rd     : std_logic;
   signal ack        : std_logic;
   --VE signals
   signal ve_in_int  : std_logic_vector(63 downto 0);
@@ -318,8 +320,10 @@ architecture struct of acore is
   
 begin
   req_c2 <= req;
+  req_rd_c2 <= req_rd;
   ack    <= ack_c2;
-  ready_1  <= pl(121);
+  ready_1  <= pl(121) and not dtm_fifo_rdy;
+  dfm_rdy <= ddi_vld;
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
@@ -770,7 +774,7 @@ begin
       VE_PUSH_DTM => ve_push_dtm_int,
       VE_AUTO_SEND => ve_auto_send_int,
       VE_OUT_D    => ve_out_d_int,
-      VE_OUT_DTM => ve_out_dtm_int
+      VE_OUT_DTM  => ve_out_dtm_int
       );
 ---------------------------------------------------------------------
 -- CMDR
@@ -785,6 +789,7 @@ begin
         --EXE      => exe,
         DATA_VLD => ddi_vld,
         REQ_OUT  => req,
+        REQ_RD_OUT => req_rd,
         ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,
@@ -793,6 +798,7 @@ begin
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
+        DTM_FIFO_RDY => dtm_fifo_rdy,
         VE_DTMO  =>ve_out_dtm_int,
         VE_DTM_RDY => ve_dtm_rdy_int,
         VE_PUSH_DTM => ve_push_dtm_int,

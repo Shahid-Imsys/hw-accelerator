@@ -277,6 +277,7 @@ end component;
   signal pe_data_in_e_1 : reg;
   signal data_core_int_e : reg;
   signal data_core_int_e_1 : reg;
+  signal standby : std_logic;
   --PE's ID
   --signal id_int  : ID_TYPE;
  
@@ -805,26 +806,25 @@ EVEN_P <= even_p_2;
 
  -- Fetch data from req_fifo
     process(clk_p)
-        variable cmd_tr : std_logic; --Save 1 clock to handle the request
+         --Save 1 clock to handle the request
 	begin
 		if rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
-                cmd_tr := '0';
+                standby <= '1';
 				--rd_fifo_i <= '0';
             elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
-                if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '0' then
-                    cmd_tr := '1';
-                else
-                    cmd_tr := '0';
-                end if;
+                
 
-			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and cmd_tr = '1' then --normal case
+			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
-			    elsif req_exe = '1' and write_req = '1' then --write case
+					standby <= '0';
+			    elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
 			    	RD_FIFO <= '1';
+				elsif req_exe = '1' or cb_status = '1' then
+                    standby <= '1';
 			    else
-			    	RD_FIFO <= '0';
+					RD_FIFO <= '0';
 			    end if;
                 --rd_fifo_i <= cl_net_fifo_rd; --one clk_e delay
 			else
@@ -847,10 +847,10 @@ EVEN_P <= even_p_2;
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
- 				req_len_ctr_p <='0' & REQ_FIFO(23 downto 16);--additional one bits for maximum transfer case
+ 				req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
-            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000000" then
+            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
@@ -907,12 +907,12 @@ EVEN_P <= even_p_2;
 			        	end if;
 			        end if;
                 elsif req_bexe = '1' then  --Reset broadcast signals
-                    if len_ctr_p = "000000000" then
+                    if len_ctr_p = "000000001" then
                         req_bexe <= '0';
 			    		cb_status <= '0';
                     end if;
                 elsif req_exe = '1' then --Reset unicast signals
-			    	if len_ctr_p = "000000000" then
+			    	if len_ctr_p = "000000001" then
                         req_exe <= '0';
 			    	end if;
     
@@ -928,14 +928,14 @@ EVEN_P <= even_p_2;
 	counting : process(clk_p)  
 	begin
 		if rising_edge(clk_p) then 
-			if even_p_int = '0' then
-				if noc_cmd = "01111" then
-					addr_p <= (others => '0');
-					len_ctr_p <= (others => '0');
-					write_count <= "00";
-					pe_write <= '0';
-					pe_read <= '0';
-				elsif noc_reg_rdy = '0' then
+			if noc_cmd = "01111" then
+				addr_p <= (others => '0');
+				len_ctr_p <= (others => '0');
+				write_count <= "00";
+				pe_write <= '0';
+				pe_read <= '0';
+			elsif even_p_int = '0' then	
+				if noc_reg_rdy = '0' then
 					pe_read <= '0';
 					pe_write <= '0';
 					if req_bexe = '1' then
@@ -949,15 +949,16 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' then
+						elsif write_req = '1' and fifo_vld = '1' then
 							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
             	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
             	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
             	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2)); 
+							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
 							if write_count = "11" then
 								pe_write <= '1';
-								len_ctr_p <= (others => '0');
+								--len_ctr_p <= (others => '0');
 							else
 								pe_write <= '0';
 							end if;

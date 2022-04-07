@@ -7,7 +7,9 @@ entity PE_pair_top is
   port (
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;
+    C1_REQ_RD : out std_logic;
     C2_REQ    : out std_logic;
+    C2_REQ_RD : out std_logic;
     C1_ACK    : in std_logic;
     C2_ACK    : in std_logic;
     C1_REQ_D  : out std_logic_vector(31 downto 0);
@@ -1235,6 +1237,7 @@ architecture struct of PE_pair_top is
     signal c1_d_cas    : std_logic;  -- CAS to SDRAM
     signal c1_d_we     : std_logic;  -- WE to SDRAM
     signal c1_req_i    : std_logic;  -- Request signal of core1
+    signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
     signal c1_ack_i    : std_logic;
     signal c1_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor --CJ
     signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
@@ -1246,6 +1249,7 @@ architecture struct of PE_pair_top is
     signal c2_d_cas    : std_logic;  -- CAS to SDRAM
     signal c2_d_we     : std_logic;  -- WE to SDRAM
     signal c2_req_i    : std_logic;  --Requset signal of core 2.
+    signal c2_req_rd_i : std_logic;  -- signal indicate that core2 is reading out request from CMDR fifo.
     signal c2_ack_i    : std_logic;
     signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
@@ -1451,7 +1455,9 @@ begin
   ddi_vld_c1 <= C1_DDI_VLD;
   ddi_vld_c2 <= C2_DDI_VLD;
   C1_REQ <= c1_req_i;
+  c1_req_rd <= c1_req_rd_i;
   C2_req <= c2_req_i;
+  c2_req_rd <= c2_req_rd_i;
   c1_ack_i <= C1_ACK;
   c2_ack_i <= C2_ACK;
   C1_REQ_D <=c1_d_dqi;
@@ -2704,6 +2710,7 @@ begin
     resume => RESUME,   --CJ
     id_number => c1_ID,  --CJ
     req_c1 => c1_req_i,  --CJ
+    req_rd_c1 => c1_req_rd_i,
     ack_c1 => C1_ACK,
     ddi_vld => ddi_vld_c1, --CJ
     reset_core_n   => reset_core_n   ,
@@ -2886,6 +2893,7 @@ begin
     pmem_we_n     => c2_pmem_we_n   ,
     exe          => exe ,     --CJ
     req_c2       => c2_req_i,
+    req_rd_c2    => c2_req_rd_i,
     ack_c2       => C2_ACK,
      ddi_vld      =>ddi_vld_c2, --CJ 
      resume => RESUME,   --CJ

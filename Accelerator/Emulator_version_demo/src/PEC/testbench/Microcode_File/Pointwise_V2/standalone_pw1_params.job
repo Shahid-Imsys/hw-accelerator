@@ -1,0 +1,17 @@
+
+
+#LOAD_MP 0x0     mpmem.data 
+LOAD_MP 0x0     test_mp.ascii
+
+LOAD_CM 0x1000  test_params.ascii
+LOAD_CM 0x2000  test_k.ascii
+LOAD_CM 0x3000  test_bias.ascii
+LOAD_CM 0x4000  test_in.ascii
+START_VE
+READ_CM 0x14000 result.... 4 4 144
+
+VERIFY  test_out.ascii 2304 result.ascii
+
+
+#_________________________________________________________________________________________________________________________
+

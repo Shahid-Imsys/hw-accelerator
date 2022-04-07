@@ -47,6 +47,7 @@ entity req_dst_logic is
         --Requet logic
         REQ_TO_NOC : out std_logic;
         REQ_SIG   : in std_logic_vector(15 downto 0);
+        REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
         OUTPUT    : out std_logic_vector(31 downto 0); --Output to CC
@@ -86,6 +87,8 @@ COMPONENT fifo_generator_1
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
     signal id_num   : std_logic_vector(3 downto 0):="0000";
+    signal id_syn   : std_logic_vector(3 downto 0);
+    signal id_syn_d : std_logic_vector(3 downto 0);
     signal poll_act : std_logic;
     signal fifo_rdy : std_logic; --active low
     signal add_in_1 : std_logic_vector(3 downto 0);
@@ -100,46 +103,47 @@ END COMPONENT;
     signal almost_full : std_logic;
     signal empty   : std_logic;
     signal almost_empty : std_logic;
-    signal wr_req  : std_logic;
+--    signal wr_req  : std_logic;
     signal ack_sig_i :std_logic_vector(15 downto 0); --Will be replaced with a DTM fifo signal.
-    signal loop_c  : integer := 0;
-    signal chain   : std_logic;
+--    signal loop_c  : integer := 0;
+    signal chain   : std_logic; --reserved for later use
     signal data_in_fifo : std_logic_vector(9 downto 0);
     signal prog_empty_i : std_logic;
     signal data_vld_out_i : std_logic_vector(15 downto 0);
     signal reset_i     : std_logic;
     signal req_to_noc_i : std_logic;
+    signal req_rd_reg   : std_logic_vector(15 downto 0) := (others => '0');
 
 
 begin
     reset_i <= not RESET;
     --Recognize the write request and hold the wr_req signal for 4 clock cycles.
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then 
-            if EVEN_P = '0' then
-                if loop_c = 0 then
-                    if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
-                        wr_req <= '1';
-                        loop_c <= 1;
-                    else
-                        if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
-                            chain<= '1';
-                        else
-                            chain <= '0';
-                        end if;
-                        wr_req <= '0';
-                        loop_c <= 0;
-                    end if;
-                elsif loop_c = 4 then
-                    wr_req <= '0';
-                    loop_c <= 0;
-                else
-                    loop_c <= loop_c + 1;
-                end if;
-            end if;
-        end if;
-    end process;
+--    process(clk_p)
+--    begin
+--        if rising_edge(clk_p) then 
+--            if EVEN_P = '0' then
+--                if loop_c = 0 then
+--                    if PE_REQ_IN(to_integer(unsigned(id_num)))(31)= '1' and PE_REQ_IN(to_integer(unsigned(id_num)))(30) = '1' then
+--                        wr_req <= '1';
+--                        loop_c <= 1;
+--                    else
+--                        --if PE_REQ_IN(to_integer(unsigned(id_num)))(29)= '1' then
+--                        --    chain<= '1';
+--                        --else
+--                        --    chain <= '0';
+--                        --end if;
+--                        wr_req <= '0';
+--                        loop_c <= 0;
+--                    end if;
+--                elsif loop_c = 4 then
+--                    wr_req <= '0';
+--                    loop_c <= 0;
+--                else
+--                    loop_c <= loop_c + 1;
+--                end if;
+--            end if;
+--        end if;
+--    end process;
             
 
 -------------------------------------------------------------
@@ -154,6 +158,9 @@ begin
         else
             if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
                 poll_act <= '1'; 
+                if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
+                    poll_act <= '0';
+                end if;
             else
                 poll_act <= '0';
             end if;
@@ -168,7 +175,7 @@ process(clk_p)
 begin
     if rising_edge (clk_p) then
         if EVEN_P = '1'then
-            if req_sig /= (req_sig'range => '0') then
+            if req_rd_reg /= (req_rd_reg'range => '0') then
             req_to_noc_i <= '1';
             else
             req_to_noc_i <= '0';
@@ -178,14 +185,18 @@ begin
 end process;
 REQ_TO_NOC <= not empty or req_to_noc_i;
 --ID Number Register and write controller
-process(reset_i,poll_act,id_num)
+process(reset_i,poll_act,id_num,req_sig)
 begin
     --if rising_edge(clk_p) then
     if reset_i = '1' then
         ack_sig_i <= (others => '0');
     elsif poll_act = '1' then
-        ack_sig_i <=(others => '0');
-        ack_sig_i(to_integer(unsigned(id_num))) <= '1';
+        ack_sig_i <=(others => '0'); ---handshake ?
+        if req_sig(to_integer(15 - unsigned(id_num))) = '1' then
+            ack_sig_i(to_integer(unsigned(id_num))) <= '1';
+        else
+            ack_sig_i(to_integer(unsigned(id_num))) <= '0';
+        end if;
     else
         ack_sig_i <=(others => '0');
     end if;
@@ -260,20 +271,36 @@ end process;
 
 --Adder
 add_in_1 <= id_num;
-process(clk_p,poll_act)--add_in_2,wr_req,chain)
+process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
-    if poll_act = '0' then--------------TBD
-        id_num <= (others => '0'); 
-    elsif rising_edge(clk_p) then
+    if rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            if wr_req = '1' or chain = '1' then
-                id_num <= add_in_1;
-            else
+            --if wr_req = '1' then
+            --    id_num <= add_in_1;
+            --else
+                if REQ_RD_IN = (REQ_RD_IN'range => '0') then
                 id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
-            end if;
+                end if;
+            --end if;
         end if;
     end if;
     
+end process;
+
+------synchronize id with request data-------
+process(clk_p)
+begin
+    if rising_edge(clk_p) then
+        if reset_i = '1' then 
+            id_syn <= "0000";
+            id_syn_d <= "0000";
+        else
+            if EVEN_P = '1' then
+                id_syn <= id_num;
+            end if;
+            id_syn_d <= id_syn;
+        end if;
+    end if;
 end process;
 
 ----------------------------------------------------------------
@@ -283,9 +310,13 @@ end process;
 process(clk_p)
 begin
     if rising_edge(clk_p) then 
-        if EVEN_P = '0' then--rising_edge (clk_e)
-            pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_num))); --PE req in comes the same clock cycle when req_sig is raised
-        --else
+        if reset_i = '1' then
+            pe_mux_out <= (others => '0');
+            req_rd_reg <= (others => '0');
+        elsif EVEN_P = '0' then--rising_edge (clk_e)
+            pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_syn_d))); --PE req in comes the same clock cycle when req_sig is raised
+            req_rd_reg <= REQ_RD_IN;
+            --else
         --    pe_mux_out <= (others => '0');
         end if;
     end if;
@@ -295,7 +326,7 @@ end process;
 process(clk_p) 
 begin
     if rising_edge(clk_p)then
-        if (poll_act = '1' and EVEN_P = '0') or (wr_req = '1' and EVEN_P = '0')then
+        if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then--or (wr_req = '1' and EVEN_P = '0')then
             wr <= '1';
         else
             wr <= '0';

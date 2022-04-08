@@ -45,6 +45,7 @@ entity cmdr is
         EXE       : in std_logic;
         DATA_VLD  : in std_logic;
         REQ_OUT   : out std_logic;
+        REQ_RD_OUT: out std_logic;
         ACK_IN    : in std_logic;
         DIN       : in std_logic_vector(127 downto 0);
         DOUT      : out std_logic_vector(31 downto 0);
@@ -54,6 +55,7 @@ entity cmdr is
         VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
+        DTM_FIFO_RDY : out std_logic;
         VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
         VE_DTM_RDY : in std_logic;
         VE_PUSH_DTM : in std_logic;
@@ -95,7 +97,6 @@ architecture rtl of cmdr is
     signal transfer_cnt  : unsigned(7 downto 0);
     signal cnt_reg       : unsigned(7 downto 0);
     signal transfer_type : std_logic_vector(1 downto 0);
-    signal type_reg      : std_logic_vector(1 downto 0);
 
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
@@ -112,8 +113,10 @@ architecture rtl of cmdr is
     signal empty       : std_logic;
     signal fifo_full   : std_logic;
     signal fb          : std_logic;
-    signal req         : std_logic;
+    signal req         : std_logic := '0';
+    signal rd_trig     : std_logic;
     signal srst        : std_logic;
+    signal push_cnt    : integer;
     attribute keep : string;
     attribute keep of mp_data_int : signal is "true";
 
@@ -123,17 +126,19 @@ begin
 --*******************************************************************
     pl_dfm_byte  <= PL(112 downto 109);
     pl_dbus_s    <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44);
-    process(clk_p)
+    process(RST_EN, pl_dbus_s, DATA_VLD)
     begin 
-        if rising_edge(clk_p) then
+        --if rising_edge(clk_p) then
             if RST_EN = '0' then
                 ddfm_trig <= '0';
             elsif pl_dbus_s = "10001" then
                 ddfm_trig <= '1';
             elsif DATA_VLD = '1' then
                 ddfm_trig <= '0';
+            else
+                ddfm_trig <= '0';
             end if;
-        end if;
+        --end if;
     end process;
 
     process(CLK_E_NEG, DIN, DATA_VLD, RST_EN)
@@ -161,16 +166,18 @@ begin
                 mp_data_int <= (others => '0');
                 dbus_reg <= (others => '0');
             elsif DATA_VLD = '1' then 
-                mp_data_int <= DIN;           --input to microprogram data
-                if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
-                    dbus_reg <= DIN;
-                end if;
+                mp_data_int <= DIN; 
+                dbus_reg <= DIN;          --input to microprogram data
+                --if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
+                    
+                --end if;
             end if;
             VE_DIN <= ve_data_int;
         end if;
     end process;
 
-    dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte))));
+    dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte)))) when ddfm_trig = '1'
+                else (others => '0');
     MPGMM_IN <= mp_data_int;
     DBUS_DATA <= dbus_int;
 
@@ -199,7 +206,7 @@ begin
             dtm_reg <= (others => '0');
             ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq_single;
+            dtm_reg <= init_mpgm_rq;
             ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
@@ -234,24 +241,52 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
+            if rst_en = '0' then
+                push_cnt <= 0;
+            else
+                if clk_e_neg = '0' then
+                    if VE_AUTO_SEND = '0' then
+                        if fifo_push = '1' then
+                            push_cnt <= push_cnt + 1;
+                            if push_cnt = 5 then
+                                push_cnt <= 0;
+                            end if; 
+                        end if;
+                    else 
+                        push_cnt <= 0;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
             if rst_en = '0' then 
                 transfer_cnt <= (others => '0');
                 cnt_reg <= (others => '0');
                 transfer_type <= "00";
             else
-                if fifo_push = '1' then
-                    transfer_type <= dtm_reg(31 downto 30);
-                    if dtm_reg (31 downto 30) = "11" then
-                        cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
-                        if fifo_rd_en = '1' then
+                if push_cnt = 0 then
+                    if fifo_push = '1' or EXE = '1' then
+                        transfer_type <= dtm_reg(31 downto 30);
+                        if dtm_reg (31 downto 30) = "11" then
+                            cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
+                            if fifo_rd_en = '1' then
+                                if transfer_cnt /= (transfer_cnt'range => '0') then
+                                    transfer_cnt <= transfer_cnt -1;
+                                else 
+                                    transfer_cnt <= cnt_reg;
+                                end if;
+                            end if;
+                        end if;
+                    elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
+                        transfer_cnt <= cnt_reg;
+                    else
+                        if fifo_rd_en = '1' and transfer_type = "11" then
                             transfer_cnt <= transfer_cnt -1;
                         end if;
-                    end if;
-                elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
-                    transfer_cnt <= cnt_reg;
-                else
-                    if fifo_rd_en = '1' and transfer_type = "11" then
-                        transfer_cnt <= transfer_cnt -1;
                     end if;
                 end if;
             end if;
@@ -261,31 +296,48 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then 
-            requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+            if rst_en = '0' then
+                requesting <= '0';
+            else
+                requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+                if rd_trig = '1' or fb = '1' then
+                    requesting  <= '0';
+                end if; 
+            end if;
         end if;
     end process;
 
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if clk_e_neg = '1' then --rising_edge
-                if EXE ='1'then
-                    send_req_d <= '1';
-                elsif empty = '1' then
-                    send_req_d <= '0';
-                elsif requesting = '1' then
-                    send_req_d <= '1';--requesting;
-                elsif transfer_type = "11" then
-                    if fb = '1' then
-                        send_req_d <= '0';
-                    elsif transfer_cnt = x"01" then
-                        send_req_d <= '0';
-                    end if;
-                end if;
-                send_req <= send_req_d;
+            if rst_en = '0' then
+                send_req_d <= '0';
+                send_req <= '0';
+                rd_trig <= '0';
             else
-                if fb = '1' then
-                    send_req <= '0'; 
+                if clk_e_neg = '1' then --rising_edge
+                    if fb = '1' then            -- if got feedback from cluster net, start to read the fifo and stop send request.
+                        rd_trig <= '1';
+                        send_req <= '0';
+                        send_req_d <= '0';
+                    else
+                        if EXE ='1'then
+                            send_req_d <= '1';
+                        --elsif empty = '1' then
+                        --    send_req_d <= '0';
+                        elsif requesting = '1' then
+                            send_req_d <= '1';--requesting;
+                        else
+                            case transfer_type is
+                                when "11" =>
+                                    if transfer_cnt = x"00" then
+                                        rd_trig <= '0';
+                                    end if;
+                                when others => rd_trig <= '0';
+                            end case;
+                        end if;
+                        send_req <= send_req_d;
+                    end if;
                 end if;
             end if;
         end if;
@@ -294,7 +346,7 @@ begin
     process(clk_p)
     begin
         if rising_edge(clk_p) then
-            if send_req = '1' and CLK_E_NEG = '0' and empty = '0'then
+            if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
                 fifo_rd_en <= '1';
             else
                 fifo_rd_en <= '0';
@@ -327,17 +379,17 @@ begin
     end process;
     
     REQ_OUT <= req;
+    REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
-    --srst <= not rst_en;
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            srst <= not rst_en;
-            if CLK_E_NEG = '0' and ld_dtm ='1' and empty = '1' then 
-                srst <= '1';
-            end if;
-        end if;
-    end process;
+    srst <= not rst_en;
+    --process(clk_p)
+    --begin
+        --if rising_edge(clk_p) then
+            --if clk_e_neg = '1' then
+                DTM_FIFO_RDY <= not empty;
+            --end if;
+        --end if;
+    --end process;
 
     req_fifo : fifo_generator_0
     PORT MAP (

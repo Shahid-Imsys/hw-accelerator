@@ -440,15 +440,15 @@ begin
 --      west_en_int <= dbus(4);            --delete by HYX, 20141027
 --      east_en_int <= dbus(3);            --delete by HYX, 20141027
 --      router_clk_en_int <= dbus(2);      --delete by HYX, 20141027
-          if dbus(7) = '0' then
-            if c2_ready = '1' then
+        --  if dbus(7) = '0' then
+        --    if c2_ready = '1' then
               core2_en_int <= dbus(7);
-            else 
-              core2_en_int <= core2_en_int;
-            end if;
-          else
-            core2_en_int <= dbus(7);
-          end if;
+        --    else 
+        --      core2_en_int <= core2_en_int;
+        --    end if;
+        --  else
+        --    core2_en_int <= dbus(7);
+        --  end if;
 --            ram_partition_int <= dbus(6 downto 3);
             halt_en_int <= dbus(3);           -- added bu HYX, 20150707
             short_cycle_int <= dbus(2);

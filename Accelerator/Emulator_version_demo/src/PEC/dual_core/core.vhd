@@ -127,6 +127,7 @@ entity core is
     bmem_ce_n   : out  std_logic;
     -- CC signal
     req_c1     : out std_logic;
+    req_rd_c1  : out std_logic;
     ack_c1     : in std_logic;
     ddi_vld    : in std_logic; --Added by CJ
 	-- router control signals
@@ -290,7 +291,7 @@ architecture struct of core is
 ---------------------------------------------------------------------
   -- Microinstruction pipeline register
   signal pl         : std_logic_vector(127 downto 0);
-  constant init_mpgm : std_logic_vector(127 downto 0) := (106 => '1', 100 => '1', 98 => '0', 97 => '0', 42 => '0', 74 => '0', 15 => '1', 5 => '0', 34 => '1',others => '-');--TBA--CJ
+  constant init_mpgm : std_logic_vector(127 downto 0) := x"00000410000000780060000602A08040";--(106 => '1', 100 => '1', 98 => '0', 97 => '0', 42 => '0', 74 => '0', 15 => '1', 5 => '0', 34 => '1',others => '-');--TBA--CJ
                                                           --45 => '0', 50 => '1', 23 => '1', 68 => '1', 6 => '1', 54 => '1', 27 => '0', 49 => '0',others => '0');--core2 enable--ZH
 
   -- Named fields of the pipeline register input
@@ -448,6 +449,7 @@ architecture struct of core is
   attribute syn_keep of curr_mpga : signal is true;
   -- Microprogram loading signal --CJ
   signal req    : std_logic;
+  signal req_rd : std_logic;
   signal ack    : std_logic;
   signal ld_mpgm:  std_logic; 
   signal vldl   : std_logic;
@@ -486,15 +488,17 @@ begin
   dbus <= dbus_int;
   pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
   aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
-  ready <= pl(121);
+  ready <= pl(121) and not dtm_fifo_rdy;
 ---------------------------------------------------------------------
 -- Microinstruction loading 
 ---------------------------------------------------------------------
   exe_i <= exe;
   req_c1 <= req;
+  req_rd_c1 <= req_rd;
   ack <= ACK_C1; 
   init_ld <= pl(100) and pl(106) and not pl(98) and not pl(97);
   --ld_mpgm <= pl(100) and pl(98);
+  dfm_rdy <= ddi_vld;
   data_vld_latch: process(clk_p) --half clk_e latchvariable mid : std_logic;
   begin
       if rising_edge(clk_p) then
@@ -1316,6 +1320,7 @@ begin
         EXE      => exe,
         DATA_VLD => ddi_vld,
         REQ_OUT  => req,
+        REQ_RD_OUT => req_rd,
         ACK_IN   => ack,
         DIN      => din_c,
         DOUT     =>dout_c,
@@ -1324,6 +1329,7 @@ begin
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
+        DTM_FIFO_RDY => dtm_fifo_rdy,
         VE_DTMO  =>ve_out_dtm_int,
         VE_DTM_RDY => ve_dtm_rdy_int,
         VE_PUSH_DTM => ve_push_dtm_int,

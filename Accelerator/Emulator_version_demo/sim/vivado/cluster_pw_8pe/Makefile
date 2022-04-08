@@ -4,6 +4,8 @@ all: work  rtl tb elab
 
 rtl: pec_rtl 
 
+etb: tb elab
+
 tb: cluster_pw_8pes_tb 
 
 elab:

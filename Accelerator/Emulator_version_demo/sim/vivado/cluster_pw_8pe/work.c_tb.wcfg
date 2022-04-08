@@ -3,1335 +3,1214 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="c_tb_behav.wdb" id="1">
+      <db_ref path="work.c_tb.wdb" id="1">
          <top_modules>
             <top_module name="c_tb" />
             <top_module name="cluster_pkg" />
-            <top_module name="glbl" />
             <top_module name="gp_pkg" />
             <top_module name="mpgmfield_lib" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,122.000001 us"></ZoomEndTime>
-      <Cursor1Time time="704.403508 us"></Cursor1Time>
+      <ZoomStartTime time="89,152.495 ns"></ZoomStartTime>
+      <ZoomEndTime time="90,511.501 ns"></ZoomEndTime>
+      <Cursor1Time time="90,285.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="114"></NameColumnWidth>
-      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+      <NameColumnWidth column_width="317"></NameColumnWidth>
+      <ValueColumnWidth column_width="143"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="310" />
+   <WVObjectSize size="166" />
    <wave_markers>
-      <marker time="322350000" label="" />
-      <marker time="723090000" label="" />
-      <marker time="302460000" label="" />
-      <marker time="704100000" label="" />
+      <marker label="" time="322350000" />
+      <marker label="" time="723090000" />
+      <marker label="" time="302460000" />
+      <marker label="" time="704100000" />
    </wave_markers>
-   <wvobject fp_name="/c_tb/clk_p_i" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/clk_p_i">
       <obj_property name="ElementShortName">clk_p_i</obj_property>
       <obj_property name="ObjectShortName">clk_p_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/clk_e_i" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/clk_e_i">
       <obj_property name="ElementShortName">clk_e_i</obj_property>
       <obj_property name="ObjectShortName">clk_e_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/rst_e_i" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/rst_e_i">
       <obj_property name="ElementShortName">rst_e_i</obj_property>
       <obj_property name="ObjectShortName">rst_e_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/clk_o_i" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/clk_o_i">
       <obj_property name="ElementShortName">clk_o_i</obj_property>
       <obj_property name="ObjectShortName">clk_o_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/data_out_i" type="array">
-      <obj_property name="ElementShortName">data_out_i[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out_i[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/CLK_O" type="logic">
-      <obj_property name="ElementShortName">CLK_O</obj_property>
-      <obj_property name="ObjectShortName">CLK_O</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/rd_trig" type="logic">
-      <obj_property name="ElementShortName">rd_trig</obj_property>
-      <obj_property name="ObjectShortName">rd_trig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/delay" type="logic">
-      <obj_property name="ElementShortName">delay</obj_property>
-      <obj_property name="ObjectShortName">delay</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/rd_ena" type="logic">
-      <obj_property name="ElementShortName">rd_ena</obj_property>
-      <obj_property name="ObjectShortName">rd_ena</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_cmd" type="array">
-      <obj_property name="ElementShortName">noc_cmd[4:0]</obj_property>
-      <obj_property name="ObjectShortName">noc_cmd[4:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/tag_i" type="logic">
-      <obj_property name="ElementShortName">tag_i</obj_property>
-      <obj_property name="ObjectShortName">tag_i</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/byte_ctr" type="array">
-      <obj_property name="ElementShortName">byte_ctr[3:0]</obj_property>
-      <obj_property name="ObjectShortName">byte_ctr[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/len_ctr" type="array">
-      <obj_property name="ElementShortName">len_ctr[14:0]</obj_property>
-      <obj_property name="ObjectShortName">len_ctr[14:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/addr_n" type="array">
-      <obj_property name="ElementShortName">addr_n[14:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_n[14:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/tag_fb_i" type="logic">
-      <obj_property name="ElementShortName">tag_fb_i</obj_property>
-      <obj_property name="ObjectShortName">tag_fb_i</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/c_rdy_i" type="logic">
-      <obj_property name="ElementShortName">c_rdy_i</obj_property>
-      <obj_property name="ObjectShortName">c_rdy_i</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/EXE" type="logic">
-      <obj_property name="ElementShortName">EXE</obj_property>
-      <obj_property name="ObjectShortName">EXE</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mpram00/RAM" type="array">
-      <obj_property name="ElementShortName">RAM[255:0][127:0]</obj_property>
-      <obj_property name="ObjectShortName">RAM[255:0][127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/LD_MPGM" type="logic">
-      <obj_property name="ElementShortName">LD_MPGM</obj_property>
-      <obj_property name="ObjectShortName">LD_MPGM</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DATA_VLD" type="logic">
-      <obj_property name="ElementShortName">DATA_VLD</obj_property>
-      <obj_property name="ObjectShortName">DATA_VLD</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DIN" type="array">
-      <obj_property name="ElementShortName">DIN[127:0]</obj_property>
-      <obj_property name="ObjectShortName">DIN[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_data_int" type="array">
-      <obj_property name="ElementShortName">ve_data_int[63:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_data_int[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/MPGMM_IN" type="array">
-      <obj_property name="ElementShortName">MPGMM_IN[127:0]</obj_property>
-      <obj_property name="ObjectShortName">MPGMM_IN[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/mp_data_int" type="array">
-      <obj_property name="ElementShortName">mp_data_int[127:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_data_int[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/tb/progress" type="other">
+   <wvobject type="other" fp_name="/c_tb/tb/progress">
       <obj_property name="ElementShortName">progress</obj_property>
       <obj_property name="ObjectShortName">progress</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/data_i" type="array">
-      <obj_property name="ElementShortName">data_i[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_i[7:0]</obj_property>
+   <wvobject type="group" fp_name="group526">
+      <obj_property name="label">NoC Bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/c_tb/data_out_i">
+         <obj_property name="ElementShortName">data_out_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">data_out_i[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/data_i">
+         <obj_property name="ElementShortName">data_i[7:0]</obj_property>
+         <obj_property name="ObjectShortName">data_i[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/tag_i">
+         <obj_property name="ElementShortName">tag_i</obj_property>
+         <obj_property name="ObjectShortName">tag_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/tag_fb_i">
+         <obj_property name="ElementShortName">tag_fb_i</obj_property>
+         <obj_property name="ObjectShortName">tag_fb_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/c_rdy_i">
+         <obj_property name="ElementShortName">c_rdy_i</obj_property>
+         <obj_property name="ObjectShortName">c_rdy_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/cc/noc_read">
+         <obj_property name="ElementShortName">noc_read</obj_property>
+         <obj_property name="ObjectShortName">noc_read</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_DI" type="array">
-      <obj_property name="ElementShortName">mp_RAM0_DI[127:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_RAM0_DI[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_DO" type="array">
-      <obj_property name="ElementShortName">mp_RAM0_DO[127:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_RAM0_DO[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mpmem_inf_inst/c1_mpram_a" type="array">
-      <obj_property name="ElementShortName">c1_mpram_a[7:0]</obj_property>
-      <obj_property name="ObjectShortName">c1_mpram_a[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mpmem_inf_inst/c2_mpram_a" type="array">
-      <obj_property name="ElementShortName">c2_mpram_a[7:0]</obj_property>
-      <obj_property name="ObjectShortName">c2_mpram_a[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_A" type="array">
-      <obj_property name="ElementShortName">mp_RAM0_A[7:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_RAM0_A[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/data_core_int" type="array">
-      <obj_property name="ElementShortName">data_core_int[15:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_core_int[15:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_5/mp_RAM0_DI" type="array">
-      <obj_property name="ElementShortName">mp_RAM0_DI[127:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_RAM0_DI[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_5/mp_RAM0_A" type="array">
-      <obj_property name="ElementShortName">mp_RAM0_A[7:0]</obj_property>
-      <obj_property name="ObjectShortName">mp_RAM0_A[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_read" type="logic">
-      <obj_property name="ElementShortName">noc_read</obj_property>
-      <obj_property name="ObjectShortName">noc_read</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_reg_rdy" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/noc_reg_rdy">
       <obj_property name="ElementShortName">noc_reg_rdy</obj_property>
       <obj_property name="ObjectShortName">noc_reg_rdy</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/write_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/CLK_O">
+      <obj_property name="ElementShortName">CLK_O</obj_property>
+      <obj_property name="ObjectShortName">CLK_O</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/noc_cmd">
+      <obj_property name="ElementShortName">noc_cmd[4:0]</obj_property>
+      <obj_property name="ObjectShortName">noc_cmd[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group319">
+      <obj_property name="label">Cluster_controller</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="divider327" type="divider">
+         <obj_property name="label">Cluster Controller</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group525">
+      <obj_property name="label">PE1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/EXE">
+         <obj_property name="ElementShortName">EXE</obj_property>
+         <obj_property name="ObjectShortName">EXE</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mpram00/RAM">
+         <obj_property name="ElementShortName">RAM[255:0][127:0]</obj_property>
+         <obj_property name="ObjectShortName">RAM[255:0][127:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/LD_MPGM">
+         <obj_property name="ElementShortName">LD_MPGM</obj_property>
+         <obj_property name="ObjectShortName">LD_MPGM</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DATA_VLD">
+         <obj_property name="ElementShortName">DATA_VLD</obj_property>
+         <obj_property name="ObjectShortName">DATA_VLD</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DIN">
+         <obj_property name="ElementShortName">DIN[127:0]</obj_property>
+         <obj_property name="ObjectShortName">DIN[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_data_int">
+         <obj_property name="ElementShortName">ve_data_int[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ve_data_int[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/mp_data_int">
+         <obj_property name="ElementShortName">mp_data_int[127:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_data_int[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_DI">
+         <obj_property name="ElementShortName">mp_RAM0_DI[127:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_RAM0_DI[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_DO">
+         <obj_property name="ElementShortName">mp_RAM0_DO[127:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_RAM0_DO[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/MPGMM_IN">
+         <obj_property name="ElementShortName">MPGMM_IN[127:0]</obj_property>
+         <obj_property name="ObjectShortName">MPGMM_IN[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mpmem_inf_inst/c1_mpram_a">
+         <obj_property name="ElementShortName">c1_mpram_a[7:0]</obj_property>
+         <obj_property name="ObjectShortName">c1_mpram_a[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mpmem_inf_inst/c2_mpram_a">
+         <obj_property name="ElementShortName">c2_mpram_a[7:0]</obj_property>
+         <obj_property name="ObjectShortName">c2_mpram_a[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/mp_RAM0_A">
+         <obj_property name="ElementShortName">mp_RAM0_A[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_RAM0_A[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_full">
+         <obj_property name="ElementShortName">fifo_full</obj_property>
+         <obj_property name="ObjectShortName">fifo_full</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group527">
+      <obj_property name="label">PE5 pair</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_5/mp_RAM0_DI">
+         <obj_property name="ElementShortName">mp_RAM0_DI[127:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_RAM0_DI[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_5/mp_RAM0_A">
+         <obj_property name="ElementShortName">mp_RAM0_A[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mp_RAM0_A[7:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/write_req">
       <obj_property name="ElementShortName">write_req</obj_property>
       <obj_property name="ObjectShortName">write_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/cb_status" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/cb_status">
       <obj_property name="ElementShortName">cb_status</obj_property>
       <obj_property name="ObjectShortName">cb_status</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/pe_req_type" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/pe_req_type">
       <obj_property name="ElementShortName">pe_req_type[1:0]</obj_property>
       <obj_property name="ObjectShortName">pe_req_type[1:0]</obj_property>
    </wvobject>
-   <wvobject type="divider" fp_name="divider1091">
-      <obj_property name="label">debug here</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/id_num" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/id_num">
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">id_num[5:0]</obj_property>
       <obj_property name="ObjectShortName">id_num[5:0]</obj_property>
       <obj_property name="label">cc_id_num[5:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/req_last" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/req_last">
       <obj_property name="ElementShortName">req_last[5:0]</obj_property>
       <obj_property name="ObjectShortName">req_last[5:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/req_exe" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/req_exe">
       <obj_property name="ElementShortName">req_exe</obj_property>
       <obj_property name="ObjectShortName">req_exe</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/req_bexe" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/req_bexe">
       <obj_property name="ElementShortName">req_bexe</obj_property>
       <obj_property name="ObjectShortName">req_bexe</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/pe_read" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/pe_read">
       <obj_property name="ElementShortName">pe_read</obj_property>
       <obj_property name="ObjectShortName">pe_read</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/pe_write" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/pe_write">
       <obj_property name="ElementShortName">pe_write</obj_property>
       <obj_property name="ObjectShortName">pe_write</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/bc_i" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/bc_i">
       <obj_property name="ElementShortName">bc_i[6:0]</obj_property>
       <obj_property name="ObjectShortName">bc_i[6:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_reg_rdy" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/noc_reg_rdy">
       <obj_property name="ElementShortName">noc_reg_rdy</obj_property>
       <obj_property name="ObjectShortName">noc_reg_rdy</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/DATA_VLD" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/DATA_VLD">
       <obj_property name="ElementShortName">DATA_VLD</obj_property>
       <obj_property name="ObjectShortName">DATA_VLD</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/b_cast_ctr" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/b_cast_ctr">
       <obj_property name="ElementShortName">b_cast_ctr[5:0]</obj_property>
       <obj_property name="ObjectShortName">b_cast_ctr[5:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/FIFO_VLD" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/FIFO_VLD">
       <obj_property name="ElementShortName">FIFO_VLD</obj_property>
       <obj_property name="ObjectShortName">FIFO_VLD</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/RD_FIFO" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/RD_FIFO">
       <obj_property name="ElementShortName">RD_FIFO</obj_property>
       <obj_property name="ObjectShortName">RD_FIFO</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/standby" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/standby">
       <obj_property name="ElementShortName">standby</obj_property>
       <obj_property name="ObjectShortName">standby</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/REQ_IN" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/REQ_IN">
       <obj_property name="ElementShortName">REQ_IN</obj_property>
       <obj_property name="ObjectShortName">REQ_IN</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/transfer_cnt" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/transfer_cnt">
       <obj_property name="ElementShortName">transfer_cnt[7:0]</obj_property>
       <obj_property name="ObjectShortName">transfer_cnt[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/transfer_type" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/transfer_type">
       <obj_property name="ElementShortName">transfer_type[1:0]</obj_property>
       <obj_property name="ObjectShortName">transfer_type[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/requesting" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/requesting">
       <obj_property name="ElementShortName">requesting</obj_property>
       <obj_property name="ObjectShortName">requesting</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/empty" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/empty">
       <obj_property name="ElementShortName">empty</obj_property>
       <obj_property name="ObjectShortName">empty</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/send_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/send_req">
       <obj_property name="ElementShortName">send_req</obj_property>
       <obj_property name="ObjectShortName">send_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/send_req_d" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/send_req_d">
       <obj_property name="ElementShortName">send_req_d</obj_property>
       <obj_property name="ObjectShortName">send_req_d</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req">
       <obj_property name="ElementShortName">req</obj_property>
       <obj_property name="ObjectShortName">req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fb" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fb">
       <obj_property name="ElementShortName">fb</obj_property>
       <obj_property name="ObjectShortName">fb</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_2/core1/cmdr/send_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_2/core1/cmdr/send_req">
       <obj_property name="ElementShortName">send_req</obj_property>
       <obj_property name="ObjectShortName">send_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_2/core1/cmdr/fb" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_2/core1/cmdr/fb">
       <obj_property name="ElementShortName">fb</obj_property>
       <obj_property name="ObjectShortName">fb</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/REQ_SIG" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/REQ_SIG">
       <obj_property name="ElementShortName">REQ_SIG[15:0]</obj_property>
       <obj_property name="ObjectShortName">REQ_SIG[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/ACK_SIG" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/ACK_SIG">
       <obj_property name="ElementShortName">ACK_SIG[15:0]</obj_property>
       <obj_property name="ObjectShortName">ACK_SIG[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/pl_send_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/pl_send_req">
       <obj_property name="ElementShortName">pl_send_req</obj_property>
       <obj_property name="ObjectShortName">pl_send_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/send_req_d" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/send_req_d">
       <obj_property name="ElementShortName">send_req_d</obj_property>
       <obj_property name="ObjectShortName">send_req_d</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/send_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/send_req">
       <obj_property name="ElementShortName">send_req</obj_property>
       <obj_property name="ObjectShortName">send_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/requesting" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/requesting">
       <obj_property name="ElementShortName">requesting</obj_property>
       <obj_property name="ObjectShortName">requesting</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/REQ_SIG[1]" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/REQ_SIG[1]">
       <obj_property name="ElementShortName">[1]</obj_property>
       <obj_property name="ObjectShortName">[1]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/ACK_SIG[14]" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/ACK_SIG[14]">
       <obj_property name="ElementShortName">[14]</obj_property>
       <obj_property name="ObjectShortName">[14]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/VE_AUTO_SEND" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/VE_AUTO_SEND">
       <obj_property name="ElementShortName">VE_AUTO_SEND</obj_property>
       <obj_property name="ObjectShortName">VE_AUTO_SEND</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/fifo_push" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/fifo_push">
       <obj_property name="ElementShortName">fifo_push</obj_property>
       <obj_property name="ObjectShortName">fifo_push</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/VE_PUSH_DTM" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/VE_PUSH_DTM">
       <obj_property name="ElementShortName">VE_PUSH_DTM</obj_property>
       <obj_property name="ObjectShortName">VE_PUSH_DTM</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/push_cnt" type="other">
+   <wvobject type="other" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/push_cnt">
       <obj_property name="ElementShortName">push_cnt</obj_property>
       <obj_property name="ObjectShortName">push_cnt</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/req_fifo/wr_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/req_fifo/wr_en">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/dtm_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/dtm_reg">
       <obj_property name="ElementShortName">dtm_reg[31:0]</obj_property>
       <obj_property name="ObjectShortName">dtm_reg[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/rd_trig" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/rd_trig">
       <obj_property name="ElementShortName">rd_trig</obj_property>
       <obj_property name="ObjectShortName">rd_trig</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/req_fifo/rd_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/req_fifo/rd_en">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/transfer_cnt" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/transfer_cnt">
       <obj_property name="ElementShortName">transfer_cnt[7:0]</obj_property>
       <obj_property name="ObjectShortName">transfer_cnt[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/transfer_type" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/transfer_type">
       <obj_property name="ElementShortName">transfer_type[1:0]</obj_property>
       <obj_property name="ObjectShortName">transfer_type[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/fifo_full" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/cmdr/fifo_full">
       <obj_property name="ElementShortName">fifo_full</obj_property>
       <obj_property name="ObjectShortName">fifo_full</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/pl" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/pl">
       <obj_property name="ElementShortName">pl[127:0]</obj_property>
       <obj_property name="ObjectShortName">pl[127:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/REQ_RD_IN" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/REQ_RD_IN">
       <obj_property name="ElementShortName">REQ_RD_IN[15:0]</obj_property>
       <obj_property name="ObjectShortName">REQ_RD_IN[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/req_rd_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/req_rd_reg">
       <obj_property name="ElementShortName">req_rd_reg[15:0]</obj_property>
       <obj_property name="ObjectShortName">req_rd_reg[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/bs_out" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/bs_out">
       <obj_property name="ElementShortName">bs_out[15:0]</obj_property>
       <obj_property name="ObjectShortName">bs_out[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/add_in_1" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/add_in_1">
       <obj_property name="ElementShortName">add_in_1[3:0]</obj_property>
       <obj_property name="ObjectShortName">add_in_1[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/add_in_2" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/add_in_2">
       <obj_property name="ElementShortName">add_in_2[3:0]</obj_property>
       <obj_property name="ObjectShortName">add_in_2[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/id_num" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/id_num">
       <obj_property name="ElementShortName">id_num[3:0]</obj_property>
       <obj_property name="ObjectShortName">id_num[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/id_syn" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/id_syn">
       <obj_property name="ElementShortName">id_syn[3:0]</obj_property>
       <obj_property name="ObjectShortName">id_syn[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/id_syn_d" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/id_syn_d">
       <obj_property name="ElementShortName">id_syn_d[3:0]</obj_property>
       <obj_property name="ObjectShortName">id_syn_d[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/PE_REQ_IN" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/PE_REQ_IN">
       <obj_property name="ElementShortName">PE_REQ_IN[15:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">PE_REQ_IN[15:0][31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/pe_mux_out" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/pe_mux_out">
       <obj_property name="ElementShortName">pe_mux_out[31:0]</obj_property>
       <obj_property name="ObjectShortName">pe_mux_out[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/req_core" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/req_core">
       <obj_property name="ElementShortName">req_core[31:0]</obj_property>
       <obj_property name="ObjectShortName">req_core[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/request_fifo/wr_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/request_fifo/wr_en">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/poll_act" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/poll_act">
       <obj_property name="ElementShortName">poll_act</obj_property>
       <obj_property name="ObjectShortName">poll_act</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/EVEN_P" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/EVEN_P">
       <obj_property name="ElementShortName">EVEN_P</obj_property>
       <obj_property name="ObjectShortName">EVEN_P</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_E_NEG" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_E_NEG">
       <obj_property name="ElementShortName">CLK_E_NEG</obj_property>
       <obj_property name="ObjectShortName">CLK_E_NEG</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/data_in_fifo" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/data_in_fifo">
       <obj_property name="ElementShortName">data_in_fifo[9:0]</obj_property>
       <obj_property name="ObjectShortName">data_in_fifo[9:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/OUTPUT">
       <obj_property name="ElementShortName">OUTPUT[31:0]</obj_property>
       <obj_property name="ObjectShortName">OUTPUT[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/req_addr_p" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/req_addr_p">
       <obj_property name="ElementShortName">req_addr_p[14:0]</obj_property>
       <obj_property name="ObjectShortName">req_addr_p[14:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/len_ctr_p" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/len_ctr_p">
       <obj_property name="ElementShortName">len_ctr_p[8:0]</obj_property>
       <obj_property name="ObjectShortName">len_ctr_p[8:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/addr_p" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/addr_p">
       <obj_property name="ElementShortName">addr_p[14:0]</obj_property>
       <obj_property name="ObjectShortName">addr_p[14:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/addr_n" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/addr_n">
       <obj_property name="ElementShortName">addr_n[14:0]</obj_property>
       <obj_property name="ObjectShortName">addr_n[14:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/clustermem/addr_c" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/clustermem/addr_c">
       <obj_property name="ElementShortName">addr_c[14:0]</obj_property>
       <obj_property name="ObjectShortName">addr_c[14:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/clustermem/WR" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/clustermem/WR">
       <obj_property name="ElementShortName">WR</obj_property>
       <obj_property name="ObjectShortName">WR</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/write_count" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/write_count">
       <obj_property name="ElementShortName">write_count[1:0]</obj_property>
       <obj_property name="ObjectShortName">write_count[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/pe_data_in" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/pe_data_in">
       <obj_property name="ElementShortName">pe_data_in[15:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">pe_data_in[15:0][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/DATA_TO_PE" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/DATA_TO_PE">
       <obj_property name="ElementShortName">DATA_TO_PE[127:0]</obj_property>
       <obj_property name="ObjectShortName">DATA_TO_PE[127:0]</obj_property>
       <obj_property name="Reversed">false</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/DATA" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/DATA">
       <obj_property name="ElementShortName">DATA[7:0]</obj_property>
       <obj_property name="ObjectShortName">DATA[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/peci_busy" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/peci_busy">
       <obj_property name="ElementShortName">peci_busy</obj_property>
       <obj_property name="ObjectShortName">peci_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/tb/TAG_FB" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/tb/TAG_FB">
       <obj_property name="ElementShortName">TAG_FB</obj_property>
       <obj_property name="ObjectShortName">TAG_FB</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/tb/C_RDY" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/tb/C_RDY">
       <obj_property name="ElementShortName">C_RDY</obj_property>
       <obj_property name="ObjectShortName">C_RDY</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/mpram_d" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/mpram_d">
       <obj_property name="ElementShortName">mpram_d[127:0]</obj_property>
       <obj_property name="ObjectShortName">mpram_d[127:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/clc/sct1/pl_seqc" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/clc/sct1/pl_seqc">
       <obj_property name="ElementShortName">pl_seqc[4:0]</obj_property>
       <obj_property name="ObjectShortName">pl_seqc[4:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/mpgm/mpga" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/mpgm/mpga">
       <obj_property name="ElementShortName">mpga[7:0]</obj_property>
       <obj_property name="ObjectShortName">mpga[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core2/pl" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core2/pl">
       <obj_property name="ElementShortName">pl[127:0]</obj_property>
       <obj_property name="ObjectShortName">pl[127:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core2/mpgm/mpga" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core2/mpgm/mpga">
       <obj_property name="ElementShortName">mpga[7:0]</obj_property>
       <obj_property name="ObjectShortName">mpga[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/clc/re_rdy" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/clc/re_rdy">
       <obj_property name="ElementShortName">re_rdy</obj_property>
       <obj_property name="ObjectShortName">re_rdy</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_IN" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_IN">
       <obj_property name="ElementShortName">VE_IN[63:0]</obj_property>
       <obj_property name="ObjectShortName">VE_IN[63:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/request_fifo/rd_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/request_fifo/rd_en">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT" type="array">
-      <obj_property name="ElementShortName">OUTPUT[31:0]</obj_property>
-      <obj_property name="ObjectShortName">OUTPUT[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="vbus397" type="vbus">
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[14]" type="logic">
-         <obj_property name="ElementShortName">[14]</obj_property>
-         <obj_property name="ObjectShortName">[14]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[13]" type="logic">
-         <obj_property name="ElementShortName">[13]</obj_property>
-         <obj_property name="ObjectShortName">[13]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[12]" type="logic">
-         <obj_property name="ElementShortName">[12]</obj_property>
-         <obj_property name="ObjectShortName">[12]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[11]" type="logic">
-         <obj_property name="ElementShortName">[11]</obj_property>
-         <obj_property name="ObjectShortName">[11]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[10]" type="logic">
-         <obj_property name="ElementShortName">[10]</obj_property>
-         <obj_property name="ObjectShortName">[10]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[9]" type="logic">
-         <obj_property name="ElementShortName">[9]</obj_property>
-         <obj_property name="ObjectShortName">[9]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[8]" type="logic">
-         <obj_property name="ElementShortName">[8]</obj_property>
-         <obj_property name="ObjectShortName">[8]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[7]" type="logic">
-         <obj_property name="ElementShortName">[7]</obj_property>
-         <obj_property name="ObjectShortName">[7]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[6]" type="logic">
-         <obj_property name="ElementShortName">[6]</obj_property>
-         <obj_property name="ObjectShortName">[6]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[5]" type="logic">
-         <obj_property name="ElementShortName">[5]</obj_property>
-         <obj_property name="ObjectShortName">[5]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[4]" type="logic">
-         <obj_property name="ElementShortName">[4]</obj_property>
-         <obj_property name="ObjectShortName">[4]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[3]" type="logic">
-         <obj_property name="ElementShortName">[3]</obj_property>
-         <obj_property name="ObjectShortName">[3]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[2]" type="logic">
-         <obj_property name="ElementShortName">[2]</obj_property>
-         <obj_property name="ObjectShortName">[2]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[1]" type="logic">
-         <obj_property name="ElementShortName">[1]</obj_property>
-         <obj_property name="ObjectShortName">[1]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/c_tb/cluster/cluster_net/OUTPUT[0]" type="logic">
-         <obj_property name="ElementShortName">[0]</obj_property>
-         <obj_property name="ObjectShortName">[0]</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/mpgm/lmpen" type="logic">
-      <obj_property name="ElementShortName">lmpen</obj_property>
-      <obj_property name="ObjectShortName">lmpen</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/fifo_rdy" type="logic">
-      <obj_property name="ElementShortName">fifo_rdy</obj_property>
-      <obj_property name="ObjectShortName">fifo_rdy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/ACK_SIG" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/ACK_SIG">
       <obj_property name="ElementShortName">ACK_SIG[15:0]</obj_property>
       <obj_property name="ObjectShortName">ACK_SIG[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm">
       <obj_property name="ElementShortName">ld_dtm</obj_property>
       <obj_property name="ObjectShortName">ld_dtm</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_mux_sel" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_mux_sel">
       <obj_property name="ElementShortName">dtm_mux_sel[1:0]</obj_property>
       <obj_property name="ObjectShortName">dtm_mux_sel[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/YBUS" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/YBUS">
       <obj_property name="ElementShortName">YBUS[7:0]</obj_property>
       <obj_property name="ObjectShortName">YBUS[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DATA_VLD" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/DATA_VLD">
       <obj_property name="ElementShortName">DATA_VLD</obj_property>
       <obj_property name="ObjectShortName">DATA_VLD</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_reg">
       <obj_property name="ElementShortName">dtm_reg[31:0]</obj_property>
       <obj_property name="ObjectShortName">dtm_reg[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/wr_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/wr_en">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/dout" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/dout">
       <obj_property name="ElementShortName">dout[31:0]</obj_property>
       <obj_property name="ObjectShortName">dout[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_in_cnt" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_in_cnt">
       <obj_property name="ElementShortName">ve_in_cnt[1:0]</obj_property>
       <obj_property name="ObjectShortName">ve_in_cnt[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTM_RDY" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTM_RDY">
       <obj_property name="ElementShortName">VE_DTM_RDY</obj_property>
       <obj_property name="ObjectShortName">VE_DTM_RDY</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_AUTO_SEND" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_AUTO_SEND">
       <obj_property name="ElementShortName">VE_AUTO_SEND</obj_property>
       <obj_property name="ObjectShortName">VE_AUTO_SEND</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_full" type="logic">
-      <obj_property name="ElementShortName">fifo_full</obj_property>
-      <obj_property name="ObjectShortName">fifo_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_P" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_P">
       <obj_property name="ElementShortName">CLK_P</obj_property>
       <obj_property name="ObjectShortName">CLK_P</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_ctl" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_ctl">
       <obj_property name="ElementShortName">mul_ctl[7:0]</obj_property>
       <obj_property name="ObjectShortName">mul_ctl[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_start_reg" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_start_reg">
       <obj_property name="ElementShortName">ve_start_reg</obj_property>
       <obj_property name="ObjectShortName">ve_start_reg</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mult_delay" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mult_delay">
       <obj_property name="ElementShortName">mult_delay</obj_property>
       <obj_property name="ObjectShortName">mult_delay</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_inn_ctl" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_inn_ctl">
       <obj_property name="ElementShortName">mul_inn_ctl</obj_property>
       <obj_property name="ObjectShortName">mul_inn_ctl</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/ce" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/ce">
       <obj_property name="ElementShortName">ce</obj_property>
       <obj_property name="ObjectShortName">ce</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/a" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/a">
       <obj_property name="ElementShortName">a[8:0]</obj_property>
       <obj_property name="ObjectShortName">a[8:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/b" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mul_0/b">
       <obj_property name="ElementShortName">b[8:0]</obj_property>
       <obj_property name="ObjectShortName">b[8:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/ce" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/ce">
       <obj_property name="ElementShortName">ce</obj_property>
       <obj_property name="ObjectShortName">ce</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/data" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/data">
       <obj_property name="ElementShortName">data[17:0]</obj_property>
       <obj_property name="ObjectShortName">data[17:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/sum" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/sum">
       <obj_property name="ElementShortName">sum[31:0]</obj_property>
       <obj_property name="ObjectShortName">sum[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/reset" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/accu_0/reset">
       <obj_property name="ElementShortName">reset</obj_property>
       <obj_property name="ObjectShortName">reset</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/RST" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/RST">
       <obj_property name="ElementShortName">RST</obj_property>
       <obj_property name="ObjectShortName">RST</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_clr_acc" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_clr_acc">
       <obj_property name="ElementShortName">ve_clr_acc</obj_property>
       <obj_property name="ObjectShortName">ve_clr_acc</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/sclr_i_delay" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/sclr_i_delay">
       <obj_property name="ElementShortName">sclr_i_delay</obj_property>
       <obj_property name="ObjectShortName">sclr_i_delay</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_RDY" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_RDY">
       <obj_property name="ElementShortName">VE_RDY</obj_property>
       <obj_property name="ObjectShortName">VE_RDY</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_start" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_start">
       <obj_property name="ElementShortName">ve_start</obj_property>
       <obj_property name="ObjectShortName">ve_start</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_reload" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_reload">
       <obj_property name="ElementShortName">ve_addr_reload</obj_property>
       <obj_property name="ObjectShortName">ve_addr_reload</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_loop_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_loop_reg">
       <obj_property name="ElementShortName">ve_loop_reg[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_loop_reg[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_oloop_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_oloop_reg">
       <obj_property name="ElementShortName">ve_oloop_reg[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_oloop_reg[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_loop" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_loop">
       <obj_property name="ElementShortName">ve_loop[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_loop[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_oloop" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_oloop">
       <obj_property name="ElementShortName">ve_oloop[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_oloop[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_l" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_l">
       <obj_property name="ElementShortName">ve_addr_l[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_addr_l[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_r" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_addr_r">
       <obj_property name="ElementShortName">ve_addr_r[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_addr_r[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_saddr_l" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_saddr_l">
       <obj_property name="ElementShortName">ve_saddr_l[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_saddr_l[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_saddr_r" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_saddr_r">
       <obj_property name="ElementShortName">ve_saddr_r[7:0]</obj_property>
       <obj_property name="ObjectShortName">ve_saddr_r[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/config" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/config">
       <obj_property name="ElementShortName">config[7:0]</obj_property>
       <obj_property name="ObjectShortName">config[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/shifter_ena" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/shifter_ena">
       <obj_property name="ElementShortName">shifter_ena</obj_property>
       <obj_property name="ObjectShortName">shifter_ena</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/scale" type="array">
-      <obj_property name="ElementShortName">scale[4:0]</obj_property>
-      <obj_property name="ObjectShortName">scale[4:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider222">
-      <obj_property name="label">Left buffer(data)</obj_property>
+   <wvobject type="group" fp_name="group528">
+      <obj_property name="label">VE1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/scale">
+         <obj_property name="ElementShortName">scale[4:0]</obj_property>
+         <obj_property name="ObjectShortName">scale[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider222" type="divider">
+         <obj_property name="label">Left buffer(data)</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_l">
+         <obj_property name="ElementShortName">addr_p_l[7:0]</obj_property>
+         <obj_property name="ObjectShortName">addr_p_l[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+         <obj_property name="Reversed">false</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/zp_data">
+         <obj_property name="ElementShortName">zp_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">zp_data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider221" type="divider">
+         <obj_property name="label">Right buffer(kernel)</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_r">
+         <obj_property name="ElementShortName">addr_p_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">addr_p_r[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/zp_weight">
+         <obj_property name="ElementShortName">zp_weight[7:0]</obj_property>
+         <obj_property name="ObjectShortName">zp_weight[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider223" type="divider">
+         <obj_property name="label">Bias buffer</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/reg_in">
+         <obj_property name="ElementShortName">reg_in[4:0]</obj_property>
+         <obj_property name="ObjectShortName">reg_in[4:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_index_start">
+         <obj_property name="ElementShortName">bias_index_start[7:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_index_start[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_index_wr">
+         <obj_property name="ElementShortName">bias_index_wr[5:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_index_wr[5:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_b">
+         <obj_property name="ElementShortName">addr_p_b[5:0]</obj_property>
+         <obj_property name="ObjectShortName">addr_p_b[5:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_IN">
+         <obj_property name="ElementShortName">VE_IN[63:0]</obj_property>
+         <obj_property name="ObjectShortName">VE_IN[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/DDI_VLD">
+         <obj_property name="ElementShortName">DDI_VLD</obj_property>
+         <obj_property name="ObjectShortName">DDI_VLD</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/YBUS">
+         <obj_property name="ElementShortName">YBUS[7:0]</obj_property>
+         <obj_property name="ObjectShortName">YBUS[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mode_a_l">
+         <obj_property name="ElementShortName">mode_a_l</obj_property>
+         <obj_property name="ObjectShortName">mode_a_l</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mode_b_l">
+         <obj_property name="ElementShortName">mode_b_l</obj_property>
+         <obj_property name="ObjectShortName">mode_b_l</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_start_reg">
+         <obj_property name="ElementShortName">re_start_reg</obj_property>
+         <obj_property name="ObjectShortName">re_start_reg</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_start">
+         <obj_property name="ElementShortName">re_start</obj_property>
+         <obj_property name="ObjectShortName">re_start</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_loop_reg">
+         <obj_property name="ElementShortName">re_loop_reg[7:0]</obj_property>
+         <obj_property name="ObjectShortName">re_loop_reg[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_loop">
+         <obj_property name="ElementShortName">re_loop[7:0]</obj_property>
+         <obj_property name="ObjectShortName">re_loop[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_source">
+         <obj_property name="ElementShortName">re_source</obj_property>
+         <obj_property name="ObjectShortName">re_source</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_addr_reload">
+         <obj_property name="ElementShortName">re_addr_reload</obj_property>
+         <obj_property name="ObjectShortName">re_addr_reload</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_saddr_r">
+         <obj_property name="ElementShortName">re_saddr_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">re_saddr_r[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_addr_r">
+         <obj_property name="ElementShortName">re_addr_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">re_addr_r[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_OUT_DTM">
+         <obj_property name="ElementShortName">VE_OUT_DTM[127:0]</obj_property>
+         <obj_property name="ObjectShortName">VE_OUT_DTM[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_out_p">
+         <obj_property name="ElementShortName">ve_out_p</obj_property>
+         <obj_property name="ObjectShortName">ve_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/o_mux_ena">
+         <obj_property name="ElementShortName">o_mux_ena</obj_property>
+         <obj_property name="ObjectShortName">o_mux_ena</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/pp_stage_1">
+         <obj_property name="ElementShortName">pp_stage_1</obj_property>
+         <obj_property name="ObjectShortName">pp_stage_1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/adder_ena">
+         <obj_property name="ElementShortName">adder_ena</obj_property>
+         <obj_property name="ObjectShortName">adder_ena</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_mux">
+         <obj_property name="ElementShortName">bias_mux[1:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_mux[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_mux_out">
+         <obj_property name="ElementShortName">bias_mux_out[15:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_mux_out[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_shifter_in">
+         <obj_property name="ElementShortName">p_shifter_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_shifter_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_shifter_out">
+         <obj_property name="ElementShortName">p_shifter_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_shifter_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_adder_out">
+         <obj_property name="ElementShortName">p_adder_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_adder_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/clip_ena">
+         <obj_property name="ElementShortName">clip_ena</obj_property>
+         <obj_property name="ObjectShortName">clip_ena</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_clip_out">
+         <obj_property name="ElementShortName">p_clip_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">p_clip_out[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/ve_in_int">
+         <obj_property name="ElementShortName">ve_in_int[63:0]</obj_property>
+         <obj_property name="ObjectShortName">ve_in_int[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DIN">
+         <obj_property name="ElementShortName">VE_DIN[63:0]</obj_property>
+         <obj_property name="ObjectShortName">VE_DIN[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/dtm_data_reg">
+         <obj_property name="ElementShortName">dtm_data_reg[15:0][7:0]</obj_property>
+         <obj_property name="ObjectShortName">dtm_data_reg[15:0][7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/dfy_reg">
+         <obj_property name="ElementShortName">dfy_reg[7:0][7:0]</obj_property>
+         <obj_property name="ObjectShortName">dfy_reg[7:0][7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/pp_stage_2">
+         <obj_property name="ElementShortName">pp_stage_2</obj_property>
+         <obj_property name="ObjectShortName">pp_stage_2</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_l" type="array">
-      <obj_property name="ElementShortName">addr_p_l[7:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_p_l[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_0/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
-      <obj_property name="Reversed">false</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/zp_data" type="array">
-      <obj_property name="ElementShortName">zp_data[7:0]</obj_property>
-      <obj_property name="ObjectShortName">zp_data[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider221">
-      <obj_property name="label">Right buffer(kernel)</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_r" type="array">
-      <obj_property name="ElementShortName">addr_p_r[7:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_p_r[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_1/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/zp_weight" type="array">
-      <obj_property name="ElementShortName">zp_weight[7:0]</obj_property>
-      <obj_property name="ObjectShortName">zp_weight[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider223">
-      <obj_property name="label">Bias buffer</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/reg_in" type="array">
-      <obj_property name="ElementShortName">reg_in[4:0]</obj_property>
-      <obj_property name="ObjectShortName">reg_in[4:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/YBUS" type="array">
-      <obj_property name="ElementShortName">YBUS[7:0]</obj_property>
-      <obj_property name="ObjectShortName">YBUS[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_index_start" type="array">
-      <obj_property name="ElementShortName">bias_index_start[7:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_index_start[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_index_wr" type="array">
-      <obj_property name="ElementShortName">bias_index_wr[5:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_index_wr[5:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/addr_p_b" type="array">
-      <obj_property name="ElementShortName">addr_p_b[5:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_p_b[5:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/buf_bias/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_IN" type="array">
-      <obj_property name="ElementShortName">VE_IN[63:0]</obj_property>
-      <obj_property name="ObjectShortName">VE_IN[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/DDI_VLD" type="logic">
-      <obj_property name="ElementShortName">DDI_VLD</obj_property>
-      <obj_property name="ObjectShortName">DDI_VLD</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/DATA_VLD_OUT" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/DATA_VLD_OUT">
       <obj_property name="ElementShortName">DATA_VLD_OUT[15:0]</obj_property>
       <obj_property name="ObjectShortName">DATA_VLD_OUT[15:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mode_a_l" type="logic">
-      <obj_property name="ElementShortName">mode_a_l</obj_property>
-      <obj_property name="ObjectShortName">mode_a_l</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/mode_b_l" type="logic">
-      <obj_property name="ElementShortName">mode_b_l</obj_property>
-      <obj_property name="ObjectShortName">mode_b_l</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_start_reg" type="logic">
-      <obj_property name="ElementShortName">re_start_reg</obj_property>
-      <obj_property name="ObjectShortName">re_start_reg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_start" type="logic">
-      <obj_property name="ElementShortName">re_start</obj_property>
-      <obj_property name="ObjectShortName">re_start</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_loop_reg" type="array">
-      <obj_property name="ElementShortName">re_loop_reg[7:0]</obj_property>
-      <obj_property name="ObjectShortName">re_loop_reg[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_loop" type="array">
-      <obj_property name="ElementShortName">re_loop[7:0]</obj_property>
-      <obj_property name="ObjectShortName">re_loop[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_source" type="logic">
-      <obj_property name="ElementShortName">re_source</obj_property>
-      <obj_property name="ObjectShortName">re_source</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_addr_reload" type="logic">
-      <obj_property name="ElementShortName">re_addr_reload</obj_property>
-      <obj_property name="ObjectShortName">re_addr_reload</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_saddr_r" type="array">
-      <obj_property name="ElementShortName">re_saddr_r[7:0]</obj_property>
-      <obj_property name="ObjectShortName">re_saddr_r[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/re_addr_r" type="array">
-      <obj_property name="ElementShortName">re_addr_r[7:0]</obj_property>
-      <obj_property name="ObjectShortName">re_addr_r[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/VE_OUT_DTM" type="array">
-      <obj_property name="ElementShortName">VE_OUT_DTM[127:0]</obj_property>
-      <obj_property name="ObjectShortName">VE_OUT_DTM[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_out_p" type="logic">
-      <obj_property name="ElementShortName">ve_out_p</obj_property>
-      <obj_property name="ObjectShortName">ve_out_p</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/ve_out_c" type="array">
-      <obj_property name="ElementShortName">ve_out_c[2:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_out_c[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_0" type="array">
-      <obj_property name="ElementShortName">acc_out_0[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_0[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_1" type="array">
-      <obj_property name="ElementShortName">acc_out_1[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_1[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_2" type="array">
-      <obj_property name="ElementShortName">acc_out_2[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_2[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_3" type="array">
-      <obj_property name="ElementShortName">acc_out_3[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_3[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_4" type="array">
-      <obj_property name="ElementShortName">acc_out_4[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_4[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_5" type="array">
-      <obj_property name="ElementShortName">acc_out_5[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_5[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_6" type="array">
-      <obj_property name="ElementShortName">acc_out_6[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_6[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_7" type="array">
-      <obj_property name="ElementShortName">acc_out_7[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_7[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/acc_out_a" type="array">
-      <obj_property name="ElementShortName">acc_out_a[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_a[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/o_mux_ena" type="logic">
-      <obj_property name="ElementShortName">o_mux_ena</obj_property>
-      <obj_property name="ObjectShortName">o_mux_ena</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/pp_stage_1" type="logic">
-      <obj_property name="ElementShortName">pp_stage_1</obj_property>
-      <obj_property name="ObjectShortName">pp_stage_1</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/adder_ena" type="logic">
-      <obj_property name="ElementShortName">adder_ena</obj_property>
-      <obj_property name="ObjectShortName">adder_ena</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_mux" type="array">
-      <obj_property name="ElementShortName">bias_mux[1:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_mux[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/bias_mux_out" type="array">
-      <obj_property name="ElementShortName">bias_mux_out[15:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_mux_out[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_shifter_in" type="array">
-      <obj_property name="ElementShortName">p_shifter_in[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_shifter_in[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_shifter_out" type="array">
-      <obj_property name="ElementShortName">p_shifter_out[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_shifter_out[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_adder_out" type="array">
-      <obj_property name="ElementShortName">p_adder_out[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_adder_out[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/clip_ena" type="logic">
-      <obj_property name="ElementShortName">clip_ena</obj_property>
-      <obj_property name="ObjectShortName">clip_ena</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/p_clip_out" type="array">
-      <obj_property name="ElementShortName">p_clip_out[7:0]</obj_property>
-      <obj_property name="ObjectShortName">p_clip_out[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/ve_in_int" type="array">
-      <obj_property name="ElementShortName">ve_in_int[63:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_in_int[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DIN" type="array">
-      <obj_property name="ElementShortName">VE_DIN[63:0]</obj_property>
-      <obj_property name="ObjectShortName">VE_DIN[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/dtm_data_reg" type="array">
-      <obj_property name="ElementShortName">dtm_data_reg[15:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dtm_data_reg[15:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/dfy_reg" type="array">
-      <obj_property name="ElementShortName">dfy_reg[7:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dfy_reg[7:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/vector_engine/pp_stage_2" type="logic">
-      <obj_property name="ElementShortName">pp_stage_2</obj_property>
-      <obj_property name="ObjectShortName">pp_stage_2</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/DATA_OUT" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/DATA_OUT">
       <obj_property name="ElementShortName">DATA_OUT[7:0]</obj_property>
       <obj_property name="ObjectShortName">DATA_OUT[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_data_out" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/noc_data_out">
       <obj_property name="ElementShortName">noc_data_out[15:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">noc_data_out[15:0][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/byte_ctr" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/byte_ctr">
       <obj_property name="ElementShortName">byte_ctr[3:0]</obj_property>
       <obj_property name="ObjectShortName">byte_ctr[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/noc_read" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/cc/noc_read">
       <obj_property name="ElementShortName">noc_read</obj_property>
       <obj_property name="ObjectShortName">noc_read</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cc/clustermem/addr_c" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cc/clustermem/addr_c">
       <obj_property name="ElementShortName">addr_c[14:0]</obj_property>
       <obj_property name="ObjectShortName">addr_c[14:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTMO" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTMO">
       <obj_property name="ElementShortName">VE_DTMO[127:0]</obj_property>
       <obj_property name="ObjectShortName">VE_DTMO[127:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_reg" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/dtm_reg">
       <obj_property name="ElementShortName">dtm_reg[31:0]</obj_property>
       <obj_property name="ObjectShortName">dtm_reg[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_in_cnt" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_in_cnt">
       <obj_property name="ElementShortName">ve_in_cnt[1:0]</obj_property>
       <obj_property name="ObjectShortName">ve_in_cnt[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTM_RDY" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_DTM_RDY">
       <obj_property name="ElementShortName">VE_DTM_RDY</obj_property>
       <obj_property name="ObjectShortName">VE_DTM_RDY</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/pl_send_req" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/pl_send_req">
       <obj_property name="ElementShortName">pl_send_req</obj_property>
       <obj_property name="ObjectShortName">pl_send_req</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm">
       <obj_property name="ElementShortName">ld_dtm</obj_property>
       <obj_property name="ObjectShortName">ld_dtm</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm_v" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ld_dtm_v">
       <obj_property name="ElementShortName">ld_dtm_v</obj_property>
       <obj_property name="ObjectShortName">ld_dtm_v</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_push" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_push">
       <obj_property name="ElementShortName">fifo_push</obj_property>
       <obj_property name="ObjectShortName">fifo_push</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_PUSH_DTM" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_PUSH_DTM">
       <obj_property name="ElementShortName">VE_PUSH_DTM</obj_property>
       <obj_property name="ObjectShortName">VE_PUSH_DTM</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/EXE" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/EXE">
       <obj_property name="ElementShortName">EXE</obj_property>
       <obj_property name="ObjectShortName">EXE</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/wr_en" type="logic">
+   <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/wr_en">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/din" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/din">
       <obj_property name="ElementShortName">din[31:0]</obj_property>
       <obj_property name="ObjectShortName">din[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/ve_in_cnt" type="array">
-      <obj_property name="ElementShortName">ve_in_cnt[1:0]</obj_property>
-      <obj_property name="ObjectShortName">ve_in_cnt[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_E_NEG" type="logic">
-      <obj_property name="ElementShortName">CLK_E_NEG</obj_property>
-      <obj_property name="ObjectShortName">CLK_E_NEG</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/CLK_P" type="logic">
-      <obj_property name="ElementShortName">CLK_P</obj_property>
-      <obj_property name="ObjectShortName">CLK_P</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/dout" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/dout">
       <obj_property name="ElementShortName">dout[31:0]</obj_property>
       <obj_property name="ObjectShortName">dout[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/PE_REQ_IN[0]" type="array">
+   <wvobject type="array" fp_name="/c_tb/cluster/cluster_net/PE_REQ_IN[0]">
       <obj_property name="ElementShortName">[0][31:0]</obj_property>
       <obj_property name="ObjectShortName">[0][31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/fifo_rdy" type="logic">
-      <obj_property name="ElementShortName">fifo_rdy</obj_property>
-      <obj_property name="ObjectShortName">fifo_rdy</obj_property>
+   <wvobject type="group" fp_name="group524">
+      <obj_property name="label">FIFO_distribution</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/empty">
+         <obj_property name="ElementShortName">empty</obj_property>
+         <obj_property name="ObjectShortName">empty</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/fifo_rdy">
+         <obj_property name="ElementShortName">fifo_rdy</obj_property>
+         <obj_property name="ObjectShortName">fifo_rdy</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/almost_empty">
+         <obj_property name="ElementShortName">almost_empty</obj_property>
+         <obj_property name="ObjectShortName">almost_empty</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/cluster_net/almost_full">
+         <obj_property name="ElementShortName">almost_full</obj_property>
+         <obj_property name="ObjectShortName">almost_full</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_full">
+         <obj_property name="ElementShortName">fifo_full</obj_property>
+         <obj_property name="ObjectShortName">fifo_full</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/empty" type="logic">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
+   <wvobject type="group" fp_name="group475">
+      <obj_property name="label">Result data</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/c_tb/tb/outword">
+         <obj_property name="ElementShortName">outword[2303:0][7:0]</obj_property>
+         <obj_property name="ObjectShortName">outword[2303:0][7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/tb/out_ram">
+         <obj_property name="ElementShortName">out_ram[143:0][127:0]</obj_property>
+         <obj_property name="ObjectShortName">out_ram[143:0][127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/tb/ref_out">
+         <obj_property name="ElementShortName">ref_out[143:0][127:0]</obj_property>
+         <obj_property name="ObjectShortName">ref_out[143:0][127:0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/almost_empty" type="logic">
-      <obj_property name="ElementShortName">almost_empty</obj_property>
-      <obj_property name="ObjectShortName">almost_empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/cluster_net/almost_full" type="logic">
-      <obj_property name="ElementShortName">almost_full</obj_property>
-      <obj_property name="ObjectShortName">almost_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/fifo_full" type="logic">
-      <obj_property name="ElementShortName">fifo_full</obj_property>
-      <obj_property name="ObjectShortName">fifo_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/VE_AUTO_SEND" type="logic">
-      <obj_property name="ElementShortName">VE_AUTO_SEND</obj_property>
-      <obj_property name="ObjectShortName">VE_AUTO_SEND</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/pl_send_req" type="logic">
-      <obj_property name="ElementShortName">pl_send_req</obj_property>
-      <obj_property name="ObjectShortName">pl_send_req</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/RST_EN" type="logic">
-      <obj_property name="ElementShortName">RST_EN</obj_property>
-      <obj_property name="ObjectShortName">RST_EN</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_1/core1/cmdr/req_fifo/srst" type="logic">
-      <obj_property name="ElementShortName">srst</obj_property>
-      <obj_property name="ObjectShortName">srst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/tb/outword" type="array">
-      <obj_property name="ElementShortName">outword[2303:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">outword[2303:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/tb/out_ram" type="array">
-      <obj_property name="ElementShortName">out_ram[143:0][127:0]</obj_property>
-      <obj_property name="ObjectShortName">out_ram[143:0][127:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider281">
+   <wvobject fp_name="divider281" type="divider">
       <obj_property name="label">core14(e)</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/PL" type="array">
-      <obj_property name="ElementShortName">PL[127:0]</obj_property>
-      <obj_property name="ObjectShortName">PL[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/VE_IN" type="array">
-      <obj_property name="ElementShortName">VE_IN[63:0]</obj_property>
-      <obj_property name="ObjectShortName">VE_IN[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/DDI_VLD" type="logic">
-      <obj_property name="ElementShortName">DDI_VLD</obj_property>
-      <obj_property name="ObjectShortName">DDI_VLD</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider305">
-      <obj_property name="label">left buffer</obj_property>
+   <wvobject type="group" fp_name="group320">
+      <obj_property name="label">VE8</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/PL">
+         <obj_property name="ElementShortName">PL[127:0]</obj_property>
+         <obj_property name="ObjectShortName">PL[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/VE_IN">
+         <obj_property name="ElementShortName">VE_IN[63:0]</obj_property>
+         <obj_property name="ObjectShortName">VE_IN[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/DDI_VLD">
+         <obj_property name="ElementShortName">DDI_VLD</obj_property>
+         <obj_property name="ObjectShortName">DDI_VLD</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider305" type="divider">
+         <obj_property name="label">left buffer</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/addr">
+         <obj_property name="ElementShortName">addr[7:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/zp_data">
+         <obj_property name="ElementShortName">zp_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">zp_data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider310" type="divider">
+         <obj_property name="label">right buffer</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/addr">
+         <obj_property name="ElementShortName">addr[7:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/zp_weight">
+         <obj_property name="ElementShortName">zp_weight[7:0]</obj_property>
+         <obj_property name="ObjectShortName">zp_weight[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider319" type="divider">
+         <obj_property name="label">bias buffer</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/we">
+         <obj_property name="ElementShortName">we</obj_property>
+         <obj_property name="ObjectShortName">we</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/di">
+         <obj_property name="ElementShortName">di[63:0]</obj_property>
+         <obj_property name="ObjectShortName">di[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/addr">
+         <obj_property name="ElementShortName">addr[5:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[5:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/do">
+         <obj_property name="ElementShortName">do[63:0]</obj_property>
+         <obj_property name="ObjectShortName">do[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider282" type="divider">
+         <obj_property name="label">mul0</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/ce">
+         <obj_property name="ElementShortName">ce</obj_property>
+         <obj_property name="ObjectShortName">ce</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/a">
+         <obj_property name="ElementShortName">a[8:0]</obj_property>
+         <obj_property name="ObjectShortName">a[8:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/b">
+         <obj_property name="ElementShortName">b[8:0]</obj_property>
+         <obj_property name="ObjectShortName">b[8:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/p">
+         <obj_property name="ElementShortName">p[17:0]</obj_property>
+         <obj_property name="ObjectShortName">p[17:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider283" type="divider">
+         <obj_property name="label">acc0</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/ce">
+         <obj_property name="ElementShortName">ce</obj_property>
+         <obj_property name="ObjectShortName">ce</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/reset">
+         <obj_property name="ElementShortName">reset</obj_property>
+         <obj_property name="ObjectShortName">reset</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/data">
+         <obj_property name="ElementShortName">data[17:0]</obj_property>
+         <obj_property name="ObjectShortName">data[17:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/sum">
+         <obj_property name="ElementShortName">sum[31:0]</obj_property>
+         <obj_property name="ObjectShortName">sum[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="divider288" type="divider">
+         <obj_property name="label">PP</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_0">
+         <obj_property name="ElementShortName">acc_out_0[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_0[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_1">
+         <obj_property name="ElementShortName">acc_out_1[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_1[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_2">
+         <obj_property name="ElementShortName">acc_out_2[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_2[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_3">
+         <obj_property name="ElementShortName">acc_out_3[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_3[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_4">
+         <obj_property name="ElementShortName">acc_out_4[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_4[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_5">
+         <obj_property name="ElementShortName">acc_out_5[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_5[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_6">
+         <obj_property name="ElementShortName">acc_out_6[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_6[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_7">
+         <obj_property name="ElementShortName">acc_out_7[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_7[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_a">
+         <obj_property name="ElementShortName">acc_out_a[31:0]</obj_property>
+         <obj_property name="ObjectShortName">acc_out_a[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_buf_out">
+         <obj_property name="ElementShortName">bias_buf_out[63:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_buf_out[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_mux_out">
+         <obj_property name="ElementShortName">bias_mux_out[15:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_mux_out[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_mux">
+         <obj_property name="ElementShortName">bias_mux[1:0]</obj_property>
+         <obj_property name="ObjectShortName">bias_mux[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_shifter_in">
+         <obj_property name="ElementShortName">p_shifter_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_shifter_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_adder_out">
+         <obj_property name="ElementShortName">p_adder_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_adder_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_shifter_out">
+         <obj_property name="ElementShortName">p_shifter_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">p_shifter_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_clip_out">
+         <obj_property name="ElementShortName">p_clip_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">p_clip_out[7:0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
+   <wvobject type="other" fp_name="/c_tb/tb/progress">
+      <obj_property name="ElementShortName">progress</obj_property>
+      <obj_property name="ObjectShortName">progress</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_3/core1/clc/pl">
+      <obj_property name="ElementShortName">pl[127:0]</obj_property>
+      <obj_property name="ObjectShortName">pl[127:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/addr" type="array">
-      <obj_property name="ElementShortName">addr[7:0]</obj_property>
-      <obj_property name="ObjectShortName">addr[7:0]</obj_property>
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_3/core1/clc/mpga">
+      <obj_property name="ElementShortName">mpga[7:0]</obj_property>
+      <obj_property name="ObjectShortName">mpga[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_0/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_3/core1/mbm/mask">
+      <obj_property name="ElementShortName">mask[7:0]</obj_property>
+      <obj_property name="ObjectShortName">mask[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/zp_data" type="array">
-      <obj_property name="ElementShortName">zp_data[7:0]</obj_property>
-      <obj_property name="ObjectShortName">zp_data[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider310">
-      <obj_property name="label">right buffer</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/addr" type="array">
-      <obj_property name="ElementShortName">addr[7:0]</obj_property>
-      <obj_property name="ObjectShortName">addr[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_1/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/zp_weight" type="array">
-      <obj_property name="ElementShortName">zp_weight[7:0]</obj_property>
-      <obj_property name="ObjectShortName">zp_weight[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider319">
-      <obj_property name="label">bias buffer</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/we" type="logic">
-      <obj_property name="ElementShortName">we</obj_property>
-      <obj_property name="ObjectShortName">we</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/di" type="array">
-      <obj_property name="ElementShortName">di[63:0]</obj_property>
-      <obj_property name="ObjectShortName">di[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/addr" type="array">
-      <obj_property name="ElementShortName">addr[5:0]</obj_property>
-      <obj_property name="ObjectShortName">addr[5:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/buf_bias/do" type="array">
-      <obj_property name="ElementShortName">do[63:0]</obj_property>
-      <obj_property name="ObjectShortName">do[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider282">
-      <obj_property name="label">mul0</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/ce" type="logic">
-      <obj_property name="ElementShortName">ce</obj_property>
-      <obj_property name="ObjectShortName">ce</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/a" type="array">
-      <obj_property name="ElementShortName">a[8:0]</obj_property>
-      <obj_property name="ObjectShortName">a[8:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/b" type="array">
-      <obj_property name="ElementShortName">b[8:0]</obj_property>
-      <obj_property name="ObjectShortName">b[8:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/mul_0/p" type="array">
-      <obj_property name="ElementShortName">p[17:0]</obj_property>
-      <obj_property name="ObjectShortName">p[17:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider283">
-      <obj_property name="label">acc0</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/ce" type="logic">
-      <obj_property name="ElementShortName">ce</obj_property>
-      <obj_property name="ObjectShortName">ce</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/reset" type="logic">
-      <obj_property name="ElementShortName">reset</obj_property>
-      <obj_property name="ObjectShortName">reset</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/data" type="array">
-      <obj_property name="ElementShortName">data[17:0]</obj_property>
-      <obj_property name="ObjectShortName">data[17:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/accu_0/sum" type="array">
-      <obj_property name="ElementShortName">sum[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sum[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider288">
-      <obj_property name="label">PP</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_0" type="array">
-      <obj_property name="ElementShortName">acc_out_0[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_0[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_1" type="array">
-      <obj_property name="ElementShortName">acc_out_1[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_1[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_2" type="array">
-      <obj_property name="ElementShortName">acc_out_2[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_2[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_3" type="array">
-      <obj_property name="ElementShortName">acc_out_3[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_3[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_4" type="array">
-      <obj_property name="ElementShortName">acc_out_4[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_4[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_5" type="array">
-      <obj_property name="ElementShortName">acc_out_5[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_5[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_6" type="array">
-      <obj_property name="ElementShortName">acc_out_6[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_6[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_7" type="array">
-      <obj_property name="ElementShortName">acc_out_7[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_7[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/acc_out_a" type="array">
-      <obj_property name="ElementShortName">acc_out_a[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc_out_a[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_buf_out" type="array">
-      <obj_property name="ElementShortName">bias_buf_out[63:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_buf_out[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_mux_out" type="array">
-      <obj_property name="ElementShortName">bias_mux_out[15:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_mux_out[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/bias_mux" type="array">
-      <obj_property name="ElementShortName">bias_mux[1:0]</obj_property>
-      <obj_property name="ObjectShortName">bias_mux[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_shifter_in" type="array">
-      <obj_property name="ElementShortName">p_shifter_in[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_shifter_in[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_adder_out" type="array">
-      <obj_property name="ElementShortName">p_adder_out[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_adder_out[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_shifter_out" type="array">
-      <obj_property name="ElementShortName">p_shifter_out[31:0]</obj_property>
-      <obj_property name="ObjectShortName">p_shifter_out[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/c_tb/cluster/pe_pair_8/core1/vector_engine/p_clip_out" type="array">
-      <obj_property name="ElementShortName">p_clip_out[7:0]</obj_property>
-      <obj_property name="ObjectShortName">p_clip_out[7:0]</obj_property>
+   <wvobject type="array" fp_name="/c_tb/cluster/pe_pair_3/core1/mbm/pl_data0_sig">
+      <obj_property name="ElementShortName">pl_data0_sig[7:0]</obj_property>
+      <obj_property name="ObjectShortName">pl_data0_sig[7:0]</obj_property>
    </wvobject>
 </wave_config>

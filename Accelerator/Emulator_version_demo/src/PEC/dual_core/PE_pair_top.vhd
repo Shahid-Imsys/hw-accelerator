@@ -901,8 +901,7 @@ architecture struct of PE_pair_top is
   -----------------------------------------------------------------------------
   -- Internal signals driven by (i.e. "output" from) each block 
   -----------------------------------------------------------------------------  
-  signal hclk_i       : std_logic;  -- 16.7mhz clk
-  signal pllout       : std_logic;                         
+  signal hclk_i       : std_logic;  -- 16.7mhz clk                         
   signal msdin_i      : std_logic;                         
   signal pd_i         : std_logic_vector(7 downto 0);      
   signal pj_i         : std_logic_vector(7 downto 0);      
@@ -941,7 +940,6 @@ architecture struct of PE_pair_top is
   signal clk_i_pos  : std_logic;
   signal clk_e_pos  : std_logic;
   signal clk_e_neg  : std_logic;
-  signal clk_p  : std_logic;
   signal clk_rx : std_logic;  
   signal clk_tx : std_logic;
   signal clk_a_pos  : std_logic;
@@ -1451,7 +1449,6 @@ begin
   pmic_io_en <= '1';
   io_iso <= '1';
 
-  pllout <= HCLK;
   ddi_vld_c1 <= C1_DDI_VLD;
   ddi_vld_c2 <= C2_DDI_VLD;
   C1_REQ <= c1_req_i;
@@ -1958,7 +1955,7 @@ begin
       DI126       => mp_RAM0_DI(126), --CJ
       DI127       => mp_RAM0_DI(127), --CJ           
       WEB         => mp_RAM0_WEB,              
-      CK          => clk_p,           
+      CK          => hclk,           
       CS          => mp_RAM0_CS,               
       OE          => std_logic'('1') --'1'                
       );
@@ -2475,54 +2472,54 @@ begin
   -----------------------------------------------------------------------------
   -- Clock generation block
   -----------------------------------------------------------------------------
-  clk_gen0: entity work.clk_gen
-    port map (
+--  clk_gen0: entity work.clk_gen
+--    port map (
       --rst_n      => rst_n,
-      rst_cn     => rst_cn,
+--      rst_cn     => rst_cn,
       --pllout     => pllout,
 --      pllout     => tcko,   -- added by HYX, 20141115, for pll test
       --xout       => hclk_i, -- 16.7mhz clk
 --      clk_mux_out => clk_mux_out,
-      clk_mux_out => pllout,
-      erxclk     => erxclk,
-      etxclk     => etxclk,
+--      clk_mux_out => HCLK,--pllout,
+--      erxclk     => erxclk,
+--      etxclk     => etxclk,
 --      en_eth     => en_eth,
       --sel_pll    => en_pll,--sel_pll,  to select ref oscillator change sel_pll to en_pll to select suitable clock by maning
-      en_d       => en_d,  
-      fast_d     => fast_d,
+--      en_d       => en_d,  
+--      fast_d     => fast_d,
       --din_e      => din_e,
       --din_ea     => din_ea,
-      din_i      => din_i, 
-      din_u      => din_u, 
-      din_s      => din_s,
-      din_a      => din_a,
-	    clk_in_off => clk_in_off,
-      clk_main_off => clk_main_off ,
-      hold_flash_d => hold_flash_d,
+--      din_i      => din_i, 
+--      din_u      => din_u, 
+--      din_s      => din_s,
+--      din_a      => din_a,
+--	    clk_in_off => clk_in_off,
+--      clk_main_off => clk_main_off ,
+--      hold_flash_d => hold_flash_d,
 --	  en_r		=> router_clk_en,       --delete by HYX, 20141027
-      clk_p      => clk_p, 
-      clk_c_en   => clk_c_en,
-      even_c     => even_c,
+--      clk_p      => hclk, 
+--      clk_c_en   => clk_c_en,
+--      even_c     => even_c,
       --clk_c2_pos => clk_c2_pos,
       --clk_e_pos  => clk_e_pos,
       --clk_e_neg  => clk_e_neg,
 	  --clk_c2a_pos => clk_c2a_pos,
 	  --clk_ea_pos     => clk_ea_pos,
 	  --clk_ea_neg     => clk_ea_neg,
-      clk_i      => clk_i, 
-      clk_i_pos  => clk_i_pos, 
+--      clk_i      => clk_i, 
+--      clk_i_pos  => clk_i_pos, 
 --	  clk_i_r	=> clk_i_r,     --delete by HYX, 20141027
 --	  clk_p_r	=> clk_p_r,     --delete by HYX, 20141027
-      clk_d      => clk_d, 
-      clk_d_pos  => clk_d_pos, 
-      clk_da_pos  => clk_da_pos, 
-      clk_u_pos  => clk_u_pos,
-      clk_s      => clk_s, 
-      clk_s_pos  => clk_s_pos,
-      clk_rx     => clk_rx,
-      clk_tx     => clk_tx,
-      clk_a_pos  => clk_a_pos
-	  );
+--      clk_d      => clk_d, 
+--      clk_d_pos  => clk_d_pos, 
+--      clk_da_pos  => clk_da_pos, 
+--      clk_u_pos  => clk_u_pos,
+--      clk_s      => clk_s, 
+--      clk_s_pos  => clk_s_pos,
+--      clk_rx     => clk_rx,
+--      clk_tx     => clk_tx,
+--      clk_a_pos  => clk_a_pos
+--	  );
 --  clk_a <= clk_a_pos;
 --  -----------------------------------------------------------------------------
 --  -- Real time clock  !!! SEPARATELY POWERED !!!
@@ -2530,7 +2527,7 @@ begin
     rtc0: entity work.rtc 
      port map(
     --  xout      => hclk_i,
-      pllout    => pllout,
+      pllout    => HCLK,
     --  sel_pll   => sel_pll,
     --  xout_selected => xout_selected,
       lp_pwr_ok => lp_pwr_ok,
@@ -2594,7 +2591,7 @@ begin
   core1: entity work.core
     port map(
     -- Clocks to/from clock block
-    clk_p         => clk_p,   --: in  std_logic;  -- PLL clock
+    clk_p         => HCLK,   --: in  std_logic;  -- PLL clock
     clk_c_en      => clk_c_en,   --: in  std_logic;  -- CP clock
     even_c        => even_c,
     ready         => C1_RDY,
@@ -2822,7 +2819,7 @@ begin
     -- Signals to/from other blocks
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
-    clk_p         => clk_p  ,      
+    clk_p         => HCLK  ,      
     clk_c_en      => clk_c_en  ,
     even_c        => even_c, 
     ready         => core2_rdy,    
@@ -3064,7 +3061,7 @@ begin
   --flash interface
   flash_inf_inst : entity work.flash_inf 
 	PORT MAP( 
-	    clk_p       => clk_p       ,
+	    clk_p       => hclk       ,
 		even_c		=> even_c		,
 	    rst_cn      => rst_n      ,
 	    

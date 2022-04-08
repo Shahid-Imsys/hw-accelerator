@@ -63,6 +63,9 @@ module dist_mem_gen_0 (
   qspo
 );
 
+    parameter C_MEM_INIT_FILE      = "null.mif";
+    parameter C_READ_MIF           = 0;
+   
 input wire [10 : 0] a;
 input wire [79 : 0] d;
 input wire clk;
@@ -92,13 +95,13 @@ output wire [79 : 0] qspo;
     .C_HAS_QSPO_SRST(0),
     .C_HAS_SPO(0),
     .C_HAS_WE(1),
-    .C_MEM_INIT_FILE("no_coe_file_loaded"),
+    .C_MEM_INIT_FILE(C_MEM_INIT_FILE),
     .C_ELABORATION_DIR("./"),
     .C_MEM_TYPE(1),
     .C_PIPELINE_STAGES(0),
     .C_QCE_JOINED(0),
     .C_QUALIFY_WE(0),
-    .C_READ_MIF(0),
+    .C_READ_MIF(C_READ_MIF),
     .C_REG_A_D_INPUTS(1),
     .C_REG_DPRA_INPUT(0),
     .C_SYNC_ENABLE(1),

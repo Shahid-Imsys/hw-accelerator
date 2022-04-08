@@ -57,6 +57,7 @@ begin  -- architecture tb
 
   top0 : entity work.top
     generic map (
+      g_memory_type => fpga,
       g_clock_frequency => 31
       )
     port map (

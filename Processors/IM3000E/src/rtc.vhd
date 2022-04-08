@@ -29,21 +29,20 @@
 --              
 -------------------------------------------------------------------------------
 -- Revisions  :
--- Date                                 Version         Author  Description
--- 2005-11-28           2.5                             CB                      Created
--- 2006-02-01           2.6                     CB                      Added the en_bmem latch, controlled by the
+-- Date         Version  Author  Description
+-- 2005-11-28     2.5      CB      Created
+-- 2006-02-01     2.6      CB      Added the en_bmem latch, controlled by the
 --                                                                                                                              new ld_bmem input port.
--- 2006-03-08           2.7                     CB                      Changed pwr_on to pwr_ok, en_bmem to dis_bmem.
--- 2006-05-11           2.8                     CB                      Added gate-offs with pwr_ok at all input signals.
--- 2006-05-12           2.9                     CB                      Moved gate-offs to a block of their own.
--- 2015-07-01       3.0             HYX         Add reset counter, isolation cells and power switch control
--- 2015-07-31       3.1             MN          Change output control signals to register
+-- 2006-03-08     2.7      CB      Changed pwr_on to pwr_ok, en_bmem to dis_bmem.
+-- 2006-05-11     2.8      CB      Added gate-offs with pwr_ok at all input signals.
+-- 2006-05-12     2.9      CB      Moved gate-offs to a block of their own.
+-- 2015-07-01     3.0      HYX     Add reset counter, isolation cells and power switch control
+-- 2015-07-31     3.1      MN      Change output control signals to register
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---use ieee.std_logic_unsigned.all;
---use work.all;
+
 use work.gp_pkg.all;
 
 entity rtc is

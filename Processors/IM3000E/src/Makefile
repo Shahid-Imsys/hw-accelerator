@@ -1,7 +1,9 @@
 GPP_DIR=$(PROJECT_PATH)/Processors/IM3000E/src
 GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
-gpp_rtl: mem_comp
+IP_DIR=$(PROJECT_PATH)/Processors/IM3000E/fpga_synth/gpp
+
+gpp_rtl: mem_comp fpga_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \
 			 	  $(GPP_DIR_WIN)/gp_pkg.vhd \
 			 	  $(GPP_DIR_WIN)/fgendec.vhd \
@@ -79,5 +81,8 @@ mem_comp:
 		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_1024x8_fast_func.v \
 		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_512x8_fast_func.v
 
+fpga_ip:
+	$(V_COMP) $(IP_DIR)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \
+		  $(IP_DIR)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
 
 #include $(GPP_DIR)/pads/Makefile

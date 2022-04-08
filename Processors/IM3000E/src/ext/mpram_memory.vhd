@@ -225,12 +225,26 @@ architecture str of mpram_memory is
       );
   end component;
 
+  component dist_mem_gen_0 is
+    generic (
+        C_MEM_INIT_FILE : string;
+        C_READ_MIF     : integer);
+    port (
+      a       : in  std_logic_vector(10 downto 0);
+      d       : in  std_logic_vector(79 downto 0);
+      clk     : in  std_logic;
+      we      : in  std_logic;
+      i_ce    : in  std_logic;
+      qspo_ce : in  std_logic;
+      qspo    : out std_logic_vector(79 downto 0));
+  end component dist_mem_gen_0;
+  
   component load_mpram is
     generic (
       initFile : string);
   end component load_mpram;
 
-  signal ram_do_asic : std_logic_vector(79 downto 0);
+  signal ram_do_fpga : std_logic_vector(79 downto 0);
 
 begin  -- architecture str
 
@@ -262,7 +276,23 @@ begin  -- architecture str
         BC2      => '0'
         );
 
-    -- Use referens memory design for FPGA.
+  elsif g_memory_type = fpga generate
+
+    mpram_fpga : dist_mem_gen_0
+      generic map (
+        C_MEM_INIT_FILE => g_file_name,
+        C_READ_MIF     => 1)
+    port map (
+      a       => address,
+      d       => ram_di,
+      clk     => clk,
+      we      => not we_n,
+      --i_ce    => cs,
+      i_ce    => '1',
+      qspo_ce => '1',
+      qspo    => ram_do_fpga
+      );
+
   else generate
 
     mpram_org : SU180_2048X80X1BM1

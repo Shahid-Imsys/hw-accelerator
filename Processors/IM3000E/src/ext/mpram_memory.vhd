@@ -290,7 +290,7 @@ begin  -- architecture str
       --i_ce    => cs,
       i_ce    => '1',
       qspo_ce => '1',
-      qspo    => ram_do_fpga
+      qspo    => ram_do
       );
 
   else generate

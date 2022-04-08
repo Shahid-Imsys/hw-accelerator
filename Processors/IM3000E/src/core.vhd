@@ -220,7 +220,7 @@ entity core is
     msdin_i     : in  std_logic;  -- Serial data in (debug) 
     msdout_o    : out std_logic;  -- Serial data out
     mrstout_o   : out std_logic;  -- Reset out
-    mxout_o     : out std_logic;  -- Oscillator test output
+    --mxout_o     : out std_logic;  -- Oscillator test output
     mexec_o     : out std_logic;  -- clk_e test output
     mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL

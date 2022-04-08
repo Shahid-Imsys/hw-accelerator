@@ -631,7 +631,7 @@ architecture struct of top is
   signal msdout_o      : std_logic;
   signal mrstout_o     : std_logic;
   signal mexec_o       : std_logic;
-  signal mxout_o       : std_logic;
+  --signal mxout_o       : std_logic;
   signal ddq_en        : std_logic;
   signal da_o          : std_logic_vector(13 downto 0);
   signal dba_o         : std_logic_vector(1 downto 0);
@@ -972,7 +972,6 @@ begin
       sd_cke    => dcke_o,
       --to other module
 
-      hclk_i   => open,
       mreset_i => mreset_i,
       mtest_i  => mtest_i,
       mirq0_i  => mirq0_i,
@@ -1710,7 +1709,7 @@ begin
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
       msdout_o        => msdout_o,      --: out std_logic;  -- Serial data out
       mrstout_o       => mrstout_o,     --: out std_logic;  -- Reset out
-      mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
+      --mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
       mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---
       mbypass_i       => mbypass_i,     --: in  std_logic;  -- bypass PLL

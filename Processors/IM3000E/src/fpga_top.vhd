@@ -101,13 +101,14 @@ architecture rtl of fpga_top is
 
   component top is
     generic (
-      g_memory_type : memory_type_t := referens
+      g_memory_type : memory_type_t := referens;
+      g_clock_frequency : integer         -- Frequency in MHz
       );
     port (
       -- clocks and control signals
       HCLK    : in  std_logic;          -- clk input
       MRESET  : in  std_logic;  -- system reset               low active
-      MRSTOUT : out std_logic;          -- Reset output
+      --MRSTOUT : out std_logic;          -- Reset output
       MIRQOUT : out std_logic;          -- interrupt request output
       MCKOUT0 : out std_logic;          --for trace adapter
       MCKOUT1 : out std_logic;          --programable clock out
@@ -320,12 +321,13 @@ begin
 
   im4000_inst : top
     generic map (
-      g_memory_type => fpga
+      g_memory_type => fpga,
+      g_clock_frequency => 200  -- Frequency in MHz
       )
     port map (
       HCLK       => HCLK,
       MRESET     => MRESET,
-      MRSTOUT    => MRSTOUT,
+      --MRSTOUT    => MRSTOUT,
       MIRQOUT    => MIRQOUT,
       MCKOUT0    => MCKOUT0,
       MCKOUT1    => MCKOUT1,

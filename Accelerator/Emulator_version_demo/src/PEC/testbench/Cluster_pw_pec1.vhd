@@ -36,8 +36,8 @@ use std.env.all;
 
 entity Cluster_sim is
 Port (
-CLK_P            : out std_logic;     --PE clocks
-CLK_E            : out std_logic;     --PE's execution clock 
+CLK_P            : in std_logic;     --PE clocks
+CLK_E            : in std_logic;     --PE's execution clock 
 RST_E            : out std_logic;
 
 CLK_O            : in std_logic;
@@ -60,7 +60,7 @@ architecture Behavioral of Cluster_sim is
     type bias_in    is array (17 downto 0) of std_logic_vector(127 downto 0);
     type param_in   is array (63 downto 0) of std_logic_vector(127 downto 0);
     type result_out is array (18431 downto 0) of std_logic_vector(127 downto 0);
-	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
     type data_in_b  is array (4095 downto 0) of bit_vector(127 downto 0);
     type kernels_b  is array (215 downto 0) of bit_vector(127 downto 0);
     type bias_in_b  is array (17 downto 0) of bit_vector(127 downto 0);
@@ -166,8 +166,6 @@ signal kernel_pw : kernels_in := init_kernel_from_file("test_k_pec.ascii");
 signal bias_pw   : bias_in := init_bias_from_file("test_bias_pec.ascii");
 signal param_pw  : param_in := init_param_from_file("test_params_pec.ascii");
 signal ref_out   : result_out := init_out_from_file("test_out_pec_1.ascii");
-signal clk_p_i : std_logic;
-signal clk_e_i : std_logic;
 signal clk_e_neg_i : std_logic;
 signal tag_in  : std_logic;
 signal tag_out : std_logic;
@@ -207,152 +205,132 @@ constant pw_out_len : std_logic_vector(14 downto 0) := "100011111111111";--18431
 
 begin 
 
---Main clock, 30 ns.
-process
-begin 
-  clk_p_i <= '1';
-  wait for 7.5 ns;
-  clk_p_i <= '0';
-  wait for 7.5 ns;
-end process;
-
---clk_e
-process
-begin
-  clk_e_i <= '1';
-  wait for 15 ns;
-  clk_e_i <= '0';
-  wait for 15 ns;
-end process;
-clk_e_neg_i <= not clk_e_i;
-
-
 --TEST
 process
 
 procedure sendNOCcommand (constant word : in std_logic_vector(5 downto 0))is
 begin 
   tag_in <= word(5);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(4);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(3);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(2);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(1);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(0);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= '0';
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns; --one more cycle for transfering from collecting buffer to noc_command register
 end sendNOCcommand;
 
 procedure send15bits (constant word : in std_logic_vector(14 downto 0)) is
 begin
   tag_in <= word(14);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(13);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(12);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(11);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(10);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(9);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(8);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(7);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(6);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(5);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(4);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(3);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(2);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(1);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= word(0);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
 end send15bits;
 
 procedure sendmemword (constant word : in mem_word)is
 begin
   data <= word(15);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(14);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(13);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(12);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(11);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(10);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(9);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(8);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(7);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(6);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(5);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(4);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(3);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(2);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(1);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   data <= word(0);
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
 end sendmemword;
 
@@ -360,7 +338,7 @@ procedure readmemword (signal outword : out out_word) is
 begin
   for i in 0 to 294911 loop
   outword(i) <= data_out;
-  wait until rising_edge(clk_e_i);
+  wait until rising_edge(clk_e);
 wait for 5ns;
   end loop;
 end readmemword;
@@ -372,7 +350,7 @@ wait until rd_fifo = '1';
 wait for 15 ns;
 fifo_vld <= '1';
 req_fifo <= word;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5ns;
 fifo_vld<= '0';
 end sendpedata;
@@ -382,27 +360,27 @@ begin
 
 tag_in <= '0';
 --wait for 150 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 sendNOCcommand(RESET);
 --wait for 150 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --sendNOCcommand(RESET);
 --wait until tag_out= '0';--RESET DONE
@@ -411,13 +389,13 @@ sendNOCcommand(WRITEC);
 send15bits(param_len);
 send15bits(param_sa);--0x400
 tag_in <= '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=63;
 for i in 0 to 63 loop
@@ -425,26 +403,26 @@ for i in 0 to 63 loop
 end loop;
 progress <=7;
 wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --input
 sendNOCcommand(WRITEC);
 send15bits(data_len);
 send15bits(data_sa);--0x400
 tag_in <= '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=4095;
 for i in 0 to 4095 loop
@@ -452,26 +430,26 @@ for i in 0 to 4095 loop
 end loop;
 progress <=7;
 wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --kernel
 sendNOCcommand(WRITEC);
 send15bits(kernels_len);
 send15bits(kernels_sa);--0x100
 tag_in <= '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=215;
 for i in 0 to 215 loop
@@ -479,26 +457,26 @@ for i in 0 to 215 loop
 end loop;
 progress <=8;
 wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --bias
 sendNOCcommand(WRITEC);
 send15bits(bias_len);
 send15bits(bias_sa);--200
 tag_in <= '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=17;
 for i in 0 to 17 loop
@@ -506,13 +484,13 @@ for i in 0 to 17 loop
 end loop;
 progress <=9;
 wait until tag_fb = '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --ucode
 sendNOCcommand(WRITEC);
@@ -520,13 +498,13 @@ send15bits(ucode_len);--255
 send15bits(ucode_sa);--0
 tag_in <= '0';
 --wait for 120 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=41;
 for i in 0 to 255 loop
@@ -537,13 +515,13 @@ progress <=5;
 wait until tag_fb = '0'; 
 
 --wait for 120 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --first exe
 sendNOCcommand(Exe);
@@ -553,13 +531,13 @@ progress <= 8;
 
 --Start testing on PE side(simulated data input)
 wait until rising_edge(C_RDY);
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --second exe
 sendNOCcommand(Exe);
@@ -567,30 +545,30 @@ tag_in <= '0';
 progress <= 8;
 
 wait until rising_edge(C_RDY);
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
 --read out result
 sendNOCcommand(READ);
 send15bits(pw_out_len);
 send15bits(pw_out_a);
 tag_in <= '0';
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
 wait for 5 ns;
-wait until rising_edge(clk_e_i);
+wait until rising_edge(clk_e);
             wait for 5 ns;
 
 assert false report "test" severity note;
@@ -619,8 +597,6 @@ progress <= 294911;
 --wait;
 
 end process;
-CLK_P<= clk_p_i;
-CLK_E <= clk_e_i;
 TAG<=tag_in;
 tag_out <= TAG_FB; 
 

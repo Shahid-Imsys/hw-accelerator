@@ -49,378 +49,27 @@ end PE_pair_top;
 
 architecture struct of PE_pair_top is
 
-
-  ------------------------------------------------------
-  -- Old version of dual core CPU with debug access only
-  ------------------------------------------------------
-  
-  -- iomem
-  --component SY180_1024X8X1CM8     
-  --  port(
-  --    A0                         :   IN   std_logic;
-  --    A1                         :   IN   std_logic;
-  --    A2                         :   IN   std_logic;
-  --    A3                         :   IN   std_logic;
-  --    A4                         :   IN   std_logic;
-  --    A5                         :   IN   std_logic;
-  --    A6                         :   IN   std_logic;
-  --    A7                         :   IN   std_logic;
-  --    A8                         :   IN   std_logic;
-  --    A9                         :   IN   std_logic;
-  --    DO0                        :   OUT   std_logic;
-  --    DO1                        :   OUT   std_logic;
-  --    DO2                        :   OUT   std_logic;
-  --    DO3                        :   OUT   std_logic;
-  --    DO4                        :   OUT   std_logic;
-  --    DO5                        :   OUT   std_logic;
-  --    DO6                        :   OUT   std_logic;
-  --    DO7                        :   OUT   std_logic;
-  --    DI0                        :   IN   std_logic;
-  --    DI1                        :   IN   std_logic;
-  --    DI2                        :   IN   std_logic;
-  --    DI3                        :   IN   std_logic;
-  --    DI4                        :   IN   std_logic;
-  --    DI5                        :   IN   std_logic;
-  --    DI6                        :   IN   std_logic;
-  --    DI7                        :   IN   std_logic;
-  --    WEB                        :   IN   std_logic;
-  --    CK                         :   IN   std_logic;
-  --    CSB                        :   IN   std_logic
-  --    );
-  --end component; 
-  -- trcmem
-  --component SY180_256X32X1CM4
-  --port(
-  --    A0                         :   IN   std_logic;
-  --    A1                         :   IN   std_logic;
-  --    A2                         :   IN   std_logic;
-  --    A3                         :   IN   std_logic;
-  --    A4                         :   IN   std_logic;
-  --    A5                         :   IN   std_logic;
-  --    A6                         :   IN   std_logic;
-  --    A7                         :   IN   std_logic;
-  --    DO0                        :   OUT   std_logic;
-  --    DO1                        :   OUT   std_logic;
-  --    DO2                        :   OUT   std_logic;
-  --    DO3                        :   OUT   std_logic;
-  --    DO4                        :   OUT   std_logic;
-  --    DO5                        :   OUT   std_logic;
-  --    DO6                        :   OUT   std_logic;
-  --    DO7                        :   OUT   std_logic;
-  --    DO8                        :   OUT   std_logic;
-  --    DO9                        :   OUT   std_logic;
-  --    DO10                        :   OUT   std_logic;
-  --    DO11                        :   OUT   std_logic;
-  --    DO12                        :   OUT   std_logic;
-  --    DO13                        :   OUT   std_logic;
-  --    DO14                        :   OUT   std_logic;
-  --    DO15                        :   OUT   std_logic;
-  --    DO16                        :   OUT   std_logic;
-  --    DO17                        :   OUT   std_logic;
-  --    DO18                        :   OUT   std_logic;
-  --    DO19                        :   OUT   std_logic;
-  --    DO20                        :   OUT   std_logic;
-  --    DO21                        :   OUT   std_logic;
-  --    DO22                        :   OUT   std_logic;
-  --    DO23                        :   OUT   std_logic;
-  --    DO24                        :   OUT   std_logic;
-  --    DO25                        :   OUT   std_logic;
-  --    DO26                        :   OUT   std_logic;
-  --    DO27                        :   OUT   std_logic;
-  --    DO28                        :   OUT   std_logic;
-  --    DO29                        :   OUT   std_logic;
-  --    DO30                        :   OUT   std_logic;
-  --    DO31                        :   OUT   std_logic;
-  --    DI0                        :   IN   std_logic;
-  --    DI1                        :   IN   std_logic;
-  --    DI2                        :   IN   std_logic;
-  --    DI3                        :   IN   std_logic;
-  --    DI4                        :   IN   std_logic;
-  --    DI5                        :   IN   std_logic;
-  --    DI6                        :   IN   std_logic;
-  --    DI7                        :   IN   std_logic;
-  --    DI8                        :   IN   std_logic;
-  --    DI9                        :   IN   std_logic;
-  --    DI10                        :   IN   std_logic;
-  --    DI11                        :   IN   std_logic;
-  --    DI12                        :   IN   std_logic;
-  --    DI13                        :   IN   std_logic;
-  --    DI14                        :   IN   std_logic;
-  --    DI15                        :   IN   std_logic;
-  --    DI16                        :   IN   std_logic;
-  --    DI17                        :   IN   std_logic;
-  --    DI18                        :   IN   std_logic;
-  --    DI19                        :   IN   std_logic;
-  --    DI20                        :   IN   std_logic;
-  --    DI21                        :   IN   std_logic;
-  --    DI22                        :   IN   std_logic;
-  --    DI23                        :   IN   std_logic;
-  --    DI24                        :   IN   std_logic;
-  --    DI25                        :   IN   std_logic;
-  --    DI26                        :   IN   std_logic;
-  --    DI27                        :   IN   std_logic;
-  --    DI28                        :   IN   std_logic;
-  --    DI29                        :   IN   std_logic;
-  --    DI30                        :   IN   std_logic;
-  --    DI31                        :   IN   std_logic;
-  --    WEB                         :   IN   std_logic;
-  --    CK                          :   IN   std_logic;
-  --    CSB                         :   IN   std_logic
-  --    );
-  -- end component;
-
-  -- pmem
-  --component SY180_2048X2X1CM8
-  --port(
-  --    A0                         :   IN   std_logic;
-  --    A1                         :   IN   std_logic;
-  --    A2                         :   IN   std_logic;
-  --    A3                         :   IN   std_logic;
-  --    A4                         :   IN   std_logic;
-  --    A5                         :   IN   std_logic;
-  --    A6                         :   IN   std_logic;
-  --    A7                         :   IN   std_logic;
-  --    A8                         :   IN   std_logic;
-  --    A9                         :   IN   std_logic;
-  --    A10                        :   IN   std_logic;
-  --    DO0                        :   OUT   std_logic;
-  --    DO1                        :   OUT   std_logic;
-  --    DI0                        :   IN   std_logic;
-  --    DI1                        :   IN   std_logic;
-  --    WEB                        :   IN   std_logic;
-  --    CK                         :   IN   std_logic;
-  --    CSB                         :   IN   std_logic
-  --    );
-  --end component;
-
-
---ROM0
-  --component SP180_4096X80BM1A
-  --port(
-  --    A0                            :   IN   std_logic;
-  --    A1                            :   IN   std_logic;
-  --    A2                            :   IN   std_logic;
-  --    A3                            :   IN   std_logic;
-  --    A4                            :   IN   std_logic;
-  --    A5                            :   IN   std_logic;
-  --    A6                            :   IN   std_logic;
-  --    A7                            :   IN   std_logic;
-  --    A8                            :   IN   std_logic;
-  --    A9                            :   IN   std_logic;
-  --    A10                            :   IN   std_logic;
-  --    A11                            :   IN   std_logic;
-  --    DO0                           :   OUT   std_logic;
-  --    DO1                           :   OUT   std_logic;
-  --    DO2                           :   OUT   std_logic;
-  --    DO3                           :   OUT   std_logic;
-  --    DO4                           :   OUT   std_logic;
-  --    DO5                           :   OUT   std_logic;
-  --    DO6                           :   OUT   std_logic;
-  --    DO7                           :   OUT   std_logic;
-  --    DO8                           :   OUT   std_logic;
-  --    DO9                           :   OUT   std_logic;
-  --    DO10                           :   OUT   std_logic;
-  --    DO11                           :   OUT   std_logic;
-  --    DO12                           :   OUT   std_logic;
-  --    DO13                           :   OUT   std_logic;
-  --    DO14                           :   OUT   std_logic;
-  --    DO15                           :   OUT   std_logic;
-  --    DO16                           :   OUT   std_logic;
-  --    DO17                           :   OUT   std_logic;
-  --    DO18                           :   OUT   std_logic;
-  --    DO19                           :   OUT   std_logic;
-  --    DO20                           :   OUT   std_logic;
-  --    DO21                           :   OUT   std_logic;
-  --    DO22                           :   OUT   std_logic;
-  --    DO23                           :   OUT   std_logic;
-  --    DO24                           :   OUT   std_logic;
-  --    DO25                           :   OUT   std_logic;
-  --    DO26                           :   OUT   std_logic;
-  --    DO27                           :   OUT   std_logic;
-  --    DO28                           :   OUT   std_logic;
-  --    DO29                           :   OUT   std_logic;
-  --    DO30                           :   OUT   std_logic;
-  --    DO31                           :   OUT   std_logic;
-  --    DO32                           :   OUT   std_logic;
-  --    DO33                           :   OUT   std_logic;
-  --    DO34                           :   OUT   std_logic;
-  --    DO35                           :   OUT   std_logic;
-  --    DO36                           :   OUT   std_logic;
-  --    DO37                           :   OUT   std_logic;
-  --    DO38                           :   OUT   std_logic;
-  --    DO39                           :   OUT   std_logic;
-  --    DO40                           :   OUT   std_logic;
-  --    DO41                           :   OUT   std_logic;
-  --    DO42                           :   OUT   std_logic;
-  --    DO43                           :   OUT   std_logic;
-  --    DO44                           :   OUT   std_logic;
-  --    DO45                           :   OUT   std_logic;
-  --    DO46                           :   OUT   std_logic;
-  --    DO47                           :   OUT   std_logic;
-  --    DO48                           :   OUT   std_logic;
-  --    DO49                           :   OUT   std_logic;
-  --    DO50                           :   OUT   std_logic;
-  --    DO51                           :   OUT   std_logic;
-  --    DO52                           :   OUT   std_logic;
-  --    DO53                           :   OUT   std_logic;
-  --    DO54                           :   OUT   std_logic;
-  --    DO55                           :   OUT   std_logic;
-  --    DO56                           :   OUT   std_logic;
-  --    DO57                           :   OUT   std_logic;
-  --    DO58                           :   OUT   std_logic;
-  --    DO59                           :   OUT   std_logic;
-  --    DO60                           :   OUT   std_logic;
-  --    DO61                           :   OUT   std_logic;
-  --    DO62                           :   OUT   std_logic;
-  --    DO63                           :   OUT   std_logic;
-  --    DO64                           :   OUT   std_logic;
-  --    DO65                           :   OUT   std_logic;
-  --    DO66                           :   OUT   std_logic;
-  --    DO67                           :   OUT   std_logic;
-  --    DO68                           :   OUT   std_logic;
-  --    DO69                           :   OUT   std_logic;
-  --    DO70                           :   OUT   std_logic;
-  --    DO71                           :   OUT   std_logic;
-  --    DO72                           :   OUT   std_logic;
-  --    DO73                           :   OUT   std_logic;
-  --    DO74                           :   OUT   std_logic;
-  --    DO75                           :   OUT   std_logic;
-  --    DO76                           :   OUT   std_logic;
-  --    DO77                           :   OUT   std_logic;
-  --    DO78                           :   OUT   std_logic;
-  --    DO79                           :   OUT   std_logic;
-  --    CK                               :   IN   std_logic;
-  --    CS                               :   IN   std_logic;
-  --    OE                               :   IN   std_logic
-  --    );
-  --end component;
-
-
--- ROM1
-   --component SP180_4096X80BM1B
-   --port(
-   --    A0                            :   IN   std_logic;
-   --    A1                            :   IN   std_logic;
-   --    A2                            :   IN   std_logic;
-   --    A3                            :   IN   std_logic;
-   --    A4                            :   IN   std_logic;
-   --    A5                            :   IN   std_logic;
-   --    A6                            :   IN   std_logic;
-   --    A7                            :   IN   std_logic;
-   --    A8                            :   IN   std_logic;
-   --    A9                            :   IN   std_logic;
-   --    A10                            :   IN   std_logic;
-   --    A11                            :   IN   std_logic;
-   --    DO0                           :   OUT   std_logic;
-   --    DO1                           :   OUT   std_logic;
-   --    DO2                           :   OUT   std_logic;
-   --    DO3                           :   OUT   std_logic;
-   --    DO4                           :   OUT   std_logic;
-   --    DO5                           :   OUT   std_logic;
-   --    DO6                           :   OUT   std_logic;
-   --    DO7                           :   OUT   std_logic;
-   --    DO8                           :   OUT   std_logic;
-   --    DO9                           :   OUT   std_logic;
-   --    DO10                           :   OUT   std_logic;
-   --    DO11                           :   OUT   std_logic;
-   --    DO12                           :   OUT   std_logic;
-   --    DO13                           :   OUT   std_logic;
-   --    DO14                           :   OUT   std_logic;
-   --    DO15                           :   OUT   std_logic;
-   --    DO16                           :   OUT   std_logic;
-   --    DO17                           :   OUT   std_logic;
-   --    DO18                           :   OUT   std_logic;
-   --    DO19                           :   OUT   std_logic;
-   --    DO20                           :   OUT   std_logic;
-   --    DO21                           :   OUT   std_logic;
-   --    DO22                           :   OUT   std_logic;
-   --    DO23                           :   OUT   std_logic;
-   --    DO24                           :   OUT   std_logic;
-   --    DO25                           :   OUT   std_logic;
-   --    DO26                           :   OUT   std_logic;
-   --    DO27                           :   OUT   std_logic;
-   --    DO28                           :   OUT   std_logic;
-   --    DO29                           :   OUT   std_logic;
-   --    DO30                           :   OUT   std_logic;
-   --    DO31                           :   OUT   std_logic;
-   --    DO32                           :   OUT   std_logic;
-   --    DO33                           :   OUT   std_logic;
-   --    DO34                           :   OUT   std_logic;
-   --    DO35                           :   OUT   std_logic;
-   --    DO36                           :   OUT   std_logic;
-   --    DO37                           :   OUT   std_logic;
-   --    DO38                           :   OUT   std_logic;
-   --    DO39                           :   OUT   std_logic;
-   --    DO40                           :   OUT   std_logic;
-   --    DO41                           :   OUT   std_logic;
-   --    DO42                           :   OUT   std_logic;
-   --    DO43                           :   OUT   std_logic;
-   --    DO44                           :   OUT   std_logic;
-   --    DO45                           :   OUT   std_logic;
-   --    DO46                           :   OUT   std_logic;
-   --    DO47                           :   OUT   std_logic;
-   --    DO48                           :   OUT   std_logic;
-   --    DO49                           :   OUT   std_logic;
-   --    DO50                           :   OUT   std_logic;
-   --    DO51                           :   OUT   std_logic;
-   --    DO52                           :   OUT   std_logic;
-   --    DO53                           :   OUT   std_logic;
-   --    DO54                           :   OUT   std_logic;
-   --    DO55                           :   OUT   std_logic;
-   --    DO56                           :   OUT   std_logic;
-   --    DO57                           :   OUT   std_logic;
-   --    DO58                           :   OUT   std_logic;
-   --    DO59                           :   OUT   std_logic;
-   --    DO60                           :   OUT   std_logic;
-   --    DO61                           :   OUT   std_logic;
-   --    DO62                           :   OUT   std_logic;
-   --    DO63                           :   OUT   std_logic;
-   --    DO64                           :   OUT   std_logic;
-   --    DO65                           :   OUT   std_logic;
-   --    DO66                           :   OUT   std_logic;
-   --    DO67                           :   OUT   std_logic;
-   --    DO68                           :   OUT   std_logic;
-   --    DO69                           :   OUT   std_logic;
-   --    DO70                           :   OUT   std_logic;
-   --    DO71                           :   OUT   std_logic;
-   --    DO72                           :   OUT   std_logic;
-   --    DO73                           :   OUT   std_logic;
-   --    DO74                           :   OUT   std_logic;
-   --    DO75                           :   OUT   std_logic;
-   --    DO76                           :   OUT   std_logic;
-   --    DO77                           :   OUT   std_logic;
-   --    DO78                           :   OUT   std_logic;
-   --    DO79                           :   OUT   std_logic;
-   --    CK                               :   IN   std_logic;
-   --    CS                               :   IN   std_logic;
-   --    OE                               :   IN   std_logic
-   --    );
-   --end component;
-
   --RAM 0
   component SU180_256X128X1BM1A
   port(
-      A0                         :   IN   std_logic;
-      A1                         :   IN   std_logic;
-      A2                         :   IN   std_logic;
-      A3                         :   IN   std_logic;
-      A4                         :   IN   std_logic;
-      A5                         :   IN   std_logic;
-      A6                         :   IN   std_logic;
-      A7                         :   IN   std_logic;
-      --A8                         :   IN   std_logic;
-      --A9                         :   IN   std_logic;
-      --A10                         :   IN   std_logic;
-      DO0                        :   OUT   std_logic;
-      DO1                        :   OUT   std_logic;
-      DO2                        :   OUT   std_logic;
-      DO3                        :   OUT   std_logic;
-      DO4                        :   OUT   std_logic;
-      DO5                        :   OUT   std_logic;
-      DO6                        :   OUT   std_logic;
-      DO7                        :   OUT   std_logic;
-      DO8                        :   OUT   std_logic;
-      DO9                        :   OUT   std_logic;
+      A0                          :   IN   std_logic;
+      A1                          :   IN   std_logic;
+      A2                          :   IN   std_logic;
+      A3                          :   IN   std_logic;
+      A4                          :   IN   std_logic;
+      A5                          :   IN   std_logic;
+      A6                          :   IN   std_logic;
+      A7                          :   IN   std_logic;
+      DO0                         :   OUT   std_logic;
+      DO1                         :   OUT   std_logic;
+      DO2                         :   OUT   std_logic;
+      DO3                         :   OUT   std_logic;
+      DO4                         :   OUT   std_logic;
+      DO5                         :   OUT   std_logic;
+      DO6                         :   OUT   std_logic;
+      DO7                         :   OUT   std_logic;
+      DO8                         :   OUT   std_logic;
+      DO9                         :   OUT   std_logic;
       DO10                        :   OUT   std_logic;
       DO11                        :   OUT   std_logic;
       DO12                        :   OUT   std_logic;
@@ -539,16 +188,16 @@ architecture struct of PE_pair_top is
       DO125                       :   OUT   std_logic;
       DO126                       :   OUT   std_logic;
       DO127                       :   OUT   std_logic;
-      DI0                        :   IN   std_logic;
-      DI1                        :   IN   std_logic;
-      DI2                        :   IN   std_logic;
-      DI3                        :   IN   std_logic;
-      DI4                        :   IN   std_logic;
-      DI5                        :   IN   std_logic;
-      DI6                        :   IN   std_logic;
-      DI7                        :   IN   std_logic;
-      DI8                        :   IN   std_logic;
-      DI9                        :   IN   std_logic;
+      DI0                         :   IN   std_logic;
+      DI1                         :   IN   std_logic;
+      DI2                         :   IN   std_logic;
+      DI3                         :   IN   std_logic;
+      DI4                         :   IN   std_logic;
+      DI5                         :   IN   std_logic;
+      DI6                         :   IN   std_logic;
+      DI7                         :   IN   std_logic;
+      DI8                         :   IN   std_logic;
+      DI9                         :   IN   std_logic;
       DI10                        :   IN   std_logic;
       DI11                        :   IN   std_logic;
       DI12                        :   IN   std_logic;
@@ -673,228 +322,6 @@ architecture struct of PE_pair_top is
       OE                          :   IN   std_logic
       );
   END component;
-
--- RAM 1
-  --component SU180_2048X80X1BM1B
-  --port(
-  --    A0                         :   IN   std_logic;
-  --    A1                         :   IN   std_logic;
-  --    A2                         :   IN   std_logic;
-  --    A3                         :   IN   std_logic;
-  --    A4                         :   IN   std_logic;
-  --    A5                         :   IN   std_logic;
-  --    A6                         :   IN   std_logic;
-  --    A7                         :   IN   std_logic;
-  --    A8                         :   IN   std_logic;
-  --    A9                         :   IN   std_logic;
-  --    A10                         :   IN   std_logic;
-  --    DO0                        :   OUT   std_logic;
-  --    DO1                        :   OUT   std_logic;
-  --    DO2                        :   OUT   std_logic;
-  --    DO3                        :   OUT   std_logic;
-  --    DO4                        :   OUT   std_logic;
-  --    DO5                        :   OUT   std_logic;
-  --    DO6                        :   OUT   std_logic;
-  --    DO7                        :   OUT   std_logic;
-  --    DO8                        :   OUT   std_logic;
-  --    DO9                        :   OUT   std_logic;
-  --    DO10                        :   OUT   std_logic;
-  --    DO11                        :   OUT   std_logic;
-  --    DO12                        :   OUT   std_logic;
-  --    DO13                        :   OUT   std_logic;
-  --    DO14                        :   OUT   std_logic;
-  --    DO15                        :   OUT   std_logic;
-  --    DO16                        :   OUT   std_logic;
-  --    DO17                        :   OUT   std_logic;
-  --    DO18                        :   OUT   std_logic;
-  --    DO19                        :   OUT   std_logic;
-  --    DO20                        :   OUT   std_logic;
-  --    DO21                        :   OUT   std_logic;
-  --    DO22                        :   OUT   std_logic;
-  --    DO23                        :   OUT   std_logic;
-  --    DO24                        :   OUT   std_logic;
-  --    DO25                        :   OUT   std_logic;
-  --    DO26                        :   OUT   std_logic;
-  --    DO27                        :   OUT   std_logic;
-  --    DO28                        :   OUT   std_logic;
-  --    DO29                        :   OUT   std_logic;
-  --    DO30                        :   OUT   std_logic;
-  --    DO31                        :   OUT   std_logic;
-  --    DO32                        :   OUT   std_logic;
-  --    DO33                        :   OUT   std_logic;
-  --    DO34                        :   OUT   std_logic;
-  --    DO35                        :   OUT   std_logic;
-  --    DO36                        :   OUT   std_logic;
-  --    DO37                        :   OUT   std_logic;
-  --    DO38                        :   OUT   std_logic;
-  --    DO39                        :   OUT   std_logic;
-  --    DO40                        :   OUT   std_logic;
-  --    DO41                        :   OUT   std_logic;
-  --    DO42                        :   OUT   std_logic;
-  --    DO43                        :   OUT   std_logic;
-  --    DO44                        :   OUT   std_logic;
-  --    DO45                        :   OUT   std_logic;
-  --    DO46                        :   OUT   std_logic;
-  --    DO47                        :   OUT   std_logic;
-  --    DO48                        :   OUT   std_logic;
-  --    DO49                        :   OUT   std_logic;
-  --    DO50                        :   OUT   std_logic;
-  --    DO51                        :   OUT   std_logic;
-  --    DO52                        :   OUT   std_logic;
-  --    DO53                        :   OUT   std_logic;
-  --    DO54                        :   OUT   std_logic;
-  --    DO55                        :   OUT   std_logic;
-  --    DO56                        :   OUT   std_logic;
-  --    DO57                        :   OUT   std_logic;
-  --    DO58                        :   OUT   std_logic;
-  --    DO59                        :   OUT   std_logic;
-  --    DO60                        :   OUT   std_logic;
-  --    DO61                        :   OUT   std_logic;
-  --    DO62                        :   OUT   std_logic;
-  --    DO63                        :   OUT   std_logic;
-  --    DO64                        :   OUT   std_logic;
-  --    DO65                        :   OUT   std_logic;
-  --    DO66                        :   OUT   std_logic;
-  --    DO67                        :   OUT   std_logic;
-  --    DO68                        :   OUT   std_logic;
-  --    DO69                        :   OUT   std_logic;
-  --    DO70                        :   OUT   std_logic;
-  --    DO71                        :   OUT   std_logic;
-  --    DO72                        :   OUT   std_logic;
-  --    DO73                        :   OUT   std_logic;
-  --    DO74                        :   OUT   std_logic;
-  --    DO75                        :   OUT   std_logic;
-  --    DO76                        :   OUT   std_logic;
-  --    DO77                        :   OUT   std_logic;
-  --    DO78                        :   OUT   std_logic;
-  --    DO79                        :   OUT   std_logic;
-  --    DI0                        :   IN   std_logic;
-  --    DI1                        :   IN   std_logic;
-  --    DI2                        :   IN   std_logic;
-  --    DI3                        :   IN   std_logic;
-  --    DI4                        :   IN   std_logic;
-  --    DI5                        :   IN   std_logic;
-  --    DI6                        :   IN   std_logic;
-  --    DI7                        :   IN   std_logic;
-  --    DI8                        :   IN   std_logic;
-  --    DI9                        :   IN   std_logic;
-  --    DI10                        :   IN   std_logic;
-  --    DI11                        :   IN   std_logic;
-  --    DI12                        :   IN   std_logic;
-  --    DI13                        :   IN   std_logic;
-  --    DI14                        :   IN   std_logic;
-  --    DI15                        :   IN   std_logic;
-  --    DI16                        :   IN   std_logic;
-  --    DI17                        :   IN   std_logic;
-  --    DI18                        :   IN   std_logic;
-  --    DI19                        :   IN   std_logic;
-  --    DI20                        :   IN   std_logic;
-  --    DI21                        :   IN   std_logic;
-  --    DI22                        :   IN   std_logic;
-  --    DI23                        :   IN   std_logic;
-  --    DI24                        :   IN   std_logic;
-  --    DI25                        :   IN   std_logic;
-  --    DI26                        :   IN   std_logic;
-  --    DI27                        :   IN   std_logic;
-  --    DI28                        :   IN   std_logic;
-  --    DI29                        :   IN   std_logic;
-  --    DI30                        :   IN   std_logic;
-  --    DI31                        :   IN   std_logic;
-  --    DI32                        :   IN   std_logic;
-  --    DI33                        :   IN   std_logic;
-  --    DI34                        :   IN   std_logic;
-  --    DI35                        :   IN   std_logic;
-  --    DI36                        :   IN   std_logic;
-  --    DI37                        :   IN   std_logic;
-  --    DI38                        :   IN   std_logic;
-  --    DI39                        :   IN   std_logic;
-  --    DI40                        :   IN   std_logic;
-  --    DI41                        :   IN   std_logic;
-  --    DI42                        :   IN   std_logic;
-  --    DI43                        :   IN   std_logic;
-  --    DI44                        :   IN   std_logic;
-  --    DI45                        :   IN   std_logic;
-  --    DI46                        :   IN   std_logic;
-  --    DI47                        :   IN   std_logic;
-  --    DI48                        :   IN   std_logic;
-  --    DI49                        :   IN   std_logic;
-  --    DI50                        :   IN   std_logic;
-  --    DI51                        :   IN   std_logic;
-  --    DI52                        :   IN   std_logic;
-  --    DI53                        :   IN   std_logic;
-  --    DI54                        :   IN   std_logic;
-  --    DI55                        :   IN   std_logic;
-  --    DI56                        :   IN   std_logic;
-  --    DI57                        :   IN   std_logic;
-  --    DI58                        :   IN   std_logic;
-  --    DI59                        :   IN   std_logic;
-  --    DI60                        :   IN   std_logic;
-  --    DI61                        :   IN   std_logic;
-  --    DI62                        :   IN   std_logic;
-  --    DI63                        :   IN   std_logic;
-  --    DI64                        :   IN   std_logic;
-  --    DI65                        :   IN   std_logic;
-  --    DI66                        :   IN   std_logic;
-  --    DI67                        :   IN   std_logic;
-  --    DI68                        :   IN   std_logic;
-  --    DI69                        :   IN   std_logic;
-  --    DI70                        :   IN   std_logic;
-  --    DI71                        :   IN   std_logic;
-  --    DI72                        :   IN   std_logic;
-  --    DI73                        :   IN   std_logic;
-  --    DI74                        :   IN   std_logic;
-  --    DI75                        :   IN   std_logic;
-  --    DI76                        :   IN   std_logic;
-  --    DI77                        :   IN   std_logic;
-  --    DI78                        :   IN   std_logic;
-  --    DI79                        :   IN   std_logic;
-  --    WEB                         :   IN   std_logic;
-  --    CK                          :   IN   std_logic;
-  --    CS                          :   IN   std_logic;
-  --    OE                          :   IN   std_logic
-  --    );
-  --END component;
--- application and microprogram shared memory
- -- component SU180_16384X8X1BM8
- -- port(
- --     A0                         :   IN   std_logic;
- --     A1                         :   IN   std_logic;
- --     A2                         :   IN   std_logic;
- --     A3                         :   IN   std_logic;
- --     A4                         :   IN   std_logic;
- --     A5                         :   IN   std_logic;
- --     A6                         :   IN   std_logic;
- --     A7                         :   IN   std_logic;
- --     A8                         :   IN   std_logic;
- --     A9                         :   IN   std_logic;
- --     A10                         :   IN   std_logic;
- --     A11                         :   IN   std_logic;
- --     A12                         :   IN   std_logic;
- --     A13                         :   IN   std_logic;
- --     DO0                        :   OUT   std_logic;
- --     DO1                        :   OUT   std_logic;
- --     DO2                        :   OUT   std_logic;
- --     DO3                        :   OUT   std_logic;
- --     DO4                        :   OUT   std_logic;
- --     DO5                        :   OUT   std_logic;
- --     DO6                        :   OUT   std_logic;
- --     DO7                        :   OUT   std_logic;
- --     DI0                        :   IN   std_logic;
- --     DI1                        :   IN   std_logic;
- --     DI2                        :   IN   std_logic;
- --     DI3                        :   IN   std_logic;
- --     DI4                        :   IN   std_logic;
- --     DI5                        :   IN   std_logic;
- --     DI6                        :   IN   std_logic;
- --     DI7                        :   IN   std_logic;
- --     WEB                       :   IN   std_logic;
- --     CK                            :   IN   std_logic;
- --     CS                           :   IN   std_logic;
- --     OE                            :   IN   std_logic
- --     );
- --end component;
-
-
 
 
 
@@ -1024,7 +451,6 @@ architecture struct of PE_pair_top is
   signal  c2_core2_en   : std_logic;  -- core2 enable
   signal  c2_rsc_n      : std_logic;
   signal  c2_clkreq_gen : std_logic;
-  --signal  c2_even_c     : std_logic;
   signal  c2_crb_out    : std_logic_vector(7 downto 0);
   signal  c2_crb_sel    : std_logic_vector(3 downto 0);  
   signal  c2_en_pmem    : std_logic;
@@ -1040,8 +466,6 @@ architecture struct of PE_pair_top is
   signal c1_mprom_a       : std_logic_vector(13 downto 0); 
   signal c1_mprom_ce      : std_logic_vector(1 downto 0);  
   signal c1_mprom_oe      : std_logic_vector(1 downto 0);
-  --signal c1_mpram_a       : std_logic_vector(13 downto 0);    --Modified by CJ
-  --signal c1_mpram_d       : std_logic_vector(79 downto 0);   --Modified by CJ
   signal c1_mpram_a       : std_logic_vector(7 downto 0);   --Modified by CJ
   signal c1_mpram_d       : std_logic_vector(127 downto 0);     --Modified by CJ 
   signal c1_mpram_ce      : std_logic_vector(1 downto 0);    
@@ -1175,8 +599,8 @@ architecture struct of PE_pair_top is
     signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
     signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram  
     signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
-	signal c2_d_addr   : std_logic_vector(31 downto 0);
-	signal c2_d_cs     : std_logic;  -- CS to SDRAM
+	  signal c2_d_addr   : std_logic_vector(31 downto 0);
+	  signal c2_d_cs     : std_logic;  -- CS to SDRAM
     signal c2_d_ras    : std_logic;  -- RAS to SDRAM
     signal c2_d_cas    : std_logic;  -- CAS to SDRAM
     signal c2_d_we     : std_logic;  -- WE to SDRAM
@@ -1603,10 +1027,10 @@ begin
       DI125       => mp_RAM0_DI(125), --CJ
       DI126       => mp_RAM0_DI(126), --CJ
       DI127       => mp_RAM0_DI(127), --CJ           
-      WEB         => mp_RAM0_WEB,              
-      CK          => hclk,           
-      CS          => mp_RAM0_CS,               
-      OE          => std_logic'('1') --'1'                
+      WEB         => mp_RAM0_WEB    ,              
+      CK          => hclk           ,           
+      CS          => mp_RAM0_CS     ,               
+      OE          => std_logic'('1')                
       );
 
 --  -----------------------------------------------------------------------------
@@ -1614,41 +1038,38 @@ begin
 --  -----------------------------------------------------------------------------
     rtc0: entity work.rtc 
      port map(
-      pllout    => HCLK,
-      lp_pwr_ok => lp_pwr_ok,
-      ld_bmem   => ld_bmem,  -- Latch enable to the dis_bmem latch   
-	    halt_en        => halt_en            ,    
-      nap_en         => nap_en             ,    
-      wakeup_lp      => wakeup_lp          ,    
-      poweron_finish => poweron_finish     ,    
-      reset_iso      => reset_iso          ,    
-      reset_core_n   => reset_core_n       ,    
-      io_iso         => io_iso             ,    
-      nap_rec        => nap_rec            ,    
-      pmic_core_en   => pmic_core_en       ,    
-      pmic_io_en     => pmic_io_en         ,    
-      clk_mux_out    => clk_mux_out        ,    
-      
-          --gmem1
-      c1_gmem_a     =>  c1_gmem_a,   
-      c1_gmem_q     =>  c1_gmem_q,   
-      c1_gmem_d     =>  c1_gmem_d,   
-      c1_gmem_we_n  =>  c1_gmem_we_n,   
-      c1_gmem_ce_n  =>  c1_gmem_ce_n,   
-  
+      pllout    => HCLK                     ,
+      lp_pwr_ok => lp_pwr_ok                ,
+      ld_bmem   => ld_bmem                  ,  -- Latch enable to the dis_bmem latch   
+	    halt_en        => halt_en             ,    
+      nap_en         => nap_en              ,    
+      wakeup_lp      => wakeup_lp           ,    
+      poweron_finish => poweron_finish      ,    
+      reset_iso      => reset_iso           ,    
+      reset_core_n   => reset_core_n        ,    
+      io_iso         => io_iso              ,    
+      nap_rec        => nap_rec             ,    
+      pmic_core_en   => pmic_core_en        ,    
+      pmic_io_en     => pmic_io_en          ,    
+      clk_mux_out    => clk_mux_out         ,         
+      --gmem1
+      c1_gmem_a     =>  c1_gmem_a           ,   
+      c1_gmem_q     =>  c1_gmem_q           ,   
+      c1_gmem_d     =>  c1_gmem_d           ,   
+      c1_gmem_we_n  =>  c1_gmem_we_n        ,   
+      c1_gmem_ce_n  =>  c1_gmem_ce_n        ,   
       --gmem2
-      c2_gmem_a     =>  c2_gmem_a,  
-      c2_gmem_q     =>  c2_gmem_q,  
-      c2_gmem_d     =>  c2_gmem_d,  
-      c2_gmem_we_n  =>  c2_gmem_we_n,  
-      c2_gmem_ce_n  =>  c2_gmem_ce_n,  
-
+      c2_gmem_a     =>  c2_gmem_a           ,  
+      c2_gmem_q     =>  c2_gmem_q           ,  
+      c2_gmem_d     =>  c2_gmem_d           ,  
+      c2_gmem_we_n  =>  c2_gmem_we_n        ,  
+      c2_gmem_ce_n  =>  c2_gmem_ce_n        ,  
       --bmem
-      dbus          =>  dbus,  
-      bmem_a8       =>  bmem_a8,  
-      bmem_q        =>  bmem_q,  
-      bmem_d        =>  bmem_d,  
-      bmem_we_n     =>  bmem_we_n,  
+      dbus          =>  dbus                ,  
+      bmem_a8       =>  bmem_a8             ,  
+      bmem_q        =>  bmem_q              ,  
+      bmem_d        =>  bmem_d              ,  
+      bmem_we_n     =>  bmem_we_n           ,  
       bmem_ce_n     =>  bmem_ce_n
       ); 
  
@@ -1658,197 +1079,195 @@ begin
   core1: entity work.core
     port map(
     -- Clocks to/from clock block
-    clk_p         => HCLK,   --: in  std_logic;  -- PLL clock
-    clk_c_en      => clk_c_en,   --: in  std_logic;  -- CP clock
-    even_c        => even_c,
-    ready         => C1_RDY,
-    --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2 
-    clk_e_pos     => clk_e_pos,   --: out  std_logic;  -- Execution clock
-    clk_e_neg     => clk_e_neg,   --: out  std_logic;  -- Execution clock
-    clk_i_pos     => clk_i_pos,   --: in  std_logic;  -- I/O clock
-    clk_d_pos     => clk_d_pos,   --: in  std_logic;  -- DRAM clock
-    clk_s_pos     => clk_s_pos,   --: in  std_logic;  -- SP clock
+    clk_p         => HCLK             , --: in  std_logic;  -- PLL clock
+    clk_c_en      => clk_c_en         , --: in  std_logic;  -- CP clock
+    even_c        => even_c           ,
+    ready         => C1_RDY           ,
+    clk_e_pos     => clk_e_pos        , --: out  std_logic;  -- Execution clock
+    clk_e_neg     => clk_e_neg        , --: out  std_logic;  -- Execution clock
+    clk_i_pos     => clk_i_pos        , --: in  std_logic;  -- I/O clock
+    clk_d_pos     => clk_d_pos        , --: in  std_logic;  -- DRAM clock
+    clk_s_pos     => clk_s_pos        , --: in  std_logic;  -- SP clock
     -- Control outputs to the clock block
-    rst_n         => rst_n,   --: out std_logic;  -- Asynchronous reset to clk_gen
-    rst_cn        => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-    en_d          => en_d,    --: out std_logic;  -- Enable clk_d
-    fast_d        => fast_d,  --: out std_logic;  -- clk_d speed select 
-    --din_e       => din_e,   --: out std_logic;  -- D input to FF generating clk_e
-    din_i         => din_i,   --: out std_logic;  -- D input to FF generating clk_i
-    din_u         => din_u,   --: out std_logic;  -- D input to FF generating clk_u
-    din_s         => din_s,   --: out std_logic;  -- D input to FF generating clk_s
-    clk_in_off    => clk_in_off   ,
-    clk_main_off  => clk_main_off ,
-	  sdram_en      => sdram_en,
+    rst_n         => rst_n            , --: out std_logic;  -- Asynchronous reset to clk_gen
+    rst_cn        => rst_cn           , --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
+    en_d          => en_d             , --: out std_logic;  -- Enable clk_d
+    fast_d        => fast_d           , --: out std_logic;  -- clk_d speed select 
+    din_i         => din_i            , --: out std_logic;  -- D input to FF generating clk_i
+    din_u         => din_u            , --: out std_logic;  -- D input to FF generating clk_u
+    din_s         => din_s            , --: out std_logic;  -- D input to FF generating clk_s
+    clk_in_off    => clk_in_off       ,
+    clk_main_off  => clk_main_off     ,
+	  sdram_en      => sdram_en         ,
     --flash Control   -coreflag
-    out_line      => out_line,
-    hold_flash    => hold_flash,
-    hold_flash_d  => hold_flash_d,
-    flash_en      => flash_en,
-    flash_mode    => flash_mode,
-    ld_dqi_flash  => ld_dqi_flash,
+    out_line      => out_line         ,
+    hold_flash    => hold_flash       ,
+    hold_flash_d  => hold_flash_d     ,
+    flash_en      => flash_en         ,
+    flash_mode    => flash_mode       ,
+    ld_dqi_flash  => ld_dqi_flash     ,
     -- Control signals to/from the oscillator and PLL
-    pll_frange    => pll_frange, --: out std_logic;  -- Frequency range select
-    pll_n         => pll_n,    --: out std_logic_vector(5 downto 0);   -- Multiplier
-    pll_m         => pll_m,    --: out std_logic_vector(2 downto 0);   -- Divider
-    en_xosc       => en_xosc,  --: out std_logic;  -- Enable XOSC 
-    en_pll        => en_pll,   --: out std_logic;  -- Enable PLL 
-	  sel_pll       => sel_pll,  --: out std_logic;  -- Select PLL as clock source
-	  test_pll      => test_pll, --: out std_logic;  -- PLL in test mode
-    xout          => hclk_i,     --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
+    pll_frange    => pll_frange       , --: out std_logic;  -- Frequency range select
+    pll_n         => pll_n            , --: out std_logic_vector(5 downto 0);   -- Multiplier
+    pll_m         => pll_m            , --: out std_logic_vector(2 downto 0);   -- Divider
+    en_xosc       => en_xosc          , --: out std_logic;  -- Enable XOSC 
+    en_pll        => en_pll           , --: out std_logic;  -- Enable PLL 
+	  sel_pll       => sel_pll          , --: out std_logic;  -- Select PLL as clock source
+	  test_pll      => test_pll         , --: out std_logic;  -- PLL in test mode
+    xout          => hclk_i           , --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
     -- Power on signal
-    pwr_ok        => std_logic'('1'), --'1',--pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
+    pwr_ok        => std_logic'('1')  , --'1',--pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
 	---------------------------------------------------------------------
     -- Memory signals
     ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a       => c1_mprom_a,    --: out std_logic_vector(13 downto 0);-- Address  
-    mprom_ce      => c1_mprom_ce,   --: out std_logic_vector(1 downto 0); -- Chip enable(active high) 
-    mprom_oe      => c1_mprom_oe,   --: out std_logic_vector(1 downto 0); --Output enable(active high)
+    mprom_a       => c1_mprom_a       , --: out std_logic_vector(13 downto 0);-- Address  
+    mprom_ce      => c1_mprom_ce      , --: out std_logic_vector(1 downto 0); -- Chip enable(active high) 
+    mprom_oe      => c1_mprom_oe      , --: out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
-    mpram_a       => c1_mpram_a,    --: out std_logic_vector(13 downto 0);-- Address  
-    mpram_d       => c1_mpram_d,    --: out std_logic_vector(79 downto 0);-- Data to memory
-    mpram_ce      => c1_mpram_ce,    --: out std_logic_vector(1 downto 0); -- Chip enable(active high)
-    mpram_oe      => c1_mpram_oe,   --: out std_logic_vector(1 downto 0); -- Output enable(active high)
-    mpram_we_n    => c1_mpram_we_n, --: out std_logic;                    -- Write enable(active low)
+    mpram_a       => c1_mpram_a       , --: out std_logic_vector(13 downto 0);-- Address  
+    mpram_d       => c1_mpram_d       , --: out std_logic_vector(79 downto 0);-- Data to memory
+    mpram_ce      => c1_mpram_ce      , --: out std_logic_vector(1 downto 0); -- Chip enable(active high)
+    mpram_oe      => c1_mpram_oe      , --: out std_logic_vector(1 downto 0); -- Output enable(active high)
+    mpram_we_n    => c1_mpram_we_n    , --: out std_logic;                    -- Write enable(active low)
     -- MPROM/MPRAM data out bus
-    mp_q          => c1_mp_q,       --: in  std_logic_vector(79 downto 0);-- Data from MPROM/MPRAM
+    mp_q          => c1_mp_q          , --: in  std_logic_vector(79 downto 0);-- Data from MPROM/MPRAM
     -- GMEM signals
-    gmem_a        => c1_gmem_a,  --: out std_logic_vector(9 downto 0);  
-    gmem_d        => c1_gmem_d,  --: out std_logic_vector(7 downto 0);  
-    gmem_q        => c1_gmem_q,  --: in  std_logic_vector(7 downto 0);
-    gmem_ce_n     => c1_gmem_ce_n,--: out std_logic;                      
-    gmem_we_n     => c1_gmem_we_n,--: out std_logic;                      
-    -- IOMEM signals
-    iomem_a       => iomem_a,    --: out std_logic_vector(9 downto 0);
-    iomem_d       => iomem_d,    --: out std_logic_vector(15 downto 0);
-    iomem_q       => iomem_q,    --: in  std_logic_vector(15 downto 0);
-    iomem_ce_n    => iomem_ce_n, --: out std_logic_vector(1 downto 0); 
-    iomem_we_n    => iomem_we_n, --: out std_logic;
+    gmem_a        => c1_gmem_a        , --: out std_logic_vector(9 downto 0);  
+    gmem_d        => c1_gmem_d        , --: out std_logic_vector(7 downto 0);  
+    gmem_q        => c1_gmem_q        , --: in  std_logic_vector(7 downto 0);
+    gmem_ce_n     => c1_gmem_ce_n     , --: out std_logic;                      
+    gmem_we_n     => c1_gmem_we_n     , --: out std_logic;                      
+    -- IOMEM signals 
+    iomem_a       => iomem_a          , --: out std_logic_vector(9 downto 0);
+    iomem_d       => iomem_d          , --: out std_logic_vector(15 downto 0);
+    iomem_q       => iomem_q          , --: in  std_logic_vector(15 downto 0);
+    iomem_ce_n    => iomem_ce_n       , --: out std_logic_vector(1 downto 0); 
+    iomem_we_n    => iomem_we_n       , --: out std_logic;
     -- TRCMEM signals (Trace memory)
-    trcmem_a      => trcmem_a,   --: out std_logic_vector(7 downto 0);
-    trcmem_d      => trcmem_d,   --: out std_logic_vector(31 downto 0);
-    trcmem_q      => trcmem_q,     --: in  std_logic_vector(31 downto 0);
-    trcmem_ce_n   => trcmem_ce_n, --: out std_logic; 
-    trcmem_we_n   => trcmem_we_n, --: out std_logic;
+    trcmem_a      => trcmem_a         , --: out std_logic_vector(7 downto 0);
+    trcmem_d      => trcmem_d         , --: out std_logic_vector(31 downto 0);
+    trcmem_q      => trcmem_q         , --: in  std_logic_vector(31 downto 0);
+    trcmem_ce_n   => trcmem_ce_n      , --: out std_logic; 
+    trcmem_we_n   => trcmem_we_n      , --: out std_logic;
     -- PMEM signals (Patch memory)
-    pmem_a        => c1_pmem_a,   --: out std_logic_vector(10 downto 0);
-    pmem_d        => c1_pmem_d,   --: out std_logic_vector(1  downto 0);
-    pmem_q        => c1_pmem_q,   --: in  std_logic_vector(1  downto 0);
-    pmem_ce_n     => c1_pmem_ce_n,--: out std_logic;  
-    pmem_we_n     => c1_pmem_we_n,
+    pmem_a        => c1_pmem_a        ,--: out std_logic_vector(10 downto 0);
+    pmem_d        => c1_pmem_d        ,--: out std_logic_vector(1  downto 0);
+    pmem_q        => c1_pmem_q        ,--: in  std_logic_vector(1  downto 0);
+    pmem_ce_n     => c1_pmem_ce_n     ,--: out std_logic;  
+    pmem_we_n     => c1_pmem_we_n     ,
     
-    c2_core2_en   => c2_core2_en   ,
-    c2_rsc_n      => c2_rsc_n,
-    c2_clkreq_gen => c2_clkreq_gen,
-    c2_ready      => core2_rdy     ,
-    c2_crb_sel    => c2_crb_sel    ,
-    c2_crb_out    => c2_crb_out    ,
-    c2_en_pmem    => c2_en_pmem    ,
-    c2_en_wdog    => c2_en_wdog    ,
-    c2_pup_clk    => c2_pup_clk    ,
-    c2_pup_irq    => c2_pup_irq    ,
-    c2_r_size     => c2_r_size     ,
-    c2_c_size     => c2_c_size     ,
-    c2_t_ras      => c2_t_ras      ,
-    c2_t_rcd      => c2_t_rcd      ,
-    c2_t_rp       => c2_t_rp       ,
-    short_cycle   => short_cycle,
+    c2_core2_en   => c2_core2_en      ,
+    c2_rsc_n      => c2_rsc_n         ,
+    c2_clkreq_gen => c2_clkreq_gen    ,
+    c2_ready      => core2_rdy        ,
+    c2_crb_sel    => c2_crb_sel       ,
+    c2_crb_out    => c2_crb_out       ,
+    c2_en_pmem    => c2_en_pmem       ,
+    c2_en_wdog    => c2_en_wdog       ,
+    c2_pup_clk    => c2_pup_clk       ,
+    c2_pup_irq    => c2_pup_irq       ,
+    c2_r_size     => c2_r_size        ,
+    c2_c_size     => c2_c_size        ,
+    c2_t_ras      => c2_t_ras         ,
+    c2_t_rcd      => c2_t_rcd         ,
+    c2_t_rp       => c2_t_rp          ,
+    short_cycle   => short_cycle      ,
     -- BMEM block signals
-    bmem_a8       => bmem_a8,  --: out  std_logic;
-    bmem_q        => bmem_q,   --: in   std_logic_vector(7 downto 0);
-    bmem_d        => bmem_d,   --: out  std_logic_vector(7 downto 0);
-    bmem_ce_n     => bmem_ce_n,--: out  std_logic;
-	  bmem_we_n     => bmem_we_n,
+    bmem_a8       => bmem_a8          ,--: out  std_logic;
+    bmem_q        => bmem_q           ,--: in   std_logic_vector(7 downto 0);
+    bmem_d        => bmem_d           ,--: out  std_logic_vector(7 downto 0);
+    bmem_ce_n     => bmem_ce_n        ,--: out  std_logic;
+	  bmem_we_n     => bmem_we_n        ,
+    exe => EXE                        , --CJ
+    resume => RESUME                  , --CJ
+    id_number => c1_ID                , --CJ
+    req_c1 => c1_req_i                , --CJ
+    req_rd_c1 => c1_req_rd_i          ,
+    ack_c1 => C1_ACK                  ,
+    ddi_vld => ddi_vld_c1             , --CJ
     -- RTC block signals
-    exe => EXE,         --CJ
-    resume => RESUME,   --CJ
-    id_number => c1_ID,  --CJ
-    req_c1 => c1_req_i,  --CJ
-    req_rd_c1 => c1_req_rd_i,
-    ack_c1 => C1_ACK,
-    ddi_vld => ddi_vld_c1, --CJ
-    reset_core_n   => reset_core_n   ,
-    reset_iso      => reset_iso      ,
-	reset_iso_clear=> reset_iso_clear,
-    poweron_finish => poweron_finish ,
-    nap_rec        => nap_rec        ,
-    halt_en        => halt_en        ,
-    nap_en         => nap_en         ,
-    ld_bmem       => ld_bmem,  --: out std_logic;  -- Latch enable to the en_bmem latch
+    reset_core_n   => reset_core_n    ,
+    reset_iso      => reset_iso       ,
+	  reset_iso_clear=> reset_iso_clear ,
+    poweron_finish => poweron_finish  ,
+    nap_rec        => nap_rec         ,
+    halt_en        => halt_en         ,
+    nap_en         => nap_en          ,
+    ld_bmem       => ld_bmem          ,--: out std_logic;  -- Latch enable to the en_bmem latch
     --  Signals to/from Peripheral block
-    dfp           => dfp,     --: in  std_logic_vector(7 downto 0); 
-    dbus          => dbus,    --: out std_logic_vector(7 downto 0);
-    rst_en        => rst_en,  --: out std_logic;
-    pd            => pd_s,      --: out std_logic_vector(2 downto 0);  -- pl_pd
-    aaddr         => aaddr,   --: out std_logic_vector(4 downto 0);  -- pl_aaddr
-    idreq         => idreq,   --: in  std_logic_vector(7 downto 0);
-    idi           => idi,     --: in  std_logic_vector(7 downto 0);     
-    idack         => idack,   --: out std_logic_vector(7 downto 0);                   
-    ios_iden      => ios_iden,--: out std_logic;                   
-    ios_ido       => ios_ido, --: out std_logic_vector(7 downto 0);                  
-    ilioa         => ilioa,   --: out std_logic;                   
-    ildout        => ildout,  --: out std_logic;                   
-    inext         => inext,   --: out std_logic;
-    iden          => iden,    --: in  std_logic;
-    dqm_size      => dqm_size,--: out std_logic_vector(1 downto 0);
-    adc_dac       => adc_dac, --: out std_logic;
-    en_uart1      => en_uart1,--: out std_logic;
-    en_uart2      => en_uart2,--: out std_logic;
-    en_uart3      => en_uart3,--: out std_logic;
-    en_eth        => en_eth,  --: out std_logic_vector(1 downto 0);
-    en_tiu        => en_tiu,  --: out std_logic;
-    run_tiu       => run_tiu, --: out std_logic;
-    en_tstamp     => en_tstamp,--: out std_logic_vector(1 downto 0);
-    en_iobus      => en_iobus,--: out std_logic_vector(1 downto 0);
-    ddqm          => ddqm,    --: out std_logic_vector(7  downto 0);   
-    irq0          => irq0,    --: in  std_logic;  -- Interrupt request 0   
-    irq1          => irq1,    --: in  std_logic;  -- Interrupt request 1   
-    adc_ref2v  	  => open, --: out	std_logic;	-- Select 2V internal ADC reference (1V)
+    dfp           => dfp              ,--: in  std_logic_vector(7 downto 0); 
+    dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
+    rst_en        => rst_en           ,--: out std_logic;
+    pd            => pd_s             ,--: out std_logic_vector(2 downto 0);  -- pl_pd
+    aaddr         => aaddr            ,--: out std_logic_vector(4 downto 0);  -- pl_aaddr
+    idreq         => idreq            ,--: in  std_logic_vector(7 downto 0);
+    idi           => idi              ,--: in  std_logic_vector(7 downto 0);     
+    idack         => idack            ,--: out std_logic_vector(7 downto 0);                   
+    ios_iden      => ios_iden         ,--: out std_logic;                   
+    ios_ido       => ios_ido          ,--: out std_logic_vector(7 downto 0);                  
+    ilioa         => ilioa            ,--: out std_logic;                   
+    ildout        => ildout           ,--: out std_logic;                   
+    inext         => inext            ,--: out std_logic;
+    iden          => iden             ,--: in  std_logic;
+    dqm_size      => dqm_size         ,--: out std_logic_vector(1 downto 0);
+    adc_dac       => adc_dac          ,--: out std_logic;
+    en_uart1      => en_uart1         ,--: out std_logic;
+    en_uart2      => en_uart2         ,--: out std_logic;
+    en_uart3      => en_uart3         ,--: out std_logic;
+    en_eth        => en_eth           ,--: out std_logic_vector(1 downto 0);
+    en_tiu        => en_tiu           ,--: out std_logic;
+    run_tiu       => run_tiu          ,--: out std_logic;
+    en_tstamp     => en_tstamp        ,--: out std_logic_vector(1 downto 0);
+    en_iobus      => en_iobus         ,--: out std_logic_vector(1 downto 0);
+    ddqm          => ddqm             ,--: out std_logic_vector(7  downto 0);   
+    irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0   
+    irq1          => irq1             ,--: in  std_logic;  -- Interrupt request 1   
+    adc_ref2v  	  => open             ,--: out	std_logic;	-- Select 2V internal ADC reference (1V)
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
     -- Misc. signals
-    mreset_i      => mreset_i, --: in  std_logic;  -- Asynchronous reset input 
-    mirqout_o     => mirqout_o, --: out std_logic;  -- Interrupt  request output 
-    mckout1_o     => mckout1_o, --: out std_logic;  -- Programmable clock out
-    mckout1_o_en  => mckout1_o_en, 
-    msdin_i       => msdin_i, --: in  std_logic;  -- Serial data in (debug) 
-    msdout_o      => msdout_o, --: out std_logic;  -- Serial data out
-    mrstout_o     => mrstout_o, --: out std_logic;  -- Reset out
-    mxout_o       => mxout_o, --: out std_logic;  -- Oscillator test output
-    mexec_o       => mexec_o, --: out std_logic;  -- clk_e test output
-    mtest_i       => mtest_i,--: in  std_logic;  -- Test mode---
-    mbypass_i     => mbypass_i,--: in  std_logic;  -- bypass PLL
-    mwake_i       => std_logic'('0'), --'0',--: in  std_logic;  -- wake up
+    mreset_i      => mreset_i         , --: in  std_logic;  -- Asynchronous reset input 
+    mirqout_o     => mirqout_o        , --: out std_logic;  -- Interrupt  request output 
+    mckout1_o     => mckout1_o        , --: out std_logic;  -- Programmable clock out
+    mckout1_o_en  => mckout1_o_en     , 
+    msdin_i       => msdin_i          , --: in  std_logic;  -- Serial data in (debug) 
+    msdout_o      => msdout_o         , --: out std_logic;  -- Serial data out
+    mrstout_o     => mrstout_o        , --: out std_logic;  -- Reset out
+    mxout_o       => mxout_o          , --: out std_logic;  -- Oscillator test output
+    mexec_o       => mexec_o          , --: out std_logic;  -- clk_e test output
+    mtest_i       => mtest_i          ,--: in  std_logic;  -- Test mode---
+    mbypass_i     => mbypass_i        ,--: in  std_logic;  -- bypass PLL
+    mwake_i       => std_logic'('0')  , --'0',--: in  std_logic;  -- wake up
     -- DRAM signals
-	  en_pmem2      => en_pmem2,
-    d_addr        => c1_d_addr,--to internal sram block
-    dcs_o         => c1_d_cs,  --: out std_logic;  -- Chip select
-    dras_o        => c1_d_ras, --: out std_logic;  -- Row address strobe
-    dcas_o        => c1_d_cas, --: out std_logic;  -- Column address strobe
-    dwe_o         => c1_d_we,  --: out std_logic;  -- Write enable
-    ddq_i         => c1_d_dqo_sd,
-    ddq_o         => c1_d_dqi_sd,
-    ddq_en        => ddq_en, --: out std_logic;  -- Data output bus enable
-    da_o          => da_o,   --: out std_logic_vector(13 downto 0);  -- Address
-    dba_o         => dba_o,  --: out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o        => dcke_o, --: out std_logic_vector(3 downto 0); -- Clock enable
+	  en_pmem2      => en_pmem2         ,
+    d_addr        => c1_d_addr        ,--to internal sram block
+    dcs_o         => c1_d_cs          ,  --: out std_logic;  -- Chip select
+    dras_o        => c1_d_ras         , --: out std_logic;  -- Row address strobe
+    dcas_o        => c1_d_cas         , --: out std_logic;  -- Column address strobe
+    dwe_o         => c1_d_we          ,  --: out std_logic;  -- Write enable
+    ddq_i         => c1_d_dqo_sd      ,
+    ddq_o         => c1_d_dqi_sd      ,
+    ddq_en        => ddq_en           , --: out std_logic;  -- Data output bus enable
+    da_o          => da_o             ,   --: out std_logic_vector(13 downto 0);  -- Address
+    dba_o         => dba_o            ,  --: out std_logic_vector(1 downto 0); -- Bank address
+    dcke_o        => dcke_o           , --: out std_logic_vector(3 downto 0); -- Clock enable
     -- Cluster interface
-    din_c         => c1_d_dqo,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
-    dout_c        => c1_d_dqi,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
+    din_c         => c1_d_dqo         ,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
+    dout_c        => c1_d_dqi         ,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
     -- Port A
-    pa_i          => pa_i(4 downto 0), --: in  std_logic_vector(4 downto 0);
+    pa_i          => pa_i(4 downto 0) , --: in  std_logic_vector(4 downto 0);
 		-- I/O cell configuration control outputs
-    d_hi          => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
-    d_sr          => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
-    d_lo          => d_lo           ,   --: out std_logic; -- Low drive on DRAM interface
-    p1_hi         => p1_hi          ,   --: out std_logic; -- High drive on port group 1 pins
-    p1_sr         => p1_sr          ,   --: out std_logic; -- Slew rate limit on port group 1 pins
-    p2_hi         => p2_hi          ,   --: out std_logic; -- High drive on port group 2 pins
-    p2_sr         => p2_sr          ,   --: out std_logic; -- Slew rate limit on port group 2 pins
-    p3_hi         => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
-    p3_sr         => p3_sr             --: out std_logic; -- Slew rate limit on port group 3 pins
+    d_hi          => d_hi             ,   --: out std_logic; -- High drive on DRAM interface
+    d_sr          => d_sr             ,   --: out std_logic; -- Slew rate limit on DRAM interface
+    d_lo          => d_lo             ,   --: out std_logic; -- Low drive on DRAM interface
+    p1_hi         => p1_hi            ,   --: out std_logic; -- High drive on port group 1 pins
+    p1_sr         => p1_sr            ,   --: out std_logic; -- Slew rate limit on port group 1 pins
+    p2_hi         => p2_hi            ,   --: out std_logic; -- High drive on port group 2 pins
+    p2_sr         => p2_sr            ,   --: out std_logic; -- Slew rate limit on port group 2 pins
+    p3_hi         => p3_hi            ,   --: out std_logic; -- High drive on port group 3 pins
+    p3_sr         => p3_sr                --: out std_logic; -- Slew rate limit on port group 3 pins
     ); 
   core2 : entity work.acore 
   port map(
@@ -1856,53 +1275,53 @@ begin
     -- Signals to/from other blocks
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
-    clk_p         => HCLK  ,      
-    clk_c_en      => clk_c_en  ,
-    even_c        => even_c, 
-    ready         => core2_rdy,    
-    clk_e_pos     => clk_ea_pos,
-	  clk_d_pos		  => clk_da_pos,    -- Control outputs to the clock block
-    -- signals from the master core
-    rst_cn        => c2_core2_en,       --reset core2 if disabled
-    rsc_n         => c2_rsc_n,
-    clkreq_gen    => std_logic'('0'), --'0',
-    id_number     => c2_ID,
-    core2_en      => c2_core2_en     ,
-    crb_out       => c2_crb_out      ,
-    en_pmem       => c2_en_pmem      ,
-    en_wdog       => c2_en_wdog      ,
-    pup_clk       => c2_pup_clk      ,
-    pup_irq    	  => c2_pup_irq    	,
-    r_size     	  => c2_r_size     	,
-    c_size     	  => c2_c_size     	,
-    t_ras      	  => c2_t_ras      	,
-    t_rcd      	  => c2_t_rcd      	,
-    t_rp       	  => c2_t_rp       	,
-    dqm_size      => dqm_size     ,
-    fast_d        => fast_d       ,
-    short_cycle   => short_cycle,
-    
-    crb_sel       => c2_crb_sel,
+    clk_p         => HCLK             ,      
+    clk_c_en      => clk_c_en         ,
+    even_c        => even_c           , 
+    ready         => core2_rdy        ,    
+    clk_e_pos     => clk_ea_pos       ,
+	  clk_d_pos		  => clk_da_pos       ,    -- Control outputs to the clock block
+    -- signals from the master core 
+    rst_cn        => c2_core2_en      ,       --reset core2 if disabled
+    rsc_n         => c2_rsc_n         ,
+    clkreq_gen    => std_logic'('0')  , --'0',
+    id_number     => c2_ID            ,
+    core2_en      => c2_core2_en      ,
+    crb_out       => c2_crb_out       ,
+    en_pmem       => c2_en_pmem       ,
+    en_wdog       => c2_en_wdog       ,
+    pup_clk       => c2_pup_clk       ,
+    pup_irq    	  => c2_pup_irq    	  ,
+    r_size     	  => c2_r_size     	  ,
+    c_size     	  => c2_c_size     	  ,
+    t_ras      	  => c2_t_ras      	  ,
+    t_rcd      	  => c2_t_rcd      	  ,
+    t_rp       	  => c2_t_rp       	  ,
+    dqm_size      => dqm_size         ,
+    fast_d        => fast_d           ,
+    short_cycle   => short_cycle      ,
+
+    crb_sel       => c2_crb_sel       ,
     --  Signals to/from Peripheral block
-    dfp           => dfp          , 
-    ddqm          => open,   
-    irq0          => std_logic'('1'), --'1',  -- Interrupt request 0   
-    irq1          => std_logic'('1'), --'1',  -- Interrupt request 1   
+    dfp           => dfp              , 
+    ddqm          => open             ,   
+    irq0          => std_logic'('1')  , --'1',  -- Interrupt request 0   
+    irq1          => std_logic'('1')  , --'1',  -- Interrupt request 1   
 ---------------------------------------------------------------------
     -- Memory signals
 ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a       => c2_mprom_a    ,
-    mprom_ce      => c2_mprom_ce   ,
-    mprom_oe      => c2_mprom_oe   ,
-    -- MPRAM signals
-    mpram_a       => c2_mpram_a    ,-- Address  
-    mpram_d       => c2_mpram_d    ,-- Data to memory
-    mpram_ce      => c2_mpram_ce   ,-- Chip enable(active high)
-    mpram_oe      => c2_mpram_oe   ,-- Output enable(active high)
-    mpram_we_n    => c2_mpram_we_n ,-- Write enable(active low)
+    mprom_a       => c2_mprom_a     ,
+    mprom_ce      => c2_mprom_ce    ,
+    mprom_oe      => c2_mprom_oe    ,
+    -- MPRAM signals  
+    mpram_a       => c2_mpram_a     ,-- Address  
+    mpram_d       => c2_mpram_d     ,-- Data to memory
+    mpram_ce      => c2_mpram_ce    ,-- Chip enable(active high)
+    mpram_oe      => c2_mpram_oe    ,-- Output enable(active high)
+    mpram_we_n    => c2_mpram_we_n  ,-- Write enable(active low)
     -- MPROM/MPRAM data out bus
-    mp_q          => c2_mp_q      ,-- Data from MPROM/MPRAM
+    mp_q          => c2_mp_q        ,-- Data from MPROM/MPRAM
     -- GMEM signals
     gmem_a        => c2_gmem_a      ,  
     gmem_d        => c2_gmem_d      ,  
@@ -1915,29 +1334,29 @@ begin
     pmem_q        => c2_pmem_q      ,
     pmem_ce_n     => c2_pmem_ce_n   ,  
     pmem_we_n     => c2_pmem_we_n   ,
-    exe          => exe ,     --CJ
-    req_c2       => c2_req_i,
-    req_rd_c2    => c2_req_rd_i,
-    ack_c2       => C2_ACK,
-     ddi_vld      =>ddi_vld_c2, --CJ 
-     resume => RESUME,   --CJ
+    exe          => exe             ,     --CJ
+    req_c2       => c2_req_i        ,
+    req_rd_c2    => c2_req_rd_i     ,
+    ack_c2       => C2_ACK          ,
+    ddi_vld      =>ddi_vld_c2       , --CJ 
+    resume => RESUME                ,   --CJ
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
     -- DRAM signals     
-    d_addr        => c2_d_addr,
-    dcs_o         => c2_d_cs,
-    dras_o        => c2_d_ras,
-    dcas_o        => c2_d_cas,
-    dwe_o         => c2_d_we,
-    ddq_i         => c1_d_dqo_sd,
-    ddq_o         => c1_d_dqi_sd,
-    ddq_en        => open,
-    da_o          => open,
-    dba_o         => open,
-    dcke_o        => open, -- Clock enable
+    d_addr        => c2_d_addr      ,
+    dcs_o         => c2_d_cs        ,
+    dras_o        => c2_d_ras       ,
+    dcas_o        => c2_d_cas       ,
+    dwe_o         => c2_d_we        ,
+    ddq_i         => c1_d_dqo_sd    ,
+    ddq_o         => c1_d_dqi_sd    ,
+    ddq_en        => open           ,
+    da_o          => open           ,
+    dba_o         => open           ,
+    dcke_o        => open           , -- Clock enable
     -- Cluster interface
-    din_c         => c2_d_dqo,   --in std_logic_vector(127 downto 0)-- Data input bus
+    din_c         => c2_d_dqo       ,   --in std_logic_vector(127 downto 0)-- Data input bus
     dout_c        => c2_d_dqi   -- out std_logic_vector(31 downto 0); -- Data output bus
 
     );  
@@ -1962,13 +1381,13 @@ begin
         c2_mpram_we_n  => c2_mpram_we_n  ,-- Write enable(active low)
         c2_pmem_q      => c2_pmem_q      ,
         c2_mp_q        => c2_mp_q        ,
-        PM_DO       => mp_PM_DO      ,--: in  std_logic_vector (1 downto 0);
+        PM_DO       => mp_PM_DO          ,--: in  std_logic_vector (1 downto 0);
         --RAM0
-        RAM0_DO     => mp_RAM0_DO     ,--: in  std_logic_vector (79 downto 0);
-        RAM0_DI     => mp_RAM0_DI     ,--: out std_logic_vector (79 downto 0);
-        RAM0_A      => mp_RAM0_A      ,--: out std_logic_vector (13 downto 0);
-        RAM0_WEB    => mp_RAM0_WEB    ,--: out std_logic;
-        RAM0_OE     => mp_RAM0_OE     ,
+        RAM0_DO     => mp_RAM0_DO        ,--: in  std_logic_vector (79 downto 0);
+        RAM0_DI     => mp_RAM0_DI        ,--: out std_logic_vector (79 downto 0);
+        RAM0_A      => mp_RAM0_A         ,--: out std_logic_vector (13 downto 0);
+        RAM0_WEB    => mp_RAM0_WEB       ,--: out std_logic;
+        RAM0_OE     => mp_RAM0_OE        ,
         RAM0_CS     => mp_RAM0_CS      --: out std_logic;
     );
 
@@ -1977,47 +1396,44 @@ begin
   --flash interface
   flash_inf_inst : entity work.flash_inf 
 	PORT MAP( 
-	    clk_p       => hclk       ,
-		even_c		=> even_c		,
-	    rst_cn      => rst_n      ,
-	    
-	    flash_en    => flash_en    ,
-	    flash_mode  => flash_mode  ,
-	    out_line    => out_line    ,
-	    hold_flash  => hold_flash  ,
-	    hold_flash_d => hold_flash_d,
-	    
-	    addr_in     => f_addr_in   ,
-        rd_in       => f_rd_in     ,
-        wr_in       => f_wr_in     ,
-        data_in     => f_data_in   ,
-        data_out    => f_data_out  ,
-		ld_dqi_flash => ld_dqi_flash,
-        
-        CE          => f_CE          ,
-        ADDR        => f_ADDR        ,
-        WRONLY      => f_WRONLY      ,
-        PERASE      => f_PERASE      ,
-        SERASE      => f_SERASE      ,
-        MERASE      => f_MERASE      ,
-        PROG        => f_PROG        ,
-        INF         => f_INF         ,
-        POR         => f_POR         ,
-        SAVEN       => f_SAVEN       ,
-        TM          => f_TM          ,
-        DATA_WR     => f_DATA_WR     ,    
-        f0_ALE      => f0_ALE      ,
-        f0_DATA_IN  => f0_DATA_IN  ,       
-        f0_RBB      => f0_RBB      ,
-        f1_ALE      => f1_ALE      ,
-        f1_DATA_IN  => f1_DATA_IN  ,       
-        f1_RBB      => f1_RBB      ,
-        f2_ALE      => f2_ALE      ,
-        f2_DATA_IN  => f2_DATA_IN  ,       
-        f2_RBB      => f2_RBB      ,
-        f3_ALE      => f3_ALE      ,
-        f3_DATA_IN  => f3_DATA_IN  ,       
-        f3_RBB      => f3_RBB            
+	    clk_p       => hclk           ,
+		  even_c		=> even_c		        ,
+	    rst_cn      => rst_n          ,
+	    flash_en    => flash_en       ,
+	    flash_mode  => flash_mode     ,
+	    out_line    => out_line       ,
+	    hold_flash  => hold_flash     ,
+	    hold_flash_d => hold_flash_d  ,  
+	    addr_in     => f_addr_in      ,
+      rd_in       => f_rd_in        ,
+      wr_in       => f_wr_in        ,
+      data_in     => f_data_in      ,
+      data_out    => f_data_out     ,
+		  ld_dqi_flash => ld_dqi_flash  ,      
+      CE          => f_CE           ,
+      ADDR        => f_ADDR         ,
+      WRONLY      => f_WRONLY       ,
+      PERASE      => f_PERASE       ,
+      SERASE      => f_SERASE       ,
+      MERASE      => f_MERASE       ,
+      PROG        => f_PROG         ,
+      INF         => f_INF          ,
+      POR         => f_POR          ,
+      SAVEN       => f_SAVEN        ,
+      TM          => f_TM           ,
+      DATA_WR     => f_DATA_WR      ,    
+      f0_ALE      => f0_ALE         ,
+      f0_DATA_IN  => f0_DATA_IN     ,       
+      f0_RBB      => f0_RBB         ,
+      f1_ALE      => f1_ALE         ,
+      f1_DATA_IN  => f1_DATA_IN     ,       
+      f1_RBB      => f1_RBB         ,
+      f2_ALE      => f2_ALE         ,
+      f2_DATA_IN  => f2_DATA_IN     ,       
+      f2_RBB      => f2_RBB         ,
+      f3_ALE      => f3_ALE         ,
+      f3_DATA_IN  => f3_DATA_IN     ,       
+      f3_RBB      => f3_RBB            
 		);		
 
 

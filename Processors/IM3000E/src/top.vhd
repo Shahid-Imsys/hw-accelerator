@@ -80,6 +80,7 @@ entity top is
     -- clocks and control signals
     HCLK    : in  std_logic;            -- clk input   
     MRESET  : in  std_logic;  -- system reset               low active
+    MRSTOUT : out std_logic;            -- Reset output
     MIRQOUT : out std_logic;            -- interrupt request output    
     MCKOUT0 : out std_logic;            --for trace adapter
     MCKOUT1 : out std_logic;            --programable clock out
@@ -2061,6 +2062,8 @@ begin
   -----------------------------------------------------------------------------
 
   peri01 : entity work.peri
+    generic map (
+      g_build_type => g_memory_type)
     port map(
       clk_p      => clk_p,
       clk_c_en   => clk_c_en,

@@ -92,72 +92,72 @@ architecture Behavioral of Noc_State_Machine is
      );
     end component;
     
-    component ila_2
-    port(
-        clk     : in  std_logic;
-        probe0  : in std_logic_vector(0 downto 0); 
-        probe1  : in std_logic_vector(0 downto 0); 
-        probe2  : in std_logic_vector(7 downto 0); 
-        probe3  : in std_logic_vector(7 downto 0); 
-        probe4  : in std_logic_vector(0 downto 0); 
-        probe5  : in std_logic_vector(0 downto 0); 
-        probe6  : in std_logic_vector(0 downto 0); 
-        probe7  : in std_logic_vector(0 downto 0); 
-        probe8  : in std_logic_vector(0 downto 0); 
-        probe9  : in std_logic_vector(0 downto 0); 
-        probe10 : in std_logic_vector(0 downto 0); 
-        probe11 : in std_logic_vector(0 downto 0); 
-        probe12 : in std_logic_vector(7 downto 0); 
-        probe13 : in std_logic_vector(0 downto 0); 
-        probe14 : in std_logic_vector(23 downto 0); 
-        probe15 : in std_logic_vector(0 downto 0); 
-        probe16 : in std_logic_vector(7 downto 0); 
-        probe17 : in std_logic_vector(7 downto 0); 
-        probe18 : in std_logic_vector(19 downto 0); 
-        probe19 : in std_logic_vector(19 downto 0); 
-        probe20 : in std_logic_vector(15 downto 0); 
-        probe21 : in std_logic_vector(0 downto 0); 
-        probe22 : in std_logic_vector(0 downto 0); 
-        probe23 : in std_logic_vector(19 downto 0); 
-        probe24 : in std_logic_vector(0 downto 0);
-        probe25 : in std_logic_vector(0 downto 0); 
-        probe26 : in std_logic_vector(0 downto 0); 
-        probe27 : in std_logic_vector(0 downto 0); 
-        probe28 : in std_logic_vector(0 downto 0); 
-        probe29 : in std_logic_vector(0 downto 0); 
-        probe30 : in std_logic_vector(0 downto 0); 
-        probe31 : in std_logic_vector(0 downto 0); 
-        probe32 : in std_logic_vector(8 downto 0); 
-        probe33 : in std_logic_vector(2 downto 0); 
-        probe34 : in std_logic_vector(0 downto 0); 
-        probe35 : in std_logic_vector(0 downto 0); 
-        probe36 : in std_logic_vector(0 downto 0); 
-        probe37 : in std_logic_vector(0 downto 0); 
-        probe38 : in std_logic_vector(0 downto 0);
-        probe39 : in std_logic_vector(0 downto 0);
-        probe40 : in std_logic_vector(0 downto 0);
-        probe41 : in std_logic_vector(0 downto 0);
-        probe42 : in std_logic_vector(0 downto 0);
-        probe43 : in std_logic_vector(0 downto 0);
-        probe44 : in std_logic_vector(0 downto 0);
-        probe45 : in std_logic_vector(0 downto 0);
-        probe46 : in std_logic_vector(0 downto 0);
-        probe47 : in std_logic_vector(0 downto 0);
-        probe48 : in std_logic_vector(0 downto 0);
-        probe49 : in std_logic_vector(0 downto 0);
-        probe50 : in std_logic_vector(0 downto 0);
-        probe51 : in std_logic_vector(0 downto 0);
-        probe52 : in std_logic_vector(0 downto 0);
-        probe53 : in std_logic_vector(0 downto 0);
-        probe54 : in std_logic_vector(0 downto 0);
-        probe55 : in std_logic_vector(0 downto 0);
-        probe56 : in std_logic_vector(0 downto 0);
-        probe57 : in std_logic_vector(0 downto 0);
-        probe58 : in std_logic_vector(11 downto 0);
-        probe59 : in std_logic_vector(4 downto 0);
-        probe60 : in std_logic_vector(15 downto 0)
-    );
-    end component;
+    -- component ila_2
+    -- port(
+        -- clk     : in  std_logic;
+        -- probe0  : in std_logic_vector(0 downto 0); 
+        -- probe1  : in std_logic_vector(0 downto 0); 
+        -- probe2  : in std_logic_vector(7 downto 0); 
+        -- probe3  : in std_logic_vector(7 downto 0); 
+        -- probe4  : in std_logic_vector(0 downto 0); 
+        -- probe5  : in std_logic_vector(0 downto 0); 
+        -- probe6  : in std_logic_vector(0 downto 0); 
+        -- probe7  : in std_logic_vector(0 downto 0); 
+        -- probe8  : in std_logic_vector(0 downto 0); 
+        -- probe9  : in std_logic_vector(0 downto 0); 
+        -- probe10 : in std_logic_vector(0 downto 0); 
+        -- probe11 : in std_logic_vector(0 downto 0); 
+        -- probe12 : in std_logic_vector(7 downto 0); 
+        -- probe13 : in std_logic_vector(0 downto 0); 
+        -- probe14 : in std_logic_vector(23 downto 0); 
+        -- probe15 : in std_logic_vector(0 downto 0); 
+        -- probe16 : in std_logic_vector(7 downto 0); 
+        -- probe17 : in std_logic_vector(7 downto 0); 
+        -- probe18 : in std_logic_vector(19 downto 0); 
+        -- probe19 : in std_logic_vector(19 downto 0); 
+        -- probe20 : in std_logic_vector(15 downto 0); 
+        -- probe21 : in std_logic_vector(0 downto 0); 
+        -- probe22 : in std_logic_vector(0 downto 0); 
+        -- probe23 : in std_logic_vector(19 downto 0); 
+        -- probe24 : in std_logic_vector(0 downto 0);
+        -- probe25 : in std_logic_vector(0 downto 0); 
+        -- probe26 : in std_logic_vector(0 downto 0); 
+        -- probe27 : in std_logic_vector(0 downto 0); 
+        -- probe28 : in std_logic_vector(0 downto 0); 
+        -- probe29 : in std_logic_vector(0 downto 0); 
+        -- probe30 : in std_logic_vector(0 downto 0); 
+        -- probe31 : in std_logic_vector(0 downto 0); 
+        -- probe32 : in std_logic_vector(8 downto 0); 
+        -- probe33 : in std_logic_vector(2 downto 0); 
+        -- probe34 : in std_logic_vector(0 downto 0); 
+        -- probe35 : in std_logic_vector(0 downto 0); 
+        -- probe36 : in std_logic_vector(0 downto 0); 
+        -- probe37 : in std_logic_vector(0 downto 0); 
+        -- probe38 : in std_logic_vector(0 downto 0);
+        -- probe39 : in std_logic_vector(0 downto 0);
+        -- probe40 : in std_logic_vector(0 downto 0);
+        -- probe41 : in std_logic_vector(0 downto 0);
+        -- probe42 : in std_logic_vector(0 downto 0);
+        -- probe43 : in std_logic_vector(0 downto 0);
+        -- probe44 : in std_logic_vector(0 downto 0);
+        -- probe45 : in std_logic_vector(0 downto 0);
+        -- probe46 : in std_logic_vector(0 downto 0);
+        -- probe47 : in std_logic_vector(0 downto 0);
+        -- probe48 : in std_logic_vector(0 downto 0);
+        -- probe49 : in std_logic_vector(0 downto 0);
+        -- probe50 : in std_logic_vector(0 downto 0);
+        -- probe51 : in std_logic_vector(0 downto 0);
+        -- probe52 : in std_logic_vector(0 downto 0);
+        -- probe53 : in std_logic_vector(0 downto 0);
+        -- probe54 : in std_logic_vector(0 downto 0);
+        -- probe55 : in std_logic_vector(0 downto 0);
+        -- probe56 : in std_logic_vector(0 downto 0);
+        -- probe57 : in std_logic_vector(0 downto 0);
+        -- probe58 : in std_logic_vector(11 downto 0);
+        -- probe59 : in std_logic_vector(4 downto 0);
+        -- probe60 : in std_logic_vector(15 downto 0)
+    -- );
+    -- end component;
 
     signal  Load_Mode_Reg           : std_logic;
     signal  Reset_LC                : std_logic;   
@@ -223,68 +223,69 @@ architecture Behavioral of Noc_State_Machine is
 	signal  Step_BC_i               : std_logic;
 	signal  Load_Mux_Reg_i          : std_logic;
 	signal  Shift_TC_i              : std_logic;
-    --ILA SIGNALS
-    signal probe0_i  : std_logic_vector(0 downto 0); 
-	signal probe1_i  : std_logic_vector(0 downto 0); 
-	signal probe2_i  : std_logic_vector(7 downto 0); 
-	signal probe3_i  : std_logic_vector(7 downto 0); 
-	signal probe4_i  : std_logic_vector(0 downto 0); 
-	signal probe5_i  : std_logic_vector(0 downto 0); 
-	signal probe6_i  : std_logic_vector(0 downto 0); 
-	signal probe7_i  : std_logic_vector(0 downto 0); 
-	signal probe8_i  : std_logic_vector(0 downto 0); 
-	signal probe9_i  : std_logic_vector(0 downto 0); 
-	signal probe10_i : std_logic_vector(0 downto 0); 
-	signal probe11_i : std_logic_vector(0 downto 0); 
-	signal probe12_i : std_logic_vector(7 downto 0); 
-	signal probe13_i : std_logic_vector(0 downto 0); 
-	signal probe14_i : std_logic_vector(23 downto 0); 
-	signal probe15_i : std_logic_vector(0 downto 0); 
-	signal probe16_i : std_logic_vector(7 downto 0); 
-	signal probe17_i : std_logic_vector(7 downto 0); 
-	signal probe18_i : std_logic_vector(19 downto 0); 
-	signal probe19_i : std_logic_vector(19 downto 0); 
-	signal probe20_i : std_logic_vector(15 downto 0); 
-	signal probe21_i : std_logic_vector(0 downto 0); 
-	signal probe22_i : std_logic_vector(0 downto 0); 
-	signal probe23_i : std_logic_vector(19 downto 0); 
-	signal probe24_i : std_logic_vector(0 downto 0); 
-	signal probe25_i : std_logic_vector(0 downto 0); 
-	signal probe26_i : std_logic_vector(0 downto 0); 
-	signal probe27_i : std_logic_vector(0 downto 0); 
-	signal probe28_i : std_logic_vector(0 downto 0); 
-	signal probe29_i : std_logic_vector(0 downto 0); 
-	signal probe30_i : std_logic_vector(0 downto 0); 
-	signal probe31_i : std_logic_vector(0 downto 0); 
-	signal probe32_i : std_logic_vector(8 downto 0); 
-	signal probe33_i : std_logic_vector(2 downto 0); 
-	signal probe34_i : std_logic_vector(0 downto 0); 
-	signal probe35_i : std_logic_vector(0 downto 0); 
-	signal probe36_i : std_logic_vector(0 downto 0); 
-	signal probe37_i : std_logic_vector(0 downto 0); 
-	signal probe38_i : std_logic_vector(0 downto 0);
-	signal probe39_i : std_logic_vector(0 downto 0);
-    signal probe40_i : std_logic_vector(0 downto 0);
-    signal probe41_i : std_logic_vector(0 downto 0);
-    signal probe42_i : std_logic_vector(0 downto 0);
-    signal probe43_i : std_logic_vector(0 downto 0);
-    signal probe44_i : std_logic_vector(0 downto 0);
-    signal probe45_i : std_logic_vector(0 downto 0);
-    signal probe46_i : std_logic_vector(0 downto 0);
-    signal probe47_i : std_logic_vector(0 downto 0);
-    signal probe48_i : std_logic_vector(0 downto 0);
-    signal probe49_i : std_logic_vector(0 downto 0);
-    signal probe50_i : std_logic_vector(0 downto 0);
-    signal probe51_i : std_logic_vector(0 downto 0);
-    signal probe52_i : std_logic_vector(0 downto 0);
-    signal probe53_i : std_logic_vector(0 downto 0);
-    signal probe54_i : std_logic_vector(0 downto 0);
-    signal probe55_i : std_logic_vector(0 downto 0);
-    signal probe56_i : std_logic_vector(0 downto 0);
-    signal probe57_i : std_logic_vector(0 downto 0);
-    signal probe58_i : std_logic_vector(11 downto 0);
-    signal probe59_i : std_logic_vector(4 downto 0);
-    signal probe60_i : std_logic_vector(15 downto 0);
+	signal  TS_odd                  : std_logic_vector(15 downto 0);          
+    -- ILA SIGNALS
+    -- signal probe0_i  : std_logic_vector(0 downto 0); 
+	-- signal probe1_i  : std_logic_vector(0 downto 0); 
+	-- signal probe2_i  : std_logic_vector(7 downto 0); 
+	-- signal probe3_i  : std_logic_vector(7 downto 0); 
+	-- signal probe4_i  : std_logic_vector(0 downto 0); 
+	-- signal probe5_i  : std_logic_vector(0 downto 0); 
+	-- signal probe6_i  : std_logic_vector(0 downto 0); 
+	-- signal probe7_i  : std_logic_vector(0 downto 0); 
+	-- signal probe8_i  : std_logic_vector(0 downto 0); 
+	-- signal probe9_i  : std_logic_vector(0 downto 0); 
+	-- signal probe10_i : std_logic_vector(0 downto 0); 
+	-- signal probe11_i : std_logic_vector(0 downto 0); 
+	-- signal probe12_i : std_logic_vector(7 downto 0); 
+	-- signal probe13_i : std_logic_vector(0 downto 0); 
+	-- signal probe14_i : std_logic_vector(23 downto 0); 
+	-- signal probe15_i : std_logic_vector(0 downto 0); 
+	-- signal probe16_i : std_logic_vector(7 downto 0); 
+	-- signal probe17_i : std_logic_vector(7 downto 0); 
+	-- signal probe18_i : std_logic_vector(19 downto 0); 
+	-- signal probe19_i : std_logic_vector(19 downto 0); 
+	-- signal probe20_i : std_logic_vector(15 downto 0); 
+	-- signal probe21_i : std_logic_vector(0 downto 0); 
+	-- signal probe22_i : std_logic_vector(0 downto 0); 
+	-- signal probe23_i : std_logic_vector(19 downto 0); 
+	-- signal probe24_i : std_logic_vector(0 downto 0); 
+	-- signal probe25_i : std_logic_vector(0 downto 0); 
+	-- signal probe26_i : std_logic_vector(0 downto 0); 
+	-- signal probe27_i : std_logic_vector(0 downto 0); 
+	-- signal probe28_i : std_logic_vector(0 downto 0); 
+	-- signal probe29_i : std_logic_vector(0 downto 0); 
+	-- signal probe30_i : std_logic_vector(0 downto 0); 
+	-- signal probe31_i : std_logic_vector(0 downto 0); 
+	-- signal probe32_i : std_logic_vector(8 downto 0); 
+	-- signal probe33_i : std_logic_vector(2 downto 0); 
+	-- signal probe34_i : std_logic_vector(0 downto 0); 
+	-- signal probe35_i : std_logic_vector(0 downto 0); 
+	-- signal probe36_i : std_logic_vector(0 downto 0); 
+	-- signal probe37_i : std_logic_vector(0 downto 0); 
+	-- signal probe38_i : std_logic_vector(0 downto 0);
+	-- signal probe39_i : std_logic_vector(0 downto 0);
+    -- signal probe40_i : std_logic_vector(0 downto 0);
+    -- signal probe41_i : std_logic_vector(0 downto 0);
+    -- signal probe42_i : std_logic_vector(0 downto 0);
+    -- signal probe43_i : std_logic_vector(0 downto 0);
+    -- signal probe44_i : std_logic_vector(0 downto 0);
+    -- signal probe45_i : std_logic_vector(0 downto 0);
+    -- signal probe46_i : std_logic_vector(0 downto 0);
+    -- signal probe47_i : std_logic_vector(0 downto 0);
+    -- signal probe48_i : std_logic_vector(0 downto 0);
+    -- signal probe49_i : std_logic_vector(0 downto 0);
+    -- signal probe50_i : std_logic_vector(0 downto 0);
+    -- signal probe51_i : std_logic_vector(0 downto 0);
+    -- signal probe52_i : std_logic_vector(0 downto 0);
+    -- signal probe53_i : std_logic_vector(0 downto 0);
+    -- signal probe54_i : std_logic_vector(0 downto 0);
+    -- signal probe55_i : std_logic_vector(0 downto 0);
+    -- signal probe56_i : std_logic_vector(0 downto 0);
+    -- signal probe57_i : std_logic_vector(0 downto 0);
+    -- signal probe58_i : std_logic_vector(11 downto 0);
+    -- signal probe59_i : std_logic_vector(4 downto 0);
+    -- signal probe60_i : std_logic_vector(15 downto 0);
 
 begin
 
@@ -473,9 +474,11 @@ begin
                 TC_Equal_Zero    <= '0';
             end if;
             
+            TS_odd <= TS + '1';
+            
             if Load_TC = '1' then
                 if Shift_TC_i = '1' then
-                    Transfer_Counter <= '0' & TS(15 downto 1);
+                    Transfer_Counter <= '0' & TS_odd(15 downto 1);
                 else
                     Transfer_Counter <= TS;
                 end if;       
@@ -503,146 +506,146 @@ begin
         end if; --reset
     end process;
 
-    process(Gated_CLK_from_PEC, reset)
+    process(clk, reset)
     begin
         if reset = '1'then
             CM_Flag_Latch <= '0';
-        elsif rising_edge(Gated_CLK_from_PEC) then
+        elsif rising_edge(clk) then
             if Reset_CM_Flag = '1' then
                 CM_Flag_Latch <= '0';
-            else
+            elsif Gated_CLK_from_PEC = '1' then
                 CM_Flag_Latch <= Cond_Wait; 
             end if;
         end if;
     end process;
 	 
-    probe0_i(0)           <= h2c_cmd_t;
-    probe1_i(0)           <= CMD_flag_t;
-    probe2_i(7 downto 0)  <= Mux2;
-    probe3_i(7 downto 0)  <= Return_Reg2;
-    probe4_i(0)           <= Noc_CMD_flag_t;
-    probe5_i(0)           <= PCIe_req_t;
-    probe6_i(0)           <= c2h_cmd_t;
-    probe7_i(0)           <= PCIe_ack;
-    probe8_i(0)           <= En_PCIe_Data_i;
-    probe9_i(0)           <= pcie_wr_data_wrs_t;
-    probe10_i(0)          <= pcie_wr_ctl_wrs_t;
-    probe11_i(0)          <= Load_AS_Counter;
-    probe12_i(7 downto 0) <= Address_Counter;
-    probe13_i(0)          <= Enable_AS_Counter;
-    probe14_i(23 downto 0)<= Program_Mem_Out;
-    probe15_i(0)          <= Load_Mode_Reg;
-    probe16_i(7 downto 0) <= Mode_Reg;
-    probe17_i(7 downto 0) <= AS_Counter_Mux;
-    probe18_i(19 downto 0)<= Loop_Counter;
-    probe19_i(19 downto 0)<= Loop_Register;
-    probe20_i(15 downto 0)<= Transfer_Counter;
-    probe21_i(0)          <= TC_Equal_Zero;
-    probe22_i(0)          <= LC_Equal_LR;
-    probe23_i(19 downto 0)<= Loop_Mux;
-    probe24_i(0)          <= CMD_FF;
-    probe25_i(0)          <= Load_MD_Reg_i;
-    probe26_i(0)          <= CM_Flag_Latch;
-    probe27_i(0)          <= Load_Tag_Shift_Counter_i;
-    probe28_i(0)          <= Start_TAG_Shift_i;
-    probe29_i(0)          <= Tag_shift;
-    probe30_i(0)          <= Load_CMD_Reg_i;
-    probe31_i(0)          <= Jump_condition_Mux;
-    probe32_i(8 downto 0) <= decoder1;
-    probe33_i(2 downto 0) <= decoder2;
-    probe34_i(0)          <= Cond_Wait;
-    probe35_i(0)          <= Wait_condition_Mux;
-    probe36_i(0)          <= LC_Equal_LR_latch;
-    probe37_i(0)          <= LC_Equal_LR_extend;
-    probe38_i(0)          <= Mux1(0);
-    probe39_i(0)          <= Mux1(1);
-    probe40_i(0)          <= PEC_Ready;
-    probe41_i(0)          <= CMD_FF;
-    probe42_i(0)          <= PCIe_ready;
-    probe43_i(0)          <= Load_RM_as_gen_i;
-    probe44_i(0)          <= Load_PEC_Reg_i;
-    probe45_i(0)          <= Load_PEC_Reg_i;
-    probe46_i(0)          <= Load_PCIe_CMD_Reg_i;
-    probe47_i(0)          <= Load_Req_reg_i;
-    probe48_i(0)          <= En_PCIe_ctrl_i;
-    probe49_i(0)          <= Set_PEC_FF2_i;
-    probe50_i(0)          <= En_NOC_Transfer_i;
-    probe51_i(0)          <= En_RM_i;
-    probe52_i(0)          <= En_RM_i;
-    probe53_i(0)          <= R_W_RM_i;
-    probe54_i(0)          <= R_W_PCIe_i;
-    probe55_i(0)          <= Step_BC_i;
-    probe56_i(0)          <= Load_Mux_Reg_i;
-    probe57_i(0)          <= Reset;
-    probe58_i(11 downto 0)<= Opcode;
-    probe59_i(4 downto 0) <= BC;
-    probe60_i(15 downto 0)<= TS;
+    -- probe0_i(0)           <= h2c_cmd_t;
+    -- probe1_i(0)           <= CMD_flag_t;
+    -- probe2_i(7 downto 0)  <= Mux2;
+    -- probe3_i(7 downto 0)  <= Return_Reg2;
+    -- probe4_i(0)           <= Noc_CMD_flag_t;
+    -- probe5_i(0)           <= PCIe_req_t;
+    -- probe6_i(0)           <= c2h_cmd_t;
+    -- probe7_i(0)           <= PCIe_ack;
+    -- probe8_i(0)           <= En_PCIe_Data_i;
+    -- probe9_i(0)           <= pcie_wr_data_wrs_t;
+    -- probe10_i(0)          <= pcie_wr_ctl_wrs_t;
+    -- probe11_i(0)          <= Load_AS_Counter;
+    -- probe12_i(7 downto 0) <= Address_Counter;
+    -- probe13_i(0)          <= Enable_AS_Counter;
+    -- probe14_i(23 downto 0)<= Program_Mem_Out;
+    -- probe15_i(0)          <= Load_Mode_Reg;
+    -- probe16_i(7 downto 0) <= Mode_Reg;
+    -- probe17_i(7 downto 0) <= AS_Counter_Mux;
+    -- probe18_i(19 downto 0)<= Loop_Counter;
+    -- probe19_i(19 downto 0)<= Loop_Register;
+    -- probe20_i(15 downto 0)<= Transfer_Counter;
+    -- probe21_i(0)          <= TC_Equal_Zero;
+    -- probe22_i(0)          <= LC_Equal_LR;
+    -- probe23_i(19 downto 0)<= Loop_Mux;
+    -- probe24_i(0)          <= CMD_FF;
+    -- probe25_i(0)          <= Load_MD_Reg_i;
+    -- probe26_i(0)          <= CM_Flag_Latch;
+    -- probe27_i(0)          <= Load_Tag_Shift_Counter_i;
+    -- probe28_i(0)          <= Start_TAG_Shift_i;
+    -- probe29_i(0)          <= Tag_shift;
+    -- probe30_i(0)          <= Load_CMD_Reg_i;
+    -- probe31_i(0)          <= Jump_condition_Mux;
+    -- probe32_i(8 downto 0) <= decoder1;
+    -- probe33_i(2 downto 0) <= decoder2;
+    -- probe34_i(0)          <= Cond_Wait;
+    -- probe35_i(0)          <= Wait_condition_Mux;
+    -- probe36_i(0)          <= LC_Equal_LR_latch;
+    -- probe37_i(0)          <= LC_Equal_LR_extend;
+    -- probe38_i(0)          <= Mux1(0);
+    -- probe39_i(0)          <= Mux1(1);
+    -- probe40_i(0)          <= PEC_Ready;
+    -- probe41_i(0)          <= CMD_FF;
+    -- probe42_i(0)          <= PCIe_ready;
+    -- probe43_i(0)          <= Load_RM_as_gen_i;
+    -- probe44_i(0)          <= Load_PEC_Reg_i;
+    -- probe45_i(0)          <= Load_PEC_Reg_i;
+    -- probe46_i(0)          <= Load_PCIe_CMD_Reg_i;
+    -- probe47_i(0)          <= Load_Req_reg_i;
+    -- probe48_i(0)          <= En_PCIe_ctrl_i;
+    -- probe49_i(0)          <= Set_PEC_FF2_i;
+    -- probe50_i(0)          <= En_NOC_Transfer_i;
+    -- probe51_i(0)          <= En_RM_i;
+    -- probe52_i(0)          <= En_RM_i;
+    -- probe53_i(0)          <= R_W_RM_i;
+    -- probe54_i(0)          <= R_W_PCIe_i;
+    -- probe55_i(0)          <= Step_BC_i;
+    -- probe56_i(0)          <= Load_Mux_Reg_i;
+    -- probe57_i(0)          <= Reset;
+    -- probe58_i(11 downto 0)<= Opcode;
+    -- probe59_i(4 downto 0) <= BC;
+    -- probe60_i(15 downto 0)<= TS;
 
     	
-    Ila_NOC : ila_2
-    port map(
-	clk 	=> clk,
-    probe0  => probe0_i, 
-	probe1  => probe1_i, 
-	probe2  => probe2_i, 
-	probe3  => probe3_i, 
-	probe4  => probe4_i, 
-	probe5  => probe5_i, 
-	probe6  => probe6_i, 
-	probe7  => probe7_i, 
-	probe8  => probe8_i, 
-	probe9  => probe9_i, 
-	probe10 => probe10_i,
-	probe11 => probe11_i,
-	probe12 => probe12_i,
-	probe13 => probe13_i,
-	probe14 => probe14_i,
-	probe15 => probe15_i,
-	probe16 => probe16_i,
-	probe17 => probe17_i,
-	probe18 => probe18_i,
-	probe19 => probe19_i,
-	probe20 => probe20_i,
-	probe21 => probe21_i,
-	probe22 => probe22_i,
-	probe23 => probe23_i,
-	probe24 => probe24_i,
-	probe25 => probe25_i,
-	probe26 => probe26_i,
-	probe27 => probe27_i,
-	probe28 => probe28_i,
-	probe29 => probe29_i,
-	probe30 => probe30_i,
-	probe31 => probe31_i, 
-	probe32 => probe32_i, 
-	probe33 => probe33_i, 
-	probe34 => probe34_i, 
-	probe35 => probe35_i, 
-	probe36 => probe36_i, 
-	probe37 => probe37_i, 
-	probe38 => probe38_i,
-	probe39 => probe39_i,
-	probe40 => probe40_i, 
-	probe41 => probe41_i, 
-	probe42 => probe42_i, 
-	probe43 => probe43_i, 
-	probe44 => probe44_i, 
-	probe45 => probe45_i, 
-	probe46 => probe46_i, 
-	probe47 => probe47_i, 
-	probe48 => probe48_i,
-	probe49 => probe49_i,
-	probe50 => probe50_i, 
-	probe51 => probe51_i, 
-	probe52 => probe52_i, 
-	probe53 => probe53_i, 
-	probe54 => probe54_i, 
-	probe55 => probe55_i, 
-	probe56 => probe56_i, 
-	probe57 => probe57_i, 
-	probe58 => probe58_i,
-	probe59 => probe59_i,
-	probe60 => probe60_i			
-);
+    -- Ila_NOC : ila_2
+    -- port map(
+	-- clk 	=> clk,
+    -- probe0  => probe0_i, 
+	-- probe1  => probe1_i, 
+	-- probe2  => probe2_i, 
+	-- probe3  => probe3_i, 
+	-- probe4  => probe4_i, 
+	-- probe5  => probe5_i, 
+	-- probe6  => probe6_i, 
+	-- probe7  => probe7_i, 
+	-- probe8  => probe8_i, 
+	-- probe9  => probe9_i, 
+	-- probe10 => probe10_i,
+	-- probe11 => probe11_i,
+	-- probe12 => probe12_i,
+	-- probe13 => probe13_i,
+	-- probe14 => probe14_i,
+	-- probe15 => probe15_i,
+	-- probe16 => probe16_i,
+	-- probe17 => probe17_i,
+	-- probe18 => probe18_i,
+	-- probe19 => probe19_i,
+	-- probe20 => probe20_i,
+	-- probe21 => probe21_i,
+	-- probe22 => probe22_i,
+	-- probe23 => probe23_i,
+	-- probe24 => probe24_i,
+	-- probe25 => probe25_i,
+	-- probe26 => probe26_i,
+	-- probe27 => probe27_i,
+	-- probe28 => probe28_i,
+	-- probe29 => probe29_i,
+	-- probe30 => probe30_i,
+	-- probe31 => probe31_i, 
+	-- probe32 => probe32_i, 
+	-- probe33 => probe33_i, 
+	-- probe34 => probe34_i, 
+	-- probe35 => probe35_i, 
+	-- probe36 => probe36_i, 
+	-- probe37 => probe37_i, 
+	-- probe38 => probe38_i,
+	-- probe39 => probe39_i,
+	-- probe40 => probe40_i, 
+	-- probe41 => probe41_i, 
+	-- probe42 => probe42_i, 
+	-- probe43 => probe43_i, 
+	-- probe44 => probe44_i, 
+	-- probe45 => probe45_i, 
+	-- probe46 => probe46_i, 
+	-- probe47 => probe47_i, 
+	-- probe48 => probe48_i,
+	-- probe49 => probe49_i,
+	-- probe50 => probe50_i, 
+	-- probe51 => probe51_i, 
+	-- probe52 => probe52_i, 
+	-- probe53 => probe53_i, 
+	-- probe54 => probe54_i, 
+	-- probe55 => probe55_i, 
+	-- probe56 => probe56_i, 
+	-- probe57 => probe57_i, 
+	-- probe58 => probe58_i,
+	-- probe59 => probe59_i,
+	-- probe60 => probe60_i			
+-- );
 
 end Behavioral;

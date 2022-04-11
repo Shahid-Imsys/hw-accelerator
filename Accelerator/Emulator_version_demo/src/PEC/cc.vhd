@@ -153,33 +153,6 @@ component CMEM_32KX16 is
 		 );
 end component;
 
---component delay_count is
---	port(
---		 clk_e             :   in std_logic;
---         peci_busy         :   in std_logic;
---         sig_fin           :   in std_logic;
---         noc_cmd           :   in std_logic_vector(4 downto 0);
---         noc_reg_rdy       :   in std_logic;
---         len_ctr           :   in std_logic_vector(14 downto 0);
---
---         delay             :   out std_logic
---        
---		);
---end component;
-
---component mem_ctrl is
---	port(
---		clk_e           : in std_logic;
---        byte_ctr        : in std_logic_vector(3 downto 0);
---        delay           : in std_logic;
---        noc_cmd         : in std_logic_vector(4 downto 0);
---
---        noc_reg_rdy     : out std_logic;
---        noc_write       : out std_logic;
---        noc_read        : out std_logic
---
---		);
---end component;
 
   --Clock signals
   signal clk_m    : std_logic; --CM clock
@@ -191,7 +164,6 @@ end component;
   --Control flip-flops  --TBD
   signal act      : std_logic;  --Activation
   signal c_rdy_i  : std_logic;  --Cluster ready feedback
-  --signal rst_en   : std_logic;  --Reset
   signal cmc      : std_logic;  --Communication
   signal dir_n    : std_logic;  --NOC side direction
   signal exe_i      : std_logic;  --Execution
@@ -243,7 +215,6 @@ end component;
   signal wr_i        : std_logic;
   signal rd_i         : std_logic;
   --State machine
-  --signal tag_ctr      : std_logic_vector(5 downto 0);  
   signal byte_ctr     : std_logic_vector(3 downto 0):="0000";    --Byte counter
   signal byte_ctr_buffer : std_logic_vector (3 downto 0);  --Buffers to delay 1 clock cycle for byte counter
   signal len_ctr      : std_logic_vector(14 downto 0);
@@ -256,8 +227,6 @@ end component;
   signal b_cast_ctr   : std_logic_vector(5 downto 0);
   signal write_count  : std_logic_vector(1 downto 0); --Wr req data counter
   --Delay signal
-  --constant dn_c       : integer :=32  --Data delay for continous writing and reading
-  --constant dn_b       : integer :=32+TBD1+TBD2;  --Data delay for burst writing
   signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
   signal delay_b      : std_logic_vector(37 downto 0);
   signal rd_ena       : std_logic;
@@ -279,8 +248,6 @@ end component;
   signal data_core_int_e_1 : reg;
   signal standby : std_logic;
   signal delay_p      : std_logic;
-  --PE's ID
-  --signal id_int  : ID_TYPE;
  
 begin
 ----------------------------
@@ -301,51 +268,6 @@ even_p_3 <= even_p_2;   --two delta delay to make sure the even_p comes later th
 even_p_int <= even_p_3;  --3 delta delay to make sure the processor signals comes later than clk_e inside PE, All PE interfaces use this signal
 EVEN_P <= even_p_2;		  
 		  
-  ------------------------------------------------------------------------------
-  -- Reset
-  ------------------------------------------------------------------------------
---  reset: process(clk_e, sig_fin)
---  begin
---	if rising_edge(clk_p) and even_p_int = '0' then
---		if noc_cmd = "01111" then
---	        peci_busy      <= '0';
---	        sig_fin        <= '0';
---	        noc_reg_rdy    <= '0';
---	        noc_write      <= '0';
---	        noc_read       <= '0';
---	        cmd_in         <= '0';
---			delay          <= '0';
---			addr_c         <= (others => '0');
---			addr_n         <= (others => '0');
---			addr_p         <= (others => '0');
---	        noc_cmd        <= (others => '0');
---	        byte_ctr       <= (others => '1');
---	        len_ctr        <= (others => '0');
---	        pk_reg         <= (others => '0');
---	        pk_ctr         <= (others => '0');
---	        dist_reg       <= (others => '0');
---			dist_ctr       <= (others => '0');
---	    else  
---			peci_busy      <= 'Z';
---	        sig_fin        <= 'Z';
---	        noc_reg_rdy    <= 'Z';
---	        noc_write      <= 'Z';
---	        noc_read       <= 'Z';
---	        cmd_in         <= 'Z';
---	        delay          <= 'Z';
---			addr_c         <= (others => 'Z');
---			addr_n         <= (others => 'Z');
---			addr_p         <= (others => 'Z');
---	        noc_cmd        <= (others => 'Z');
---	        byte_ctr       <= (others => 'Z');
---	        len_ctr        <= (others => 'Z');
---	        pk_reg         <= (others => 'Z');
---	        pk_ctr         <= (others => 'Z');
---	        dist_reg       <= (others => 'Z');
---			dist_ctr       <= (others => 'Z');
---		end if;
---    end if;
---end process;
   
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
@@ -388,12 +310,6 @@ EVEN_P <= even_p_2;
 	end if;
   end process;
   
---  busy_flag: process(cmd_in)
---  begin 
---    if peci_busy = '0' and cmd_in= '1' then
---	    peci_busy <= '1';
---	end if;
---  end process;
 	--This process translates the incoming data from tag line to command register
     tag_translate : process (clk_e)
     variable noc_cmd_ctr : integer :=5;
@@ -424,68 +340,6 @@ EVEN_P <= even_p_2;
     	  end if;
     end process;
   
---  noc_ctrl: process(clk_e,sig_fin,noc_cmd) --moved to mem_interaction process
---  
---  variable tag_ctr_2 : integer;
---  variable tag_ctr_3 : integer;   --Both to be described in define document
---  begin
---	if rising_edge(clk_p) and even_p_int = '0' then
---		if noc_cmd = "01111" then
---			tag_ctr_2 := 30;
---			tag_ctr_3 := 38;
---			len_ctr <= (others => '0');
---			addr_n  <= (others => '0');
---			pk_reg  <= (others => '0');
---			dist_reg <= (others => '0'); 
---		elsif sig_fin = '1' and delay = '0' then 
---		    if noc_cmd = "00011" or noc_cmd = "00100" then
---		    	tag_ctr_2 := tag_ctr_2 - 1;
---		    	if tag_ctr_2 > 14 then
---		    		len_ctr(0) <= tag; 
---		    		for i in 0 to 13 loop
---		    			len_ctr(i+1)<= len_ctr(i);
---		    		end loop;
---		    	elsif tag_ctr_2 <= 14 and tag_ctr_2 >= 0 then
---		    		addr_n(0) <= tag;
---		    		for i in 0 to 13 loop
---		    			addr_n(i+1)<= addr_n(i);
---		    		end loop;
---		    	end if;
---		    elsif noc_cmd = "00101" then
---		    	tag_ctr_3:= tag_ctr_3-1;
---		    	if tag_ctr_3 > 22 then
---		    		len_ctr(0) <= tag; 
---		    		for i in 0 to 13 loop
---		    			len_ctr(i+1)<= len_ctr(i);
---		    		end loop;
---		    	elsif tag_ctr_3 > 7 then
---		    		addr_n(0) <= tag;
---		    		for i in 0 to 13 loop
---		    			addr_n(i+1)<= addr_n(i);
---		    		end loop;
---		    	elsif tag_ctr_3 > 3 then
---		    		pk_reg(0) <= tag;
---		    		for i in 0 to 2 loop
---		    			pk_reg(i+1)<= pk_reg(i);
---		    		end loop;
---		    	elsif tag_ctr_3 >= 0 then
---		    		dist_reg(0) <= tag;
---		    		for i in 0 to 2 loop
---		    			dist_reg(i+1)<= dist_reg(i);
---		    		end loop;
---		    	end if;
---		    end if;
---		elsif delay = '1' then
---		tag_ctr_2 := 30;
---		tag_ctr_3 := 38; 
---		len_ctr <= (others=> 'Z');
---		addr_n <= (others=> 'Z');
---		pk_reg <= (others=> 'Z');
---		dist_reg <= (others=> 'Z');
---		end if;
---
---	end if;
---  end process; 
     --Generate execution and resume signals. exe_i and resume_i only get one pulse 
 	--per command.
     exe_and_resume: process(clk_p)
@@ -544,7 +398,6 @@ EVEN_P <= even_p_2;
 			    if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
 				    delay <= '0';
 			    elsif peci_busy = '1' and sig_fin = '1' then
-			    --if noc_cmd = "00011" or noc_cmd = "00100" then
 			    	delay_c(0) <= '1';
 		            for i in 0 to 32 loop--30 loop --28 loop
 			    		delay_c(i+1) <= delay_c(i);
@@ -565,7 +418,6 @@ EVEN_P <= even_p_2;
 				if noc_reg_rdy= '1' and len_ctr = "111111111111111" then  
 					delay <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
-					--if noc_cmd = "00011" or noc_cmd = "00100" then
 						delay_c(0) <= '1';
 						for i in 0 to 28 loop
 							delay_c(i+1) <= delay_c(i);
@@ -581,17 +433,12 @@ EVEN_P <= even_p_2;
 	--This process generates a the latched delay signals to control the behaviour 
 	--of some triggers.
 	rd_act : process(clk_e)
-	--variable two_cycle_delay: std_logic_vector(2 downto 0);
     begin
 		if rising_edge(clk_e) then
             noc_delay <= noc_reg_rdy;
-			--two_cycle_delay(0) := delay;
 			one_c_delay <= delay;
 			two_c_delay <= one_c_delay;
 			three_c_delay <= two_c_delay;
-            --for i in 0 to 1 loop
-			--	two_cycle_delay(i+1) := two_cycle_delay(i);
-			--end loop;
 		end if;
 	end process; 
 	rd_trig <= (one_c_delay and two_c_delay and three_c_delay);	
@@ -628,41 +475,37 @@ EVEN_P <= even_p_2;
 	mem_activation : process(clk_e)
     begin
 		if rising_edge(clk_e) then
-		noc_reg_rdy <= '0';
-        noc_write <= '0';
-        noc_read <= '0';
-		if noc_cmd = "01111" then
 			noc_reg_rdy <= '0';
-            noc_write <= '0';
-            noc_read <= '0';
-        elsif delay = '1' then     
-		    if noc_cmd = "00011" or noc_cmd = "00101" then
-		        if byte_ctr = "0000" then 
-		        	noc_reg_rdy <= '1';
-                    noc_write <= '1';
-					noc_read <= '0';
-		        else
-		            noc_reg_rdy <= '0';
-                    noc_write <= '0';
-		    	end if;
-		    elsif noc_cmd = "00100" then
-		    	if byte_ctr = "1111" then
-		    		noc_reg_rdy <= '1';
-                    noc_read <= '1';
-		    	else 
-		    		noc_reg_rdy <= '0';
-                    noc_read <= '0';
-		    	end if;
-		    else 
-		    	noc_reg_rdy <='0';
-                noc_write <= '0';
-                noc_read <= '0';   
-	        end if;
-		--else 
-			--noc_reg_rdy <='0'; 
-            --noc_write <= '0';
-            --noc_read <= '0';  
-		end if;
+        	noc_write <= '0';
+        	noc_read <= '0';
+			if noc_cmd = "01111" then
+				noc_reg_rdy <= '0';
+        	    noc_write <= '0';
+        	    noc_read <= '0';
+        	elsif delay = '1' then     
+			    if noc_cmd = "00011" or noc_cmd = "00101" then
+			        if byte_ctr = "0000" then 
+			        	noc_reg_rdy <= '1';
+        	            noc_write <= '1';
+						noc_read <= '0';
+			        else
+			            noc_reg_rdy <= '0';
+        	            noc_write <= '0';
+			    	end if;
+			    elsif noc_cmd = "00100" then
+			    	if byte_ctr = "1111" then
+			    		noc_reg_rdy <= '1';
+        	            noc_read <= '1';
+			    	else 
+			    		noc_reg_rdy <= '0';
+        	            noc_read <= '0';
+			    	end if;
+			    else 
+			    	noc_reg_rdy <='0';
+        	        noc_write <= '0';
+        	        noc_read <= '0';   
+	    	    end if;
+			end if;
 		end if;
 	end process;
 	--Write data from DATA port byte by byte to the noc_data_in register
@@ -673,11 +516,7 @@ EVEN_P <= even_p_2;
 				noc_data_in <=(others => (others => '0'));
 			elsif delay = '1' then
         	  if noc_cmd = "00011" or noc_cmd ="00101" then
-				--if byte_ctr_buffer = "1111" or byte_ctr = "0000" then
-					noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
-				--end if;
-			  --else 
-			  --noc_data_in <=(others => (others => 'Z'));
+				noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
 			  end if;
 			end if;
 		end if;
@@ -752,28 +591,18 @@ EVEN_P <= even_p_2;
 			tag_ctr_2 := 30;
 			tag_ctr_3 := 38;
 		    if noc_reg_rdy = '1' then
-		        --if len_ctr = (len_ctr'range => '0') then
-				    --noc_write <= '0';
-				    --noc_read  <= '0';
-                    --dist_ctr <= (others=> '0');
-                    --pk_ctr <= (others => '0');
-		        --Write block continous
                 if noc_cmd = "00011" then
 		                len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 		            	addr_n <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));
-		            	--noc_write <= '1';
 		        --Read block
 		        elsif noc_cmd = "00100" then
 		        		len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 		        		addr_n <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));
-		        		--noc_read <= '1';
 		        --Write block burst
 		        elsif noc_cmd = "00101" then
 		            if dist_ctr = (dist_ctr'range => '0') and noc_write = '0'then
-		                --noc_write <= '1';
 		            	pk_ctr <= pk_reg;
-		            elsif pk_ctr = (pk_ctr'range => '0') then
-		            	--noc_write <= '0';			
+		            elsif pk_ctr = (pk_ctr'range => '0') then		
 		            	dist_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(dist_ctr))-1,4));
 		            elsif noc_write = '1' then
 		              	pk_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(pk_ctr))-1,4));
@@ -791,10 +620,8 @@ EVEN_P <= even_p_2;
 		    	dist_ctr <= dist_ctr;
 	        end if;
 	    elsif delay = '0' then
-	    --noc_write <='0';
-        --noc_read <='0';
-		pk_ctr <= (others => '0'); --reset
-		dist_ctr <=(others => '0'); --reset
+			pk_ctr <= (others => '0'); --reset
+			dist_ctr <=(others => '0'); --reset
 		end if;
 	end if;
 	end process;
@@ -813,7 +640,6 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
                 standby <= '1';
-				--rd_fifo_i <= '0';
             elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
                 
 
@@ -827,7 +653,6 @@ EVEN_P <= even_p_2;
 			    else
 					RD_FIFO <= '0';
 			    end if;
-                --rd_fifo_i <= cl_net_fifo_rd; --one clk_e delay
 			else
 				RD_FIFO <= '0';
             end if;
@@ -890,8 +715,6 @@ EVEN_P <= even_p_2;
 			        		elsif b_cast_ctr = "000000" then
 			        			if len_ctr_p /= "000000000" then
 			        				req_bexe <= '1';
-			        				--addr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_p))+1,15));       --Move to another process
-			        				--len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9));  --Move to another process
 			        			end if;
 			        		end if;
 			        	end if;
@@ -959,7 +782,6 @@ EVEN_P <= even_p_2;
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
 							if write_count = "11" then
 								pe_write <= '1';
-								--len_ctr_p <= (others => '0');
 							else
 								pe_write <= '0';
 							end if;
@@ -973,14 +795,6 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 
---pipeline data
---process(clk_p)
---begin
---	if rising_edge(clk_p) then
---		data_core_int_e <= data_core_int;
---		data_core_int_e_1 <= data_core_int_e;
---	end if;
---end process;
 
 --distribution network
     process (clk_p)
@@ -1000,21 +814,6 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 
- ---pipeline signal
--- process(clk_e)
--- begin
---	if rising_edge(clk_e) then
---		addr_p_e <= addr_p;
---		addr_p_e_1 <= addr_p_e;
---		pe_write_e <= pe_write;
---		pe_write_e_1 <= pe_write_e;
---		pe_read_e <= pe_read;
---		pe_read_e_1 <= pe_read_e;
---		pe_read_e_d <= pe_read_e_1;
---		pe_data_in_e <= pe_data_in;
---		pe_data_in_e_1 <= pe_data_in_e;
---	end if;
--- end process;	
 
  --Address & trigger MUX
  process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
@@ -1037,19 +836,15 @@ EVEN_P <= even_p_2;
 		mem_in <= pe_data_in;
         if noc_reg_rdy = '1' then
             mem_in <= noc_data_in;
-        --else
-            --mem_in <= pe_data_in;
         end if;
     end process;
 --Output Latch
     process(clk_e)
     begin
         if rising_edge(clk_e) then
-			--if even_p_int = '0' then
             if noc_delay = '1' then
                 noc_data_out <= data_core_int;
             end if;
-			--end if;
         end if;
     end process;
 
@@ -1125,32 +920,6 @@ end process;
 		DO14 => data_core_int(14),
 		DO15 => data_core_int(15)
         );		
-
-	--delay_counter : delay_count
-	--port map (
-	--	clk_e => clk_e,
-	--	peci_busy => peci_busy,
-	--	sig_fin => sig_fin,
-	--	noc_cmd => noc_cmd,
-	--	noc_reg_rdy => noc_reg_rdy,
-	--	len_ctr => len_ctr,
---
-	--	delay => delay
---
-	--);
-
-	--mem_control : mem_ctrl
-	--port map (
-	--	clk_e => clk_e,
-    --    byte_ctr => byte_ctr,
-    --    delay => delay,
-    --    noc_cmd => noc_cmd,
---
-    --    noc_reg_rdy => noc_reg_rdy,
-    --    noc_write => noc_write,
-    --    noc_read => noc_read
---
-	--);
 	
 
 end architecture rtl; 

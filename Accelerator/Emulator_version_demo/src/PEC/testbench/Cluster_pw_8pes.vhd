@@ -53,18 +53,18 @@ end Cluster_sim;
 
 architecture Behavioral of Cluster_sim is
     type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
-    type out_word   is array (2303 downto 0) of std_logic_vector(7 downto 0);
+    type out_word   is array (294911 downto 0) of std_logic_vector(7 downto 0);
    	type ram_type   is array (255 downto 0) of std_logic_vector(127 downto 0);
-    type data_in    is array (31 downto 0) of std_logic_vector(127 downto 0);
+    type data_in    is array (4095 downto 0) of std_logic_vector(127 downto 0);
     type kernels_in is array (215 downto 0) of std_logic_vector(127 downto 0);
     type bias_in    is array (17 downto 0) of std_logic_vector(127 downto 0);
     type param_in   is array (63 downto 0) of std_logic_vector(127 downto 0);
-    type result_out is array (143 downto 0) of std_logic_vector(127 downto 0);
+    type result_out is array (18431 downto 0) of std_logic_vector(127 downto 0);
 	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-    type data_in_b  is array (31 downto 0) of bit_vector(127 downto 0);
+    type data_in_b  is array (4095 downto 0) of bit_vector(127 downto 0);
     type kernels_b  is array (215 downto 0) of bit_vector(127 downto 0);
     type bias_in_b  is array (17 downto 0) of bit_vector(127 downto 0);
-    type res_out_b  is array (143 downto 0) of bit_vector(127 downto 0);
+    type res_out_b  is array (18431 downto 0) of bit_vector(127 downto 0);
     type param_b    is array (63 downto 0) of bit_vector(127 downto 0);
 
 		impure function init_ram_from_file (ram_file_name : in string) return ram_type is
@@ -101,7 +101,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM_B : data_in_b;
         variable RAM :data_in;
         begin
-          for i in 0 to 31 loop
+          for i in 0 to 4095 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -143,7 +143,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM_B : res_out_b;
         variable RAM :result_out;
         begin
-          for i in 0 to 143 loop
+          for i in 0 to 18431 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -160,12 +160,12 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_pw  : ram_type := init_ram_from_file("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
-signal data_pw   : data_in := init_input_from_file("test_in.ascii");
-signal kernel_pw : kernels_in := init_kernel_from_file("test_k.ascii");
-signal bias_pw   : bias_in := init_bias_from_file("test_bias.ascii");
-signal param_pw  : param_in := init_param_from_file("test_params.ascii");
-signal ref_out   : result_out := init_out_from_file("test_out.ascii");
+signal ucode_pw  : ram_type := init_ram_from_file("test_mp_pec.ascii");--("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
+signal data_pw   : data_in := init_input_from_file("test_in_pec_1.ascii");
+signal kernel_pw : kernels_in := init_kernel_from_file("test_k_pec.ascii");
+signal bias_pw   : bias_in := init_bias_from_file("test_bias_pec.ascii");
+signal param_pw  : param_in := init_param_from_file("test_params_pec.ascii");
+signal ref_out   : result_out := init_out_from_file("test_out_pec_1.ascii");
 signal clk_p_i : std_logic;
 signal clk_e_i : std_logic;
 signal clk_e_neg_i : std_logic;
@@ -202,8 +202,8 @@ constant ucode_len  : std_logic_vector(14 downto 0) := "000000011111111";--255, 
 constant param_len  : std_logic_vector(14 downto 0) := "000000000111111";--63, 64 words
 constant kernels_len: std_logic_vector(14 DOWNTO 0) := "000000011010111";--215, 216 words
 constant bias_len   : std_logic_vector(14 DOWNTO 0) := "000000000010001";--17, 18 words
-constant data_len   : std_logic_vector(14 DOWNTO 0) := "000000000011111";--31, 32 WORDS
-constant pw_out_len : std_logic_vector(14 downto 0) := "000000010001111";--143, 144 output channels.
+constant data_len   : std_logic_vector(14 DOWNTO 0) := "000111111111111";--4095, 4096 WORDS
+constant pw_out_len : std_logic_vector(14 downto 0) := "100011111111111";--18431, 18432 WORDS.
 
 begin 
 
@@ -358,7 +358,7 @@ end sendmemword;
 
 procedure readmemword (signal outword : out out_word) is
 begin
-  for i in 0 to 2303 loop
+  for i in 0 to 294911 loop
   outword(i) <= data_out;
   wait until rising_edge(clk_e_i);
 wait for 5ns;
@@ -446,8 +446,8 @@ wait until rising_edge(clk_e_i);
 wait for 5 ns;
 wait until rising_edge(clk_e_i);
 wait for 5 ns;
-progress <=31;
-for i in 0 to 31 loop
+progress <=4095;
+for i in 0 to 4095 loop
   sendmemword(conv_to_memword(data_pw(i)));
 end loop;
 progress <=7;
@@ -594,11 +594,11 @@ wait until rising_edge(clk_e_i);
             wait for 5 ns;
 
 assert false report "test" severity note;
-progress <= 2303; 
+progress <= 294911; 
             readmemword(outword);
 
               
-  for i in 0 to 143 loop
+  for i in 0 to 18431 loop
     out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
                   outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
                   outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &

@@ -126,19 +126,15 @@ begin
 --*******************************************************************
     pl_dfm_byte  <= PL(112 downto 109);
     pl_dbus_s    <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44);
-    process(RST_EN, pl_dbus_s, DATA_VLD)
+    process(pl_dbus_s, DATA_VLD)
     begin 
-        --if rising_edge(clk_p) then
-            if RST_EN = '0' then
-                ddfm_trig <= '0';
-            elsif pl_dbus_s = "10001" then
-                ddfm_trig <= '1';
-            elsif DATA_VLD = '1' then
-                ddfm_trig <= '0';
-            else
-                ddfm_trig <= '0';
-            end if;
-        --end if;
+        if pl_dbus_s = "10001" then
+            ddfm_trig <= '1';
+        elsif DATA_VLD = '1' then
+            ddfm_trig <= '0';
+        else
+            ddfm_trig <= '0';
+        end if;
     end process;
 
     process(CLK_E_NEG, DIN, DATA_VLD)
@@ -164,9 +160,6 @@ begin
             elsif DATA_VLD = '1' then 
                 mp_data_int <= DIN; 
                 dbus_reg <= DIN;          --input to microprogram data
-                --if ddfm_trig = '1' then --load dbus register once when d source is cdfm (maximum 16 clk_e cycles before send next read request to cluster controller!!)
-                    
-                --end if;
             end if;
             VE_DIN <= ve_data_int;
         end if;
@@ -319,8 +312,6 @@ begin
                     else
                         if EXE ='1'then
                             send_req_d <= '1';
-                        --elsif empty = '1' then
-                        --    send_req_d <= '0';
                         elsif requesting = '1' then
                             send_req_d <= '1';--requesting;
                         else
@@ -378,14 +369,7 @@ begin
     REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
     srst <= not rst_en;
-    --process(clk_p)
-    --begin
-        --if rising_edge(clk_p) then
-            --if clk_e_neg = '1' then
-                DTM_FIFO_RDY <= not empty;
-            --end if;
-        --end if;
-    --end process;
+    DTM_FIFO_RDY <= not empty;
 
     req_fifo : fifo_generator_0
     PORT MAP (

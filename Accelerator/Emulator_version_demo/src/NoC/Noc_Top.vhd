@@ -124,6 +124,7 @@ architecture structure of Noc_Top is
     component NoC_Input_reg is
     port(
         clk               : in  std_logic;
+		enable			  : in  std_logic;
         reset             : in  std_logic;
         NoC_Input_reg_In  : in  std_logic_vector(15 downto 0);
         NoC_Input_reg_Out : out std_logic_vector(15 downto 0)
@@ -283,32 +284,31 @@ architecture structure of Noc_Top is
     );
     end component;
     
-COMPONENT ila_7
-PORT (
-	clk : IN STD_LOGIC;
-	probe0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe2 : IN STD_LOGIC_VECTOR(1 DOWNTO 0); 
-	probe3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe4 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe5 : IN STD_LOGIC_VECTOR(3 DOWNTO 0); 
-	probe6 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe9 : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
-	probe10 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-    probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-	probe12 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-	probe13 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe14 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe16 : IN STD_LOGIC_VECTOR(12 DOWNTO 0); 
-	probe17 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-	probe18 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-	probe19 : in STD_LOGIC_VECTOR (31 DOWNTO 0);
-	probe20 : in STD_LOGIC_VECTOR (255 DOWNTO 0)	
-);
-END COMPONENT  ;
+-- COMPONENT ila_7
+-- PORT (
+	-- clk : IN STD_LOGIC;
+	-- probe0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	-- probe1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	-- probe2 : IN STD_LOGIC_VECTOR(1 DOWNTO 0); 
+	-- probe3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	-- probe4 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	-- probe5 : IN STD_LOGIC_VECTOR(3 DOWNTO 0); 
+	-- probe6 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+	-- probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	-- probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	-- probe9 : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+	-- probe10 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    -- probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+	-- probe12 : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+	-- probe13 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	-- probe14 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	-- probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+	-- probe16 : IN STD_LOGIC_VECTOR(12 DOWNTO 0); 
+	-- probe17 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	-- probe18 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+	-- probe19 : in STD_LOGIC_VECTOR (31 DOWNTO 0)
+-- );
+-- END COMPONENT  ;
 
     --Noc_State_Machine signals
     signal  Byte_counter                : std_logic_vector(4 downto 0);
@@ -372,28 +372,27 @@ END COMPONENT  ;
     signal  PCIe_req_t                  : std_logic;
     signal  PCIe_req_i                  : std_logic;
     signal  Noc_CMD_flag_i              : std_logic;
-    --ILA signals
-    signal probe0_i                     : std_logic_vector(15 downto 0);         
-    signal probe1_i                     : std_logic_vector(15 downto 0);
-    signal probe2_i                     : std_logic_vector(1 downto 0);
-    signal probe3_i                     : std_logic_vector(15 downto 0);
-    signal probe4_i                     : std_logic_vector(15 downto 0);
-    signal probe5_i                     : std_logic_vector(3 downto 0);
-    signal probe6_i                     : std_logic_vector(15 downto 0);
-    signal probe7_i                     : std_logic_vector(0 downto 0);
-    signal probe8_i                     : std_logic_vector(0 downto 0);
-    signal probe9_i                     : std_logic_vector(255 downto 0);
-    signal probe10_i                    : std_logic_vector(63 downto 0);
-    signal probe11_i                    : std_logic_vector(0 downto 0);
-    signal probe12_i                    : std_logic_vector(7 downto 0);
-    signal probe13_i                    : std_logic_vector(0 downto 0);
-    signal probe14_i                    : std_logic_vector(0 downto 0);
-    signal probe15_i                    : std_logic_vector(0 downto 0);
-    signal probe16_i                    : std_logic_vector(12 downto 0);
-    signal probe17_i                    : std_logic_vector(15 downto 0);
-    signal probe18_i                    : std_logic_vector(15 downto 0);
-    signal probe19_i                    : std_logic_vector(31 downto 0);
-    signal probe20_i                    : std_logic_vector(255 downto 0);
+   --ILA signals
+    -- signal probe0_i                     : std_logic_vector(15 downto 0);         
+    -- signal probe1_i                     : std_logic_vector(15 downto 0);
+    -- signal probe2_i                     : std_logic_vector(1 downto 0);
+    -- signal probe3_i                     : std_logic_vector(15 downto 0);
+    -- signal probe4_i                     : std_logic_vector(15 downto 0);
+    -- signal probe5_i                     : std_logic_vector(3 downto 0);
+    -- signal probe6_i                     : std_logic_vector(15 downto 0);
+    -- signal probe7_i                     : std_logic_vector(0 downto 0);
+    -- signal probe8_i                     : std_logic_vector(0 downto 0);
+    -- signal probe9_i                     : std_logic_vector(255 downto 0);
+    -- signal probe10_i                    : std_logic_vector(63 downto 0);
+    -- signal probe11_i                    : std_logic_vector(0 downto 0);
+    -- signal probe12_i                    : std_logic_vector(7 downto 0);
+    -- signal probe13_i                    : std_logic_vector(0 downto 0);
+    -- signal probe14_i                    : std_logic_vector(0 downto 0);
+    -- signal probe15_i                    : std_logic_vector(0 downto 0);
+    -- signal probe16_i                    : std_logic_vector(12 downto 0);
+    -- signal probe17_i                    : std_logic_vector(15 downto 0);
+    -- signal probe18_i                    : std_logic_vector(15 downto 0);
+    -- signal probe19_i                    : std_logic_vector(31 downto 0);
     				 
 begin
 
@@ -525,7 +524,8 @@ begin
 	
     Noc_Input_Reg_Inst: Noc_Input_Reg
     port map(
-            clk                 => Gated_clk_from_PEC,
+            clk                 => clk,
+			enable				=> Gated_clk_from_PEC,
             reset               => reset,
             NoC_Input_reg_In    => NOC_bus_In,
             NoC_Input_reg_Out   => NoC_Input_reg_Out
@@ -608,55 +608,52 @@ begin
             PCIe_Request_out       => PCIe_request_out
     );
 	
-	probe0_i(15 downto 0) <= NOC_bus_In;      
-    probe1_i(15 downto 0) <= NoC_Input_reg_Out;   
-    probe2_i(1 downto 0)  <= NoC_Reg_Mux_Select;                       	
-    probe3_i(15 downto 0) <= Noc_reg_DataIn(15 downto 0);                             
-    probe4_i(15 downto 0) <= NOC_bus_Output; --Noc_reg_DataOut(15 downto 0);                   
-    probe5_i(3 downto 0)  <= Switch_Ctrl;
-    probe6_i(15 downto 0) <= Noc_Switch_Out;                           
-    probe7_i(0)           <= Gated_clk_from_PEC; --Load_MD_Reg;
-    probe8_i(0)           <= PCIedata_Switch;       
-    probe9_i(255 downto 0)<= Noc_reg_DataOut; --Noc_reg_mux_data; --Noc_data_Mux_Demux;       
-    --probe10_i(255 downto 0)<= Noc_data_i;
-    probe10_i(63 downto 0) <= Noc_data_i(63 downto 0); --PCIe_data(63 downto 0);
-    probe11_i(0)           <= Load_NOC_reg;
-    probe12_i(7 downto 0)  <= Address_Counter_t;
-    probe13_i(0)           <= R_W_RM;
-    probe14_i(0)           <= En_RM;
-    probe15_i(0)           <= Load_RM_address;
-    probe16_i(11 downto 0) <= RM_Address(11 downto 0);
-    probe17_i(15 downto 0) <= RM_DataIn;
-    probe18_i(15 downto 0) <= RM_DataOut;
-    probe19_i(31 downto 0) <= decoder;
-    probe20_i(255 downto 0)<= PCIe_data;
+	-- probe0_i(15 downto 0) <= NOC_bus_In;      
+    -- probe1_i(15 downto 0) <= NoC_Input_reg_Out;   
+    -- probe2_i(1 downto 0)  <= NoC_Reg_Mux_Select;                       	
+    -- probe3_i(15 downto 0) <= Noc_reg_DataIn(15 downto 0);                             
+    -- probe4_i(15 downto 0) <= Noc_reg_DataOut(15 downto 0);                   
+    -- probe5_i(3 downto 0)  <= Switch_Ctrl;
+    -- probe6_i(15 downto 0) <= Noc_Switch_Out;                           
+    -- probe7_i(0)           <= Gated_clk_from_PEC; --Load_MD_Reg;
+    -- probe8_i(0)           <= PCIedata_Switch;       
+    -- probe9_i(255 downto 0)<= Noc_reg_mux_data; --Noc_data_Mux_Demux;       
+    -- probe10_i(255 downto 0)<= Noc_data_i;
+    -- probe10_i(63 downto 0) <= PCIe_data(63 downto 0);--Noc_data_i(63 downto 0);
+    -- probe11_i(0)           <= Load_NOC_reg;
+    -- probe12_i(7 downto 0)  <= Address_Counter_t;
+    -- probe13_i(0)           <= R_W_RM;
+    -- probe14_i(0)           <= En_RM;
+    -- probe15_i(0)           <= Load_RM_address;
+    -- probe16_i(11 downto 0) <= RM_Address(11 downto 0);
+    -- probe17_i(15 downto 0) <= RM_DataIn;
+    -- probe18_i(15 downto 0) <= RM_DataOut;
+    -- probe19_i(31 downto 0) <= decoder;
         
         
-    ILA_NOC_TOP : ila_7
-    port map (
-        clk => clk,
-        probe0     => probe0_i, 
-        probe1     => probe1_i, 
-        probe2     => probe2_i, 
-        probe3     => probe3_i, 
-        probe4     => probe4_i, 
-        probe5     => probe5_i, 
-        probe6     => probe6_i, 
-        probe7     => probe7_i, 
-        probe8     => probe8_i, 
-        probe9     => probe9_i, 
-        probe10    => probe10_i,
-        probe11    => probe11_i,
-        probe12    => probe12_i,
-        probe13    => probe13_i, 
-        probe14    => probe14_i, 
-        probe15    => probe15_i, 
-        probe16    => probe16_i, 
-        probe17    => probe17_i, 
-        probe18    => probe18_i,
-        probe19    => probe19_i,
-        probe20    => probe20_i
-    );
+    -- ILA_NOC_TOP : ila_7
+    -- port map (
+        -- clk => clk,
+        -- probe0     => probe0_i, 
+        -- probe1     => probe1_i, 
+        -- probe2     => probe2_i, 
+        -- probe3     => probe3_i, 
+        -- probe4     => probe4_i, 
+        -- probe5     => probe5_i, 
+        -- probe6     => probe6_i, 
+        -- probe7     => probe7_i, 
+        -- probe8     => probe8_i, 
+        -- probe9     => probe9_i, 
+        -- probe10    => probe10_i,
+        -- probe11    => probe11_i,
+        -- probe12    => probe12_i,
+        -- probe13    => probe13_i, 
+        -- probe14    => probe14_i, 
+        -- probe15    => probe15_i, 
+        -- probe16    => probe16_i, 
+        -- probe17    => probe17_i, 
+        -- probe18    => probe18_i,
+        -- probe19    => probe19_i
+    -- );
 
 end structure;
-

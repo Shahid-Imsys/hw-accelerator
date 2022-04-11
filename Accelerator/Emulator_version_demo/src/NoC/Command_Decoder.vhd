@@ -62,6 +62,8 @@ architecture Behavioral of Command_Decoder is
     signal PEC_FF1      : std_logic;
     signal PEC_FF2      : std_logic:= '0';
     signal Adder        : std_logic_vector(6 downto 0);
+	signal Adder2		: std_logic_vector(14 downto 0);
+	signal PEC_TS_REG_divided: std_logic_vector(14 downto 0);
 
 begin
 
@@ -70,8 +72,6 @@ begin
         if reset = '1' then
             CMD_reg     <= (others => '0');
             CMD_FF      <= '0';
-			Adder		<= (others => '0');
-			PCIe_length <= (others => '0');
         elsif rising_edge(clk) then
             if Load_CMD_reg = '1' then
                 CMD_reg <= Noc_data;
@@ -81,7 +81,9 @@ begin
             PEC_FF2  <= PEC_FF1 and (Set_PEC_FF2 or PEC_FF2);
             PEC_FF1  <= PEC_Ready_In;
             Adder       <= CMD_reg(22 downto 16) + "0000011";
-            PCIe_length <= Adder(6 downto 2) + "11111";      --number of cache lines - 1               
+            PCIe_length <= Adder(6 downto 2) + "11111";      --number of cache lines - 1 
+		    Adder2      <= CMD_reg(30 downto 16) + "000000000000001";
+			PEC_TS_REG_divided <= '0' & Adder2(14 downto 1);
         end if;
     end process;
 
@@ -89,8 +91,8 @@ begin
 
     Opcode              <= CMD_reg(11 downto 0);
     Switch_Ctrl         <= CMD_reg(15 downto 12);
-    Transfer_Size       <= CMD_reg(31 downto 16);
-    PEC_TS_REG          <= CMD_reg(30 downto 16);
+    Transfer_Size       <= CMD_reg(31 downto 16); --'0'& CMD_reg(31 downto 17); -- As Transfer size in host is number of 16 byte word and in RM is number of 32 byte words so I truncated one lowest bit -- + '1';  --for test with CC as CC is currently working with length zero for 1 word.
+    PEC_TS_REG          <= CMD_reg(30 downto 16) when (not(CMD_reg(13)) and (CMD_reg(12))) = '1' else PEC_TS_REG_divided;
     RM_Address          <= CMD_reg(47 downto 32);
     PEC_Address_reg     <= CMD_reg(62 downto 48);
     PCIe_Address        <= CMD_reg(95 downto 64);

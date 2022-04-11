@@ -63,7 +63,7 @@ begin  -- architecture tb
     port map (
       HCLK    => MX1_CK,
       MRESET  => MRESET,
-      MRSTOUT => open,
+      --MRSTOUT => open,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,
       MCKOUT1 => MCKOUT1,

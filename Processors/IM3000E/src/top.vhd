@@ -2062,6 +2062,8 @@ begin
   -----------------------------------------------------------------------------
 
   peri01 : entity work.peri
+    generic map (
+      g_build_type => g_memory_type)
     port map(
       clk_p      => clk_p,
       clk_c_en   => clk_c_en,

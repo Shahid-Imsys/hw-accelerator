@@ -80,7 +80,7 @@ entity top is
     -- clocks and control signals
     HCLK    : in  std_logic;            -- clk input   
     MRESET  : in  std_logic;  -- system reset               low active
-    --MRSTOUT : out std_logic;
+    MRSTOUT : out std_logic;
     MIRQOUT : out std_logic;            -- interrupt request output    
     MCKOUT0 : out std_logic;            --for trace adapter
     MCKOUT1 : out std_logic;            --programable clock out
@@ -630,7 +630,6 @@ architecture struct of top is
   signal mckout1_o     : std_logic;
   signal mckout1_o_en  : std_logic;
   signal msdout_o      : std_logic;
-  signal mrstout_o     : std_logic;
   signal mexec_o       : std_logic;
   --signal mxout_o       : std_logic;
   signal ddq_en        : std_logic;
@@ -1709,7 +1708,7 @@ begin
       mckout1_o_en    => mckout1_o_en,
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
       msdout_o        => msdout_o,      --: out std_logic;  -- Serial data out
-      mrstout_o       => mrstout_o,     --: out std_logic;  -- Reset out
+      mrstout_o       => MRSTOUT,     --: out std_logic;  -- Reset out
       --mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
       mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---

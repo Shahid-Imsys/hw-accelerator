@@ -79,7 +79,8 @@ mem_comp:
 		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_2Kx80_fast_func.v \
 		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_16Kx8_fast_func.v \
 		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_1024x8_fast_func.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_512x8_fast_func.v
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_512x8_fast_func.v \
+		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_256x32_fast_func.v
 
 fpga_ip:
 	$(V_COMP) $(IP_DIR)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \

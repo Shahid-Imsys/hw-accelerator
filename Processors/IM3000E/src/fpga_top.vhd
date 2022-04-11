@@ -108,7 +108,7 @@ architecture rtl of fpga_top is
       -- clocks and control signals
       HCLK    : in  std_logic;          -- clk input
       MRESET  : in  std_logic;  -- system reset               low active
-      --MRSTOUT : out std_logic;          -- Reset output
+      MRSTOUT : out std_logic;          -- Reset output
       MIRQOUT : out std_logic;          -- interrupt request output
       MCKOUT0 : out std_logic;          --for trace adapter
       MCKOUT1 : out std_logic;          --programable clock out
@@ -327,7 +327,7 @@ begin
     port map (
       HCLK       => HCLK,
       MRESET     => MRESET,
-      --MRSTOUT    => MRSTOUT,
+      MRSTOUT    => MRSTOUT,
       MIRQOUT    => MIRQOUT,
       MCKOUT0    => MCKOUT0,
       MCKOUT1    => MCKOUT1,

@@ -377,7 +377,7 @@ begin  -- behav
 
 end process;
 
-mrstout <= << signal ^.top0.mrstout_o : std_logic >>;
+mrstout <= << signal ^.top0.MRSTOUT : std_logic >>;
 
 end behav;
 

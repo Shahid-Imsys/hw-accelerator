@@ -235,8 +235,7 @@ architecture str of mpram_memory is
       clk     : in  std_logic;
       we      : in  std_logic;
       i_ce    : in  std_logic;
-      qspo_ce : in  std_logic;
-      qspo    : out std_logic_vector(79 downto 0));
+      spo    : out std_logic_vector(79 downto 0));
   end component dist_mem_gen_0;
   
   component load_mpram is
@@ -287,10 +286,8 @@ begin  -- architecture str
       d       => ram_di,
       clk     => clk,
       we      => not we_n,
-      --i_ce    => cs,
-      i_ce    => '1',
-      qspo_ce => '1',
-      qspo    => ram_do
+      i_ce    => cs,
+      spo    => ram_do
       );
 
   else generate

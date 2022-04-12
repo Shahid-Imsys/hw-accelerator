@@ -59,20 +59,19 @@ module dist_mem_gen_0 (
   clk,
   we,
   i_ce,
-  qspo_ce,
-  qspo
+  spo
 );
 
     parameter C_MEM_INIT_FILE      = "null.mif";
     parameter C_READ_MIF           = 0;
+ 
    
 input wire [10 : 0] a;
 input wire [79 : 0] d;
 input wire clk;
 input wire we;
 input wire i_ce;
-input wire qspo_ce;
-output wire [79 : 0] qspo;
+output wire [79 : 0] spo;
 
   dist_mem_gen_v8_0_13 #(
     .C_FAMILY("virtexuplus"),
@@ -89,11 +88,11 @@ output wire [79 : 0] qspo;
     .C_HAS_QDPO_CLK(0),
     .C_HAS_QDPO_RST(0),
     .C_HAS_QDPO_SRST(0),
-    .C_HAS_QSPO(1),
-    .C_HAS_QSPO_CE(1),
+    .C_HAS_QSPO(0),
+    .C_HAS_QSPO_CE(0),
     .C_HAS_QSPO_RST(0),
     .C_HAS_QSPO_SRST(0),
-    .C_HAS_SPO(0),
+    .C_HAS_SPO(1),
     .C_HAS_WE(1),
     .C_MEM_INIT_FILE(C_MEM_INIT_FILE),
     .C_ELABORATION_DIR("./"),
@@ -114,16 +113,16 @@ output wire [79 : 0] qspo;
     .clk(clk),
     .we(we),
     .i_ce(i_ce),
-    .qspo_ce(qspo_ce),
+    .qspo_ce(1'D1),
     .qdpo_ce(1'D1),
     .qdpo_clk(1'D0),
     .qspo_rst(1'D0),
     .qdpo_rst(1'D0),
     .qspo_srst(1'D0),
     .qdpo_srst(1'D0),
-    .spo(),
+    .spo(spo),
     .dpo(),
-    .qspo(qspo),
+    .qspo(),
     .qdpo()
   );
 endmodule

@@ -59,8 +59,7 @@ COMPONENT dist_mem_gen_0
     clk : IN STD_LOGIC;
     we : IN STD_LOGIC;
     i_ce : IN STD_LOGIC;
-    qspo_ce : IN STD_LOGIC;
-    qspo : OUT STD_LOGIC_VECTOR(79 DOWNTO 0)
+    spo : OUT STD_LOGIC_VECTOR(79 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------
@@ -76,8 +75,7 @@ your_instance_name : dist_mem_gen_0
     clk => clk,
     we => we,
     i_ce => i_ce,
-    qspo_ce => qspo_ce,
-    qspo => qspo
+    spo => spo
   );
 -- INST_TAG_END ------ End INSTANTIATION Template ---------
 

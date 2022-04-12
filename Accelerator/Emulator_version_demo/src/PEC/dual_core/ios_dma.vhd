@@ -533,6 +533,7 @@ begin
   ido_mem_latch: process (iomem_q, ido_sel, ido_le)
     variable id_mux : std_logic_vector(7 downto 0);
   begin
+    ido_mem <= x"00";
     if ido_le = '1' then
       if ido_sel = '1' then
         ido_mem <= iomem_q(15 downto 8);

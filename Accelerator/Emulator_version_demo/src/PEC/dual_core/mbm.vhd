@@ -261,7 +261,7 @@ begin
           mbmd <= ar(7 downto 0);
         when MBMOP_MUL1|MBMOP_MUL3 =>
           mbmd <= x"00";
-        when others => null;
+        when others => mbmd <= x"00";
       end case;      
     end if;      
   end process;  

@@ -506,7 +506,6 @@ architecture struct of top is
   signal pmic_io_en      : std_logic;
   signal clk_mux_out     : std_logic;
 
-  signal lp_pwr_ok : std_logic;
 
   -----------------------------------------------------------------------------
   -- core/peri driven signals
@@ -910,8 +909,6 @@ begin
     port map(
       -- clocks and control signals
       HCLK       => HCLK,
-      MWAKEUP_LP => MWAKEUP_LP,
-      MLP_PWR_OK => MLP_PWR_OK,
       MPMIC_CORE => MPMIC_CORE,
       MPMIC_IO   => MPMIC_IO,
 
@@ -921,7 +918,6 @@ begin
       --MCKOUT          => MCKOUT           ,
       --MEXEC           => MEXEC            ,
       --MXOUT           => MXOUT            ,
-      --MRSTOUT         => MRSTOUT          ,
       MCKOUT0 => MCKOUT0,
       MCKOUT1 => MCKOUT1,
       MTEST   => MTEST,
@@ -982,16 +978,13 @@ begin
       --mckout_o        => mrxout_o         ,
       --mexec_o         => mexec_o          ,
       --mxout_o         => mxout_o          ,
-      --mrstout_o       => mrstout_o        ,
       mckout0_o    => clk_s,
       mckout1_o    => mckout1_o,
       mckout1_o_en => mckout1_o_en,
       msdout_o     => msdout_o,
       mbypass_i    => mbypass_i,
       --clk_in_off      => clk_in_off           ,
-
-      wakeup_lp    => wakeup_lp,
-      lp_pwr_ok    => lp_pwr_ok,
+      
       pmic_core_en => pmic_core_en,
       pmic_io_en   => pmic_io_en,
       io_iso       => io_iso,
@@ -1483,7 +1476,7 @@ begin
       pllout        => HCLK,
       sel_pll       => sel_pll,
       xout_selected => xout_selected,
-      lp_pwr_ok     => lp_pwr_ok,
+      lp_pwr_ok     => MLP_PWR_OK,
       rxout         => rxout,           -- 32KHz oscillator input         
       mrxout_o      => mrxout_o,  -- 32KHz oscillator output or external wake
       rst_rtc       => rst_rtc,         -- Reset RTC counter byte            
@@ -1497,7 +1490,7 @@ begin
       reset_iso_clear => reset_iso_clear,
       halt_en         => halt_en,
       nap_en          => nap_en,
-      wakeup_lp       => wakeup_lp,
+      wakeup_lp       => MWAKEUP_LP,
       poweron_finish  => poweron_finish,
       reset_iso       => reset_iso,
       reset_core_n    => reset_core_n,

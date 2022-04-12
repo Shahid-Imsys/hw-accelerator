@@ -39,9 +39,7 @@ use work.all;
 entity iopads is
   port (
     -- clocks and control signals   always on!!!!
-    HCLK       : in  std_logic;         -- clk input   
-    MWAKEUP_LP : in  std_logic;
-    MLP_PWR_OK : in  std_logic;
+    HCLK       : in  std_logic;         -- clk input
     MPMIC_CORE : out std_logic;
     MPMIC_IO   : out std_logic;
     --
@@ -118,8 +116,6 @@ entity iopads is
     msdout_o     : in  std_logic;
 
     -- low power mode pad
-    wakeup_lp    : out std_logic;
-    lp_pwr_ok    : out std_logic;
     pmic_core_en : in  std_logic;
     pmic_io_en   : in  std_logic;
     io_iso       : in  std_logic;
@@ -213,17 +209,6 @@ architecture struct of iopads is
         );
   end component;
 
-  --signal rtc_clk_feb_n : std_logic;
-  --signal rtc_clk_feb : std_logic;
-  --signal hclk_en      : std_logic;
-  signal wakeup_lp_int : std_logic;
-  signal lp_pwr_ok_int : std_logic;
-  signal mreset_int    : std_logic;
-  signal mtest_i_int   : std_logic;
-  signal mbypass_i_int : std_logic;
-  signal mirq0_i_int   : std_logic;
-  signal mirq1_i_int   : std_logic;
-  signal msdin_i_int   : std_logic;
   signal sd_dqi_int    : std_logic_vector (7 downto 0);
   signal pa_oen        : std_logic_vector (7 downto 0);  --output enable
   signal pb_oen        : std_logic_vector (7 downto 0);
@@ -259,39 +244,17 @@ begin
   --input pads
 
   --reset signal, PU
-  MRESET_inst : XMD port map
-    (O => mreset_int, I => MRESET, PU => '0', PD => '0', SMT => '1');
-  mreset_i <= mreset_int or io_iso;
+  mreset_i <= MRESET or io_iso;
+  
   --test signal,  PD
-  MTEST_inst : XMD port map
-    (O => mtest_i_int, I => MTEST, PU => '0', PD => '0', SMT => '1');
-  mtest_i <= mtest_i_int and (not io_iso);
+    mtest_i <= MTEST and (not io_iso);
   --pll bypass signal
-  MBYPASS_inst : XMD port map
-    (O => mbypass_i_int, I => MBYPASS, PU => '0', PD => '0', SMT => '1');
-  mbypass_i <= mbypass_i_int and (not io_iso);
+  mbypass_i <= MBYPASS and (not io_iso);
   --irq signal, PU
-  MIRQ0_inst : XMD port map
-    (O => mirq0_i_int, I => MIRQ0, PU => '0', PD => '0', SMT => '1');
-  mirq0_i <= mirq0_i_int or io_iso;
-  --irq signal, PU
-  MIRQ1_inst : XMD port map
-    (O => mirq1_i_int, I => MIRQ1, PU => '0', PD => '0', SMT => '1');
---      mirq1_i <= rd_irq_n WHEN router_ir_en = '1' ELSE mirq1_i_int; --delete by HYX, 20141027
-  mirq1_i <= mirq1_i_int or io_iso;
+  mirq0_i <= MIRQ0 or io_iso;
+  mirq1_i <= MIRQ1 or io_iso;
   --msdin signal, PU
-  MSDIN_inst : XMD port map
-    (O => msdin_i_int, I => MSDIN, PU => '0', PD => '0', SMT => '1');
-  msdin_i <= msdin_i_int or io_iso;
-
-
-  MWAKEUP_LP_inst : XMD port map
-    (O => wakeup_lp_int, I => MWAKEUP_LP, PU => '0', PD => '0', SMT => '1');
-  wakeup_lp <= wakeup_lp_int;
-
-  MLP_PWR_OK_inst : XMD port map
-    (O => lp_pwr_ok_int, I => MLP_PWR_OK, PU => '0', PD => '0', SMT => '1');
-  lp_pwr_ok <= lp_pwr_ok_int;
+  msdin_i <= MSDIN or io_iso;
 
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
@@ -576,23 +539,23 @@ begin
 --------------PH----------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------
 
-  ph_oen(0) <= '1' when mtest_i_int = '1' else ph_en(0);
-  ph_oen(1) <= '1' when mtest_i_int = '1' else ph_en(1);
-  ph_oen(2) <= '1' when mtest_i_int = '1' else ph_en(2);
-  ph_oen(3) <= '1' when mtest_i_int = '1' else ph_en(3);
-  ph_oen(4) <= '1' when mtest_i_int = '1' else ph_en(4);
-  ph_oen(5) <= '1' when mtest_i_int = '1' else ph_en(5);
-  ph_oen(6) <= '1' when mtest_i_int = '1' else ph_en(6);
-  ph_oen(7) <= '1' when mtest_i_int = '1' else ph_en(7);  --modified by HYX, 20141115
+  ph_oen(0) <= '1' when MTEST = '1' else ph_en(0);
+  ph_oen(1) <= '1' when MTEST = '1' else ph_en(1);
+  ph_oen(2) <= '1' when MTEST = '1' else ph_en(2);
+  ph_oen(3) <= '1' when MTEST = '1' else ph_en(3);
+  ph_oen(4) <= '1' when MTEST = '1' else ph_en(4);
+  ph_oen(5) <= '1' when MTEST = '1' else ph_en(5);
+  ph_oen(6) <= '1' when MTEST = '1' else ph_en(6);
+  ph_oen(7) <= '1' when MTEST = '1' else ph_en(7);  --modified by HYX, 20141115
 
-  ph_d_o(0) <= rtc_clk_tst when mtest_i_int = '1' else ph_o(0);
-  ph_d_o(1) <= HCLK  when mtest_i_int = '1' else ph_o(1);
-  ph_d_o(2) <= clk_p_tst   when mtest_i_int = '1' else ph_o(2);
-  ph_d_o(3) <= clk_c_tst   when mtest_i_int = '1' else ph_o(3);
-  ph_d_o(4) <= clk_c2_tst  when mtest_i_int = '1' else ph_o(4);
-  ph_d_o(5) <= clk_e_tst   when mtest_i_int = '1' else ph_o(5);
-  ph_d_o(6) <= clk_c2a_tst when mtest_i_int = '1' else ph_o(6);
-  ph_d_o(7) <= clk_ea_tst  when mtest_i_int = '1' else ph_o(7);  --modified by HYX, 20141115
+  ph_d_o(0) <= rtc_clk_tst when MTEST = '1' else ph_o(0);
+  ph_d_o(1) <= HCLK        when MTEST = '1' else ph_o(1);
+  ph_d_o(2) <= clk_p_tst   when MTEST = '1' else ph_o(2);
+  ph_d_o(3) <= clk_c_tst   when MTEST = '1' else ph_o(3);
+  ph_d_o(4) <= clk_c2_tst  when MTEST = '1' else ph_o(4);
+  ph_d_o(5) <= clk_e_tst   when MTEST = '1' else ph_o(5);
+  ph_d_o(6) <= clk_c2a_tst when MTEST = '1' else ph_o(6);
+  ph_d_o(7) <= clk_ea_tst  when MTEST = '1' else ph_o(7);  --modified by HYX, 20141115
 
 
   ph_i(0) <= ph_d_i(0);

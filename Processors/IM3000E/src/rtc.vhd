@@ -32,7 +32,7 @@
 -- Date         Version  Author  Description
 -- 2005-11-28     2.5      CB      Created
 -- 2006-02-01     2.6      CB      Added the en_bmem latch, controlled by the
---                                                                                                                              new ld_bmem input port.
+--                                 ld_bmem input port.
 -- 2006-03-08     2.7      CB      Changed pwr_on to pwr_ok, en_bmem to dis_bmem.
 -- 2006-05-11     2.8      CB      Added gate-offs with pwr_ok at all input signals.
 -- 2006-05-12     2.9      CB      Moved gate-offs to a block of their own.
@@ -752,7 +752,7 @@ begin  -- rtl
   -- exteranl 32 Khz crystal.
   -----------------------------------------------------------------------------
 
--- For the testchip is not  a eal 23 KHz crystal used, instead is the clock
+-- For the testchip is not  a real 32 KHz crystal used, instead is the clock
   -- generated from the system clock.
   p_gen_rx_out: process (pllout_iso_1, pwr_on_rst_n) is
     variable rx_counter : integer range 0 to 32767;
@@ -797,12 +797,12 @@ begin  -- rtl
         if (en_fclk_iso_0 = '1') and (fclk_iso_0 = '1') and (fclk_iso_0_old = '0') then
            
           case rtc_sel_iso_0 is
-            when "000" => qn(7 downto 0) <=  qn(7 downto 0) - 1;
-            when "001" => qn(15 downto 8) <=  qn(15 downto 8) - 1;
-            when "010" => qn(23 downto 16) <=  qn(23 downto 16) - 1;
-            when "011" => qn(31 downto 24) <=  qn(31 downto 24) - 1;
-            when "100" => qn(39 downto 32) <=  qn(39 downto 32) - 1;
-            when "101" => qn(46 downto 40) <=  qn(46 downto 40) - 1;
+            when "000" => qn(6 downto 0) <=  qn(6 downto 0) - 1;
+            when "001" => qn(14 downto 7) <=  qn(14 downto 7) - 1;
+            when "010" => qn(22 downto 15) <=  qn(22 downto 15) - 1;
+            when "011" => qn(30 downto 23) <=  qn(30 downto 23) - 1;
+            when "100" => qn(38 downto 31) <=  qn(38 downto 31) - 1;
+            when "101" => qn(46 downto 39) <=  qn(46 downto 39) - 1;
             when others => null;
           end case;
         end if;

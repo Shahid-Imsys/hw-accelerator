@@ -22,6 +22,7 @@ architecture tb of main_tb is
   signal MSDOUT  : std_logic;
   signal MIRQOUT : std_logic;
   signal MRESET : std_logic;
+  signal MRSTOUT : std_logic;
   signal MTEST : std_logic := '0';
   signal MIRQ0 : std_logic;
   signal MIRQ1 : std_logic;
@@ -63,7 +64,7 @@ begin  -- architecture tb
     port map (
       HCLK    => MX1_CK,
       MRESET  => MRESET,
-      MRSTOUT => open,
+      MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,
       MCKOUT1 => MCKOUT1,
@@ -146,6 +147,7 @@ begin  -- architecture tb
       MSDOUT  => MSDOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,
+      mrstout => MRSTOUT,
 
       reg_to_block   => reg_to_block,
       reg_from_block => open

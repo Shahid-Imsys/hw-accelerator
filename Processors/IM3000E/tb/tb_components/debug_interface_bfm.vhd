@@ -14,7 +14,8 @@ entity debug_interface_bfm is
     MSDOUT  : in  std_logic;
     MIRQOUT : in  std_logic;
     MCKOUT0 : in  std_logic;
-
+    mrstout : in  std_logic;
+    
     reg_to_block   : in  reg_to_block_t;
     reg_from_block : out reg_from_block_t
     );
@@ -87,7 +88,6 @@ architecture behav of debug_interface_bfm is
   constant Jump1802 : std_logic_vector(79 downto 0) := x"0068046224069aa0a040";
   constant Jump1FFF : std_logic_vector(79 downto 0) := x"007849622426fba2a450";
 
-  signal mrstout : std_logic;
   signal recvWord           : std_logic_vector(7 downto 0) := (others => '0');
   signal memSize            : std_logic_vector(15 downto 0);
   signal CPpar              : std_logic_vector(7 downto 0);
@@ -376,8 +376,6 @@ begin  -- behav
     
 
 end process;
-
-mrstout <= << signal ^.top0.MRSTOUT : std_logic >>;
 
 end behav;
 

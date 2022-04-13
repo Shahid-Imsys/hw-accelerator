@@ -235,17 +235,6 @@ end component;
   signal two_c_delay :std_logic;
   signal three_c_delay : std_logic;
   
-  signal addr_p_e : std_logic_vector(14 downto 0);
-  signal addr_p_e_1 : std_logic_vector(14 downto 0);
-  signal pe_write_e : std_logic;
-  signal pe_write_e_1 : std_logic;
-  signal pe_read_e : std_logic;
-  signal pe_read_e_1 : std_logic;
-  signal pe_read_e_d : std_logic;
-  signal pe_data_in_e : reg;
-  signal pe_data_in_e_1 : reg;
-  signal data_core_int_e : reg;
-  signal data_core_int_e_1 : reg;
   signal standby : std_logic;
   signal delay_p      : std_logic;
  

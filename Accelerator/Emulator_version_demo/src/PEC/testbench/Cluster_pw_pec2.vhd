@@ -46,6 +46,7 @@ TAG              : out std_logic;
 TAG_FB           : in std_logic;
 
 C_RDY            : in std_logic; 
+TEST_DONE        : out std_logic;
 DATA             : out std_logic_vector(7 downto 0);
 DATA_OUT         : in std_logic_vector(7 downto 0)
  );
@@ -582,7 +583,7 @@ progress <= 294911;
                   outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
                   outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
     wait for 1 ns;
-    assert (out_ram(i) = ref_out(i)) report "Incorrect output data "&integer'image(i) severity warning;
+    assert (out_ram(i) = ref_out(i)) report "Incorrect output data in PEC2 "&integer'image(i) severity warning;
     --assert (out_ram(i) /= ref_out(i)) report "Correct output data "&integer'image(j) severity note;
   end loop;
 
@@ -593,7 +594,8 @@ progress <= 294911;
 
 
             wait for 1000ns;
-  finish; --assert false report "Simulation End" severity Error;          
+  TEST_DONE <= '1';
+--  finish; --assert false report "Simulation End" severity Error;          
 --wait;
 
 end process;

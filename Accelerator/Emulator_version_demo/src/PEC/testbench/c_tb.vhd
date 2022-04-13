@@ -21,6 +21,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.all;
+use std.env.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -57,7 +59,8 @@ component PEC_top
     CLK_O            : in std_logic;
     TAG              : out std_logic;
     TAG_FB           : in std_logic;
-    c_rdy            : in std_logic;  
+    c_rdy            : in std_logic; 
+    TEST_DONE        : out std_logic; 
     DATA             : out std_logic_vector(7 downto 0);
     DATA_OUT         : in std_logic_vector(7 downto 0)
  );
@@ -72,6 +75,7 @@ component PEC_top
      TAG              : out std_logic;
      TAG_FB           : in std_logic;
      c_rdy            : in std_logic;  
+     TEST_DONE        : out std_logic;
      DATA             : out std_logic_vector(7 downto 0);
      DATA_OUT         : in std_logic_vector(7 downto 0)
   );
@@ -87,6 +91,7 @@ component PEC_top
  signal c_rdy_1 : std_logic;
  signal data_1 : std_logic_vector(7 downto 0);
  signal data_out_1 : std_logic_vector( 7 downto 0);
+ signal test_done_1: std_logic;
  --signals for PEC2
  signal rst_e_2 : std_logic;
  signal clk_o_2 : std_logic;
@@ -95,6 +100,7 @@ component PEC_top
  signal c_rdy_2 : std_logic;
  signal data_2 : std_logic_vector(7 downto 0);
  signal data_out_2 : std_logic_vector( 7 downto 0);
+ signal test_done_2: std_logic;
  
 begin
 
@@ -112,6 +118,13 @@ begin
     wait for 15 ns;
     clk_e <= '0';
     wait for 15 ns;
+  end process;
+
+  process
+  begin
+    wait until (test_done_1 and test_done_2) = '1';
+    report "simulation end";
+    finish;
   end process;
 
 cluster_1: PEC_top
@@ -147,6 +160,7 @@ clk_o => clk_o_1,
 tag => tag_1,
 tag_fb => tag_fb_1,
 c_rdy => c_rdy_1,
+test_done => test_done_1,
 data => data_1,
 data_out => data_out_1);
 
@@ -159,6 +173,7 @@ clk_o => clk_o_2,
 tag => tag_2,
 tag_fb => tag_fb_2,
 c_rdy => c_rdy_2,
+test_done => test_done_2,
 data => data_2,
 data_out => data_out_2);
 

@@ -185,11 +185,8 @@ END COMPONENT;
     signal dtm_data_reg : dtm_word;
     signal re_start_reg : std_logic; --RE start latch
     signal ve_start_reg : std_logic; --VE start latch
-    --signal mode_a_reg  : std_logic; --replaced with mode_a_l
-    --signal mode_b_reg  : std_logic; --replaced with mode_b_l
     signal re_addr_reload   : std_logic;
     signal ve_addr_reload   : std_logic;
-    --signal rst_i       : std_logic;
     signal sclr_i        : std_logic; --For clear accumulator 0-7
     signal buf_out_l  : std_logic_vector(63 downto 0);
     signal buf_out_r  : std_logic_vector(63 downto 0);
@@ -245,7 +242,6 @@ END COMPONENT;
     signal bypass     : std_logic;
     signal sram_in    : std_logic_vector(63 downto 0);
     signal bias_in    : std_logic_vector(63 downto 0);
-    --signal pb_reg      : std_logic_vector(63 downto 0); --pushback register
     signal mode_a_l  : std_logic;
     signal mode_b_l  : std_logic;
     signal sram_l_we  : std_logic;
@@ -254,7 +250,6 @@ END COMPONENT;
     signal ve_clr_acc : std_logic; --clear accumulators
     signal mul_inn_ctl : std_logic;
     signal acc_inn_ctl : std_logic;
-    --signal sramr_in    : std_logic_vector(63 downto 0);
     signal pl_ve_byte : std_logic_vector(3 downto 0);
 
 
@@ -281,8 +276,6 @@ END COMPONENT;
     signal actl_6 : std_logic;
     signal actl_7 : std_logic;
     signal a_delay : std_logic;
-    --signal substract_i : std_logic;
-    --signal pcout_i : std_logic_vector(47 downto 0);
     --data flow control signals
     signal latch_ena : std_logic;
     signal o_mux_ena : std_logic;
@@ -340,28 +333,6 @@ END COMPONENT;
     signal delay0 : std_logic; --
     signal delay1 : std_logic;
     signal delay3 : std_logic_vector(9 downto 0);
-
-    attribute dont_touch : string;
-    attribute dont_touch of p_shifter_in : signal is "true";
-    attribute dont_touch of p_shifter_out : signal is "true";
-    attribute dont_touch of p_adder_out : signal is "true";
-    attribute dont_touch of p_clip_out : signal is "true";
-    attribute dont_touch of mul_in_l_0 : signal is "true";
-    attribute dont_touch of mul_in_l_1 : signal is "true";
-    attribute dont_touch of mul_in_l_2 : signal is "true";
-    attribute dont_touch of mul_in_l_3 : signal is "true";
-    attribute dont_touch of mul_in_l_4 : signal is "true";
-    attribute dont_touch of mul_in_l_5 : signal is "true";
-    attribute dont_touch of mul_in_l_6 : signal is "true";
-    attribute dont_touch of mul_in_l_7 : signal is "true";
-    attribute dont_touch of mul_in_r_0 : signal is "true";
-    attribute dont_touch of mul_in_r_1 : signal is "true";
-    attribute dont_touch of mul_in_r_2 : signal is "true";
-    attribute dont_touch of mul_in_r_3 : signal is "true";
-    attribute dont_touch of mul_in_r_4 : signal is "true";
-    attribute dont_touch of mul_in_r_5 : signal is "true";
-    attribute dont_touch of mul_in_r_6 : signal is "true";
-    attribute dont_touch of mul_in_r_7 : signal is "true";
 
 
 begin

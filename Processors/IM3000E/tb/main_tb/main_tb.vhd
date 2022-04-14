@@ -11,6 +11,16 @@ end main_tb;
 
 architecture tb of main_tb is
 
+  type port_name_t is (A, B, C, D, E, F, G, H, I, J);
+
+  type ports_t is array (A to J) of std_logic_vector(7 downto 0);
+
+  signal pad              : ports_t;
+  signal port_to_im4000   : ports_t;
+  signal port_from_im4000 : ports_t;
+  signal port_oe          : ports_t;
+
+
   constant HALF_CLK_C_CYCLE : time := 16000 ps;
 
   signal MX1_CK  : std_logic;
@@ -21,23 +31,29 @@ architecture tb of main_tb is
   signal MSDIN   : std_logic;
   signal MSDOUT  : std_logic;
   signal MIRQOUT : std_logic;
-  signal MRESET : std_logic;
+  signal MRESET  : std_logic;
   signal MRSTOUT : std_logic;
-  signal MTEST : std_logic := '0';
-  signal MIRQ0 : std_logic;
-  signal MIRQ1 : std_logic;
-  signal D_DQ : std_logic_vector(7 downto 0) := (others => 'Z');
+  signal MTEST   : std_logic                    := '0';
+  signal MIRQ0   : std_logic;
+  signal MIRQ1   : std_logic;
+  signal D_DQ    : std_logic_vector(7 downto 0) := (others => 'Z');
 
-  signal PA : std_logic_vector(7 downto 0);
-  signal PB : std_logic_vector(7 downto 0);
-  signal PC : std_logic_vector(7 downto 0);
-  signal PD : std_logic_vector(7 downto 0);
-  signal PE : std_logic_vector(7 downto 0);
-  signal PF : std_logic_vector(7 downto 0);
-  signal PG : std_logic_vector(7 downto 0);
-  signal PH : std_logic_vector(7 downto 0);
-  signal PI : std_logic_vector(7 downto 0);
-  signal PJ : std_logic_vector(7 downto 0);
+  signal pa_i  : std_logic_vector(7 downto 0);
+  signal PB    : std_logic_vector(7 downto 0);
+  signal PC    : std_logic_vector(7 downto 0);
+  signal PD    : std_logic_vector(7 downto 0);
+  signal PE    : std_logic_vector(7 downto 0);
+  signal PF    : std_logic_vector(7 downto 0);
+  signal PG    : std_logic_vector(7 downto 0);
+  signal PH    : std_logic_vector(7 downto 0);
+  signal PI    : std_logic_vector(7 downto 0);
+  signal pi_i  : std_logic_vector(7 downto 0);
+  signal pi_o  : std_logic_vector(7 downto 0);
+  signal pi_en : std_logic_vector(7 downto 0);
+  signal PJ    : std_logic_vector(7 downto 0);
+  signal pj_i  : std_logic_vector(7 downto 0);
+  signal pj_o  : std_logic_vector(7 downto 0);
+  signal pj_en : std_logic_vector(7 downto 0);
 
   signal MBYPASS    : std_logic;
   signal MWAKE      : std_logic;
@@ -46,19 +62,19 @@ architecture tb of main_tb is
 
   signal reg_to_block : reg_to_block_t;
 
-  signal xtal1_int : std_logic := '0';
+  signal xtal1_int  : std_logic := '0';
   signal mx1_ck_int : std_logic := '0';
 
-  signal OSPI_Out   : OSPI_InterfaceOut_t;
-  signal OSPI_DQ    : std_logic_vector(7 downto 0);
-  signal OSPI_RWDS  : std_logic;
+  signal OSPI_Out  : OSPI_InterfaceOut_t;
+  signal OSPI_DQ   : std_logic_vector(7 downto 0);
+  signal OSPI_RWDS : std_logic;
 
 begin  -- architecture tb
 
 
   top0 : entity work.top
     generic map (
-      g_memory_type => fpga,
+      g_memory_type     => fpga,
       g_clock_frequency => 31
       )
     port map (
@@ -86,23 +102,65 @@ begin  -- architecture tb
       D_BA  => open,
       D_CKE => open,
 
-      PA => PA,
-      PB => PB,
-      PC => PC,
-      PD => PD,
-      PE => PE,
-      PF => PF,
-      PH => PH,
-      PI => PI,
-      PJ => PJ,
+      -- Port A
+      pa_i  => port_to_im4000(A),
+      pa_en => port_oe(A),
+      pa_o  => port_from_im4000(A),
+      -- Port B
+      pb_i  => port_to_im4000(B),
+      pb_en => port_oe(B),
+      pb_o  => port_from_im4000(B),
+      -- Port C
+      pc_i  => port_to_im4000(C),
+      pc_en => port_oe(C),
+      pc_o  => port_from_im4000(C),
+      -- Port D
+      pd_i  => port_to_im4000(D),
+      pd_en => port_oe(D),
+      pd_o  => port_from_im4000(D),
+      -- Port Eopen,
+      pe_i  => port_to_im4000(E),
+      pe_en => port_oe(E),
+      pe_o  => port_from_im4000(E),
+      -- Port F
+      pf_i  => port_to_im4000(F),
+      pf_en => port_oe(F),
+      pf_o  => port_from_im4000(F),
+      -- Port G
+      pg_i  => port_to_im4000(G),
+      pg_en => port_oe(G),
+      pg_o  => port_from_im4000(G),
+      -- Port H
+      ph_i  => port_to_im4000(H),
+      ph_en => port_oe(H),
+      ph_o  => port_from_im4000(H),
+      -- Port I
+      pi_i  => port_to_im4000(I),
+      pi_en => port_oe(I),
+      pi_o  => port_from_im4000(I),
+      -- Port J
+      pj_i  => port_to_im4000(J),
+      pj_en => port_oe(J),
+      pj_o  => port_from_im4000(J),
+      -- I/O cell configuration control outputs
+      -- d_hi  => open,
+      -- d_sr  => open,
+      d_lo  => open,
+      p1_hi => open,
+      p1_sr => open,
+      p2_hi => open,
+      p2_sr => open,
+      p3_hi => open,
+      p3_sr => open,
+
 
       MBYPASS    => MBYPASS,
       MWAKEUP_LP => MWAKE,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      OSPI_Out   => OSPI_Out,
-      OSPI_DQ    => OSPI_DQ,
-      OSPI_RWDS  => OSPI_RWDS,
+      OSPI_Out  => OSPI_Out,
+      OSPI_DQ   => OSPI_DQ,
+      OSPI_RWDS => OSPI_RWDS,
 
       pwr_ok   => '1',
       vdd_bmem => '0',
@@ -111,10 +169,23 @@ begin  -- architecture tb
       adc_bits => '0'
       );
 
-  PA(7 downto 5) <= "000";              -- This is read by ROM bootloader
-  PA(4 downto 3) <= "01";               -- Set SP communication at /2 speed
-  PA(2 downto 1) <= "01";               -- Set PLL multiplier to 4
-  PA(0)          <= '1';                -- Set PLL divider to 1
+  pad(A)(7 downto 5) <= "000";          -- This is read by ROM bootloader
+  pad(A)(4 downto 3) <= "01";           -- Set SP communication at /2 speed
+  pad(A)(2 downto 1) <= "01";           -- Set PLL multiplier to 4
+  pad(A)(0)          <= '1';            -- Set PLL divider to 1
+
+  g_ports_pad : for p in port_name_t generate
+    g_pad : for i in 7 downto 0 generate
+      i_pi : entity work.ZMA2GSD
+        port map (
+          o  => port_to_im4000(p)(i),
+          i  => port_from_im4000(p)(i),
+          IO => pad(p)(i),
+          E  => port_oe(p)(i));
+    end generate g_pad;
+  end generate g_ports_pad;
+
+
 
   -- Reset the circuit for 10 ns;
   MRESET <= '0', '1' after 10 ns;
@@ -155,10 +226,10 @@ begin  -- architecture tb
 
   i_uart : entity work.uart_tb
     port map (
-      tx             => PJ(1),
-      rx             => PJ(0),
-      reg_to_block   =>  reg_to_block,
-      reg_from_block =>  x"00"
+      tx             => pad(J)(1),
+      rx             => pad(J)(0),
+      reg_to_block   => reg_to_block,
+      reg_from_block => x"00"
       );
 
   i_octo_spi : entity work.octo_memory_bfm

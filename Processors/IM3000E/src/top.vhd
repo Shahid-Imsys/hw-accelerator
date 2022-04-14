@@ -84,6 +84,7 @@ entity top is
     MIRQOUT : out std_logic;            -- interrupt request output    
     MCKOUT0 : out std_logic;            --for trace adapter
     MCKOUT1 : out std_logic;            --programable clock out
+    mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
     MTEST   : in  std_logic;  --                            high active                 
     MBYPASS : in  std_logic;
     MIRQ0   : in  std_logic;  --                            low active
@@ -130,26 +131,58 @@ entity top is
     dac1_en    : out std_logic;         -- Enable for DAC1 
     clk_a      : out std_logic;         -- Clock to the DAC's and ADC 
 
-    -- PLL
-    -- VCC18A  : in   std_logic;
-    -- GND18A  : in   std_logic;
-    -- VCC18D  : in   std_logic;
-    -- GND18D  : in   std_logic;
-    -- VCCK    : in   std_logic;
-    -- GNDK    : in   std_logic; 
 
-    -- PORT
-    PA : inout std_logic_vector(7 downto 0);  -- port A 
-    PB : inout std_logic_vector(7 downto 0);  -- port B 
-    PC : inout std_logic_vector(7 downto 0);  -- port C 
-    PD : inout std_logic_vector(7 downto 0);  -- port D /DDQM, connect to TYA(7..0) and to DDQM(7..0)
-    PE : inout std_logic_vector(7 downto 0);
-    PF : inout std_logic_vector(7 downto 0);  -- port F ethernet 1
-    PG : inout std_logic_vector(7 downto 0);  -- port G, added by HYX, 20141115
-    PH : inout std_logic_vector(7 downto 0);  -- port H /DMA ctrl
-    PI : inout std_logic_vector(7 downto 0);  -- port I /ID
-    PJ : inout std_logic_vector(7 downto 0);  -- port J /I/O ctrl, UART1, connect to I/O ctrl, DRAS(3..0)
-
+    -- Port A
+    pa_i       : in  std_logic_vector(7 downto 0);
+    pa_en      : out std_logic_vector(7 downto 0);
+    pa_o       : out std_logic_vector(7 downto 0);
+    -- Port B
+    pb_i       : in  std_logic_vector(7 downto 0);
+    pb_en      : out std_logic_vector(7 downto 0);
+    pb_o       : out std_logic_vector(7 downto 0);
+    -- Port C
+    pc_i       : in  std_logic_vector(7 downto 0);
+    pc_en      : out std_logic_vector(7 downto 0);
+    pc_o       : out std_logic_vector(7 downto 0);
+    -- Port D
+    pd_i       : in  std_logic_vector(7 downto 0);
+    pd_en      : out std_logic_vector(7 downto 0);
+    pd_o       : out std_logic_vector(7 downto 0);
+    -- Port E
+    pe_i       : in  std_logic_vector(7 downto 0);
+    pe_en      : out std_logic_vector(7 downto 0);
+    pe_o       : out std_logic_vector(7 downto 0);
+    -- Port F
+    pf_i       : in  std_logic_vector(7 downto 0);
+    pf_en      : out std_logic_vector(7 downto 0);
+    pf_o       : out std_logic_vector(7 downto 0);
+    -- Port G
+    pg_i       : in  std_logic_vector(7 downto 0);
+    pg_en      : out std_logic_vector(7 downto 0);
+    pg_o       : out std_logic_vector(7 downto 0);
+    -- Port H
+    ph_i       : in  std_logic_vector(7 downto 0);
+    ph_en      : out std_logic_vector(7 downto 0);
+    ph_o       : out std_logic_vector(7 downto 0);
+    -- Port I
+    pi_i       : in  std_logic_vector(7 downto 0);
+    pi_en      : out std_logic_vector(7 downto 0);
+    pi_o       : out std_logic_vector(7 downto 0);
+    -- Port J
+    pj_i       : in  std_logic_vector(7 downto 0);
+    pj_en      : out std_logic_vector(7 downto 0);
+    pj_o       : out std_logic_vector(7 downto 0);
+		-- I/O cell configuration control outputs
+    -- d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
+    -- d_sr        : out std_logic; -- Slew rate limit on DRAM interface
+    d_lo        : out std_logic; -- Low drive on DRAM interface
+    p1_hi       : out std_logic; -- High drive on port group 1 pins
+    p1_sr       : out std_logic; -- Slew rate limit on port group 1 pins
+    p2_hi       : out std_logic; -- High drive on port group 2 pins
+    p2_sr       : out std_logic; -- Slew rate limit on port group 2 pins
+    p3_hi       : out std_logic; -- High drive on port group 3 pins
+    p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
+    
     -- OSPI interface
     OSPI_Out  : out   OSPI_InterfaceOut_t;
     OSPI_DQ   : inout std_logic_vector(7 downto 0);
@@ -442,22 +475,13 @@ architecture struct of top is
   -----------------------------------------------------------------------------  
   signal hclk_i    : std_logic;
   signal msdin_i   : std_logic;
-  signal pd_i      : std_logic_vector(7 downto 0);
-  signal pj_i      : std_logic_vector(7 downto 0);
-  signal pi_i      : std_logic_vector(7 downto 0);
-  signal ph_i      : std_logic_vector(7 downto 0);
-  signal pc_i      : std_logic_vector(7 downto 0);
+  signal ph_i_from_iopads : std_logic_vector(7 downto 0);
   signal mbypass_i : std_logic;
   signal mreset_i  : std_logic;
   signal mtest_i   : std_logic;
   signal mwake_i   : std_logic;
   signal mirq0_i   : std_logic;
   signal mirq1_i   : std_logic;
-  signal pe_i      : std_logic_vector(7 downto 0);
-  signal pf_i      : std_logic_vector(7 downto 0);
-  signal pg_i      : std_logic_vector(7 downto 0);
-  signal pa_i      : std_logic_vector(7 downto 0);
-  signal pb_i      : std_logic_vector(7 downto 0);
 --  signal mpordis_i    : std_logic;                                                
 
 -- PLL
@@ -473,7 +497,6 @@ architecture struct of top is
   signal clk_da_pos  : std_logic;
   signal clk_c_en    : std_logic;
   --signal clk_c2_pos : std_logic;  
-  signal clk_s       : std_logic;
   signal clk_s_pos   : std_logic;
   signal clk_u_pos   : std_logic;
   signal clk_i       : std_logic;
@@ -502,8 +525,6 @@ architecture struct of top is
   signal reset_core_n    : std_logic;   -- to reset core, low active
   signal io_iso          : std_logic;  -- to isolate the io signals in nap mode
   signal nap_rec         : std_logic;   -- will recover from nap mode
-  signal pmic_core_en    : std_logic;
-  signal pmic_io_en      : std_logic;
   signal clk_mux_out     : std_logic;
 
 
@@ -619,52 +640,24 @@ architecture struct of top is
   signal en_pmem2      : std_logic;
   signal short_cycle   : std_logic;
   -- to PADS
---  signal router_ir_en  : std_logic;   --delete by HYX, 20141027
---  signal north_en        : std_logic;     --delete by HYX, 20141027
---  signal south_en        : std_logic;     --delete by HYX, 20141027
---  signal west_en         : std_logic;      --delete by HYX, 20141027
---  signal east_en         : std_logic;      --delete by HYX, 20141027
---  signal router_clk_en : std_logic;   --delete by HYX, 20141027  
-  signal mirqout_o     : std_logic;
-  signal mckout1_o     : std_logic;
-  signal mckout1_o_en  : std_logic;
-  signal msdout_o      : std_logic;
   signal mexec_o       : std_logic;
   --signal mxout_o       : std_logic;
   signal ddq_en        : std_logic;
   signal da_o          : std_logic_vector(13 downto 0);
   signal dba_o         : std_logic_vector(1 downto 0);
-  signal dcke_o        : std_logic_vector(3 downto 0);
-  signal pa_en         : std_logic_vector(7 downto 0);
-  signal pa_o          : std_logic_vector(7 downto 0);
-  signal pb_en         : std_logic_vector(7 downto 0);
-  signal pb_o          : std_logic_vector(7 downto 0);
-  signal pc_en         : std_logic_vector(7 downto 0);
-  signal pc_o          : std_logic_vector(7 downto 0);
-  signal pd_en         : std_logic_vector(7 downto 0);
-  signal pd_o          : std_logic_vector(7 downto 0);
-  signal pe_en         : std_logic_vector(7 downto 0);
-  signal pe_o          : std_logic_vector(7 downto 0);
-  signal pf_en         : std_logic_vector(7 downto 0);
-  signal pf_o          : std_logic_vector(7 downto 0);
-  signal pg_en         : std_logic_vector(7 downto 0);
-  signal pg_o          : std_logic_vector(7 downto 0);
-  signal ph_en         : std_logic_vector(7 downto 0);
-  signal ph_o          : std_logic_vector(7 downto 0);
-  signal pi_en         : std_logic_vector(7 downto 0);
-  signal pi_o          : std_logic_vector(7 downto 0);
-  signal pj_en         : std_logic_vector(7 downto 0);
-  signal pj_o          : std_logic_vector(7 downto 0);
+  signal dcke_o        : std_logic_vector(3 downto 0);  
+  signal ph_en_to_iopads         : std_logic_vector(7 downto 0);
+  signal ph_o_to_iopads          : std_logic_vector(7 downto 0);
 
   signal d_hi  : std_logic;
   signal d_sr  : std_logic;
-  signal d_lo  : std_logic;
-  signal p1_hi : std_logic;
-  signal p1_sr : std_logic;
-  signal p2_hi : std_logic;
-  signal p2_sr : std_logic;
-  signal p3_hi : std_logic;
-  signal p3_sr : std_logic;
+  -- signal d_lo  : std_logic;
+  -- signal p1_hi : std_logic;
+  -- signal p1_sr : std_logic;
+  -- signal p2_hi : std_logic;
+  -- signal p2_sr : std_logic;
+  -- signal p3_hi : std_logic;
+  -- signal p3_sr : std_logic;
   -- signal pc_hi         : std_logic;                       
   -- signal pc_lo_n       : std_logic;                       
   -- signal ph_hi         : std_logic;                       
@@ -882,24 +875,6 @@ architecture struct of top is
   signal RAM4_A     : std_logic_vector (13 downto 0);
   signal RAM4_WEB   : std_logic;
   signal RAM4_CS    : std_logic;
---         --RAM5 
---  signal RAM5_DO         : std_logic_vector (127 downto 0);
---  signal RAM5_DI         : std_logic_vector (127 downto 0);
---  signal RAM5_A          : std_logic_vector (9 downto 0);
---  signal RAM5_WEB        : std_logic_vector(15 downto 0);
---  signal RAM5_CS         : std_logic;
---         --RAM6 
---  signal RAM6_DO         : std_logic_vector (127 downto 0);
---  signal RAM6_DI         : std_logic_vector (127 downto 0);
---  signal RAM6_A          : std_logic_vector (9 downto 0);
---  signal RAM6_WEB        : std_logic_vector(15 downto 0);
---  signal RAM6_CS         : std_logic;
---         --RAM7 
---  signal RAM7_DO         : std_logic_vector (127 downto 0);
---  signal RAM7_DI         : std_logic_vector (127 downto 0);
---  signal RAM7_A          : std_logic_vector (9 downto 0);
---  signal RAM7_WEB        : std_logic_vector(15 downto 0);
---  signal RAM7_CS         : std_logic;   
 
 begin
 
@@ -909,24 +884,14 @@ begin
     port map(
       -- clocks and control signals
       HCLK       => HCLK,
-      MPMIC_CORE => MPMIC_CORE,
-      MPMIC_IO   => MPMIC_IO,
-
-      --RTCCLK_FEB      => RTCCLK_FEB       ,        
+       
       MRESET  => MRESET,
-      MIRQOUT => MIRQOUT,
-      --MCKOUT          => MCKOUT           ,
-      --MEXEC           => MEXEC            ,
-      --MXOUT           => MXOUT            ,
-      MCKOUT0 => MCKOUT0,
-      MCKOUT1 => MCKOUT1,
       MTEST   => MTEST,
       MBYPASS => MBYPASS,
       MIRQ0   => MIRQ0,
       MIRQ1   => MIRQ1,
       -- SW debug                                                                
       MSDIN   => MSDIN,
-      MSDOUT  => MSDOUT,
 
       -- SDRAM
       D_CLK     => D_CLK,
@@ -939,19 +904,8 @@ begin
       D_A       => D_A,
       D_BA      => D_BA,
       D_CKE     => D_CKE,
-      --pl_out          : out std_logic_vector(79 downto 0);--maning
       -- Ports
-      PA        => PA,
-      PB        => PB,
-      PC        => PC,
-      PD        => PD,
-      PE        => PE,
-      PF        => PF,
-      PG        => PG,
-      PH        => PH,
-      PI        => PI,
-      PJ        => PJ,
-      --sdram interface
+      
       --sdram interface
       sdram_en  => sdram_en,
       sd_clk    => clk_d,
@@ -974,19 +928,8 @@ begin
       mirq1_i  => mirq1_i,
       msdin_i  => msdin_i,
 
-      mirqout_o    => mirqout_o,
-      --mckout_o        => mrxout_o         ,
-      --mexec_o         => mexec_o          ,
-      --mxout_o         => mxout_o          ,
-      mckout0_o    => clk_s,
-      mckout1_o    => mckout1_o,
-      mckout1_o_en => mckout1_o_en,
-      msdout_o     => msdout_o,
       mbypass_i    => mbypass_i,
-      --clk_in_off      => clk_in_off           ,
       
-      pmic_core_en => pmic_core_en,
-      pmic_io_en   => pmic_io_en,
       io_iso       => io_iso,
 
 
@@ -997,60 +940,18 @@ begin
       clk_e_tst   => clk_e_pos,
       clk_c2a_tst => even_c,
       clk_ea_tst  => clk_ea_pos,
-
-      pa_i  => pa_i,
-      pa_en => pa_en,
-      pa_o  => pa_o,
-      pb_i  => pb_i,
-      pb_en => pb_en,
-      pb_o  => pb_o,
-      pc_i  => pc_i,
-      pc_en => pc_en,
-      pc_o  => pc_o,
-      pd_i  => pd_i,
-      pd_en => pd_en,
-      pd_o  => pd_o,
-      pe_i  => pe_i,
-      pe_en => pe_en,
-      pe_o  => pe_o,
-      pf_i  => pf_i,
-      pf_en => pf_en,
-      pf_o  => pf_o,
-      pg_i  => pg_i,
-      pg_en => pg_en,
-      pg_o  => pg_o,
+     
       ph_i  => ph_i,
       ph_en => ph_en,
       ph_o  => ph_o,
-      pi_i  => pi_i,
-      pi_en => pi_en,
-      pi_o  => pi_o,
-      pj_i  => pj_i,
-      pj_en => pj_en,
-      pj_o  => pj_o,
+           
+      ph_i_from_iopads  => ph_i_from_iopads,
+      ph_en_to_iopads => ph_en_to_iopads,
+      ph_o_to_iopads  => ph_o_to_iopads,
+      
       -- I/O cell configuration control outputs
       d_hi  => d_hi,
-      d_sr  => d_sr,
-      d_lo  => d_lo,
-      p1_hi => p1_hi,
-      p1_sr => p1_sr,
-      p2_hi => p2_hi,
-      p2_sr => p2_sr,
-      p3_hi => p3_hi,
-      p3_sr => p3_sr
-     -- pc_hi           => pc_hi            ,
-     -- pc_lo_n         => pc_lo_n          ,
-     -- ph_hi           => ph_hi            ,
-     -- ph_lo_n         => ph_lo_n          ,
-     -- pi_hi           => pi_hi            ,
-     -- pi_lo_n         => pi_lo_n          ,
-     -- pel_hi          => pel_hi           ,
-     -- peh_hi          => peh_hi           ,
-     -- pdll_hi         => pdll_hi          ,
-     -- pdlh_hi         => pdlh_hi          ,
-     -- pdh_hi          => pdh_hi           ,
-     -- pf_hi           => pf_hi            ,
-     -- pg_hi           => pg_hi            
+      d_sr  => d_sr
       );
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
@@ -1457,7 +1358,7 @@ begin
       clk_d_pos    => clk_d_pos,
       clk_da_pos   => clk_da_pos,
       clk_u_pos    => clk_u_pos,
-      clk_s        => clk_s,
+      clk_s        => MCKOUT0,
       clk_s_pos    => clk_s_pos,
       clk_rx       => clk_rx,
       clk_tx       => clk_tx,
@@ -1496,8 +1397,8 @@ begin
       reset_core_n    => reset_core_n,
       io_iso          => io_iso,
       nap_rec         => nap_rec,
-      pmic_core_en    => pmic_core_en,
-      pmic_io_en      => pmic_io_en,
+      pmic_core_en    => MPMIC_CORE,
+      pmic_io_en      => MPMIC_IO,
       clk_mux_out     => clk_mux_out,
 
       --gmem1
@@ -1696,11 +1597,11 @@ begin
       -- Misc. signals
       --mpordis_i     => '1',--MPORDIS, --: in  std_logic;  -- 'power on' from pad
       mreset_i        => mreset_i,  --: in  std_logic;  -- Asynchronous reset input 
-      mirqout_o       => mirqout_o,  --: out std_logic;  -- Interrupt  request output 
-      mckout1_o       => mckout1_o,  --: out std_logic;  -- Programmable clock out
-      mckout1_o_en    => mckout1_o_en,
+      mirqout_o       => MIRQOUT,  --: out std_logic;  -- Interrupt  request output 
+      mckout1_o       => MCKOUT1,  --: out std_logic;  -- Programmable clock out
+      mckout1_o_en    => mckout1_en,
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
-      msdout_o        => msdout_o,      --: out std_logic;  -- Serial data out
+      msdout_o        => MSDOUT,      --: out std_logic;  -- Serial data out
       mrstout_o       => MRSTOUT,     --: out std_logic;  -- Reset out
       --mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
@@ -2129,9 +2030,9 @@ begin
       pg_i       => pg_i,
       pg_en      => pg_en,
       pg_o       => pg_o,
-      ph_i       => ph_i,
-      ph_en      => ph_en,
-      ph_o       => ph_o,
+      ph_i       => ph_i_from_iopads,
+      ph_en      => ph_en_to_iopads,
+      ph_o       => ph_o_to_iopads,
       pi_i       => pi_i,
       pi_en      => pi_en,
       pi_o       => pi_o,

@@ -29,10 +29,9 @@ use ieee.std_logic_1164.all;
 
 use work.gp_pkg.all;
 
-entity digital_core is
+entity digital_top is
   
   generic (
-    g_memory_type     : memory_type_t := asic;
     g_clock_frequency : integer);
 
   port (
@@ -134,19 +133,19 @@ entity digital_core is
     OSPI_DQ   : inout std_logic_vector(7 downto 0);
     OSPI_RWDS : inout std_logic);
 
-end entity digital_core;
+end entity digital_top;
 
-architecture rtl of digital_core is
+architecture rtl of digital_top is
 
 begin  -- architecture rtl
 
-  i_im4000_top : entity work.top
+  i_digital_core : entity work.digital_core
     generic map (
-      g_memory_type     => fpga,
-      g_clock_frequency => 31         -- system clock frequency in MHz
+      g_memory_type     => asic,
+      g_clock_frequency => g_clock_frequency   -- system clock frequency in MHz
       )
-    port map (
-      HCLK    => HCLK,
+      port map (
+        HCLK    => HCLK,
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
@@ -158,17 +157,6 @@ begin  -- architecture rtl
       -- SW debug
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
-
-      D_CLK => open,
-      D_CS  => open,
-      D_RAS => open,
-      D_CAS => open,
-      D_WE  => open,
-      D_DQM => open,
-      D_DQ  => x"00",
-      D_A   => open,
-      D_BA  => open,
-      D_CKE => open,
 
       -- Port A
       pa_i  => pa_i,

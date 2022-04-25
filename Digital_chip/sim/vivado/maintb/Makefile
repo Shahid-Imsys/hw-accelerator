@@ -7,7 +7,7 @@ rtl: digital_chip_rtl
 tb: main_tb_tb
 
 elab:
-	xelab --debug typical main_tb
+	xelab --relax --debug typical main_tb
 sim:
 	cp ../../../../fw-test-im3000e/build/bin/Tmpgm.${TEST_CASE}/* .
 	$(SIM) $(SIM_FLAGS) work.main_tb

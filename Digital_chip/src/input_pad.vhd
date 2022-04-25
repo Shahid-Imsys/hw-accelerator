@@ -25,7 +25,7 @@ architecture str of input_pad is
   
 begin  -- architecture str
 
-  verical : if direction = vertical generate
+  vertical_g : if direction = vertical generate
     i_v_pad : RIIO_EG1D80V_GPI_LVT28_V
       port map (
         -- PAD
@@ -50,12 +50,11 @@ begin  -- architecture str
         PU_I  => pu,
         DI_O  => di_vect
         );
-
-  end generate verical;
+  end generate vertical_g;
 
   di <= di_vect(0);
   
-  -- i_bond_pad : RIIO_BOND64_OUTER_SIG
-  --   port map (PAD => pad);
+  i_bond_pad : RIIO_BOND64_OUTER_SIG
+     port map (PAD => pad);
 
 end architecture str;

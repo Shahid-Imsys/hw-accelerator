@@ -420,7 +420,7 @@ architecture struct of core is
   
   attribute syn_keep              : boolean;
   attribute syn_keep of pend_i    : signal is true;
-  -- To easy gate-level simulation
+  -- To ease gate-level simulation
   attribute syn_keep of dbus_int  : signal is true;
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;

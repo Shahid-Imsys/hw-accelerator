@@ -1,10 +1,10 @@
 // Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
-// Date        : Thu Mar 31 13:14:50 2022
+// Date        : Thu Apr 21 09:04:58 2022
 // Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
-// Command     : write_verilog -force -mode funcsim -rename_top clk_wiz_0 -prefix
-//               clk_wiz_0_ clk_wiz_0_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim
+//               /home/markar/checkouts/ImSys/testMaster/Processors/IM3000E/fpga_synth/gpp/gpp.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.v
 // Design      : clk_wiz_0
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -15,51 +15,51 @@
 (* NotValidForBitStream *)
 module clk_wiz_0
    (clk_200M,
-    clk_300M,
-    clk_400M,
+    clk_100M,
+    clk_50M,
     clk_in1_p,
     clk_in1_n);
   output clk_200M;
-  output clk_300M;
-  output clk_400M;
+  output clk_100M;
+  output clk_50M;
   input clk_in1_p;
   input clk_in1_n;
 
+  wire clk_100M;
   wire clk_200M;
-  wire clk_300M;
-  wire clk_400M;
+  wire clk_50M;
   (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_n;
   (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_p;
 
-  clk_wiz_0_clk_wiz_0_clk_wiz inst
-       (.clk_200M(clk_200M),
-        .clk_300M(clk_300M),
-        .clk_400M(clk_400M),
+  clk_wiz_0_clk_wiz inst
+       (.clk_100M(clk_100M),
+        .clk_200M(clk_200M),
+        .clk_50M(clk_50M),
         .clk_in1_n(clk_in1_n),
         .clk_in1_p(clk_in1_p));
 endmodule
 
-module clk_wiz_0_clk_wiz_0_clk_wiz
+module clk_wiz_0_clk_wiz
    (clk_200M,
-    clk_300M,
-    clk_400M,
+    clk_100M,
+    clk_50M,
     clk_in1_p,
     clk_in1_n);
   output clk_200M;
-  output clk_300M;
-  output clk_400M;
+  output clk_100M;
+  output clk_50M;
   input clk_in1_p;
   input clk_in1_n;
 
+  wire clk_100M;
+  wire clk_100M_clk_wiz_0;
+  wire clk_100M_clk_wiz_0_en_clk;
   wire clk_200M;
   wire clk_200M_clk_wiz_0;
   wire clk_200M_clk_wiz_0_en_clk;
-  wire clk_300M;
-  wire clk_300M_clk_wiz_0;
-  wire clk_300M_clk_wiz_0_en_clk;
-  wire clk_400M;
-  wire clk_400M_clk_wiz_0;
-  wire clk_400M_clk_wiz_0_en_clk;
+  wire clk_50M;
+  wire clk_50M_clk_wiz_0;
+  wire clk_50M_clk_wiz_0_en_clk;
   wire clk_in1_clk_wiz_0;
   wire clk_in1_n;
   wire clk_in1_p;
@@ -138,8 +138,8 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
     .STARTUP_SYNC("FALSE")) 
     clkout2_buf
        (.CE(seq_reg2[7]),
-        .I(clk_300M_clk_wiz_0),
-        .O(clk_300M));
+        .I(clk_100M_clk_wiz_0),
+        .O(clk_100M));
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFGCE #(
     .CE_TYPE("SYNC"),
@@ -149,8 +149,8 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
     .STARTUP_SYNC("FALSE")) 
     clkout2_buf_en
        (.CE(1'b1),
-        .I(clk_300M_clk_wiz_0),
-        .O(clk_300M_clk_wiz_0_en_clk));
+        .I(clk_100M_clk_wiz_0),
+        .O(clk_100M_clk_wiz_0_en_clk));
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFGCE #(
     .CE_TYPE("SYNC"),
@@ -160,8 +160,8 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
     .STARTUP_SYNC("FALSE")) 
     clkout3_buf
        (.CE(seq_reg3[7]),
-        .I(clk_400M_clk_wiz_0),
-        .O(clk_400M));
+        .I(clk_50M_clk_wiz_0),
+        .O(clk_50M));
   (* BOX_TYPE = "PRIMITIVE" *) 
   BUFGCE #(
     .CE_TYPE("SYNC"),
@@ -171,8 +171,8 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
     .STARTUP_SYNC("FALSE")) 
     clkout3_buf_en
        (.CE(1'b1),
-        .I(clk_400M_clk_wiz_0),
-        .O(clk_400M_clk_wiz_0_en_clk));
+        .I(clk_50M_clk_wiz_0),
+        .O(clk_50M_clk_wiz_0_en_clk));
   (* BOX_TYPE = "PRIMITIVE" *) 
   (* OPT_MODIFIED = "MLO" *) 
   MMCME4_ADV #(
@@ -186,11 +186,11 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
     .CLKOUT0_DUTY_CYCLE(0.500000),
     .CLKOUT0_PHASE(0.000000),
     .CLKOUT0_USE_FINE_PS("FALSE"),
-    .CLKOUT1_DIVIDE(4),
+    .CLKOUT1_DIVIDE(12),
     .CLKOUT1_DUTY_CYCLE(0.500000),
     .CLKOUT1_PHASE(0.000000),
     .CLKOUT1_USE_FINE_PS("FALSE"),
-    .CLKOUT2_DIVIDE(3),
+    .CLKOUT2_DIVIDE(24),
     .CLKOUT2_DUTY_CYCLE(0.500000),
     .CLKOUT2_PHASE(0.000000),
     .CLKOUT2_USE_FINE_PS("FALSE"),
@@ -240,9 +240,9 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
         .CLKINSTOPPED(NLW_mmcme4_adv_inst_CLKINSTOPPED_UNCONNECTED),
         .CLKOUT0(clk_200M_clk_wiz_0),
         .CLKOUT0B(NLW_mmcme4_adv_inst_CLKOUT0B_UNCONNECTED),
-        .CLKOUT1(clk_300M_clk_wiz_0),
+        .CLKOUT1(clk_100M_clk_wiz_0),
         .CLKOUT1B(NLW_mmcme4_adv_inst_CLKOUT1B_UNCONNECTED),
-        .CLKOUT2(clk_400M_clk_wiz_0),
+        .CLKOUT2(clk_50M_clk_wiz_0),
         .CLKOUT2B(NLW_mmcme4_adv_inst_CLKOUT2B_UNCONNECTED),
         .CLKOUT3(NLW_mmcme4_adv_inst_CLKOUT3_UNCONNECTED),
         .CLKOUT3B(NLW_mmcme4_adv_inst_CLKOUT3B_UNCONNECTED),
@@ -348,7 +348,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[0] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(locked_int),
         .Q(seq_reg2[0]),
@@ -358,7 +358,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[1] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[0]),
         .Q(seq_reg2[1]),
@@ -368,7 +368,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[2] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[1]),
         .Q(seq_reg2[2]),
@@ -378,7 +378,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[3] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[2]),
         .Q(seq_reg2[3]),
@@ -388,7 +388,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[4] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[3]),
         .Q(seq_reg2[4]),
@@ -398,7 +398,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[5] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[4]),
         .Q(seq_reg2[5]),
@@ -408,7 +408,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[6] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[5]),
         .Q(seq_reg2[6]),
@@ -418,7 +418,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg2_reg[7] 
-       (.C(clk_300M_clk_wiz_0_en_clk),
+       (.C(clk_100M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg2[6]),
         .Q(seq_reg2[7]),
@@ -428,7 +428,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[0] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(locked_int),
         .Q(seq_reg3[0]),
@@ -438,7 +438,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[1] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[0]),
         .Q(seq_reg3[1]),
@@ -448,7 +448,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[2] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[1]),
         .Q(seq_reg3[2]),
@@ -458,7 +458,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[3] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[2]),
         .Q(seq_reg3[3]),
@@ -468,7 +468,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[4] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[3]),
         .Q(seq_reg3[4]),
@@ -478,7 +478,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[5] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[4]),
         .Q(seq_reg3[5]),
@@ -488,7 +488,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[6] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[5]),
         .Q(seq_reg3[6]),
@@ -498,7 +498,7 @@ module clk_wiz_0_clk_wiz_0_clk_wiz
   FDRE #(
     .INIT(1'b0)) 
     \seq_reg3_reg[7] 
-       (.C(clk_400M_clk_wiz_0_en_clk),
+       (.C(clk_50M_clk_wiz_0_en_clk),
         .CE(1'b1),
         .D(seq_reg3[6]),
         .Q(seq_reg3[7]),

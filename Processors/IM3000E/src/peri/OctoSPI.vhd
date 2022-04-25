@@ -42,33 +42,39 @@ entity OctoSPI is
     ospi_latency_address : std_logic_vector(7 downto 0) := x"44";
     MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
     );
-  port (clk_p     : in    std_logic;    -- Main clock
-        clk_i_pos : in    std_logic;    --
-        rst_n     : in    std_logic;    -- Async reset
-        idi       : in    std_logic_vector (7 downto 0);      -- I/O bus in
-        ido       : out   std_logic_vector (7 downto 0);      -- I/O bus out
-        iden      : out   std_logic;    -- I/O bus enabled (in use)
-        ilioa     : in    std_logic;    -- I/O bus load I/O address
-        ildout    : in    std_logic;    -- I/O bus data output strobe
-        inext     : in    std_logic;    -- I/O bus data input  strobe
-        idack     : in    std_logic;    -- I/O bus DMA Ack
-        idreq     : out   std_logic;    -- I/O bus DMA Request
-        OSPI_Out  : out   OSPI_InterfaceOut_t;  -- OSPI pins out to chip
-        OSPI_DQ   : inout std_logic_vector(7 downto 0);       -- OSPI data bus
-        OSPI_RWDS : inout std_logic     -- OSPI pins in/out from/to chip
+  port (clk_p       : in  std_logic;    -- Main clock
+        clk_i_pos   : in  std_logic;    --
+        rst_n       : in  std_logic;    -- Async reset
+        --
+        idi         : in  std_logic_vector (7 downto 0); -- I/O bus in
+        ido         : out std_logic_vector (7 downto 0); -- I/O bus out
+        iden        : out std_logic;                     -- I/O bus enabled (in use)
+        ilioa       : in  std_logic;                     -- I/O bus load I/O address
+        ildout      : in  std_logic;                     -- I/O bus data output strobe
+        inext       : in  std_logic;                     -- I/O bus data input  strobe
+        idack       : in  std_logic;                     -- I/O bus DMA Ack
+        idreq       : out std_logic;                     -- I/O bus DMA Request
+        --
+        OSPI_Out    : out OSPI_InterfaceOut_t;          -- OSPI pins out to chip
+        OSPI_DQ_i   : in  std_logic_vector(7 downto 0); -- OSPI data bus in
+        OSPI_DQ_o   : out std_logic_vector(7 downto 0); -- OSPI data bus out
+        OSPI_DQ_e   : out std_logic;                    -- OSPI data bus enable (1=out)
+        OSPI_RWDS_i : in  std_logic;                    -- OSPI RWDS in
+        OSPI_RWDS_o : out std_logic;                    -- OSPI RWDS out
+        OSPI_RWDS_e : out std_logic                     -- OSPI RWDS enable (1=out)
         );
 end OctoSPI;
 
 architecture rtl of OctoSPI is
 
   type OSPI_FSM_t is (
-    wr_cmd,                             -- Write cmd bytes
-    wr_addr,                            -- Write addr bytes
-    wait_latency,                       -- Wait for latency time
-    wr_data,                            -- Write data bytes
-    rd_data,                            -- Read data bytes
-    wait_idle,     -- Waiting for even clock out before going idle
-    idle);                              -- Idle, no access
+    wr_cmd,       -- Write cmd bytes
+    wr_addr,      -- Write addr bytes
+    wait_latency, -- Wait for latency time
+    wr_data,      -- Write data bytes
+    rd_data,      -- Read data bytes
+    wait_idle,    -- Waiting for even clock out before going idle
+    idle);        -- Idle, no access
 
   -- subtype OSPI_Cmd_t is std_logic_vector(7 downto 0);
 
@@ -90,11 +96,11 @@ architecture rtl of OctoSPI is
   signal flags_wr   : std_logic;                     -- Flags   write strobe
   signal latency_wr : std_logic;                     -- Latency write strobe
   --
-  -- signal cmd_rd     : std_logic;                     -- Command read strobe
-  -- signal addr_rd    : std_logic;                     -- Address read strobe
+  -- signal cmd_rd     : std_logic;                  -- Command read strobe
+  -- signal addr_rd    : std_logic;                  -- Address read strobe
   signal data_rd    : std_logic;                     -- Data read strobe
-  -- signal flags_rd   : std_logic;                     -- Flags   read strobe
-  -- signal latency_rd : std_logic;                     -- Latency read strobe
+  -- signal flags_rd   : std_logic;                  -- Flags   read strobe
+  -- signal latency_rd : std_logic;                  -- Latency read strobe
   --
   signal flags_out  : std_logic_vector(7 downto 0);  -- Data out register
 
@@ -109,6 +115,7 @@ architecture rtl of OctoSPI is
   signal latency_sel   : std_logic;     -- Latency access selected
   --
   signal iobus_rdindex : ospi_cache_index_t;
+  signal iobus_rddata  : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------
   -- bus_input_proc
@@ -141,14 +148,14 @@ architecture rtl of OctoSPI is
 begin
 
 -- DMA
-  idreq <= '1';                         -- Active low
+  idreq <= '1'; -- Active low
 
 -- I/O bus current statements
   ido <= flags_out when flags_sel = '1' else
          addr_reg(7 downto 0) when addr_sel = '1' else
          cmd_reg              when cmd_sel = '1' else
          latency_reg          when latency_sel = '1' else
-         ospi_rddata(iobus_rdindex);
+         iobus_rddata;
 
   iden <= not inext and (               -- inext is active low
     cmd_sel or addr_sel or data_sel or flags_sel or latency_sel);
@@ -180,13 +187,19 @@ begin
       latency_sel   <= '0';
       --
       iobus_rdindex <= 0;
+      iobus_rddata  <= (others => '0');
 
     elsif rising_edge(clk_p) then
 
-      if data_rd = '1' and clk_i_pos = '0' and
-        (iobus_rdindex /= (ospi_rddata'length - 1)) then
-        iobus_rdindex <= iobus_rdindex + 1;
+      if data_rd = '1' and clk_i_pos = '0' then
+        if iobus_rdindex /= (ospi_rddata'length - 1) then
+            iobus_rdindex <= iobus_rdindex + 1;
+        else
+            iobus_rdindex <= 0;
+        end if;
       end if;
+      
+      iobus_rddata <= ospi_rddata(iobus_rdindex);
 
       if ilioa = '0' and clk_i_pos = '0' then
         cmd_sel     <= '0';
@@ -313,8 +326,10 @@ begin
       OSPI_Out.RESET_n <= '0';
       OSPI_Out.CS_n    <= '1';
 
-      OSPI_DQ   <= x"ZZ";
-      OSPI_RWDS <= 'Z';
+      OSPI_DQ_o   <= x"00";
+      OSPI_DQ_e   <= '0';
+      OSPI_RWDS_o <= '0';
+      OSPI_RWDS_e <= '0';
 
       clk_out_int <= '0';
 
@@ -341,12 +356,14 @@ begin
 
       OSPI_Out.RESET_n <= '1';
       OSPI_Out.CS_n    <= '0';
-      OSPI_DQ          <= x"ZZ";
-      OSPI_RWDS        <= 'Z';
+      OSPI_DQ_o        <= x"--";
+      OSPI_DQ_e        <= '0';
+      OSPI_RWDS_o      <= '-';
+      OSPI_RWDS_e      <= '0';
 
       clk_out_int <= std_logic(ospi_counter(OSPI_CNTPOS_CLK));
 
-      ospi_rwds_p <= OSPI_RWDS;
+      ospi_rwds_p <= OSPI_RWDS_i;
 
       ospi_counter <= ospi_counter + 1;
 
@@ -378,7 +395,8 @@ begin
           end if;
 
         when wr_cmd =>
-          OSPI_DQ <= ospi_cmd;
+          OSPI_DQ_o <= ospi_cmd;
+          OSPI_DQ_e <= '1';
 
           if ospi_counter(OSPI_CNTPOS_CLK + 2 downto OSPI_CNTPOS_CLK - 2) = 9 then
             if ospi_length = 0 then
@@ -390,7 +408,7 @@ begin
               ospi_fsm <= wr_addr;
             end if;
 
-            if OSPI_RWDS = '1' then
+            if OSPI_RWDS_i = '1' then
               ospi_latency <= unsigned(latency_reg(2 downto 0)) & "0";
             else
               ospi_latency <= "0" & unsigned(latency_reg(2 downto 0));
@@ -398,17 +416,18 @@ begin
           end if;
 
         when wr_addr =>
+          OSPI_DQ_e <= '1';
           if ospi_counter(OSPI_CNTPOS_CLK + 2 downto OSPI_CNTPOS_CLK - 2) < 14 then
-            OSPI_DQ <= ospi_addr(31 downto 24);
+            OSPI_DQ_o <= ospi_addr(31 downto 24);
 
           elsif ospi_counter(OSPI_CNTPOS_CLK + 2 downto OSPI_CNTPOS_CLK - 2) < 18 then
-            OSPI_DQ <= ospi_addr(23 downto 16);
+            OSPI_DQ_o <= ospi_addr(23 downto 16);
 
           elsif ospi_counter(OSPI_CNTPOS_CLK + 2 downto OSPI_CNTPOS_CLK - 2) < 22 then
-            OSPI_DQ <= ospi_addr(15 downto 8);
+            OSPI_DQ_o <= ospi_addr(15 downto 8);
 
           else
-            OSPI_DQ <= ospi_addr(7 downto 0);
+            OSPI_DQ_o <= ospi_addr(7 downto 0);
             if ospi_counter(OSPI_CNTPOS_CLK + 2 downto OSPI_CNTPOS_CLK - 2) = 25 then
               ospi_counter(OSPI_CNT_BITS - 1 downto OSPI_CNTPOS_CLK + 1) <= (others => '0');
               if ospi_latency /= 0 then
@@ -453,12 +472,12 @@ begin
 
             if rd_trig then
               rd_trig                   := false;
-              ospi_rddata(ospi_rdindex) <= OSPI_DQ;
+              ospi_rddata(ospi_rdindex) <= OSPI_DQ_i;
               ospi_rdindex              <= ospi_rdindex + 1;
             end if;
           end if;
 
-          if OSPI_RWDS /= ospi_rwds_p then
+          if OSPI_RWDS_i /= ospi_rwds_p then
             rd_trig := true;
           end if;
 
@@ -473,10 +492,12 @@ begin
           end if;
 
           if wr_trig then
-            OSPI_DQ <= ospi_wrdata(ospi_wrindex);
+            OSPI_DQ_e <= '1';
+            OSPI_DQ_o <= ospi_wrdata(ospi_wrindex);
             if ospi_latency /= 0 then
               -- If reg access, do not drive RWDS
-              OSPI_RWDS <= '0';
+              OSPI_RWDS_o <= '0';
+              OSPI_RWDS_e <= '1';
             end if;
 
             if ospi_counter(OSPI_CNTPOS_CLK - 1 downto 0) = 2**(OSPI_CNTPOS_CLK - 1) - 1 then  -- Timing adjustment possible here

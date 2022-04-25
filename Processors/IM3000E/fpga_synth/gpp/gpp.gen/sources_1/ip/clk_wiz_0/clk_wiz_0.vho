@@ -56,8 +56,8 @@
 --   Clock     Freq (MHz)  (degrees)    (%)     Jitter (ps)  Error (ps)
 ------------------------------------------------------------------------------
 -- clk_200M__200.00000______0.000______50.0_______88.577_____77.836
--- clk_300M__300.00000______0.000______50.0_______81.814_____77.836
--- clk_400M__400.00000______0.000______50.0_______77.334_____77.836
+-- clk_100M__100.00000______0.000______50.0______101.475_____77.836
+-- _clk_50M__50.00000______0.000______50.0______116.415_____77.836
 --
 ------------------------------------------------------------------------------
 -- Input Clock   Freq (MHz)    Input Jitter (UI)
@@ -72,8 +72,8 @@ port
  (-- Clock in ports
   -- Clock out ports
   clk_200M          : out    std_logic;
-  clk_300M          : out    std_logic;
-  clk_400M          : out    std_logic;
+  clk_100M          : out    std_logic;
+  clk_50M          : out    std_logic;
   clk_in1_p         : in     std_logic;
   clk_in1_n         : in     std_logic
  );
@@ -87,8 +87,8 @@ your_instance_name : clk_wiz_0
    port map ( 
   -- Clock out ports  
    clk_200M => clk_200M,
-   clk_300M => clk_300M,
-   clk_400M => clk_400M,
+   clk_100M => clk_100M,
+   clk_50M => clk_50M,
    -- Clock in ports
    clk_in1_p => clk_in1_p,
    clk_in1_n => clk_in1_n

@@ -57,8 +57,8 @@
 //   Clock     Freq (MHz)  (degrees)    (%)     Jitter (ps)  Error (ps)
 //----------------------------------------------------------------------------
 // clk_200M__200.00000______0.000______50.0_______88.577_____77.836
-// clk_300M__300.00000______0.000______50.0_______81.814_____77.836
-// clk_400M__400.00000______0.000______50.0_______77.334_____77.836
+// clk_100M__100.00000______0.000______50.0______101.475_____77.836
+// _clk_50M__50.00000______0.000______50.0______116.415_____77.836
 //
 //----------------------------------------------------------------------------
 // Input Clock   Freq (MHz)    Input Jitter (UI)
@@ -73,8 +73,8 @@ module clk_wiz_0
  (
   // Clock out ports
   output        clk_200M,
-  output        clk_300M,
-  output        clk_400M,
+  output        clk_100M,
+  output        clk_50M,
  // Clock in ports
   input         clk_in1_p,
   input         clk_in1_n
@@ -84,8 +84,8 @@ module clk_wiz_0
   (
   // Clock out ports  
   .clk_200M(clk_200M),
-  .clk_300M(clk_300M),
-  .clk_400M(clk_400M),
+  .clk_100M(clk_100M),
+  .clk_50M(clk_50M),
  // Clock in ports
   .clk_in1_p(clk_in1_p),
   .clk_in1_n(clk_in1_n)

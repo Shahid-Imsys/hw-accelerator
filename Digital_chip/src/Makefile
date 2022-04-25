@@ -6,6 +6,7 @@ PLL_PATH_WIN=$(CHIP_DIR_WIN)/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx
 
 digital_chip_rtl: digital_top_rtl pad_comp
 	$(COMP) $(COMP_RTL_FLAGS) $(CHIP_DIR_WIN)/pad_instance_package.vhd \
+                                  $(CHIP_DIR_WIN)/inoutput_pad.vhd \
                                   $(CHIP_DIR_WIN)/input_pad.vhd \
                                   $(CHIP_DIR_WIN)/output_pad.vhd \
 				  $(CHIP_DIR_WIN)/digital_chip.vhd
@@ -17,7 +18,7 @@ pad_comp:
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_H.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_V.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_H.v \
-                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_V.v 
+                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_V.v \
 #		  $(PLL_PATH_WIN)/ri_adpll_gf22fdx_2gmp_behavioral.v
 
 include $(PROJECT_PATH)/Digital_top/src/Makefile

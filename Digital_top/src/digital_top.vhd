@@ -129,7 +129,10 @@ entity digital_top is
     p3_sr : out std_logic;              -- Slew rate limit on port group 3 pins
 
     -- OSPI interface
-    ospi_out         : out OSPI_InterfaceOut_t;
+    ospi_cs_n        : out std_logic;
+    ospi_ck_n        : out std_logic;
+    ospi_ck_p        : out std_logic;
+    ospi_reset_n     : out std_logic;
     ospi_dq_in       : in  std_logic_vector(7 downto 0);
     ospi_dq_out      : out std_logic_vector(7 downto 0);
     ospi_dq_enable   : out std_logic;
@@ -218,7 +221,10 @@ begin  -- architecture rtl
       MWAKEUP_LP => MWAKEUP_LP,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      ospi_out  => ospi_out,
+      ospi_out.cs_n  => ospi_cs_n,
+      ospi_out.ck_n  => ospi_ck_n,
+      ospi_out.ck_p  => ospi_ck_p,
+      ospi_out.reset_n => ospi_reset_n,
       ospi_dq_in  => ospi_dq_in,
       ospi_dq_out  => ospi_dq_out,
       ospi_dq_enable  => ospi_dq_enable,

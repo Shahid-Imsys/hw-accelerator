@@ -254,6 +254,17 @@ architecture rtl of digital_chip is
   signal p3_hi : std_logic;
   signal p3_sr : std_logic;
 
+  signal ospi_cs_n        : std_logic;
+  signal ospi_ck_n        : std_logic;
+  signal ospi_ck_p        : std_logic;
+  signal ospi_reset_n     : std_logic;
+  signal ospi_dq_in       : std_logic_vector(7 downto 0);
+  signal ospi_dq_out      : std_logic_vector(7 downto 0);
+  signal ospi_dq_enable   : std_logic;
+  signal ospi_rwds_in     : std_logic;
+  signal ospi_rwds_out    : std_logic;
+  signal ospi_rwds_enable : std_logic;
+  
 begin  -- architecture rtl
 
   -- i_pll : ri_adpll_gf22fdx_2gmp_behavioral
@@ -380,17 +391,16 @@ begin  -- architecture rtl
         MWAKEUP_LP => '0', --MWAKE,
         MLP_PWR_OK => '0',  --MLP_PWR_OK,
 
-        --OSPI_Out.cs_n => open, --emem_cs_n,
-        --OSPI_Out.ck_p => open, --emem_ck,
-        OSPI_RWDS     => emem_rwds,
-        OSPI_DQ(0)    => emem_d0,
-        OSPI_DQ(1)    => emem_d1,
-        OSPI_DQ(2)    => emem_d2,
-        OSPI_DQ(3)    => emem_d3,
-        OSPI_DQ(4)    => emem_d4,
-        OSPI_DQ(5)    => emem_d5,
-        OSPI_DQ(6)    => emem_d6,
-        OSPI_DQ(7)    => emem_d7,
+        ospi_cs_n  => ospi_cs_n,
+        ospi_ck_n  => ospi_ck_n,
+        ospi_ck_p  => ospi_ck_p,
+        ospi_reset_n  => ospi_reset_n,
+        ospi_dq_in  => ospi_dq_in,
+        ospi_dq_out  => ospi_dq_out,
+        ospi_dq_enable  => ospi_dq_enable,
+        ospi_rwds_in => ospi_rwds_in,
+        ospi_rwds_out => ospi_rwds_out,
+        ospi_rwds_enable => ospi_rwds_enable,
 
         pwr_ok   => '1',
         vdd_bmem => '0',

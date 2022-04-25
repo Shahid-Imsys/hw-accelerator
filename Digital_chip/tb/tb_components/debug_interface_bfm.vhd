@@ -308,6 +308,8 @@ begin  -- behav
 
   begin
 
+    msdin <= '0';
+    
       wait until mrstout = '1';
       ---------------------------------------------------------------------------
       -- START TEST MICROPROGRAM

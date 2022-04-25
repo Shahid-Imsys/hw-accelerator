@@ -314,7 +314,6 @@ begin  -- architecture rtl
   --     bist_fail_fine_o       => open  --1:BIST fail for finetune (monotony error or BIST was not correct started); 0:BIST pass
   --     );
 
-
   i_digital_top : entity work.digital_top 
     generic map
       (
@@ -323,8 +322,8 @@ begin  -- architecture rtl
       port map (
         HCLK    => pll_ref_clk,
         --HCLK    => dco_clk(0),
-        MRESET  => '1',
-        MRSTOUT => open, --MRSTOUT,
+        MRESET  => mreset_n,
+        MRSTOUT => mrstout_n,  -- Missing pad.
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
         MCKOUT1 => MCKOUT1,
@@ -389,7 +388,7 @@ begin  -- architecture rtl
 
         MBYPASS    => '0', --MBYPASS,
         MWAKEUP_LP => '0', --MWAKE,
-        MLP_PWR_OK => '0',  --MLP_PWR_OK,
+        MLP_PWR_OK => mreset_n,  --MLP_PWR_OK,
 
         ospi_cs_n  => ospi_cs_n,
         ospi_ck_n  => ospi_ck_n,
@@ -503,6 +502,10 @@ begin  -- architecture rtl
         di  => mirq1
         );
 
+
+  pj_i(0) <= pj_o(0);
+  pj_i(7 downto 2) <= pj_o(7 downto 2);
+  
     i_utx_pad : entity work.output_pad
       generic map (
         direction =>  horizontal)
@@ -533,6 +536,8 @@ begin  -- architecture rtl
         di  => pj_i(1)
         );
 
+  pa_i(4 downto 1) <= "0101";
+  
     i_pa0_sin_pad : entity work.inoutput_pad
       generic map (
         direction => vertical)

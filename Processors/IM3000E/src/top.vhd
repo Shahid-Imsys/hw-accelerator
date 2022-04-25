@@ -483,14 +483,12 @@ architecture struct of top is
   signal mbypass_i : std_logic;
   signal mreset_i  : std_logic;
   signal mtest_i   : std_logic;
-  signal mwake_i   : std_logic;
   signal mirq0_i   : std_logic;
   signal mirq1_i   : std_logic;
 --  signal mpordis_i    : std_logic;                                                
 
 -- PLL
-  -- PLL                                           
-  signal pllout  : std_logic;
+  -- PLL 
   signal tcko    : std_logic;
   signal const_0 : std_logic;
 
@@ -522,7 +520,6 @@ architecture struct of top is
 
   signal halt_en         : std_logic;   --high active, will go to halt state
   signal nap_en          : std_logic;   --high active, will go to nap state
-  signal wakeup_lp       : std_logic;   -- From wakeup_lp input IO
   signal poweron_finish  : std_logic;   -- 
   signal reset_iso       : std_logic;   -- to isolate the core reset
   signal reset_iso_clear : std_logic;   --clear reset isolate
@@ -966,7 +963,6 @@ begin
   -- PLL
   -----------------------------------------------------------------------------
 
-  --pllout <= hclk_i;
   tcko    <= '0';
   pll_pdn <= en_pll or (not xout_selected);  --pll can only be reset when pll is not selected (xout is selected)
   const_0 <= '0';

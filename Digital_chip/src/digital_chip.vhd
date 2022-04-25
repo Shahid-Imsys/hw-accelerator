@@ -234,6 +234,14 @@ architecture rtl of digital_chip is
 
   signal vbias : std_logic;
 
+  signal pa_o : std_logic_vector(7 downto 0);
+  signal pa_i : std_logic_vector(7 downto 0);
+  signal pa_en : std_logic_vector(7 downto 0);
+
+  signal pg_o : std_logic_vector(7 downto 0);
+  signal pg_i : std_logic_vector(7 downto 0);
+  signal pg_en : std_logic_vector(7 downto 0);
+
   signal pj_o : std_logic_vector(7 downto 0);
   signal pj_i : std_logic_vector(7 downto 0);
   signal pj_en : std_logic_vector(7 downto 0);
@@ -595,6 +603,167 @@ begin  -- architecture rtl
         di  => pa_i(7)
         );
 
+    --i_pg0_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg0,
+    --    -- GPIO
+    --    do  => pa_g(0),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(0), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(0)
+    --    );
+
+    --i_pg1_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg1,
+    --    -- GPIO
+    --    do  => pa_g(1),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(1), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(1)
+    --    );
+
+    --i_pg2_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg2,
+    --    -- GPIO
+    --    do  => pa_g(2),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(2), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(2)
+    --    );
+
+    --i_pg3_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg3,
+    --    -- GPIO
+    --    do  => pa_g(3),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(3), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(3)
+    --    );
+
+    --i_pg4_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg4,
+    --    -- GPIO
+    --    do  => pa_g(4),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(4), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(4)
+    --    );
+
+    --i_pg5_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg5,
+    --    -- GPIO
+    --    do  => pa_g(5),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(5), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(5)
+    --    );
+
+    --i_pg6_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg6,
+    --    -- GPIO
+    --    do  => pa_g(6),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(6), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(6)
+    --    );
+
+    --i_pg7_pad : entity work.inoutput_pad
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => pg7,
+    --    -- GPIO
+    --    do  => pa_g(7),
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => pg_en(7), 
+    --    odp => '0',
+    --    odn => '0',
+    --    ste => "00",
+    --    pd  => '0',
+    --    pu  => '0',
+    --    di  => pa_i(7)
+    --    );
+
+    
     -- i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
     --   port map (
     --     PAD_B => emem_d4,

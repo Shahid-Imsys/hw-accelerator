@@ -68,124 +68,99 @@ architecture tb of main_tb is
   signal OSPI_Out  : OSPI_InterfaceOut_t;
   signal OSPI_DQ   : std_logic_vector(7 downto 0);
   signal OSPI_RWDS : std_logic;
+  signal OSPI_rst_n : std_logic;
+
+  signal enet_mdio : std_logic := 'Z';
 
 begin  -- architecture tb
 
 
-  top0 : entity work.top
-    generic map (
-      g_memory_type     => fpga,
-      g_clock_frequency => 31
-      )
+  dut : entity work.digital_chip
     port map (
-      HCLK    => MX1_CK,
-      MRESET  => MRESET,
-      MRSTOUT => MRSTOUT,
-      MIRQOUT => MIRQOUT,
-      MCKOUT0 => MCKOUT0,
-      MCKOUT1 => MCKOUT1,
-      MTEST   => MTEST,
-      MIRQ0   => MIRQ0,
-      MIRQ1   => MIRQ1,
+      pll_ref_clk    => MX1_CK,
+      mreset_n  => MRESET,
+      preset_n  => '1',
+      mrstout_n => MRSTOUT,
+      --MCKOUT1 => MCKOUT1,
+      mtest   => MTEST,
+      mirq0_n   => MIRQ0,
+      mirq1_n   => MIRQ1,
       -- SW debug
-      MSDIN   => MSDIN,
-      MSDOUT  => MSDOUT,
-
-      D_CLK => open,
-      D_CS  => open,
-      D_RAS => open,
-      D_CAS => open,
-      D_WE  => open,
-      D_DQM => open,
-      D_DQ  => D_DQ,
-      D_A   => open,
-      D_BA  => open,
-      D_CKE => open,
+      msdin   => MSDIN,
+      msdout  => MSDOUT,
+      mirqout => MIRQOUT,
+      mclkout => MCKOUT0,
 
       -- Port A
-      pa_i  => port_to_im4000(A),
-      pa_en => port_oe(A),
-      pa_o  => port_from_im4000(A),
-      -- Port B
-      pb_i  => port_to_im4000(B),
-      pb_en => port_oe(B),
-      pb_o  => port_from_im4000(B),
-      -- Port C
-      pc_i  => port_to_im4000(C),
-      pc_en => port_oe(C),
-      pc_o  => port_from_im4000(C),
-      -- Port D
-      pd_i  => port_to_im4000(D),
-      pd_en => port_oe(D),
-      pd_o  => port_from_im4000(D),
-      -- Port Eopen,
-      pe_i  => port_to_im4000(E),
-      pe_en => port_oe(E),
-      pe_o  => port_from_im4000(E),
-      -- Port F
-      pf_i  => port_to_im4000(F),
-      pf_en => port_oe(F),
-      pf_o  => port_from_im4000(F),
-      -- Port G
-      pg_i  => port_to_im4000(G),
-      pg_en => port_oe(G),
-      pg_o  => port_from_im4000(G),
-      -- Port H
-      ph_i  => port_to_im4000(H),
-      ph_en => port_oe(H),
-      ph_o  => port_from_im4000(H),
-      -- Port I
-      pi_i  => port_to_im4000(I),
-      pi_en => port_oe(I),
-      pi_o  => port_from_im4000(I),
-      -- Port J
-      pj_i  => port_to_im4000(J),
-      pj_en => port_oe(J),
-      pj_o  => port_from_im4000(J),
-      -- I/O cell configuration control outputs
-      -- d_hi  => open,
-      -- d_sr  => open,
-      d_lo  => open,
-      p1_hi => open,
-      p1_sr => open,
-      p2_hi => open,
-      p2_sr => open,
-      p3_hi => open,
-      p3_sr => open,
+      pa0_sin => pad(A)(0),
+      pa5_sin => pad(A)(5),
+      pa6_sin => pad(A)(6),
+      pa7_sin => pad(A)(7),
+      
+      -- Port G   
+      pg0 => pad(G)(0),    
+      pg1 => pad(G)(1),  
+      pg2 => pad(G)(2),  
+      pg3 => pad(G)(3),  
+      pg4 => pad(G)(4),  
+      pg5 => pad(G)(5),  
+      pg6 => pad(G)(6),
+      pg7 => pad(G)(7),
+   
+      -- Ethernet Interface
+      enet_mdio => enet_mdio,
+    enet_mdc  => open,
+    enet_clk  => '0',
+    enet_txen => open,
+    enet_txer => open,
+    enet_txd0 => open,
+    enet_txd1 => open,
+    enet_rxvd => '0',
+    enet_rxer => '0',
+    enet_rxdo => '0',
+    enet_rxd1 => '0',
+   
+      
+      -- UART
+      utx => pad(J)(0),
+      urx => pad(J)(1),
+      
+      --MBYPASS    => MBYPASS,
+      mwake => MWAKE,
+      --MLP_PWR_OK => MLP_PWR_OK,
 
+    -- Octal_spi
+      emem_cs_n  => OSPI_Out.CS_n,
+      emem_clk  => OSPI_Out.CK_p,
+      emem_rst_n  => OSPI_rst_n,
+      emem_rwds => OSPI_RWDS,
+      emem_d0  => OSPI_DQ(0),
+      emem_d1  => OSPI_DQ(1),
+      emem_d2  => OSPI_DQ(2),
+      emem_d3  => OSPI_DQ(3),
+      emem_d4  => OSPI_DQ(4),
+      emem_d5  => OSPI_DQ(5),
+      emem_d6  => OSPI_DQ(6),
+      emem_d7  => OSPI_DQ(7),
 
-      MBYPASS    => MBYPASS,
-      MWAKEUP_LP => MWAKE,
-      MLP_PWR_OK => MLP_PWR_OK,
+    -- SPI, chip control interface
+      spi_sclk => '0',
+      spi_cs_n => '0',
+      spi_miso => open,
+      spi_mosi => '0',
 
-      OSPI_Out  => OSPI_Out,
-      OSPI_DQ   => OSPI_DQ,
-      OSPI_RWDS => OSPI_RWDS,
+    -- DAC and ADC pins
+    aout0 => open,
+    aout1 => open,
+    ach0  => '0',
+    ach1  => '0'
 
-      pwr_ok   => '1',
-      vdd_bmem => '0',
-      VCC18LP  => '1',
-      rxout    => XTAL1,
-      adc_bits => '0'
       );
 
   pad(A)(7 downto 5) <= "000";          -- This is read by ROM bootloader
   pad(A)(4 downto 3) <= "01";           -- Set SP communication at /2 speed
   pad(A)(2 downto 1) <= "01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= '1';            -- Set PLL divider to 1
-
-  g_ports_pad : for p in port_name_t generate
-    g_pad : for i in 7 downto 0 generate
-      i_pi : entity work.ZMA2GSD
-        port map (
-          o  => port_to_im4000(p)(i),
-          i  => port_from_im4000(p)(i),
-          IO => pad(p)(i),
-          E  => port_oe(p)(i));
-    end generate g_pad;
-  end generate g_ports_pad;
-
-
 
   -- Reset the circuit for 10 ns;
   MRESET <= '0', '1' after 10 ns;
@@ -238,7 +213,7 @@ begin  -- architecture tb
       cs      => OSPI_Out.CS_n,
       rwds    => OSPI_RWDS,
       dq      => OSPI_DQ,
-      reset_n => MRESET
+      reset_n => OSPI_rst_n
       );
 
 end architecture tb;

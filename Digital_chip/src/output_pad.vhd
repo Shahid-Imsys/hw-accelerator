@@ -60,7 +60,7 @@ begin  -- architecture str
         );
     end generate vertical_g;
     
-  i_bond_pad : RIIO_BOND64_OUTER_SIG
-    port map (PAD => pad);
+  -- i_bond_pad : RIIO_BOND64_OUTER_SIG
+  --   port map (PAD => pad);
 
 end architecture str;

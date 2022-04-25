@@ -21,6 +21,8 @@ end entity input_pad;
 
 architecture str of input_pad is
 
+  signal di_vect : std_logic_vector(1 downto 0);
+  
 begin  -- architecture str
 
   verical : if direction = vertical generate
@@ -33,9 +35,7 @@ begin  -- architecture str
         STE_I => ste,
         PD_I  => pd,
         PU_I  => pu,
-        DI_O  => di,
-
-        VBIAS => open
+        DI_O  => di_vect
         );
 
   elsif direction = horizontal generate
@@ -48,14 +48,14 @@ begin  -- architecture str
         STE_I => ste,
         PD_I  => pd,
         PU_I  => pu,
-        DI_O  => di,
-
-        VBIAS => open
+        DI_O  => di_vect
         );
 
   end generate verical;
 
-  i_bond_pad : RIIO_BOND64_OUTER_SIG
-    port map (PAD => pad);
+  di <= di_vect(0);
+  
+  -- i_bond_pad : RIIO_BOND64_OUTER_SIG
+  --   port map (PAD => pad);
 
 end architecture str;

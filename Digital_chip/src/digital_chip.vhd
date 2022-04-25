@@ -67,9 +67,9 @@ entity digital_chip is
     emem_d7    : inout std_logic;
 
     -- SPI, chip control interface
-    spi_sclk : out std_logic;
-    spi_cs_n : out std_logic;
-    spi_mosi : out std_logic;
+    spi_sclk : in std_logic;
+    spi_cs_n : in std_logic;
+    spi_mosi : in std_logic;
     spi_miso : out std_logic;
 
     -- IM400 DEBUG interface
@@ -248,52 +248,52 @@ architecture rtl of digital_chip is
 
 begin  -- architecture rtl
 
-  i_pll : ri_adpll_gf22fdx_2gmp_behavioral
-    port map (
-      ref_clk_i              => pll_ref_clk,
-      scan_clk_i             => '0',
-      reset_q_i              => preset_n,  --asynchronous reset
-      en_adpll_ctrl_i        => '1',  --enable controller
-      clk_core_o             => open,  --low speed core clock output
-      pll_locked_o           => pll_locked,  --lock signal
-      c_ci_i                 => "00100",  -- integral filter coefficient (alpha)
-      c_cp_i                 => x"30",  -- proportional filter coefficient (beta)
-      c_main_div_n1_i        => '1',  -- main loop divider N1 = 1
-      c_main_div_n2_i        => "11",  -- main loop divider N2 = 5
-      c_main_div_n3_i        => "00",  -- main loop divider N3 = 2
-      c_main_div_n4_i        => "01",  -- main loop divider N4 = 2
-      c_out_div_sel_i        => "00",  -- output divider select signal
-      c_open_loop_i          => '0',  -- PLL starts without loop regulation
-      c_ft_i                 => x"80",  -- fine tune signal for open loop
-      c_divcore_sel_i        => "00",  -- divcore in Custom macro = 1
-      c_coarse_i             => "001000",  -- Coarse Tune Value for open loop and Fast Fine Tune
-      c_bist_mode_i          => '0',  -- BIST mode 1:BIST; 0: normal PLL usage
-      c_auto_coarsetune_i    => '1',  -- automatic Coarse tune search
-      c_enforce_lock_i       => '0',  -- overwrites lock bit
-      c_pfd_select_i         => '0',  -- enables synchronizer for PFD
-      c_lock_window_sel_i    => '0',  -- lock detection window: 1:short, 0:long
-      c_div_core_mux_sel_i   => '0',  -- selects divider chain: 0: COREDIV, 1: OUTDIV + COREDIV
-      c_filter_shift_i       => "10",  -- shift for CP/CI for fast lockin
-      c_en_fast_lock_i       => '1',  -- enables fast fine tune lockin
-      c_sar_limit_i          => "000",  -- limit for binary search in fast fine tune
-      c_set_op_lock_i        => '0',  -- force lock bit to 1 in OP mode
-      c_disable_lock_i       => '0',  -- force lock bit to 0
-      c_ref_bypass_i         => '0',  --bypass reference clock to core clock output
-      c_ct_compensation_i    => '0',  --in case of finetune underflow/overflow coarsetune will be increased/decreased
-      adpll_status_o         => open,  --ADPLL status
-      adpll_status_ack_o     => open,
-      adpll_status_capture_i => '0',  --capture Bit for APDLL status, rising edge of adpll_status_capture_i captures status
-      scan_in_i              => "000",
-      scan_out_o             => open,
-      scan_enable_i          => '0',
-      testmode_i             => mtest,
-      dco_clk_o              => dco_clk,
-      clk_tx_o               => open,
-      pfd_o                  => open,
-      bist_busy_o            => open,  --1:BIST is still running; 0:BIST finished
-      bist_fail_coarse_o     => open,  --1:BIST fail for coarsetune (monotony error or BIST was not correct started); 0:BIST pass
-      bist_fail_fine_o       => open  --1:BIST fail for finetune (monotony error or BIST was not correct started); 0:BIST pass
-      );
+  -- i_pll : ri_adpll_gf22fdx_2gmp_behavioral
+  --   port map (
+  --     ref_clk_i              => pll_ref_clk,
+  --     scan_clk_i             => '0',
+  --     reset_q_i              => preset_n,  --asynchronous reset
+  --     en_adpll_ctrl_i        => '1',  --enable controller
+  --     clk_core_o             => open,  --low speed core clock output
+  --     pll_locked_o           => pll_locked,  --lock signal
+  --     c_ci_i                 => "00100",  -- integral filter coefficient (alpha)
+  --     c_cp_i                 => x"30",  -- proportional filter coefficient (beta)
+  --     c_main_div_n1_i        => '1',  -- main loop divider N1 = 1
+  --     c_main_div_n2_i        => "11",  -- main loop divider N2 = 5
+  --     c_main_div_n3_i        => "00",  -- main loop divider N3 = 2
+  --     c_main_div_n4_i        => "01",  -- main loop divider N4 = 2
+  --     c_out_div_sel_i        => "00",  -- output divider select signal
+  --     c_open_loop_i          => '0',  -- PLL starts without loop regulation
+  --     c_ft_i                 => x"80",  -- fine tune signal for open loop
+  --     c_divcore_sel_i        => "00",  -- divcore in Custom macro = 1
+  --     c_coarse_i             => "001000",  -- Coarse Tune Value for open loop and Fast Fine Tune
+  --     c_bist_mode_i          => '0',  -- BIST mode 1:BIST; 0: normal PLL usage
+  --     c_auto_coarsetune_i    => '1',  -- automatic Coarse tune search
+  --     c_enforce_lock_i       => '0',  -- overwrites lock bit
+  --     c_pfd_select_i         => '0',  -- enables synchronizer for PFD
+  --     c_lock_window_sel_i    => '0',  -- lock detection window: 1:short, 0:long
+  --     c_div_core_mux_sel_i   => '0',  -- selects divider chain: 0: COREDIV, 1: OUTDIV + COREDIV
+  --     c_filter_shift_i       => "10",  -- shift for CP/CI for fast lockin
+  --     c_en_fast_lock_i       => '1',  -- enables fast fine tune lockin
+  --     c_sar_limit_i          => "000",  -- limit for binary search in fast fine tune
+  --     c_set_op_lock_i        => '0',  -- force lock bit to 1 in OP mode
+  --     c_disable_lock_i       => '0',  -- force lock bit to 0
+  --     c_ref_bypass_i         => '0',  --bypass reference clock to core clock output
+  --     c_ct_compensation_i    => '0',  --in case of finetune underflow/overflow coarsetune will be increased/decreased
+  --     adpll_status_o         => open,  --ADPLL status
+  --     adpll_status_ack_o     => open,
+  --     adpll_status_capture_i => '0',  --capture Bit for APDLL status, rising edge of adpll_status_capture_i captures status
+  --     scan_in_i              => "000",
+  --     scan_out_o             => open,
+  --     scan_enable_i          => '0',
+  --     testmode_i             => mtest,
+  --     dco_clk_o              => dco_clk,
+  --     clk_tx_o               => open,
+  --     pfd_o                  => open,
+  --     bist_busy_o            => open,  --1:BIST is still running; 0:BIST finished
+  --     bist_fail_coarse_o     => open,  --1:BIST fail for coarsetune (monotony error or BIST was not correct started); 0:BIST pass
+  --     bist_fail_fine_o       => open  --1:BIST fail for finetune (monotony error or BIST was not correct started); 0:BIST pass
+  --     );
 
 
   i_digital_top : entity work.digital_top 
@@ -302,7 +302,8 @@ begin  -- architecture rtl
         g_clock_frequency => 31  -- system clock frequency in MHz
         )
       port map (
-        HCLK    => dco_clk(0),
+        HCLK    => pll_ref_clk,
+        --HCLK    => dco_clk(0),
         MRESET  => '1',
         MRSTOUT => open, --MRSTOUT,
         MIRQOUT => mirqout_out,

@@ -55,9 +55,7 @@ package pad_instance_package is
       STE_I : in    std_logic_vector(1 downto 0);
       PD_I  : in    std_logic;
       PU_I  : in    std_logic;
-      DI_O  : out   std_logic;
-
-      VBIAS : inout std_logic
+      DI_O  : out   std_logic_vector(1 downto 0)
       );
   end component;
 
@@ -70,11 +68,10 @@ package pad_instance_package is
       STE_I : in    std_logic_vector(1 downto 0);
       PD_I  : in    std_logic;
       PU_I  : in    std_logic;
-      DI_O  : out   std_logic;
-
-      VBIAS : inout std_logic
+      DI_O  : out   std_logic_vector(1 downto 0)
       );
   end component;
+  
   component RIIO_EG1D80V_GPIO_LVT28_V
     port (
       -- PAD
@@ -91,7 +88,7 @@ package pad_instance_package is
       STE_I : in    std_logic_vector(1 downto 0);
       PD_I  : in    std_logic;
       PU_I  : in    std_logic;
-      DI_O  : out   std_logic;
+      DI_O  : out   std_logic_vector(1 downto 0);
 
       VBIAS : inout std_logic
       );

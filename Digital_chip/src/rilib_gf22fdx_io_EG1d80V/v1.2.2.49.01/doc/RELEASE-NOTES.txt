@@ -1,0 +1,311 @@
+<!-- -*- mode: markdown; -*- -->
+# Release Notes - v0.0.1 #
+
+- Project Owner:
+-
+
+## How to Integrate
+
+## Open Issues ##
+
+
+# Changelog #
+
+All notable changes to 'rilib_gf22fdx_io_EG1d80V' will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/).
+Please see [Keep a Changelog](http://keepachangelog.com/) for how to write a changelog
+Please keep version numbering scheme, e.g. `## v1.2.3` exactly at
+beginning of line, it is parsed.
+
+
+## v1.2.2 20211108_Mon_221037 (released by schreiter) ##
+### Changes ###
+-- DRC fixes for ESD
+-- DRC fixes for JV/JW density in 10M_2Mx_5Cx_1Jx_2Qx_LB
+-- CORECELLS.lef:  LB connector blockages corrected
+-- LVS + LEF fixes for VDDX/VSSX in 10M_2Mx_5Cx_1Jx_2Qx_LB
+
+## v1.2.1 20211101_Mon_112238 (released by schreiter) ##
+-- changed: fixes in HSIO GDS, correcting cell set
+
+
+## v1.2.0 20211019_Tue_082159 (released by schreiter) ##
+-- changed: layout bug fixes
+-- added: CORNER_45, FILL16B2B
+
+
+## v1.1.0 20210706_Tue_021717 (released by schreiter) ##
+-- changed: 22FDX -> 22FDX-EXT, Auto G1 rules
+-- changed: ESD structures for 22FDX-EXT
+-- changed: core logic sections for 22FDX-EXT
+-- added: CORECELLS sub lib 
+
+
+## v1.0.18 20210623_Wed_091045 (released by schreiter)##
+-- specific release for IFX
+-- added: APL views
+-- removed: HSIO
+
+## v1.0.17 20210510_Mon_234236 (released by schreiter)##
+-- added: NDM views
+-- added: ATPG view for GPIO
+-- added: Application note as documentation
+-- changed: zbb_0d55V and zbb_0d80V core voltage corners with -10/0/25/55 degC
+
+## v1.0.16.1 20210503_Mon_004131 (released by schreiter)##
+-- added: zbb_0d55V nominal core voltage corners in liberty
+
+## v1.0.16 20210424_Sat_074611 (released by schreiter)##
+-- changed: bug fix of a bug fix
+
+## v1.0.15 20210408_Thu_221751 (released by schreiter) ##
+-- changed: ESD B2B diodes GDS patch for LVS
+
+
+## v1.0.14 20200914_Mon_103535 (released by schreiter) ##
+-- changed: source/behavioral/verilog/RIIO_EG1D80V_HPLVDS_*.v -- bug fic for TC polarity
+
+## v1.0.13 20200826_Wed_062707 (released by schreiter) ##
+-- changed: ESD block clamps and block B2B diodes layout fixes
+-- changed: no more mirroring of ESD block clamps, symmetry changed to R0
+
+
+## v1.0.12 20200824_Mon_120748 (released by schreiter) ##
+-- changed: GPIO timing reverted to pre-G1 state as was in v1.0.11
+-- changed: Bug fixes in Verilog behaviorals
+-- unchanged to v1.0.11.2: ESD_B2B 
+
+## v1.0.11.2 20200824_Mon_103814 (released by schreiter) ##
+-- changed: Bug fix "PIN SUB" in RIIO_GF22FDX_ESD_B2B_EG1D80V_9M_2Mx_3Cx_2Bx_1Ix_1Ox_LB.lef
+
+## v1.0.11.1 20200820_Thu_234228 (released by schreiter) ##
+-- added: standalone ESD_B2B diodes
+
+## v1.0.11.2 20200824_Mon_103814 (released by schreiter) ##
+-- changed: max_capacitance corected for PAD / PAD_B pins in BASEIO libs
+-- changed: .lef OBS corrected for core clamps 
+
+## v1.0.10 20200219_Wed_123956 (released by schreiter) ##
+-- changed: Fixes in BUMP_SNAG layouts
+-- changed: voltage labels in clamp cells
+-- changed: well spacing / LUP in HSLVDS cells
+
+## v1.0.9 20200211_Tue_093222 (released by schreiter) ##
+-- changed: Bug fixes in GPIO_RVT28 .cdl and .gds.gz
+-- added: RIIO_CONN_LB05_GND/PWR verilog + cdl
+
+
+## v1.0.8 20200210_Mon_231717 (released by schreiter) ##
+-- changed: bug fix in RIIO_GF22FDX_HSIO_EG1D80V_zbb_tc_0d80V_1d80V_85C .lib/.db
+-- changed: RIIO_RVT0D80V_CLAMP_010x230 resized (200nm narrower)
+-- changed: pins removed from RIIO_BUMP_SNAG*_DY, cells removed from .lib/.db
+-- added: RIIO_CONN_LB05_GND and RIIO_CONN_LB05_PWR connectors
+ 
+
+## v1.0.7 20200128_Tue_211502 (released by schreiter) ##
+-- changed: bug fix in opcon voltage in .lib and .db files
+
+## v1.0.6 20191218_Wed_120113 (released by schreiter) ##
+-- changed: core-side pins for VDD, VSS 
+-- added: RAILSHORT cells
+
+## v1.0.5 20191207_Sat_080205 (released by schreiter) ##
+-- changed: corrected bounding boxes
+-- changed: fixed .lef bugs
+-- changed: fixed .lib bugs
+-- changed: GPIO and GPO .lib default timing fpr DO_I->PAD_B set to recommended config
+
+## v1.0.4 20191129_Fri_072254 (released by schreiter) ##
+-- added: BUMP pads with DUMMYLB
+-- changed: Corrected SNAG140 bump pads
+-- added: HVT0d80V_CLAMP_010x230 RVT0d80V_CLAMP_059x057 HVT0d80V_CLAMP_059x057
+
+
+## v1.0.3 20191111_Mon_102015 (released by schreiter) ##
+-- added: BUMP pasds
+-- added: separate HPLVDS_TX and HPLVDS_RX
+-- added: RVT0d80V_CLAMP_010x230
+
+## v1.0.2 20191005_Sat_103712 (released by schreiter) ##
+-- changed: lightweight release - no cdslibs
+-- changed: removed invalid .gds and .lef files
+
+## v1.0.1 20191005_Sat_102031 (released by schreiter) ##
+-- changed: lightweight release - no cdslibs
+
+## v1.0.0 20191004_Fri_221125 (released by schreiter) ##
+-- changed: New sub-library structure BASEIO/GPIO/HSIO
+
+
+## v0.5.5 20190220_Wed_135044 (released by schreiter) ##
+-- changed: LVS corrections in rilib_gf22fdx_io_EG1d80V_10M_2Mx_6Cx_2Ix_LB/RIIO_EXTRA_WELLFILTER
+
+## v0.5.4 20190218_Mon_122403 (released by schreiter) ##
+-- changed: non-functional M6 Fix 
+
+## v0.5.3 20190214_Thu_095143 (released by schreiter) ##
+-- changed: non-functional M6 Fix 
+
+
+## v0.5.2 20190211_Mon_210354 (released by schreiter) ##
+-- changed: Metal Fix 
+
+## v0.5.1 20190206_Wed_133805 (released by schreiter) ##
+-- added:  POR cells
+-- changed: .lib/.db from schmatics in zbb 0.6V and 0.8V corners with 0C/25C/85C
+-- problem: .cdl not adapted because of netlisting issues.  .scs netlist is valid 
+
+
+## v0.5.0 20190123_Wed_082221 (released by schreiter) ##
+-- added: VT variants in the core logic parts of digital IOs
+-- changes: Bug fixes in .lib, .lef, .v
+-- problems in 9M and 8M metal stacks
+-- - RIIO_EXTRA_WELLFILTER is missing
+-- - CUTCOREB2B_V has extra pins
+-- - to be corrected in future revisions
+
+## v0.4.1 20190104_Fri_171158 (released by schreiter) ##
+-- changes: Bug fixes in abstract and release generation
+
+## v0.4.0 20190102_Wed_154557 (released by schreiter) ##
+-- changes: HPLVDS_[VH]: CONFIG[31:0] bus changed to individual pins and busses
+-- ToDo: HPLVDS, GPI and GPO-type cells still without timing 
+
+## v0.3.1 20181004_Thu_165643 (released by schreiter) ##
+-- changes: Layout bug fix in VDDX_H
+
+## v0.3.0 20180912_Wed_192529 (released by schreiter) ##
+-- changes:
+-- VBIAS is signal pin in .lib,.lef
+-- correct pin count [4:0] of TRIM_{CURV|VBG}_I in *_BIAS_[HV] cells
+-- RIIO_BOND* cells with .v and in .lib/.db
+
+
+## v0.2.5 20180912_Wed_170102 (released by schreiter) ##
+-- included RIIO_BOND* cells in .lib files
+
+## v0.2.4 20180912_Wed_131701 (released by schreiter) ##
+-- Bug fix in *BIAS_H cells, pin count of TRIM_{CURV|VBG}_I changed to [4:0] in .lef and .gds for 8M metal stacks
+
+## v0.2.3 20180911_Tue_213405 (released by schreiter) ##
+-- changed: VBIAS as pg_pin in .lef and .lib 
+-- changed: VBIAS pg pin in a reduced cell set in .cdl, .lib, .lef
+
+## v0.2.2 20180911_Tue_131701 (released by schreiter) ##
+-- changed cdl netlist
+-- changed gds files, DRC fixes
+-- added metal stacks to new scheme: 10M_2Mx_6Cx_2Ix_LB 9M_2Mx_5Cx_1Jx_1Ox_LB
+
+
+## v0.2.1 20180907_Fri_134256 (released by schreiter) ##
+-- added metal stack 9M_2Mx_3Cx_2Bx_1Ix_1Ox_LB
+
+## v0.2.0 20180907_Fri_102944 (released by schreiter) ##
+-- preliminary release, try out the following new features:
+-- new scheme to handle metal stacks: All Metal Stacks in one unit.
+-- added 8M metal stacks to be used in amchar0.0.6 aka TVV
+
+
+## v0.0.18 20180119_Fri_124735 (released by dietrich) ##
+- cdslib: new view schematic_nofillcap
+- corresponding to rilib_gf22fdx_io_EG1d80V_10M_2Mx_6Cx_2Ix_LB v0.0.2 20171205_Tue_112321:
+	- add antenna information (LEF)
+	- update specify block GPIO_H/V.v
+	
+
+
+## v0.0.17 20171121_Tue_090103 (released by dietrich) ##
+- change pg_type: primary_power/ground to n/pwell for pg_pin VNW / VPW
+
+
+## v0.0.16 20171120_Mon_094644 (released by dietrich) ##
+- added verilog behavioural for HPLVDS_H/V
+- modified pin naming of HPLVDS_H/V
+- modified timing libs (new naming + corner groups, dummie timing for HPLVDS_H/V, characterization for GPIO_H/V)
+
+
+## v0.0.15 20171018_Wed_134405 (released by dietrich) ##
+- added missing verilog files
+
+
+## v0.0.14 20171013_Fri_152516 (released by dietrich) ##
+- added HPLVDS_H/V dummies
+- added supply cells: VDD/VSS04_H/V and VDDX/VSSX04_H/V
+
+
+## v0.0.13 20170921_Thu_154829 (released by scharfe) ##
+- generate new gds file for IOLib
+
+## v0.0.12 20170919_Tue_154829 (released by dietrich) ##
+- added BOND60x90_*_CESD_*
+- fixed NW/T3 M1 problems
+- Bond: change transitiontime 
+
+
+## v0.0.11 20170904_Mon_114146 (released by henker) ##
+- added bias cell, completed vddx,vddiox
+
+## v0.0.10 20170817_Thu_103104 (released by scharfe) ##
+- included .lib corner files
+
+## v0.0.9 20170818_Fri_120420 (released by henker) ##
+- added pwr-cut cells
+- added abstracts for bias cells
+- added BIASPAD_H cell for external biasing
+
+
+## v0.0.8 20170724_Mon_095300 (released by dietrich) ##
+
+### Changed ###
+- cdslib with updated schematics and layouts
+- pinout, lef, timing unchanged
+
+## Added ##
+- dummy libs
+- BOND60x90
+
+
+## v0.0.6 20170213_Mon_143550 (released by schreiter) ##
+### Changed ###
+- cdslib update with schematics and layouts.
+- pinout, lef, timing unchanged
+
+
+## v0.0.5 20170207_Tue_101833 (released by schreiter) ##
+
+### Changed ###
+- lots of new cells
+- pins / busses
+
+
+
+## v0.0.4 20170130_Mon_133455 (released by hocker) ##
+
+### Added ###
+- `cdslib/rilib_gf22fdx_io_EG1d80V_core`
+- `cdslib/rilib_gf22fdx_io_EG1d80V_std`
+
+
+## v0.0.3 20170130_Mon_130033 (released by hocker) ##
+
+### Changed ###
+-lef, lib, cdslib
+-behaviorals (pg pins)
+-fixed name: dfx -> fdx
+
+### Added ###
+- sitedef.lef
+
+
+## v0.0.2 20170130_Mon_112543 (released by hocker) ##
+
+### Changed ###
+-behaviorals (pg pins)
+
+
+## v0.0.1 20170115_Sun_185651 (released by schluessler) ##
+
+### Changed ###
+
+### Added ###
+- inital release of `rilib_gf22fdx_io_EG1d80V`

@@ -729,8 +729,8 @@ begin
 mmcm_inst : clk_wiz_0
    port map ( 
   -- Clock out ports  
-   clk_p => CLK_P,   --Fast clock 123.808 MHz
-   clk_e => clk_gen, --61.90 MHz
+   clk_p => CLK_P,   --Fast clock 129.998 MHz
+   clk_e => clk_gen, --64.999 MHz
 
   -- Status and control signals                
    reset => Reset,

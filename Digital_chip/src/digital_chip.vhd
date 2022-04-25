@@ -317,9 +317,9 @@ begin  -- architecture rtl
         MSDOUT  => msdout_out,
 
         -- Port A
-        pa_i  => x"00", --pa_i,
-        pa_en => open, --pa_en,
-        pa_o  => open, --pa_o,
+        pa_i  => pa_i, --pa_i,
+        pa_en => pa_en, --pa_en,
+        pa_o  => pa_o, --pa_o,
         -- Port B
         pb_i  => x"00", --pb_i,
         pb_en => open, --pb_en,
@@ -500,6 +500,7 @@ begin  -- architecture rtl
         odp => '0',
         odn => '0'
         );
+
     i_urx_pad : entity work.input_pad
       generic map (
         direction => horizontal)
@@ -514,7 +515,85 @@ begin  -- architecture rtl
         di  => pj_i(1)
         );
 
-    
+    i_pa0_sin_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pa0_sin,
+        -- GPIO
+        do  => pa_o(0),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pa_en(0), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pa_i(0)
+        );
+
+    i_pa5_cs_n_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pa5_sin,
+        -- GPIO
+        do  => pa_o(5),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pa_en(5), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pa_i(5)
+        );
+
+    i_pa6_sck_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pa6_sin,
+        -- GPIO
+        do  => pa_o(6),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pa_en(6), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pa_i(6)
+        );
+
+    i_pa7_sck_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pa7_sin,
+        -- GPIO
+        do  => pa_o(7),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pa_en(7), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pa_i(7)
+        );
 
     -- i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
     --   port map (

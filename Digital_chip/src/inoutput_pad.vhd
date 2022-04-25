@@ -17,7 +17,6 @@ entity inoutput_pad is
     oe  : in std_logic;
     odp : in std_logic;
     odn : in std_logic;
-    ie  : in  std_logic;
     ste : in  std_logic_vector(1 downto 0);
     pd  : in  std_logic;
     pu  : in  std_logic;
@@ -45,7 +44,7 @@ begin  -- architecture str
         OE_I  => oe,
         ODP_I => odp,
         ODN_I => odn,
-        IE_I  => ie,
+        IE_I  => '1',
         STE_I => ste,
         PD_I  => pd,
         PU_I  => pu,
@@ -68,7 +67,7 @@ begin  -- architecture str
         OE_I  => oe,
         ODP_I => odp,
         ODN_I => odn,
-        IE_I  => ie,
+        IE_I  => '1',
         STE_I => ste,
         PD_I  => pd,
         PU_I  => pu,

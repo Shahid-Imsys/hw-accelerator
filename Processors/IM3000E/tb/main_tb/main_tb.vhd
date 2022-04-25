@@ -64,6 +64,13 @@ architecture tb of main_tb is
 
   signal xtal1_int  : std_logic := '0';
   signal mx1_ck_int : std_logic := '0';
+  
+  signal OSPI_DQ_i   : std_logic_vector(7 downto 0);
+  signal OSPI_DQ_o   : std_logic_vector(7 downto 0);
+  signal OSPI_DQ_e   : std_logic;                   
+  signal OSPI_RWDS_i : std_logic;                   
+  signal OSPI_RWDS_o : std_logic;                   
+  signal OSPI_RWDS_e : std_logic; 
 
   signal OSPI_Out  : OSPI_InterfaceOut_t;
   signal OSPI_DQ   : std_logic_vector(7 downto 0);
@@ -158,9 +165,13 @@ begin  -- architecture tb
       MWAKEUP_LP => MWAKE,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      OSPI_Out  => OSPI_Out,
-      OSPI_DQ   => OSPI_DQ,
-      OSPI_RWDS => OSPI_RWDS,
+      OSPI_Out   => OSPI_Out,
+      OSPI_DQ_i  => OSPI_DQ_i,
+      OSPI_DQ_o  => OSPI_DQ_o,
+      OSPI_DQ_e  => OSPI_DQ_e,
+      OSPI_RWDS_i => OSPI_RWDS_i,
+      OSPI_RWDS_o => OSPI_RWDS_o,
+      OSPI_RWDS_e => OSPI_RWDS_e,
 
       pwr_ok   => '1',
       vdd_bmem => '0',
@@ -173,6 +184,12 @@ begin  -- architecture tb
   pad(A)(4 downto 3) <= "01";           -- Set SP communication at /2 speed
   pad(A)(2 downto 1) <= "01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= '1';            -- Set PLL divider to 1
+  
+  OSPI_RWDS   <= OSPI_RWDS_o when OSPI_RWDS_e = '1' else 'Z';
+  OSPI_RWDS_i <= OSPI_RWDS;
+
+  OSPI_DQ   <= OSPI_DQ_o when OSPI_DQ_e = '1' else (others => 'Z');
+  OSPI_DQ_i <= OSPI_DQ;
 
   g_ports_pad : for p in port_name_t generate
     g_pad : for i in 7 downto 0 generate

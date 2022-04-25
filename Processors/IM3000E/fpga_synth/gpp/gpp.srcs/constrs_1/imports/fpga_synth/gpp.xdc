@@ -133,3 +133,12 @@ set_property IOSTANDARD LVCMOS18 [get_ports ENET_TXCLK]
 set_property IOSTANDARD LVCMOS18 [get_ports MIRQ0]
 set_property IOSTANDARD LVCMOS18 [get_ports MRESET]
 set_property IOSTANDARD LVCMOS18 [get_ports MSDIN]
+
+create_clock -period 20.000 -name ENET_TXCLK -waveform {0.000 10.000} [get_ports ENET_TXCLK]
+
+set_clock_groups -name ENET_TXCLK -asynchronous -group [get_clocks ENET_TXCLK]
+
+create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports ENET_RXCLK]
+
+set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
+

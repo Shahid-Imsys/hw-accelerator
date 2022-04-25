@@ -648,7 +648,7 @@ begin
 	-- the stack counter without writing/reading the stack does not generate
 	-- error however, even if the stack is full/empty. The stack counter is
 	-- supposed to never wrap from empty to full.
-	process (clk_p, rst_en)
+	process (clk_p)
 	begin
 	    if rising_edge(clk_p) then
             if rst_en = '0' then

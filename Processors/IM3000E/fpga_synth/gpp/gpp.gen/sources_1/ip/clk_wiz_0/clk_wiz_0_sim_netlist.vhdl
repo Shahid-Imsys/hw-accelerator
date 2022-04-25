@@ -1,10 +1,10 @@
 -- Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
--- Date        : Thu Mar 31 13:14:50 2022
+-- Date        : Thu Apr 21 09:04:58 2022
 -- Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
--- Command     : write_vhdl -force -mode funcsim -rename_top clk_wiz_0 -prefix
---               clk_wiz_0_ clk_wiz_0_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               /home/markar/checkouts/ImSys/testMaster/Processors/IM3000E/fpga_synth/gpp/gpp.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.vhdl
 -- Design      : clk_wiz_0
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -14,23 +14,23 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity clk_wiz_0_clk_wiz_0_clk_wiz is
+entity clk_wiz_0_clk_wiz is
   port (
     clk_200M : out STD_LOGIC;
-    clk_300M : out STD_LOGIC;
-    clk_400M : out STD_LOGIC;
+    clk_100M : out STD_LOGIC;
+    clk_50M : out STD_LOGIC;
     clk_in1_p : in STD_LOGIC;
     clk_in1_n : in STD_LOGIC
   );
-end clk_wiz_0_clk_wiz_0_clk_wiz;
+end clk_wiz_0_clk_wiz;
 
-architecture STRUCTURE of clk_wiz_0_clk_wiz_0_clk_wiz is
+architecture STRUCTURE of clk_wiz_0_clk_wiz is
+  signal clk_100M_clk_wiz_0 : STD_LOGIC;
+  signal clk_100M_clk_wiz_0_en_clk : STD_LOGIC;
   signal clk_200M_clk_wiz_0 : STD_LOGIC;
   signal clk_200M_clk_wiz_0_en_clk : STD_LOGIC;
-  signal clk_300M_clk_wiz_0 : STD_LOGIC;
-  signal clk_300M_clk_wiz_0_en_clk : STD_LOGIC;
-  signal clk_400M_clk_wiz_0 : STD_LOGIC;
-  signal clk_400M_clk_wiz_0_en_clk : STD_LOGIC;
+  signal clk_50M_clk_wiz_0 : STD_LOGIC;
+  signal clk_50M_clk_wiz_0_en_clk : STD_LOGIC;
   signal clk_in1_clk_wiz_0 : STD_LOGIC;
   signal clkfbout_clk_wiz_0 : STD_LOGIC;
   signal locked_int : STD_LOGIC;
@@ -191,8 +191,8 @@ clkout2_buf: unisim.vcomponents.BUFGCE
     )
         port map (
       CE => seq_reg2(7),
-      I => clk_300M_clk_wiz_0,
-      O => clk_300M
+      I => clk_100M_clk_wiz_0,
+      O => clk_100M
     );
 clkout2_buf_en: unisim.vcomponents.BUFGCE
     generic map(
@@ -204,8 +204,8 @@ clkout2_buf_en: unisim.vcomponents.BUFGCE
     )
         port map (
       CE => '1',
-      I => clk_300M_clk_wiz_0,
-      O => clk_300M_clk_wiz_0_en_clk
+      I => clk_100M_clk_wiz_0,
+      O => clk_100M_clk_wiz_0_en_clk
     );
 clkout3_buf: unisim.vcomponents.BUFGCE
     generic map(
@@ -217,8 +217,8 @@ clkout3_buf: unisim.vcomponents.BUFGCE
     )
         port map (
       CE => seq_reg3(7),
-      I => clk_400M_clk_wiz_0,
-      O => clk_400M
+      I => clk_50M_clk_wiz_0,
+      O => clk_50M
     );
 clkout3_buf_en: unisim.vcomponents.BUFGCE
     generic map(
@@ -230,8 +230,8 @@ clkout3_buf_en: unisim.vcomponents.BUFGCE
     )
         port map (
       CE => '1',
-      I => clk_400M_clk_wiz_0,
-      O => clk_400M_clk_wiz_0_en_clk
+      I => clk_50M_clk_wiz_0,
+      O => clk_50M_clk_wiz_0_en_clk
     );
 mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
     generic map(
@@ -245,11 +245,11 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       CLKOUT0_DUTY_CYCLE => 0.500000,
       CLKOUT0_PHASE => 0.000000,
       CLKOUT0_USE_FINE_PS => "FALSE",
-      CLKOUT1_DIVIDE => 4,
+      CLKOUT1_DIVIDE => 12,
       CLKOUT1_DUTY_CYCLE => 0.500000,
       CLKOUT1_PHASE => 0.000000,
       CLKOUT1_USE_FINE_PS => "FALSE",
-      CLKOUT2_DIVIDE => 3,
+      CLKOUT2_DIVIDE => 24,
       CLKOUT2_DUTY_CYCLE => 0.500000,
       CLKOUT2_PHASE => 0.000000,
       CLKOUT2_USE_FINE_PS => "FALSE",
@@ -300,9 +300,9 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       CLKINSTOPPED => NLW_mmcme4_adv_inst_CLKINSTOPPED_UNCONNECTED,
       CLKOUT0 => clk_200M_clk_wiz_0,
       CLKOUT0B => NLW_mmcme4_adv_inst_CLKOUT0B_UNCONNECTED,
-      CLKOUT1 => clk_300M_clk_wiz_0,
+      CLKOUT1 => clk_100M_clk_wiz_0,
       CLKOUT1B => NLW_mmcme4_adv_inst_CLKOUT1B_UNCONNECTED,
-      CLKOUT2 => clk_400M_clk_wiz_0,
+      CLKOUT2 => clk_50M_clk_wiz_0,
       CLKOUT2B => NLW_mmcme4_adv_inst_CLKOUT2B_UNCONNECTED,
       CLKOUT3 => NLW_mmcme4_adv_inst_CLKOUT3_UNCONNECTED,
       CLKOUT3B => NLW_mmcme4_adv_inst_CLKOUT3B_UNCONNECTED,
@@ -417,7 +417,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => locked_int,
       Q => seq_reg2(0),
@@ -428,7 +428,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(0),
       Q => seq_reg2(1),
@@ -439,7 +439,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(1),
       Q => seq_reg2(2),
@@ -450,7 +450,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(2),
       Q => seq_reg2(3),
@@ -461,7 +461,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(3),
       Q => seq_reg2(4),
@@ -472,7 +472,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(4),
       Q => seq_reg2(5),
@@ -483,7 +483,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(5),
       Q => seq_reg2(6),
@@ -494,7 +494,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_300M_clk_wiz_0_en_clk,
+      C => clk_100M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg2(6),
       Q => seq_reg2(7),
@@ -505,7 +505,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => locked_int,
       Q => seq_reg3(0),
@@ -516,7 +516,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(0),
       Q => seq_reg3(1),
@@ -527,7 +527,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(1),
       Q => seq_reg3(2),
@@ -538,7 +538,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(2),
       Q => seq_reg3(3),
@@ -549,7 +549,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(3),
       Q => seq_reg3(4),
@@ -560,7 +560,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(4),
       Q => seq_reg3(5),
@@ -571,7 +571,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(5),
       Q => seq_reg3(6),
@@ -582,7 +582,7 @@ mmcme4_adv_inst: unisim.vcomponents.MMCME4_ADV
       INIT => '0'
     )
         port map (
-      C => clk_400M_clk_wiz_0_en_clk,
+      C => clk_50M_clk_wiz_0_en_clk,
       CE => '1',
       D => seq_reg3(6),
       Q => seq_reg3(7),
@@ -596,8 +596,8 @@ use UNISIM.VCOMPONENTS.ALL;
 entity clk_wiz_0 is
   port (
     clk_200M : out STD_LOGIC;
-    clk_300M : out STD_LOGIC;
-    clk_400M : out STD_LOGIC;
+    clk_100M : out STD_LOGIC;
+    clk_50M : out STD_LOGIC;
     clk_in1_p : in STD_LOGIC;
     clk_in1_n : in STD_LOGIC
   );
@@ -607,11 +607,11 @@ end clk_wiz_0;
 
 architecture STRUCTURE of clk_wiz_0 is
 begin
-inst: entity work.clk_wiz_0_clk_wiz_0_clk_wiz
+inst: entity work.clk_wiz_0_clk_wiz
      port map (
+      clk_100M => clk_100M,
       clk_200M => clk_200M,
-      clk_300M => clk_300M,
-      clk_400M => clk_400M,
+      clk_50M => clk_50M,
       clk_in1_n => clk_in1_n,
       clk_in1_p => clk_in1_p
     );

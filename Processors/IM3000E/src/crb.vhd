@@ -263,7 +263,7 @@ architecture rtl of crb is
   signal pl_sig15 : std_logic_vector(3 downto 0);
 begin
   pl_sig15 <= pl(6)&pl(54)&pl(27)&pl(49);
-  process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, pa_i)
+  process (clk_p, rst_cn)
   begin
     if rst_cn = '0' then
       -- CCFF register
@@ -463,7 +463,7 @@ begin
     end if;
   end process;
 ------------------------------maning add the following for power management-------------------------------
-process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, reqrun)
+process (clk_p, rst_cn, reqrun)
   begin
     if rst_cn = '0' or reqrun = '1' then
       clk_in_off_int <= '0';
@@ -482,7 +482,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, reqrun)
     end if;
   end process;
 
-process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
+process (clk_p, rst_cn, nap_rec)
   begin
     if rst_cn = '0' or nap_rec = '1'then  --both reset and nap_rec will clear the nap_en bit
       nap_en_int <= '0';
@@ -505,7 +505,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
   -- This process handles the 'dis_xosc' bit in the PLLC register,
   -- because its reset differs from most of the CRB register bits. 
-  process (clk_p, rst_cn, mwake_i, ld_crb, pl_sig15, dbus)
+  process (clk_p, rst_cn, mwake_i)
   begin
     if rst_cn = '0' or mwake_i = '1' then
       -- PLLC register, dis_xosc also reset by MWAKE pin
@@ -520,7 +520,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
   -- This process handles the 'stick(3)' bit in the SECC register,
   -- because its reset differs from most of the CRB register bits. 
-  process (clk_p, rst_seqc_n, ld_crb, pl_sig15, dbus)
+  process (clk_p)
   begin
 --  if clk_e = '0' then          -- Latch based implementation
     if rising_edge(clk_p) then   -- Register based implementation
@@ -539,7 +539,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
   -- This process handles the 'stick(1)' bit in the SECC register,
   -- because its reset differs from most of the CRB register bits. 
-  process (clk_p, mreset, pwr_ok, ld_crb, pl_sig15, dbus)
+  process (clk_p, mreset, pwr_ok)
   begin
     if mreset = '0' or pwr_ok = '0' then
       -- SECC register, stick(1) reset by mreset or pwr_ok
@@ -556,7 +556,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
   -- This process handles the 'stick(0)' bit in the SECC register,
   -- because its reset differs from most of the CRB register bits. 
-  process (clk_p, pwr_ok, ld_crb, pl_sig15, dbus)
+  process (clk_p, pwr_ok)
   begin
     if pwr_ok = '0' then
       -- SECC register, stick(0) reset by pwr_ok

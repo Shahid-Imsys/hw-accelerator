@@ -73,27 +73,27 @@ use work.gp_pkg.all;
 
 entity top is
   generic (
-    g_memory_type     : memory_type_t := asic;
-    g_clock_frequency : integer         -- Frequency in MHz
+    g_memory_type     : memory_type_t := fpga;
+    g_clock_frequency : integer       := 300 -- Frequency in MHz
     );
   port (
     -- clocks and control signals
     HCLK    : in  std_logic;            -- clk input   
-    MRESET  : in  std_logic;  -- system reset               low active
-    MRSTOUT : out std_logic;
+    MRESET  : in  std_logic;            -- system reset, active low
+    MRSTOUT : out std_logic;            -- Reset output
     MIRQOUT : out std_logic;            -- interrupt request output    
-    MCKOUT0 : out std_logic;            --for trace adapter
-    MCKOUT1 : out std_logic;            --programable clock out
+    MCKOUT0 : out std_logic;            -- for trace adapter
+    MCKOUT1 : out std_logic;            -- programable clock out
     mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST   : in  std_logic;  --                            high active                 
+    MTEST   : in  std_logic;            -- Active high                 
     MBYPASS : in  std_logic;
-    MIRQ0   : in  std_logic;  --                            low active
-    MIRQ1   : in  std_logic;  --                            low active
+    MIRQ0   : in  std_logic;            -- Active low
+    MIRQ1   : in  std_logic;            -- Active low
     -- SW debug                                                               
     MSDIN   : in  std_logic;            -- serial data in (debug)     
     MSDOUT  : out std_logic;            -- serial data out    
 
-    MWAKEUP_LP : in    std_logic;       --                          high active
+    MWAKEUP_LP : in    std_logic;       -- Active high
     MLP_PWR_OK : in    std_logic;
     -- power management control
     --pwr_switch_on : out std_logic_vector(3 downto 0);
@@ -184,9 +184,13 @@ entity top is
     p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
     
     -- OSPI interface
-    OSPI_Out  : out   OSPI_InterfaceOut_t;
-    OSPI_DQ   : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS : inout std_logic
+    OSPI_Out    : out OSPI_InterfaceOut_t;
+    OSPI_DQ_i   : in  std_logic_vector(7 downto 0);
+    OSPI_DQ_o   : out std_logic_vector(7 downto 0);
+    OSPI_DQ_e   : out std_logic;
+    OSPI_RWDS_i : in  std_logic;
+    OSPI_RWDS_o : out std_logic;
+    OSPI_RWDS_e : out std_logic
     );
 -- MPG RAM signals
 end top;
@@ -2040,8 +2044,12 @@ begin
       pj_en      => pj_en,
       pj_o       => pj_o,
       OSPI_Out   => OSPI_Out,
-      OSPI_DQ    => OSPI_DQ,
-      OSPI_RWDS  => OSPI_RWDS
+      OSPI_DQ_i  => OSPI_DQ_i,
+      OSPI_DQ_o  => OSPI_DQ_o,
+      OSPI_DQ_e  => OSPI_DQ_e,
+      OSPI_RWDS_i => OSPI_RWDS_i,
+      OSPI_RWDS_o => OSPI_RWDS_o,
+      OSPI_RWDS_e => OSPI_RWDS_e
       );
 
 end;

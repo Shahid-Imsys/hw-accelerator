@@ -136,9 +136,13 @@ entity peri is
     pj_i       : in  std_logic_vector(7 downto 0);
     pj_en      : out std_logic_vector(7 downto 0);
     pj_o       : out std_logic_vector(7 downto 0);
-    OSPI_Out   : out   OSPI_InterfaceOut_t;
-    OSPI_DQ    : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS  : inout std_logic
+    OSPI_Out   : out OSPI_InterfaceOut_t;
+    OSPI_DQ_i  : in  std_logic_vector(7 downto 0);
+    OSPI_DQ_o  : out std_logic_vector(7 downto 0);
+    OSPI_DQ_e  : out std_logic;
+    OSPI_RWDS_i: in  std_logic;
+    OSPI_RWDS_o: out std_logic;
+    OSPI_RWDS_e: out std_logic
     );
 end peri;
 
@@ -154,20 +158,24 @@ architecture struct of peri is
     ospi_latency_address : std_logic_vector(7 downto 0) := x"44";
     MAX_BURST_LEN        : integer                      := 2     -- Must be even power of 2
   );
-  port (clk_p      : in    std_logic;                     -- Main clock
-        clk_i_pos  : in    std_logic;                     --
-        rst_n      : in    std_logic;                     -- Async reset
-        idi        : in    std_logic_vector (7 downto 0); -- I/O bus in
-        ido        : out   std_logic_vector (7 downto 0); -- I/O bus out
-        iden       : out   std_logic;                     -- I/O bus enabled (in use)
-        ilioa      : in    std_logic;                     -- I/O bus load I/O address
-        ildout     : in    std_logic;                     -- I/O bus data output strobe
-        inext      : in    std_logic;                     -- I/O bus data input  strobe
-        idack      : in    std_logic;                     -- I/O bus DMA Ack
-        idreq      : out   std_logic;                     -- I/O bus DMA Request
-        OSPI_Out   : out   OSPI_InterfaceOut_t;           -- OSPI pins out to chip
-        OSPI_DQ    : inout std_logic_vector(7 downto 0);  -- OSPI Data pins
-        OSPI_RWDS  : inout std_logic                      -- OSPI bidirectional pins
+  port (clk_p       : in   std_logic;                     -- Main clock
+        clk_i_pos   : in   std_logic;                     --
+        rst_n       : in   std_logic;                     -- Async reset
+        idi         : in   std_logic_vector (7 downto 0); -- I/O bus in
+        ido         : out  std_logic_vector (7 downto 0); -- I/O bus out
+        iden        : out  std_logic;                     -- I/O bus enabled (in use)
+        ilioa       : in   std_logic;                     -- I/O bus load I/O address
+        ildout      : in   std_logic;                     -- I/O bus data output strobe
+        inext       : in   std_logic;                     -- I/O bus data input  strobe
+        idack       : in   std_logic;                     -- I/O bus DMA Ack
+        idreq       : out  std_logic;                     -- I/O bus DMA Request
+        OSPI_Out    : out  OSPI_InterfaceOut_t;           -- OSPI pins out to chip
+        OSPI_DQ_i   : in   std_logic_vector(7 downto 0);  -- OSPI data bus in
+        OSPI_DQ_o   : out  std_logic_vector(7 downto 0);  -- OSPI data bus out
+        OSPI_DQ_e   : out  std_logic;                     -- OSPI data bus enable (1=out)
+        OSPI_RWDS_i : in  std_logic;                      -- OSPI RWDS in
+        OSPI_RWDS_o : out std_logic;                      -- OSPI RWDS out
+        OSPI_RWDS_e : out std_logic                       -- OSPI RWDS enable (1=out)
   );
 end component;
 
@@ -726,19 +734,24 @@ begin  -- struct
 
   ospi : OctoSPI
     port map (
-      clk_p      => clk_p,
-      clk_i_pos  => clk_i_pos,
-      rst_n      => rst_en,
-      idi        => idi_int,
-      ido        => ospi_ido,
-      iden       => ospi_iden,
-      ilioa      => ilioa,
-      ildout     => ildout,
-      inext      => inext,
-      idack      => ospi_idack,
-      idreq      => ospi_idreq,
-      OSPI_Out   => OSPI_Out,
-      OSPI_DQ    => OSPI_DQ,
-      OSPI_RWDS  => OSPI_RWDS);
+      clk_p       => clk_p,
+      clk_i_pos   => clk_i_pos,
+      rst_n       => rst_en,
+      idi         => idi_int,
+      ido         => ospi_ido,
+      iden        => ospi_iden,
+      ilioa       => ilioa,
+      ildout      => ildout,
+      inext       => inext,
+      idack       => ospi_idack,
+      idreq       => ospi_idreq,
+      OSPI_Out    => OSPI_Out,
+      OSPI_DQ_i   => OSPI_DQ_i,
+      OSPI_DQ_o   => OSPI_DQ_o,
+      OSPI_DQ_e   => OSPI_DQ_e,
+      OSPI_RWDS_i => OSPI_RWDS_i,
+      OSPI_RWDS_o => OSPI_RWDS_o,
+      OSPI_RWDS_e => OSPI_RWDS_e
+      );
 
 end struct;

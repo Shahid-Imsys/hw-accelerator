@@ -130,9 +130,13 @@ entity digital_core is
     p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
     
     -- OSPI interface
-    OSPI_Out  : out   OSPI_InterfaceOut_t;
-    OSPI_DQ   : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS : inout std_logic);
+    ospi_out         : out OSPI_InterfaceOut_t;
+    ospi_dq_in       : in  std_logic_vector(7 downto 0);
+    ospi_dq_out      : out std_logic_vector(7 downto 0);
+    ospi_dq_enable   : out std_logic;
+    ospi_rwds_in     : in  std_logic;
+    ospi_rwds_out    : out std_logic;
+    ospi_rwds_enable : out std_logic);
 
 end entity digital_core;
 
@@ -226,9 +230,13 @@ begin  -- architecture rtl
       MWAKEUP_LP => MWAKEUP_LP,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      OSPI_Out  => OSPI_Out,
-      OSPI_DQ   => OSPI_DQ,
-      OSPI_RWDS => OSPI_RWDS,
+      OSPI_Out  =>  ospi_out,
+      OSPI_DQ_i  => ospi_dq_in,
+      OSPI_DQ_o  => ospi_dq_out,
+      OSPI_DQ_e  => ospi_dq_enable,
+      OSPI_RWDS_i => ospi_rwds_in,
+      OSPI_RWDS_o => ospi_rwds_out,
+      OSPI_RWDS_e => ospi_rwds_enable,
 
       pwr_ok   => '1',
       vdd_bmem => '0',

@@ -110,7 +110,7 @@ package pad_instance_package is
       STE_I : in    std_logic_vector(1 downto 0);
       PD_I  : in    std_logic;
       PU_I  : in    std_logic;
-      DI_O  : out   std_logic;
+      DI_O  : out   std_logic_vector(1 downto 0);
 
       VBIAS : inout std_logic
       );

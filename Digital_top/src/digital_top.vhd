@@ -30,31 +30,31 @@ use ieee.std_logic_1164.all;
 use work.gp_pkg.all;
 
 entity digital_top is
-  
+
   generic (
     g_clock_frequency : integer);
 
   port (
-    hclk : in std_logic;            -- clk input   
-    MRESET  : in  std_logic;  -- system reset               low active
-    MRSTOUT : out std_logic;
-    MIRQOUT : out std_logic;            -- interrupt request output    
-    MCKOUT0 : out std_logic;            --for trace adapter
-    MCKOUT1 : out std_logic;            --programable clock out
+    hclk       : in  std_logic;         -- clk input   
+    MRESET     : in  std_logic;  -- system reset               low active
+    MRSTOUT    : out std_logic;
+    MIRQOUT    : out std_logic;         -- interrupt request output    
+    MCKOUT0    : out std_logic;         --for trace adapter
+    MCKOUT1    : out std_logic;         --programable clock out
     mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST   : in  std_logic;  --                            high active                 
-    MBYPASS : in  std_logic;
-    MIRQ0   : in  std_logic;  --                            low active
-    MIRQ1   : in  std_logic;  --                            low active
+    MTEST      : in  std_logic;  --                            high active                 
+    MBYPASS    : in  std_logic;
+    MIRQ0      : in  std_logic;  --                            low active
+    MIRQ1      : in  std_logic;  --                            low active
     -- SW debug                                                               
-    MSDIN   : in  std_logic;            -- serial data in (debug)     
-    MSDOUT  : out std_logic;            -- serial data out    
+    MSDIN      : in  std_logic;         -- serial data in (debug)     
+    MSDOUT     : out std_logic;         -- serial data out    
 
-    MWAKEUP_LP : in    std_logic;       --                          high active
-    MLP_PWR_OK : in    std_logic;
+    MWAKEUP_LP : in  std_logic;         --                          high active
+    MLP_PWR_OK : in  std_logic;
     -- power management control
-    MPMIC_CORE : out   std_logic;
-    MPMIC_IO   : out   std_logic;
+    MPMIC_CORE : out std_logic;
+    MPMIC_IO   : out std_logic;
 
     -- Analog internal signals
     pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
@@ -78,60 +78,64 @@ entity digital_top is
 
 
     -- Port A
-    pa_i       : in  std_logic_vector(7 downto 0);
-    pa_en      : out std_logic_vector(7 downto 0);
-    pa_o       : out std_logic_vector(7 downto 0);
+    pa_i  : in  std_logic_vector(7 downto 0);
+    pa_en : out std_logic_vector(7 downto 0);
+    pa_o  : out std_logic_vector(7 downto 0);
     -- Port B
-    pb_i       : in  std_logic_vector(7 downto 0);
-    pb_en      : out std_logic_vector(7 downto 0);
-    pb_o       : out std_logic_vector(7 downto 0);
+    pb_i  : in  std_logic_vector(7 downto 0);
+    pb_en : out std_logic_vector(7 downto 0);
+    pb_o  : out std_logic_vector(7 downto 0);
     -- Port C
-    pc_i       : in  std_logic_vector(7 downto 0);
-    pc_en      : out std_logic_vector(7 downto 0);
-    pc_o       : out std_logic_vector(7 downto 0);
+    pc_i  : in  std_logic_vector(7 downto 0);
+    pc_en : out std_logic_vector(7 downto 0);
+    pc_o  : out std_logic_vector(7 downto 0);
     -- Port D
-    pd_i       : in  std_logic_vector(7 downto 0);
-    pd_en      : out std_logic_vector(7 downto 0);
-    pd_o       : out std_logic_vector(7 downto 0);
+    pd_i  : in  std_logic_vector(7 downto 0);
+    pd_en : out std_logic_vector(7 downto 0);
+    pd_o  : out std_logic_vector(7 downto 0);
     -- Port E
-    pe_i       : in  std_logic_vector(7 downto 0);
-    pe_en      : out std_logic_vector(7 downto 0);
-    pe_o       : out std_logic_vector(7 downto 0);
+    pe_i  : in  std_logic_vector(7 downto 0);
+    pe_en : out std_logic_vector(7 downto 0);
+    pe_o  : out std_logic_vector(7 downto 0);
     -- Port F
-    pf_i       : in  std_logic_vector(7 downto 0);
-    pf_en      : out std_logic_vector(7 downto 0);
-    pf_o       : out std_logic_vector(7 downto 0);
+    pf_i  : in  std_logic_vector(7 downto 0);
+    pf_en : out std_logic_vector(7 downto 0);
+    pf_o  : out std_logic_vector(7 downto 0);
     -- Port G
-    pg_i       : in  std_logic_vector(7 downto 0);
-    pg_en      : out std_logic_vector(7 downto 0);
-    pg_o       : out std_logic_vector(7 downto 0);
+    pg_i  : in  std_logic_vector(7 downto 0);
+    pg_en : out std_logic_vector(7 downto 0);
+    pg_o  : out std_logic_vector(7 downto 0);
     -- Port H
-    ph_i       : in  std_logic_vector(7 downto 0);
-    ph_en      : out std_logic_vector(7 downto 0);
-    ph_o       : out std_logic_vector(7 downto 0);
+    ph_i  : in  std_logic_vector(7 downto 0);
+    ph_en : out std_logic_vector(7 downto 0);
+    ph_o  : out std_logic_vector(7 downto 0);
     -- Port I
-    pi_i       : in  std_logic_vector(7 downto 0);
-    pi_en      : out std_logic_vector(7 downto 0);
-    pi_o       : out std_logic_vector(7 downto 0);
+    pi_i  : in  std_logic_vector(7 downto 0);
+    pi_en : out std_logic_vector(7 downto 0);
+    pi_o  : out std_logic_vector(7 downto 0);
     -- Port J
-    pj_i       : in  std_logic_vector(7 downto 0);
-    pj_en      : out std_logic_vector(7 downto 0);
-    pj_o       : out std_logic_vector(7 downto 0);
-		-- I/O cell configuration control outputs
+    pj_i  : in  std_logic_vector(7 downto 0);
+    pj_en : out std_logic_vector(7 downto 0);
+    pj_o  : out std_logic_vector(7 downto 0);
+    -- I/O cell configuration control outputs
     -- d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
     -- d_sr        : out std_logic; -- Slew rate limit on DRAM interface
-    d_lo        : out std_logic; -- Low drive on DRAM interface
-    p1_hi       : out std_logic; -- High drive on port group 1 pins
-    p1_sr       : out std_logic; -- Slew rate limit on port group 1 pins
-    p2_hi       : out std_logic; -- High drive on port group 2 pins
-    p2_sr       : out std_logic; -- Slew rate limit on port group 2 pins
-    p3_hi       : out std_logic; -- High drive on port group 3 pins
-    p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
-    
+    d_lo  : out std_logic;              -- Low drive on DRAM interface
+    p1_hi : out std_logic;              -- High drive on port group 1 pins
+    p1_sr : out std_logic;              -- Slew rate limit on port group 1 pins
+    p2_hi : out std_logic;              -- High drive on port group 2 pins
+    p2_sr : out std_logic;              -- Slew rate limit on port group 2 pins
+    p3_hi : out std_logic;              -- High drive on port group 3 pins
+    p3_sr : out std_logic;              -- Slew rate limit on port group 3 pins
+
     -- OSPI interface
-    OSPI_Out  : out   OSPI_InterfaceOut_t;
-    OSPI_DQ   : inout std_logic_vector(7 downto 0);
-    OSPI_RWDS : inout std_logic);
+    ospi_out         : out OSPI_InterfaceOut_t;
+    ospi_dq_in       : in  std_logic_vector(7 downto 0);
+    ospi_dq_out      : out std_logic_vector(7 downto 0);
+    ospi_dq_enable   : out std_logic;
+    ospi_rwds_in     : in  std_logic;
+    ospi_rwds_out    : out std_logic;
+    ospi_rwds_enable : out std_logic);
 
 end entity digital_top;
 
@@ -142,10 +146,10 @@ begin  -- architecture rtl
   i_digital_core : entity work.digital_core
     generic map (
       g_memory_type     => asic,
-      g_clock_frequency => g_clock_frequency   -- system clock frequency in MHz
+      g_clock_frequency => g_clock_frequency  -- system clock frequency in MHz
       )
-      port map (
-        HCLK    => HCLK,
+    port map (
+      HCLK    => HCLK,
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
@@ -214,9 +218,14 @@ begin  -- architecture rtl
       MWAKEUP_LP => MWAKEUP_LP,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      OSPI_Out  => OSPI_Out,
-      OSPI_DQ   => OSPI_DQ,
-      OSPI_RWDS => OSPI_RWDS,
+      ospi_out  => ospi_out,
+      ospi_dq_in  => ospi_dq_in,
+      ospi_dq_out  => ospi_dq_out,
+      ospi_dq_enable  => ospi_dq_enable,
+      ospi_rwds_in => ospi_rwds_in,
+      ospi_rwds_out => ospi_rwds_out,
+      ospi_rwds_enable => ospi_rwds_enable,
+      
 
       pwr_ok   => '1',
       vdd_bmem => '0',
@@ -224,6 +233,6 @@ begin  -- architecture rtl
       rxout    => rxout,
       adc_bits => adc_bits
 
-        );
+      );
 
 end architecture rtl;

@@ -335,9 +335,9 @@ begin  -- architecture rtl
         MSDOUT  => msdout_out,
 
         -- Port A
-        pa_i  => pa_i, --pa_i,
-        pa_en => pa_en, --pa_en,
-        pa_o  => pa_o, --pa_o,
+        pa_i  => pa_i,
+        pa_en => pa_en,
+        pa_o  => pa_o,
         -- Port B
         pb_i  => x"00", --pb_i,
         pb_en => open, --pb_en,
@@ -359,9 +359,9 @@ begin  -- architecture rtl
         pf_en => open, --pf_en,
         pf_o  => open, --pf_o,
         -- Port G
-        pg_i  => x"00", --pg_i,
-        pg_en => open, --pg_en,
-        pg_o  => open, --pg_o,
+        pg_i  => pg_i,
+        pg_en => pg_en,
+        pg_o  => pg_o,
         -- Port H
         ph_i  => x"00", --ph_i,
         ph_en => open, --ph_en,
@@ -536,6 +536,262 @@ begin  -- architecture rtl
         di  => pj_i(1)
         );
 
+    i_emem_d0_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d0,
+        -- GPIO
+        do  => ospi_dq_out(0),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(0)
+        );
+
+    i_emem_d1_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d1,
+        -- GPIO
+        do  => ospi_dq_out(1),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(1)
+        );
+
+    i_emem_d2_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d2,
+        -- GPIO
+        do  => ospi_dq_out(2),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(2)
+        );
+
+    i_emem_d3_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d3,
+        -- GPIO
+        do  => ospi_dq_out(3),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(3)
+        );
+
+    i_emem_d4_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d4,
+        -- GPIO
+        do  => ospi_dq_out(4),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(4)
+        );
+
+    i_emem_d5_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d5,
+        -- GPIO
+        do  => ospi_dq_out(5),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(5)
+        );
+
+    i_emem_d6_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d6,
+        -- GPIO
+        do  => ospi_dq_out(6),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(6)
+        );
+
+    i_emem_d7_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_d7,
+        -- GPIO
+        do  => ospi_dq_out(7),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_dq_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_dq_in(7)
+        );
+
+    --i_emem_clk_pad : entity work.output_pad  
+    --  generic map (
+    --    direction =>  horizontal)
+    --  port map (
+    --    -- PAD
+    --    pad => emem_clk,
+    --    --GPIO
+    --    do  => ospi_ck_p,
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => '1',
+    --    odp => '0',
+    --    odn => '0'
+    --    );
+
+    --i_emem_clk_n_pad : entity work.output_pad  
+    --  generic map (
+    --    direction =>  horizontal)
+    --  port map (
+    --    -- PAD
+    --    pad => emem_clk,
+    --    --GPIO
+    --    do  => ospi_ck_n,
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => '1',
+    --    odp => '0',
+    --    odn => '0'
+    --    );
+
+    i_emem_rwds_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => emem_rwds,
+        -- GPIO
+        do  => ospi_rwds_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => ospi_rwds_enable, 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => ospi_rwds_in
+        );
+
+    i_emem_cs_n_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => emem_cs_n,
+        --GPIO
+        do  => ospi_cs_n,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_emem_rst_n_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => emem_rst_n,
+        --GPIO
+        do  => ospi_reset_n,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    ---------------------------------------------------------------------------
+    -- South side pads
+    ---------------------------------------------------------------------------
+    
+    ---------------------------------------------------------------------------
+    -- East side pads
+    ---------------------------------------------------------------------------
+    
+    ---------------------------------------------------------------------------
+    -- North side pads
+    ---------------------------------------------------------------------------
+    
   pa_i(4 downto 1) <= "0101";
   
     i_pa0_sin_pad : entity work.inoutput_pad
@@ -618,186 +874,186 @@ begin  -- architecture rtl
         di  => pa_i(7)
         );
 
-    --i_pg0_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg0,
-    --    -- GPIO
-    --    do  => pa_g(0),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(0), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(0)
-    --    );
+    i_pg0_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg0,
+        -- GPIO
+        do  => pg_o(0),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(0), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(0)
+        );
 
-    --i_pg1_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg1,
-    --    -- GPIO
-    --    do  => pa_g(1),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(1), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(1)
-    --    );
+    i_pg1_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg1,
+        -- GPIO
+        do  => pg_o(1),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(1), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(1)
+        );
 
-    --i_pg2_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg2,
-    --    -- GPIO
-    --    do  => pa_g(2),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(2), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(2)
-    --    );
+    i_pg2_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg2,
+        -- GPIO
+        do  => pg_o(2),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(2), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(2)
+        );
 
-    --i_pg3_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg3,
-    --    -- GPIO
-    --    do  => pa_g(3),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(3), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(3)
-    --    );
+    i_pg3_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg3,
+        -- GPIO
+        do  => pg_o(3),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(3), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(3)
+        );
 
-    --i_pg4_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg4,
-    --    -- GPIO
-    --    do  => pa_g(4),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(4), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(4)
-    --    );
+    i_pg4_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg4,
+        -- GPIO
+        do  => pg_o(4),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(4), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(4)
+        );
 
-    --i_pg5_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg5,
-    --    -- GPIO
-    --    do  => pa_g(5),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(5), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(5)
-    --    );
+    i_pg5_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg5,
+        -- GPIO
+        do  => pg_o(5),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(5), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(5)
+        );
 
-    --i_pg6_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg6,
-    --    -- GPIO
-    --    do  => pa_g(6),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(6), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(6)
-    --    );
+    i_pg6_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg6,
+        -- GPIO
+        do  => pg_o(6),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(6), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(6)
+        );
 
-    --i_pg7_pad : entity work.inoutput_pad
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => pg7,
-    --    -- GPIO
-    --    do  => pa_g(7),
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => pg_en(7), 
-    --    odp => '0',
-    --    odn => '0',
-    --    ste => "00",
-    --    pd  => '0',
-    --    pu  => '0',
-    --    di  => pa_i(7)
-    --    );
+    i_pg7_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pg7,
+        -- GPIO
+        do  => pg_o(7),
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => pg_en(7), 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pg_i(7)
+        );
 
     
-    -- i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
-    --   port map (
-    --     PAD_B => emem_d4,
-    --     --GPIO
-    --     DO_I 
-    --     DS_I => "1000",
-    --     SR_I => '1',
-    --     CO_I => '0',
-    --     OE_I => '1',
-    --     ODP_I => '0',
-    --     ODN_I => '0',
-    --     IE_I => '1',
-    --     STE_I => "00",
-    --     PD_I => '0',
-    --     PU_I => '0',
-    --     DI_O
+     --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
+     --  port map (
+     --    PAD_B => emem_d4,
+     --    --GPIO
+     --    DO_I 
+     --    DS_I => "1000",
+     --    SR_I => '1',
+     --    CO_I => '0',
+     --    OE_I => '1',
+     --    ODP_I => '0',
+     --    ODN_I => '0',
+     --    IE_I => '1',
+     --    STE_I => "00",
+     --    PD_I => '0',
+     --    PU_I => '0',
+     --    DI_O
 
-    --     VBIAS
-    --     );
+     --    VBIAS
+     --    );
 
 
       end architecture rtl;

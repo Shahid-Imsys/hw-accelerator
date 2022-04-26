@@ -27,6 +27,7 @@ architecture rtl of spiflash is
 
   type page_type is array (0 to 31) of std_logic_vector(7 downto 0);
   type ram_type is array (0 to npages_c-1) of page_type;
+  type reg_type is array (0 to 2) of std_logic_vector(7 downto 0);
 
   procedure init_ram_from_file (ram_file_name : in string; signal content : inout ram_type ) is
     file ram_file          : text;
@@ -89,6 +90,9 @@ architecture rtl of spiflash is
 
   signal page : page_type;
   signal ram  : ram_type;
+
+  -- Registers
+  signal reg : register_type;
 
 begin
 

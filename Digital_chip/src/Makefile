@@ -19,6 +19,8 @@ pad_comp:
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_V.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_H.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_V.v \
-#		  $(PLL_PATH_WIN)/ri_adpll_gf22fdx_2gmp_behavioral.v
+                  $(CHIP_DIR_WIN)/racyic_modules/common_sync.v \
+                  $(CHIP_DIR_WIN)/racyic_modules/common_sync_pedge.v \
+		  $(PLL_PATH_WIN)/ri_adpll_gf22fdx_2gmp_behavioral.v
 
 include $(PROJECT_PATH)/Digital_top/src/Makefile

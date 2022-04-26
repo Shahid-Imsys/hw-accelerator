@@ -62,8 +62,9 @@ architecture tb of uart_tb is
   constant bit_length_600Hz     : time := 1666666 ns;
   
 
-  signal start_bit     : time := bit_length_921k600Hz * 1.5;
-  signal bit_length    : time := bit_length_921k600Hz;
+  
+  signal start_bit     : time := 27.2 ns * 1.5;
+  signal bit_length    : time := 27.2 ns;
   signal new_byte      : std_ulogic;
   signal received_byte : integer;
   signal tx_data       : integer;

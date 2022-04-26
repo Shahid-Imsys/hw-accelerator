@@ -207,7 +207,7 @@ begin  -- architecture rtl
       ph_en => ph_en,
       ph_o  => ph_o,
       -- Port I
-      pi_i  => pi_i,
+      pi_i  => pi_o,
       pi_en => pi_en,
       pi_o  => pi_o,
       -- Port J

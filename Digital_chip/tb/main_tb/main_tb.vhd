@@ -109,16 +109,16 @@ begin  -- architecture tb
    
       -- Ethernet Interface
       enet_mdio => enet_mdio,
-    enet_mdc  => open,
-    enet_clk  => '0',
-    enet_txen => open,
-    enet_txer => open,
-    enet_txd0 => open,
-    enet_txd1 => open,
-    enet_rxvd => '0',
-    enet_rxer => '0',
-    enet_rxdo => '0',
-    enet_rxd1 => '0',
+      enet_mdc  => open,
+      enet_clk  => open,
+      enet_txen => open,
+      enet_txer => open,
+      enet_txd0 => open,
+      enet_txd1 => open,
+      enet_rxdv => open,
+      enet_rxer => open,
+      enet_rxd0 => open,
+      enet_rxd1 => open,
    
       
       -- UART

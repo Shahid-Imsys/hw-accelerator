@@ -41,16 +41,16 @@ entity digital_chip is
 
     -- Ethernet Interface
     enet_mdio : inout std_logic;
-    enet_mdc  : out   std_logic;
-    enet_clk  : in    std_logic;
-    enet_txen : out   std_logic;
-    enet_txer : out   std_logic;
-    enet_txd0 : out   std_logic;
-    enet_txd1 : out   std_logic;
-    enet_rxvd : in    std_logic;
-    enet_rxer : in    std_logic;
-    enet_rxdo : in    std_logic;
-    enet_rxd1 : in    std_logic;
+    enet_mdc  : inout std_logic;
+    enet_clk  : inout std_logic;
+    enet_txen : inout std_logic;
+    enet_txer : inout std_logic;
+    enet_txd0 : inout std_logic;
+    enet_txd1 : inout std_logic;
+    enet_rxdv : inout std_logic;
+    enet_rxer : inout std_logic;
+    enet_rxd0 : inout std_logic;
+    enet_rxd1 : inout std_logic;
 
     -- Octal_spi
     emem_clk   : out   std_logic;
@@ -271,6 +271,19 @@ architecture rtl of digital_chip is
   signal ospi_rwds_out    : std_logic;
   signal ospi_rwds_enable : std_logic;
   
+  signal enet_mdin     : std_logic;
+  signal enet_mdout    : std_logic;
+  signal enet_mdc_out  : std_logic;
+  signal enet_txd0_out : std_logic;
+  signal enet_txd1_out : std_logic;
+  signal enet_txen_out : std_logic;
+  signal enet_txer_out : std_logic;
+  signal enet_clk_in   : std_logic;
+  signal enet_rxdv_in  : std_logic;
+  signal enet_rxer_in  : std_logic;
+  signal enet_rxd0_in  : std_logic;
+  signal enet_rxd1_in  : std_logic;
+
   signal dac0_bits : std_logic;
   signal dac1_bits : std_logic;
 
@@ -410,17 +423,18 @@ begin  -- architecture rtl
         ospi_rwds_out => ospi_rwds_out,
         ospi_rwds_enable => ospi_rwds_enable,
 
-        enet_mdio => open,
-        enet_mdc  => open,
-        enet_clk  => '0',
-        enet_txen => open,
-        enet_txer => open,
-        enet_txd0 => open,
-        enet_txd1 => open,
-        enet_rxvd => '0',
-        enet_rxer => '0',
-        enet_rxdo => '0',
-        enet_rxd1 => '0',
+        enet_mdin  => enet_mdin,
+        enet_mdout => enet_mdout,
+        enet_mdc   => enet_mdc_out,
+        enet_clk   => enet_clk_in,
+        enet_txen  => enet_txen_out,
+        enet_txer  => enet_txer_out,
+        enet_txd0  => enet_txd0_out,
+        enet_txd1  => enet_txd1_out,
+        enet_rxdv  => enet_rxdv_in,
+        enet_rxer  => enet_rxer_in,
+        enet_rxd0  => enet_rxd0_in,
+        enet_rxd1  => enet_rxd1_in,
 
         pwr_ok   => '1',
         vdd_bmem => '0',
@@ -872,6 +886,176 @@ begin  -- architecture rtl
 --        odp => '0',
 --        odn => '0'
 --        );
+
+    i_enet_mdio_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_mdio,
+        -- GPIO
+        do  => enet_mdout,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1', 
+        odp => '0',
+        odn => '0',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_mdin
+        );
+
+    i_enet_mdc_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_mdc,
+        --GPIO
+        do  => enet_mdc_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_enet_txer_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txer,
+        --GPIO
+        do  => enet_txer_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_enet_txd0_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txd0,
+        --GPIO
+        do  => enet_txd0_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_enet_txd1_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txd1,
+        --GPIO
+        do  => enet_txd1_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_enet_txen_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txen,
+        --GPIO
+        do  => enet_txen_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_enet_clk_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_clk,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_clk_in
+        );
+
+    i_enet_rxdv_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_rxdv,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_rxdv_in
+        );
+
+    i_enet_rxd0_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_rxd0,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_rxd0_in
+        );
+
+    i_enet_rxd1_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_rxd1,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_rxd1_in
+        );
+
+    i_enet_rxer_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_rxer,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => enet_rxer_in
+        );
 
     ---------------------------------------------------------------------------
     -- North side pads

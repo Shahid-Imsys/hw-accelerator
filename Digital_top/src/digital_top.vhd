@@ -141,17 +141,18 @@ entity digital_top is
     ospi_rwds_enable : out std_logic;
 
     -- Ethernet interface
-    enet_mdio : inout std_logic;
-    enet_mdc  : out   std_logic;
-    enet_clk  : in    std_logic;
-    enet_txen : out   std_logic;
-    enet_txer : out   std_logic;
-    enet_txd0 : out   std_logic;
-    enet_txd1 : out   std_logic;
-    enet_rxvd : in    std_logic;
-    enet_rxer : in    std_logic;
-    enet_rxdo : in    std_logic;
-    enet_rxd1 : in    std_logic);
+    enet_mdin  : in std_logic;
+    enet_mdout : out std_logic;
+    enet_mdc   : out   std_logic;
+    enet_clk   : in    std_logic;
+    enet_txen  : out   std_logic;
+    enet_txer  : out   std_logic;
+    enet_txd0  : out   std_logic;
+    enet_txd1  : out   std_logic;
+    enet_rxdv  : in    std_logic;
+    enet_rxer  : in    std_logic;
+    enet_rxd0  : in    std_logic;
+    enet_rxd1  : in    std_logic);
 
 end entity digital_top;
 

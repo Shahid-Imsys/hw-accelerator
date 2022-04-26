@@ -35,9 +35,9 @@ entity digital_chip is
     -- PLL reference clock
     pll_ref_clk : in  std_logic;
     -- reset pins
-    preset_n    : in  std_logic;  -- Power on reset
-    mreset_n    : in  std_logic;  -- Functional reset
-    mrstout_n   : out std_logic;  -- reset output for external components
+    preset_n    : in     std_logic;  -- Power on reset
+    mreset_n    : inout  std_logic;  -- Functional reset
+    mrstout_n   : inout  std_logic;  -- reset output for external components
 
     -- Ethernet Interface
     enet_mdio : inout std_logic;
@@ -107,9 +107,9 @@ entity digital_chip is
     pg6 : inout std_logic;
     pg7 : inout std_logic;
 
-    mtest  : in  std_logic;  -- port for testmode
-    mwake  : in  std_logic;  -- Wake up signal, from what???
-    mrxout : out std_logic;  -- RTC test signal/power supply wake up
+    mtest  : inout std_logic;  -- port for testmode
+    mwake  : inout std_logic;  -- Wake up signal, from what???
+    mrxout : inout std_logic;  -- RTC test signal/power supply wake up
 
     -- interrupts
     mirq0_n : inout std_logic;
@@ -225,6 +225,9 @@ architecture rtl of digital_chip is
   signal pll_locked : std_logic;
   signal dco_clk    : std_logic_vector(7 downto 0);
 
+  signal mreset : std_logic;
+  signal mrstout : std_logic;
+
   signal mckout0, mckout1  : std_logic;
   signal msdin_in : std_logic;
   signal msdout_out : std_logic;
@@ -241,6 +244,9 @@ architecture rtl of digital_chip is
   signal pg_o : std_logic_vector(7 downto 0);
   signal pg_i : std_logic_vector(7 downto 0);
   signal pg_en : std_logic_vector(7 downto 0);
+  signal mtest_in : std_logic;
+  signal mwake_in : std_logic;
+  signal mrxout_out : std_logic;
 
   signal pj_o : std_logic_vector(7 downto 0);
   signal pj_i : std_logic_vector(7 downto 0);
@@ -265,6 +271,9 @@ architecture rtl of digital_chip is
   signal ospi_rwds_out    : std_logic;
   signal ospi_rwds_enable : std_logic;
   
+  signal dac0_bits : std_logic;
+  signal dac1_bits : std_logic;
+
 begin  -- architecture rtl
 
   -- i_pll : ri_adpll_gf22fdx_2gmp_behavioral
@@ -400,6 +409,18 @@ begin  -- architecture rtl
         ospi_rwds_in => ospi_rwds_in,
         ospi_rwds_out => ospi_rwds_out,
         ospi_rwds_enable => ospi_rwds_enable,
+
+        enet_mdio => open,
+        enet_mdc  => open,
+        enet_clk  => '0',
+        enet_txen => open,
+        enet_txer => open,
+        enet_txd0 => open,
+        enet_txd1 => open,
+        enet_rxvd => '0',
+        enet_rxer => '0',
+        enet_rxdo => '0',
+        enet_rxd1 => '0',
 
         pwr_ok   => '1',
         vdd_bmem => '0',
@@ -788,10 +809,102 @@ begin  -- architecture rtl
     -- East side pads
     ---------------------------------------------------------------------------
     
+    i_aout0_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => aout0,
+        --GPIO
+        do  => dac0_bits,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+    i_aout1_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => aout1,
+        --GPIO
+        do  => dac1_bits,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
+--    i_ach0_pad : entity work.output_pad  
+--      generic map (
+--        direction =>  horizontal)
+--      port map (
+--        -- PAD
+--        pad => ach0,
+--        --GPIO
+--        do  => ???,
+--        ds  => "1000",
+--        sr  => '1',
+--        co  => '0',
+--        oe  => '1',
+--        odp => '0',
+--        odn => '0'
+--        );
+--
+--    i_ach1_pad : entity work.output_pad  
+--      generic map (
+--        direction =>  horizontal)
+--      port map (
+--        -- PAD
+--        pad => ach1,
+--        --GPIO
+--        do  => ???,
+--        ds  => "1000",
+--        sr  => '1',
+--        co  => '0',
+--        oe  => '1',
+--        odp => '0',
+--        odn => '0'
+--        );
+
     ---------------------------------------------------------------------------
     -- North side pads
     ---------------------------------------------------------------------------
     
+    i_mreset_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mreset_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => mreset
+        );
+
+    i_mrst_out_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mrstout_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => mrstout
+        );
+
   pa_i(4 downto 1) <= "0101";
   
     i_pa0_sin_pad : entity work.inoutput_pad
@@ -1034,7 +1147,50 @@ begin  -- architecture rtl
         di  => pg_i(7)
         );
 
+    i_mtest_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mtest,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '1',
+        pu  => '0',
+        di  => mtest_in
+        );
     
+    i_mwake_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mwake,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '1',
+        pu  => '0',
+        di  => mwake_in
+        );
+    
+    i_mrxout_pad : entity work.output_pad  
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mrxout,
+        --GPIO
+        do  => mrxout_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
+
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
      --  port map (
      --    PAD_B => emem_d4,

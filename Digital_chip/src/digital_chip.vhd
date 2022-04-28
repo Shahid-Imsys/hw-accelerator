@@ -33,9 +33,9 @@ entity digital_chip is
 
   port (
     -- PLL reference clock
-    pll_ref_clk : in  std_logic;
+    pll_ref_clk : inout  std_logic;
     -- reset pins
-    preset_n    : in     std_logic;  -- Power on reset
+    preset_n    : inout  std_logic;  -- Power on reset
     mreset_n    : inout  std_logic;  -- Functional reset
     mrstout_n   : inout  std_logic;  -- reset output for external components
 
@@ -88,10 +88,9 @@ entity digital_chip is
     -- I/O bus
 
     -- DAC and ADC pins
-    aout0 : out std_logic;
-    aout1 : out std_logic;
-    ach0  : in  std_logic;
-    ach1  : in  std_logic;
+    aout0 : inout std_logic;
+    aout1 : inout std_logic;
+    ach0  : inout  std_logic;
 
     -- UART
     utx : inout std_logic;
@@ -225,6 +224,8 @@ architecture rtl of digital_chip is
   signal pll_locked : std_logic;
   signal dco_clk    : std_logic_vector(7 downto 0);
 
+  signal pll_ref_clk_in : std_logic;
+
   signal mreset : std_logic;
   signal mrstout : std_logic;
 
@@ -287,11 +288,15 @@ architecture rtl of digital_chip is
   signal dac0_bits : std_logic;
   signal dac1_bits : std_logic;
 
+  signal adc_bits : std_logic;
+
+  signal pwr_ok : std_logic;
+
 begin  -- architecture rtl
 
   i_pll : ri_adpll_gf22fdx_2gmp_behavioral
     port map (
-      ref_clk_i              => pll_ref_clk,
+      ref_clk_i              => pll_ref_clk_in,
       scan_clk_i             => '0',
       reset_q_i              => preset_n,  --asynchronous reset
       en_adpll_ctrl_i        => '1',  --enable controller
@@ -436,11 +441,11 @@ begin  -- architecture rtl
         enet_rxd0  => enet_rxd0_in,
         enet_rxd1  => enet_rxd1_in,
 
-        pwr_ok   => '1',
+        pwr_ok   => pwr_ok,
         vdd_bmem => '0',
         VCC18LP  => '1',
         rxout    => mrxout,
-        adc_bits => '0' --adc_bits
+        adc_bits => adc_bits
       );
 
     ---------------------------------------------------------------------------
@@ -855,37 +860,21 @@ begin  -- architecture rtl
         odn => '0'
         );
 
---    i_ach0_pad : entity work.output_pad  
---      generic map (
---        direction =>  horizontal)
---      port map (
---        -- PAD
---        pad => ach0,
---        --GPIO
---        do  => ???,
---        ds  => "1000",
---        sr  => '1',
---        co  => '0',
---        oe  => '1',
---        odp => '0',
---        odn => '0'
---        );
---
---    i_ach1_pad : entity work.output_pad  
---      generic map (
---        direction =>  horizontal)
---      port map (
---        -- PAD
---        pad => ach1,
---        --GPIO
---        do  => ???,
---        ds  => "1000",
---        sr  => '1',
---        co  => '0',
---        oe  => '1',
---        odp => '0',
---        odn => '0'
---        );
+    i_ach0_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => ach0,
+        --GPIO
+        do  => adc_bits,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
 
     i_enet_mdio_pad : entity work.inoutput_pad
       generic map (
@@ -1061,6 +1050,34 @@ begin  -- architecture rtl
     -- North side pads
     ---------------------------------------------------------------------------
     
+    i_pll_ref_clk_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => pll_ref_clk,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pll_ref_clk_in
+        );
+
+    i_preset_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => preset_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pwr_ok
+        );
+
     i_mreset_n_pad : entity work.input_pad
       generic map (
         direction => vertical)

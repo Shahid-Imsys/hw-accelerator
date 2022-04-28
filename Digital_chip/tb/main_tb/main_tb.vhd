@@ -79,7 +79,7 @@ begin  -- architecture tb
     port map (
       pll_ref_clk    => MX1_CK,
       mreset_n  => MRESET,
-      preset_n  => '1',
+      preset_n  => open,
       mrstout_n => MRSTOUT,
       --MCKOUT1 => MCKOUT1,
       mtest   => MTEST,
@@ -152,8 +152,7 @@ begin  -- architecture tb
     -- DAC and ADC pins
     aout0 => open,
     aout1 => open,
-    ach0  => '0',
-    ach1  => '0'
+    ach0  => open
 
       );
 

@@ -332,7 +332,7 @@ begin  -- architecture rtl
       scan_in_i              => "000",
       scan_out_o             => open,
       scan_enable_i          => '0',
-      testmode_i             => mtest,
+      testmode_i             => mtest_in,
       dco_clk_o              => dco_clk,
       clk_tx_o               => open,
       pfd_o                  => open,
@@ -354,7 +354,7 @@ begin  -- architecture rtl
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
         MCKOUT1 => MCKOUT1,
-        MTEST   => MTEST,
+        MTEST   => mtest_in,
         MIRQ0   => mirq0,
         MIRQ1   => mirq1,
         -- SW debug

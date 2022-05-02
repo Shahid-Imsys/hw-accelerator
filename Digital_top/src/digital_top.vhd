@@ -158,15 +158,42 @@ end entity digital_top;
 
 architecture rtl of digital_top is
 
+  constant asic_c : memory_type_t := asic;
+  
+  signal clk_p_cpu : std_logic;
+  signal clk_rx : std_logic;
+  signal clk_tx : std_logic;
+  signal clock_in_off : std_logic;
+  
 begin  -- architecture rtl
+
+  i_clock_reset : entity work.clock_reset
+    
+    generic map (
+      fpga_g => (asic_c = fpga))
+
+    port map (
+      pll_clk => hclk,
+      enet_clk  => enet_clk,
+      clk_p =>  clk_p_cpu,
+      clk_rx => clk_rx,
+      clk_tx => clk_tx,
+
+      clock_in_off => clock_in_off,
+
+      scan_mode =>  mtest
+      );
 
   i_digital_core : entity work.digital_core
     generic map (
-      g_memory_type     => asic,
+      g_memory_type     => asic_c,
       g_clock_frequency => g_clock_frequency  -- system clock frequency in MHz
       )
     port map (
-      HCLK    => HCLK,
+      clk_p_cpu    => clk_p_cpu,
+      clk_rx => clk_rx,
+      clk_tx => clk_tx,
+
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
@@ -178,6 +205,8 @@ begin  -- architecture rtl
       -- SW debug
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
+
+      clock_in_off => clock_in_off, 
 
       -- Port A
       pa_i  => pa_i,

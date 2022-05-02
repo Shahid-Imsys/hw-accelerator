@@ -78,7 +78,10 @@ entity top is
     );
   port (
     -- clocks and control signals
-    HCLK    : in  std_logic;            -- clk input   
+    clk_p    : in  std_logic;            -- clk input
+    clk_rx : in std_logic;
+    clk_tx : in std_logic;
+                                         
     MRESET  : in  std_logic;            -- system reset, active low
     MRSTOUT : out std_logic;            -- Reset output
     MIRQOUT : out std_logic;            -- interrupt request output    
@@ -477,7 +480,6 @@ architecture struct of top is
   -----------------------------------------------------------------------------
   -- Internal signals driven by (i.e. "output" from) each block 
   -----------------------------------------------------------------------------  
-  signal hclk_i    : std_logic;
   signal msdin_i   : std_logic;
   signal ph_i_from_iopads : std_logic_vector(7 downto 0);
   signal mbypass_i : std_logic;
@@ -505,10 +507,7 @@ architecture struct of top is
   signal clk_i_pos   : std_logic;
   signal clk_e_pos   : std_logic;
   signal clk_e_neg   : std_logic;
-  signal clk_p       : std_logic;
-  signal clk_rx      : std_logic;
-  signal clk_tx      : std_logic;
-  signal clk_a_pos   : std_logic;
+   signal clk_a_pos   : std_logic;
   signal clk_c2a_pos : std_logic;
   signal clk_ea_pos  : std_logic;
   --signal clk_ea_neg : std_logic;
@@ -884,7 +883,7 @@ begin
   iopads_inst : entity work.iopads
     port map(
       -- clocks and control signals
-      HCLK       => HCLK,
+      HCLK       => clk_p,
        
       MRESET  => MRESET,
       MTEST   => MTEST,
@@ -1318,21 +1317,12 @@ begin
   -----------------------------------------------------------------------------
   clk_gen0 : entity work.clk_gen
     port map (
-      --rst_n      => rst_n,
       rst_cn       => rst_cn,
-      --pllout     => HCLK,
---      pllout     => tcko,   -- added by HYX, 20141115, for pll test
-      --xout       => hclk_i, -- 16.7mhz clk
---      clk_mux_out => clk_mux_out,
-      clk_mux_out  => HCLK,
+      clk_mux_out  => clk_p,
       erxclk       => erxclk,
       etxclk       => etxclk,
---      en_eth     => en_eth,
-      --sel_pll    => en_pll,--sel_pll,  to select ref oscillator change sel_pll to en_pll to select suitable clock by maning
       en_d         => en_d,
       fast_d       => fast_d,
-      --din_e      => din_e,
-      --din_ea     => din_ea,
       din_i        => din_i,
       din_u        => din_u,
       din_s        => din_s,
@@ -1340,28 +1330,19 @@ begin
       clk_in_off   => clk_in_off,
       clk_main_off => clk_main_off,
       hold_flash_d => hold_flash_d,
---        en_r          => router_clk_en,       --delete by HYX, 20141027
-      clk_p        => clk_p,
+      clk_p        => open, --clk_p,
       clk_c_en     => clk_c_en,
       even_c       => even_c,
-      --clk_c2_pos => clk_c2_pos,
-      --clk_e_pos  => clk_e_pos,
-      --clk_e_neg  => clk_e_neg,
-      --clk_c2a_pos => clk_c2a_pos,
-      --clk_ea_pos     => clk_ea_pos,
-      --clk_ea_neg     => clk_ea_neg,
       clk_i        => clk_i,
       clk_i_pos    => clk_i_pos,
---        clk_i_r       => clk_i_r,     --delete by HYX, 20141027
---        clk_p_r       => clk_p_r,     --delete by HYX, 20141027
       clk_d        => clk_d,
       clk_d_pos    => clk_d_pos,
       clk_da_pos   => clk_da_pos,
       clk_u_pos    => clk_u_pos,
       clk_s        => MCKOUT0,
       clk_s_pos    => clk_s_pos,
-      clk_rx       => clk_rx,
-      clk_tx       => clk_tx,
+      clk_rx       => open,
+      clk_tx       => open,
       clk_a_pos    => clk_a_pos
       );
   clk_a <= clk_a_pos;
@@ -1373,8 +1354,8 @@ begin
       g_memory_type     => g_memory_type,
       g_clock_frequency => g_clock_frequency)
     port map(
-      xout          => HCLK,
-      pllout        => HCLK,
+      xout          => clk_p,
+      pllout        => clk_p,
       sel_pll       => sel_pll,
       xout_selected => xout_selected,
       lp_pwr_ok     => MLP_PWR_OK,
@@ -1474,7 +1455,7 @@ begin
       en_pll       => en_pll,           --: out std_logic;  -- Enable PLL 
       sel_pll      => sel_pll,  --: out std_logic;  -- Select PLL as clock source
       test_pll     => test_pll,         --: out std_logic;  -- PLL in test mode
-      xout         => HCLK,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
+      xout         => clk_p,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
       -- Power on signal
       pwr_ok       => pwr_ok,  --pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
       ---------------------------------------------------------------------

@@ -36,7 +36,10 @@ entity digital_core is
     g_clock_frequency : integer);
 
   port (
-    hclk : in std_logic;            -- clk input   
+    clk_p_cpu : in std_logic;            -- clk input
+    clk_rx : in std_logic;
+    clk_tx : in std_logic;
+    
     MRESET  : in  std_logic;  -- system reset               low active
     MRSTOUT : out std_logic;
     MIRQOUT : out std_logic;            -- interrupt request output    
@@ -56,6 +59,8 @@ entity digital_core is
     -- power management control
     MPMIC_CORE : out   std_logic;
     MPMIC_IO   : out   std_logic;
+
+    clock_in_off : out std_logic;
 
     -- Analog internal signals
     pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
@@ -150,7 +155,9 @@ begin  -- architecture rtl
       g_clock_frequency => 31         -- system clock frequency in MHz
       )
     port map (
-      HCLK    => HCLK,
+      clk_p    => clk_p_cpu,
+      clk_rx => clk_rx,
+      clk_tx => clk_tx,
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,

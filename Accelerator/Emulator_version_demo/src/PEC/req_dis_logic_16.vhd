@@ -275,13 +275,13 @@ process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
     if rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            --if wr_req = '1' then
-            --    id_num <= add_in_1;
-            --else
+            if REQ_SIG = (REQ_SIG'range => '0') AND REQ_RD_IN = (REQ_RD_IN'range => '0') then
+                id_num <= x"0";
+            else
                 if REQ_RD_IN = (REQ_RD_IN'range => '0') then
-                id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
+                    id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
                 end if;
-            --end if;
+            end if;
         end if;
     end if;
     

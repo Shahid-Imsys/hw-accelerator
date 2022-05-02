@@ -53,12 +53,8 @@ use ieee.std_logic_unsigned.all;
 entity clk_gen is
   port (
     -- Reset input
-    --rst_n         : in  std_logic;      -- Asynchronous, from core
-    clk_mux_out  : in  std_logic;
     rst_cn       : in  std_logic;       -- Synchronized to clk_c, from core
     -- Clock inputs
-    erxclk       : in  std_logic;       -- Ethernet rx clock from Pad
-    etxclk       : in  std_logic;       -- Ethernet tx clock from Pad
     -- Clock control inputs, from core
     en_d         : in  std_logic;       -- Enables clk_d when high
     fast_d       : in  std_logic;       -- High speed of DRAM clock when high
@@ -71,7 +67,7 @@ entity clk_gen is
     clk_main_off : in  std_logic;
     hold_flash_d : in  std_logic;
     -- Buffered clock net outputs, to core 
-    clk_p        : out std_logic;       -- PLL clock, also feedback to PLL  
+    clk_p        : in std_logic;       -- PLL clock, also feedback to PLL  
     clk_c_en     : out std_logic;       -- PLL clock with enable  
     even_c       : out std_logic; 
     clk_i_pos    : out std_logic;       -- I/O clock positive edge
@@ -82,15 +78,12 @@ entity clk_gen is
     clk_u_pos    : out std_logic;       -- UART clock
     clk_s        : out std_logic;
     clk_s_pos    : out std_logic;       -- SP clock
-    clk_rx       : out std_logic;       -- ETH Rx clock
-    clk_tx       : out std_logic;       -- ETH Tx clock    
     clk_a_pos    : out std_logic);      -- Analog clock
 end clk_gen;
 
 architecture rtl of clk_gen is
   -- These are the clocks before the clock trees, all FFs below
   -- are clocked by clk_c_int, before the clock tree.
-  signal clk_p_int  : std_logic;
   signal clk_c_int  : std_logic;
   -- Early copy of the even_c signal used in the core.
   -- Used here only to generate clk_d when fast_d is zero.
@@ -98,8 +91,6 @@ architecture rtl of clk_gen is
 
   -- These intermediate signals are needed for zero-timing
   -- simulation. They should not affect synthesis.
-  --signal clk_p_int2   : std_logic;
-  signal clk_p_int3     : std_logic;
   signal clk_i_int      : std_logic;
   signal clk_i_pos_int  : std_logic;
   signal clk_d_int      : std_logic;
@@ -112,21 +103,17 @@ architecture rtl of clk_gen is
 
 begin
 
-  clk_p_int <= clk_mux_out when clk_in_off = '0' else '0';
-  clk_p     <= clk_p_int;
-
   -- PLL output is the source of clk_c except when the PLL
   -- is disabled, then clk_c is taken directly from the
   -- reference oscillator. clk_c can be disabled by rst_cn
   -- low. When disabled, clk_c stays high.
---  clk_c_int           <= clk_p_int or not rst_cn;
   clk_c_int <= rst_cn and (not clk_main_off);
 
   -- Generation of even_c, high during even cycles of clk_c
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         even_c_int <= '1';
       elsif clk_c_int = '1' then
@@ -138,9 +125,9 @@ begin
 
   -- Generate clk_i
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_i_int <= '1';
       elsif clk_c_int = '1' then
@@ -149,9 +136,9 @@ begin
     end if;
   end process;
 
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_i_pos_int <= '1';
       elsif clk_c_int = '1' then
@@ -164,7 +151,7 @@ begin
   -- even_c otherwise. When en_d is not set, clk_d stays high if fast_d is
   -- set, low otherwise.
   -- NOTE that the source of this signal is clk_c_int, before the clock tree!
-  clk_d_int <= clk_p_int or (not clk_c_int) or not en_d when fast_d = '1' else
+  clk_d_int <= clk_p or (not clk_c_int) or not en_d when fast_d = '1' else
                not even_c_int and en_d;
 
   clk_d_pos_int <= (not clk_c_int) or (not en_d) or hold_flash_d when fast_d = '1' else
@@ -173,9 +160,9 @@ begin
                     (not clk_c_int) or even_c_int or (not en_d);
   -- Generate clk_u
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_u_int <= '0';
       elsif clk_c_int = '1' then
@@ -186,9 +173,9 @@ begin
 
   -- Generate clk_s
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_s_int <= '0';
       elsif clk_c_int = '1' then
@@ -197,9 +184,9 @@ begin
     end if;
   end process;
 
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_s_pos_int <= '0';
       elsif clk_c_int = '1' then
@@ -208,14 +195,11 @@ begin
     end if;
   end process;
 
-  clk_rx <= erxclk;
-  clk_tx <= etxclk;
-
   -- Generate clk_a
   -- NOTE that this FF is clocked by clk_c_int, before the clock tree!
-  process (clk_p_int)
+  process (clk_p)
   begin
-    if rising_edge(clk_p_int) then
+    if rising_edge(clk_p) then
       if rst_cn = '0' then
         clk_a_int <= '0';
       elsif clk_c_int = '1' then
@@ -226,8 +210,6 @@ begin
 
   -- These buffers are needed for zero-timing simulation.
   -- They should not affect synthesis.
-  --clk_p_int3 <= clk_p_int2;
-  clk_p      <= clk_p_int;
   clk_c_en   <= clk_c_int;
   clk_i      <= clk_i_int;
   clk_i_pos  <= clk_i_pos_int or (not din_i);

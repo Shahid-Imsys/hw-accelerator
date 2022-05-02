@@ -181,6 +181,8 @@ begin  -- architecture rtl
       D_BA  => open,
       D_CKE => open,
 
+      clock_in_off => clock_in_off,
+      
       -- Port A
       pa_i  => pa_i,
       pa_en => pa_en,

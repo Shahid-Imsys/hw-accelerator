@@ -114,6 +114,8 @@ entity top is
     D_BA       : out   std_logic_vector(1 downto 0);
     D_CKE      : out   std_logic_vector(3 downto 0);
 
+    clock_in_off : out std_logic;
+    
     -- Analog internal signals
     pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
     dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)  
@@ -493,6 +495,7 @@ architecture struct of top is
   -- PLL 
   signal tcko    : std_logic;
   signal const_0 : std_logic;
+  --signal clk_p : std_logic;
 
   -- Core clock buffers
   signal even_c      : std_logic;
@@ -525,8 +528,7 @@ architecture struct of top is
   signal reset_core_n    : std_logic;   -- to reset core, low active
   signal io_iso          : std_logic;  -- to isolate the io signals in nap mode
   signal nap_rec         : std_logic;   -- will recover from nap mode
-  signal clk_mux_out     : std_logic;
-
+  
 
   -----------------------------------------------------------------------------
   -- core/peri driven signals
@@ -1318,9 +1320,6 @@ begin
   clk_gen0 : entity work.clk_gen
     port map (
       rst_cn       => rst_cn,
-      clk_mux_out  => clk_p,
-      erxclk       => erxclk,
-      etxclk       => etxclk,
       en_d         => en_d,
       fast_d       => fast_d,
       din_i        => din_i,
@@ -1330,7 +1329,7 @@ begin
       clk_in_off   => clk_in_off,
       clk_main_off => clk_main_off,
       hold_flash_d => hold_flash_d,
-      clk_p        => open, --clk_p,
+      clk_p        => clk_p,
       clk_c_en     => clk_c_en,
       even_c       => even_c,
       clk_i        => clk_i,
@@ -1341,8 +1340,6 @@ begin
       clk_u_pos    => clk_u_pos,
       clk_s        => MCKOUT0,
       clk_s_pos    => clk_s_pos,
-      clk_rx       => open,
-      clk_tx       => open,
       clk_a_pos    => clk_a_pos
       );
   clk_a <= clk_a_pos;
@@ -1380,7 +1377,7 @@ begin
       nap_rec         => nap_rec,
       pmic_core_en    => MPMIC_CORE,
       pmic_io_en      => MPMIC_IO,
-      clk_mux_out     => clk_mux_out,
+      clk_mux_out     => open,
 
       --gmem1
       c1_gmem_a    => c1_gmem_a,
@@ -1413,6 +1410,9 @@ begin
 
   -- Disable power to BMEM 
   dis_bmem <= dis_bmem_int;
+
+  clock_in_off <= clk_in_off;
+  
   -----------------------------------------------------------------------------
   -- core
   -----------------------------------------------------------------------------

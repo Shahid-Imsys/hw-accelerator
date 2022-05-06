@@ -1,0 +1,5756 @@
+library( RIIO_GF22FDX_BASEIO_EG1D80V_zbb_tc_0d80V_1d80V_85C ) {
+  technology (cmos) ;
+  delay_model : table_lookup ;
+  define ("add_pg_pin_to_lib",  "library",  "boolean");
+  add_pg_pin_to_lib : true;
+  voltage_map ( PWR_PAD, 0.800000 );
+  voltage_map ( PWR_VNW, 1.800000 );
+  voltage_map ( PWR_VDDIOX, 1.800000 );
+  voltage_map ( PWR_VDDQ, 0.800000 );
+  voltage_map ( PWR_VDDX, 0.800000 );
+  voltage_map ( PWR_VSUP, 0.800000 );
+  voltage_map ( PWR_VDDIO, 1.800000 );
+  voltage_map ( PWR_VDDIO_POR, 1.800000 );
+  voltage_map ( PWR_VDD, 0.800000 );
+  voltage_map ( PWR_VDD_POR, 0.800000 );
+  voltage_map ( GND_VSSIO_R, 0.000000 );
+  voltage_map ( GND_VSSIO_L, 0.000000 );
+  voltage_map ( GND_VSS_R, 0.000000 );
+  voltage_map ( GND_VSS_L, 0.000000 );
+  voltage_map ( GND_VPW, -1.800000 );
+  voltage_map ( GND_VSSIOX, 0.000000 );
+  voltage_map ( GND_VSSQ, 0.000000 );
+  voltage_map ( GND_VSSX, 0.000000 );
+  voltage_map ( GND_VSUP, 0.800000 );
+  voltage_map ( GND_VSSIO, 0.000000 );
+  voltage_map ( GND_VSSIO_POR, 0.000000 );
+  voltage_map ( GND_VSS, 0.000000 );
+  voltage_map ( GND_VSS_POR, 0.000000 );
+  voltage_map ( GND_SUB, 0.000000 );
+  library_features ( report_delay_calculation ) ;
+  date            : "Mar 22 11:32:04 2019" ;
+  revision        : "1.0" ;
+  nom_process     : 1.0 ;
+  nom_voltage     : 0.800000 ;
+  nom_temperature : 85.000000 ;
+  operating_conditions("zbb_tc_0d80V_1d80V_85C"){
+    calc_mode     : nominal ;
+    process       : 1.0 ;
+    voltage       : 0.800000 ;
+    temperature   : 85.000000 ;
+  } /* current design opcond */
+  default_operating_conditions : "zbb_tc_0d80V_1d80V_85C" ;
+  voltage_unit            : "1V" ;
+  time_unit               : "1ns" ;
+  current_unit            : "1uA" ;
+  leakage_power_unit      : "1nW" ;
+  pulling_resistance_unit : "1kohm" ;
+  capacitive_load_unit (1.0, ff);
+  slew_derate_from_library      :  0.5;
+  slew_lower_threshold_pct_rise : 30.0;
+  slew_lower_threshold_pct_fall : 30.0;
+  slew_upper_threshold_pct_rise : 70.0;
+  slew_upper_threshold_pct_fall : 70.0;
+  input_threshold_pct_rise      : 50.0;
+  input_threshold_pct_fall      : 50.0;
+  output_threshold_pct_rise     : 50.0;
+  output_threshold_pct_fall     : 50.0;
+  k_process_cell_rise           :  0.0;
+  k_process_cell_fall           :  0.0;
+  k_volt_cell_rise              :  0.0;
+  k_volt_cell_fall              :  0.0;
+  k_temp_cell_rise              :  0.0;
+  k_temp_cell_fall              :  0.0;
+  k_process_rise_transition     :  0.0;
+  k_process_fall_transition     :  0.0;
+  k_volt_rise_transition        :  0.0;
+  k_volt_fall_transition        :  0.0;
+  k_temp_rise_transition        :  0.0;
+  k_temp_fall_transition        :  0.0;
+  default_fanout_load           :  1.0;
+  default_inout_pin_cap         :  1.0;
+  default_input_pin_cap         :  1.0;
+  default_output_pin_cap        :  0.0;
+  default_cell_leakage_power    :  0.0;
+  default_leakage_power_density :  0.0;
+  define(min_delay_flag, timing, boolean);
+  define(original_pin, pin, string);
+  input_voltage(PAD) { 
+    vil : 0 ; 
+    vih : 1.800000 ; 
+    vimin : 0 ; 
+    vimax : 1.800000 ; 
+  }
+
+
+  input_voltage(default) { 
+    vil : 0 ; 
+    vih : 0.800000 ; 
+    vimin : 0 ; 
+    vimax : 0.800000 ; 
+  }
+
+  output_voltage(PAD) { 
+    vol : 0 ; 
+    voh : 1.800000 ; 
+    vomin : 0 ; 
+    vomax : 1.800000 ; 
+  }
+
+  output_voltage(default) { 
+    vol : 0 ; 
+    voh : 0.800000 ; 
+    vomin : 0 ; 
+    vomax : 0.800000 ; 
+  }
+  type(sis_DS_I_4) { 
+    base_type : "array" ; 
+    bit_from : 3 ; 
+    bit_to : 0 ; 
+    bit_width : 4 ; 
+    data_type : "bit" ; 
+    downto : true ; 
+  }
+
+  type(sis_STE_I_2) { 
+    base_type : "array" ; 
+    bit_from : 1 ; 
+    bit_to : 0 ; 
+    bit_width : 2 ; 
+    data_type : "bit" ; 
+    downto : true ; 
+  }
+
+  lu_table_template(ndw_ntin_nvolt_10x2) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : normalized_voltage ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2");
+  }
+
+  lu_table_template(tmg_ntin_10) { 
+    variable_1 : input_net_transition ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+  }
+
+  lu_table_template(tmg_ntin_oload_10x8) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8");
+  }
+
+  lu_table_template(tmg_ntin_oload_10x9) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8, 9");
+  }
+
+  lu_table_template(tmg_ntin_oload_6x9) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8, 9");
+  }
+
+  normalized_driver_waveform(ndw_ntin_nvolt_10x2) { 
+    driver_waveform_name : "driver_waveform_default_rise" ; 
+    index_1("0.004, 0.018, 0.036, 0.068, 0.116, 0.21, 0.396, 0.712, 1.28, 2.4");
+    index_2("0, 1");
+    values("0, 0.005",\
+           "0, 0.0225",\
+           "0, 0.045",\
+           "0, 0.085",\
+           "0, 0.145",\
+           "0, 0.2625",\
+           "0, 0.495",\
+           "0, 0.89",\
+           "0, 1.6",\
+           "0, 3");
+  }
+
+
+cell( RIIO_EG1D80V_FILL16B2B_V ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL16B2B_V */
+cell( RIIO_EG1D80V_FILL16B2B_H ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL16B2B_H */
+cell( RIIO_EG1D80V_CORNER_45 ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CORNER_45 */
+cell( RIIO_EG1D80V_POR_IO_V1D0_H ) {
+  area                : 640.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO_POR) {
+    voltage_name : PWR_VDDIO_POR;
+    pg_type : primary_power;
+  }
+  pg_pin (VDD_POR) {
+    voltage_name : PWR_VDD_POR;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO_POR) {
+    voltage_name : GND_VSSIO_POR;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSS_POR) {
+    voltage_name : GND_VSS_POR;
+    pg_type : primary_ground;
+  }
+
+
+
+  pin ("POR_N_CORE_O") {
+    related_power_pin : VDD_POR;
+    related_ground_pin : VSS_POR;
+    power_down_function : "!VDD_POR+VSS_POR";
+    direction : output;
+    original_pin : "POR_N_CORE_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+
+} /* end of cell RIIO_EG1D80V_POR_IO_V1D0_H */
+cell( RIIO_EG1D80V_POR_IO_V1D0_V ) {
+  area                : 640.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO_POR) {
+    voltage_name : PWR_VDDIO_POR;
+    pg_type : primary_power;
+  }
+  pg_pin (VDD_POR) {
+    voltage_name : PWR_VDD_POR;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO_POR) {
+    voltage_name : GND_VSSIO_POR;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSS_POR) {
+    voltage_name : GND_VSS_POR;
+    pg_type : primary_ground;
+  }
+
+
+
+  pin ("POR_N_CORE_O") {
+    related_power_pin : VDD_POR;
+    related_ground_pin : VSS_POR;
+    power_down_function : "!VDD_POR+VSS_POR";
+    direction : output;
+    original_pin : "POR_N_CORE_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+
+} /* end of cell RIIO_EG1D80V_POR_IO_V1D0_V */
+cell( RIIO_BUMP_RCUP130_SIG ) {
+  area                : 6710.195358 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : "PAD";
+    capacitance : 1.0;
+    max_transition : 20.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BUMP_RCUP130_SIG */
+cell( RIIO_BUMP_RCUP130_PWR ) {
+  area                : 6710.195358 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_RCUP130_PWR */
+cell( RIIO_BUMP_RCUP130_GND ) {
+  area                : 6710.195358 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_RCUP130_GND */
+cell( RIIO_BUMP_RCUP100_SIG ) {
+  area                : 2982.309048 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : "PAD";
+    capacitance : 1.0;
+    max_transition : 20.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BUMP_RCUP100_SIG */
+cell( RIIO_BUMP_RCUP100_PWR ) {
+  area                : 2982.309048 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_RCUP100_PWR */
+cell( RIIO_BUMP_RCUP100_GND ) {
+  area                : 2982.309048 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_RCUP100_GND */
+cell( RIIO_CONN_LB05_PWR ) {
+  area                : 0.250000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+  pin ("SIG") {
+    related_power_pin : VDD;
+    direction : inout;
+    original_pin : SIG;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_CONN_LB05_PWR */
+cell( RIIO_CONN_LB05_GND ) {
+  area                : 0.250000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+  pin ("SIG") {
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : SIG;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_CONN_LB05_GND */
+cell( RIIO_EG1D80V_RAILSHORT_PWR_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_PWR_V */
+cell( RIIO_EG1D80V_RAILSHORT_PWR_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_PWR_H */
+cell( RIIO_EG1D80V_RAILSHORT_PG_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_PG_V */
+cell( RIIO_EG1D80V_RAILSHORT_PG_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_PG_H */
+cell( RIIO_EG1D80V_RAILSHORT_GND_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_GND_V */
+cell( RIIO_EG1D80V_RAILSHORT_GND_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_RAILSHORT_GND_H */
+cell( RIIO_BUMP_SNAG180_SIG ) {
+  area                : 7634.756152 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BUMP_SNAG180_SIG */
+cell( RIIO_BUMP_SNAG180_PWR ) {
+  area                : 7634.756152 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG180_PWR */
+cell( RIIO_BUMP_SNAG180_GND ) {
+  area                : 7634.756152 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG180_GND */
+cell( RIIO_BUMP_SNAG150_SIG ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BUMP_SNAG150_SIG */
+cell( RIIO_BUMP_SNAG150_PWR ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG150_PWR */
+cell( RIIO_BUMP_SNAG150_GND ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG150_GND */
+cell( RIIO_BUMP_SNAG140_SIG ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BUMP_SNAG140_SIG */
+cell( RIIO_BUMP_SNAG140_PWR ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG140_PWR */
+cell( RIIO_BUMP_SNAG140_GND ) {
+  area                : 5516.140000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BUMP_SNAG140_GND */
+cell( RIIO_BOND80x100_PLAIN_SIG ) {
+  area                : 8000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 500.0;
+    max_transition : 20.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_PLAIN_SIG */
+cell( RIIO_BOND80x100_INNER_SIG ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 500.0;
+    max_transition : 20.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_INNER_SIG */
+cell( RIIO_EG1D80V_VSS_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS_HVT_V */
+cell( RIIO_EG1D80V_VSS_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS_HVT_H */
+cell( RIIO_EG1D80V_VSSX_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX_HVT_V */
+cell( RIIO_EG1D80V_VSSX_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX_HVT_H */
+cell( RIIO_EG1D80V_VSSQ_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ_HVT_V */
+cell( RIIO_EG1D80V_VSSQ_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ_HVT_H */
+cell( RIIO_EG1D80V_VPWINT_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPWINT_HVT_V */
+cell( RIIO_EG1D80V_VPWINT_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPWINT_HVT_H */
+cell( RIIO_EG1D80V_VNWINT_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNWINT_HVT_V */
+cell( RIIO_EG1D80V_VNWINT_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNWINT_HVT_H */
+cell( RIIO_EG1D80V_VDD_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD_HVT_V */
+cell( RIIO_EG1D80V_VDD_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD_HVT_H */
+cell( RIIO_EG1D80V_VDDX_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX_HVT_V */
+cell( RIIO_EG1D80V_VDDX_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX_HVT_H */
+cell( RIIO_EG1D80V_VDDQ_HVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ_HVT_V */
+cell( RIIO_EG1D80V_VDDQ_HVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ_HVT_H */
+cell( RIIO_EG1D80V_CORNER_RVT ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CORNER_RVT */
+cell( RIIO_EG1D80V_CORNER_HVT ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CORNER_HVT */
+cell( RIIO_EG1D80V_CORNER_EG ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CORNER_EG */
+cell( RIIO_EG1D80V_BIASPAD_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("PAD_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VBIAS") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VBIAS;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_BIASPAD_H */
+cell( RIIO_BOND20x10_INNER_SIG ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 500.0;
+    max_transition : 20.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND20x10_INNER_SIG */
+cell( RIIO_BOND20x10_INNER_PWR ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND20x10_INNER_PWR */
+cell( RIIO_BOND20x10_INNER_GND ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND20x10_INNER_GND */
+cell( RIIO_EG1D80V_VPW_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPW_H */
+cell( RIIO_EG1D80V_VPW_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPW_V */
+cell( RIIO_BOND70_PLAIN_PWR ) {
+  area                : 4900.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_PLAIN_PWR */
+cell( RIIO_EG1D80V_ANAIO_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD0_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD1_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD2_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD3_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES0_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES1_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES2_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES3_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_ANAIO_V */
+cell( RIIO_EG1D80V_VDDQ04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ04_V */
+cell( RIIO_EG1D80V_VSUP_CORE_SIG_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("VSUP") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VSUP;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_SIG_V */
+cell( RIIO_BOND60x90_OUTER_SIG ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_OUTER_SIG */
+cell( RIIO_BOND60_INNER_SIG ) {
+  area                : 4000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60_INNER_SIG */
+cell( RIIO_EG1D80V_VSS04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS04_V */
+cell( RIIO_EG1D80V_VSUP_CORE_PWR_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_power;
+    voltage_name : PWR_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_PWR_H */
+cell( RIIO_EG1D80V_ANACORE_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("PAD_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD0_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD1_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD2_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD3_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES0_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES1_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES2_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES3_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_ANACORE_V */
+cell( RIIO_BOND80x100_PLAIN_GND ) {
+  area                : 8000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_PLAIN_GND */
+cell( RIIO_BOND64_INNER_GND ) {
+  area                : 4416.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_INNER_GND */
+cell( RIIO_EG1D80V_CUTCOREB2B_V ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSS_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_L;
+  }
+  pg_pin (VSS_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCOREB2B_V */
+cell( RIIO_EG1D80V_CUTIOB2B_H ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_L;
+  }
+  pg_pin (VSSIO_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIOB2B_H */
+cell( RIIO_BOND60x90_PLAIN_GND_CESD ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_PLAIN_GND_CESD */
+cell( RIIO_EG1D80V_CUT_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUT_H */
+cell( RIIO_BOND60_INNER_PWR ) {
+  area                : 4000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_INNER_PWR */
+cell( RIIO_EG1D80V_VDDX04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX04_H */
+cell( RIIO_BOND64_OUTER_GND ) {
+  area                : 7296.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_OUTER_GND */
+cell( RIIO_EG1D80V_VDDX04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX04_V */
+cell( RIIO_BOND60_OUTER_GND ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_OUTER_GND */
+cell( RIIO_BOND60_OUTER_SIG ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60_OUTER_SIG */
+cell( RIIO_EG1D80V_CUTCOREPWR_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCOREPWR_H */
+cell( RIIO_EG1D80V_VNWINT_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNWINT_RVT_H */
+cell( RIIO_EG1D80V_VSSQ04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ04_V */
+cell( RIIO_EG1D80V_VSUP_CORE_GND_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_GND_V */
+cell( RIIO_BOND60_PLAIN_SIG ) {
+  area                : 3600.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60_PLAIN_SIG */
+cell( RIIO_EG1D80V_VDD04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD04_V */
+cell( RIIO_EG1D80V_VNW_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNW_H */
+cell( RIIO_BOND64_INNER_SIG ) {
+  area                : 4416.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND64_INNER_SIG */
+cell( RIIO_EG1D80V_VDD_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD_RVT_H */
+cell( RIIO_EG1D80V_CUTIO_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIO_H */
+cell( RIIO_BOND80x100_INNER_PWR ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_INNER_PWR */
+cell( RIIO_EG1D80V_VSSX04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX04_H */
+cell( RIIO_BOND70_OUTER_GND ) {
+  area                : 8050.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_OUTER_GND */
+cell( RIIO_EG1D80V_VSUP_CORE_GND_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_GND_H */
+cell( RIIO_EG1D80V_VDDIO_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDIO_V */
+cell( RIIO_EG1D80V_VDDIOX_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDIOX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIOX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSIOX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIOX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDIOX_V */
+cell( RIIO_BOND60x90_PLAIN_PWR ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_PLAIN_PWR */
+cell( RIIO_EG1D80V_FILL2_V ) {
+  area                : 160.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL2_V */
+cell( RIIO_EG1D80V_CUTCOREPWR_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCOREPWR_V */
+cell( RIIO_EG1D80V_VPWINT_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPWINT_RVT_V */
+cell( RIIO_EG1D80V_ANAIO_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD0_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD1_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD2_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD3_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VESD3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES0_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES1_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES2_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES3_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VRES3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_ANAIO_H */
+cell( RIIO_BOND60_OUTER_PWR ) {
+  area                : 6400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_OUTER_PWR */
+cell( RIIO_EG1D80V_VDDQ04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ04_H */
+cell( RIIO_BOND60x90_OUTER_PWR_CESD ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_OUTER_PWR_CESD */
+cell( RIIO_EG1D80V_VDD04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD04_H */
+cell( RIIO_EG1D80V_VSS_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS_RVT_H */
+cell( RIIO_BOND60x90_INNER_GND_CESD ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_INNER_GND_CESD */
+cell( RIIO_EG1D80V_FILL4_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL4_V */
+cell( RIIO_EG1D80V_CUTCORE_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCORE_V */
+cell( RIIO_BOND60x90_INNER_SIG ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_INNER_SIG */
+cell( RIIO_BOND60x90_INNER_GND ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_INNER_GND */
+cell( RIIO_EG1D80V_VSUP_CORE_PWR_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_power;
+    voltage_name : PWR_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_PWR_V */
+cell( RIIO_BOND60x90_PLAIN_GND ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_PLAIN_GND */
+cell( RIIO_BOND60x90_PLAIN_SIG ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_PLAIN_SIG */
+cell( RIIO_EG1D80V_VSSIOX_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDIOX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIOX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSIOX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIOX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSIOX_V */
+cell( RIIO_EG1D80V_VSUP_IO_PWR_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_power;
+    voltage_name : PWR_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_PWR_V */
+cell( RIIO_BOND80x100_INNER_GND ) {
+  area                : 400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_INNER_GND */
+cell( RIIO_EG1D80V_VSUP_IO_PWR_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_power;
+    voltage_name : PWR_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_PWR_H */
+cell( RIIO_EG1D80V_VDD_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDD_RVT_V */
+cell( RIIO_EG1D80V_VSSQ_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ_RVT_H */
+cell( RIIO_EG1D80V_FILL32_H ) {
+  area                : 2560.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL32_H */
+cell( RIIO_EG1D80V_VDDIO_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDIO_H */
+cell( RIIO_EG1D80V_CUT_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUT_V */
+cell( RIIO_EG1D80V_FILL2_H ) {
+  area                : 160.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL2_H */
+cell( RIIO_EG1D80V_VSUP_CORE_SIG_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("VSUP") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VSUP;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_VSUP_CORE_SIG_H */
+cell( RIIO_EG1D80V_VNWINT_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNWINT_RVT_V */
+cell( RIIO_BOND60x90_OUTER_GND_CESD ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_OUTER_GND_CESD */
+cell( RIIO_EG1D80V_VNW_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VNW) {
+    pg_type : nwell;
+    voltage_name : PWR_VNW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VNW_V */
+cell( RIIO_EG1D80V_CUTB2B_V ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSSIO_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_L;
+  }
+  pg_pin (VSSIO_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_R;
+  }
+  pg_pin (VSS_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_L;
+  }
+  pg_pin (VSS_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTB2B_V */
+cell( RIIO_EG1D80V_VSUP_IO_SIG_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("VSUP") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VSUP;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_SIG_V */
+cell( RIIO_BOND60_PLAIN_PWR ) {
+  area                : 3600.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_PLAIN_PWR */
+cell( RIIO_EG1D80V_VSS_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS_RVT_V */
+cell( RIIO_BOND60x90_INNER_PWR_CESD ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_INNER_PWR_CESD */
+cell( RIIO_EG1D80V_VSSX_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX_RVT_V */
+cell( RIIO_EG1D80V_VSSQ04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ04_H */
+cell( RIIO_BOND70_PLAIN_GND ) {
+  area                : 4900.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_PLAIN_GND */
+cell( RIIO_EG1D80V_CUTPWR_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTPWR_V */
+cell( RIIO_EG1D80V_VDDX_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX_RVT_H */
+cell( RIIO_EG1D80V_VDDQ_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ_RVT_H */
+cell( RIIO_BOND60x90_OUTER_PWR ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_OUTER_PWR */
+cell( RIIO_EG1D80V_CUTIOPWR_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIOPWR_H */
+cell( RIIO_BOND64_PLAIN_PWR ) {
+  area                : 4096.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_PLAIN_PWR */
+cell( RIIO_BOND64_INNER_PWR ) {
+  area                : 4416.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_INNER_PWR */
+cell( RIIO_EG1D80V_VSUP_IO_SIG_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("VSUP") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VSUP;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_SIG_H */
+cell( RIIO_EG1D80V_CUTIOB2B_V ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_L;
+  }
+  pg_pin (VSSIO_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIOB2B_V */
+cell( RIIO_EG1D80V_VSSX04_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX04_V */
+cell( RIIO_EG1D80V_CUTCOREB2B_H ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSS_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_L;
+  }
+  pg_pin (VSS_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCOREB2B_H */
+cell( RIIO_BOND64_OUTER_SIG ) {
+  area                : 7296.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND64_OUTER_SIG */
+cell( RIIO_EG1D80V_ANACORE_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+  pin ("PAD_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD0_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD1_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD2_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VESD3_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VESD3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES0_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES0_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES1_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES1_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES2_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES2_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("VRES3_B") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : inout;
+    original_pin : VRES3_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_ANACORE_H */
+cell( RIIO_BOND60x90_INNER_SIG_CESD ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_INNER_SIG_CESD */
+cell( RIIO_EG1D80V_VSSQ_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSQ_RVT_V */
+cell( RIIO_EG1D80V_VDDIOX_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDIOX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIOX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSIOX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIOX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDIOX_H */
+cell( RIIO_EG1D80V_FILL1_V ) {
+  area                : 80.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL1_V */
+cell( RIIO_BOND64_PLAIN_SIG ) {
+  area                : 4096.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND64_PLAIN_SIG */
+cell( RIIO_BOND60x90_OUTER_SIG_CESD ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_OUTER_SIG_CESD */
+cell( RIIO_BOND70_INNER_PWR ) {
+  area                : 5300.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_INNER_PWR */
+cell( RIIO_EG1D80V_CUTBIAS_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTBIAS_V */
+cell( RIIO_EG1D80V_VSSIO_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSIO_V */
+cell( RIIO_EG1D80V_CUTCORE_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTCORE_H */
+cell( RIIO_EG1D80V_VDDX_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDX_RVT_V */
+cell( RIIO_BOND64_PLAIN_GND ) {
+  area                : 4096.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_PLAIN_GND */
+cell( RIIO_EG1D80V_FILL16_V ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL16_V */
+cell( RIIO_BOND60_PLAIN_GND ) {
+  area                : 3600.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_PLAIN_GND */
+cell( RIIO_BOND70_INNER_SIG ) {
+  area                : 5300.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND70_INNER_SIG */
+cell( RIIO_EG1D80V_VSS04_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSS04_H */
+cell( RIIO_EG1D80V_VSUP_IO_GND_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_GND_V */
+cell( RIIO_EG1D80V_FILL4_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL4_H */
+cell( RIIO_EG1D80V_CUTIOPWR_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIOPWR_V */
+cell( RIIO_BOND60x90_OUTER_GND ) {
+  area                : 9250.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_OUTER_GND */
+cell( RIIO_EG1D80V_FILL1_H ) {
+  area                : 80.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL1_H */
+cell( RIIO_BOND70_OUTER_SIG ) {
+  area                : 8050.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND70_OUTER_SIG */
+cell( RIIO_EG1D80V_FILL8_H ) {
+  area                : 640.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL8_H */
+cell( RIIO_EG1D80V_VPWINT_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VPW) {
+    pg_type : pwell;
+    voltage_name : GND_VPW;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VPWINT_RVT_H */
+cell( RIIO_EG1D80V_VSSIO_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSIO_H */
+cell( RIIO_BOND70_OUTER_PWR ) {
+  area                : 8050.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_OUTER_PWR */
+cell( RIIO_BOND60x90_PLAIN_PWR_CESD ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_PLAIN_PWR_CESD */
+cell( RIIO_EG1D80V_CUTB2B_H ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSSIO_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_L;
+  }
+  pg_pin (VSSIO_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO_R;
+  }
+  pg_pin (VSS_L) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_L;
+  }
+  pg_pin (VSS_R) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS_R;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTB2B_H */
+cell( RIIO_EG1D80V_VSSX_RVT_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSX_RVT_H */
+cell( RIIO_EG1D80V_FILL32_V ) {
+  area                : 2560.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL32_V */
+cell( RIIO_BOND80x100_PLAIN_PWR ) {
+  area                : 8000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND80x100_PLAIN_PWR */
+cell( RIIO_BOND70_PLAIN_SIG ) {
+  area                : 4900.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND70_PLAIN_SIG */
+cell( RIIO_BOND70_INNER_GND ) {
+  area                : 5300.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND70_INNER_GND */
+cell( RIIO_BOND64_OUTER_PWR ) {
+  area                : 7296.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND64_OUTER_PWR */
+cell( RIIO_EG1D80V_FILL8_V ) {
+  area                : 640.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL8_V */
+cell( RIIO_BOND60_INNER_GND ) {
+  area                : 4000.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60_INNER_GND */
+cell( RIIO_EG1D80V_VSUP_IO_GND_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSUP) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSUP;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSUP_IO_GND_H */
+cell( RIIO_BOND60x90_INNER_PWR ) {
+  area                : 5800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+
+
+
+
+} /* end of cell RIIO_BOND60x90_INNER_PWR */
+cell( RIIO_BOND60x90_PLAIN_SIG_CESD ) {
+  area                : 5400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+
+
+
+  pin ("PAD") {
+    direction : inout;
+    original_pin : PAD;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 50000.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_BOND60x90_PLAIN_SIG_CESD */
+cell( RIIO_EG1D80V_CUTBIAS_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTBIAS_H */
+cell( RIIO_EG1D80V_CUTIO_V ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTIO_V */
+cell( RIIO_EG1D80V_FILL16_H ) {
+  area                : 1280.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_FILL16_H */
+cell( RIIO_EG1D80V_CUTPWR_H ) {
+  area                : 320.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_CUTPWR_H */
+cell( RIIO_EG1D80V_VSSIOX_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDIOX) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIOX;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSIOX) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIOX;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VSSIOX_H */
+cell( RIIO_EG1D80V_VDDQ_RVT_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+
+
+
+} /* end of cell RIIO_EG1D80V_VDDQ_RVT_V */
+/*%%cells%%*/
+} /* end of library( RIIO_GF22FDX_BASEIO_EG1D80V_zbb_tc_0d80V_1d80V_85C ) */

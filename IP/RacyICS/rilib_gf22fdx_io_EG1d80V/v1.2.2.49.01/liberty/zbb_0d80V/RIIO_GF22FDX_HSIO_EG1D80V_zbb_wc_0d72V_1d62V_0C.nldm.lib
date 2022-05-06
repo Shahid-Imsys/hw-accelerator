@@ -1,0 +1,4405 @@
+library( RIIO_GF22FDX_HSIO_EG1D80V_zbb_wc_0d72V_1d62V_0C ) {
+  technology (cmos) ;
+  delay_model : table_lookup ;
+  define ("add_pg_pin_to_lib",  "library",  "boolean");
+  add_pg_pin_to_lib : true;
+  voltage_map ( PWR_VDDQ, 0.720000 );
+  voltage_map ( PWR_VDDIO, 1.620000 );
+  voltage_map ( PWR_VDD, 0.720000 );
+  voltage_map ( GND_VSSQ, 0.000000 );
+  voltage_map ( GND_VSSIO, 0.000000 );
+  voltage_map ( GND_VSS, 0.000000 );
+  library_features ( report_delay_calculation ) ;
+  date            : "Jun 30 22:15:35 2019" ;
+  revision        : "1.0" ;
+  nom_process     : 1.0 ;
+  nom_voltage     : 0.720000 ;
+  nom_temperature : 0.000000 ;
+  operating_conditions("zbb_wc_0d72V_1d62V_0C"){
+    calc_mode     : worst ;
+    process       : 1.0 ;
+    voltage       : 0.720000 ;
+    temperature   : 0.000000 ;
+  } /* current design opcond */
+  default_operating_conditions : "zbb_wc_0d72V_1d62V_0C" ;
+  voltage_unit            : "1V" ;
+  time_unit               : "1ns" ;
+  current_unit            : "1uA" ;
+  leakage_power_unit      : "1nW" ;
+  pulling_resistance_unit : "1kohm" ;
+  capacitive_load_unit (1.0, ff);
+  slew_derate_from_library      :  0.5;
+  slew_lower_threshold_pct_rise : 30.0;
+  slew_lower_threshold_pct_fall : 30.0;
+  slew_upper_threshold_pct_rise : 70.0;
+  slew_upper_threshold_pct_fall : 70.0;
+  input_threshold_pct_rise      : 50.0;
+  input_threshold_pct_fall      : 50.0;
+  output_threshold_pct_rise     : 50.0;
+  output_threshold_pct_fall     : 50.0;
+  k_process_cell_rise           :  0.0;
+  k_process_cell_fall           :  0.0;
+  k_volt_cell_rise              :  0.0;
+  k_volt_cell_fall              :  0.0;
+  k_temp_cell_rise              :  0.0;
+  k_temp_cell_fall              :  0.0;
+  k_process_rise_transition     :  0.0;
+  k_process_fall_transition     :  0.0;
+  k_volt_rise_transition        :  0.0;
+  k_volt_fall_transition        :  0.0;
+  k_temp_rise_transition        :  0.0;
+  k_temp_fall_transition        :  0.0;
+  default_fanout_load           :  1.0;
+  default_inout_pin_cap         :  1.0;
+  default_input_pin_cap         :  1.0;
+  default_output_pin_cap        :  0.0;
+  default_cell_leakage_power    :  0.0;
+  default_leakage_power_density :  0.0;
+  define(min_delay_flag, timing, boolean);
+  define(original_pin, pin, string);
+  input_voltage(PAD) { 
+    vil : 0 ; 
+    vih : 1.620000 ; 
+    vimin : 0 ; 
+    vimax : 1.620000 ; 
+  }
+
+
+  input_voltage(default) { 
+    vil : 0 ; 
+    vih : 0.720000 ; 
+    vimin : 0 ; 
+    vimax : 0.720000 ; 
+  }
+
+  output_voltage(PAD) { 
+    vol : 0 ; 
+    voh : 1.620000 ; 
+    vomin : 0 ; 
+    vomax : 1.620000 ; 
+  }
+
+  output_voltage(default) { 
+    vol : 0 ; 
+    voh : 0.720000 ; 
+    vomin : 0 ; 
+    vomax : 0.720000 ; 
+  }
+  type(sis_DS_I_4) { 
+    base_type : "array" ; 
+    bit_from : 3 ; 
+    bit_to : 0 ; 
+    bit_width : 4 ; 
+    data_type : "bit" ; 
+    downto : true ; 
+  }
+
+  type(sis_STE_I_2) { 
+    base_type : "array" ; 
+    bit_from : 1 ; 
+    bit_to : 0 ; 
+    bit_width : 2 ; 
+    data_type : "bit" ; 
+    downto : true ; 
+  }
+
+  lu_table_template(ndw_ntin_nvolt_10x2) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : normalized_voltage ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2");
+  }
+
+  lu_table_template(tmg_ntin_10) { 
+    variable_1 : input_net_transition ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+  }
+
+  lu_table_template(tmg_ntin_oload_10x8) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8");
+  }
+
+  lu_table_template(tmg_ntin_oload_10x9) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8, 9");
+  }
+
+  lu_table_template(tmg_ntin_oload_6x9) { 
+    variable_1 : input_net_transition ; 
+    variable_2 : total_output_net_capacitance ; 
+    index_1("1, 2, 3, 4, 5, 6");
+    index_2("1, 2, 3, 4, 5, 6, 7, 8, 9");
+  }
+
+  normalized_driver_waveform(ndw_ntin_nvolt_10x2) { 
+    driver_waveform_name : "driver_waveform_default_rise" ; 
+    index_1("0.004, 0.018, 0.036, 0.068, 0.116, 0.21, 0.396, 0.712, 1.28, 2.4");
+    index_2("0, 1");
+    values("0, 0.005",\
+           "0, 0.0225",\
+           "0, 0.045",\
+           "0, 0.085",\
+           "0, 0.145",\
+           "0, 0.2625",\
+           "0, 0.495",\
+           "0, 0.89",\
+           "0, 1.6",\
+           "0, 3");
+  }
+
+  normalized_driver_waveform(ndw_ntin_nvolt_10x2) { 
+    index_1("0.004, 0.018, 0.036, 0.068, 0.116, 0.21, 0.396, 0.712, 1.28, 2.4");
+    index_2("0, 1");
+    values("0, 0.005",\
+           "0, 0.0225",\
+           "0, 0.045",\
+           "0, 0.085",\
+           "0, 0.145",\
+           "0, 0.2625",\
+           "0, 0.495",\
+           "0, 0.89",\
+           "0, 1.6",\
+           "0, 3");
+  }
+
+  normalized_driver_waveform(ndw_ntin_nvolt_10x2) { 
+    driver_waveform_name : "driver_waveform_default_fall" ; 
+    index_1("0.004, 0.018, 0.036, 0.068, 0.116, 0.21, 0.396, 0.712, 1.28, 2.4");
+    index_2("0, 1");
+    values("0, 0.005",\
+           "0, 0.0225",\
+           "0, 0.045",\
+           "0, 0.085",\
+           "0, 0.145",\
+           "0, 0.2625",\
+           "0, 0.495",\
+           "0, 0.89",\
+           "0, 1.6",\
+           "0, 3");
+  }
+
+cell( RIIO_EG1D80V_HPLVDS_TX_SLVT28_V ) {
+  area                : 14400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_3_3_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 3 ;
+    bit_from  : 3 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_7_7_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 7 ;
+    bit_from  : 7 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+
+  bus (RTERM_TRIM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_4_3_0 ;
+    pin ("RTERM_TRIM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_CAP_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_3_3_1 ;
+    pin ("RX_CTLE_CAP_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_RES_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_7_7_1 ;
+    pin ("RX_CTLE_RES_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[7]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[6]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[5]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[4]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_GAIN_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_3_3_1 ;
+    pin ("RX_GAIN_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (TX_BIAS_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_4_3_0 ;
+    pin ("TX_BIAS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (TX_VCM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_V_bus_4_3_0 ;
+    pin ("TX_VCM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+
+  pin ("A_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "A_PAD_B";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("B_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "B_PAD_B";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("DI_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : "!VDD+VSS";
+    direction : output;
+    original_pin : "DI_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("DO_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "DO_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "EI_DETECT_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : "!VDD+VSS";
+    direction : output;
+    original_pin : "EI_DETECT_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("RTERM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RTERM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_POL_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_VCM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_BIAS_OD_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_BIAS_OD_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_EI_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_EI_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_FFE_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_FFE_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_POL_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_VCM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("VBIAS") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "VBIAS";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_HPLVDS_TX_SLVT28_V */
+cell( RIIO_EG1D80V_HPLVDS_TX_SLVT28_H ) {
+  area                : 14400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    voltage_name : PWR_VDD;
+    pg_type : primary_power;
+  }
+  pg_pin (VDDIO) {
+    voltage_name : PWR_VDDIO;
+    pg_type : primary_power;
+  }
+  pg_pin (VSS) {
+    voltage_name : GND_VSS;
+    pg_type : primary_ground;
+  }
+  pg_pin (VSSIO) {
+    voltage_name : GND_VSSIO;
+    pg_type : primary_ground;
+  }
+
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_3_3_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 3 ;
+    bit_from  : 3 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_7_7_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 7 ;
+    bit_from  : 7 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+
+  bus (RTERM_TRIM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_4_3_0 ;
+    pin ("RTERM_TRIM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RTERM_TRIM_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_CAP_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_3_3_1 ;
+    pin ("RX_CTLE_CAP_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_CAP_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_RES_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_7_7_1 ;
+    pin ("RX_CTLE_RES_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[7]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[6]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[5]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[4]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_CTLE_RES_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_GAIN_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_3_3_1 ;
+    pin ("RX_GAIN_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "RX_GAIN_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (TX_BIAS_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_4_3_0 ;
+    pin ("TX_BIAS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_BIAS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_BIAS_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (TX_VCM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_TX_SLVT28_H_bus_4_3_0 ;
+    pin ("TX_VCM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[3]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[2]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[1]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("TX_VCM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : "TX_VCM_I[0]";
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+
+  pin ("A_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "A_PAD_B";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("B_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "B_PAD_B";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("DI_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : "!VDD+VSS";
+    direction : output;
+    original_pin : "DI_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("DO_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "DO_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "EI_DETECT_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : "!VDD+VSS";
+    direction : output;
+    original_pin : "EI_DETECT_O";
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("RTERM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RTERM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_POL_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "RX_VCM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_BIAS_OD_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_BIAS_OD_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_EI_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_EI_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_FFE_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_FFE_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_POL_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("TX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : "TX_VCM_EN_I";
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("VBIAS") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : "VBIAS";
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_HPLVDS_TX_SLVT28_H */
+cell( RIIO_EG1D80V_HPLVDS_RX_SLVT28_V ) {
+  area                : 14400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_3_3_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 3 ;
+    bit_from  : 3 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_7_7_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 7 ;
+    bit_from  : 7 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+
+  bus (RTERM_TRIM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_4_3_0 ;
+    pin ("RTERM_TRIM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_CAP_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_3_3_1 ;
+    pin ("RX_CTLE_CAP_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_RES_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_7_7_1 ;
+    pin ("RX_CTLE_RES_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_GAIN_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_V_bus_3_3_1 ;
+    pin ("RX_GAIN_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+
+  pin ("A_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : A_PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("B_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : B_PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("DI_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : !VDD+VSS;
+    direction : output;
+    original_pin : DI_O;
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("EI_DETECT_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : EI_DETECT_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : !VDD+VSS;
+    direction : output;
+    original_pin : EI_DETECT_O;
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("RTERM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RTERM_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_POL_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_VCM_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("VBIAS") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VBIAS;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_HPLVDS_RX_SLVT28_V */
+cell( RIIO_EG1D80V_HPLVDS_RX_SLVT28_H ) {
+  area                : 14400.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_3_3_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 3 ;
+    bit_from  : 3 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_7_7_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 7 ;
+    bit_from  : 7 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+
+  bus (RTERM_TRIM_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_4_3_0 ;
+    pin ("RTERM_TRIM_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RTERM_TRIM_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RTERM_TRIM_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_CAP_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_3_3_1 ;
+    pin ("RX_CTLE_CAP_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_CAP_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_CAP_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_CTLE_RES_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_7_7_1 ;
+    pin ("RX_CTLE_RES_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_CTLE_RES_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_CTLE_RES_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RX_GAIN_I) {
+    bus_type  : RIIO_EG1D80V_HPLVDS_RX_SLVT28_H_bus_3_3_1 ;
+    pin ("RX_GAIN_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("RX_GAIN_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : RX_GAIN_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+
+  pin ("A_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : A_PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("B_PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : B_PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+  pin ("DI_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : !VDD+VSS;
+    direction : output;
+    original_pin : DI_O;
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("EI_DETECT_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : EI_DETECT_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("EI_DETECT_O") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    power_down_function : !VDD+VSS;
+    direction : output;
+    original_pin : EI_DETECT_O;
+    capacitance : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+/*    function : "<logic function>"; */
+  }
+  pin ("RTERM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RTERM_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_POL_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_POL_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("RX_VCM_EN_I") {
+    related_power_pin : VDD;
+    related_ground_pin : VSS;
+    direction : input;
+    original_pin : RX_VCM_EN_I;
+    capacitance : 1.0;
+    max_transition : 1.0;
+  }
+  pin ("VBIAS") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : VBIAS;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_HPLVDS_RX_SLVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_LVT28_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_H_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_LVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_RVT28_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_H_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_RVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_LLHVT28_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_H_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_LLHVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_SLVT28_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_V_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_SLVT28_V */
+cell( RIIO_EG1D80V_RTERMCAL_RVT28_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_RVT28_V_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_RVT28_V */
+cell( RIIO_EG1D80V_RTERMCAL_LLHVT28_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LLHVT28_V_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_LLHVT28_V */
+cell( RIIO_EG1D80V_RTERMCAL_LVT28_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_LVT28_V_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_LVT28_V */
+cell( RIIO_EG1D80V_RTERMCAL_SLVT28_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_SLVT28_H_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_SLVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_HVT28_H ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_H_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_HVT28_H */
+cell( RIIO_EG1D80V_RTERMCAL_HVT28_V ) {
+  area                : 4800.000000 ;
+  cell_leakage_power  : 0 ;
+/*  dont_use            : true ; */
+/*  dont_touch          : true ; */
+/*  is_macro_cell       : true; */
+/*  interface_timing    : true; */
+/*  timing_model_type   : "extracted"; */
+
+  pg_pin (VDD) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDD;
+  }
+  pg_pin (VDDIO) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDIO;
+  }
+  pg_pin (VDDQ) {
+    pg_type : primary_power;
+    voltage_name : PWR_VDDQ;
+  }
+  pg_pin (VSS) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSS;
+  }
+  pg_pin (VSSIO) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSIO;
+  }
+  pg_pin (VSSQ) {
+    pg_type : primary_ground;
+    voltage_name : GND_VSSQ;
+  }
+
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_15_15_1) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 15 ;
+    bit_from  : 15 ;
+    bit_to    : 1 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_2_1_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 2 ;
+    bit_from  : 1 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+  type (RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_4_3_0) {
+    base_type : array ;
+    data_type : bit ;
+    bit_width : 4 ;
+    bit_from  : 3 ;
+    bit_to    : 0 ;
+    downto    : true ;
+  }
+
+  bus (D_IOSG_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_15_15_1 ;
+    pin ("D_IOSG_I[15]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[15];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[14]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[14];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[13]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[13];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[12]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[12];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[11]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[11];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[10]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[10];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[9]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[9];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[8]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[8];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[7]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[7];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[6]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[6];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[5]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[5];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[4]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[4];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_IOSG_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_IOSG_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (D_LVDS_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_4_3_0 ;
+    pin ("D_LVDS_I[3]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[3];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[2]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[2];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("D_LVDS_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : D_LVDS_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (MODE_I) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_2_1_0 ;
+    pin ("MODE_I[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[1];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+    pin ("MODE_I[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      direction : input;
+      original_pin : MODE_I[0];
+      capacitance : 1.0;
+      max_transition : 1.0;
+    }
+  }
+  bus (RESULT_O) {
+    bus_type  : RIIO_EG1D80V_RTERMCAL_HVT28_V_bus_2_1_0 ;
+    pin ("RESULT_O[1]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[1];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+    pin ("RESULT_O[0]") {
+      related_power_pin : VDD;
+      related_ground_pin : VSS;
+      power_down_function : !VDD+VSS;
+      direction : output;
+      original_pin : RESULT_O[0];
+      capacitance : 1.0;
+      min_transition : 0.0;
+      max_capacitance : 100.0;
+      min_capacitance : 0.0;
+/*      function : "<logic function>"; */
+    }
+  }
+
+  pin ("PAD_B") {
+    related_power_pin : VDDIO;
+    related_ground_pin : VSSIO;
+    direction : inout;
+    original_pin : PAD_B;
+    capacitance : 1.0;
+    max_transition : 1.0;
+    min_transition : 0.0;
+    max_capacitance : 100.0;
+    min_capacitance : 0.0;
+  }
+
+} /* end of cell RIIO_EG1D80V_RTERMCAL_HVT28_V */
+/*%%cells%%*/
+} /* end of library( RIIO_GF22FDX_HSIO_EG1D80V_zbb_wc_0d72V_1d62V_0C ) */

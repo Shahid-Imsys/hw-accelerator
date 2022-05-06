@@ -1,0 +1,31 @@
+VERSION 5.7 ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+
+SITE IO_NS_site
+  SIZE 1 BY 80 ;
+  CLASS PAD ;
+  SYMMETRY X Y ;
+END IO_NS_site
+
+
+SITE IO_EW_site
+  SIZE 80 BY 1 ;
+  CLASS PAD ;
+  SYMMETRY X Y ;
+END IO_EW_site
+
+
+SITE IO_BOND_site
+  SIZE 1 BY 1 ;
+  CLASS PAD ;
+  SYMMETRY X Y ;
+END IO_BOND_site
+
+
+SITE corner_site
+  SIZE 80 BY 80 ;
+  CLASS PAD ;
+  SYMMETRY X Y ;
+END corner_site

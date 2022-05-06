@@ -1,0 +1,4 @@
+<!DOCTYPE Status>
+<Status>
+ <Target status="OK" logfile="/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_8Kx128/SNPS_SP_HD_8Kx128.log" errors="0" name="GENERATE" warnings="0"/>
+</Status>

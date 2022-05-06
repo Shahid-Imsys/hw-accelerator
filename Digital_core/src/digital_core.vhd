@@ -170,17 +170,6 @@ begin  -- architecture rtl
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
 
-      D_CLK => open,
-      D_CS  => open,
-      D_RAS => open,
-      D_CAS => open,
-      D_WE  => open,
-      D_DQM => open,
-      D_DQ  => x"00",
-      D_A   => open,
-      D_BA  => open,
-      D_CKE => open,
-
       clock_in_off => clock_in_off,
       
       -- Port A
@@ -216,7 +205,7 @@ begin  -- architecture rtl
       ph_en => ph_en,
       ph_o  => ph_o,
       -- Port I
-      pi_i  => pi_o,
+      pi_i  => pi_i,
       pi_en => pi_en,
       pi_o  => pi_o,
       -- Port J
@@ -252,7 +241,6 @@ begin  -- architecture rtl
       VCC18LP  => '1',
       rxout    => rxout,
       adc_bits => adc_bits
-
         );
 
 end architecture rtl;

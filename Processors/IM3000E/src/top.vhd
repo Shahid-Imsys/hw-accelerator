@@ -102,17 +102,6 @@ entity top is
     --pwr_switch_on : out std_logic_vector(3 downto 0);
     MPMIC_CORE : out   std_logic;
     MPMIC_IO   : out   std_logic;
-    -- SDRAM interface (41bits)
-    D_CLK      : out   std_logic;       --clock to SDRAM
-    D_CS       : out   std_logic;       -- CS to SDRAM
-    D_RAS      : out   std_logic;       -- RAS to SDRAM
-    D_CAS      : out   std_logic;       -- CAS to SDRAM
-    D_WE       : out   std_logic;       -- WE to SDRAM
-    D_DQM      : out   std_logic_vector(7 downto 0);  --data mask
-    D_DQ       : inout std_logic_vector(7 downto 0);  --data
-    D_A        : out   std_logic_vector(13 downto 0);
-    D_BA       : out   std_logic_vector(1 downto 0);
-    D_CKE      : out   std_logic_vector(3 downto 0);
 
     clock_in_off : out std_logic;
     
@@ -896,16 +885,16 @@ begin
       MSDIN   => MSDIN,
 
       -- SDRAM
-      D_CLK     => D_CLK,
-      D_CS      => D_CS,
-      D_RAS     => D_RAS,
-      D_CAS     => D_CAS,
-      D_WE      => D_WE,
-      D_DQ      => D_DQ,
-      D_DQM     => D_DQM,
-      D_A       => D_A,
-      D_BA      => D_BA,
-      D_CKE     => D_CKE,
+      D_CLK     => open,
+      D_CS      => open,
+      D_RAS     => open,
+      D_CAS     => open,
+      D_WE      => open,
+      D_DQ      => open,
+      D_DQM     => open,
+      D_A       => open,
+      D_BA      => open,
+      D_CKE     => open,
       -- Ports
       
       --sdram interface

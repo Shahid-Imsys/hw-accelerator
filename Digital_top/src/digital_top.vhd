@@ -32,15 +32,16 @@ use work.gp_pkg.all;
 entity digital_top is
 
   generic (
+    g_memory_type     : memory_type_t := asic;
     g_clock_frequency : integer);
 
   port (
     hclk       : in  std_logic;         -- clk input   
-    MRESET     : in  std_logic;  -- system reset               low active
+    MRESET     : in  std_logic;         -- system reset, active low
     MRSTOUT    : out std_logic;
     MIRQOUT    : out std_logic;         -- interrupt request output    
-    MCKOUT0    : out std_logic;         --for trace adapter
-    MCKOUT1    : out std_logic;         --programable clock out
+    MCKOUT0    : out std_logic;         -- for trace adapter
+    MCKOUT1    : out std_logic;         -- programable clock out
     mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
     MTEST      : in  std_logic;  --                            high active                 
     MBYPASS    : in  std_logic;
@@ -138,61 +139,48 @@ entity digital_top is
     ospi_dq_enable   : out std_logic;
     ospi_rwds_in     : in  std_logic;
     ospi_rwds_out    : out std_logic;
-    ospi_rwds_enable : out std_logic;
-
-    -- Ethernet interface
-    enet_mdin  : in std_logic;
-    enet_mdout : out std_logic;
-    enet_mdc   : out   std_logic;
-    enet_clk   : in    std_logic;
-    enet_txen  : out   std_logic;
-    enet_txer  : out   std_logic;
-    enet_txd0  : out   std_logic;
-    enet_txd1  : out   std_logic;
-    enet_rxdv  : in    std_logic;
-    enet_rxer  : in    std_logic;
-    enet_rxd0  : in    std_logic;
-    enet_rxd1  : in    std_logic);
+    ospi_rwds_enable : out std_logic
+    );
 
 end entity digital_top;
 
 architecture rtl of digital_top is
 
   constant asic_c : memory_type_t := asic;
-  
-  signal clk_p_cpu : std_logic;
-  signal clk_rx : std_logic;
-  signal clk_tx : std_logic;
+
+  signal clk_p_cpu    : std_logic;
+  signal clk_rx       : std_logic;
+  signal clk_tx       : std_logic;
   signal clock_in_off : std_logic;
-  
+
 begin  -- architecture rtl
 
   i_clock_reset : entity work.clock_reset
-    
+
     generic map (
       fpga_g => (asic_c = fpga))
 
     port map (
-      pll_clk => hclk,
-      enet_clk  => enet_clk,
-      clk_p =>  clk_p_cpu,
-      clk_rx => clk_rx,
-      clk_tx => clk_tx,
+      pll_clk  => hclk,
+      enet_clk => '0',                  -- TODO
+      clk_p    => clk_p_cpu,
+      clk_rx   => clk_rx,
+      clk_tx   => clk_tx,
 
       clock_in_off => clock_in_off,
 
-      scan_mode =>  mtest
+      scan_mode => mtest
       );
 
   i_digital_core : entity work.digital_core
     generic map (
-      g_memory_type     => asic_c,
+      g_memory_type     => g_memory_type,
       g_clock_frequency => g_clock_frequency  -- system clock frequency in MHz
       )
     port map (
-      clk_p_cpu    => clk_p_cpu,
-      clk_rx => clk_rx,
-      clk_tx => clk_tx,
+      clk_p_cpu => clk_p_cpu,
+      clk_rx    => clk_rx,
+      clk_tx    => clk_tx,
 
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
@@ -206,7 +194,7 @@ begin  -- architecture rtl
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
 
-      clock_in_off => clock_in_off, 
+      clock_in_off => clock_in_off,
 
       -- Port A
       pa_i  => pa_i,
@@ -264,17 +252,17 @@ begin  -- architecture rtl
       MWAKEUP_LP => MWAKEUP_LP,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      ospi_out.cs_n  => ospi_cs_n,
-      ospi_out.ck_n  => ospi_ck_n,
-      ospi_out.ck_p  => ospi_ck_p,
+      ospi_out.cs_n    => ospi_cs_n,
+      ospi_out.ck_n    => ospi_ck_n,
+      ospi_out.ck_p    => ospi_ck_p,
       ospi_out.reset_n => ospi_reset_n,
-      ospi_dq_in  => ospi_dq_in,
-      ospi_dq_out  => ospi_dq_out,
-      ospi_dq_enable  => ospi_dq_enable,
-      ospi_rwds_in => ospi_rwds_in,
-      ospi_rwds_out => ospi_rwds_out,
+      ospi_dq_in       => ospi_dq_in,
+      ospi_dq_out      => ospi_dq_out,
+      ospi_dq_enable   => ospi_dq_enable,
+      ospi_rwds_in     => ospi_rwds_in,
+      ospi_rwds_out    => ospi_rwds_out,
       ospi_rwds_enable => ospi_rwds_enable,
-      
+
 
       pwr_ok   => '1',
       vdd_bmem => '0',

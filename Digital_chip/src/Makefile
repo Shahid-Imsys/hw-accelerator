@@ -11,12 +11,12 @@ digital_chip_rtl: digital_top_rtl pad_comp
                                   $(CHIP_DIR_WIN)/output_pad.vhd \
 				  $(CHIP_DIR_WIN)/digital_chip.vhd
 
-pad_comp:
-	$(V_COMP) $(BOND_PATH_WIN)/RIIO_BOND_PADS.v \
-                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPO_LVT28_H.v \
-                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPO_LVT28_V.v \
-                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_H.v \
-                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_V.v \
+#pad_comp:
+#	$(V_COMP) $(BOND_PATH_WIN)/RIIO_BOND_PADS.v \
+#                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPO_LVT28_H.v \
+#                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPO_LVT28_V.v \
+#                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_H.v \
+#                  $(BOND_PATH_WIN)/RIIO_EG1D80V_GPI_LVT28_V.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_H.v \
                   $(BOND_PATH_WIN)/RIIO_EG1D80V_GPIO_LVT28_V.v \
                   $(CHIP_DIR_WIN)/racyic_modules/common_sync.v \
@@ -24,3 +24,4 @@ pad_comp:
 		  $(PLL_PATH_WIN)/ri_adpll_gf22fdx_2gmp_behavioral.v
 
 include $(PROJECT_PATH)/Digital_top/src/Makefile
+include $(PROJECT_PATH)/IP/RacyICS/Makefile

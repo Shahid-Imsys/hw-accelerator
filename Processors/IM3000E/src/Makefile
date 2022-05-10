@@ -3,7 +3,7 @@ GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
 IP_DIR=$(PROJECT_PATH)/Processors/IM3000E/fpga_synth/gpp
 
-gpp_rtl: mem_comp fpga_ip
+gpp_rtl: mem_load_comp fpga_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \
 			 	  $(GPP_DIR_WIN)/gp_pkg.vhd \
 			 	  $(GPP_DIR_WIN)/fgendec.vhd \
@@ -74,13 +74,8 @@ gpp_rtl: mem_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1A.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_1024X8X1CM8.vhd
 
-mem_comp:
-	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_2Kx80_fast_func.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_16Kx8_fast_func.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_1024x8_fast_func.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_512x8_fast_func.v \
-		  $(GPP_DIR_WIN)/ext/SNPS_SP_HD_256x32_fast_func.v
+mem_load_comp:
+	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v
 
 fpga_ip:
 	$(V_COMP) $(IP_DIR)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \

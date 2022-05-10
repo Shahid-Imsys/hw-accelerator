@@ -151,7 +151,7 @@ begin  -- architecture rtl
 
   i_im4000_top : entity work.top
     generic map (
-      g_memory_type     => fpga,
+      g_memory_type     => g_memory_type,
       g_clock_frequency => 31         -- system clock frequency in MHz
       )
     port map (

@@ -23,14 +23,14 @@ architecture rtl of clock_reset is
 
 begin  -- architecture rtl
 
-  clk_mux_1 : clk_mux
-    port map (
-      clk1          => pll_ref_clk,
-      clk2          => pll_clk,
-      sel           => sel_pll,
-      rst_n         => lp_pwr_ok,
-      clk1_selected => xout_selected,
-      clk_mux_out   => clk_mux_out_int);
+  -- clk_mux_1 : clk_mux
+  --   port map (
+  --     clk1          => pll_ref_clk,
+  --     clk2          => pll_clk,
+  --     sel           => sel_pll,
+  --     rst_n         => lp_pwr_ok,
+  --     clk1_selected => xout_selected,
+  --     clk_mux_out   => clk_mux_out_int);
   
   i_clock_gate : entity work.clock_gate
     

@@ -34,11 +34,11 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity fifo_0 is
+entity fifo_1 is
     generic(
         DATA_WIDTH : integer := 32;
-        DATA_DEPTH : integer := 256;
-        PROG_FULL_TRESHOLD : integer :=256
+        DATA_DEPTH : integer := 1024;
+        PROG_FULL_TRESHOLD : integer :=1024
     );
     port(
         clk     : in std_logic;
@@ -46,25 +46,31 @@ entity fifo_0 is
         rd_en   : in std_logic;
         wr_en   : in std_logic;
         full    : out std_logic;
+        almost_full : out std_logic;
         empty   : out std_logic;
+        almost_empty : out std_logic;
         prog_full : out std_logic;
+        valid   : out std_logic;
         din       : in std_logic_vector(31 downto 0);
         dout      : out std_logic_vector(31 downto 0);
         counter   : out integer range DATA_DEPTH-1 downto 0
     );
 end entity;
 
-architecture behavioral of fifo_0 is
+architecture behavioral of fifo_1 is
     type ram_type is array (DATA_DEPTH-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
     signal ram : ram_type;
 
     subtype index_type is integer range ram_type'range;
     signal head :index_type;
     signal tail :index_type;
-
+    
+    signal almost_full_i : std_logic;
+    signal almost_empty_i : std_logic;
     signal empty_i : std_logic;
     signal full_i  : std_logic;
     signal prog_full_i : std_logic;
+    signal valid_i     : std_logic;
     signal counter_i : integer range DATA_DEPTH-1 downto 0;
 
     procedure increase (signal index : inout index_type) is
@@ -89,14 +95,20 @@ begin
         end if;
     end process;
 
-    --TAIL
+    --TAIL AND VALID FLAG
     process(clk)
     begin
         if rising_edge(clk) then
             if srst = '1' then
                 tail <= 0;
-            elsif rd_en = '1' and empty_i ='0' then
-                increase(tail);
+                valid_i <= '0';
+            else
+                if rd_en = '1' and empty_i ='0' then
+                    increase(tail);
+                    valid_i <= '1';
+                else
+                    valid_i <= '0';
+                end if;
             end if;
         end if;
     end process;
@@ -133,10 +145,22 @@ begin
             empty_i <= '0';
         end if;
 
+        if counter_i <= 1 then
+            almost_empty_i <= '1';
+        else
+            almost_empty_i <= '0';
+        end if;
+
         if counter_i = DATA_DEPTH -1 then
             full_i <= '1';
         else
             full_i <= '0';
+        end if;
+
+        if counter_i >= DATA_DEPTH -2 then
+            almost_full_i <= '1';
+        else
+            almost_full_i <= '0';
         end if;
 
         if counter_i >= PROG_FULL_TRESHOLD then
@@ -147,8 +171,11 @@ begin
     end process;
     --OUTPUT
     empty <= empty_i;
+    almost_empty <= almost_empty_i;
     full <= full_i;
+    almost_full <= almost_full_i;
     prog_full <= prog_full_i;
+    valid <= valid_i;
     counter <= counter_i;
 
 

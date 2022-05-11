@@ -836,36 +836,24 @@ architecture struct of top is
   signal f3_ALE     : std_logic;
   signal f3_DATA_IN : std_logic_vector(31 downto 0);
   signal f3_RBB     : std_logic;
+
+  -- Ram memory
+  signal ram_a   : main_ram_address_t;
+  signal ram_di  : main_ram_data_t;
+  signal ram_do : main_ram_data_t;
+  signal ram_cs  : main_ram_cs_t;
+  signal ram_web : main_ram_web_t;
+
   --RAM0 
-  signal RAM0_DO    : std_logic_vector (7 downto 0);  -- modify flag, 2015lp
-  signal RAM0_DI    : std_logic_vector (7 downto 0);
-  signal RAM0_A     : std_logic_vector (13 downto 0);
-  signal RAM0_WEB   : std_logic;
-  signal RAM0_CS    : std_logic;
-  --RAM1 
-  signal RAM1_DO    : std_logic_vector (7 downto 0);
-  signal RAM1_DI    : std_logic_vector (7 downto 0);
-  signal RAM1_A     : std_logic_vector (13 downto 0);
-  signal RAM1_WEB   : std_logic;
-  signal RAM1_CS    : std_logic;
-  --RAM2 
-  signal RAM2_DO    : std_logic_vector (7 downto 0);
-  signal RAM2_DI    : std_logic_vector (7 downto 0);
-  signal RAM2_A     : std_logic_vector (13 downto 0);
-  signal RAM2_WEB   : std_logic;
-  signal RAM2_CS    : std_logic;
-  --RAM3 
-  signal RAM3_DO    : std_logic_vector (7 downto 0);
-  signal RAM3_DI    : std_logic_vector (7 downto 0);
-  signal RAM3_A     : std_logic_vector (13 downto 0);
-  signal RAM3_WEB   : std_logic;
-  signal RAM3_CS    : std_logic;
-  --RAM4 
-  signal RAM4_DO    : std_logic_vector (7 downto 0);
-  signal RAM4_DI    : std_logic_vector (7 downto 0);
-  signal RAM4_A     : std_logic_vector (13 downto 0);
-  signal RAM4_WEB   : std_logic;
-  signal RAM4_CS    : std_logic;
+  -- signal RAM0_DO    : std_logic_vector (7 downto 0); 
+  -- --RAM1 
+  -- signal RAM1_DO    : std_logic_vector (7 downto 0);
+  -- --RAM2 
+  -- signal RAM2_DO    : std_logic_vector (7 downto 0);
+  -- --RAM3 
+  -- signal RAM3_DO    : std_logic_vector (7 downto 0);
+  -- --RAM4 
+  -- signal RAM4_DO    : std_logic_vector (7 downto 0);
 
 begin
 
@@ -1258,50 +1246,53 @@ begin
       cs_n    => trcmem_ce_n
       );
 
+  ram_g: for i in 1 to MEMNUM-2 generate
+    
 ---application memories
   ram1 : ram_memory
     generic map (
       g_memory_type => g_memory_type)
     port map (
       clk     => clk_p,
-      address => RAM1_A,
-      ram_di  => RAM1_DI,
-      ram_do  => RAM1_DO,
-      we_n    => RAM1_WEB,
-      cs      => RAM1_CS);
+      address => ram_a(i),
+      ram_di  => ram_di(i),
+      ram_do  => ram_do(i),
+      we_n    => ram_web(i),
+      cs      => ram_cs(i));
+  end generate ram_g;
 
-  ram2 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM2_A,
-      ram_di  => RAM2_DI,
-      ram_do  => RAM2_DO,
-      we_n    => RAM2_WEB,
-      cs      => RAM2_CS);
+  -- ram2 : ram_memory
+  --   generic map (
+  --     g_memory_type => g_memory_type)
+  --   port map (
+  --     clk     => clk_p,
+  --     address => ram_a(2),
+  --     ram_di  => ram_di(2),
+  --     ram_do  => ram_do(2,
+  --     we_n    => ram_web(2),
+  --     cs      => ram_cs(2));
 
-  ram3 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM3_A,
-      ram_di  => RAM3_DI,
-      ram_do  => RAM3_DO,
-      we_n    => RAM3_WEB,
-      cs      => RAM3_CS);
+  -- ram3 : ram_memory
+  --   generic map (
+  --     g_memory_type => g_memory_type)
+  --   port map (
+  --     clk     => clk_p,
+  --     address => ram_a(3),
+  --     ram_di  => ram_di(3),
+  --     ram_do  => RAM3_DO,
+  --     we_n    => ram_web(3),
+  --     cs      => ram_cs(3));
 
-  ram4 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM4_A,
-      ram_di  => RAM4_DI,
-      ram_do  => RAM4_DO,
-      we_n    => RAM4_WEB,
-      cs      => RAM4_CS);
+  -- ram4 : ram_memory
+  --   generic map (
+  --     g_memory_type => g_memory_type)
+  --   port map (
+  --     clk     => clk_p,
+  --     address => ram_a(4),
+  --     ram_di  => ram_di(4),
+  --     ram_do  => RAM4_DO,
+  --     we_n    => ram_web(4),
+  --     cs      => ram_cs(4));
 
   -----------------------------------------------------------------------------
   -- Clock generation block
@@ -1390,11 +1381,11 @@ begin
       bmem_we_n => bmem_we_n,
       bmem_ce_n => bmem_ce_n,
       --RAM0 
-      RAM0_DO   => RAM0_DO,
-      RAM0_DI   => RAM0_DI,
-      RAM0_A    => RAM0_A,
-      RAM0_WEB  => RAM0_WEB,
-      RAM0_CS   => RAM0_CS
+      RAM0_DO   => ram_do(0),       
+      RAM0_DI   => ram_di(0),
+      RAM0_A    => ram_a(0),
+      RAM0_WEB  => ram_web(0),
+      RAM0_CS   => ram_cs(0)
       );
 
   -- Disable power to BMEM 
@@ -1820,36 +1811,21 @@ begin
       f_data_in   => f_data_in,
       f_data_out  => f_data_out,
       --SRAM interface
+      ram_a => ram_a,
+      ram_di => ram_di,
+      ram_do => ram_do,
+      ram_cs => ram_cs,
+      ram_web => ram_web
       --RAM0 
-      RAM0_DO     => RAM0_DO,
-      RAM0_DI     => RAM0_DI,
-      RAM0_A      => RAM0_A,
-      RAM0_WEB    => RAM0_WEB,
-      RAM0_CS     => RAM0_CS,
-      --RAM1        => --RAM1          ,
-      RAM1_DO     => RAM1_DO,
-      RAM1_DI     => RAM1_DI,
-      RAM1_A      => RAM1_A,
-      RAM1_WEB    => RAM1_WEB,
-      RAM1_CS     => RAM1_CS,
-      --RAM2        => --RAM2          ,
-      RAM2_DO     => RAM2_DO,
-      RAM2_DI     => RAM2_DI,
-      RAM2_A      => RAM2_A,
-      RAM2_WEB    => RAM2_WEB,
-      RAM2_CS     => RAM2_CS,
-      --RAM3        => --RAM3          ,
-      RAM3_DO     => RAM3_DO,
-      RAM3_DI     => RAM3_DI,
-      RAM3_A      => RAM3_A,
-      RAM3_WEB    => RAM3_WEB,
-      RAM3_CS     => RAM3_CS,
-      --RAM4        => --RAM4          --,
-      RAM4_DO     => RAM4_DO,
-      RAM4_DI     => RAM4_DI,
-      RAM4_A      => RAM4_A,
-      RAM4_WEB    => RAM4_WEB,
-      RAM4_CS     => RAM4_CS
+      -- RAM0_DO     => RAM0_DO,
+      -- --RAM1        => --RAM1          ,
+      -- RAM1_DO     => RAM1_DO,
+      -- --RAM2        => --RAM2          ,
+      -- RAM2_DO     => RAM2_DO,
+      -- --RAM3        => --RAM3          ,
+      -- RAM3_DO     => RAM3_DO,
+      -- --RAM4        => --RAM4          --,
+      -- RAM4_DO     => RAM4_DO
       );
 
   --flash interface

@@ -21,8 +21,8 @@
 LIBRARY IEEE;
 
 USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
-USE IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.numeric_std.all;
+
 use work.gp_pkg.all;
 
 ENTITY sdram_inf IS 
@@ -58,36 +58,22 @@ ENTITY sdram_inf IS
         f_data_in   : out  std_logic_vector(7 downto 0); -- Data in from processor
         f_data_out  : in std_logic_vector(7 downto 0); -- Data out to processor
 
-        --RAM0 higher 1K address maybe used as patching address
-        RAM0_DO     : in  std_logic_vector (7 downto 0);
-        RAM0_DI     : out std_logic_vector (7 downto 0);
-        RAM0_A      : out std_logic_vector (13 downto 0);
-        RAM0_WEB    : out std_logic;
-        RAM0_CS     : out std_logic;
-        --RAM1 higher 1K address maybe used as patching address
-        RAM1_DO     : in  std_logic_vector (7 downto 0);
-        RAM1_DI     : out std_logic_vector (7 downto 0);
-        RAM1_A      : out std_logic_vector (13 downto 0);
-        RAM1_WEB    : out std_logic;
-        RAM1_CS     : out std_logic;
-        --RAM2
-        RAM2_DO     : in  std_logic_vector (7 downto 0);
-        RAM2_DI     : out std_logic_vector (7 downto 0);
-        RAM2_A      : out std_logic_vector (13 downto 0);
-        RAM2_WEB    : out std_logic;
-        RAM2_CS     : out std_logic;
-        --RAM3
-        RAM3_DO     : in  std_logic_vector (7 downto 0);
-        RAM3_DI     : out std_logic_vector (7 downto 0);
-        RAM3_A      : out std_logic_vector (13 downto 0);
-        RAM3_WEB    : out std_logic;
-        RAM3_CS     : out std_logic;
-        --RAM4
-        RAM4_DO     : in  std_logic_vector (7 downto 0);
-        RAM4_DI     : out std_logic_vector (7 downto 0);
-        RAM4_A      : out std_logic_vector (13 downto 0);
-        RAM4_WEB    : out std_logic;
-        RAM4_CS     : out std_logic
+        ram_a   : out main_ram_address_t;
+        ram_di  : out main_ram_data_t;
+        ram_do  : in  main_ram_data_t;
+        ram_cs  : out main_ram_cs_t;
+        ram_web : out main_ram_web_t
+        
+        -- RAM0 higher 1K address maybe used as patching address
+        -- RAM0_DO     : in  std_logic_vector (7 downto 0);
+        -- RAM1 higher 1K address maybe used as patching address
+        -- RAM1_DO     : in  std_logic_vector (7 downto 0);
+        -- RAM2
+        -- RAM2_DO     : in  std_logic_vector (7 downto 0);
+        -- RAM3
+        -- RAM3_DO     : in  std_logic_vector (7 downto 0);
+        -- RAM4
+        -- RAM4_DO     : in  std_logic_vector (7 downto 0)
 		);
 END sdram_inf;
 
@@ -115,21 +101,48 @@ ARCHITECTURE behav OF sdram_inf IS
 BEGIN
     row_addr_1 <= c1_d_addr(31 downto 14);
     row_addr_2 <= c2_d_addr(31 downto 14);
-    toReq_c1(0) <= '1'  WHEN row_addr_1 = FLSH_ADDR0 OR row_addr_1 = FLSH_ADDR1 OR row_addr_1 = FLSH_ADDR2 OR row_addr_1 = FLSH_ADDR3 or 
-                             row_addr_1 = FLSH_ADDR4 OR row_addr_1 = FLSH_ADDR5 OR row_addr_1 = FLSH_ADDR6 OR row_addr_1 = FLSH_ADDR7 ELSE '0';
-    toReq_c1(1) <= '1'  WHEN row_addr_1 = RAM0_ADDR ELSE '0';
-    toReq_c1(2) <= '1'  WHEN row_addr_1 = RAM1_ADDR ELSE '0';
-    toReq_c1(3) <= '1'  WHEN row_addr_1 = RAM2_ADDR ELSE '0';
-    toReq_c1(4) <= '1'  WHEN row_addr_1 = RAM3_ADDR ELSE '0';
-    toReq_c1(5) <= '1'  WHEN row_addr_1 = RAM4_ADDR ELSE '0';
-                
-    toReq_c2(0) <= '1'  WHEN row_addr_2 = FLSH_ADDR0 OR row_addr_2 = FLSH_ADDR1 OR row_addr_2 = FLSH_ADDR2 OR row_addr_2 = FLSH_ADDR3 or 
-                             row_addr_2 = FLSH_ADDR4 OR row_addr_2 = FLSH_ADDR5 OR row_addr_2 = FLSH_ADDR6 OR row_addr_2 = FLSH_ADDR7 ELSE '0';
-    toReq_c2(1) <= '1'  WHEN row_addr_2 = RAM0_ADDR ELSE '0';
-    toReq_c2(2) <= '1'  WHEN row_addr_2 = RAM1_ADDR ELSE '0';
-    toReq_c2(3) <= '1'  WHEN row_addr_2 = RAM2_ADDR ELSE '0';
-    toReq_c2(4) <= '1'  WHEN row_addr_2 = RAM3_ADDR ELSE '0';
-    toReq_c2(5) <= '1'  WHEN row_addr_2 = RAM4_ADDR ELSE '0';
+    -- toReq_c1(0) <= '1'  WHEN row_addr_1 = FLSH_ADDR0 OR row_addr_1 = FLSH_ADDR1 OR row_addr_1 = FLSH_ADDR2 OR row_addr_1 = FLSH_ADDR3 or 
+    --                          row_addr_1 = FLSH_ADDR4 OR row_addr_1 = FLSH_ADDR5 OR row_addr_1 = FLSH_ADDR6 OR row_addr_1 = FLSH_ADDR7 ELSE '0';
+    -- toReq_c1(1) <= '1'  WHEN row_addr_1 = RAM0_ADDR ELSE '0';
+    -- toReq_c1(2) <= '1'  WHEN row_addr_1 = RAM1_ADDR ELSE '0';
+    -- toReq_c1(3) <= '1'  WHEN row_addr_1 = RAM2_ADDR ELSE '0';
+    -- toReq_c1(4) <= '1'  WHEN row_addr_1 = RAM3_ADDR ELSE '0';
+    -- toReq_c1(5) <= '1'  WHEN row_addr_1 = RAM4_ADDR ELSE '0';
+    
+    fix_toreq2_p: process (row_addr_2) is
+    begin  -- process fix_toreq2_p
+      toReq_c2 <= (others => '0');
+      
+      if (row_addr_2 = FLSH_ADDR0 OR row_addr_2 = FLSH_ADDR1 OR row_addr_2 = FLSH_ADDR2 OR
+          row_addr_2 = FLSH_ADDR3 or row_addr_2 = FLSH_ADDR4 OR row_addr_2 = FLSH_ADDR5 OR
+          row_addr_2 = FLSH_ADDR6 OR row_addr_2 = FLSH_ADDR7)
+      then
+        toReq_c2(0) <= '1';    
+      else
+        toReq_c2(to_integer(unsigned(row_addr_2)) + 1) <= '1';
+      end if;
+
+    end process fix_toreq2_p;
+    
+    fix_toreq1_p: process (row_addr_1) is
+    begin  -- process fix_toreq2_p
+
+      toReq_c1 <= (others => '0');
+      
+      if (row_addr_1 = FLSH_ADDR0 OR row_addr_1 = FLSH_ADDR1 OR row_addr_1 = FLSH_ADDR2 OR
+          row_addr_1 = FLSH_ADDR3 or row_addr_1 = FLSH_ADDR4 OR row_addr_1 = FLSH_ADDR5 OR
+          row_addr_1 = FLSH_ADDR6 OR row_addr_1 = FLSH_ADDR7)
+      then
+        toReq_c1(0) <= '1';    
+      else       
+        toReq_c1(to_integer(unsigned(row_addr_1)) + 1) <= '1';
+      end if;
+      
+    end process fix_toreq1_p;
+
+    fix_to_req_g: for i in toReq_c2'range generate
+      
+    end generate fix_to_req_g;
     
     valueZero <= (others => '0');
 	process (clk_p, rst_n)
@@ -186,21 +199,37 @@ BEGIN
 	c2_d_dqo <= c2_data_inner WHEN short_cycle = '1' ELSE
 	            c2_data_b1  WHEN fast_d = '0' ELSE
 	            c2_data_b2;
-	
-    c1_data_inner <= f_data_out WHEN data_en_c1(0) = '1'          ELSE  --read flash
-	                 RAM0_DO    WHEN data_en_c1(1) = '1'          ELSE  --read RAM0
-	                 RAM1_DO    WHEN data_en_c1(2) = '1'          ELSE  --read RAM1
-	                 RAM2_DO    WHEN data_en_c1(3) = '1'          ELSE  --read RAM2
-	                 RAM3_DO    WHEN data_en_c1(4) = '1'          ELSE  --read RAM3 
-	                 RAM4_DO    WHEN data_en_c1(5) = '1'          ELSE  --read RAM4
-	                 c1_d_dqi;  
-    c2_data_inner <= --f_data_out WHEN data_en_c2(0) = '1'          ELSE  --read flash 
-                     RAM0_DO    WHEN data_en_c2(1) = '1'          ELSE  --read RAM0
-	                 RAM1_DO    WHEN data_en_c2(2) = '1'          ELSE  --read RAM1
-	                 RAM2_DO    WHEN data_en_c2(3) = '1'          ELSE  --read RAM2
-	                 RAM3_DO    WHEN data_en_c2(4) = '1'          ELSE  --read RAM3 
-	                 RAM4_DO    WHEN data_en_c2(5) = '1'          ELSE  --read RAM4
-	                 c2_d_dqi; 
+
+    choose_ram_data_p: process (ram_do, data_en_c1, f_data_out) is
+    begin  -- process choose_ram_data_p
+      c1_data_inner <= c1_d_dqi;
+      c2_data_inner <= c2_d_dqi;
+      
+      if data_en_c1(0) = '1' then
+        c1_data_inner <= f_data_out;
+      end if;
+
+      for i in ram_do'range loop
+        c1_data_inner <= ram_do(i) when data_en_c1(i+1) = '1';
+        c1_data_inner <= ram_do(i) when data_en_c2(i+1) = '1';
+      end loop;  -- i
+    end process choose_ram_data_p;
+    
+    
+    -- c1_data_inner <= f_data_out WHEN data_en_c1(0) = '1'          ELSE  --read flash
+    --                      RAM0_DO    WHEN data_en_c1(1) = '1'          ELSE  --read RAM0
+    --                      RAM1_DO    WHEN data_en_c1(2) = '1'          ELSE  --read RAM1
+    --                      RAM2_DO    WHEN data_en_c1(3) = '1'          ELSE  --read RAM2
+    --                      RAM3_DO    WHEN data_en_c1(4) = '1'          ELSE  --read RAM3 
+    --                      RAM4_DO    WHEN data_en_c1(5) = '1'          ELSE  --read RAM4
+    --                      c1_d_dqi;  
+    -- c2_data_inner <= --f_data_out WHEN data_en_c2(0) = '1'          ELSE  --read flash 
+    --                  RAM0_DO    WHEN data_en_c2(1) = '1'          ELSE  --read RAM0
+    --                      RAM1_DO    WHEN data_en_c2(2) = '1'          ELSE  --read RAM1
+    --                      RAM2_DO    WHEN data_en_c2(3) = '1'          ELSE  --read RAM2
+    --                      RAM3_DO    WHEN data_en_c2(4) = '1'          ELSE  --read RAM3 
+    --                      RAM4_DO    WHEN data_en_c2(5) = '1'          ELSE  --read RAM4
+    --	                 c2_d_dqi; 
 
     c1_csb <= c1_d_cs OR (NOT c1_d_ras) OR c1_d_cas;
     c2_csb <= c2_d_cs OR (NOT c2_d_ras) OR c2_d_cas;
@@ -213,38 +242,21 @@ BEGIN
     f_wr_in     <=                  (c1_wr_n OR (NOT toReq_c1(0)));
     f_data_in   <= c1_d_dqi;
 -----------------------RAM0----------------------       index is 1
-    RAM0_DI     <= c2_d_dqi                     WHEN toReq_c2(1) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
-    RAM0_A      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(1) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);                                                         --core1 use RAM1
-    RAM0_WEB    <=                  (c1_wr_n OR (NOT toReq_c1(1))) 
-                                AND (c2_wr_n OR (NOT toReq_c2(1)));
-    RAM0_CS    <=               NOT ((c1_csb OR (NOT toReq_c1(1))) AND (c2_csb OR (NOT toReq_c2(1))) );
------------------------RAM1----------------------       index is 2
-    RAM1_DI     <= c2_d_dqi                     WHEN toReq_c2(2) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
-    RAM1_A      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(2) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);                                                         --core1 use RAM1
-    RAM1_WEB    <=                  (c1_wr_n OR (NOT toReq_c1(2))) 
-                                AND (c2_wr_n OR (NOT toReq_c2(2)));
-    RAM1_CS    <=              NOT ( (c1_csb OR (NOT toReq_c1(2))) AND (c2_csb OR (NOT toReq_c2(2))) );
------------------------RAM2----------------------       index is 3
-    RAM2_DI     <= c2_d_dqi                     WHEN toReq_c2(3) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
-    RAM2_A      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(3) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);                                                         --core1 use RAM1
-    RAM2_WEB    <=                  (c1_wr_n OR (NOT toReq_c1(3))) 
-                                AND (c2_wr_n OR (NOT toReq_c2(3)));
-    RAM2_CS    <=              NOT ( (c1_csb OR (NOT toReq_c1(3))) AND (c2_csb OR (NOT toReq_c2(3))) );               
------------------------------------------------------------------------------------------------------------------------------------------
------------------------RAM3----------------------       index is 4
-    RAM3_DI     <= c2_d_dqi                     WHEN toReq_c2(4) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
-    RAM3_A      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(4) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);                                                         --core1 use RAM1
-    RAM3_WEB    <=                  (c1_wr_n OR (NOT toReq_c1(4))) 
-                                AND (c2_wr_n OR (NOT toReq_c2(4)));
-    RAM3_CS    <=              NOT ( (c1_csb OR (NOT toReq_c1(4))) AND (c2_csb OR (NOT toReq_c2(4))) );               
------------------------------------------------------------------------------------------------------------------------------------------
------------------------RAM4----------------------       index is 5
-    RAM4_DI     <= c2_d_dqi                     WHEN toReq_c2(5) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
-    RAM4_A      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(5) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);                                                         --core1 use RAM1
-    RAM4_WEB    <=                  (c1_wr_n OR (NOT toReq_c1(5))) 
-                                AND (c2_wr_n OR (NOT toReq_c2(5)));
-    RAM4_CS    <=              NOT ( (c1_csb OR (NOT toReq_c1(5))) AND (c2_csb OR (NOT toReq_c2(5))) );               
------------------------------------------------------------------------------------------------------------------------------------------      
+ 
+    set_ram_adress_g: for i in ram_a'range generate
+      ram_a(i)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(i+1) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0);
+      ram_di(i)     <= c2_d_dqi                     WHEN toReq_c2(i+1) = '1' and c2_csb = '0' ELSE  c1_d_dqi;
+      ram_cs(i)     <=              NOT ((c1_csb OR (NOT toReq_c1(i+1))) AND (c2_csb  OR (NOT toReq_c2(i+1))) );
+      ram_web(i)    <=                  (c1_wr_n OR (NOT toReq_c1(i+1))) AND (c2_wr_n OR (NOT toReq_c2(i+1)));
+    end generate set_ram_adress_g;
+      
+    -- ram_a(0)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(1) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0); --core1 use RAM1
+    -- ram_a(1)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(2) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0); --core1 use RAM1
+    -- ram_a(2)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(3) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0); --core1 use RAM1
+    -- ram_a(3)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(4) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0); --core1 use RAM1
+    -- ram_a(4)      <= c2_d_addr(13 downto 0)       WHEN toReq_c2(5) = '1' and c2_csb = '0' ELSE  c1_d_addr(13 downto 0); --core1 use RAM1
+
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------------------
 	

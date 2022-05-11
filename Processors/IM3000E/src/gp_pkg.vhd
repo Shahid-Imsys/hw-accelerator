@@ -134,7 +134,7 @@ package gp_pkg is
 
   --application ram or rom
   --added by maning for dual core processor
-  constant MEMNUM     : integer                       := 6;
+  constant MEMNUM     : integer                       := 129;
 --    constant ROM0_ADDR0     : std_logic_vector(17 downto 0) :=  "000000000000000000";--16KB
 --    constant ROM0_ADDR1     : std_logic_vector(17 downto 0) :=  "000000000000000001";--16KB
 --    constant ROM0_ADDR2     : std_logic_vector(17 downto 0) :=  "000000000000000010";--16KB
@@ -171,6 +171,11 @@ package gp_pkg is
 --      constant RAM8_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000011000";--16KB     RAM8 16 KB
 --    constant RAM9_ADDR      : std_logic_vector(17 downto 0) :=  "000000000000011001";--16KB     RAM9 16 KB
 
+  type main_ram_address_t is array (0 to MEMNUM - 2) of std_logic_vector(13 downto 0);
+  type main_ram_data_t    is array (0 to MEMNUM - 2) of std_logic_vector(7 downto 0);
+  subtype main_ram_cs_t is std_logic_vector(MEMNUM - 2 downto 0);
+  subtype main_ram_web_t is std_logic_vector(MEMNUM - 2 downto 0);
+  
   type OSPI_InterfaceOut_t is record
     RESET_n : std_logic;
     CK_p    : std_logic;

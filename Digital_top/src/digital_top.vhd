@@ -111,9 +111,9 @@ entity digital_top is
     ph_en : out std_logic_vector(7 downto 0);
     ph_o  : out std_logic_vector(7 downto 0);
     -- Port I
-    pi_i  : in  std_logic_vector(7 downto 0);
-    pi_en : out std_logic_vector(7 downto 0);
-    pi_o  : out std_logic_vector(7 downto 0);
+    -- pi_i  : in  std_logic_vector(7 downto 0);
+    -- pi_en : out std_logic_vector(7 downto 0);
+    -- pi_o  : out std_logic_vector(7 downto 0);
     -- Port J
     pj_i  : in  std_logic_vector(7 downto 0);
     pj_en : out std_logic_vector(7 downto 0);
@@ -315,6 +315,7 @@ architecture rtl of digital_top is
   signal clk_tx       : std_logic;
   signal clock_in_off : std_logic;
 
+  signal pi_data : std_logic_vector(7 downto 0);
 
 begin  -- architecture rtl
 
@@ -393,10 +394,13 @@ ospi_dq_out <= ospi_dq_out_int;
       ph_i  => ph_i,
       ph_en => ph_en,
       ph_o  => ph_o,
+
+      -- This port must be connected like this for simulation to work.
+      -- There shall be a bug report on this.
       -- Port I
-      pi_i  => pi_o,
-      pi_en => pi_en,
-      pi_o  => pi_o,
+      pi_i  => pi_data,
+      pi_en => open,
+      pi_o  => pi_data,
       -- Port J
       pj_i  => pj_i,
       pj_en => pj_en,

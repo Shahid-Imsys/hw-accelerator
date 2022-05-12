@@ -1199,7 +1199,7 @@ begin
       cs_n    => trcmem_ce_n
       );
 
-  ram_g: for i in 1 to MEMNUM-2 generate    
+  ram_g: for i in 0 to MEMNUM-2 generate    
     ---application memories
     ram1 : ram_memory
       generic map (
@@ -1298,13 +1298,7 @@ begin
       bmem_q    => bmem_q,
       bmem_d    => bmem_d,
       bmem_we_n => bmem_we_n,
-      bmem_ce_n => bmem_ce_n,
-      --RAM0 
-      RAM0_DO   => ram_do(0),       
-      RAM0_DI   => ram_di(0),
-      RAM0_A    => ram_a(0),
-      RAM0_WEB  => ram_web(0),
-      RAM0_CS   => ram_cs(0)
+      bmem_ce_n => bmem_ce_n
       );
 
   -- Disable power to BMEM 

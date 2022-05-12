@@ -39,12 +39,6 @@ entity rtc_iso is
       bmem_we_n         : in    std_logic;
       bmem_ce_n         : in    std_logic;
 	  
-	  --RAM0
-	  RAM0_DI           : in    std_logic_vector(7 downto 0);
-      RAM0_A            : in    std_logic_vector(13 downto 0);
-      RAM0_WEB          : in    std_logic;
-      RAM0_CS           : in    std_logic;
-
       -- signals isolated to 0
       sel_pll_iso_0   : out std_logic;
       rst_rtc_iso_0   : out std_logic;
@@ -67,10 +61,6 @@ entity rtc_iso is
       bmem_a8_iso_0     : out std_logic; 
       bmem_d_iso_0      : out std_logic_vector(7 downto 0);
 	  
-	  RAM0_DI_iso_0       : out    std_logic_vector(7 downto 0);
-	  RAM0_A_iso_0        : out    std_logic_vector(13 downto 0);
-      RAM0_CS_iso_0       : out    std_logic;
-
       clk_mux_out_iso_1   : out  std_logic;
 	  pllout_iso_1    	  : out std_logic;
 
@@ -113,15 +103,9 @@ begin
             c2_gmem_d_iso_0(i) <= c2_gmem_d(i)  and (not iso);
             dbus_iso_0(i) <= dbus(i)            and (not iso);
             bmem_d_iso_0(i) <= bmem_d(i)        and (not iso);
-			RAM0_DI_iso_0(i)   <= RAM0_DI(i)	and (not iso);
       end generate data_bus_gen;
       
-      ram_addr_gen : for i in 0 to 13 generate
-            RAM0_A_iso_0(i) <= RAM0_A(i)  and (not iso);
-      end generate ram_addr_gen;
-      
       bmem_a8_iso_0  <= bmem_a8                 and (not iso);
-	  RAM0_CS_iso_0  <= RAM0_CS					and (not iso); 
          
       -- These input signals are gated off to 1 using iso, make
       -- sure this is synthezised into simple OR gates!
@@ -133,7 +117,6 @@ begin
       c2_gmem_ce_n_iso_1 <= c2_gmem_ce_n    or iso;
       bmem_we_n_iso_1   <= bmem_we_n        or iso;   
       bmem_ce_n_iso_1   <= bmem_ce_n        or iso;  
-	  RAM0_WEB_iso_1    <= RAM0_WEB         or iso;
 
   
 end rtl;

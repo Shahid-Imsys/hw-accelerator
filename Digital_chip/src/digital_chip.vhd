@@ -394,9 +394,9 @@ begin  -- architecture rtl
         ph_en => open, --ph_en,
         ph_o  => open, --ph_o,
         -- Port I
-        pi_i  => x"00", --pi_i,
-        pi_en => open, --pi_en,
-        pi_o  => open, --pi_o,
+        -- pi_i  => x"00", --pi_i,
+        -- pi_en => open, --pi_en,
+        -- pi_o  => open, --pi_o,
         -- Port J
         pj_i  => pj_i,
         pj_en => pj_en,

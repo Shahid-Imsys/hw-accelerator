@@ -73,13 +73,6 @@ entity rtc is
     bmem_we_n : in  std_logic;
     bmem_ce_n : in  std_logic;
 
-    --RAM0 
-    RAM0_DO  : out std_logic_vector (7 downto 0);
-    RAM0_DI  : in  std_logic_vector (7 downto 0);
-    RAM0_A   : in  std_logic_vector (13 downto 0);
-    RAM0_WEB : in  std_logic;
-    RAM0_CS  : in  std_logic;
-
     xout          : in  std_logic;  -- external high frequency oscillator clock 
     pllout        : in  std_logic;
     sel_pll       : in  std_logic;
@@ -141,13 +134,6 @@ architecture rtl of rtc is
   signal bmem_d_iso_0    : std_logic_vector(7 downto 0);
   signal bmem_we_n_iso_1 : std_logic;
   signal bmem_ce_n_iso_1 : std_logic;
-
-  -- RAM0
-  signal RAM0_DI_iso_0  : std_logic_vector(7 downto 0);
-  signal RAM0_A_iso_0   : std_logic_vector(13 downto 0);
-  signal RAM0_CS_iso_0  : std_logic;
-  signal RAM0_WEB_iso_1 : std_logic;
-
 
   signal clk_mux_out_iso_1 : std_logic;
 
@@ -228,13 +214,6 @@ architecture rtl of rtc is
       bmem_we_n : in std_logic;
       bmem_ce_n : in std_logic;
 
-      --RAM0
-      RAM0_DI  : in std_logic_vector(7 downto 0);
-      RAM0_A   : in std_logic_vector(13 downto 0);
-      RAM0_WEB : in std_logic;
-      RAM0_CS  : in std_logic;
-
-
       -- signals isolated to 0
       sel_pll_iso_0         : out std_logic;
       pllout_iso_1          : out std_logic;
@@ -257,9 +236,6 @@ architecture rtl of rtc is
       bmem_a8_iso_0 : out std_logic;
       bmem_d_iso_0  : out std_logic_vector(7 downto 0);
 
-      RAM0_DI_iso_0 : out std_logic_vector(7 downto 0);
-      RAM0_A_iso_0  : out std_logic_vector(13 downto 0);
-      RAM0_CS_iso_0 : out std_logic;
 
       clk_mux_out_iso_1 : out std_logic;
 
@@ -359,11 +335,6 @@ begin  -- rtl
       bmem_ce_n    => bmem_ce_n,
 
 
-      RAM0_DI  => RAM0_DI,
-      RAM0_A   => RAM0_A,
-      RAM0_WEB => RAM0_WEB,
-      RAM0_CS  => RAM0_CS,
-
       sel_pll_iso_0           => sel_pll_iso_0,
       pllout_iso_1            => pllout_iso_1,
       rst_rtc_iso_0           => rst_rtc_iso_0,
@@ -390,12 +361,7 @@ begin  -- rtl
       c2_gmem_we_n_iso_1 => c2_gmem_we_n_iso_1,
       c2_gmem_ce_n_iso_1 => c2_gmem_ce_n_iso_1,
       bmem_we_n_iso_1    => bmem_we_n_iso_1,
-      bmem_ce_n_iso_1    => bmem_ce_n_iso_1,
-
-      RAM0_DI_iso_0  => RAM0_DI_iso_0,
-      RAM0_A_iso_0   => RAM0_A_iso_0,
-      RAM0_WEB_iso_1 => RAM0_WEB_iso_1,
-      RAM0_CS_iso_0  => RAM0_CS_iso_0
+      bmem_ce_n_iso_1    => bmem_ce_n_iso_1
 
       );
 
@@ -440,18 +406,6 @@ begin  -- rtl
       we_n                => bmem_we_n_iso_1,
       cs                  => bmem_ce_n_iso_1
       );
-
----application memories
-  ram0 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_mux_out_iso_1,
-      address => RAM0_A_iso_0,
-      ram_di  => RAM0_DI_iso_0,
-      ram_do  => RAM0_DO,
-      we_n    => RAM0_WEB_iso_1,
-      cs      => RAM0_CS_iso_0);
 
   --Clock switching logic, designed to handle asynchronous clocks.
   clk_mux_1 : clk_mux

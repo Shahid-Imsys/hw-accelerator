@@ -555,12 +555,6 @@ architecture struct of top is
   signal clk_in_off    : std_logic;
   signal clk_main_off  : std_logic;
   signal sdram_en      : std_logic;
-  signal out_line      : std_logic;
-  signal hold_flash    : std_logic;
-  signal hold_flash_d  : std_logic;
-  signal flash_en      : std_logic;
-  signal flash_mode    : std_logic_vector (3 downto 0);
-  signal ld_dqi_flash  : std_logic;
   signal router_ido    : std_logic_vector(7 downto 0);
   signal core_idi      : std_logic_vector(7 downto 0);
   signal bmem_a8       : std_logic;
@@ -806,66 +800,13 @@ architecture struct of top is
   signal mp_RAM1_A   : std_logic_vector (13 downto 0);
   signal mp_RAM1_WEB : std_logic;
   signal mp_RAM1_CS  : std_logic;
-
-  signal f_addr_in  : std_logic_vector(16 downto 0);
-  signal f_rd_in    : std_logic;        -- low active
-  signal f_wr_in    : std_logic;        -- low active        
-  signal f_data_in  : std_logic_vector(7 downto 0);  -- Data in from processor
-  signal f_data_out : std_logic_vector(7 downto 0);  -- Data out to processor   
-  signal f_CE       : std_logic;
-  signal f_ADDR     : std_logic_vector(12 downto 0);
-  signal f_WRONLY   : std_logic;
-  signal f_PERASE   : std_logic;
-  signal f_SERASE   : std_logic;
-  signal f_MERASE   : std_logic;
-  signal f_PROG     : std_logic;
-  signal f_INF      : std_logic;
-  signal f_POR      : std_logic;
-  signal f_SAVEN    : std_logic;
-  signal f_TM       : std_logic_vector(3 downto 0);
-  signal f_DATA_WR  : std_logic_vector(31 downto 0);
-  signal f0_ALE     : std_logic;
-  signal f0_DATA_IN : std_logic_vector(31 downto 0);
-  signal f0_RBB     : std_logic;
-  signal f1_ALE     : std_logic;
-  signal f1_DATA_IN : std_logic_vector(31 downto 0);
-  signal f1_RBB     : std_logic;
-  signal f2_ALE     : std_logic;
-  signal f2_DATA_IN : std_logic_vector(31 downto 0);
-  signal f2_RBB     : std_logic;
-  signal f3_ALE     : std_logic;
-  signal f3_DATA_IN : std_logic_vector(31 downto 0);
-  signal f3_RBB     : std_logic;
-  --RAM0 
-  signal RAM0_DO    : std_logic_vector (7 downto 0);  -- modify flag, 2015lp
-  signal RAM0_DI    : std_logic_vector (7 downto 0);
-  signal RAM0_A     : std_logic_vector (13 downto 0);
-  signal RAM0_WEB   : std_logic;
-  signal RAM0_CS    : std_logic;
-  --RAM1 
-  signal RAM1_DO    : std_logic_vector (7 downto 0);
-  signal RAM1_DI    : std_logic_vector (7 downto 0);
-  signal RAM1_A     : std_logic_vector (13 downto 0);
-  signal RAM1_WEB   : std_logic;
-  signal RAM1_CS    : std_logic;
-  --RAM2 
-  signal RAM2_DO    : std_logic_vector (7 downto 0);
-  signal RAM2_DI    : std_logic_vector (7 downto 0);
-  signal RAM2_A     : std_logic_vector (13 downto 0);
-  signal RAM2_WEB   : std_logic;
-  signal RAM2_CS    : std_logic;
-  --RAM3 
-  signal RAM3_DO    : std_logic_vector (7 downto 0);
-  signal RAM3_DI    : std_logic_vector (7 downto 0);
-  signal RAM3_A     : std_logic_vector (13 downto 0);
-  signal RAM3_WEB   : std_logic;
-  signal RAM3_CS    : std_logic;
-  --RAM4 
-  signal RAM4_DO    : std_logic_vector (7 downto 0);
-  signal RAM4_DI    : std_logic_vector (7 downto 0);
-  signal RAM4_A     : std_logic_vector (13 downto 0);
-  signal RAM4_WEB   : std_logic;
-  signal RAM4_CS    : std_logic;
+ 
+  -- Ram memory
+  signal ram_a   : main_ram_address_t;
+  signal ram_di  : main_ram_data_t;
+  signal ram_do : main_ram_data_t;
+  signal ram_cs  : main_ram_cs_t;
+  signal ram_web : main_ram_web_t;
 
 begin
 
@@ -1258,50 +1199,19 @@ begin
       cs_n    => trcmem_ce_n
       );
 
----application memories
-  ram1 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM1_A,
-      ram_di  => RAM1_DI,
-      ram_do  => RAM1_DO,
-      we_n    => RAM1_WEB,
-      cs      => RAM1_CS);
-
-  ram2 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM2_A,
-      ram_di  => RAM2_DI,
-      ram_do  => RAM2_DO,
-      we_n    => RAM2_WEB,
-      cs      => RAM2_CS);
-
-  ram3 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM3_A,
-      ram_di  => RAM3_DI,
-      ram_do  => RAM3_DO,
-      we_n    => RAM3_WEB,
-      cs      => RAM3_CS);
-
-  ram4 : ram_memory
-    generic map (
-      g_memory_type => g_memory_type)
-    port map (
-      clk     => clk_p,
-      address => RAM4_A,
-      ram_di  => RAM4_DI,
-      ram_do  => RAM4_DO,
-      we_n    => RAM4_WEB,
-      cs      => RAM4_CS);
+  ram_g: for i in 1 to MEMNUM-2 generate    
+    ---application memories
+    ram1 : ram_memory
+      generic map (
+        g_memory_type => g_memory_type)
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate ram_g;
 
   -----------------------------------------------------------------------------
   -- Clock generation block
@@ -1317,7 +1227,7 @@ begin
       din_a        => din_a,
       clk_in_off   => clk_in_off,
       clk_main_off => clk_main_off,
-      hold_flash_d => hold_flash_d,
+      hold_flash_d => '0',
       clk_p        => clk_p,
       clk_c_en     => clk_c_en,
       even_c       => even_c,
@@ -1390,11 +1300,11 @@ begin
       bmem_we_n => bmem_we_n,
       bmem_ce_n => bmem_ce_n,
       --RAM0 
-      RAM0_DO   => RAM0_DO,
-      RAM0_DI   => RAM0_DI,
-      RAM0_A    => RAM0_A,
-      RAM0_WEB  => RAM0_WEB,
-      RAM0_CS   => RAM0_CS
+      RAM0_DO   => ram_do(0),       
+      RAM0_DI   => ram_di(0),
+      RAM0_A    => ram_a(0),
+      RAM0_WEB  => ram_web(0),
+      RAM0_CS   => ram_cs(0)
       );
 
   -- Disable power to BMEM 
@@ -1430,12 +1340,12 @@ begin
       clk_main_off => clk_main_off,
       sdram_en     => sdram_en,
       --flash Control   -coreflag
-      out_line     => out_line,
-      hold_flash   => hold_flash,
-      hold_flash_d => hold_flash_d,
-      flash_en     => flash_en,
-      flash_mode   => flash_mode,
-      ld_dqi_flash => ld_dqi_flash,
+      out_line     => open,
+      hold_flash   => '0',
+      hold_flash_d => '0',
+      flash_en     => open,
+      flash_mode   => open,
+      ld_dqi_flash => '1',
       -- Control signals to/from the oscillator and PLL
       pll_frange   => pll_frange,  --: out std_logic;  -- Frequency range select
       pll_n        => pll_n,  --: out std_logic_vector(5 downto 0);   -- Multiplier
@@ -1813,110 +1723,12 @@ begin
       c2_d_dqi    => c2_d_dqi,
       c2_d_dqo    => c2_d_dqo,
       --memory interface
-      --ROM0
-      f_addr_in   => f_addr_in,
-      f_rd_in     => f_rd_in,
-      f_wr_in     => f_wr_in,
-      f_data_in   => f_data_in,
-      f_data_out  => f_data_out,
       --SRAM interface
-      --RAM0 
-      RAM0_DO     => RAM0_DO,
-      RAM0_DI     => RAM0_DI,
-      RAM0_A      => RAM0_A,
-      RAM0_WEB    => RAM0_WEB,
-      RAM0_CS     => RAM0_CS,
-      --RAM1        => --RAM1          ,
-      RAM1_DO     => RAM1_DO,
-      RAM1_DI     => RAM1_DI,
-      RAM1_A      => RAM1_A,
-      RAM1_WEB    => RAM1_WEB,
-      RAM1_CS     => RAM1_CS,
-      --RAM2        => --RAM2          ,
-      RAM2_DO     => RAM2_DO,
-      RAM2_DI     => RAM2_DI,
-      RAM2_A      => RAM2_A,
-      RAM2_WEB    => RAM2_WEB,
-      RAM2_CS     => RAM2_CS,
-      --RAM3        => --RAM3          ,
-      RAM3_DO     => RAM3_DO,
-      RAM3_DI     => RAM3_DI,
-      RAM3_A      => RAM3_A,
-      RAM3_WEB    => RAM3_WEB,
-      RAM3_CS     => RAM3_CS,
-      --RAM4        => --RAM4          --,
-      RAM4_DO     => RAM4_DO,
-      RAM4_DI     => RAM4_DI,
-      RAM4_A      => RAM4_A,
-      RAM4_WEB    => RAM4_WEB,
-      RAM4_CS     => RAM4_CS
-      );
-
-  --flash interface
-  flash_inf_inst : entity work.flash_inf
-    port map(
-      clk_p  => clk_p,
-      even_c => even_c,
-      rst_cn => rst_n,
-
-      flash_en     => flash_en,
-      flash_mode   => flash_mode,
-      out_line     => out_line,
-      hold_flash   => hold_flash,
-      hold_flash_d => hold_flash_d,
-
-      addr_in      => f_addr_in,
-      rd_in        => f_rd_in,
-      wr_in        => f_wr_in,
-      data_in      => f_data_in,
-      data_out     => f_data_out,
-      ld_dqi_flash => ld_dqi_flash,
-
-      CE         => f_CE,
-      ADDR       => f_ADDR,
-      WRONLY     => f_WRONLY,
-      PERASE     => f_PERASE,
-      SERASE     => f_SERASE,
-      MERASE     => f_MERASE,
-      PROG       => f_PROG,
-      INF        => f_INF,
-      POR        => f_POR,
-      SAVEN      => f_SAVEN,
-      TM         => f_TM,
-      DATA_WR    => f_DATA_WR,
-      f0_ALE     => f0_ALE,
-      --f0_PVPP   => --f0_PVPP   ,
-      f0_DATA_IN => f0_DATA_IN,
-      f0_RBB     => f0_RBB,
-      f1_ALE     => f1_ALE,
-      --f1_PVPP   => --f1_PVPP   ,
-      f1_DATA_IN => f1_DATA_IN,
-      f1_RBB     => f1_RBB,
-      f2_ALE     => f2_ALE,
-      --f2_PVPP   => --f2_PVPP   ,
-      f2_DATA_IN => f2_DATA_IN,
-      f2_RBB     => f2_RBB,
-      f3_ALE     => f3_ALE,
-      --f3_PVPP   => --f3_PVPP   ,
-      f3_DATA_IN => f3_DATA_IN,
-      f3_RBB     => f3_RBB              --,
---        f4_ALE      => f4_ALE      ,
---        --f4_PVPP   => --f4_PVPP   ,
---        f4_DATA_IN  => f4_DATA_IN  ,       
---        f4_RBB      => f4_RBB      ,
---        f5_ALE      => f5_ALE      ,
---        --f5_PVPP   => --f5_PVPP   ,
---        f5_DATA_IN  => f5_DATA_IN  ,       
---        f5_RBB      => f5_RBB      ,
---        f6_ALE      => f6_ALE      ,
---        --f6_PVPP   => --f6_PVPP   ,
---        f6_DATA_IN  => f6_DATA_IN  ,       
---        f6_RBB      => f6_RBB      ,
---        f7_ALE      => f7_ALE      ,
---        --f7_PVPP   => --f7_PVPP   ,
---        f7_DATA_IN  => f7_DATA_IN  ,       
---        f7_RBB      => f7_RBB      
-
+      ram_a => ram_a,
+      ram_di => ram_di,
+      ram_do => ram_do,
+      ram_cs => ram_cs,
+      ram_web => ram_web
       );
 
 

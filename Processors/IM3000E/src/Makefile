@@ -43,7 +43,6 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/core2/acore.vhd \
 			 	  $(GPP_DIR_WIN)/mpmem_inf.vhd \
 			 	  $(GPP_DIR_WIN)/sdram_inf.vhd \
-			 	  $(GPP_DIR_WIN)/flash_inf.vhd \
 			 	  $(GPP_DIR_WIN)/peri/pdi.vhd \
 			 	  $(GPP_DIR_WIN)/peri/tiu.vhd \
 			 	  $(GPP_DIR_WIN)/peri/ports.vhd \

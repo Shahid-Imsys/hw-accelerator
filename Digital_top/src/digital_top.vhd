@@ -146,6 +146,168 @@ end entity digital_top;
 
 architecture rtl of digital_top is
 
+  component SNPS_RF_SP_UHS_1024x8 is
+    port (
+      Q        : out std_logic_vector(7 downto 0);
+      ADR      : in  std_logic_vector(9 downto 0);
+      D        : in  std_logic_vector(7 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+
+--  component SNPS_RF_SP_UHS_256x128 is
+--      port (
+--      Q        : out std_logic_vector(127 downto 0);
+--      ADR      : in  std_logic_vector(7 downto 0);
+--      D        : in  std_logic_vector(127 downto 0);
+--      WE       : in  std_logic;
+--      ME       : in  std_logic;
+--      CLK      : in  std_logic;
+--      TEST1    : in  std_logic;
+--      TEST_RNM : in  std_logic;
+--      RME      : in  std_logic;
+--      RM       : in  std_logic_vector(3 downto 0);
+--      WA       : in  std_logic_vector(1 downto 0);
+--      WPULSE   : in  std_logic_vector(2 downto 0);
+--      LS       : in  std_logic;
+--      BC0      : in  std_logic;
+--      BC1      : in  std_logic;
+--      BC2      : in  std_logic);
+--  end component;
+
+  component SNPS_RF_SP_UHS_1024x32 is
+    port (
+      Q        : out std_logic_vector(31 downto 0);
+      ADR      : in  std_logic_vector(9 downto 0);
+      D        : in  std_logic_vector(31 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+
+
+  component SNPS_RF_SP_UHS_256x64 is
+    port (
+      Q        : out std_logic_vector(63 downto 0);
+      ADR      : in  std_logic_vector(7 downto 0);
+      D        : in  std_logic_vector(63 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+
+  component SNPS_RF_SP_UHS_64x64 is
+    port (
+      Q        : out std_logic_vector(63 downto 0);
+      ADR      : in  std_logic_vector(5 downto 0);
+      D        : in  std_logic_vector(63 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+
+  component SNPS_SP_HD_8Kx128 is
+    port (
+      Q        : out std_logic_vector(127 downto 0);
+      ADR      : in  std_logic_vector(12 downto 0);
+      D        : in  std_logic_vector(127 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+  
+  component SNPS_SP_HD_16Kx8
+    port (
+      Q        : out std_logic_vector(7 downto 0);
+      ADR      : in  std_logic_vector(13 downto 0);
+      D        : in  std_logic_vector(7 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic
+      );
+  end component;
+
+  type slv8   is array(natural range <>) of std_logic_vector(  7 downto 0);
+  type slv64  is array(natural range <>) of std_logic_vector( 63 downto 0);
+  type slv128 is array(natural range <>) of std_logic_vector(127 downto 0);
+  
+  signal dummy_dout_1   : slv64(7 downto 0);
+  signal dummy_dout_2   : slv8(15 downto 0);
+  signal dummy_dout_3   : std_logic_vector(31 downto 0);
+  signal dummy_dout_4   : slv64(15 downto 0);
+  signal dummy_dout_5   : slv64(15 downto 0);
+  signal dummy_dout_6   : slv64(15 downto 0);
+  signal dummy_dout_7   : slv128(3 downto 0);
+  signal dummy_dout_8   : slv8(127 downto 0);
+  
+  signal dummy_addr     : std_logic_vector(13 downto 0);
+  signal dummy_din      : std_logic_vector(127 downto 0);
+  signal dummy_we       : std_logic_vector(204 downto 0);
+  
+  signal ospi_dq_in_int  : std_logic_vector(7 downto 0);
+  signal ospi_dq_out_int : std_logic_vector(7 downto 0);
+
   constant asic_c : memory_type_t := asic;
 
   signal clk_p_cpu    : std_logic;
@@ -153,7 +315,10 @@ architecture rtl of digital_top is
   signal clk_tx       : std_logic;
   signal clock_in_off : std_logic;
 
+
 begin  -- architecture rtl
+
+ospi_dq_out <= ospi_dq_out_int;
 
   i_clock_reset : entity work.clock_reset
 
@@ -162,7 +327,7 @@ begin  -- architecture rtl
 
     port map (
       pll_clk  => hclk,
-      enet_clk => '0',                  -- TODO
+      enet_clk => '0', -- TODO
       clk_p    => clk_p_cpu,
       clk_rx   => clk_rx,
       clk_tx   => clk_tx,
@@ -256,8 +421,8 @@ begin  -- architecture rtl
       ospi_out.ck_n    => ospi_ck_n,
       ospi_out.ck_p    => ospi_ck_p,
       ospi_out.reset_n => ospi_reset_n,
-      ospi_dq_in       => ospi_dq_in,
-      ospi_dq_out      => ospi_dq_out,
+      ospi_dq_in       => ospi_dq_in_int,
+      ospi_dq_out      => ospi_dq_out_int,
       ospi_dq_enable   => ospi_dq_enable,
       ospi_rwds_in     => ospi_rwds_in,
       ospi_rwds_out    => ospi_rwds_out,
@@ -269,7 +434,259 @@ begin  -- architecture rtl
       VCC18LP  => '1',
       rxout    => rxout,
       adc_bits => adc_bits
-
       );
+
+
+  -- All "dummy" named instances and signals are temporary and are to be soon removed!!
+  
+  asic_dummy_memories: if g_memory_type = asic generate
+        --  signal dummy_dout_1   : slv64(7 downto 0);
+        --  signal dummy_dout_2   : slv8(15 downto 0);
+        --  signal dummy_dout_3   : std_logic_vector(31 downto 0);
+        --  signal dummy_dout_4   : slv64(15 downto 0);
+        --  signal dummy_dout_5   : slv64(15 downto 0);
+        --  signal dummy_dout_6   : slv64(15 downto 0);
+        --  signal dummy_dout_7   : slv128(3 downto 0);
+        --  signal dummy_dout_8   : slv128(1 downto 0);
+        --  signal dummy_addr     : std_logic_vector(12 downto 0);
+        --  signal dummy_din      : std_logic_vector(127 downto 0);
+        --  signal dummy_we       : std_logic_vector(78 downto 0);
+  
+    dummy_signal_proc: process( hclk )
+        variable offset :  integer := 0;
+        variable index   : integer := 0;
+        variable lvector : std_logic_vector(5153 downto 0);
+    begin
+        if false then
+        -- No reset available?
+        
+        elsif rising_edge( hclk ) then
+        
+            dummy_addr <= dummy_addr(5 downto 0) & ospi_dq_out_int;
+            dummy_din  <= (ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int &
+                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int &
+                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int & 
+                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int )
+                           xor dummy_dout_7(3)
+                           xor dummy_dout_7(2)
+                           xor dummy_dout_7(1)
+                           xor dummy_dout_7(0);
+                           
+            dummy_we       <= dummy_din(75 downto 0) & dummy_din & lvector(index);
+            ospi_dq_in_int <= dummy_we(7 downto 0);
+            
+            if index = 4385 then
+                index := 0;
+            else
+                index := index + 1;
+            end if;
+            
+            offset := 0;
+            for i in dummy_dout_1'range loop -- 8 * 64 = 512
+                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_1(i);
+            end loop;
+
+            offset := 512;
+            for i in dummy_dout_2'range loop -- 16 * 8 = 128
+                lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2(i);
+            end loop;
+            
+            lvector( 31 + 512+128  downto 512+128 ) := dummy_dout_3;
+              
+            offset := 544;
+            for i in dummy_dout_4'range loop -- 16 * 64 = 1024
+                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_4(i);
+            end loop;
+                          
+            offset := 1568;
+            for i in dummy_dout_5'range loop -- 16 * 64 = 1024
+                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_5(i);
+            end loop;
+                                        
+            offset := 2592;
+            for i in dummy_dout_6'range loop -- 16 * 64 = 1024
+                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_6(i);
+            end loop;
+              
+            offset := 3618;
+            for i in dummy_dout_7'range loop -- 4 * 128 = 512
+                lvector(i*128 + 127 + offset downto i*128 + offset) := dummy_dout_7(i);
+            end loop; 
+
+            offset := 4130;
+            for i in dummy_dout_8'range loop -- 128 * 8 = 1024
+                lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_8(i);
+            end loop;
+        
+        end if;
+    end process;
+    
+    
+    mpgm_gen : for i in 0 to 7 generate
+      mpgm : SNPS_RF_SP_UHS_256x64
+        port map (
+          Q        => dummy_dout_1(i),
+          ADR      => dummy_addr(7 downto 0),
+          D        => dummy_din(63 downto 0),
+          WE       => dummy_we(0 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+    
+    gmem_gen : for i in 0 to 15 generate
+      gmem : SNPS_RF_SP_UHS_1024x8
+        port map (
+          Q        => dummy_dout_2(i),
+          ADR      => dummy_addr(9 downto 0),
+          D        => dummy_din(7 downto 0),
+          WE       => dummy_we(8 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+    
+    fifo_gen_1 : SNPS_RF_SP_UHS_1024x32
+        port map (
+          Q        => dummy_dout_3,
+          ADR      => dummy_addr(9 downto 0),
+          D        => dummy_din(31 downto 0),
+          WE       => dummy_we(24),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+          
+    ve_l_gen : for i in 0 to 15 generate
+      ve_l : SNPS_RF_SP_UHS_256x64
+        port map (
+          Q        => dummy_dout_4(i),
+          ADR      => dummy_addr(7 downto 0),
+          D        => dummy_din(63 downto 0),
+          WE       => dummy_we(25 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate; 
+             
+    ve_r_gen : for i in 0 to 15 generate
+      ve_r : SNPS_RF_SP_UHS_256x64
+        port map (
+          Q        => dummy_dout_5(i),
+          ADR      => dummy_addr(7 downto 0),
+          D        => dummy_din(63 downto 0),
+          WE       => dummy_we(41 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+              
+    ve_bias_gen : for i in 0 to 15 generate
+      ve_bias : SNPS_RF_SP_UHS_64x64
+        port map (
+          Q        => dummy_dout_6(i),
+          ADR      => dummy_addr(5 downto 0),
+          D        => dummy_din(63 downto 0),
+          WE       => dummy_we(57 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+               
+    cm_clust_gen : for i in 0 to 3 generate
+      cm_clust : SNPS_SP_HD_8Kx128
+        port map (
+          Q        => dummy_dout_7(i),
+          ADR      => dummy_addr(12 downto 0),
+          D        => dummy_din(127 downto 0),
+          WE       => dummy_we(73 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+
+    rm_gen : for i in 0 to 127 generate
+      rm : SNPS_SP_HD_16Kx8
+        port map (
+          Q        => dummy_dout_8(i),
+          ADR      => dummy_addr(13 downto 0),
+          D        => dummy_din(7 downto 0),
+          WE       => dummy_we(77 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+  end generate;
 
 end architecture rtl;

@@ -439,7 +439,7 @@ ospi_dq_out <= ospi_dq_out_int;
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
   
-  asic_dummy_memories: if g_memory_type = fpga generate
+  asic_dummy_memories: if g_memory_type = asic generate
         --  signal dummy_dout_1   : slv64(7 downto 0);
         --  signal dummy_dout_2   : slv8(15 downto 0);
         --  signal dummy_dout_3   : std_logic_vector(31 downto 0);

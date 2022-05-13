@@ -11,10 +11,10 @@
 --   which the document(s) have been supplied.                               --
 --                                                                           --
 -------------------------------------------------------------------------------
--- Title      : FIFO_0
+-- Title      : fifo
 -- Project    : GP3000
 -------------------------------------------------------------------------------
--- File       : fifo_0.vhd
+-- File       : fifo.vhd
 -- Author     : Chuhang Jin
 -- Company    : Imsys Technologies AB
 -- Date       : 
@@ -34,14 +34,15 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity fifo_0 is
+entity fifo is
     generic(
-        DATA_WIDTH : integer := 32;
-        DATA_DEPTH : integer := 8;
-        PROG_FULL_TRESHOLD : integer :=5
+        DATA_WIDTH : integer ;
+        DATA_DEPTH : integer ;
+        PROG_FULL_TRESHOLD : integer 
     );
     port(
         clk     : in std_logic;
+        --rd_clk     : in std_logic;
         srst    : in std_logic;
         rd_en   : in std_logic;
         wr_en   : in std_logic;
@@ -57,7 +58,7 @@ entity fifo_0 is
     );
 end entity;
 
-architecture behavioral of fifo_0 is
+architecture rtl of fifo is
     type ram_type is array (DATA_DEPTH-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
     signal ram : ram_type;
 
@@ -96,7 +97,7 @@ begin
     end process;
 
     --TAIL AND VALID FLAG
-    process(clk)
+    process(clk) 
     begin
         if rising_edge(clk) then
             if srst = '1' then
@@ -119,12 +120,27 @@ begin
         if rising_edge(clk) then
             if srst = '1' then
                 ram <= (others =>(others =>'0'));
+                dout <= (others => '0');
             else
-                ram(head) <= din;
-                dout <= ram(tail);
+                if wr_en = '1' then
+                    ram(head) <= din;
+                end if;
+
+                if rd_en = '1' then
+                    dout <= ram(tail);
+                end if;
             end if;
         end if;
     end process;
+    ----DATA READ
+    --process(clk)
+    --begin
+    --    if rising_edge(clk) then
+    --        if rd_en = '1' and empty_i = '0' then
+    --            dout <= ram(tail);
+    --        end if;
+    --    end if;
+    --end process;
 
     --COUNTER
     process(head, tail)
@@ -179,4 +195,4 @@ begin
     counter <= counter_i;
 
 
-end behavioral;
+end rtl;

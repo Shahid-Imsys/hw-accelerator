@@ -66,9 +66,11 @@ entity req_dst_logic is
 end entity req_dst_logic;
 
 architecture rtl of req_dst_logic is
-COMPONENT fifo_generator_1
-    PORT (
+COMPONENT fifo
+GENERIC(DATA_WIDTH,DATA_DEPTH,PROG_FULL_TRESHOLD : integer);
+PORT (
     clk : IN STD_LOGIC;
+    --rd_clk : IN STD_LOGIC;
     srst : IN STD_LOGIC;
     din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     wr_en : IN STD_LOGIC;
@@ -78,12 +80,12 @@ COMPONENT fifo_generator_1
     almost_full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
     almost_empty : OUT STD_LOGIC;
-    prog_empty : OUT STD_LOGIC;
+    prog_full : OUT STD_LOGIC;
     valid      : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(9 downto 0);
-    wr_rst_busy : OUT STD_LOGIC;
-    rd_rst_busy : OUT STD_LOGIC
-  );
+    counter : OUT integer range DATA_DEPTH-1 downto 0
+    --wr_rst_busy : OUT STD_LOGIC;
+    --rd_rst_busy : OUT STD_LOGIC
+);
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
     signal id_num   : std_logic_vector(3 downto 0):="0000";
@@ -108,11 +110,13 @@ END COMPONENT;
 --    signal loop_c  : integer := 0;
     signal chain   : std_logic; --reserved for later use
     signal data_in_fifo : std_logic_vector(9 downto 0);
-    signal prog_empty_i : std_logic;
+    signal prog_full_i : std_logic;
     signal data_vld_out_i : std_logic_vector(15 downto 0);
     signal reset_i     : std_logic;
     signal req_to_noc_i : std_logic;
     signal req_rd_reg   : std_logic_vector(15 downto 0) := (others => '0');
+    signal valid_d : std_logic;
+    signal dout_d : std_logic_vector(31 downto 0);
 
 
 begin
@@ -334,6 +338,15 @@ begin
     end if;
 end process;
 --wr <= poll_act;
+--Output delay for synchronization with clk_e
+process(clk_p)
+begin
+    if rising_edge(clk_p) then
+        FIFO_VLD <= valid_d;
+        OUTPUT <= dout_d;
+    end if;
+end process;
+
 req_core <= pe_mux_out;
 fifo_rdy <= almost_full and rd;
 rd       <= RD_FIFO;
@@ -360,22 +373,28 @@ begin
     end if;
 end process;
 --DATA_VLD_OUT <= data_vld_out_i; 
-request_fifo : fifo_generator_1
-  PORT MAP (
+request_fifo : fifo
+GENERIC MAP(
+    DATA_WIDTH => 32,
+    DATA_DEPTH => 1024,
+    PROG_FULL_TRESHOLD => 1023
+)
+PORT MAP (
     clk => clk_p,
+    --rd_clk => clk_p,
     srst => reset_i,
     din => req_core,
     wr_en => wr,
     rd_en => rd,
-    dout => output,
+    dout => dout_d,
     full => full,
     almost_full => almost_full,
     empty => empty,
     almost_empty => almost_empty,
-    prog_empty => prog_empty_i,
-    valid      => FIFO_VLD,
-    data_count => data_in_fifo,
-    wr_rst_busy => open,
-    rd_rst_busy => open
-  );
+    prog_full => prog_full_i,
+    valid      => valid_d,
+    counter => open
+    --wr_rst_busy => open,
+    --rd_rst_busy => open
+);
 end architecture;

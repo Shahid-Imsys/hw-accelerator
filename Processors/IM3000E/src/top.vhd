@@ -1199,7 +1199,7 @@ begin
       cs_n    => trcmem_ce_n
       );
 
-  ram_g: for i in 0 to MEMNUM-2 generate    
+  ram_g: for i in 0 to MEMNUM-1 generate    
     ---application memories
     ram1 : ram_memory
       generic map (

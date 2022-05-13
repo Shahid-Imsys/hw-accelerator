@@ -111,9 +111,9 @@ entity digital_top is
     ph_en : out std_logic_vector(7 downto 0);
     ph_o  : out std_logic_vector(7 downto 0);
     -- Port I
-    -- pi_i  : in  std_logic_vector(7 downto 0);
-    -- pi_en : out std_logic_vector(7 downto 0);
-    -- pi_o  : out std_logic_vector(7 downto 0);
+    pi_i  : in  std_logic_vector(7 downto 0);
+    pi_en : out std_logic_vector(7 downto 0);
+    pi_o  : out std_logic_vector(7 downto 0);
     -- Port J
     pj_i  : in  std_logic_vector(7 downto 0);
     pj_en : out std_logic_vector(7 downto 0);
@@ -299,11 +299,11 @@ architecture rtl of digital_top is
   signal dummy_dout_5   : slv64(15 downto 0);
   signal dummy_dout_6   : slv64(15 downto 0);
   signal dummy_dout_7   : slv128(3 downto 0);
-  signal dummy_dout_8   : slv8(127 downto 0);
+  signal dummy_dout_8   : slv8(31 downto 0);
   
   signal dummy_addr     : std_logic_vector(13 downto 0);
   signal dummy_din      : std_logic_vector(127 downto 0);
-  signal dummy_we       : std_logic_vector(204 downto 0);
+  signal dummy_we       : std_logic_vector(108 downto 0);
   
   signal ospi_dq_in_int  : std_logic_vector(7 downto 0);
   signal ospi_dq_out_int : std_logic_vector(7 downto 0);
@@ -315,7 +315,6 @@ architecture rtl of digital_top is
   signal clk_tx       : std_logic;
   signal clock_in_off : std_logic;
 
-  signal pi_data : std_logic_vector(7 downto 0);
 
 begin  -- architecture rtl
 
@@ -394,13 +393,10 @@ ospi_dq_out <= ospi_dq_out_int;
       ph_i  => ph_i,
       ph_en => ph_en,
       ph_o  => ph_o,
-
-      -- This port must be connected like this for simulation to work.
-      -- There shall be a bug report on this.
       -- Port I
-      pi_i  => pi_data,
-      pi_en => open,
-      pi_o  => pi_data,
+      pi_i  => pi_o,
+      pi_en => pi_en,
+      pi_o  => pi_o,
       -- Port J
       pj_i  => pj_i,
       pj_en => pj_en,
@@ -443,7 +439,7 @@ ospi_dq_out <= ospi_dq_out_int;
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
   
-  asic_dummy_memories: if g_memory_type = asic generate
+  asic_dummy_memories: if g_memory_type = fpga generate
         --  signal dummy_dout_1   : slv64(7 downto 0);
         --  signal dummy_dout_2   : slv8(15 downto 0);
         --  signal dummy_dout_3   : std_logic_vector(31 downto 0);
@@ -451,15 +447,15 @@ ospi_dq_out <= ospi_dq_out_int;
         --  signal dummy_dout_5   : slv64(15 downto 0);
         --  signal dummy_dout_6   : slv64(15 downto 0);
         --  signal dummy_dout_7   : slv128(3 downto 0);
-        --  signal dummy_dout_8   : slv128(1 downto 0);
+        --  signal dummy_dout_8   : slv8(31 downto 0);
         --  signal dummy_addr     : std_logic_vector(12 downto 0);
         --  signal dummy_din      : std_logic_vector(127 downto 0);
-        --  signal dummy_we       : std_logic_vector(78 downto 0);
+        --  signal dummy_we       : std_logic_vector(108 downto 0);
   
     dummy_signal_proc: process( hclk )
         variable offset :  integer := 0;
         variable index   : integer := 0;
-        variable lvector : std_logic_vector(5153 downto 0);
+        variable lvector : std_logic_vector(4511 downto 0);
     begin
         if false then
         -- No reset available?
@@ -476,10 +472,10 @@ ospi_dq_out <= ospi_dq_out_int;
                            xor dummy_dout_7(1)
                            xor dummy_dout_7(0);
                            
-            dummy_we       <= dummy_din(75 downto 0) & dummy_din & lvector(index);
+            dummy_we       <= dummy_din(107 downto 0) & lvector(index);
             ospi_dq_in_int <= dummy_we(7 downto 0);
             
-            if index = 4385 then
+            if index = 4511 then
                 index := 0;
             else
                 index := index + 1;
@@ -490,37 +486,39 @@ ospi_dq_out <= ospi_dq_out_int;
                 lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_1(i);
             end loop;
 
-            offset := 512;
+            offset := offset + 512;
             for i in dummy_dout_2'range loop -- 16 * 8 = 128
                 lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2(i);
             end loop;
             
             lvector( 31 + 512+128  downto 512+128 ) := dummy_dout_3;
               
-            offset := 544;
+            offset := offset + 128+32;
             for i in dummy_dout_4'range loop -- 16 * 64 = 1024
                 lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_4(i);
             end loop;
                           
-            offset := 1568;
+            offset := offset + 1024;
             for i in dummy_dout_5'range loop -- 16 * 64 = 1024
                 lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_5(i);
             end loop;
                                         
-            offset := 2592;
+            offset := offset + 1024;
             for i in dummy_dout_6'range loop -- 16 * 64 = 1024
                 lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_6(i);
             end loop;
               
-            offset := 3618;
+            offset := offset + 1024;
             for i in dummy_dout_7'range loop -- 4 * 128 = 512
                 lvector(i*128 + 127 + offset downto i*128 + offset) := dummy_dout_7(i);
             end loop; 
 
-            offset := 4130;
-            for i in dummy_dout_8'range loop -- 128 * 8 = 1024
+            offset := offset + 512;
+            for i in dummy_dout_8'range loop -- 32 * 8 = 256
                 lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_8(i);
             end loop;
+            
+            --offset := offset + 256;
         
         end if;
     end process;
@@ -671,7 +669,7 @@ ospi_dq_out <= ospi_dq_out_int;
           BC2      => '0');
     end generate;
 
-    rm_gen : for i in 0 to 127 generate
+    rm_gen : for i in 0 to 31 generate
       rm : SNPS_SP_HD_16Kx8
         port map (
           Q        => dummy_dout_8(i),

@@ -23,14 +23,18 @@ end entity;
 
 architecture rtl of spiflash is
 
-  constant npages_c : integer := 8; -- 1 page = 32 bytes
-  constant bytes_per_line_c : integer := 10;
+  constant npages_c         : integer := 8; -- 1 page = 32 bytes
+  constant bytes_per_line_c : integer := 10; -- in file to read
+  constant pp_exec_time_c   : time    := 200 ns; -- Typ 0.4 ms, max 3 ms
+  constant ec_exec_time_c   : time    := 200 ns; -- Typ 20 s, max 100 s
 
   type page_type is array (0 to 31) of std_logic_vector(7 downto 0);
   type ram_type  is array (0 to npages_c-1) of page_type;
   type reg_type  is array (0 to 2) of std_logic_vector(7 downto 0);
 
-  type state_fall_type is (idle, we, wd, rsr1, rsr2, rsr3, rd);
+  type state_fall_type is (idle, rsr1, rsr2, rsr3, rd);
+  type state_cs_type   is (idle, pp, ec, we, wd);
+  type state_busy_type is (idle, pp, ec);
 
   procedure init_ram_from_file (ram_file_name : in string; signal content : inout ram_type ) is
     file ram_file            : text;
@@ -93,16 +97,16 @@ architecture rtl of spiflash is
   end procedure;
 
   signal page  : page_type;
-  signal ppbuf : page_type := (others => (others => '1'));
-  signal ppdv  : std_logic := '0';
-  signal erase : std_logic := '0';
   signal ram   : ram_type := (others => (others => (others => '1')));
   signal reg   : reg_type := (others => (others => '0'));
-  signal state_fall : state_fall_type;
-  signal WEL   : std_logic := '0'; -- Write Enable Latch
   signal BUSY  : std_logic := '0';
+  signal WEL   : std_logic := '0'; -- Write Enable Latch
+  signal ppbuf : page_type := (others => (others => '1'));
+  signal timer : time;
 
-  signal addr_test : std_logic_vector(23 downto 0); -- TEMP TEST
+  signal state_fall : state_fall_type;
+  signal state_cs   : state_cs_type;
+  signal state_busy : state_busy_type;
 
 begin
 
@@ -111,14 +115,15 @@ begin
 
   process
 
-    variable instruction : std_logic_vector(7 downto 0);
-    variable address     : std_logic_vector(23 downto 0);
+    variable instruction_v : std_logic_vector(7 downto 0)  := (others => '0');
+    variable address_v     : std_logic_vector(23 downto 0) := (others => '0');
 
-    variable instcnt : integer;
-    variable addrcnt : integer;
-    variable bitcnt  : integer;
-    variable pagecnt : integer;
-    variable bytecnt : integer;
+    variable instcnt_v : integer := 0;
+    variable addrcnt_v : integer := -1;
+    variable bitcnt_v  : integer := 7;
+    variable pagecnt_v : integer := 0;
+    variable bytecnt_v : integer := 0;
+    variable busycnt_v : integer := 0;
 
   begin
     wait for 10 ps;
@@ -127,40 +132,36 @@ begin
     loop
       wait on clk, cs_n;
 
-      if (clk = '1' and cs_n = '1') then
-
-        do          <= '0';
-        state_fall  <= idle;
-        instruction := (others => '0');
-        address     := (others => '0');
-        instcnt     := 0;
-        addrcnt     := -1;
-        bitcnt      := 7;
-        pagecnt     := 0;
-        bytecnt     := 0;
-
-      elsif (clk = '1' and cs_n = '0') then
-        if (instcnt < 7) then
-          instruction(instruction'left - instcnt) := di;
-          instcnt := instcnt + 1;
+      if (rising_edge(clk)) then
+        if (instcnt_v < 7) then
+          instruction_v(instruction_v'left - instcnt_v) := di;
+          instcnt_v := instcnt_v + 1;
         else
-          if (instcnt = 7) then
-            instruction(instruction'left - instcnt) := di;
-            instcnt := instcnt + 1;
+          if (instcnt_v = 7) then
+            instruction_v(instruction_v'left - instcnt_v) := di;
+            instcnt_v := instcnt_v + 1;
           end if;
-          case instruction is
+          case instruction_v is
 
             ---------------------------
             -- Write enable
             ---------------------------
             when x"06" =>
-              state_fall <= we;
+              if (BUSY = '1') then
+                instruction_v := (others => '0');
+              else
+                state_cs <= we;
+              end if;
 
             ---------------------------
             -- Write disable
             ---------------------------
             when x"04"=>
-              state_fall <= wd;
+              if (BUSY = '1') then
+                instruction_v := (others => '0');
+              else
+                state_cs <= wd;
+              end if;
 
             ---------------------------
             -- Read Status Register 1
@@ -184,23 +185,22 @@ begin
             -- Read data
             ---------------------------
             when x"03" =>
-              if (BUSY = '1') then -- if BUSY
-                instruction := (others => '0');
+              if (BUSY = '1') then
+                instruction_v := (others => '0');
               else
                 -- Read address
-                if (addrcnt < 0) then
-                  addrcnt := addrcnt + 1;
-                elsif (addrcnt < 23) then
-                  address(address'left - addrcnt) := di;
-                  addr_test <= address; -- TEMP TEST
-                  addrcnt := addrcnt + 1;
+                if (addrcnt_v < 0) then
+                  addrcnt_v := addrcnt_v + 1;
+                elsif (addrcnt_v < 23) then
+                  address_v(address_v'left - addrcnt_v) := di;
+                  addrcnt_v := addrcnt_v + 1;
                 else
-                  if (addrcnt = 23) then
-                    address(address'left - addrcnt) := di;
-                    addr_test <= address; -- TEMP TEST
-                    addrcnt := addrcnt + 1;
-                    bytecnt := to_integer(unsigned(address(4 downto 0)));
-                    pagecnt := to_integer(unsigned(address(integer(ceil(log2(real(npages_c))))-1 downto 5))); 
+                  if (addrcnt_v = 23) then
+                    address_v(address_v'left - addrcnt_v) := di;
+                    addrcnt_v := addrcnt_v + 1;
+                    bytecnt_v := to_integer(unsigned(address_v(4 downto 0)));
+                    pagecnt_v := to_integer(unsigned(address_v(23 downto 5))); 
+                  --pagecnt_v := to_integer(unsigned(address_v(integer(ceil(log2(real(npages_c))))-1 downto 5))); 
                   end if;
                   state_fall <= rd;
                 end if;
@@ -210,33 +210,33 @@ begin
             -- Page program
             ---------------------------
             when x"02" =>
-              if (BUSY = '1' or WEL = '0') then -- if BUSY or WEL = 0
-                instruction := (others => '0');
+              if (BUSY = '1' or WEL = '0') then
+                instruction_v := (others => '0');
               else
                 -- Read address
-                if (addrcnt < 0) then
-                  addrcnt := addrcnt + 1;
-                elsif (addrcnt < 24) then
-                  address(address'left - addrcnt) := di;
-                  addrcnt := addrcnt + 1;
-                  bytecnt := to_integer(unsigned(address(4 downto 0)));
-                  pagecnt := to_integer(unsigned(address(integer(ceil(log2(real(npages_c))))-1 downto 5))); 
+                if (addrcnt_v < 0) then
+                  addrcnt_v := addrcnt_v + 1;
+                elsif (addrcnt_v < 24) then
+                  address_v(address_v'left - addrcnt_v) := di;
+                  addrcnt_v := addrcnt_v + 1;
+                  bytecnt_v := to_integer(unsigned(address_v(4 downto 0)));
+                  pagecnt_v := to_integer(unsigned(address_v(23 downto 5))); 
                 else
                   -- Read data into buffer
-                  if (bitcnt < 0) then
-                    if (bytecnt > 30) then
-                      bytecnt := 0;
+                  if (bitcnt_v < 0) then
+                    if (bytecnt_v > 30) then
+                      bytecnt_v := 0;
                     else
-                      bytecnt := bytecnt + 1;
+                      bytecnt_v := bytecnt_v + 1;
                     end if;
-                    bitcnt := 7;
+                    bitcnt_v := 7;
                   end if;
-                  ppbuf(bytecnt)(bitcnt) <= di;
-                  bitcnt := bitcnt - 1;
-                  if (bitcnt < 0) then
-                    ppdv <= '1';
+                  ppbuf(bytecnt_v)(bitcnt_v) <= di;
+                  bitcnt_v := bitcnt_v - 1;
+                  if (bitcnt_v < 0) then
+                    state_cs <= pp;
                   else
-                    ppdv <= '0';
+                    state_cs <= idle;
                   end if;
                 end if;
               end if;
@@ -245,10 +245,10 @@ begin
             -- Chip Erase
             ---------------------------
             when x"c7" | x"60" =>
-              if (BUSY = '1' or WEL = '0') then -- if BUSY or WEL = 0
-                instruction := (others => '0');
+              if (BUSY = '1' or WEL = '0') then 
+                instruction_v := (others => '0');
               else
-                erase <= '1';
+                state_cs <= ec;
               end if;
 
             when others =>
@@ -256,86 +256,130 @@ begin
           end case;
         end if;
 
-      elsif (clk = '0' and cs_n = '0') then -- Falling edge
+      elsif (falling_edge(clk)) then -- Falling edge
 
         case state_fall is
 
-          -- Write enable
-          when we =>
-            WEL <= '1'; -- WEL
-
-          -- Write disable
-          when wd =>
-            WEL <= '0'; -- WEL
-
           -- Read status register 1
           when rsr1 =>
-            if (bitcnt < 0) then
-              bitcnt := 7;
+            if (bitcnt_v < 0) then
+              bitcnt_v := 7;
             end if;
-            do     <= reg(0)(bitcnt);
-            bitcnt := bitcnt - 1;
+            do     <= reg(0)(bitcnt_v);
+            bitcnt_v := bitcnt_v - 1;
 
           -- Read status register 2
           when rsr2 =>
-            if (bitcnt < 0) then
-              bitcnt := 7;
+            if (bitcnt_v < 0) then
+              bitcnt_v := 7;
             end if;
-            do     <= reg(1)(bitcnt);
-            bitcnt := bitcnt - 1;
+            do     <= reg(1)(bitcnt_v);
+            bitcnt_v := bitcnt_v - 1;
 
           -- Read status register 3
           when rsr3 =>
-            if (bitcnt > 7) then
-              bitcnt := 0;
+            if (bitcnt_v > 7) then
+              bitcnt_v := 0;
             end if;
-            do     <= reg(2)(bitcnt);
-            bitcnt := bitcnt + 1;
+            do     <= reg(2)(bitcnt_v);
+            bitcnt_v := bitcnt_v + 1;
 
           -- Read data
           when rd =>
-            if (bitcnt < 0) then
-              if (bytecnt > 30) then
-                if (pagecnt > npages_c - 2) then
-                  pagecnt := 0;
+            if (bitcnt_v < 0) then
+              if (bytecnt_v > 30) then
+                if (pagecnt_v > npages_c - 2) then
+                  pagecnt_v := 0;
                 else
-                  pagecnt := pagecnt + 1;
+                  pagecnt_v := pagecnt_v + 1;
                 end if;
-                bytecnt := 0;
+                bytecnt_v := 0;
               else
-                bytecnt := bytecnt + 1;
+                bytecnt_v := bytecnt_v + 1;
               end if;
-              bitcnt := 7;
+              bitcnt_v := 7;
             end if;
-            do     <= ram(pagecnt)(bytecnt)(bitcnt);
-            bitcnt := bitcnt - 1;
+            do     <= ram(pagecnt_v)(bytecnt_v)(bitcnt_v);
+            bitcnt_v := bitcnt_v - 1;
 
           when others =>
             state_fall <= state_fall;
         end case;
-
-      -- Data valid, program ram with buffer
-      elsif (cs_n = '1' and ppdv = '1') then
-        BUSY <= '1';
-        for i in ppbuf'low to ppbuf'high loop
-          for j in 0 to 7 loop
-            ram(pagecnt)(i)(j) <= ram(pagecnt)(i)(j) and ppbuf(i)(j);
-          end loop;
-        end loop;
-        wait for 0.4 ms; -- Typ page program duration
-        WEL  <= '0';
-        BUSY <= '0';
-        ppdv <= '0';
-
-      -- Erase chip
-      elsif (cs_n = '1' and erase = '1') then
-        ram       <= (others => (others => (others => '1')));
-        BUSY  <= '1';
-        --wait for 20 ms; -- Chip Erase Time (Typ 20 s)
-        BUSY  <= '0';
-        erase <= '0';
-        WEL   <= '0';
       end if;
+
+
+      if (cs_n = '1') then
+        case state_cs is
+
+          -- Write enable
+          when we =>
+            WEL      <= '1';
+
+          -- Write disable
+          when wd =>
+            WEL      <= '0';
+
+          -- Page program
+          when pp =>
+            for i in ppbuf'low to ppbuf'high loop
+              for j in 0 to 7 loop
+                ram(pagecnt_v)(i)(j) <= ram(pagecnt_v)(i)(j) and ppbuf(i)(j);
+              end loop;
+            end loop;
+            WEL        <= '0';
+            timer      <= now;
+            state_busy <= pp;
+
+          -- Erase chip
+          when ec =>
+            ram   <= (others => (others => (others => '1')));
+            WEL        <= '0';
+            timer      <= now;
+            state_busy <= ec;
+
+          when others =>
+            null;
+
+        end case;
+
+        state_cs      <= idle;
+        do            <= '0';
+        state_fall    <= idle;
+        instruction_v := (others => '0');
+        address_v     := (others => '0');
+        instcnt_v     := 0;
+        addrcnt_v     := -1;
+        bitcnt_v      := 7;
+        pagecnt_v     := 0;
+        bytecnt_v     := 0;
+        busycnt_v     := 0;
+
+      end if;
+    end loop;
+  end process;
+
+  busy_timer : process
+  begin
+    loop
+      case state_busy is
+        when pp =>
+          if (timer > now - pp_exec_time_c) then
+            BUSY <= '1';
+          else
+            BUSY <= '0';
+          end if;
+
+        when ec =>
+          if (timer > now - ec_exec_time_c) then
+            BUSY <= '1';
+          else
+            BUSY <= '0';
+          end if;
+
+        when others =>
+          BUSY <= '0';
+      end case;
+      wait for 1 ns;
     end loop;
   end process;
 end rtl;

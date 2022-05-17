@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 use work.project_settings.all;
 
-package register_pack_imsys_demo is
+package test_spi_register_pack is
 
   constant temp_version_imsys_demo : string := "$Revision: 0000 $";
   constant imsys_demo_base : integer := 16#0#;
@@ -357,7 +357,7 @@ package register_pack_imsys_demo is
   constant urx_pu_reset_c : urx_pu_t := '0';
   constant urx_pu_scan_c  : urx_pu_t := '0';
 
-  component register_block_imsys_demo
+  component test_spi_register_block
 
     port (
           clk   : in std_ulogic;
@@ -411,4 +411,4 @@ package register_pack_imsys_demo is
     );
   end component;
 
-end register_pack_imsys_demo;
+end test_spi_register_pack;

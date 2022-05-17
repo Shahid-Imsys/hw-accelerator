@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.register_pack_imsys_demo.all;
+use work.test_spi_register_pack.all;
 use work.project_settings.all;
 use work.register_record_pack.all;
 use work.data_types_pack.all;
@@ -65,7 +65,7 @@ begin  -- architecture rtl
 
   sub_word <= str_to_stdUlogicVector (version_str);
 
-  i_register_block_imsys_demo : register_block_imsys_demo
+  i_test_spi_register_block : test_spi_register_block
     port map (
       clk                             => sclk_n,
       rst_n                           => rst_n,

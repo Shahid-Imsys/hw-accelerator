@@ -347,9 +347,10 @@ begin  -- architecture rtl
         g_clock_frequency => 31  -- system clock frequency in MHz
         )
       port map (
-        --HCLK    => pll_ref_clk,
+        pll_ref_clk    => pll_ref_clk_in,
         HCLK    => dco_clk(0),
-        MRESET  => mreset_n,
+        pll_locked => pll_locked,
+        MRESET  => mreset,
         MRSTOUT => mrstout_n,  -- Missing pad.
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
@@ -415,7 +416,7 @@ begin  -- architecture rtl
 
         MBYPASS    => '0', --MBYPASS,
         MWAKEUP_LP => '0', --MWAKE,
-        MLP_PWR_OK => mreset_n,  --MLP_PWR_OK,
+        MLP_PWR_OK => mreset,  --MLP_PWR_OK,
 
         ospi_cs_n  => ospi_cs_n,
         ospi_ck_n  => ospi_ck_n,

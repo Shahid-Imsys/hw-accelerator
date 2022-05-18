@@ -32,6 +32,7 @@ architecture tb of main_tb is
   signal MSDOUT  : std_logic;
   signal MIRQOUT : std_logic;
   signal MRESET  : std_logic;
+  signal preset_n : std_logic := '0';
   signal MRSTOUT : std_logic;
   signal MTEST   : std_logic                    := '0';
   signal MIRQ0   : std_logic;
@@ -79,7 +80,7 @@ begin  -- architecture tb
     port map (
       pll_ref_clk    => MX1_CK,
       mreset_n  => MRESET,
-      preset_n  => open,
+      preset_n  => preset_n,
       mrstout_n => MRSTOUT,
       --MCKOUT1 => MCKOUT1,
       mtest   => MTEST,
@@ -163,6 +164,7 @@ begin  -- architecture tb
 
   -- Reset the circuit for 10 ns;
   MRESET <= '0', '1' after 10 ns;
+  preset_n <= '1', '1' after 5 ns;
 
   -- This emulates a 31.25 MHz crystal
   mx1_ck_int <= not mx1_ck_int after HALF_CLK_C_CYCLE;

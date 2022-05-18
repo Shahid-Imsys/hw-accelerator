@@ -83,6 +83,7 @@ entity top is
     clk_tx : in std_logic;
                                          
     MRESET  : in  std_logic;            -- system reset, active low
+    cpu_rst_n : in std_logic;
     MRSTOUT : out std_logic;            -- Reset output
     MIRQOUT : out std_logic;            -- interrupt request output    
     MCKOUT0 : out std_logic;            -- for trace adapter
@@ -817,7 +818,6 @@ begin
       -- clocks and control signals
       HCLK       => clk_p,
        
-      MRESET  => MRESET,
       MTEST   => MTEST,
       MBYPASS => MBYPASS,
       MIRQ0   => MIRQ0,
@@ -854,7 +854,6 @@ begin
       sd_cke    => dcke_o,
       --to other module
 
-      mreset_i => mreset_i,
       mtest_i  => mtest_i,
       mirq0_i  => mirq0_i,
       mirq1_i  => mirq1_i,

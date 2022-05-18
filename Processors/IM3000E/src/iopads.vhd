@@ -41,7 +41,6 @@ entity iopads is
     -- clocks and control signals   always on!!!!
     HCLK       : in  std_logic;         -- clk input
     --
-    MRESET     : in  std_logic;
     MTEST      : in  std_logic;
     MBYPASS    : in  std_logic;
     MIRQ0      : in  std_logic;
@@ -84,7 +83,6 @@ entity iopads is
     clk_c2a_tst : in  std_logic;
     clk_ea_tst  : in  std_logic;
     --to other module
-    mreset_i    : out std_logic;
     mtest_i     : out std_logic;
     mirq0_i     : out std_logic;
     mirq1_i     : out std_logic;
@@ -161,9 +159,6 @@ architecture struct of iopads is
 begin
   --input pads
 
-  --reset signal, PU
-  mreset_i <= MRESET or io_iso;
-  
   --test signal,  PD
     mtest_i <= MTEST and (not io_iso);
   --pll bypass signal

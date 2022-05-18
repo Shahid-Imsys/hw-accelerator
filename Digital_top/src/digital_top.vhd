@@ -36,7 +36,9 @@ entity digital_top is
     g_clock_frequency : integer);
 
   port (
-    hclk       : in  std_logic;         -- clk input   
+    hclk       : in  std_logic;         -- clk input
+    pll_ref_clk : in std_logic;
+    pll_locked : in std_logic;
     MRESET     : in  std_logic;         -- system reset, active low
     MRSTOUT    : out std_logic;
     MIRQOUT    : out std_logic;         -- interrupt request output    
@@ -111,9 +113,9 @@ entity digital_top is
     ph_en : out std_logic_vector(7 downto 0);
     ph_o  : out std_logic_vector(7 downto 0);
     -- Port I
-    pi_i  : in  std_logic_vector(7 downto 0);
-    pi_en : out std_logic_vector(7 downto 0);
-    pi_o  : out std_logic_vector(7 downto 0);
+    -- pi_i  : in  std_logic_vector(7 downto 0);
+    -- pi_en : out std_logic_vector(7 downto 0);
+    -- pi_o  : out std_logic_vector(7 downto 0);
     -- Port J
     pj_i  : in  std_logic_vector(7 downto 0);
     pj_en : out std_logic_vector(7 downto 0);
@@ -313,8 +315,11 @@ architecture rtl of digital_top is
   signal clk_p_cpu    : std_logic;
   signal clk_rx       : std_logic;
   signal clk_tx       : std_logic;
+ 
+  signal cpu_rst_n : std_logic;
   signal clock_in_off : std_logic;
 
+  signal pi_data : std_logic_vector(7 downto 0);
 
 begin  -- architecture rtl
 
@@ -327,12 +332,26 @@ ospi_dq_out <= ospi_dq_out_int;
 
     port map (
       pll_clk  => hclk,
+      pll_ref_clk => pll_ref_clk,
       enet_clk => '0', -- TODO
+
+      mreset_n => mreset,
+      pwr_ok => pwr_ok,
+
+      rst_n => cpu_rst_n,
+      
       clk_p    => clk_p_cpu,
       clk_rx   => clk_rx,
       clk_tx   => clk_tx,
 
+      pg_1_i => pg_i(1),
+      pf_1_i => pf_i(1),
+
       clock_in_off => clock_in_off,
+      sel_pll => '1',
+      spi_sel_pll  => '1',
+      spi_override_pll_locked => '0',
+      pll_locked   => pll_locked,
 
       scan_mode => mtest
       );
@@ -346,6 +365,8 @@ ospi_dq_out <= ospi_dq_out_int;
       clk_p_cpu => clk_p_cpu,
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
+
+      rst_n => cpu_rst_n,
 
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
@@ -394,9 +415,9 @@ ospi_dq_out <= ospi_dq_out_int;
       ph_en => ph_en,
       ph_o  => ph_o,
       -- Port I
-      pi_i  => pi_o,
-      pi_en => pi_en,
-      pi_o  => pi_o,
+      pi_i  => pi_data,
+      pi_en => open,
+      pi_o  => pi_data,
       -- Port J
       pj_i  => pj_i,
       pj_en => pj_en,

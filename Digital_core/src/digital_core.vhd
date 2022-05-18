@@ -39,6 +39,8 @@ entity digital_core is
     clk_p_cpu : in std_logic;            -- clk input
     clk_rx : in std_logic;
     clk_tx : in std_logic;
+
+    rst_n : in std_logic;
     
     MRESET  : in  std_logic;  -- system reset               low active
     MRSTOUT : out std_logic;
@@ -147,6 +149,7 @@ end entity digital_core;
 
 architecture rtl of digital_core is
 
+  signal cpu_rst_n : std_logic;
 begin  -- architecture rtl
 
   i_im4000_top : entity work.top
@@ -159,6 +162,7 @@ begin  -- architecture rtl
       clk_rx => clk_rx,
       clk_tx => clk_tx,
       MRESET  => MRESET,
+      cpu_rst_n => cpu_rst_n,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,

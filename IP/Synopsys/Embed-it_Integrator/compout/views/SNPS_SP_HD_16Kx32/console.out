@@ -1,0 +1,131 @@
+
+                                      VMC 
+                               Embed-It! (R)  VMC
+
+               Version S-2021.09-SP1 for linux64 - Oct 15, 2021 
+
+                    Copyright (c) 1988 - 2021 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+            or distribution of this software is strictly prohibited.
+INFO  [VMC, VMC-264]: Load of compiler database ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/cadet.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/memory.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa.prm' ...
+INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa04p1.glb' ...
+INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa04p1_custom.glb' ...
+INFO  [VMC, CFG-018]: Reading file '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/SNPS_SP_HD_16Kx32.cfg' ...
+INFO  [VMC, CFG-230]: Load of cfg settings complete
+INFO  [VMC, VMC-131]: Load of compiler database took 0.25 secs.
+INFO  [VMC, VMC-233]: Input parameters validation ...
+INFO  [VMC, VMC-131]: Input parameters validation took 0.43 secs.
+INFO  [VMC, VMC-234]: Delay calculation ...
+INFO  [VMC, CHAR-020]: Loading project ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/cadet.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/memory.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa.prm' ...
+INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa04p1.glb' ...
+INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa04p1_custom.glb' ...
+INFO  [VMC, CHAR-060]: Project loaded from /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/gf22nsd41p11s1dcl02msa.cpj
+INFO  [VMC, CHAR-131]: Loading project took 4.29 secs.
+/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/char/arch_char
+/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/char
+INFO  [VMC, CHAR-105]: Running instance evaluation...
+INFO  [VMC, CHAR-109]: Validating the project...
+INFO  [VMC, CHAR-109]: (04-05-2022 16:33:43)  Corners validation done
+INFO  [VMC, CHAR-131]: Validating netlist files took 0.00 secs.
+INFO  [VMC, CHAR-113]: The project is valid
+INFO  [VMC, CHAR-131]: Validating project took 0.61 secs.
+INFO  [VMC, CHAR-140]: Initializing tables...
+INFO  [VMC, CHAR-180]: Initialized all tables
+INFO  [VMC, CHAR-200]: Determining what results are needed...
+diff_factor=3.8525991272927844 bk_factor=3 
+diff_factor=8.86249068792044 bk_factor=3 
+diff_factor=3.491024801401052 bk_factor=3 
+Determining peak type for spwl_ls_vddp
+Determining peak type for spwl_ls_vdda
+Determining peak type for spwl_ls_vss
+Determining peak type for spwl_ls_total
+Determining peak type for spwl_read_vdda
+Determining peak type for spwl_read_vddp
+Determining peak type for spwl_read_vss
+Determining peak type for spwl_read_total
+Determining peak type for spwl_write_vdda
+Determining peak type for spwl_write_vddp
+Determining peak type for spwl_write_vss
+Determining peak type for spwl_write_total
+diff_factor=2.03167848740557 bk_factor=3 
+diff_factor=5.318995372559269 bk_factor=3 
+diff_factor=1.9995967272796011 bk_factor=3 
+Determining peak type for spwl_ls_vddp
+Determining peak type for spwl_ls_vdda
+Determining peak type for spwl_ls_vss
+Determining peak type for spwl_ls_total
+Determining peak type for spwl_read_vdda
+Determining peak type for spwl_read_vddp
+Determining peak type for spwl_read_vss
+Determining peak type for spwl_read_total
+Determining peak type for spwl_write_vdda
+Determining peak type for spwl_write_vddp
+Determining peak type for spwl_write_vss
+Determining peak type for spwl_write_total
+diff_factor=2.108923426459849 bk_factor=3 
+diff_factor=5.197761327185659 bk_factor=3 
+diff_factor=1.5287460266637631 bk_factor=3 
+Determining peak type for spwl_ls_vddp
+Determining peak type for spwl_ls_vdda
+Determining peak type for spwl_ls_vss
+Determining peak type for spwl_ls_total
+Determining peak type for spwl_read_vdda
+Determining peak type for spwl_read_vddp
+Determining peak type for spwl_read_vss
+Determining peak type for spwl_read_total
+Determining peak type for spwl_write_vdda
+Determining peak type for spwl_write_vddp
+Determining peak type for spwl_write_vss
+Determining peak type for spwl_write_total
+INFO  [VMC, CHAR-240]: Determined that 46644 results are needed so far
+INFO  [VMC, CHAR-240]: Regular results:    792 needed,   792 final, 0 failed
+INFO  [VMC, CHAR-240]: Equation results: 45852 needed, 45852 final, 0 failed
+INFO  [VMC, CHAR-131]: Determining results took 31.84 secs.
+Aged year list is 0.0
+Aged year list is 0.0
+Aged year list is 0.0
+INFO  [VMC, CHAR-460]: Writing of output files completed
+INFO  [VMC, CHAR-434]: Instance evaluation completed
+INFO  [VMC, VMC-053]: Reading delay files ...
+INFO  [VMC, VMC-054]: Calculating delays for 'tt0p8v25c_0p8v_0v_0v' conditions
+INFO  [VMC, VMC-054]: Calculating delays for 'ssg_fcmax0p72v125c_0p72v_0v_0v' conditions
+INFO  [VMC, VMC-054]: Calculating delays for 'ssg_fcmax0p72vn40c_0p72v_0v_0v' conditions
+INFO  [VMC, VMC-131]: Reading delay files took 0.52 secs.
+INFO  [VMC, VMC-131]: Delay calculation took 53.02 secs.
+INFO  [VMC, VMC-235]: CAF flow ...
+INFO  [VMC, VMC-236]: CAF initialization ...
+INFO  [VMC, VMC-131]: CAF initialization took 0.48 secs.
+INFO  [VMC, VMC-237]: CAF loading ...
+INFO  [VMC, VMC-131]: CAF loading took 0.02 secs.
+INFO  [VMC, VMC-238]: CAF top assembly creation ...
+INFO  [VMC, VMC-131]: CAF top assembly creation took 0.46 secs.
+INFO  [VMC, VMC-239]: CAF execution ...
+INFO  [VMC, CAF-1175]: cadet.tiler: INFO+9: Running the caf.tile flow on <Top(name='SNPS_SP_HD_16Kx32')> ...
+INFO  [VMC, CAF-1237]: cadet.tiler: INFO+9: The caf.tile flow completed: 0 Cells have errors, 0 Cells have warnings.
+INFO  [VMC, CAF-1238]: cadet.tiler: INFO+9: Running the caf.tile flow on <Top(name='SNPS_SP_HD_16Kx32')> took 6.75 secs.
+INFO  [VMC, VMC-131]: CAF execution took 6.83 secs.
+INFO  [VMC, VMC-240]: Pin map generation ...
+INFO  [VMC, VMC-131]: Pin map generation took 0.00 secs.
+INFO  [VMC, VMC-131]: CAF flow took 7.80 secs.
+INFO  [VMC, VMC-193]: Expanding templates ...
+INFO  [VMC, EXP-001]: Expanding 'Combined Datasheet for all PVT corners' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/mc_allpvt.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/SNPS_SP_HD_16Kx32_allpvt.ds'
+INFO  [VMC, EXP-001]: Expanding 'Datasheet for HTML' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/mc_allpvthtml.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/SNPS_SP_HD_16Kx32_allpvt.html'
+INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/tt0p8v25c_0p8v_0v_0v/SNPS_SP_HD_16Kx32.summ'
+INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_SP_HD_16Kx32.summ'
+INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_SP_HD_16Kx32.summ'
+INFO  [VMC, VMC-131]: Expanding templates took 2.11 secs.
+INFO  [VMC, VMC-149]: Extracting straps ...
+INFO  [VMC, VMC-173]: File '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_16Kx32/SNPS_SP_HD_16Kx32.masis': not found
+INFO  [VMC, VMC-150]: Skipping strap extraction
+INFO  [VMC, VMC-131]: Extracting straps took 0.00 secs.
+INFO  [VMC, VMC-131]: Complete component generation took 65.71 secs.
+INFO  [VMC, VMC-093]: Peak memory used: 1837.60 M
+INFO  [VMC, VMC-046]: Errors: 0, Warnings: 0

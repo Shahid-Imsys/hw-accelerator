@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE integrator_jobs PUBLIC "-//VirageLogic//DTD integrator_jobs//EN" "./integrator_jobs.dtd">
+<job>
+ <targetset enabled="true" name="TOP:">
+  <target name="Generate"/>
+ </targetset>
+</job>

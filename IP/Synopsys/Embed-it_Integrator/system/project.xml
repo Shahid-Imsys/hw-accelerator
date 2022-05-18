@@ -1,0 +1,7 @@
+<!DOCTYPE Project>
+<Project>
+ <CompilerLibraries>
+  <CompilerLibraryPath>/usr/local/designkits/GF/22nm/synopsys</CompilerLibraryPath>
+ </CompilerLibraries>
+ <Actions/>
+</Project>

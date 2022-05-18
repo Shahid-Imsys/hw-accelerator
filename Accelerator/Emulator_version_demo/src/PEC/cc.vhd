@@ -87,6 +87,7 @@ entity cluster_controller is
       RST_R            : out std_logic;  --Active low
 	  REQ_IN           : in std_logic;  --req to noc in reg logic
 	  REQ_FIFO          : in std_logic_vector(31 downto 0);
+	  DATA_FROM_PE     : in std_logic_vector(127 downto 0);
 	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
 	  DATA_VLD         : out std_logic;
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
@@ -635,8 +636,8 @@ EVEN_P <= even_p_2;
 			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
 					standby <= '0';
-			    elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
-			    	RD_FIFO <= '1';
+			    --elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
+			    	--RD_FIFO <= '1';
 				elsif req_exe = '1' or cb_status = '1' then
                     standby <= '1';
 			    else
@@ -729,9 +730,9 @@ EVEN_P <= even_p_2;
                         req_exe <= '0';
 			    	end if;
     
-			    	if write_count = "11" then
+			    	--if write_count = "11" then
 			    		write_req<= '0';
-			    	end if;
+			    	--end if;
                 end if;
 			end if;
 		end if;
@@ -762,26 +763,38 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' and fifo_vld = '1' then
-							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+						elsif write_req = '1' then--and fifo_vld = '1' then
+							--pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
+							--write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
-							if write_count = "11" then
+							--if write_count = "11" then
 								pe_write <= '1';
-							else
-								pe_write <= '0';
-							end if;
+							--else
+								--pe_write <= '0';
+							--end if;
 						end if;
 					else
 						addr_p <= req_addr_p;
-						len_ctr_p <= req_len_ctr_p;
+						if write_req = '1' then
+							len_ctr_p <= '0'& x"01";
+						else
+							len_ctr_p <= req_len_ctr_p;
+						end if;
+
 					end if;
 				end if;
 			end if;
 		end if;
+	end process;
+	--Data buffer
+	process(DATA_FROM_PE)
+	begin
+		for i in 0 to 15 loop
+			pe_data_in(i) <= DATA_FROM_PE(8*i+7 downto 8*i);
+		end loop;
 	end process;
 
 

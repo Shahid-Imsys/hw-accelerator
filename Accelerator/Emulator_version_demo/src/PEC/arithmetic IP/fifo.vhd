@@ -52,8 +52,8 @@ entity fifo is
         almost_empty : out std_logic;
         prog_full : out std_logic;
         valid   : out std_logic;
-        din       : in std_logic_vector(31 downto 0);
-        dout      : out std_logic_vector(31 downto 0);
+        din       : in std_logic_vector(DATA_WIDTH -1 downto 0);
+        dout      : out std_logic_vector(DATA_WIDTH-1 downto 0);
         counter   : out integer range DATA_DEPTH-1 downto 0
     );
 end entity;

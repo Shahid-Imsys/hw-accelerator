@@ -50,7 +50,8 @@ entity req_dst_logic is
         REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
-        OUTPUT    : out std_logic_vector(31 downto 0); --Output to CC
+        CMD_OUTPUT    : out std_logic_vector(31 downto 0); --Command output to CC
+        DATA_OUTPUT   : out std_logic_vector(127 downto 0); --Data output to CC
         RD_FIFO   : in std_logic;
         FIFO_VLD  : out std_logic;
         --FOUR_WD_LEFT : out std_logic;
@@ -72,10 +73,10 @@ PORT (
     clk : IN STD_LOGIC;
     --rd_clk : IN STD_LOGIC;
     srst : IN STD_LOGIC;
-    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    din : IN STD_LOGIC_VECTOR(DATA_WIDTH-1 DOWNTO 0);
     wr_en : IN STD_LOGIC;
     rd_en : IN STD_LOGIC;
-    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dout : OUT STD_LOGIC_VECTOR(DATA_WIDTH-1 DOWNTO 0);
     full : OUT STD_LOGIC;
     almost_full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
@@ -97,8 +98,8 @@ END COMPONENT;
     signal add_in_2 : std_logic_vector(3 downto 0):="0000";
     signal add_out  : std_logic_vector(3 downto 0);
     signal bs_out   : std_logic_vector(15 downto 0);
-    signal pe_mux_out : std_logic_vector(31 downto 0);
-    signal req_core  :  std_logic_vector(31 downto 0);
+    signal pe_mux_out : std_logic_vector(159 downto 0);
+    signal req_core  :  std_logic_vector(159 downto 0);
     signal wr      : std_logic;
     signal rd      : std_logic;
     signal full    : std_logic;
@@ -116,7 +117,7 @@ END COMPONENT;
     signal req_to_noc_i : std_logic;
     signal req_rd_reg   : std_logic_vector(15 downto 0) := (others => '0');
     signal valid_d : std_logic;
-    signal dout_d : std_logic_vector(31 downto 0);
+    signal dout_d : std_logic_vector(159 downto 0);
 
 
 begin
@@ -343,7 +344,8 @@ process(clk_p)
 begin
     if rising_edge(clk_p) then
         FIFO_VLD <= valid_d;
-        OUTPUT <= dout_d;
+        CMD_OUTPUT <= dout_d(159 downto 128);
+        DATA_OUTPUT <= dout_d(127 downto 0);
     end if;
 end process;
 
@@ -375,7 +377,7 @@ end process;
 --DATA_VLD_OUT <= data_vld_out_i; 
 request_fifo : fifo
 GENERIC MAP(
-    DATA_WIDTH => 32,
+    DATA_WIDTH => 160,
     DATA_DEPTH => 1024,
     PROG_FULL_TRESHOLD => 1023
 )
@@ -397,4 +399,6 @@ PORT MAP (
     --wr_rst_busy => open,
     --rd_rst_busy => open
 );
+
+
 end architecture;

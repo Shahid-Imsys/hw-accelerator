@@ -1,5 +1,5 @@
-MEM_DIR=$(PROJECT_PATH)/IP/Synopsys/Embed-it_Integrator\compout\views
-MEM_DIR_WIN=$(PROJECT_PATH_WIN)/IP/Synopsys/Embed-it_Integrator\compout\views
+MEM_DIR=$(PROJECT_PATH)/IP/Synopsys/Embed-it_Integrator/compout/views
+MEM_DIR_WIN=$(PROJECT_PATH_WIN)/IP/Synopsys/Embed-it_Integrator/compout/views
 
 
 mem_comp:

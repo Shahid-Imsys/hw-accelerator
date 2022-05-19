@@ -28,6 +28,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 use work.pad_instance_package.all;
+use work.data_types_pack.all;
 
 entity digital_chip is
 
@@ -67,10 +68,10 @@ entity digital_chip is
     emem_d7    : inout std_logic;
 
     -- SPI, chip control interface
-    spi_sclk : in std_logic;
-    spi_cs_n : in std_logic;
-    spi_mosi : in std_logic;
-    spi_miso : out std_logic;
+    spi_sclk : inout std_logic;
+    spi_cs_n : inout std_logic;
+    spi_mosi : inout std_logic;
+    spi_miso : inout std_logic;
 
     -- IM400 DEBUG interface
     mclkout : inout std_logic;
@@ -285,6 +286,14 @@ architecture rtl of digital_chip is
   signal enet_rxd0_in  : std_logic;
   signal enet_rxd1_in  : std_logic;
 
+  signal spi_sclk_in   : std_logic;
+  signal spi_cs_n_in   : std_logic;
+  signal spi_mosi_in   : std_logic;
+  signal spi_miso_out  : std_logic;
+  signal spi_miso_oe   : std_logic;
+  signal spi_miso_oe_n : std_logic;
+  signal pad_config    : pad_config_record_t;
+
   signal dac0_bits : std_logic;
   signal dac1_bits : std_logic;
 
@@ -428,6 +437,13 @@ begin  -- architecture rtl
         ospi_rwds_in => ospi_rwds_in,
         ospi_rwds_out => ospi_rwds_out,
         ospi_rwds_enable => ospi_rwds_enable,
+
+        spi_sclk      => spi_sclk_in,
+        spi_cs_n      => spi_cs_n_in,
+        spi_mosi      => spi_mosi_in,
+        spi_miso      => spi_miso_out,
+        spi_miso_oe_n => spi_miso_oe_n,
+        pad_config    => pad_config,
 
         -- enet_mdin  => enet_mdin,
         -- enet_mdout => enet_mdout,
@@ -737,21 +753,21 @@ begin  -- architecture rtl
         di  => ospi_dq_in(7)
         );
 
-    --i_emem_clk_pad : entity work.output_pad  
-    --  generic map (
-    --    direction =>  horizontal)
-    --  port map (
-    --    -- PAD
-    --    pad => emem_clk,
-    --    --GPIO
-    --    do  => ospi_ck_p,
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => '1',
-    --    odp => '0',
-    --    odn => '0'
-    --    );
+    i_emem_clk_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => emem_clk,
+        --GPIO
+        do  => ospi_ck_p,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
+        );
 
     --i_emem_clk_n_pad : entity work.output_pad  
     --  generic map (
@@ -838,7 +854,7 @@ begin  -- architecture rtl
         --GPIO
         do  => dac0_bits,
         ds  => "1000",
-        sr  => '1',
+        sr  => '1', -- pad_config.aout0.sr
         co  => '0',
         oe  => '1',
         odp => '0',
@@ -1045,6 +1061,64 @@ begin  -- architecture rtl
         pd  => '0',
         pu  => '0',
         di  => enet_rxer_in
+        );
+
+    i_spi_sclk_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => spi_sclk,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => spi_sclk_in
+        );
+
+    i_spi_cs_n_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => spi_cs_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => spi_cs_n_in
+        );
+
+    i_spi_mosi_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => spi_mosi,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => spi_mosi_in
+        );
+
+    i_spi_miso_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => spi_miso,
+        --GPIO
+        do  => spi_miso_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => spi_miso_oe,
+        odp => '0',
+        odn => '0'
         );
 
     ---------------------------------------------------------------------------
@@ -1413,5 +1487,6 @@ begin  -- architecture rtl
      --    VBIAS
      --    );
 
+      spi_miso_oe <= not spi_miso_oe_n;
 
-      end architecture rtl;
+end architecture rtl;

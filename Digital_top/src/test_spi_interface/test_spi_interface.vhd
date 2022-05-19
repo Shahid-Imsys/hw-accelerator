@@ -2,12 +2,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.test_spi_register_pack.all;
-use work.project_settings.all;
-use work.register_record_pack.all;
+use work.register_pack_spi_test.all;
 use work.data_types_pack.all;
+use work.project_settings.all;
 
-entity test_init is
+entity test_spi_interface is
   port (
     rst_n               : in  std_ulogic;
     spi_rst_n_i         : in  std_ulogic;
@@ -20,9 +19,9 @@ entity test_init is
     pad_config          : out pad_config_record_t
     );
 
-end entity test_init;
+end entity test_spi_interface;
 
-architecture rtl of test_init is
+architecture rtl of test_spi_interface is
 
   component spi_interface is
     generic (
@@ -59,20 +58,18 @@ architecture rtl of test_init is
   signal register_data_out   : std_ulogic_vector(spi_data_width_c-1 downto 0) := (others => '0');
   signal update_buffer_index : std_ulogic;
 
-  constant version_str : string := temp_version_imsys_demo(12 to 16);
+  constant version_str : string := temp_version_spi_test(12 to 16);
 
 begin  -- architecture rtl
 
   sub_word <= str_to_stdUlogicVector (version_str);
 
-  i_test_spi_register_block : test_spi_register_block
+  i_register_block_spi_test : register_block_spi_test
     port map (
       clk                             => sclk_n,
       rst_n                           => rst_n,
       version_analog                  => x"0",
       version_digital                 => x"1",
-      subversion_hi_byte_sub_hi_byte  => sub_word(15 downto 8),
-      subversion_low_byte_sub_lo_byte => sub_word(7 downto 0),
 
       mclkout_ds  => pad_config.mckout.ds,
       mclkout_sr  => pad_config.mckout.sr,
@@ -114,7 +111,7 @@ begin  -- architecture rtl
       data_out  => register_data_out(7 downto 0)
       );
 
-  i_spi_inteface : spi_interface
+  i_spi_interface : spi_interface
     generic map (
       data_width_g           => spi_data_width_c,
       address_width_g        => spi_address_width_c,

@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.register_pack_imsys_demo.all;
+use work.register_pack_spi_test.all;
 
 package data_types_pack is
 

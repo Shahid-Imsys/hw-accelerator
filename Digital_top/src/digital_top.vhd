@@ -28,6 +28,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 use work.gp_pkg.all;
+use work.data_types_pack.all;
 
 entity digital_top is
 
@@ -36,7 +37,7 @@ entity digital_top is
     g_clock_frequency : integer);
 
   port (
-    hclk       : in  std_logic;         -- clk input
+    hclk        : in  std_logic;         -- clk input
     pll_ref_clk : in std_logic;
     pll_locked : in std_logic;
     MRESET     : in  std_logic;         -- system reset, active low
@@ -45,15 +46,15 @@ entity digital_top is
     MCKOUT0    : out std_logic;         -- for trace adapter
     MCKOUT1    : out std_logic;         -- programable clock out
     mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST      : in  std_logic;  --                            high active                 
+    MTEST      : in  std_logic;         -- Active high
     MBYPASS    : in  std_logic;
-    MIRQ0      : in  std_logic;  --                            low active
-    MIRQ1      : in  std_logic;  --                            low active
+    MIRQ0      : in  std_logic;         -- Active low
+    MIRQ1      : in  std_logic;         -- Active low
     -- SW debug                                                               
     MSDIN      : in  std_logic;         -- serial data in (debug)     
     MSDOUT     : out std_logic;         -- serial data out    
 
-    MWAKEUP_LP : in  std_logic;         --                          high active
+    MWAKEUP_LP : in  std_logic;         -- Active high
     MLP_PWR_OK : in  std_logic;
     -- power management control
     MPMIC_CORE : out std_logic;
@@ -141,12 +142,34 @@ entity digital_top is
     ospi_dq_enable   : out std_logic;
     ospi_rwds_in     : in  std_logic;
     ospi_rwds_out    : out std_logic;
-    ospi_rwds_enable : out std_logic
+    ospi_rwds_enable : out std_logic;
+
+    -- SPI, chip control interface
+    spi_sclk      : in std_logic;
+    spi_cs_n      : in std_logic;
+    spi_mosi      : in std_logic;
+    spi_miso      : out std_logic;
+    spi_miso_oe_n : out std_logic;
+    pad_config    : out pad_config_record_t
     );
 
 end entity digital_top;
 
 architecture rtl of digital_top is
+
+  component test_spi_interface is
+  port (
+    rst_n               : in  std_ulogic;
+    spi_rst_n_i         : in  std_ulogic;
+    sclk_int            : in  std_ulogic;
+    sclk_n              : in  std_ulogic;
+    cs_n                : in  std_ulogic;
+    mosi                : in  std_ulogic;
+    miso                : out std_ulogic;
+    miso_oe_n           : out std_ulogic;
+    pad_config          : out pad_config_record_t
+    );
+  end component;
 
   component SNPS_RF_SP_UHS_1024x8 is
     port (
@@ -315,6 +338,9 @@ architecture rtl of digital_top is
   signal clk_p_cpu    : std_logic;
   signal clk_rx       : std_logic;
   signal clk_tx       : std_logic;
+
+  signal sclk   : std_logic;
+  signal sclk_n : std_logic;
  
   signal cpu_rst_n : std_logic;
   signal clock_in_off : std_logic;
@@ -334,18 +360,18 @@ ospi_dq_out <= ospi_dq_out_int;
       pll_clk  => hclk,
       pll_ref_clk => pll_ref_clk,
       enet_clk => '0', -- TODO
-      spi_sclk => '0',
+      spi_sclk => spi_sclk,
 
       mreset_n => mreset,
       pwr_ok => pwr_ok,
 
       rst_n => cpu_rst_n,
       
-      clk_p    => clk_p_cpu,
-      clk_rx   => clk_rx,
-      clk_tx   => clk_tx,
-      sclk => open,
-      sclk_n => open,
+      clk_p  => clk_p_cpu,
+      clk_rx => clk_rx,
+      clk_tx => clk_tx,
+      sclk   => sclk,
+      sclk_n => sclk_n,
       
       pg_1_i => pg_i(1),
       pf_1_i => pf_i(1),
@@ -460,6 +486,19 @@ ospi_dq_out <= ospi_dq_out_int;
       adc_bits => adc_bits
       );
 
+    i_test_spi_interface : test_spi_interface
+    port map
+    (
+    rst_n       => pwr_ok,
+    spi_rst_n_i => pwr_ok,
+    sclk_int    => sclk,
+    sclk_n      => sclk_n,
+    cs_n        => spi_cs_n,
+    mosi        => spi_mosi,
+    miso        => spi_miso,
+    miso_oe_n   => spi_miso_oe_n,
+    pad_config  => pad_config
+  );
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
   

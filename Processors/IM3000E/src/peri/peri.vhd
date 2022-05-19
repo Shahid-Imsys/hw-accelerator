@@ -49,100 +49,106 @@ entity peri is
     -- Signals to/from other blocks
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
-    clk_p      : in  std_logic;
-    clk_c_en   : in  std_logic;
-    clk_e_pos  : in  std_logic;         -- Execution clock
-    clk_e_neg  : in  std_logic;         -- Execution clock
-    clk_i      : in  std_logic;         -- I/O clock
-    clk_i_pos  : in  std_logic;         -- I/O clock
-    clk_u_pos  : in  std_logic;         -- UART clock
-    clk_rx     : in  std_logic;         -- ERx clock
-    clk_tx     : in  std_logic;         -- ETx clock
-    clk_a_pos  : in  std_logic;         -- Analog clock
-    erxclk     : out std_logic;         -- erxclk from pad to 'clock' block
-    etxclk     : out std_logic;         -- etxclk from pad to 'clock' block
-    din_a      : out std_logic;         -- D input to FF generating clk_a
+    clk_p       : in  std_logic;
+    clk_c_en    : in  std_logic;
+    clk_e_pos   : in  std_logic;        -- Execution clock
+    clk_e_neg   : in  std_logic;        -- Execution clock
+    clk_i       : in  std_logic;        -- I/O clock
+    clk_i_pos   : in  std_logic;        -- I/O clock
+    clk_u_pos   : in  std_logic;        -- UART clock
+    clk_rx      : in  std_logic;        -- ERx clock
+    clk_tx      : in  std_logic;        -- ETx clock
+    clk_a_pos   : in  std_logic;        -- Analog clock
+    erxclk      : out std_logic;        -- erxclk from pad to 'clock' block
+    etxclk      : out std_logic;        -- etxclk from pad to 'clock' block
+    din_a       : out std_logic;        -- D input to FF generating clk_a
     -- to/from core block
-    dbus       : in  std_logic_vector(7 downto 0);
-    dfp        : out std_logic_vector(7 downto 0);
-    rst_en     : in  std_logic;
+    dbus        : in  std_logic_vector(7 downto 0);
+    dfp         : out std_logic_vector(7 downto 0);
+    rst_en      : in  std_logic;
     --rst_en2     : in  std_logic;
-    pl_pd      : in  std_logic_vector(2 downto 0);
-    pl_aaddr   : in  std_logic_vector(4 downto 0);
-    idack      : in  std_logic_vector(7 downto 0);
-    ios_iden   : in  std_logic;
-    ios_ido    : in  std_logic_vector(7 downto 0);
-    ilioa      : in  std_logic;
-    ildout     : in  std_logic;
-    inext      : in  std_logic;
-    iden       : out std_logic;
+    pl_pd       : in  std_logic_vector(2 downto 0);
+    pl_aaddr    : in  std_logic_vector(4 downto 0);
+    idack       : in  std_logic_vector(7 downto 0);
+    ios_iden    : in  std_logic;
+    ios_ido     : in  std_logic_vector(7 downto 0);
+    --
+    ext_ido     : in  std_logic_vector(7 downto 0);
+    ext_iden    : in  std_logic;
+    ext_idreq   : in  std_logic;
+    ext_idack   : out std_logic;
+    --
+    ilioa       : in  std_logic;
+    ildout      : in  std_logic;
+    inext       : in  std_logic;
+    iden        : out std_logic;
     --dqm_size    : in  std_logic_vector(1 downto 0);
-    en_uart1   : in  std_logic;
-    en_uart2   : in  std_logic;
-    en_uart3   : in  std_logic;
-    en_eth     : in  std_logic_vector(1 downto 0);
-    en_tiu     : in  std_logic;
-    run_tiu    : in  std_logic;
-    en_iobus   : in  std_logic_vector(1 downto 0);
+    en_uart1    : in  std_logic;
+    en_uart2    : in  std_logic;
+    en_uart3    : in  std_logic;
+    en_eth      : in  std_logic_vector(1 downto 0);
+    en_tiu      : in  std_logic;
+    run_tiu     : in  std_logic;
+    en_iobus    : in  std_logic_vector(1 downto 0);
     --ddqm        : in  std_logic_vector(7 downto 0);
-    idreq      : out std_logic_vector(7 downto 0);
-    idi        : out std_logic_vector(7 downto 0);
-    irq0       : out std_logic;
-    irq1       : out std_logic;
-    tstamp     : out std_logic_vector(2 downto 0);
-    tiu_tstamp : in  std_logic;
+    idreq       : out std_logic_vector(7 downto 0);
+    idi         : out std_logic_vector(7 downto 0);
+    irq0        : out std_logic;
+    irq1        : out std_logic;
+    tstamp      : out std_logic_vector(2 downto 0);
+    tiu_tstamp  : in  std_logic;
     -- to/from analog block
-    ach_sel    : out std_logic_vector(2 downto 0);
-    adc_bits   : in  std_logic;
-    adc_extref : out std_logic;  -- Select external ADC reference (internal)
-    adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
-    adc_en     : out std_logic;         -- Enable for the ADC
-    dac_bits   : out std_logic_vector(0 to 1);
-    dac_en     : out std_logic_vector(0 to 1);
+    ach_sel     : out std_logic_vector(2 downto 0);
+    adc_bits    : in  std_logic;
+    adc_extref  : out std_logic;  -- Select external ADC reference (internal)
+    adc_diff    : out std_logic;  -- Select differential ADC mode (single-ended)
+    adc_en      : out std_logic;        -- Enable for the ADC
+    dac_bits    : out std_logic_vector(0 to 1);
+    dac_en      : out std_logic_vector(0 to 1);
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
     -- External interrupt pins
-    mirq0_i    : in  std_logic;
-    mirq1_i    : in  std_logic;
+    mirq0_i     : in  std_logic;
+    mirq1_i     : in  std_logic;
     -- Port A,B,C,D,E,F,G,H,I,J
-    pa_i       : in  std_logic_vector(7 downto 0);
-    pa_en      : out std_logic_vector(7 downto 0);
-    pa_o       : out std_logic_vector(7 downto 0);
-    pb_i       : in  std_logic_vector(7 downto 0);
-    pb_en      : out std_logic_vector(7 downto 0);
-    pb_o       : out std_logic_vector(7 downto 0);
-    pc_i       : in  std_logic_vector(7 downto 0);
-    pc_en      : out std_logic_vector(7 downto 0);
-    pc_o       : out std_logic_vector(7 downto 0);
-    pd_i       : in  std_logic_vector(7 downto 0);
-    pd_en      : out std_logic_vector(7 downto 0);
-    pd_o       : out std_logic_vector(7 downto 0);
-    pe_i       : in  std_logic_vector(7 downto 0);
-    pe_en      : out std_logic_vector(7 downto 0);
-    pe_o       : out std_logic_vector(7 downto 0);
-    pf_i       : in  std_logic_vector(7 downto 0);
-    pf_en      : out std_logic_vector(7 downto 0);
-    pf_o       : out std_logic_vector(7 downto 0);
-    pg_i       : in  std_logic_vector(7 downto 0);
-    pg_en      : out std_logic_vector(7 downto 0);
-    pg_o       : out std_logic_vector(7 downto 0);
-    ph_i       : in  std_logic_vector(7 downto 0);
-    ph_en      : out std_logic_vector(7 downto 0);
-    ph_o       : out std_logic_vector(7 downto 0);
-    pi_i       : in  std_logic_vector(7 downto 0);
-    pi_en      : out std_logic_vector(7 downto 0);
-    pi_o       : out std_logic_vector(7 downto 0);
-    pj_i       : in  std_logic_vector(7 downto 0);
-    pj_en      : out std_logic_vector(7 downto 0);
-    pj_o       : out std_logic_vector(7 downto 0);
-    OSPI_Out   : out OSPI_InterfaceOut_t;
-    OSPI_DQ_i  : in  std_logic_vector(7 downto 0);
-    OSPI_DQ_o  : out std_logic_vector(7 downto 0);
-    OSPI_DQ_e  : out std_logic;
-    OSPI_RWDS_i: in  std_logic;
-    OSPI_RWDS_o: out std_logic;
-    OSPI_RWDS_e: out std_logic
+    pa_i        : in  std_logic_vector(7 downto 0);
+    pa_en       : out std_logic_vector(7 downto 0);
+    pa_o        : out std_logic_vector(7 downto 0);
+    pb_i        : in  std_logic_vector(7 downto 0);
+    pb_en       : out std_logic_vector(7 downto 0);
+    pb_o        : out std_logic_vector(7 downto 0);
+    pc_i        : in  std_logic_vector(7 downto 0);
+    pc_en       : out std_logic_vector(7 downto 0);
+    pc_o        : out std_logic_vector(7 downto 0);
+    pd_i        : in  std_logic_vector(7 downto 0);
+    pd_en       : out std_logic_vector(7 downto 0);
+    pd_o        : out std_logic_vector(7 downto 0);
+    pe_i        : in  std_logic_vector(7 downto 0);
+    pe_en       : out std_logic_vector(7 downto 0);
+    pe_o        : out std_logic_vector(7 downto 0);
+    pf_i        : in  std_logic_vector(7 downto 0);
+    pf_en       : out std_logic_vector(7 downto 0);
+    pf_o        : out std_logic_vector(7 downto 0);
+    pg_i        : in  std_logic_vector(7 downto 0);
+    pg_en       : out std_logic_vector(7 downto 0);
+    pg_o        : out std_logic_vector(7 downto 0);
+    ph_i        : in  std_logic_vector(7 downto 0);
+    ph_en       : out std_logic_vector(7 downto 0);
+    ph_o        : out std_logic_vector(7 downto 0);
+    pi_i        : in  std_logic_vector(7 downto 0);
+    pi_en       : out std_logic_vector(7 downto 0);
+    pi_o        : out std_logic_vector(7 downto 0);
+    pj_i        : in  std_logic_vector(7 downto 0);
+    pj_en       : out std_logic_vector(7 downto 0);
+    pj_o        : out std_logic_vector(7 downto 0);
+    OSPI_Out    : out OSPI_InterfaceOut_t;
+    OSPI_DQ_i   : in  std_logic_vector(7 downto 0);
+    OSPI_DQ_o   : out std_logic_vector(7 downto 0);
+    OSPI_DQ_e   : out std_logic;
+    OSPI_RWDS_i : in  std_logic;
+    OSPI_RWDS_o : out std_logic;
+    OSPI_RWDS_e : out std_logic
     );
 end peri;
 
@@ -150,34 +156,34 @@ architecture struct of peri is
 
 
   component OctoSPI is
-  generic (
-    ospi_cmd_address     : std_logic_vector(7 downto 0) := x"40";
-    ospi_addr_address    : std_logic_vector(7 downto 0) := x"41";
-    ospi_data_address    : std_logic_vector(7 downto 0) := x"42";
-    ospi_flags_address   : std_logic_vector(7 downto 0) := x"43";
-    ospi_latency_address : std_logic_vector(7 downto 0) := x"44";
-    MAX_BURST_LEN        : integer                      := 2     -- Must be even power of 2
-  );
-  port (clk_p       : in   std_logic;                     -- Main clock
-        clk_i_pos   : in   std_logic;                     --
-        rst_n       : in   std_logic;                     -- Async reset
-        idi         : in   std_logic_vector (7 downto 0); -- I/O bus in
-        ido         : out  std_logic_vector (7 downto 0); -- I/O bus out
-        iden        : out  std_logic;                     -- I/O bus enabled (in use)
-        ilioa       : in   std_logic;                     -- I/O bus load I/O address
-        ildout      : in   std_logic;                     -- I/O bus data output strobe
-        inext       : in   std_logic;                     -- I/O bus data input  strobe
-        idack       : in   std_logic;                     -- I/O bus DMA Ack
-        idreq       : out  std_logic;                     -- I/O bus DMA Request
-        OSPI_Out    : out  OSPI_InterfaceOut_t;           -- OSPI pins out to chip
-        OSPI_DQ_i   : in   std_logic_vector(7 downto 0);  -- OSPI data bus in
-        OSPI_DQ_o   : out  std_logic_vector(7 downto 0);  -- OSPI data bus out
-        OSPI_DQ_e   : out  std_logic;                     -- OSPI data bus enable (1=out)
-        OSPI_RWDS_i : in  std_logic;                      -- OSPI RWDS in
-        OSPI_RWDS_o : out std_logic;                      -- OSPI RWDS out
-        OSPI_RWDS_e : out std_logic                       -- OSPI RWDS enable (1=out)
-  );
-end component;
+    generic (
+      ospi_cmd_address     : std_logic_vector(7 downto 0) := x"40";
+      ospi_addr_address    : std_logic_vector(7 downto 0) := x"41";
+      ospi_data_address    : std_logic_vector(7 downto 0) := x"42";
+      ospi_flags_address   : std_logic_vector(7 downto 0) := x"43";
+      ospi_latency_address : std_logic_vector(7 downto 0) := x"44";
+      MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
+      );
+    port (clk_p       : in  std_logic;  -- Main clock
+          clk_i_pos   : in  std_logic;  --
+          rst_n       : in  std_logic;  -- Async reset
+          idi         : in  std_logic_vector (7 downto 0);      -- I/O bus in
+          ido         : out std_logic_vector (7 downto 0);      -- I/O bus out
+          iden        : out std_logic;  -- I/O bus enabled (in use)
+          ilioa       : in  std_logic;  -- I/O bus load I/O address
+          ildout      : in  std_logic;  -- I/O bus data output strobe
+          inext       : in  std_logic;  -- I/O bus data input  strobe
+          idack       : in  std_logic;  -- I/O bus DMA Ack
+          idreq       : out std_logic;  -- I/O bus DMA Request
+          OSPI_Out    : out OSPI_InterfaceOut_t;  -- OSPI pins out to chip
+          OSPI_DQ_i   : in  std_logic_vector(7 downto 0);  -- OSPI data bus in
+          OSPI_DQ_o   : out std_logic_vector(7 downto 0);  -- OSPI data bus out
+          OSPI_DQ_e   : out std_logic;  -- OSPI data bus enable (1=out)
+          OSPI_RWDS_i : in  std_logic;  -- OSPI RWDS in
+          OSPI_RWDS_o : out std_logic;  -- OSPI RWDS out
+          OSPI_RWDS_e : out std_logic   -- OSPI RWDS enable (1=out)
+          );
+  end component;
 
 
   -----------------------------------------------------------------------------
@@ -236,12 +242,13 @@ end component;
   signal idreq_int : std_logic_vector(7 downto 0);
 
   -- IO_MUX
-  signal iden_int  : std_logic;
-  signal ido       : std_logic_vector(7 downto 0);
-  signal rx1_idack : std_logic;
-  signal rx2_idack : std_logic;
-  signal tx_idack  : std_logic;
-  signal pdi_idack : std_logic;
+  signal iden_int   : std_logic;
+  signal ido        : std_logic_vector(7 downto 0);
+  signal rx1_idack  : std_logic;
+  signal rx2_idack  : std_logic;
+  signal tx_idack   : std_logic;
+  signal pdi_idack  : std_logic;
+  signal ospi_idack : std_logic;
 
   -- UARTs
   signal uart1_ido  : std_logic_vector(7 downto 0);
@@ -289,11 +296,10 @@ end component;
   signal din_a_int : std_logic;
 
   -- Octo SPI
-  signal clk_ospi     : std_logic;
-  signal ospi_ido     : std_logic_vector(7 downto 0);
-  signal ospi_iden    : std_logic;
-  signal ospi_idack   : std_logic;
-  signal ospi_idreq   : std_logic;
+  signal clk_ospi   : std_logic;
+  signal ospi_ido   : std_logic_vector(7 downto 0);
+  signal ospi_iden  : std_logic;
+  signal ospi_idreq : std_logic;
 
 begin  -- struct
 -------------------------------------------------------------------------------
@@ -537,6 +543,8 @@ begin  -- struct
       pdi_ido    => pdi_ido,
       ospi_ido   => ospi_ido,
       ospi_iden  => ospi_iden,
+      ext_ido    => ext_ido,
+      ext_iden   => ext_iden,
       iden       => iden_int,
       ido        => ido,
       -- IDREQ
@@ -545,13 +553,17 @@ begin  -- struct
       rx2_idreq  => rx2_idreq,
       tx_idreq   => tx_idreq,
       pdi_idreq  => pdi_idreq,
+      ospi_idreq => ospi_idreq,
+      ext_idreq  => ext_idreq,
       ios_idreq  => idreq,
       -- IDACK
       idack      => idack,
       rx1_idack  => rx1_idack,
       rx2_idack  => rx2_idack,
       tx_idack   => tx_idack,
-      pdi_idack  => pdi_idack);
+      pdi_idack  => pdi_idack,
+      ospi_idack => ospi_idack,
+      ext_idack  => ext_idack);
 
   iden <= iden_int;
 
@@ -730,8 +742,6 @@ begin  -- struct
       dac_data  => dac_data,
       dac_bits  => dac_bits);
 
-  ospi_idack <= '1'; -- No DMA support at this time
-
   ospi : OctoSPI
     port map (
       clk_p       => clk_p,
@@ -751,7 +761,6 @@ begin  -- struct
       OSPI_DQ_e   => OSPI_DQ_e,
       OSPI_RWDS_i => OSPI_RWDS_i,
       OSPI_RWDS_o => OSPI_RWDS_o,
-      OSPI_RWDS_e => OSPI_RWDS_e
-      );
+      OSPI_RWDS_e => OSPI_RWDS_e);
 
 end struct;

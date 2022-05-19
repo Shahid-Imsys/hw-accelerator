@@ -17,11 +17,11 @@
 -- File       : digital_core
 -- Author     : Bengt Svantesson
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
 -- Description: Core level block that instantiates the IM4000, Accelerator and
 -- glue logic..
---              
+--
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -30,112 +30,111 @@ use ieee.std_logic_1164.all;
 use work.gp_pkg.all;
 
 entity digital_core is
-  
+
   generic (
     g_memory_type     : memory_type_t := asic;
     g_clock_frequency : integer);
 
   port (
-    clk_p_cpu : in std_logic;            -- clk input
-    clk_rx : in std_logic;
-    clk_tx : in std_logic;
+    clk_p_cpu : in std_logic;           -- clk input
+    clk_rx    : in std_logic;
+    clk_tx    : in std_logic;
 
     cpu_rst_n : in std_logic;
-    
-    MRESET  : in  std_logic;  -- system reset               low active
-    MRSTOUT : out std_logic;
-    MIRQOUT : out std_logic;            -- interrupt request output    
-    MCKOUT0 : out std_logic;            --for trace adapter
-    MCKOUT1 : out std_logic;            --programable clock out
-    mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST   : in  std_logic;  --                            high active                 
-    MBYPASS : in  std_logic;
-    MIRQ0   : in  std_logic;  --                            low active
-    MIRQ1   : in  std_logic;  --                            low active
-    -- SW debug                                                               
-    MSDIN   : in  std_logic;            -- serial data in (debug)     
-    MSDOUT  : out std_logic;            -- serial data out    
 
-    MWAKEUP_LP : in    std_logic;       --                          high active
-    MLP_PWR_OK : in    std_logic;
+    MRESET     : in  std_logic;         -- system reset, active low
+    MRSTOUT    : out std_logic;
+    MIRQOUT    : out std_logic;         -- interrupt request output
+    MCKOUT0    : out std_logic;         -- for trace adapter
+    MCKOUT1    : out std_logic;         -- programable clock out
+    mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
+    MTEST      : in  std_logic;         -- active high
+    MBYPASS    : in  std_logic;
+    MIRQ0      : in  std_logic;         -- active low
+    MIRQ1      : in  std_logic;         -- active low
+    -- SW debug
+    MSDIN      : in  std_logic;         -- serial data in (debug)
+    MSDOUT     : out std_logic;         -- serial data out
+
+    MWAKEUP_LP : in  std_logic;         -- active high
+    MLP_PWR_OK : in  std_logic;
     -- power management control
-    MPMIC_CORE : out   std_logic;
-    MPMIC_IO   : out   std_logic;
+    MPMIC_CORE : out std_logic;
+    MPMIC_IO   : out std_logic;
 
     clock_in_off : out std_logic;
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
-    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)  
-    vdd_bmem   : in  std_logic;         -- Power for the BMEM block  
-    VCC18LP    : in  std_logic;         -- Power for the RTC block  
-    rxout      : in  std_logic;         -- RTC oscillator output  
-    ach_sel0   : out std_logic;         -- ADC channel select, bit 0  
-    ach_sel1   : out std_logic;         -- ADC channel select, bit 1  
-    ach_sel2   : out std_logic;         -- ADC channel select, bit 2  
-    adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
-    adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
-    adc_extref : out std_logic;  -- Select external ADC reference (internal)
-    adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
+    pwr_ok     : in  std_logic;         -- Power on detector output (active high)
+    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
+    vdd_bmem   : in  std_logic;         -- Power for the BMEM block
+    VCC18LP    : in  std_logic;         -- Power for the RTC block
+    rxout      : in  std_logic;         -- RTC oscillator output
+    ach_sel0   : out std_logic;         -- ADC channel select, bit 0
+    ach_sel1   : out std_logic;         -- ADC channel select, bit 1
+    ach_sel2   : out std_logic;         -- ADC channel select, bit 2
+    adc_bits   : in  std_logic;         -- Bitstream from the analog part of ADC
+    adc_ref2v  : out std_logic;         -- Select 2V internal ADC reference (1V)
+    adc_extref : out std_logic;         -- Select external ADC reference (internal)
+    adc_diff   : out std_logic;         -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
-    dac1_bits  : out std_logic;         -- Bitstream to DAC1 
+    dac1_bits  : out std_logic;         -- Bitstream to DAC1
     dac0_en    : out std_logic;         -- Enable for DAC0
-    dac1_en    : out std_logic;         -- Enable for DAC1 
-    clk_a      : out std_logic;         -- Clock to the DAC's and ADC 
-
+    dac1_en    : out std_logic;         -- Enable for DAC1
+    clk_a      : out std_logic;         -- Clock to the DAC's and ADC
 
     -- Port A
-    pa_i       : in  std_logic_vector(7 downto 0);
-    pa_en      : out std_logic_vector(7 downto 0);
-    pa_o       : out std_logic_vector(7 downto 0);
+    pa_i  : in  std_logic_vector(7 downto 0);
+    pa_en : out std_logic_vector(7 downto 0);
+    pa_o  : out std_logic_vector(7 downto 0);
     -- Port B
-    pb_i       : in  std_logic_vector(7 downto 0);
-    pb_en      : out std_logic_vector(7 downto 0);
-    pb_o       : out std_logic_vector(7 downto 0);
+    pb_i  : in  std_logic_vector(7 downto 0);
+    pb_en : out std_logic_vector(7 downto 0);
+    pb_o  : out std_logic_vector(7 downto 0);
     -- Port C
-    pc_i       : in  std_logic_vector(7 downto 0);
-    pc_en      : out std_logic_vector(7 downto 0);
-    pc_o       : out std_logic_vector(7 downto 0);
+    pc_i  : in  std_logic_vector(7 downto 0);
+    pc_en : out std_logic_vector(7 downto 0);
+    pc_o  : out std_logic_vector(7 downto 0);
     -- Port D
-    pd_i       : in  std_logic_vector(7 downto 0);
-    pd_en      : out std_logic_vector(7 downto 0);
-    pd_o       : out std_logic_vector(7 downto 0);
+    pd_i  : in  std_logic_vector(7 downto 0);
+    pd_en : out std_logic_vector(7 downto 0);
+    pd_o  : out std_logic_vector(7 downto 0);
     -- Port E
-    pe_i       : in  std_logic_vector(7 downto 0);
-    pe_en      : out std_logic_vector(7 downto 0);
-    pe_o       : out std_logic_vector(7 downto 0);
+    pe_i  : in  std_logic_vector(7 downto 0);
+    pe_en : out std_logic_vector(7 downto 0);
+    pe_o  : out std_logic_vector(7 downto 0);
     -- Port F
-    pf_i       : in  std_logic_vector(7 downto 0);
-    pf_en      : out std_logic_vector(7 downto 0);
-    pf_o       : out std_logic_vector(7 downto 0);
+    pf_i  : in  std_logic_vector(7 downto 0);
+    pf_en : out std_logic_vector(7 downto 0);
+    pf_o  : out std_logic_vector(7 downto 0);
     -- Port G
-    pg_i       : in  std_logic_vector(7 downto 0);
-    pg_en      : out std_logic_vector(7 downto 0);
-    pg_o       : out std_logic_vector(7 downto 0);
+    pg_i  : in  std_logic_vector(7 downto 0);
+    pg_en : out std_logic_vector(7 downto 0);
+    pg_o  : out std_logic_vector(7 downto 0);
     -- Port H
-    ph_i       : in  std_logic_vector(7 downto 0);
-    ph_en      : out std_logic_vector(7 downto 0);
-    ph_o       : out std_logic_vector(7 downto 0);
+    ph_i  : in  std_logic_vector(7 downto 0);
+    ph_en : out std_logic_vector(7 downto 0);
+    ph_o  : out std_logic_vector(7 downto 0);
     -- Port I
-    pi_i       : in  std_logic_vector(7 downto 0);
-    pi_en      : out std_logic_vector(7 downto 0);
-    pi_o       : out std_logic_vector(7 downto 0);
+    pi_i  : in  std_logic_vector(7 downto 0);
+    pi_en : out std_logic_vector(7 downto 0);
+    pi_o  : out std_logic_vector(7 downto 0);
     -- Port J
-    pj_i       : in  std_logic_vector(7 downto 0);
-    pj_en      : out std_logic_vector(7 downto 0);
-    pj_o       : out std_logic_vector(7 downto 0);
-		-- I/O cell configuration control outputs
+    pj_i  : in  std_logic_vector(7 downto 0);
+    pj_en : out std_logic_vector(7 downto 0);
+    pj_o  : out std_logic_vector(7 downto 0);
+    -- I/O cell configuration control outputs
     -- d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
     -- d_sr        : out std_logic; -- Slew rate limit on DRAM interface
-    d_lo        : out std_logic; -- Low drive on DRAM interface
-    p1_hi       : out std_logic; -- High drive on port group 1 pins
-    p1_sr       : out std_logic; -- Slew rate limit on port group 1 pins
-    p2_hi       : out std_logic; -- High drive on port group 2 pins
-    p2_sr       : out std_logic; -- Slew rate limit on port group 2 pins
-    p3_hi       : out std_logic; -- High drive on port group 3 pins
-    p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
-    
+    d_lo  : out std_logic;              -- Low drive on DRAM interface
+    p1_hi : out std_logic;              -- High drive on port group 1 pins
+    p1_sr : out std_logic;              -- Slew rate limit on port group 1 pins
+    p2_hi : out std_logic;              -- High drive on port group 2 pins
+    p2_sr : out std_logic;              -- Slew rate limit on port group 2 pins
+    p3_hi : out std_logic;              -- High drive on port group 3 pins
+    p3_sr : out std_logic;              -- Slew rate limit on port group 3 pins
+
     -- OSPI interface
     ospi_out         : out OSPI_InterfaceOut_t;
     ospi_dq_in       : in  std_logic_vector(7 downto 0);
@@ -154,27 +153,38 @@ begin  -- architecture rtl
   i_im4000_top : entity work.top
     generic map (
       g_memory_type     => g_memory_type,
-      g_clock_frequency => 31         -- system clock frequency in MHz
+      g_clock_frequency => 31           -- system clock frequency in MHz
       )
     port map (
-      clk_p    => clk_p_cpu,
-      clk_rx => clk_rx,
-      clk_tx => clk_tx,
-      MRESET  => MRESET,
-      rst_n => cpu_rst_n,
-      MRSTOUT => MRSTOUT,
-      MIRQOUT => MIRQOUT,
-      MCKOUT0 => MCKOUT0,
-      MCKOUT1 => MCKOUT1,
-      MTEST   => MTEST,
-      MIRQ0   => MIRQ0,
-      MIRQ1   => MIRQ1,
+      clk_p     => clk_p_cpu,
+      clk_rx    => clk_rx,
+      clk_tx    => clk_tx,
+      MRESET    => MRESET,
+      rst_n     => cpu_rst_n,
+      MRSTOUT   => MRSTOUT,
+      MIRQOUT   => MIRQOUT,
+      MCKOUT0   => MCKOUT0,
+      MCKOUT1   => MCKOUT1,
+      MTEST     => MTEST,
+      MIRQ0     => MIRQ0,
+      MIRQ1     => MIRQ1,
       -- SW debug
-      MSDIN   => MSDIN,
-      MSDOUT  => MSDOUT,
+      MSDIN     => MSDIN,
+      MSDOUT    => MSDOUT,
 
       clock_in_off => clock_in_off,
-      
+
+      -- IO-bus interface to NOC adapter
+      ext_i_pos  => open,
+      ext_ido    => (others => '0'),
+      ext_iden   => '1',
+      ext_idreq  => '1',
+      ext_idack  => open,
+      ext_ilioa  => open,
+      ext_ildout => open,
+      ext_inext  => open,
+      ext_idi    => open,
+
       -- Port A
       pa_i  => pa_i,
       pa_en => pa_en,
@@ -226,15 +236,14 @@ begin  -- architecture rtl
       p3_hi => p3_hi,
       p3_sr => p3_sr,
 
-
       MBYPASS    => MBYPASS,
       MWAKEUP_LP => MWAKEUP_LP,
       MLP_PWR_OK => MLP_PWR_OK,
 
-      OSPI_Out  =>  ospi_out,
-      OSPI_DQ_i  => ospi_dq_in,
-      OSPI_DQ_o  => ospi_dq_out,
-      OSPI_DQ_e  => ospi_dq_enable,
+      OSPI_Out    => ospi_out,
+      OSPI_DQ_i   => ospi_dq_in,
+      OSPI_DQ_o   => ospi_dq_out,
+      OSPI_DQ_e   => ospi_dq_enable,
       OSPI_RWDS_i => ospi_rwds_in,
       OSPI_RWDS_o => ospi_rwds_out,
       OSPI_RWDS_e => ospi_rwds_enable,
@@ -244,6 +253,6 @@ begin  -- architecture rtl
       VCC18LP  => '1',
       rxout    => rxout,
       adc_bits => adc_bits
-        );
+      );
 
 end architecture rtl;

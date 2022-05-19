@@ -334,6 +334,7 @@ ospi_dq_out <= ospi_dq_out_int;
       pll_clk  => hclk,
       pll_ref_clk => pll_ref_clk,
       enet_clk => '0', -- TODO
+      spi_sclk => '0',
 
       mreset_n => mreset,
       pwr_ok => pwr_ok,
@@ -343,7 +344,9 @@ ospi_dq_out <= ospi_dq_out_int;
       clk_p    => clk_p_cpu,
       clk_rx   => clk_rx,
       clk_tx   => clk_tx,
-
+      sclk => open,
+      sclk_n => open,
+      
       pg_1_i => pg_i(1),
       pf_1_i => pf_i(1),
 
@@ -366,7 +369,7 @@ ospi_dq_out <= ospi_dq_out_int;
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
 
-      rst_n => cpu_rst_n,
+      cpu_rst_n => cpu_rst_n,
 
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,

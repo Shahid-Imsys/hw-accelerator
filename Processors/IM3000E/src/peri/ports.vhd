@@ -589,7 +589,7 @@ begin
   -- Re-assign serial transfer interface registers
   pi_int(PORT_SP) <= sft_reg(7 downto 0);	-- processor read sft_reg
   s_p_cfg <= pen_int(PORT_SP);
-	sft_reg_ld <= po_ld(PORT_SP);
+  sft_reg_ld <= po_ld(PORT_SP);
   pdi_dir	<= s_p_cfg(6);
   pdi_en	<= s_p_cfg(7);
 

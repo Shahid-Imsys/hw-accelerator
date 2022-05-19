@@ -64,13 +64,13 @@ architecture tb of main_tb is
 
   signal xtal1_int  : std_logic := '0';
   signal mx1_ck_int : std_logic := '0';
-  
+
   signal OSPI_DQ_i   : std_logic_vector(7 downto 0);
   signal OSPI_DQ_o   : std_logic_vector(7 downto 0);
-  signal OSPI_DQ_e   : std_logic;                   
-  signal OSPI_RWDS_i : std_logic;                   
-  signal OSPI_RWDS_o : std_logic;                   
-  signal OSPI_RWDS_e : std_logic; 
+  signal OSPI_DQ_e   : std_logic;
+  signal OSPI_RWDS_i : std_logic;
+  signal OSPI_RWDS_o : std_logic;
+  signal OSPI_RWDS_e : std_logic;
 
   signal OSPI_Out  : OSPI_InterfaceOut_t;
   signal OSPI_DQ   : std_logic_vector(7 downto 0);
@@ -85,7 +85,9 @@ begin  -- architecture tb
       g_clock_frequency => 31
       )
     port map (
-      HCLK    => MX1_CK,
+      clk_p   => MX1_CK,
+      clk_rx  => '0', -- TODO
+      clk_tx  => '0', -- TODO
       MRESET  => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
@@ -98,16 +100,15 @@ begin  -- architecture tb
       MSDIN   => MSDIN,
       MSDOUT  => MSDOUT,
 
-      D_CLK => open,
-      D_CS  => open,
-      D_RAS => open,
-      D_CAS => open,
-      D_WE  => open,
-      D_DQM => open,
-      D_DQ  => D_DQ,
-      D_A   => open,
-      D_BA  => open,
-      D_CKE => open,
+      ext_i_pos  => open,
+      ext_ido    => (others => '0'),
+      ext_iden   => '0',
+      ext_idreq  => '0',
+      ext_idack  => open,
+      ext_ilioa  => open,
+      ext_ildout => open,
+      ext_inext  => open,
+      ext_idi    => open,
 
       -- Port A
       pa_i  => port_to_im4000(A),
@@ -160,7 +161,6 @@ begin  -- architecture tb
       p3_hi => open,
       p3_sr => open,
 
-
       MBYPASS    => MBYPASS,
       MWAKEUP_LP => MWAKE,
       MLP_PWR_OK => MLP_PWR_OK,
@@ -173,6 +173,20 @@ begin  -- architecture tb
       OSPI_RWDS_o => OSPI_RWDS_o,
       OSPI_RWDS_e => OSPI_RWDS_e,
 
+      dis_bmem   => open,
+      ach_sel0   => open,
+      ach_sel1   => open,
+      ach_sel2   => open,
+      adc_ref2v  => open,
+      adc_extref => open,
+      adc_diff   => open,
+      adc_en     => open,
+      dac0_bits  => open,
+      dac1_bits  => open,
+      dac0_en    => open,
+      dac1_en    => open,
+      clk_a      => open,
+
       pwr_ok   => '1',
       vdd_bmem => '0',
       VCC18LP  => '1',
@@ -184,7 +198,7 @@ begin  -- architecture tb
   pad(A)(4 downto 3) <= "01";           -- Set SP communication at /2 speed
   pad(A)(2 downto 1) <= "01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= '1';            -- Set PLL divider to 1
-  
+
   OSPI_RWDS   <= OSPI_RWDS_o when OSPI_RWDS_e = '1' else 'Z';
   OSPI_RWDS_i <= OSPI_RWDS;
 

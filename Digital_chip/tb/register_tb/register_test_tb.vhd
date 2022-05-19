@@ -172,11 +172,11 @@ architecture tb of register_test_tb is
   constant osc_period    : time := 1 us / osc_frequency;
   signal osc_clk         : std_ulogic := '0';
 
-  signal sclk            : std_logic;
-  signal rst_n           : std_logic;
+  signal sclk            : std_logic := '0';
+  signal rst_n           : std_logic := '0';
   signal cs_n            : std_logic := '1';
-  signal mosi            : std_logic;
-  signal miso            : std_logic;
+  signal mosi            : std_logic := '0';
+  signal miso            : std_logic := '0';
 
   signal pad_config : pad_config_record_t;
 
@@ -399,6 +399,10 @@ begin  -- tb
 
   begin  -- process spi_register_test
 
+    cs_n <= '1';
+    mosi <= '0';
+    sclk <= '0';
+    
     rst_n <= '0';
     wait for 100 ns;
     rst_n <= '1';
@@ -432,19 +436,3 @@ begin  -- tb
   end process spi_register_test;
 
 end tb;
-
-configuration simulation of register_test is
-
-  for tb
-
-    end for;
-
-  end simulation;
-
-configuration netlist of register_test is
-
-  for tb
-
-    end for;
-
-  end netlist;

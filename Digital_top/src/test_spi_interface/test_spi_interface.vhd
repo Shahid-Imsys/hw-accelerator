@@ -121,7 +121,7 @@ begin  -- architecture rtl
     port map (
       clk                 => sclk_int,
       nclk                => sclk_n,
-      spi_rst_n           => spi_rst_n_i,
+      spi_rst_n           => not cs_n,
       rst_n               => rst_n,
       cs_n                => cs_n,
       mosi                => mosi,

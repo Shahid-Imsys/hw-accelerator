@@ -1248,7 +1248,6 @@ begin
       g_memory_type     => g_memory_type,
       g_clock_frequency => g_clock_frequency)
     port map(
-      xout          => clk_p,
       pllout        => clk_p,
       sel_pll       => sel_pll,
       xout_selected => xout_selected,
@@ -1475,7 +1474,6 @@ begin
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
       msdout_o        => MSDOUT,      --: out std_logic;  -- Serial data out
       mrstout_o       => MRSTOUT,     --: out std_logic;  -- Reset out
-      --mxout_o         => mxout_o,  --: out std_logic;  -- Oscillator test output
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
       mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---
       mbypass_i       => mbypass_i,     --: in  std_logic;  -- bypass PLL

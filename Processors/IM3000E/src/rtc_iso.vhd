@@ -11,15 +11,13 @@ entity rtc_iso is
       reset_iso_clear     : in  std_logic;
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-      sel_pll         : in  std_logic;  
-      pllout          : in  std_logic;  
+      sel_pll         : in  std_logic; 
       rst_rtc         : in  std_logic;  -- Reset RTC counter byte            
       en_fclk         : in  std_logic;  -- Enable fast clocking of RTC counter byte
       fclk            : in  std_logic;  -- Fast clock to RTC counter byte   
       ld_bmem         : in  std_logic;  -- Latch enable to the dis_bmem latch   
       rtc_sel         : in  std_logic_vector(2 downto 0);   -- RTC byte select
-      clk_mux_out     : in  std_logic;
-
+ 
           --gmem1
       c1_gmem_a         : in    std_logic_vector(9 downto 0);
       c1_gmem_d         : in    std_logic_vector(7 downto 0);
@@ -60,9 +58,6 @@ entity rtc_iso is
       dbus_iso_0        : out std_logic_vector(7 downto 0);
       bmem_a8_iso_0     : out std_logic; 
       bmem_d_iso_0      : out std_logic_vector(7 downto 0);
-	  
-      clk_mux_out_iso_1   : out  std_logic;
-	  pllout_iso_1    	  : out std_logic;
 
       -- signals isolated to 1
       c1_gmem_we_n_iso_1  : out std_logic;
@@ -108,9 +103,7 @@ begin
       bmem_a8_iso_0  <= bmem_a8                 and (not iso);
          
       -- These input signals are gated off to 1 using iso, make
-      -- sure this is synthezised into simple OR gates!
-      clk_mux_out_iso_1  <= clk_mux_out     or iso;
-      pllout_iso_1       <= pllout          or clk_iso;      
+      -- sure this is synthezised into simple OR gates!     
       c1_gmem_we_n_iso_1 <= c1_gmem_we_n    or iso;
       c1_gmem_ce_n_iso_1 <= c1_gmem_ce_n    or iso;
       c2_gmem_we_n_iso_1 <= c2_gmem_we_n    or iso;

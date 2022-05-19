@@ -81,10 +81,10 @@ begin  -- architecture rtl
   
   i_main_rst_n : entity work.reset_sync
   port map (
-    clk => pll_ref_clk,
+    clk => clk_mux_out_int_d,
  
     scan_mode   => scan_mode,
-    a_rst_n     => clk_mux_out_int_d,
+    a_rst_n     => main_rst_n,
     rst_n       => rst_n
     );
 

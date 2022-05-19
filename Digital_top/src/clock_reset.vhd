@@ -9,9 +9,13 @@ entity clock_reset is
     pll_clk : in  std_ulogic;
     pll_ref_clk : in std_ulogic;
     enet_clk : in  std_logic;
+    spi_sclk : in  std_logic;
     clk_p   : out std_logic;
     clk_rx  : out std_logic;
     clk_tx  : out std_logic;
+    sclk : out std_logic;
+    sclk_n : out std_logic;
+    
 
     mreset_n     : in  std_logic;   -- system reset, active low
     pwr_ok       : in  std_logic;   -- Power OK
@@ -137,5 +141,7 @@ begin  -- architecture rtl
       clk_out => clk_tx
       );
 
+  sclk <= spi_sclk;
+  sclk_n <= not spi_sclk;
 
 end architecture rtl;

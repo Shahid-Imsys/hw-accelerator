@@ -83,7 +83,7 @@ entity top is
     clk_tx : in std_logic;
 
     MRESET     : in  std_logic;         -- system reset, active low
-    cpu_rst_n  : in  std_logic;
+    rst_n      : in std_logic;
     MRSTOUT    : out std_logic;         -- Reset output
     MIRQOUT    : out std_logic;         -- interrupt request output
     MCKOUT0    : out std_logic;         -- for trace adapter
@@ -485,7 +485,6 @@ architecture struct of top is
   signal msdin_i          : std_logic;
   signal ph_i_from_iopads : std_logic_vector(7 downto 0);
   signal mbypass_i        : std_logic;
-  signal mreset_i         : std_logic;
   signal mtest_i          : std_logic;
   signal mirq0_i          : std_logic;
   signal mirq1_i          : std_logic;
@@ -552,11 +551,11 @@ architecture struct of top is
   signal pll_pdn         : std_logic;   --added by HYX,20141115
   signal erxclk          : std_logic;
   signal etxclk          : std_logic;
-  signal rst_n           : std_logic;
+  signal int_rst_n       : std_logic;
   signal rst_cn          : std_logic;
   signal en_d            : std_logic;
   signal fast_d          : std_logic;
-  --signal din_e        : std_logic;
+  --signal din_e           : std_logic;
   signal din_ea          : std_logic;
   signal din_i           : std_logic;
   signal din_u           : std_logic;
@@ -1323,7 +1322,7 @@ begin
       clk_d_pos    => clk_d_pos,        --: in  std_logic;  -- DRAM clock
       clk_s_pos    => clk_s_pos,        --: in  std_logic;  -- SP clock
       -- Control outputs to the clock block
-      rst_n        => rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
+      rst_n        => int_rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
       rst_cn       => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
       en_d         => en_d,             --: out std_logic;  -- Enable clk_d
       fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select
@@ -1471,7 +1470,7 @@ begin
 ---------------------------------------------------------------------
       -- Misc. signals
       --mpordis_i     => '1',--MPORDIS, --: in  std_logic;  -- 'power on' from pad
-      mreset_i        => mreset_i,  --: in  std_logic;  -- Asynchronous reset input
+      mreset_i        => mreset,  --: in  std_logic;  -- Asynchronous reset input 
       mirqout_o       => MIRQOUT,  --: out std_logic;  -- Interrupt  request output
       mckout1_o       => MCKOUT1,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_en,

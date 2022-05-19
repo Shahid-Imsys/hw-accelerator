@@ -4,24 +4,22 @@ use ieee.numeric_std.all;
 
 use work.project_settings.all;
 
-package test_spi_register_pack is
+package register_pack_spi_test is
 
-  constant temp_version_imsys_demo : string := "$Revision: 0000 $";
-  constant imsys_demo_base : integer := 16#0#;
+  constant temp_version_spi_test : string := "$Revision: 0000 $";
+  constant spi_test_base : integer := 16#0#;
 
   -- Register addresses
 
-  constant version_address_c             : integer := 16#00#;
-  constant subversion_hi_byte_address_c  : integer := 16#01#;
-  constant subversion_low_byte_address_c : integer := 16#02#;
-  constant mclkout_address_c             : integer := 16#03#;
-  constant msdout_address_c              : integer := 16#04#;
-  constant utx_address_c                 : integer := 16#05#;
-  constant mirqout_address_c             : integer := 16#06#;
-  constant msdin_address_c               : integer := 16#07#;
-  constant mirq0_address_c               : integer := 16#08#;
-  constant mirq1_address_c               : integer := 16#09#;
-  constant urx_address_c                 : integer := 16#0A#;
+  constant version_address_c : integer := 16#00#;
+  constant mclkout_address_c : integer := 16#01#;
+  constant msdout_address_c  : integer := 16#02#;
+  constant utx_address_c     : integer := 16#03#;
+  constant mirqout_address_c : integer := 16#04#;
+  constant msdin_address_c   : integer := 16#05#;
+  constant mirq0_address_c   : integer := 16#06#;
+  constant mirq1_address_c   : integer := 16#07#;
+  constant urx_address_c     : integer := 16#08#;
 
   -- Register and field constants
 
@@ -44,30 +42,6 @@ package test_spi_register_pack is
   subtype version_digital_t is std_ulogic_vector(version_digital_size_c - 1 downto 0);
   constant version_digital_reset_c : version_digital_t := std_ulogic_vector(to_unsigned(1, version_digital_t'length));
   constant version_digital_scan_c  : version_digital_t := std_ulogic_vector(to_unsigned(1, version_digital_t'length));
-
-  ---------------------------------------------------------------------------
-  -- Register "subversion_hi_byte"
-  constant subversion_hi_byte_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
-
-  -- Field "sub_hi_byte"
-  constant subversion_hi_byte_sub_hi_byte_size_c  : integer := 8;
-  constant subversion_hi_byte_sub_hi_byte_lsb_c   : integer := 0;
-  constant subversion_hi_byte_sub_hi_byte_msb_c   : integer := 7;
-  subtype subversion_hi_byte_sub_hi_byte_t is std_ulogic_vector(subversion_hi_byte_sub_hi_byte_size_c - 1 downto 0);
-  constant subversion_hi_byte_sub_hi_byte_reset_c : subversion_hi_byte_sub_hi_byte_t := std_ulogic_vector(to_unsigned(0, subversion_hi_byte_sub_hi_byte_t'length));
-  constant subversion_hi_byte_sub_hi_byte_scan_c  : subversion_hi_byte_sub_hi_byte_t := std_ulogic_vector(to_unsigned(0, subversion_hi_byte_sub_hi_byte_t'length));
-
-  ---------------------------------------------------------------------------
-  -- Register "subversion_low_byte"
-  constant subversion_low_byte_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
-
-  -- Field "sub_lo_byte"
-  constant subversion_low_byte_sub_lo_byte_size_c  : integer := 8;
-  constant subversion_low_byte_sub_lo_byte_lsb_c   : integer := 0;
-  constant subversion_low_byte_sub_lo_byte_msb_c   : integer := 7;
-  subtype subversion_low_byte_sub_lo_byte_t is std_ulogic_vector(subversion_low_byte_sub_lo_byte_size_c - 1 downto 0);
-  constant subversion_low_byte_sub_lo_byte_reset_c : subversion_low_byte_sub_lo_byte_t := std_ulogic_vector(to_unsigned(0, subversion_low_byte_sub_lo_byte_t'length));
-  constant subversion_low_byte_sub_lo_byte_scan_c  : subversion_low_byte_sub_lo_byte_t := std_ulogic_vector(to_unsigned(0, subversion_low_byte_sub_lo_byte_t'length));
 
   ---------------------------------------------------------------------------
   -- Register "mclkout"
@@ -357,7 +331,7 @@ package test_spi_register_pack is
   constant urx_pu_reset_c : urx_pu_t := '0';
   constant urx_pu_scan_c  : urx_pu_t := '0';
 
-  component test_spi_register_block
+  component register_block_spi_test
 
     port (
           clk   : in std_ulogic;
@@ -366,8 +340,6 @@ package test_spi_register_pack is
           -- Registerfields
           version_analog : in  version_analog_t;
           version_digital : in  version_digital_t;
-          subversion_hi_byte_sub_hi_byte : in  subversion_hi_byte_sub_hi_byte_t;
-          subversion_low_byte_sub_lo_byte : in  subversion_low_byte_sub_lo_byte_t;
           mclkout_ds : out mclkout_ds_t;
           mclkout_sr : out mclkout_sr_t;
           mclkout_co : out mclkout_co_t;
@@ -411,4 +383,4 @@ package test_spi_register_pack is
     );
   end component;
 
-end test_spi_register_pack;
+end register_pack_spi_test;

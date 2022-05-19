@@ -150,7 +150,7 @@ begin
 -- DMA
   idreq <= '1'; -- Active low
 
--- I/O bus current statements
+-- I/O bus concurrent statements
   ido <= flags_out when flags_sel = '1' else
          addr_reg(7 downto 0) when addr_sel = '1' else
          cmd_reg              when cmd_sel = '1' else
@@ -198,7 +198,7 @@ begin
             iobus_rdindex <= 0;
         end if;
       end if;
-      
+
       iobus_rddata <= ospi_rddata(iobus_rdindex);
 
       if ilioa = '0' and clk_i_pos = '0' then
@@ -356,7 +356,7 @@ begin
 
       OSPI_Out.RESET_n <= '1';
       OSPI_Out.CS_n    <= '0';
-      OSPI_DQ_o        <= x"--";
+      OSPI_DQ_o        <= (others => '-');
       OSPI_DQ_e        <= '0';
       OSPI_RWDS_o      <= '-';
       OSPI_RWDS_e      <= '0';

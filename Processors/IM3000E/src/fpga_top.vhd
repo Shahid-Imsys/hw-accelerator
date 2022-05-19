@@ -104,22 +104,24 @@ architecture rtl of fpga_top is
       g_clock_frequency : integer);
 
     port (
-      hclk       : in  std_logic;       -- clk input   
-      MRESET     : in  std_logic;  -- system reset               low active
-      MRSTOUT    : out std_logic;
-      MIRQOUT    : out std_logic;       -- interrupt request output    
-      MCKOUT0    : out std_logic;       --for trace adapter
-      MCKOUT1    : out std_logic;       --programable clock out
-      mckout1_en : out std_logic;       -- Enable signal for MCKOUT1 pad.
-      MTEST      : in  std_logic;  --                            high active                 
-      MBYPASS    : in  std_logic;
-      MIRQ0      : in  std_logic;  --                            low active
-      MIRQ1      : in  std_logic;  --                            low active
+      hclk        : in  std_logic;      -- clk input
+      pll_ref_clk : in  std_logic;
+      pll_locked  : in  std_logic;
+      MRESET      : in  std_logic;      -- system reset, active low
+      MRSTOUT     : out std_logic;
+      MIRQOUT     : out std_logic;      -- interrupt request output    
+      MCKOUT0     : out std_logic;      -- for trace adapter
+      MCKOUT1     : out std_logic;      -- programable clock out
+      mckout1_en  : out std_logic;      -- Enable signal for MCKOUT1 pad.
+      MTEST       : in  std_logic;      -- Active high
+      MBYPASS     : in  std_logic;
+      MIRQ0       : in  std_logic;      -- Active low
+      MIRQ1       : in  std_logic;      -- Active low
       -- SW debug                                                               
-      MSDIN      : in  std_logic;       -- serial data in (debug)     
-      MSDOUT     : out std_logic;       -- serial data out    
+      MSDIN       : in  std_logic;      -- serial data in (debug)     
+      MSDOUT      : out std_logic;      -- serial data out    
 
-      MWAKEUP_LP : in  std_logic;       --                          high active
+      MWAKEUP_LP : in  std_logic;       -- Active high
       MLP_PWR_OK : in  std_logic;
       -- power management control
       MPMIC_CORE : out std_logic;
@@ -144,6 +146,7 @@ architecture rtl of fpga_top is
       dac0_en    : out std_logic;       -- Enable for DAC0
       dac1_en    : out std_logic;       -- Enable for DAC1 
       clk_a      : out std_logic;       -- Clock to the DAC's and ADC 
+
 
       -- Port A
       pa_i  : in  std_logic_vector(7 downto 0);
@@ -178,9 +181,9 @@ architecture rtl of fpga_top is
       ph_en : out std_logic_vector(7 downto 0);
       ph_o  : out std_logic_vector(7 downto 0);
       -- Port I
-      pi_i  : in  std_logic_vector(7 downto 0);
-      pi_en : out std_logic_vector(7 downto 0);
-      pi_o  : out std_logic_vector(7 downto 0);
+      -- pi_i  : in  std_logic_vector(7 downto 0);
+      -- pi_en : out std_logic_vector(7 downto 0);
+      -- pi_o  : out std_logic_vector(7 downto 0);
       -- Port J
       pj_i  : in  std_logic_vector(7 downto 0);
       pj_en : out std_logic_vector(7 downto 0);
@@ -343,11 +346,11 @@ begin
   ENET_MDC   <= '0';                    -- TODO
   ENET_MDIO  <= 'Z';                    -- TODO
   -- 
-  pf_i(1)    <= ENET_TXCLK;
+  pf_i(1)    <= ENET_TXCLK;             -- Use RXCLK?
   ENET_TXCTL <= pf_o(0);                -- RMII TX_EN to TX_CTL
   ENET_TXD0  <= pf_o(2);
   ENET_TXD1  <= pf_o(3);
-  ENET_TXD2  <= '0';      -- RMII Not used ( TODO GND or floating? )
+  ENET_TXD2  <= '0';         -- RMII Not used ( TODO GND or floating? )
   ENET_TXD3  <= pg_o(0);                -- RMII TX_ER to TXD3
 
   pg_i(1) <= ENET_RXCLK;
@@ -407,70 +410,72 @@ begin
       g_clock_frequency => 100          -- Frequency in MHz
       )
     port map (
-      HCLK       => HCLK,
-      MRESET     => MRESET,
-      MRSTOUT    => MRSTOUT,
-      MIRQOUT    => MIRQOUT,
-      MCKOUT0    => MCKOUT0,
-      MCKOUT1    => MCKOUT1,
-      MTEST      => MTEST,
-      MBYPASS    => MBYPASS,
-      MIRQ0      => MIRQ0,
-      MIRQ1      => MIRQ1,
-      MSDIN      => MSDIN,
-      MSDOUT     => MSDOUT,
-      MWAKEUP_LP => MWAKEUP_LP,
-      MLP_PWR_OK => MLP_PWR_OK,
-      MPMIC_CORE => MPMIC_CORE,
-      MPMIC_IO   => MPMIC_IO,
-      pwr_ok     => pwr_ok,
-      dis_bmem   => dis_bmem,
-      vdd_bmem   => vdd_bmem,
-      VCC18LP    => VCC18LP,
-      rxout      => rxout,
-      ach_sel0   => ach_sel0,
-      ach_sel1   => ach_sel1,
-      ach_sel2   => ach_sel2,
-      adc_bits   => adc_bits,
-      adc_ref2v  => adc_ref2v,
-      adc_extref => adc_extref,
-      adc_diff   => adc_diff,
-      adc_en     => adc_en,
-      dac0_bits  => dac0_bits,
-      dac1_bits  => dac1_bits,
-      dac0_en    => dac0_en,
-      dac1_en    => dac1_en,
-      clk_a      => clk_a,
-      pa_i       => pa_i,
-      pa_en      => pa_en,
-      pa_o       => pa_o,
-      pb_i       => pb_i,
-      pb_en      => pb_en,
-      pb_o       => pb_o,
-      pc_i       => pc_i,
-      pc_en      => pc_en,
-      pc_o       => pc_o,
-      pd_i       => pd_i,
-      pd_en      => pd_en,
-      pd_o       => pd_o,
-      pe_i       => pe_i,
-      pe_en      => pe_en,
-      pe_o       => pe_o,
-      pf_i       => pf_i,
-      pf_en      => pf_en,
-      pf_o       => pf_o,
-      pg_i       => pg_i,
-      pg_en      => pg_en,
-      pg_o       => pg_o,
-      ph_i       => ph_i,
-      ph_en      => ph_en,
-      ph_o       => ph_o,
-      pi_i       => pi_i,
-      pi_en      => pi_en,
-      pi_o       => pi_o,
-      pj_i       => pj_i,
-      pj_en      => pj_en,
-      pj_o       => pj_o,
+      hclk        => HCLK,
+      pll_ref_clk => '0',
+      pll_locked  => '0',
+      MRESET      => MRESET,
+      MRSTOUT     => MRSTOUT,
+      MIRQOUT     => MIRQOUT,
+      MCKOUT0     => MCKOUT0,
+      MCKOUT1     => MCKOUT1,
+      MTEST       => MTEST,
+      MBYPASS     => MBYPASS,
+      MIRQ0       => MIRQ0,
+      MIRQ1       => MIRQ1,
+      MSDIN       => MSDIN,
+      MSDOUT      => MSDOUT,
+      MWAKEUP_LP  => MWAKEUP_LP,
+      MLP_PWR_OK  => MLP_PWR_OK,
+      MPMIC_CORE  => MPMIC_CORE,
+      MPMIC_IO    => MPMIC_IO,
+      pwr_ok      => pwr_ok,
+      dis_bmem    => dis_bmem,
+      vdd_bmem    => vdd_bmem,
+      VCC18LP     => VCC18LP,
+      rxout       => rxout,
+      ach_sel0    => ach_sel0,
+      ach_sel1    => ach_sel1,
+      ach_sel2    => ach_sel2,
+      adc_bits    => adc_bits,
+      adc_ref2v   => adc_ref2v,
+      adc_extref  => adc_extref,
+      adc_diff    => adc_diff,
+      adc_en      => adc_en,
+      dac0_bits   => dac0_bits,
+      dac1_bits   => dac1_bits,
+      dac0_en     => dac0_en,
+      dac1_en     => dac1_en,
+      clk_a       => clk_a,
+      pa_i        => pa_i,
+      pa_en       => pa_en,
+      pa_o        => pa_o,
+      pb_i        => pb_i,
+      pb_en       => pb_en,
+      pb_o        => pb_o,
+      pc_i        => pc_i,
+      pc_en       => pc_en,
+      pc_o        => pc_o,
+      pd_i        => pd_i,
+      pd_en       => pd_en,
+      pd_o        => pd_o,
+      pe_i        => pe_i,
+      pe_en       => pe_en,
+      pe_o        => pe_o,
+      pf_i        => pf_i,
+      pf_en       => pf_en,
+      pf_o        => pf_o,
+      pg_i        => pg_i,
+      pg_en       => pg_en,
+      pg_o        => pg_o,
+      ph_i        => ph_i,
+      ph_en       => ph_en,
+      ph_o        => ph_o,
+      --pi_i        => pi_i,
+      --pi_en       => pi_en,
+      --pi_o        => pi_o,
+      pj_i        => pj_i,
+      pj_en       => pj_en,
+      pj_o        => pj_o,
 
       d_lo  => open,
       p1_hi => open,

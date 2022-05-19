@@ -37,7 +37,7 @@ entity digital_top is
     g_clock_frequency : integer);
 
   port (
-    hclk       : in  std_logic;         -- clk input
+    hclk        : in  std_logic;         -- clk input
     pll_ref_clk : in std_logic;
     pll_locked : in std_logic;
     MRESET     : in  std_logic;         -- system reset, active low
@@ -46,15 +46,15 @@ entity digital_top is
     MCKOUT0    : out std_logic;         -- for trace adapter
     MCKOUT1    : out std_logic;         -- programable clock out
     mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST      : in  std_logic;  --                            high active                 
+    MTEST      : in  std_logic;         -- Active high
     MBYPASS    : in  std_logic;
-    MIRQ0      : in  std_logic;  --                            low active
-    MIRQ1      : in  std_logic;  --                            low active
+    MIRQ0      : in  std_logic;         -- Active low
+    MIRQ1      : in  std_logic;         -- Active low
     -- SW debug                                                               
     MSDIN      : in  std_logic;         -- serial data in (debug)     
     MSDOUT     : out std_logic;         -- serial data out    
 
-    MWAKEUP_LP : in  std_logic;         --                          high active
+    MWAKEUP_LP : in  std_logic;         -- Active high
     MLP_PWR_OK : in  std_logic;
     -- power management control
     MPMIC_CORE : out std_logic;

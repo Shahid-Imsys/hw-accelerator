@@ -791,8 +791,11 @@ EVEN_P <= even_p_2;
 	--Data buffer
 	process(DATA_FROM_PE)
 	begin
-		for i in 0 to 15 loop
-			pe_data_in(i) <= DATA_FROM_PE(8*i+7 downto 8*i);
+		for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
+			pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
+			pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
+			pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
+			pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
 		end loop;
 	end process;
 

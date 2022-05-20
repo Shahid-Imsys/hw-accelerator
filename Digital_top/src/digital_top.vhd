@@ -17,11 +17,11 @@
 -- File       : digital_core
 -- Author     : Bengt Svantesson
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
 -- Description: Core level block that instantiates the IM4000, Accelerator and
 -- glue logic..
---              
+--
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -37,22 +37,22 @@ entity digital_top is
     g_clock_frequency : integer);
 
   port (
-    hclk        : in  std_logic;         -- clk input
-    pll_ref_clk : in std_logic;
-    pll_locked : in std_logic;
-    MRESET     : in  std_logic;         -- system reset, active low
-    MRSTOUT    : out std_logic;
-    MIRQOUT    : out std_logic;         -- interrupt request output    
-    MCKOUT0    : out std_logic;         -- for trace adapter
-    MCKOUT1    : out std_logic;         -- programable clock out
-    mckout1_en : out std_logic;         -- Enable signal for MCKOUT1 pad.
-    MTEST      : in  std_logic;         -- Active high
-    MBYPASS    : in  std_logic;
-    MIRQ0      : in  std_logic;         -- Active low
-    MIRQ1      : in  std_logic;         -- Active low
-    -- SW debug                                                               
-    MSDIN      : in  std_logic;         -- serial data in (debug)     
-    MSDOUT     : out std_logic;         -- serial data out    
+    hclk        : in  std_logic;        -- clk input
+    pll_ref_clk : in  std_logic;
+    pll_locked  : in  std_logic;
+    MRESET      : in  std_logic;        -- system reset, active low
+    MRSTOUT     : out std_logic;
+    MIRQOUT     : out std_logic;        -- interrupt request output
+    MCKOUT0     : out std_logic;        -- for trace adapter
+    MCKOUT1     : out std_logic;        -- programable clock out
+    mckout1_en  : out std_logic;        -- Enable signal for MCKOUT1 pad.
+    MTEST       : in  std_logic;        -- Active high
+    MBYPASS     : in  std_logic;
+    MIRQ0       : in  std_logic;        -- Active low
+    MIRQ1       : in  std_logic;        -- Active low
+    -- SW debug
+    MSDIN       : in  std_logic;        -- serial data in (debug)
+    MSDOUT      : out std_logic;        -- serial data out
 
     MWAKEUP_LP : in  std_logic;         -- Active high
     MLP_PWR_OK : in  std_logic;
@@ -61,24 +61,24 @@ entity digital_top is
     MPMIC_IO   : out std_logic;
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
-    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)  
-    vdd_bmem   : in  std_logic;         -- Power for the BMEM block  
-    VCC18LP    : in  std_logic;         -- Power for the RTC block  
-    rxout      : in  std_logic;         -- RTC oscillator output  
-    ach_sel0   : out std_logic;         -- ADC channel select, bit 0  
-    ach_sel1   : out std_logic;         -- ADC channel select, bit 1  
-    ach_sel2   : out std_logic;         -- ADC channel select, bit 2  
+    pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+    dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
+    vdd_bmem   : in  std_logic;         -- Power for the BMEM block
+    VCC18LP    : in  std_logic;         -- Power for the RTC block
+    rxout      : in  std_logic;         -- RTC oscillator output
+    ach_sel0   : out std_logic;         -- ADC channel select, bit 0
+    ach_sel1   : out std_logic;         -- ADC channel select, bit 1
+    ach_sel2   : out std_logic;         -- ADC channel select, bit 2
     adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
     adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
     adc_extref : out std_logic;  -- Select external ADC reference (internal)
     adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
-    dac1_bits  : out std_logic;         -- Bitstream to DAC1 
+    dac1_bits  : out std_logic;         -- Bitstream to DAC1
     dac0_en    : out std_logic;         -- Enable for DAC0
-    dac1_en    : out std_logic;         -- Enable for DAC1 
-    clk_a      : out std_logic;         -- Clock to the DAC's and ADC 
+    dac1_en    : out std_logic;         -- Enable for DAC1
+    clk_a      : out std_logic;         -- Clock to the DAC's and ADC
 
 
     -- Port A
@@ -145,9 +145,9 @@ entity digital_top is
     ospi_rwds_enable : out std_logic;
 
     -- SPI, chip control interface
-    spi_sclk      : in std_logic;
-    spi_cs_n      : in std_logic;
-    spi_mosi      : in std_logic;
+    spi_sclk      : in  std_logic;
+    spi_cs_n      : in  std_logic;
+    spi_mosi      : in  std_logic;
     spi_miso      : out std_logic;
     spi_miso_oe_n : out std_logic;
     pad_config    : out pad_config_record_t
@@ -158,17 +158,17 @@ end entity digital_top;
 architecture rtl of digital_top is
 
   component test_spi_interface is
-  port (
-    rst_n               : in  std_ulogic;
-    spi_rst_n_i         : in  std_ulogic;
-    sclk_int            : in  std_ulogic;
-    sclk_n              : in  std_ulogic;
-    cs_n                : in  std_ulogic;
-    mosi                : in  std_ulogic;
-    miso                : out std_ulogic;
-    miso_oe_n           : out std_ulogic;
-    pad_config          : out pad_config_record_t
-    );
+    port (
+      rst_n       : in  std_ulogic;
+      spi_rst_n_i : in  std_ulogic;
+      sclk_int    : in  std_ulogic;
+      sclk_n      : in  std_ulogic;
+      cs_n        : in  std_ulogic;
+      mosi        : in  std_ulogic;
+      miso        : out std_ulogic;
+      miso_oe_n   : out std_ulogic;
+      pad_config  : out pad_config_record_t
+      );
   end component;
 
   component SNPS_RF_SP_UHS_1024x8 is
@@ -191,26 +191,6 @@ architecture rtl of digital_top is
       BC2      : in  std_logic);
   end component;
 
---  component SNPS_RF_SP_UHS_256x128 is
---      port (
---      Q        : out std_logic_vector(127 downto 0);
---      ADR      : in  std_logic_vector(7 downto 0);
---      D        : in  std_logic_vector(127 downto 0);
---      WE       : in  std_logic;
---      ME       : in  std_logic;
---      CLK      : in  std_logic;
---      TEST1    : in  std_logic;
---      TEST_RNM : in  std_logic;
---      RME      : in  std_logic;
---      RM       : in  std_logic_vector(3 downto 0);
---      WA       : in  std_logic_vector(1 downto 0);
---      WPULSE   : in  std_logic_vector(2 downto 0);
---      LS       : in  std_logic;
---      BC0      : in  std_logic;
---      BC1      : in  std_logic;
---      BC2      : in  std_logic);
---  end component;
-
   component SNPS_RF_SP_UHS_1024x32 is
     port (
       Q        : out std_logic_vector(31 downto 0);
@@ -230,7 +210,6 @@ architecture rtl of digital_top is
       BC1      : in  std_logic;
       BC2      : in  std_logic);
   end component;
-
 
   component SNPS_RF_SP_UHS_256x64 is
     port (
@@ -291,7 +270,7 @@ architecture rtl of digital_top is
       BC1      : in  std_logic;
       BC2      : in  std_logic);
   end component;
-  
+
   component SNPS_SP_HD_16Kx8
     port (
       Q        : out std_logic_vector(7 downto 0);
@@ -313,43 +292,43 @@ architecture rtl of digital_top is
       );
   end component;
 
-  type slv8   is array(natural range <>) of std_logic_vector(  7 downto 0);
-  type slv64  is array(natural range <>) of std_logic_vector( 63 downto 0);
+  type slv8 is array(natural range <>) of std_logic_vector(7 downto 0);
+  type slv64 is array(natural range <>) of std_logic_vector(63 downto 0);
   type slv128 is array(natural range <>) of std_logic_vector(127 downto 0);
-  
-  signal dummy_dout_1   : slv64(7 downto 0);
-  signal dummy_dout_2   : slv8(15 downto 0);
-  signal dummy_dout_3   : std_logic_vector(31 downto 0);
-  signal dummy_dout_4   : slv64(15 downto 0);
-  signal dummy_dout_5   : slv64(15 downto 0);
-  signal dummy_dout_6   : slv64(15 downto 0);
-  signal dummy_dout_7   : slv128(3 downto 0);
-  signal dummy_dout_8   : slv8(31 downto 0);
-  
-  signal dummy_addr     : std_logic_vector(13 downto 0);
-  signal dummy_din      : std_logic_vector(127 downto 0);
-  signal dummy_we       : std_logic_vector(108 downto 0);
-  
+
+  signal dummy_dout_1 : slv64(7 downto 0);
+  signal dummy_dout_2 : slv8(15 downto 0);
+  signal dummy_dout_3 : std_logic_vector(31 downto 0);
+  signal dummy_dout_4 : slv64(15 downto 0);
+  signal dummy_dout_5 : slv64(15 downto 0);
+  signal dummy_dout_6 : slv64(15 downto 0);
+  signal dummy_dout_7 : slv128(3 downto 0);
+  signal dummy_dout_8 : slv8(31 downto 0);
+
+  signal dummy_addr : std_logic_vector(13 downto 0);
+  signal dummy_din  : std_logic_vector(127 downto 0);
+  signal dummy_we   : std_logic_vector(108 downto 0);
+
   signal ospi_dq_in_int  : std_logic_vector(7 downto 0);
   signal ospi_dq_out_int : std_logic_vector(7 downto 0);
 
   constant asic_c : memory_type_t := asic;
 
-  signal clk_p_cpu    : std_logic;
-  signal clk_rx       : std_logic;
-  signal clk_tx       : std_logic;
+  signal clk_p_cpu : std_logic;
+  signal clk_rx    : std_logic;
+  signal clk_tx    : std_logic;
 
   signal sclk   : std_logic;
   signal sclk_n : std_logic;
- 
-  signal cpu_rst_n : std_logic;
+
+  signal cpu_rst_n    : std_logic;
   signal clock_in_off : std_logic;
 
   signal pi_data : std_logic_vector(7 downto 0);
 
 begin  -- architecture rtl
 
-ospi_dq_out <= ospi_dq_out_int;
+  ospi_dq_out <= ospi_dq_out_int;
 
   i_clock_reset : entity work.clock_reset
 
@@ -357,30 +336,30 @@ ospi_dq_out <= ospi_dq_out_int;
       fpga_g => (asic_c = fpga))
 
     port map (
-      pll_clk  => hclk,
+      pll_clk     => hclk,
       pll_ref_clk => pll_ref_clk,
-      enet_clk => '0', -- TODO
-      spi_sclk => spi_sclk,
+      enet_clk    => '0',               -- TODO
+      spi_sclk    => spi_sclk,
 
       mreset_n => mreset,
-      pwr_ok => pwr_ok,
+      pwr_ok   => pwr_ok,
 
       rst_n => cpu_rst_n,
-      
+
       clk_p  => clk_p_cpu,
       clk_rx => clk_rx,
       clk_tx => clk_tx,
       sclk   => sclk,
       sclk_n => sclk_n,
-      
+
       pg_1_i => pg_i(1),
       pf_1_i => pf_i(1),
 
-      clock_in_off => clock_in_off,
-      sel_pll => '1',
-      spi_sel_pll  => '1',
+      clock_in_off            => clock_in_off,
+      sel_pll                 => '1',
+      spi_sel_pll             => '1',
       spi_override_pll_locked => '0',
-      pll_locked   => pll_locked,
+      pll_locked              => pll_locked,
 
       scan_mode => mtest
       );
@@ -486,107 +465,107 @@ ospi_dq_out <= ospi_dq_out_int;
       adc_bits => adc_bits
       );
 
-    i_test_spi_interface : test_spi_interface
+  i_test_spi_interface : test_spi_interface
     port map
     (
-    rst_n       => pwr_ok,
-    spi_rst_n_i => pwr_ok,
-    sclk_int    => sclk,
-    sclk_n      => sclk_n,
-    cs_n        => spi_cs_n,
-    mosi        => spi_mosi,
-    miso        => spi_miso,
-    miso_oe_n   => spi_miso_oe_n,
-    pad_config  => pad_config
-  );
+      rst_n       => pwr_ok,
+      spi_rst_n_i => pwr_ok,
+      sclk_int    => sclk,
+      sclk_n      => sclk_n,
+      cs_n        => spi_cs_n,
+      mosi        => spi_mosi,
+      miso        => spi_miso,
+      miso_oe_n   => spi_miso_oe_n,
+      pad_config  => pad_config
+      );
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
-  
-  asic_dummy_memories: if g_memory_type = asic generate
-        --  signal dummy_dout_1   : slv64(7 downto 0);
-        --  signal dummy_dout_2   : slv8(15 downto 0);
-        --  signal dummy_dout_3   : std_logic_vector(31 downto 0);
-        --  signal dummy_dout_4   : slv64(15 downto 0);
-        --  signal dummy_dout_5   : slv64(15 downto 0);
-        --  signal dummy_dout_6   : slv64(15 downto 0);
-        --  signal dummy_dout_7   : slv128(3 downto 0);
-        --  signal dummy_dout_8   : slv8(31 downto 0);
-        --  signal dummy_addr     : std_logic_vector(12 downto 0);
-        --  signal dummy_din      : std_logic_vector(127 downto 0);
-        --  signal dummy_we       : std_logic_vector(108 downto 0);
-  
-    dummy_signal_proc: process( hclk )
-        variable offset :  integer := 0;
-        variable index   : integer := 0;
-        variable lvector : std_logic_vector(4511 downto 0);
+
+  asic_dummy_memories : if g_memory_type = asic generate
+    --  signal dummy_dout_1   : slv64(7 downto 0);
+    --  signal dummy_dout_2   : slv8(15 downto 0);
+    --  signal dummy_dout_3   : std_logic_vector(31 downto 0);
+    --  signal dummy_dout_4   : slv64(15 downto 0);
+    --  signal dummy_dout_5   : slv64(15 downto 0);
+    --  signal dummy_dout_6   : slv64(15 downto 0);
+    --  signal dummy_dout_7   : slv128(3 downto 0);
+    --  signal dummy_dout_8   : slv8(31 downto 0);
+    --  signal dummy_addr     : std_logic_vector(12 downto 0);
+    --  signal dummy_din      : std_logic_vector(127 downto 0);
+    --  signal dummy_we       : std_logic_vector(108 downto 0);
+
+    dummy_signal_proc : process(hclk)
+      variable offset  : integer := 0;
+      variable index   : integer := 0;
+      variable lvector : std_logic_vector(4511 downto 0);
     begin
-        if false then
+      if false then
         -- No reset available?
-        
-        elsif rising_edge( hclk ) then
-        
-            dummy_addr <= dummy_addr(5 downto 0) & ospi_dq_out_int;
-            dummy_din  <= (ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int &
-                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int &
-                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int & 
-                           ospi_dq_out_int & ospi_dq_out_int &  ospi_dq_out_int &  ospi_dq_out_int )
-                           xor dummy_dout_7(3)
-                           xor dummy_dout_7(2)
-                           xor dummy_dout_7(1)
-                           xor dummy_dout_7(0);
-                           
-            dummy_we       <= dummy_din(107 downto 0) & lvector(index);
-            ospi_dq_in_int <= dummy_we(7 downto 0);
-            
-            if index = 4511 then
-                index := 0;
-            else
-                index := index + 1;
-            end if;
-            
-            offset := 0;
-            for i in dummy_dout_1'range loop -- 8 * 64 = 512
-                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_1(i);
-            end loop;
 
-            offset := offset + 512;
-            for i in dummy_dout_2'range loop -- 16 * 8 = 128
-                lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2(i);
-            end loop;
-            
-            lvector( 31 + 512+128  downto 512+128 ) := dummy_dout_3;
-              
-            offset := offset + 128+32;
-            for i in dummy_dout_4'range loop -- 16 * 64 = 1024
-                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_4(i);
-            end loop;
-                          
-            offset := offset + 1024;
-            for i in dummy_dout_5'range loop -- 16 * 64 = 1024
-                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_5(i);
-            end loop;
-                                        
-            offset := offset + 1024;
-            for i in dummy_dout_6'range loop -- 16 * 64 = 1024
-                lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_6(i);
-            end loop;
-              
-            offset := offset + 1024;
-            for i in dummy_dout_7'range loop -- 4 * 128 = 512
-                lvector(i*128 + 127 + offset downto i*128 + offset) := dummy_dout_7(i);
-            end loop; 
+      elsif rising_edge(hclk) then
 
-            offset := offset + 512;
-            for i in dummy_dout_8'range loop -- 32 * 8 = 256
-                lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_8(i);
-            end loop;
-            
-            --offset := offset + 256;
-        
+        dummy_addr <= dummy_addr(5 downto 0) & ospi_dq_out_int;
+        dummy_din <= (ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int &
+                      ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int &
+                      ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int &
+                      ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int & ospi_dq_out_int)
+                     xor dummy_dout_7(3)
+                     xor dummy_dout_7(2)
+                     xor dummy_dout_7(1)
+                     xor dummy_dout_7(0);
+
+        dummy_we       <= dummy_din(107 downto 0) & lvector(index);
+        ospi_dq_in_int <= dummy_we(7 downto 0);
+
+        if index = 4511 then
+          index := 0;
+        else
+          index := index + 1;
         end if;
+
+        offset := 0;
+        for i in dummy_dout_1'range loop  -- 8 * 64 = 512
+          lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_1(i);
+        end loop;
+
+        offset := offset + 512;
+        for i in dummy_dout_2'range loop  -- 16 * 8 = 128
+          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2(i);
+        end loop;
+
+        lvector(31 + 512+128 downto 512+128) := dummy_dout_3;
+
+        offset := offset + 128+32;
+        for i in dummy_dout_4'range loop  -- 16 * 64 = 1024
+          lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_4(i);
+        end loop;
+
+        offset := offset + 1024;
+        for i in dummy_dout_5'range loop  -- 16 * 64 = 1024
+          lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_5(i);
+        end loop;
+
+        offset := offset + 1024;
+        for i in dummy_dout_6'range loop  -- 16 * 64 = 1024
+          lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_6(i);
+        end loop;
+
+        offset := offset + 1024;
+        for i in dummy_dout_7'range loop  -- 4 * 128 = 512
+          lvector(i*128 + 127 + offset downto i*128 + offset) := dummy_dout_7(i);
+        end loop;
+
+        offset := offset + 512;
+        for i in dummy_dout_8'range loop  -- 32 * 8 = 256
+          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_8(i);
+        end loop;
+
+        --offset := offset + 256;
+
+      end if;
     end process;
-    
-    
+
+
     mpgm_gen : for i in 0 to 7 generate
       mpgm : SNPS_RF_SP_UHS_256x64
         port map (
@@ -607,7 +586,7 @@ ospi_dq_out <= ospi_dq_out_int;
           BC1      => '0',
           BC2      => '0');
     end generate;
-    
+
     gmem_gen : for i in 0 to 15 generate
       gmem : SNPS_RF_SP_UHS_1024x8
         port map (
@@ -628,26 +607,26 @@ ospi_dq_out <= ospi_dq_out_int;
           BC1      => '0',
           BC2      => '0');
     end generate;
-    
+
     fifo_gen_1 : SNPS_RF_SP_UHS_1024x32
-        port map (
-          Q        => dummy_dout_3,
-          ADR      => dummy_addr(9 downto 0),
-          D        => dummy_din(31 downto 0),
-          WE       => dummy_we(24),
-          ME       => '1',
-          CLK      => hclk,
-          TEST1    => '0',
-          TEST_RNM => '0',
-          RME      => '0',
-          RM       => (others => '0'),
-          WA       => (others => '0'),
-          WPULSE   => (others => '0'),
-          LS       => '0',
-          BC0      => '0',
-          BC1      => '0',
-          BC2      => '0');
-          
+      port map (
+        Q        => dummy_dout_3,
+        ADR      => dummy_addr(9 downto 0),
+        D        => dummy_din(31 downto 0),
+        WE       => dummy_we(24),
+        ME       => '1',
+        CLK      => hclk,
+        TEST1    => '0',
+        TEST_RNM => '0',
+        RME      => '0',
+        RM       => (others => '0'),
+        WA       => (others => '0'),
+        WPULSE   => (others => '0'),
+        LS       => '0',
+        BC0      => '0',
+        BC1      => '0',
+        BC2      => '0');
+
     ve_l_gen : for i in 0 to 15 generate
       ve_l : SNPS_RF_SP_UHS_256x64
         port map (
@@ -667,8 +646,8 @@ ospi_dq_out <= ospi_dq_out_int;
           BC0      => '0',
           BC1      => '0',
           BC2      => '0');
-    end generate; 
-             
+    end generate;
+
     ve_r_gen : for i in 0 to 15 generate
       ve_r : SNPS_RF_SP_UHS_256x64
         port map (
@@ -689,7 +668,7 @@ ospi_dq_out <= ospi_dq_out_int;
           BC1      => '0',
           BC2      => '0');
     end generate;
-              
+
     ve_bias_gen : for i in 0 to 15 generate
       ve_bias : SNPS_RF_SP_UHS_64x64
         port map (
@@ -710,7 +689,7 @@ ospi_dq_out <= ospi_dq_out_int;
           BC1      => '0',
           BC2      => '0');
     end generate;
-               
+
     cm_clust_gen : for i in 0 to 3 generate
       cm_clust : SNPS_SP_HD_8Kx128
         port map (

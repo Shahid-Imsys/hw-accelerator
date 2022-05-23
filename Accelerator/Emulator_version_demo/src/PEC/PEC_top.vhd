@@ -88,6 +88,7 @@ port(
       RST_R            : out std_logic;  --Active low
 	  REQ_IN           : in std_logic;  --req to noc in reg logic
 	  REQ_FIFO          : in std_logic_vector(31 downto 0);
+      DATA_FROM_PE      : in std_logic_vector(127 downto 0);
 	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
 	  DATA_VLD         : out std_logic;
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
@@ -112,7 +113,8 @@ component req_dst_logic
         REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
-        OUTPUT    : out std_logic_vector(31 downto 0);
+        CMD_OUTPUT    : out std_logic_vector(31 downto 0);
+        DATA_OUTPUT   : out std_logic_vector(127 downto 0);
         RD_FIFO   : in std_logic;
         FIFO_VLD  : out std_logic;
         --Distribution network
@@ -148,8 +150,8 @@ component PE_pair_top
     C2_REQ_RD : out std_logic;
     C1_ACK    : in std_logic;
     C2_ACK    : in std_logic;
-    C1_REQ_D  : out std_logic_vector(31 downto 0);
-    C2_REQ_D  : out std_logic_vector(31 downto 0);
+    C1_REQ_D  : out std_logic_vector(159 downto 0);
+    C2_REQ_D  : out std_logic_vector(159 downto 0);
     C1_IN_D   : in std_logic_vector(127 downto 0);
     C2_IN_D   : in std_logic_vector(127 downto 0);
     C1_DDI_VLD : in std_logic;
@@ -172,6 +174,7 @@ signal data_out_i : std_logic_vector(7 downto 0);
 signal rst_i : std_logic;
 signal req_in_i : std_logic;
 signal req_fifo_i : std_logic_vector(31 downto 0);
+signal data_fifo_i : std_logic_vector(127 downto 0);
 signal data_to_pe_i       : std_logic_vector(127 downto 0);
 signal data_vld_i  : std_logic;
 signal data_vld_to_pe : std_logic_vector(15 downto 0);
@@ -230,6 +233,7 @@ port map(
 	RST_R => rst_i,
 	REQ_IN     => req_in_i,
     REQ_FIFO   => req_fifo_i,
+    DATA_FROM_PE => data_fifo_i,
     DATA_TO_PE => data_to_pe_i,
     DATA_VLD   => data_vld_i,
     PE_UNIT    => pe_unit_i,
@@ -249,7 +253,8 @@ port map(
     REQ_RD_IN  =>req_rd_i,
     ACK_SIG    =>ack_sig_i,
     PE_REQ_IN  =>pe_req_in_i,
-    OUTPUT     =>req_fifo_i,
+    CMD_OUTPUT     =>req_fifo_i,
+    DATA_OUTPUT  => data_fifo_i,
     RD_FIFO    =>rd_fifo_i,
     FIFO_VLD   =>fifo_vld_i,
 	DATA_VLD   =>data_vld_i,

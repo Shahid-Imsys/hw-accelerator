@@ -252,7 +252,7 @@ entity core is
     dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
     --CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
-    dout_c      : out std_logic_vector(31 downto 0);
+    dout_c      : out std_logic_vector(159 downto 0);
     
     -- Port A
     pa_i        : in  std_logic_vector(4 downto 0);

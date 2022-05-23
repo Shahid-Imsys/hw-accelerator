@@ -620,15 +620,15 @@ begin
     -- 1. processor write/read access
     -- 2. selectable 'shift in' sources
     process(clk_p, rst_en) is
-      variable sftp_clk_d : std_logic_vector(3 downto 0);
-      variable pdi5_d     : std_logic_vector(3 downto 0);
-      variable pdi6_d     : std_logic_vector(3 downto 0);
+      variable sft_clk_d : std_logic_vector(3 downto 0);
+      variable pdi5_d    : std_logic_vector(3 downto 0);
+      variable pdi6_d    : std_logic_vector(3 downto 0);
     begin
       if rst_en = '0' then
         -- Variables
-        sftp_clk_d := (others => '0');
-        pdi5_d     := (others => '0');
-        pdi6_d     := (others => '0');
+        sft_clk_d := (others => '0');
+        pdi5_d    := (others => '0');
+        pdi6_d    := (others => '0');
         -- Signals
         sft_reg    <= (others => '0');
 
@@ -662,7 +662,7 @@ begin
         --
         sft_clk_d := sft_clk & sft_clk_d(3 downto 1);
         pdi5_d    := pdi(5)  & pdi5_d(3 downto 1);
-        pdi7_d    := pdi(6)  & pdi6_d(3 downto 1);
+        pdi6_d    := pdi(6)  & pdi6_d(3 downto 1);
       end if;  -- clk_p
     end process;
 

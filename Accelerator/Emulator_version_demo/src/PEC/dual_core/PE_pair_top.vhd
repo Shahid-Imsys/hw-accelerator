@@ -12,8 +12,8 @@ entity PE_pair_top is
     C2_REQ_RD : out std_logic;
     C1_ACK    : in std_logic;
     C2_ACK    : in std_logic;
-    C1_REQ_D  : out std_logic_vector(31 downto 0);
-    C2_REQ_D  : out std_logic_vector(31 downto 0);
+    C1_REQ_D  : out std_logic_vector(159 downto 0);
+    C2_REQ_D  : out std_logic_vector(159 downto 0);
     C1_IN_D   : in std_logic_vector(127 downto 0);
     C2_IN_D   : in std_logic_vector(127 downto 0);
     C1_DDI_VLD : in std_logic;
@@ -595,7 +595,7 @@ architecture struct of PE_pair_top is
     signal c1_req_i    : std_logic;  -- Request signal of core1
     signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
     signal c1_ack_i    : std_logic;
-    signal c1_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor --CJ
+    signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
     signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
     signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram  
     signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
@@ -607,7 +607,7 @@ architecture struct of PE_pair_top is
     signal c2_req_i    : std_logic;  --Requset signal of core 2.
     signal c2_req_rd_i : std_logic;  -- signal indicate that core2 is reading out request from CMDR fifo.
     signal c2_ack_i    : std_logic;
-    signal c2_d_dqi    : std_logic_vector(31 downto 0); -- Data in from processor
+    signal c2_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor
     signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
     signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
     signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram

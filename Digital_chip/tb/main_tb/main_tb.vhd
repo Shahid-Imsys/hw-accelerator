@@ -73,6 +73,10 @@ architecture tb of main_tb is
 
   signal enet_mdio : std_logic := 'Z';
 
+  signal spi_sclk : std_logic := '0';
+  signal spi_cs_n : std_logic := '1';
+  signal spi_mosi : std_logic := '0';
+  
 begin  -- architecture tb
 
 
@@ -145,10 +149,10 @@ begin  -- architecture tb
       emem_d7  => OSPI_DQ(7),
 
     -- SPI, chip control interface
-      spi_sclk => '0',
-      spi_cs_n => '0',
+      spi_sclk => spi_sclk,
+      spi_cs_n => spi_cs_n,
       spi_miso => open,
-      spi_mosi => '0',
+      spi_mosi => spi_mosi,
 
     -- DAC and ADC pins
     aout0 => open,

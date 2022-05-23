@@ -177,7 +177,7 @@ begin  -- architecture rtl
       -- IO-bus interface to NOC adapter
       ext_i_pos  => open,
       ext_ido    => (others => '0'),
-      ext_iden   => '1',
+      ext_iden   => '0',
       ext_idreq  => '1',
       ext_idack  => open,
       ext_ilioa  => open,

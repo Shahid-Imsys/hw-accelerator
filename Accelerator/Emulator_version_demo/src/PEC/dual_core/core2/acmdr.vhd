@@ -48,7 +48,7 @@ entity acmdr is
         REQ_RD_OUT: out std_logic;
         ACK_IN    : in std_logic;
         DIN       : in std_logic_vector(127 downto 0);
-        DOUT      : out std_logic_vector(31 downto 0);
+        DOUT      : out std_logic_vector(159 downto 0);
         --Core interface
         YBUS      : in std_logic_vector(7 downto 0);
         LD_MPGM   : in std_logic;
@@ -66,8 +66,9 @@ end;
 
 architecture rtl of acmdr is
 
-    COMPONENT fifo_generator_0
-    PORT (
+COMPONENT fifo
+GENERIC(DATA_WIDTH,DATA_DEPTH,PROG_FULL_TRESHOLD : integer);
+PORT (
     clk : IN STD_LOGIC;
     srst : IN STD_LOGIC;
     din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -75,12 +76,16 @@ architecture rtl of acmdr is
     rd_en : IN STD_LOGIC;
     dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     full : OUT STD_LOGIC;
+    almost_full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
+    almost_empty : OUT STD_LOGIC;
     prog_full : OUT STD_LOGIC;
-    wr_rst_busy : OUT STD_LOGIC;
-    rd_rst_busy : OUT STD_LOGIC
-    );
-    END COMPONENT;
+    valid      : OUT STD_LOGIC;
+    counter : OUT integer range DATA_DEPTH-1 downto 0
+    --wr_rst_busy : OUT STD_LOGIC;
+    --rd_rst_busy : OUT STD_LOGIC
+);
+end COMPONENT;
 
     --control fields
     signal pl_dbus_s     : std_logic_vector(4 downto 0);
@@ -116,6 +121,10 @@ architecture rtl of acmdr is
     signal rd_trig     : std_logic;
     signal srst        : std_logic;
     signal push_cnt    : integer;
+
+    signal output_register : std_logic_vector(159 downto 0);
+    signal col_ctr : integer range 5 downto 0;
+
 
 begin
 --*******************************************************************     
@@ -306,16 +315,17 @@ begin
                         send_req <= '0';
                         send_req_d <= '0';
                     else
+                        rd_trig <= '0';
                         if requesting = '1' then
                             send_req_d <= '1';--requesting;
                         else
-                            case transfer_type is
-                                when "11" =>
-                                    if transfer_cnt = x"00" then
-                                        rd_trig <= '0';
-                                    end if;
-                                when others => rd_trig <= '0';
-                            end case;
+                            --case transfer_type is
+                            --    when "11" =>
+                            --        if transfer_cnt = x"00" then
+                            --            rd_trig <= '0';
+                            --        end if;
+                            --    when others => rd_trig <= '0';
+                            --end case;
                         end if;
                         send_req <= send_req_d;
                     end if;
@@ -342,16 +352,19 @@ begin
                 if rst_en = '0' then
                     req <= '0';
                 elsif fb = '0' then 
-                    case transfer_type is 
-                        when "11" =>
-                            if send_req = '1' and transfer_cnt = x"04" then
-                                req <= '1';
-                             end if;
-                        when others => 
-                            if send_req = '1' then
-                                req <= '1';
-                            end if;
-                    end case;
+                    if send_req = '1' then
+                        req <= '1';
+                    end if; 
+                    --case transfer_type is 
+                    --    when "11" =>
+                    --        if send_req = '1' and transfer_cnt = x"04" then
+                    --            req <= '1';
+                    --         end if;
+                    --    when others => 
+                    --        if send_req = '1' then
+                    --            req <= '1';
+                    --        end if;
+                    --end case;
                 elsif fb = '1' then
                     req <= '0';
                 end if;
@@ -369,21 +382,53 @@ begin
             DTM_FIFO_RDY <= not empty;
         end if;
     end process;
+
+    --Widen the bandwith to 20B. Use a collecting logic instead of fifo here.
+    --output register used as a data collector, col_ctr used as a data counter that triggers empty and prog_full signals
+    process(clk_p)
+    begin
+        if rising_edge(clk_p) then
+            if rst_en = '0' then
+                output_register <=(others => '0');
+                col_ctr <= 5;
+            else
+                if fifo_wr_en = '1' and col_ctr /= 0 then
+                    output_register(32*col_ctr-1 downto 32*col_ctr - 32) <= dtm_reg;
+                    col_ctr <= col_ctr-1;
+                elsif fifo_rd_en = '1' then
+                    dout <= output_register;
+                    col_ctr <=5;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    empty <= '1' when col_ctr = 5 else '0';
+    fifo_full <= '1' when col_ctr = 0 else '0';
     
-    req_fifo : fifo_generator_0
-    PORT MAP (
-    clk => CLK_P,
-    srst => srst,
-    din => dtm_reg,
-    wr_en => fifo_wr_en,
-    rd_en => fifo_rd_en,
-    dout => DOUT,
-    full => open,
-    empty => empty,
-    prog_full => fifo_full, --asserts when 5 words inside
-    wr_rst_busy => open,
-    rd_rst_busy => open
-    );
+    --req_fifo : fifo
+    --GENERIC MAP(
+    --    DATA_WIDTH => 32,
+    --    DATA_DEPTH => 8,
+    --    PROG_FULL_TRESHOLD => 5
+    --)
+    --PORT MAP (
+    --    clk => clk_p,
+    --    srst => srst,
+    --    din => dtm_reg,
+    --    wr_en => fifo_wr_en,
+    --    rd_en => fifo_rd_en,
+    --    dout => DOUT,
+    --    full => open,
+    --    almost_full => open,
+    --    empty => empty,
+    --    almost_empty => open,
+    --    prog_full => fifo_full,
+    --    valid      => open,
+    --    counter => open
+    --    --wr_rst_busy => open,
+    --    --rd_rst_busy => open
+    --);
 end architecture;
 
 

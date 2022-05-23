@@ -87,6 +87,7 @@ entity cluster_controller is
       RST_R            : out std_logic;  --Active low
 	  REQ_IN           : in std_logic;  --req to noc in reg logic
 	  REQ_FIFO          : in std_logic_vector(31 downto 0);
+	  DATA_FROM_PE     : in std_logic_vector(127 downto 0);
 	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
 	  DATA_VLD         : out std_logic;
 	  PE_UNIT          : out std_logic_vector(5 downto 0);
@@ -635,8 +636,8 @@ EVEN_P <= even_p_2;
 			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
 					standby <= '0';
-			    elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
-			    	RD_FIFO <= '1';
+			    --elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
+			    	--RD_FIFO <= '1';
 				elsif req_exe = '1' or cb_status = '1' then
                     standby <= '1';
 			    else
@@ -662,13 +663,13 @@ EVEN_P <= even_p_2;
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
- 				req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
+ 				--req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
             elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
-				req_len_ctr_p <= (others => '0');
+				--req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
 
                 bc_i(0) <= '0';
@@ -729,9 +730,9 @@ EVEN_P <= even_p_2;
                         req_exe <= '0';
 			    	end if;
     
-			    	if write_count = "11" then
+			    	--if write_count = "11" then
 			    		write_req<= '0';
-			    	end if;
+			    	--end if;
                 end if;
 			end if;
 		end if;
@@ -762,26 +763,40 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' and fifo_vld = '1' then
-							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+						elsif write_req = '1' then--and fifo_vld = '1' then
+							--pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
+							--write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
-							if write_count = "11" then
+							--if write_count = "11" then
 								pe_write <= '1';
-							else
-								pe_write <= '0';
-							end if;
+							--else
+								--pe_write <= '0';
+							--end if;
 						end if;
-					else
-						addr_p <= req_addr_p;
-						len_ctr_p <= req_len_ctr_p;
+					elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
+						addr_p <= REQ_FIFO(14 downto 0);
+						len_ctr_p <= std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);
+					elsif pe_req_type = "11" then  --Add trade off. For 4B version, the len_ctr is "11" but for 20B version, it is "00" instead.
+												   --Will delete when the micorocde is modified for 20B version with "00" in len_ctr field. 
+						len_ctr_p <= '0'& x"01";
+
 					end if;
 				end if;
 			end if;
 		end if;
+	end process;
+	--Data buffer
+	process(DATA_FROM_PE)
+	begin
+		for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
+			pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
+			pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
+			pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
+			pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
+		end loop;
 	end process;
 
 

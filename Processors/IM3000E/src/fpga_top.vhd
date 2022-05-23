@@ -1,21 +1,21 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
+-- Company:
+-- Engineer:
+--
 -- Create Date: 03/30/2022 10:24:00 AM
--- Design Name: 
+-- Design Name:
 -- Module Name: fpga_top - rtl
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
+-- Project Name:
+-- Target Devices:
+-- Tool Versions:
+-- Description:
+--
+-- Dependencies:
+--
 -- Revision:
 -- Revision 0.01 - File Created
 -- Additional Comments:
--- 
+--
 ----------------------------------------------------------------------------------
 
 
@@ -109,7 +109,7 @@ architecture rtl of fpga_top is
       pll_locked  : in  std_logic;
       MRESET      : in  std_logic;      -- system reset, active low
       MRSTOUT     : out std_logic;
-      MIRQOUT     : out std_logic;      -- interrupt request output    
+      MIRQOUT     : out std_logic;      -- interrupt request output
       MCKOUT0     : out std_logic;      -- for trace adapter
       MCKOUT1     : out std_logic;      -- programable clock out
       mckout1_en  : out std_logic;      -- Enable signal for MCKOUT1 pad.
@@ -117,9 +117,9 @@ architecture rtl of fpga_top is
       MBYPASS     : in  std_logic;
       MIRQ0       : in  std_logic;      -- Active low
       MIRQ1       : in  std_logic;      -- Active low
-      -- SW debug                                                               
-      MSDIN       : in  std_logic;      -- serial data in (debug)     
-      MSDOUT      : out std_logic;      -- serial data out    
+      -- SW debug
+      MSDIN       : in  std_logic;      -- serial data in (debug)
+      MSDOUT      : out std_logic;      -- serial data out
 
       MWAKEUP_LP : in  std_logic;       -- Active high
       MLP_PWR_OK : in  std_logic;
@@ -128,24 +128,24 @@ architecture rtl of fpga_top is
       MPMIC_IO   : out std_logic;
 
       -- Analog internal signals
-      pwr_ok     : in  std_logic;  -- Power on detector output (active high)  
-      dis_bmem   : out std_logic;       -- Disable for vdd_bmem (active high)  
-      vdd_bmem   : in  std_logic;       -- Power for the BMEM block  
-      VCC18LP    : in  std_logic;       -- Power for the RTC block  
-      rxout      : in  std_logic;       -- RTC oscillator output  
-      ach_sel0   : out std_logic;       -- ADC channel select, bit 0  
-      ach_sel1   : out std_logic;       -- ADC channel select, bit 1  
-      ach_sel2   : out std_logic;       -- ADC channel select, bit 2  
+      pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+      dis_bmem   : out std_logic;       -- Disable for vdd_bmem (active high)
+      vdd_bmem   : in  std_logic;       -- Power for the BMEM block
+      VCC18LP    : in  std_logic;       -- Power for the RTC block
+      rxout      : in  std_logic;       -- RTC oscillator output
+      ach_sel0   : out std_logic;       -- ADC channel select, bit 0
+      ach_sel1   : out std_logic;       -- ADC channel select, bit 1
+      ach_sel2   : out std_logic;       -- ADC channel select, bit 2
       adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
       adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
       adc_extref : out std_logic;  -- Select external ADC reference (internal)
       adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
       adc_en     : out std_logic;       -- Enable for the ADC
       dac0_bits  : out std_logic;       -- Bitstream to DAC0
-      dac1_bits  : out std_logic;       -- Bitstream to DAC1 
+      dac1_bits  : out std_logic;       -- Bitstream to DAC1
       dac0_en    : out std_logic;       -- Enable for DAC0
-      dac1_en    : out std_logic;       -- Enable for DAC1 
-      clk_a      : out std_logic;       -- Clock to the DAC's and ADC 
+      dac1_en    : out std_logic;       -- Enable for DAC1
+      clk_a      : out std_logic;       -- Clock to the DAC's and ADC
 
 
       -- Port A
@@ -226,26 +226,26 @@ architecture rtl of fpga_top is
   signal MPMIC_IO   : std_logic;        -- out
 
   -- Misc analog in (also NC)
-  signal pwr_ok   : std_logic;          -- in  
-  signal vdd_bmem : std_logic;          -- in  
-  signal VCC18LP  : std_logic;          -- in  
-  signal rxout    : std_logic;          -- in  
-  signal adc_bits : std_logic;          -- in  
+  signal pwr_ok   : std_logic;          -- in
+  signal vdd_bmem : std_logic;          -- in
+  signal VCC18LP  : std_logic;          -- in
+  signal rxout    : std_logic;          -- in
+  signal adc_bits : std_logic;          -- in
 
   -- Outputs (NC)
-  signal dis_bmem   : std_logic;        -- out 
-  signal ach_sel0   : std_logic;        -- out 
-  signal ach_sel1   : std_logic;        -- out 
-  signal ach_sel2   : std_logic;        -- out 
-  signal adc_ref2v  : std_logic;        -- out 
-  signal adc_extref : std_logic;        -- out 
-  signal adc_diff   : std_logic;        -- out 
-  signal adc_en     : std_logic;        -- out 
-  signal dac0_bits  : std_logic;        -- out 
-  signal dac1_bits  : std_logic;        -- out 
-  signal dac0_en    : std_logic;        -- out 
-  signal dac1_en    : std_logic;        -- out 
-  signal clk_a      : std_logic;        -- out 
+  signal dis_bmem   : std_logic;        -- out
+  signal ach_sel0   : std_logic;        -- out
+  signal ach_sel1   : std_logic;        -- out
+  signal ach_sel2   : std_logic;        -- out
+  signal adc_ref2v  : std_logic;        -- out
+  signal adc_extref : std_logic;        -- out
+  signal adc_diff   : std_logic;        -- out
+  signal adc_en     : std_logic;        -- out
+  signal dac0_bits  : std_logic;        -- out
+  signal dac1_bits  : std_logic;        -- out
+  signal dac0_en    : std_logic;        -- out
+  signal dac1_en    : std_logic;        -- out
+  signal clk_a      : std_logic;        -- out
 
   -- Ports
   signal pa_i : std_logic_vector(7 downto 0);
@@ -343,15 +343,16 @@ begin
   -- Ethernet
   ENET_RST_N <= MRSTOUT;
 
-  ENET_MDC   <= '0';                    -- TODO
-  ENET_MDIO  <= 'Z';                    -- TODO
-  -- 
+  ENET_MDC   <= pb_p(2);
+  ENET_MDIO  <= pb_p(1);
+  pb_i(1)    <= ENET_MDIO;
+  --
   pf_i(1)    <= ENET_TXCLK;             -- Use RXCLK?
-  ENET_TXCTL <= pf_o(0);                -- RMII TX_EN to TX_CTL
-  ENET_TXD0  <= pf_o(2);
-  ENET_TXD1  <= pf_o(3);
+  ENET_TXCTL <= pf_p(0);                -- RMII TX_EN to TX_CTL
+  ENET_TXD0  <= pf_p(2);
+  ENET_TXD1  <= pf_p(3);
   ENET_TXD2  <= '0';         -- RMII Not used ( TODO GND or floating? )
-  ENET_TXD3  <= pg_o(0);                -- RMII TX_ER to TXD3
+  ENET_TXD3  <= pg_p(0);                -- RMII TX_ER to TXD3
 
   pg_i(1) <= ENET_RXCLK;
   pf_i(4) <= ENET_RXCTL;                -- RMII DV to RX_CTL
@@ -363,11 +364,11 @@ begin
   -- Analog in
   pwr_ok   <= '1';  -- Active high, not described in data book DEV7026
   vdd_bmem <= '0';                      -- Seems to be NC in top
-  VCC18LP  <= '0';                      -- Power for the RTC block. NC in top  
+  VCC18LP  <= '0';                      -- Power for the RTC block. NC in top
   rxout    <= '0';                      -- 32KHz oscillator input, NC in rtc
   adc_bits <= '0';                      -- AC input stream
 
-  MTEST      <= '0';  -- Active high, disabled (But what does it do?) 
+  MTEST      <= '0';  -- Active high, disabled (But what does it do?)
   MBYPASS    <= '1';                    -- Bypass PLL (use ext clock)
   MIRQ1      <= '1';                    -- Active low
   MWAKEUP_LP <= '0';  -- Active high, not described in data book DEV7026

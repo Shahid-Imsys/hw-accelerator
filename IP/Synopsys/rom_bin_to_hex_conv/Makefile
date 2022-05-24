@@ -2,7 +2,8 @@
 
 all: work tb elab
 
-tb: (V_COMP) readmemh.v
+tb:
+	$(V_COMP) readmemh.v
 
 elab:
 	xelab --debug typical rom_bin_to_hex_conv

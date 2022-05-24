@@ -89,6 +89,7 @@ begin  -- architecture tb
       clk_rx  => '0', -- TODO
       clk_tx  => '0', -- TODO
       MRESET  => MRESET,
+      rst_n   => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,
@@ -103,7 +104,7 @@ begin  -- architecture tb
       ext_i_pos  => open,
       ext_ido    => (others => '0'),
       ext_iden   => '0',
-      ext_idreq  => '0',
+      ext_idreq  => '1',
       ext_idack  => open,
       ext_ilioa  => open,
       ext_ildout => open,

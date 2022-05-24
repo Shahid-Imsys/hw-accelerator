@@ -11,7 +11,8 @@ use work.gp_pkg.all;
 entity ionoc_tb is
   generic (
     ionoc_status_address : std_logic_vector(7 downto 0) := x"45";
-    ionoc_data_address   : std_logic_vector(7 downto 0) := x"46";
+    ionoc_cmd_address    : std_logic_vector(7 downto 0) := x"46";
+    ionoc_data_address   : std_logic_vector(7 downto 0) := x"47";
     MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
     );
 end entity;
@@ -21,15 +22,16 @@ architecture tb of ionoc_tb is
   component ionoc is
     generic (
       ionoc_status_address : std_logic_vector(7 downto 0) := x"45";
-      ionoc_data_address   : std_logic_vector(7 downto 0) := x"46";
+      ionoc_cmd_address    : std_logic_vector(7 downto 0) := x"46";
+      ionoc_data_address   : std_logic_vector(7 downto 0) := x"47";
       MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
       );
     port (clk_p        : in  std_logic;  -- Main clock
           clk_i_pos    : in  std_logic;  --
           rst_n        : in  std_logic;  -- Async reset
           -- I/O bus
-          idi          : in  std_logic_vector (7 downto 0);   -- I/O bus in
-          ido          : out std_logic_vector (7 downto 0);   -- I/O bus out
+          idi          : in  std_logic_vector (7 downto 0);     -- I/O bus in
+          ido          : out std_logic_vector (7 downto 0);     -- I/O bus out
           iden         : out std_logic;  -- I/O bus enabled (in use)
           ilioa        : in  std_logic;  -- I/O bus load I/O address
           ildout       : in  std_logic;  -- I/O bus data output strobe
@@ -37,24 +39,24 @@ architecture tb of ionoc_tb is
           idack        : in  std_logic;  -- I/O bus DMA Ack
           idreq        : out std_logic;  -- I/O bus DMA Request
           -- GPP to NOC
-          GPP_CMD      : out std_logic_vector(127 downto 0);  -- Command word
+          GPP_CMD      : out std_logic_vector(127 downto 0);    -- Command word
           GPP_CMD_Flag : out std_logic;  -- Command word valid
           NOC_CMD_ACK  : in  std_logic;  -- NOC ready
           -- NOC to GPP
-          NOC_CMD      : in  std_logic_vector(7 downto 0); -- Command byte
-          GPP_CMD_ACK  : out std_logic;                    -- GPP ready
-          NOC_CMD_Flag : in  std_logic;                    -- NOC asks to send byte
-          NOC_CMD_EN   : in  std_logic;                    -- Command byte valid
+          NOC_CMD      : in  std_logic_vector(7 downto 0);      -- Command byte
+          GPP_CMD_ACK  : out std_logic;  -- GPP ready
+          NOC_CMD_Flag : in  std_logic;  -- NOC asks to send byte
+          NOC_CMD_EN   : in  std_logic;  -- Command byte valid
           --
-          TxFIFO_Ready : out std_logic;                      -- Interface can accept a word from the TxIFO
-          TxFIFO_Valid : in  std_logic;                      -- TxFIFO has availble data which is presented on bus
-          TxFIFO_Data  : in  std_logic_vector(127 downto 0); -- TxFIFO data
+          TxFIFO_Ready : out std_logic;  -- Interface can accept a word from the TxIFO
+          TxFIFO_Valid : in  std_logic;  -- TxFIFO has availble data which is presented on bus
+          TxFIFO_Data  : in  std_logic_vector(127 downto 0);    -- TxFIFO data
           --
-          RxFIFO_Ready : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
-          RxFIFO_Valid : out std_logic;                      -- Interface has availble data which is presented on bus
-          RxFIFO_Data  : out std_logic_vector(127 downto 0); -- RxFIFO data
+          RxFIFO_Ready : in  std_logic;  -- RxFIFO can accept a word from the IO-bus
+          RxFIFO_Valid : out std_logic;  -- Interface has availble data which is presented on bus
+          RxFIFO_Data  : out std_logic_vector(127 downto 0);    -- RxFIFO data
           --
-          NOC_IRQ      : out std_logic                     -- Interrupt on available data from NOC
+          NOC_IRQ      : out std_logic  -- Interrupt on available data from NOC
           );
   end component;
 
@@ -69,6 +71,12 @@ architecture tb of ionoc_tb is
     poll_done2,
     read_data,
     poll_done3,
+    write_fifo_data_fr_noc,
+    write_fifo_data_fr_gpp1,
+    write_fifo_data_fr_gpp2,
+    poll_done4,
+    read_fifo_data_to_gpp,
+    poll_done5,
     wait_done,
     done);
 
@@ -113,13 +121,13 @@ architecture tb of ionoc_tb is
   signal GPP_CMD_ACK  : std_logic;
   signal NOC_IRQ      : std_logic;
 
+  signal TxFIFO_Ready : std_logic;
   signal TxFIFO_Valid : std_logic;
-  signal RxFIFO_Ready : std_logic;
-  signal TxFIFO_Data  : std_logic_vector(127 downto 0);
+  signal TxFIFO_Data  : std_logic_vector(127 downto 0) := (others => '0');
   --
-  signal TxFIFO_Ready : std_logic                      := '0';
-  signal RxFIFO_Valid : std_logic                      := '0';
-  signal RxFIFO_Data  : std_logic_vector(127 downto 0) := (others => '0');
+  signal RxFIFO_Ready : std_logic                      := '0';
+  signal RxFIFO_Valid : std_logic;
+  signal RxFIFO_Data  : std_logic_vector(127 downto 0);
 
   -- Constants
   constant clock_frequency_c : real := 300.0;  --MHz
@@ -151,16 +159,19 @@ begin
 
     if rising_edge(clk) then
       -- Defaults
-      idi    <= x"00";
-      ilioa  <= '1';
-      ildout <= '1';
-      inext  <= '1';
-      idack  <= '1';
+      idi          <= x"00";
+      ilioa        <= '1';
+      ildout       <= '1';
+      inext        <= '1';
+      idack        <= '1';
       --
-      NOC_CMD_ACK <= '0';
-      NOC_CMD_EN  <= '0';
-      NOC_CMD     <= (others => '-');
+      NOC_CMD_ACK  <= '0';
+      NOC_CMD_EN   <= '0';
+      NOC_CMD      <= (others => '-');
       --
+      TxFIFO_Valid <= '0';
+      RxFIFO_Ready <= '1';
+
       if GPP_CMD_ACK = '1' then
         NOC_CMD_Flag <= '0';
       end if;
@@ -197,7 +208,7 @@ begin
 
         when send_cmd =>
           if fsm_count < 4 then
-            idi   <= ionoc_data_address;
+            idi   <= ionoc_cmd_address;
             ilioa <= '0';
           end if;
 
@@ -211,7 +222,7 @@ begin
         when write_data =>
 
           if fsm_count < 4 then
-            idi   <= ionoc_data_address;
+            idi   <= ionoc_cmd_address;
             ilioa <= '0';
           else
             ildout <= '0';
@@ -245,7 +256,7 @@ begin
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
-          else -- if fsm_count < 8 then
+          else                          -- if fsm_count < 8 then
             inext <= '0';
           end if;
 
@@ -256,7 +267,7 @@ begin
           end if;
 
           if fsm_count = 7 then
-            fsm_count <= 0;
+            fsm_count   <= 0;
             NOC_CMD_ACK <= '1';
             write(l, string'("NOC_CMD_ACK high"));
             writeline(output, l);
@@ -276,7 +287,7 @@ begin
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
-          else -- if fsm_count < 8 then
+          else                          -- if fsm_count < 8 then
             inext <= '0';
           end if;
 
@@ -297,17 +308,17 @@ begin
         when read_data =>
           --
           if fsm_count < 4 then
-            idi   <= ionoc_data_address;
+            idi   <= ionoc_cmd_address;
             ilioa <= '0';
-          else -- if fsm_count < 8 then
+          else                          -- if fsm_count < 8 then
             inext <= '0';
           end if;
 
           if fsm_count = 7 then
             fsm_count <= 0;
-            fsm <= poll_done3;
+            fsm       <= poll_done3;
             write(l, string'("IO-bus got 0x"));
-            hwrite(l, ido );
+            hwrite(l, ido);
             writeline(output, l);
 
             write(l, string'("Waiting to idle status"));
@@ -319,22 +330,128 @@ begin
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
-          else -- if fsm_count < 8 then
+          else                          -- if fsm_count < 8 then
             inext <= '0';
           end if;
 
           if fsm_count = 7 then
             fsm_count <= 0;
             if ido(1 downto 0) = "00" then
+              fsm <= write_fifo_data_fr_noc;
+            end if;
+          end if;
+
+        when write_fifo_data_fr_noc =>
+          TxFIFO_Valid            <= '1';
+          for b in 0 to 15 loop
+            TxFIFO_Data(8*b + 7 downto 8*b) <=
+              conv_std_logic_vector(17 * b+1, 8);
+          end loop;
+          --
+          if TxFIFO_Valid = '1' and TxFIFO_Ready = '1' then
+            if fsm_count = 1-1 then     -- nr_of_words - 1
+              TxFIFO_Valid <= '0';
+              --
+              fsm          <= write_fifo_data_fr_gpp1;
+              fsm_count    <= 0;
+            end if;
+          else
+            fsm_count <= fsm_count;     -- Keep
+          end if;
+
+        when write_fifo_data_fr_gpp1 =>
+          if fsm_count < 4 then
+            idi   <= ionoc_data_address;
+            ilioa <= '0';
+          end if;
+
+          if fsm_count = 3 then
+            fsm_count <= 0;
+            fsm       <= write_fifo_data_fr_gpp2;
+            write(l, string'("IO bus is writing data to FIFO interface"));
+            writeline(output, l);
+          end if;
+
+        when write_fifo_data_fr_gpp2 =>
+          ildout <= '0';
+          if fsm_count = 0 then
+            idi <= x"11";
+          elsif fsm_count mod 4 /= 3 then
+            idi <= idi;
+          elsif fsm_count < 4 then
+            idi <= x"22";
+          elsif fsm_count < 8 then
+            idi <= x"33";
+          elsif fsm_count < 12 then
+            idi <= x"44";
+          elsif fsm_count < 68 then
+            idi <= conv_std_logic_vector((fsm_count / 4) * 17 + 34, 8);
+          end if;
+
+          if fsm_count = 67 then
+            fsm       <= poll_done4;
+            write(l, string'("Waiting for FIFO to read data"));
+            writeline(output, l);
+            fsm_count <= 0;
+          end if;
+
+        when poll_done4 =>
+          -- Poll status until FIFO has read the data
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else                          -- if fsm_count < 8 then
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(6) = '0' then
+              fsm <= read_fifo_data_to_gpp;
+              write(l, string'("NOC has read FIFO word"));
+              writeline(output, l);
+            end if;
+          end if;
+
+        when read_fifo_data_to_gpp =>
+          if fsm_count < 4 then
+            idi   <= ionoc_data_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+            -- TODO Combine and print bytes
+          end if;
+
+          if fsm_count = 67 then
+            fsm       <= poll_done5;
+            -- write(l, string'(""));
+            -- writeline(output, l);
+            fsm_count <= 0;
+          end if;
+
+        when poll_done5 =>
+          -- Poll status until FIFO has read the data
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(7) = '0' then
               fsm <= wait_done;
+              write(l, string'("GPP has read FIFO word"));
+              writeline(output, l);
             end if;
           end if;
 
         when wait_done =>
           if fsm_count = 16 then
-              write(l, string'("TB done"));
-              writeline(output, l);
-              fsm <= done;
+            write(l, string'("TB done"));
+            writeline(output, l);
+            fsm <= done;
           end if;
 
         when others =>
@@ -348,6 +465,7 @@ begin
   DUT : ionoc
     generic map (
       ionoc_status_address => ionoc_status_address,
+      ionoc_cmd_address    => ionoc_cmd_address,
       ionoc_data_address   => ionoc_data_address,
       MAX_BURST_LEN        => MAX_BURST_LEN)
     port map (

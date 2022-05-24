@@ -298,13 +298,14 @@ architecture rtl of digital_top is
   type slv128 is array(natural range <>) of std_logic_vector(127 downto 0);
 
   signal dummy_dout_1 : slv64(7 downto 0);
-  signal dummy_dout_2 : slv8(15 downto 0);
+  signal dummy_dout_2a : slv8(7 downto 0);
+  signal dummy_dout_2b : slv8(7 downto 0);
   signal dummy_dout_3 : std_logic_vector(31 downto 0);
   signal dummy_dout_4 : slv64(15 downto 0);
   signal dummy_dout_5 : slv64(15 downto 0);
   signal dummy_dout_6 : slv64(15 downto 0);
   signal dummy_dout_7 : slv128(3 downto 0);
-  signal dummy_dout_8 : slv8(31 downto 0);
+  signal dummy_dout_8 : slv128(3 downto 0);
 
   signal dummy_addr : std_logic_vector(13 downto 0);
   signal dummy_din  : std_logic_vector(127 downto 0);
@@ -534,13 +535,19 @@ begin  -- architecture rtl
         end loop;
 
         offset := offset + 512;
-        for i in dummy_dout_2'range loop  -- 16 * 8 = 128
-          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2(i);
+        for i in dummy_dout_2a'range loop  -- 8 * 8 = 64
+          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2a(i);
         end loop;
 
-        lvector(31 + 512+128 downto 512+128) := dummy_dout_3;
+        offset := offset + 64;
+        for i in dummy_dout_2b'range loop  -- 8 * 8 = 64
+          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2b(i);
+        end loop;
 
-        offset := offset + 128+32;
+        offset := offset + 64;
+        lvector(offset+32 downto offset) := dummy_dout_3;
+
+        offset := offset + 32;
         for i in dummy_dout_4'range loop  -- 16 * 64 = 1024
           lvector(i*64 + 63 + offset downto i*64 + offset) := dummy_dout_4(i);
         end loop;
@@ -571,8 +578,8 @@ begin  -- architecture rtl
     end process;
 
 
-    mpgm_gen : for i in 0 to 7 generate
-      mpgm : SNPS_RF_SP_UHS_256x64
+    mpgm_gen : for i in dummy_dout_1'range generate
+      mpram00 : SNPS_RF_SP_UHS_256x64
         port map (
           Q        => dummy_dout_1(i),
           ADR      => dummy_addr(7 downto 0),
@@ -592,10 +599,31 @@ begin  -- architecture rtl
           BC2      => '0');
     end generate;
 
-    gmem_gen : for i in 0 to 15 generate
-      gmem : SNPS_RF_SP_UHS_1024x8
+    gmem1_gen : for i in dummy_dout_2a'range generate
+      gmem1: SNPS_RF_SP_UHS_1024x8
         port map (
-          Q        => dummy_dout_2(i),
+          Q        => dummy_dout_2a(i),
+          ADR      => dummy_addr(9 downto 0),
+          D        => dummy_din(7 downto 0),
+          WE       => dummy_we(8 + i),
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+    end generate;
+    
+    gmem2_gen : for i in dummy_dout_2b'range generate
+      gmem2: SNPS_RF_SP_UHS_1024x8
+        port map (
+          Q        => dummy_dout_2b(i),
           ADR      => dummy_addr(9 downto 0),
           D        => dummy_din(7 downto 0),
           WE       => dummy_we(8 + i),
@@ -613,7 +641,7 @@ begin  -- architecture rtl
           BC2      => '0');
     end generate;
 
-    fifo_gen_1 : SNPS_RF_SP_UHS_1024x32
+    fifo_memory : SNPS_RF_SP_UHS_1024x32
       port map (
         Q        => dummy_dout_3,
         ADR      => dummy_addr(9 downto 0),
@@ -632,8 +660,8 @@ begin  -- architecture rtl
         BC1      => '0',
         BC2      => '0');
 
-    ve_l_gen : for i in 0 to 15 generate
-      ve_l : SNPS_RF_SP_UHS_256x64
+    ve_l_gen : for i in dummy_dout_4'range generate
+      buf_1 : SNPS_RF_SP_UHS_256x64
         port map (
           Q        => dummy_dout_4(i),
           ADR      => dummy_addr(7 downto 0),
@@ -653,8 +681,8 @@ begin  -- architecture rtl
           BC2      => '0');
     end generate;
 
-    ve_r_gen : for i in 0 to 15 generate
-      ve_r : SNPS_RF_SP_UHS_256x64
+    ve_r_gen : for i in dummy_dout_5'range generate
+      buf_0 : SNPS_RF_SP_UHS_256x64
         port map (
           Q        => dummy_dout_5(i),
           ADR      => dummy_addr(7 downto 0),
@@ -673,9 +701,8 @@ begin  -- architecture rtl
           BC1      => '0',
           BC2      => '0');
     end generate;
-
-    ve_bias_gen : for i in 0 to 15 generate
-      ve_bias : SNPS_RF_SP_UHS_64x64
+    ve_bias_gen : for i in dummy_dout_6'range generate
+      buf_bias : SNPS_RF_SP_UHS_64x64
         port map (
           Q        => dummy_dout_6(i),
           ADR      => dummy_addr(5 downto 0),
@@ -695,8 +722,8 @@ begin  -- architecture rtl
           BC2      => '0');
     end generate;
 
-    cm_clust_gen : for i in 0 to 3 generate
-      cm_clust : SNPS_SP_HD_8Kx128
+    cm_clust_gen : for i in dummy_dout_7'range generate
+      clustermem : SNPS_SP_HD_8Kx128
         port map (
           Q        => dummy_dout_7(i),
           ADR      => dummy_addr(12 downto 0),
@@ -716,8 +743,8 @@ begin  -- architecture rtl
           BC2      => '0');
     end generate;
 
-    rm_gen : for i in 0 to 31 generate
-      rm : SNPS_SP_HD_16Kx8
+    rm_gen : for i in dummy_dout_8'range generate
+      root_memory_inst : SNPS_SP_HD_8Kx128
         port map (
           Q        => dummy_dout_8(i),
           ADR      => dummy_addr(13 downto 0),

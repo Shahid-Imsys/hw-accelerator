@@ -32,6 +32,9 @@ use work.data_types_pack.all;
 
 entity digital_chip is
 
+  generic (
+    g_simulation      : boolean := false
+    );
   port (
     -- PLL reference clock
     pll_ref_clk : inout  std_logic;
@@ -353,7 +356,8 @@ begin  -- architecture rtl
   i_digital_top : entity work.digital_top 
     generic map
       (
-        g_clock_frequency => 31  -- system clock frequency in MHz
+        g_clock_frequency => 31,  -- system clock frequency in MHz
+        g_simulation => g_simulation
         )
       port map (
         pll_ref_clk    => pll_ref_clk_in,

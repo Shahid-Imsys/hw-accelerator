@@ -82,7 +82,8 @@ entity core is
     hold_flash_d: in std_logic;
     flash_en    : out std_logic;
     flash_mode  : out std_logic_vector (3 downto 0);
-	  ld_dqi_flash: in std_logic;
+    clock_sel   : out std_logic;
+    ld_dqi_flash: in std_logic;
     -- Control signals to/from the oscillator and PLL
     pll_frange  : out std_logic;  -- Frequency range select
     pll_n       : out std_logic_vector(5 downto 0);   -- Multiplier
@@ -668,7 +669,8 @@ begin
     c2_t_rp       <= t_rp     ;  
 --    c2_en_mexec   <= en_mexec ;  
     short_cycle <= short_cycle_int;
-    
+
+  clock_sel <= clk_sel;
     
 ---------------------------------------------------------------------
 -- TIM - timing logic
@@ -753,6 +755,7 @@ begin
   rst_n <= rst_n_int;
   clk_e_pos <= clk_e_pos_int;
   clk_e_neg <= clk_e_neg_int;
+
 ---------------------------------------------------------------------
 -- CLC
 ---------------------------------------------------------------------

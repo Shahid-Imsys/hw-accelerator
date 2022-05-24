@@ -104,6 +104,8 @@ entity top is
     MPMIC_CORE : out std_logic;
     MPMIC_IO   : out std_logic;
 
+    -- Clok control signals
+    clock_sel    : out std_logic;
     clock_in_off : out std_logic;
 
     -- Analog internal signals
@@ -136,6 +138,7 @@ entity top is
     ext_ildout : out std_logic;
     ext_inext  : out std_logic;
     ext_idi    : out std_logic_vector(7 downto 0);
+
 
     -- Port A
     pa_i  : in  std_logic_vector(7 downto 0);
@@ -1304,7 +1307,7 @@ begin
   dis_bmem <= dis_bmem_int;
 
   clock_in_off <= clk_in_off;
-
+  
   -----------------------------------------------------------------------------
   -- core
   -----------------------------------------------------------------------------
@@ -1330,6 +1333,7 @@ begin
       din_u        => din_u,  --: out std_logic;  -- D input to FF generating clk_u
       din_s        => din_s,  --: out std_logic;  -- D input to FF generating clk_s
       clk_in_off   => clk_in_off,
+      clock_sel    => clock_sel,
       clk_main_off => clk_main_off,
       sdram_en     => sdram_en,
       --flash Control   -coreflag

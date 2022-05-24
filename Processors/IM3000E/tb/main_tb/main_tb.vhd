@@ -89,6 +89,7 @@ begin  -- architecture tb
       clk_rx  => '0', -- TODO
       clk_tx  => '0', -- TODO
       MRESET  => MRESET,
+      rst_n   => MRESET,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,

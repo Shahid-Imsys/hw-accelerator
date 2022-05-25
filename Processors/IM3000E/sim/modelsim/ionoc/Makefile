@@ -7,7 +7,7 @@ all: work rtl tb
 rtl:
 	$(COMP) $(COMP_RTL_FLAGS)     \
 	$(IONOC_DIR_WIN)/gp_pkg.vhd \
-	$(IONOC_DIR_WIN)/ionoc.vhd
+	$(PROJECT_PATH)/Digital_core/src/ionoc.vhd
 
 tb: ospi_tb
 

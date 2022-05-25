@@ -313,7 +313,7 @@ begin
   LED(6)          <= not pa_o(6) when pa_en(6) = '1' else not PA6_SCK;
   LED(5)          <= not pa_o(5) when pa_en(5) = '1' else not PA5_CS_N;
   LED(4)          <= not pa_o(0) when pa_en(0) = '1' else not PA0_SIN;
-  LED(3 downto 0) <= std_logic_vector(counter34(33 downto 30));
+  LED(3 downto 0) <= std_logic_vector(counter34(28 downto 25));
 
   PA7_SOUT <= pa_p(7);
   pa_i(7)  <= PA7_SOUT;

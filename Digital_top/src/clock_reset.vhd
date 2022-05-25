@@ -8,7 +8,6 @@ entity clock_reset is
   port (
     pll_clk : in  std_ulogic;
     pll_ref_clk : in std_ulogic;
-    enet_clk : in  std_logic;
     spi_sclk : in  std_logic;
     clk_p   : out std_logic;
     clk_rx  : out std_logic;

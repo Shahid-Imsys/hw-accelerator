@@ -1,0 +1,22 @@
+#!/bin/bash
+
+rm -R ../../../To_RacyICS
+
+current_dir=$PWD;
+
+mkdir -p ../../../To_RacyICS/Processors/IM4000/src
+(cd ../Processors/IM3000E/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../../To_RacyICS/Processors/IM4000/src)
+
+
+mkdir -p ../../../To_RacyICS/Digital_core/src
+(cd ../Digital_core/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../../To_RacyICS/Digital_core/src)
+
+mkdir -p ../../../To_RacyICS/Digital_chip/src
+(cd ../Digital_chip/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../../To_RacyICS/Digital_chip/src)
+
+mkdir -p ../../../To_RacyICS/Accelerator/src
+#(cd ../Accelerator/Emulator_version_demo/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t ../../../To_RacyICS/Accelerator/src)
+
+mkdir -p ../../../To_RacyICS/IP
+cp -r ../IP/ ../../../To_RacyICS/
+

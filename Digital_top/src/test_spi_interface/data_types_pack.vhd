@@ -7,7 +7,7 @@ use work.register_pack_spi_test.all;
 package data_types_pack is
 
   type output_pad_config_record_t is record
-    ds  : std_logic_vector(1 downto 0);
+    ds  : mclkout_ds_t;
     sr  : std_logic;
     co  : std_logic;
     odp : std_logic;
@@ -15,18 +15,18 @@ package data_types_pack is
   end record output_pad_config_record_t;
 
   type input_pad_config_record_t is record
-    ste : std_logic_vector(1 downto 0);
+    ste : msdin_ste_t;
     pd  : std_logic;
     pu  : std_logic;
   end record input_pad_config_record_t;
   
   type inoutput_pad_config_record_t is record
-    ds  : std_logic_vector(1 downto 0);
+    ds  : emem_d0_out_ds_t; -- Using d0 for d0..7 
     sr  : std_logic;
     co  : std_logic;
     odp : std_logic;
     odn : std_logic;
-    ste : std_logic_vector(1 downto 0);
+    ste : emem_d0_in_ste_t; -- Using d0 for d0..7 
     pd  : std_logic;
     pu  : std_logic;
   end record inoutput_pad_config_record_t;

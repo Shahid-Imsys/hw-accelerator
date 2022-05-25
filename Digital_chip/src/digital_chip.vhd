@@ -360,7 +360,7 @@ begin  -- architecture rtl
         HCLK    => dco_clk(0),
         pll_locked => pll_locked,
         MRESET  => mreset,
-        MRSTOUT => mrstout_n,  -- Missing pad.
+        MRSTOUT => mrstout,  -- Missing pad.
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
         MCKOUT1 => MCKOUT1,
@@ -461,7 +461,7 @@ begin  -- architecture rtl
         pwr_ok   => pwr_ok,
         vdd_bmem => '0',
         VCC18LP  => '1',
-        rxout    => mrxout,
+        rxout    => mrxout_out,
         adc_bits => adc_bits
       );
 
@@ -477,12 +477,12 @@ begin  -- architecture rtl
         pad => mclkout,
         --GPIO
         do  => mckout0,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.mclkout.ds & "00",
+        sr  => pad_config.mclkout.sr,
+        co  => pad_config.mclkout.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.mclkout.odp,
+        odn => pad_config.mclkout.odn
         );
 
     i_msdin : entity work.input_pad
@@ -493,9 +493,9 @@ begin  -- architecture rtl
         pad => msdin,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.msdin.ste,
+        pd  => pad_config.msdin.pd,
+        pu  => pad_config.msdin.pu,
         di  => msdin_in
         );
 
@@ -507,12 +507,12 @@ begin  -- architecture rtl
         pad => msdout,
         --GPIO
         do  => msdout_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.msdout.ds & "00",
+        sr  => pad_config.msdout.sr,
+        co  => pad_config.msdout.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.msdout.odp,
+        odn => pad_config.msdout.odn
         );
 
     i_mirqout_pad : entity work.output_pad  
@@ -523,12 +523,12 @@ begin  -- architecture rtl
         pad => mirqout,
         --GPIO
         do  => mirqout_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.mirqout.ds & "00",
+        sr  => pad_config.mirqout.sr,
+        co  => pad_config.mirqout.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.mirqout.odp,
+        odn => pad_config.mirqout.odn
         );
     
     i_mirq0_pad : entity work.input_pad
@@ -539,9 +539,9 @@ begin  -- architecture rtl
         pad => mirq0_n,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.mirq0.ste,
+        pd  => pad_config.mirq0.pd,
+        pu  => pad_config.mirq0.pd,
         di  => mirq0
         );
     
@@ -553,9 +553,9 @@ begin  -- architecture rtl
         pad => mirq1_n,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.mirq1.ste,
+        pd  => pad_config.mirq1.pd,
+        pu  => pad_config.mirq1.pd,
         di  => mirq1
         );
 
@@ -571,12 +571,12 @@ begin  -- architecture rtl
         pad => utx,
         --GPIO
         do  => pj_o(0),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.utx.ds & "00",
+        sr  => pad_config.utx.sr,
+        co  => pad_config.utx.co,
         oe  => pj_en(0),
-        odp => '0',
-        odn => '0'
+        odp => pad_config.utx.odp,
+        odn => pad_config.utx.odn
         );
 
     i_urx_pad : entity work.input_pad
@@ -587,9 +587,9 @@ begin  -- architecture rtl
         pad => urx,
         --GPI
         ie  => pj_en(1),
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.urx.ste,
+        pd  => pad_config.urx.pd,
+        pu  => pad_config.urx.pu,
         di  => pj_i(1)
         );
 
@@ -601,15 +601,15 @@ begin  -- architecture rtl
         pad => emem_d0,
         -- GPIO
         do  => ospi_dq_out(0),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d0.ds & "00",
+        sr  => pad_config.emem_d0.sr,
+        co  => pad_config.emem_d0.sr,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d0.odp,
+        odn => pad_config.emem_d0.odn,
+        ste => pad_config.emem_d0.ste,
+        pd  => pad_config.emem_d0.pd,
+        pu  => pad_config.emem_d0.pu,
         di  => ospi_dq_in(0)
         );
 
@@ -621,15 +621,15 @@ begin  -- architecture rtl
         pad => emem_d1,
         -- GPIO
         do  => ospi_dq_out(1),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d1.ds & "00",
+        sr  => pad_config.emem_d1.sr,
+        co  => pad_config.emem_d1.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d1.odp,
+        odn => pad_config.emem_d1.odn,
+        ste => pad_config.emem_d1.ste,
+        pd  => pad_config.emem_d1.pd,
+        pu  => pad_config.emem_d1.pu,
         di  => ospi_dq_in(1)
         );
 
@@ -641,15 +641,15 @@ begin  -- architecture rtl
         pad => emem_d2,
         -- GPIO
         do  => ospi_dq_out(2),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d2.ds & "00",
+        sr  => pad_config.emem_d2.sr,
+        co  => pad_config.emem_d2.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d2.odp,
+        odn => pad_config.emem_d2.odn,
+        ste => pad_config.emem_d2.ste,
+        pd  => pad_config.emem_d2.pd,
+        pu  => pad_config.emem_d2.pu,
         di  => ospi_dq_in(2)
         );
 
@@ -661,15 +661,15 @@ begin  -- architecture rtl
         pad => emem_d3,
         -- GPIO
         do  => ospi_dq_out(3),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d3.ds & "00",
+        sr  => pad_config.emem_d3.sr,
+        co  => pad_config.emem_d3.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d3.odp,
+        odn => pad_config.emem_d3.odn,
+        ste => pad_config.emem_d3.ste,
+        pd  => pad_config.emem_d3.pd,
+        pu  => pad_config.emem_d3.pu,
         di  => ospi_dq_in(3)
         );
 
@@ -681,15 +681,15 @@ begin  -- architecture rtl
         pad => emem_d4,
         -- GPIO
         do  => ospi_dq_out(4),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d4.ds & "00",
+        sr  => pad_config.emem_d4.sr,
+        co  => pad_config.emem_d4.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d4.odp,
+        odn => pad_config.emem_d4.odn,
+        ste => pad_config.emem_d4.ste,
+        pd  => pad_config.emem_d4.pd,
+        pu  => pad_config.emem_d4.pu,
         di  => ospi_dq_in(4)
         );
 
@@ -701,15 +701,15 @@ begin  -- architecture rtl
         pad => emem_d5,
         -- GPIO
         do  => ospi_dq_out(5),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d5.ds & "00",
+        sr  => pad_config.emem_d5.sr,
+        co  => pad_config.emem_d5.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d5.odp,
+        odn => pad_config.emem_d5.odn,
+        ste => pad_config.emem_d5.ste,
+        pd  => pad_config.emem_d5.pd,
+        pu  => pad_config.emem_d5.pu,
         di  => ospi_dq_in(5)
         );
 
@@ -721,15 +721,15 @@ begin  -- architecture rtl
         pad => emem_d6,
         -- GPIO
         do  => ospi_dq_out(6),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d6.ds & "00",
+        sr  => pad_config.emem_d6.sr,
+        co  => pad_config.emem_d6.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d6.odp,
+        odn => pad_config.emem_d6.odn,
+        ste => pad_config.emem_d6.ste,
+        pd  => pad_config.emem_d6.pd,
+        pu  => pad_config.emem_d6.pu,
         di  => ospi_dq_in(6)
         );
 
@@ -741,15 +741,15 @@ begin  -- architecture rtl
         pad => emem_d7,
         -- GPIO
         do  => ospi_dq_out(7),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_d7.ds & "00",
+        sr  => pad_config.emem_d7.sr,
+        co  => pad_config.emem_d7.co,
         oe  => ospi_dq_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_d7.odp,
+        odn => pad_config.emem_d7.odn,
+        ste => pad_config.emem_d7.ste,
+        pd  => pad_config.emem_d7.pd,
+        pu  => pad_config.emem_d7.pu,
         di  => ospi_dq_in(7)
         );
 
@@ -761,12 +761,12 @@ begin  -- architecture rtl
         pad => emem_clk,
         --GPIO
         do  => ospi_ck_p,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_clk.ds & "00",
+        sr  => pad_config.emem_clk.sr,
+        co  => pad_config.emem_clk.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.emem_clk.odp,
+        odn => pad_config.emem_clk.odn
         );
 
     --i_emem_clk_n_pad : entity work.output_pad  
@@ -793,15 +793,15 @@ begin  -- architecture rtl
         pad => emem_rwds,
         -- GPIO
         do  => ospi_rwds_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_rwds.ds & "00",
+        sr  => pad_config.emem_rwds.sr,
+        co  => pad_config.emem_rwds.co,
         oe  => ospi_rwds_enable, 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.emem_rwds.odp,
+        odn => pad_config.emem_rwds.odn,
+        ste => pad_config.emem_rwds.ste,
+        pd  => pad_config.emem_rwds.pd,
+        pu  => pad_config.emem_rwds.pu,
         di  => ospi_rwds_in
         );
 
@@ -813,12 +813,12 @@ begin  -- architecture rtl
         pad => emem_cs_n,
         --GPIO
         do  => ospi_cs_n,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_cs_n.ds & "00",
+        sr  => pad_config.emem_cs_n.sr,
+        co  => pad_config.emem_cs_n.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.emem_cs_n.odp,
+        odn => pad_config.emem_cs_n.odn
         );
 
     i_emem_rst_n_pad : entity work.output_pad  
@@ -829,12 +829,12 @@ begin  -- architecture rtl
         pad => emem_rst_n,
         --GPIO
         do  => ospi_reset_n,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.emem_rst_n.ds & "00",
+        sr  => pad_config.emem_rst_n.sr,
+        co  => pad_config.emem_rst_n.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.emem_rst_n.odp,
+        odn => pad_config.emem_rst_n.odn
         );
 
     ---------------------------------------------------------------------------
@@ -853,12 +853,12 @@ begin  -- architecture rtl
         pad => aout0,
         --GPIO
         do  => dac0_bits,
-        ds  => "1000",
-        sr  => '1', -- pad_config.aout0.sr
-        co  => '0',
+        ds  => pad_config.aout0.ds & "00",
+        sr  => pad_config.aout0.sr,
+        co  => pad_config.aout0.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.aout0.odp,
+        odn => pad_config.aout0.odn
         );
 
     i_aout1_pad : entity work.output_pad  
@@ -869,28 +869,26 @@ begin  -- architecture rtl
         pad => aout1,
         --GPIO
         do  => dac1_bits,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.aout1.ds & "00",
+        sr  => pad_config.aout1.sr,
+        co  => pad_config.aout1.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.aout1.odp,
+        odn => pad_config.aout1.odn
         );
 
-    i_ach0_pad : entity work.output_pad  
+    i_ach0_pad : entity work.input_pad
       generic map (
-        direction =>  horizontal)
+        direction => horizontal)
       port map (
         -- PAD
         pad => ach0,
-        --GPIO
-        do  => adc_bits,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
-        oe  => '1',
-        odp => '0',
-        odn => '0'
+        --GPI
+        ie  => '1',
+        ste => pad_config.ach0.ste,
+        pd  => pad_config.ach0.pd,
+        pu  => pad_config.ach0.pu,
+        di  => adc_bits
         );
 
     i_enet_mdio_pad : entity work.inoutput_pad
@@ -901,15 +899,15 @@ begin  -- architecture rtl
         pad => enet_mdio,
         -- GPIO
         do  => enet_mdout,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_mdio.ds & "00",
+        sr  => pad_config.enet_mdio.sr,
+        co  => pad_config.enet_mdio.co,
         oe  => '1', 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.enet_mdio.odp,
+        odn => pad_config.enet_mdio.odn,
+        ste => pad_config.enet_mdio.ste,
+        pd  => pad_config.enet_mdio.pd,
+        pu  => pad_config.enet_mdio.pu,
         di  => enet_mdin
         );
 
@@ -921,12 +919,12 @@ begin  -- architecture rtl
         pad => enet_mdc,
         --GPIO
         do  => enet_mdc_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_mdc.ds & "00",
+        sr  => pad_config.enet_mdc.sr,
+        co  => pad_config.enet_mdc.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.enet_mdc.odp,
+        odn => pad_config.enet_mdc.odn
         );
 
     i_enet_txer_pad : entity work.output_pad  
@@ -937,12 +935,12 @@ begin  -- architecture rtl
         pad => enet_txer,
         --GPIO
         do  => enet_txer_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_txer.ds & "00",
+        sr  => pad_config.enet_txer.sr,
+        co  => pad_config.enet_txer.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.enet_txer.odp,
+        odn => pad_config.enet_txer.odn
         );
 
     i_enet_txd0_pad : entity work.output_pad  
@@ -953,12 +951,12 @@ begin  -- architecture rtl
         pad => enet_txd0,
         --GPIO
         do  => enet_txd0_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_txd0.ds & "00",
+        sr  => pad_config.enet_txd0.sr,
+        co  => pad_config.enet_txd0.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.enet_txd0.odp,
+        odn => pad_config.enet_txd0.odn
         );
 
     i_enet_txd1_pad : entity work.output_pad  
@@ -969,12 +967,12 @@ begin  -- architecture rtl
         pad => enet_txd1,
         --GPIO
         do  => enet_txd1_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_txd1.ds & "00",
+        sr  => pad_config.enet_txd1.sr,
+        co  => pad_config.enet_txd1.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.enet_txd1.odp,
+        odn => pad_config.enet_txd1.odn
         );
 
     i_enet_txen_pad : entity work.output_pad  
@@ -985,12 +983,12 @@ begin  -- architecture rtl
         pad => enet_txen,
         --GPIO
         do  => enet_txen_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.enet_txen.ds & "00",
+        sr  => pad_config.enet_txen.sr,
+        co  => pad_config.enet_txen.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.enet_txen.odp,
+        odn => pad_config.enet_txen.odn
         );
 
     i_enet_clk_pad : entity work.input_pad
@@ -1001,9 +999,9 @@ begin  -- architecture rtl
         pad => enet_clk,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.enet_clk.ste,
+        pd  => pad_config.enet_clk.pd,
+        pu  => pad_config.enet_clk.pu,
         di  => enet_clk_in
         );
 
@@ -1015,9 +1013,9 @@ begin  -- architecture rtl
         pad => enet_rxdv,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.enet_rxdv.ste,
+        pd  => pad_config.enet_rxdv.pd,
+        pu  => pad_config.enet_rxdv.pu,
         di  => enet_rxdv_in
         );
 
@@ -1029,9 +1027,9 @@ begin  -- architecture rtl
         pad => enet_rxd0,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.enet_rxd0.ste,
+        pd  => pad_config.enet_rxd0.pd,
+        pu  => pad_config.enet_rxd0.pu,
         di  => enet_rxd0_in
         );
 
@@ -1043,9 +1041,9 @@ begin  -- architecture rtl
         pad => enet_rxd1,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.enet_rxd1.ste,
+        pd  => pad_config.enet_rxd1.pd,
+        pu  => pad_config.enet_rxd1.pu,
         di  => enet_rxd1_in
         );
 
@@ -1057,9 +1055,9 @@ begin  -- architecture rtl
         pad => enet_rxer,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.enet_rxer.ste,
+        pd  => pad_config.enet_rxer.pd,
+        pu  => pad_config.enet_rxer.pu,
         di  => enet_rxer_in
         );
 
@@ -1085,9 +1083,9 @@ begin  -- architecture rtl
         pad => spi_cs_n,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.spi_cs_n.ste,
+        pd  => pad_config.spi_cs_n.pd,
+        pu  => pad_config.spi_cs_n.pu,
         di  => spi_cs_n_in
         );
 
@@ -1099,9 +1097,9 @@ begin  -- architecture rtl
         pad => spi_mosi,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.spi_mosi.ste,
+        pd  => pad_config.spi_mosi.pd,
+        pu  => pad_config.spi_mosi.pu,
         di  => spi_mosi_in
         );
 
@@ -1113,12 +1111,12 @@ begin  -- architecture rtl
         pad => spi_miso,
         --GPIO
         do  => spi_miso_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.spi_miso.ds & "00",
+        sr  => pad_config.spi_miso.sr,
+        co  => pad_config.spi_miso.co,
         oe  => spi_miso_oe,
-        odp => '0',
-        odn => '0'
+        odp => pad_config.spi_miso.odp,
+        odn => pad_config.spi_miso.odn
         );
 
     ---------------------------------------------------------------------------
@@ -1133,9 +1131,9 @@ begin  -- architecture rtl
         pad => pll_ref_clk,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        ste => pad_config.pll_ref_clk.ste,
+        pd  => pad_config.pll_ref_clk.pd,
+        pu  => pad_config.pll_ref_clk.pu,
         di  => pll_ref_clk_in
         );
 
@@ -1191,15 +1189,15 @@ begin  -- architecture rtl
         pad => pa0_sin,
         -- GPIO
         do  => pa_o(0),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pa0_sin.ds & "00",
+        sr  => pad_config.pa0_sin.sr,
+        co  => pad_config.pa0_sin.co,
         oe  => pa_en(0), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pa0_sin.odp,
+        odn => pad_config.pa0_sin.odn,
+        ste => pad_config.pa0_sin.ste,
+        pd  => pad_config.pa0_sin.pd,
+        pu  => pad_config.pa0_sin.pu,
         di  => pa_i(0)
         );
 
@@ -1211,15 +1209,15 @@ begin  -- architecture rtl
         pad => pa5_sin,
         -- GPIO
         do  => pa_o(5),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pa5_cs_n.ds & "00",
+        sr  => pad_config.pa5_cs_n.sr,
+        co  => pad_config.pa5_cs_n.co,
         oe  => pa_en(5), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pa5_cs_n.odp,
+        odn => pad_config.pa5_cs_n.odn,
+        ste => pad_config.pa5_cs_n.ste,
+        pd  => pad_config.pa5_cs_n.pd,
+        pu  => pad_config.pa5_cs_n.pu,
         di  => pa_i(5)
         );
 
@@ -1231,19 +1229,19 @@ begin  -- architecture rtl
         pad => pa6_sin,
         -- GPIO
         do  => pa_o(6),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pa6_sck.ds & "00",
+        sr  => pad_config.pa6_sck.sr,
+        co  => pad_config.pa6_sck.co,
         oe  => pa_en(6), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pa6_sck.odp,
+        odn => pad_config.pa6_sck.odn,
+        ste => pad_config.pa6_sck.ste,
+        pd  => pad_config.pa6_sck.pd,
+        pu  => pad_config.pa6_sck.pu,
         di  => pa_i(6)
         );
 
-    i_pa7_sck_pad : entity work.inoutput_pad
+    i_pa7_sout_pad : entity work.inoutput_pad
       generic map (
         direction => vertical)
       port map (
@@ -1251,15 +1249,15 @@ begin  -- architecture rtl
         pad => pa7_sin,
         -- GPIO
         do  => pa_o(7),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pa7_sout.ds & "00",
+        sr  => pad_config.pa7_sout.sr,
+        co  => pad_config.pa7_sout.co,
         oe  => pa_en(7), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pa7_sout.odp,
+        odn => pad_config.pa7_sout.odn,
+        ste => pad_config.pa7_sout.ste,
+        pd  => pad_config.pa7_sout.pd,
+        pu  => pad_config.pa7_sout.pu,
         di  => pa_i(7)
         );
 
@@ -1271,15 +1269,15 @@ begin  -- architecture rtl
         pad => pg0,
         -- GPIO
         do  => pg_o(0),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg0.ds & "00",
+        sr  => pad_config.pg0.sr,
+        co  => pad_config.pg0.co,
         oe  => pg_en(0), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg0.odp,
+        odn => pad_config.pg0.odn,
+        ste => pad_config.pg0.ste,
+        pd  => pad_config.pg0.pd,
+        pu  => pad_config.pg0.pu,
         di  => pg_i(0)
         );
 
@@ -1291,15 +1289,15 @@ begin  -- architecture rtl
         pad => pg1,
         -- GPIO
         do  => pg_o(1),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg1.ds & "00",
+        sr  => pad_config.pg1.sr,
+        co  => pad_config.pg1.co,
         oe  => pg_en(1), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg1.odp,
+        odn => pad_config.pg1.odn,
+        ste => pad_config.pg1.ste,
+        pd  => pad_config.pg1.pd,
+        pu  => pad_config.pg1.pu,
         di  => pg_i(1)
         );
 
@@ -1311,15 +1309,15 @@ begin  -- architecture rtl
         pad => pg2,
         -- GPIO
         do  => pg_o(2),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg2.ds & "00",
+        sr  => pad_config.pg2.sr,
+        co  => pad_config.pg2.co,
         oe  => pg_en(2), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg2.odp,
+        odn => pad_config.pg2.odn,
+        ste => pad_config.pg2.ste,
+        pd  => pad_config.pg2.pd,
+        pu  => pad_config.pg2.pu,
         di  => pg_i(2)
         );
 
@@ -1331,15 +1329,15 @@ begin  -- architecture rtl
         pad => pg3,
         -- GPIO
         do  => pg_o(3),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg3.ds & "00",
+        sr  => pad_config.pg3.sr,
+        co  => pad_config.pg3.co,
         oe  => pg_en(3), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg3.odp,
+        odn => pad_config.pg3.odn,
+        ste => pad_config.pg3.ste,
+        pd  => pad_config.pg3.pd,
+        pu  => pad_config.pg3.pu,
         di  => pg_i(3)
         );
 
@@ -1351,15 +1349,15 @@ begin  -- architecture rtl
         pad => pg4,
         -- GPIO
         do  => pg_o(4),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg4.ds & "00",
+        sr  => pad_config.pg4.sr,
+        co  => pad_config.pg4.co,
         oe  => pg_en(4), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg4.odp,
+        odn => pad_config.pg4.odn,
+        ste => pad_config.pg4.ste,
+        pd  => pad_config.pg4.pd,
+        pu  => pad_config.pg4.pu,
         di  => pg_i(4)
         );
 
@@ -1371,15 +1369,15 @@ begin  -- architecture rtl
         pad => pg5,
         -- GPIO
         do  => pg_o(5),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg5.ds & "00",
+        sr  => pad_config.pg5.sr,
+        co  => pad_config.pg5.co,
         oe  => pg_en(5), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg5.odp,
+        odn => pad_config.pg5.odn,
+        ste => pad_config.pg5.ste,
+        pd  => pad_config.pg5.pd,
+        pu  => pad_config.pg5.pu,
         di  => pg_i(5)
         );
 
@@ -1391,15 +1389,15 @@ begin  -- architecture rtl
         pad => pg6,
         -- GPIO
         do  => pg_o(6),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg6.ds & "00",
+        sr  => pad_config.pg6.sr,
+        co  => pad_config.pg6.co,
         oe  => pg_en(6), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg6.odp,
+        odn => pad_config.pg6.odn,
+        ste => pad_config.pg6.ste,
+        pd  => pad_config.pg6.pd,
+        pu  => pad_config.pg6.pu,
         di  => pg_i(6)
         );
 
@@ -1411,15 +1409,15 @@ begin  -- architecture rtl
         pad => pg7,
         -- GPIO
         do  => pg_o(7),
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.pg7.ds & "00",
+        sr  => pad_config.pg7.sr,
+        co  => pad_config.pg7.co,
         oe  => pg_en(7), 
-        odp => '0',
-        odn => '0',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
+        odp => pad_config.pg7.odp,
+        odn => pad_config.pg7.odn,
+        ste => pad_config.pg7.ste,
+        pd  => pad_config.pg7.pd,
+        pu  => pad_config.pg7.pu,
         di  => pg_i(7)
         );
 
@@ -1431,9 +1429,9 @@ begin  -- architecture rtl
         pad => mtest,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '1',
-        pu  => '0',
+        ste => pad_config.mtest.ste,
+        pd  => pad_config.mtest.pd,
+        pu  => pad_config.mtest.pu,
         di  => mtest_in
         );
     
@@ -1445,9 +1443,9 @@ begin  -- architecture rtl
         pad => mwake,
         --GPI
         ie  => '1',
-        ste => "00",
-        pd  => '1',
-        pu  => '0',
+        ste => pad_config.mwake.ste,
+        pd  => pad_config.mwake.pd,
+        pu  => pad_config.mwake.pu,
         di  => mwake_in
         );
     
@@ -1459,12 +1457,12 @@ begin  -- architecture rtl
         pad => mrxout,
         --GPIO
         do  => mrxout_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
+        ds  => pad_config.mrxout.ds & "00",
+        sr  => pad_config.mrxout.sr,
+        co  => pad_config.mrxout.co,
         oe  => '1',
-        odp => '0',
-        odn => '0'
+        odp => pad_config.mrxout.odp,
+        odn => pad_config.mrxout.odn
         );
 
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (

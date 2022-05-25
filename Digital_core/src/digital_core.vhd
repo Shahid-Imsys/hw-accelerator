@@ -63,6 +63,7 @@ entity digital_core is
     MPMIC_IO   : out std_logic;
 
     clock_in_off : out std_logic;
+    clock_sel    : out std_logic;
 
     -- Analog internal signals
     pwr_ok     : in  std_logic;         -- Power on detector output (active high)
@@ -173,6 +174,7 @@ begin  -- architecture rtl
       MSDOUT    => MSDOUT,
 
       clock_in_off => clock_in_off,
+      clock_sel    => clock_sel,
 
       -- IO-bus interface to NOC adapter
       ext_i_pos  => open,

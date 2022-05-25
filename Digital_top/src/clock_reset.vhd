@@ -92,7 +92,7 @@ begin  -- architecture rtl
   -- Clock section
   --------------------------------------
   
-  sel_pll_all <= mreset_n and pll_locked and spi_sel_pll;
+  sel_pll_all <= mreset_n and pll_locked and spi_sel_pll and not sel_pll;
   
   clk_mux_1 : entity work.clk_mux_top
      port map (

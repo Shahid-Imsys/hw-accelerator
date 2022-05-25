@@ -71,16 +71,19 @@ architecture tb of main_tb is
   signal OSPI_RWDS : std_logic;
   signal OSPI_rst_n : std_logic;
 
-  signal enet_mdio : std_logic := 'Z';
-
   signal spi_sclk : std_logic := '0';
   signal spi_cs_n : std_logic := '1';
   signal spi_mosi : std_logic := '0';
   
+  signal enet_mdio : std_logic := 'Z';
+
 begin  -- architecture tb
 
 
   dut : entity work.digital_chip
+    generic map (
+      g_simulation => true
+      )
     port map (
       pll_ref_clk    => MX1_CK,
       mreset_n  => MRESET,
@@ -168,7 +171,7 @@ begin  -- architecture tb
 
   -- Reset the circuit for 10 ns;
   MRESET <= '0', '1' after 10 ns;
-  preset_n <= '1', '1' after 5 ns;
+  preset_n <= '0', '1' after 5 ns;
 
   -- This emulates a 31.25 MHz crystal
   mx1_ck_int <= not mx1_ck_int after HALF_CLK_C_CYCLE;

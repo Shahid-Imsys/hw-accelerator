@@ -341,7 +341,6 @@ begin  -- architecture rtl
     port map (
       pll_clk     => hclk,
       pll_ref_clk => pll_ref_clk,
-      enet_clk    => '0',               -- TODO
       spi_sclk    => spi_sclk,
 
       mreset_n => mreset,
@@ -487,22 +486,11 @@ begin  -- architecture rtl
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
   
   asic_dummy_memories: if g_memory_type = asic and not g_simulation generate
-        --  signal dummy_dout_1   : slv64(7 downto 0);
-        --  signal dummy_dout_2   : slv8(15 downto 0);
-        --  signal dummy_dout_3   : std_logic_vector(31 downto 0);
-        --  signal dummy_dout_4   : slv64(15 downto 0);
-        --  signal dummy_dout_5   : slv64(15 downto 0);
-        --  signal dummy_dout_6   : slv64(15 downto 0);
-        --  signal dummy_dout_7   : slv128(3 downto 0);
-        --  signal dummy_dout_8   : slv8(31 downto 0);
-        --  signal dummy_addr     : std_logic_vector(12 downto 0);
-        --  signal dummy_din      : std_logic_vector(127 downto 0);
-        --  signal dummy_we       : std_logic_vector(108 downto 0);
   
     dummy_signal_proc: process( hclk )
         variable offset :  integer := 0;
         variable index   : integer := 0;
-        variable lvector : std_logic_vector(4511 downto 0);
+        variable lvector : std_logic_vector(4767 downto 0);
 
     begin
       if false then
@@ -523,7 +511,7 @@ begin  -- architecture rtl
         dummy_we       <= dummy_din(107 downto 0) & lvector(index);
         ospi_dq_in_int <= dummy_we(7 downto 0);
 
-        if index = 4511 then
+        if index = 4767 then
           index := 0;
         else
           index := index + 1;
@@ -545,7 +533,7 @@ begin  -- architecture rtl
         end loop;
 
         offset := offset + 64;
-        lvector(offset+32 downto offset) := dummy_dout_3;
+        lvector(offset+31 downto offset) := dummy_dout_3;
 
         offset := offset + 32;
         for i in dummy_dout_4'range loop  -- 16 * 64 = 1024
@@ -568,11 +556,11 @@ begin  -- architecture rtl
         end loop;
 
         offset := offset + 512;
-        for i in dummy_dout_8'range loop  -- 32 * 8 = 256
-          lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_8(i);
+        for i in dummy_dout_8'range loop  -- 4 * 128 = 512
+          lvector(i*128 + 127 + offset downto i*128 + offset) := dummy_dout_8(i);
         end loop;
 
-        --offset := offset + 256;
+        --offset := offset + 512;
 
       end if;
     end process;

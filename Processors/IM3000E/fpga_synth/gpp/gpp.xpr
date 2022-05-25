@@ -523,29 +523,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../src/fpga_top.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../src/pads/XMD.vhd">
         <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../src/pads/ZMA2GSD.vhd">
         <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../src/ext/FXPLL031HA0A_APGD.vhd">
-        <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -583,14 +568,6 @@
         <FileInfo>
           <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../../../Digital_chip/src/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/ri_adpll_gf22fdx_2gmp.v">
-        <FileInfo>
-          <Attr Name="UserDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -639,6 +616,47 @@
       <File Path="$PPRDIR/../../../../Digital_top/src/test_spi_interface/register_block_spi_test.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../fpga_top.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_256x64/SNPS_RF_SP_UHS_256x64_func.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x8/SNPS_RF_SP_UHS_1024x8_func.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_8Kx128/SNPS_SP_HD_8Kx128_func.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_64x64/SNPS_RF_SP_UHS_64x64_func.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x32/SNPS_RF_SP_UHS_1024x32_func.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>

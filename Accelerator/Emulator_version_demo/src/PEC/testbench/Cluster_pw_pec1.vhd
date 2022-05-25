@@ -572,7 +572,7 @@ wait for 5 ns;
 wait until rising_edge(clk_e);
             wait for 5 ns;
 
-assert false report "test" severity note;
+assert false report "pec1_test_done, start to reading out data from CM" severity note;
 progress <= 294911; 
             readmemword(outword);
 

@@ -5,4 +5,4 @@
 [submodule "fw-im3000e"]
 	path = fw-im3000e
 	url = https://imsystech@dev.azure.com/imsystech/Imsystech/_git/fw-im3000e
-	branch = master
+	branch = tmp-yliu

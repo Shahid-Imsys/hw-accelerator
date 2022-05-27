@@ -239,6 +239,7 @@ end component;
   signal delay_c      : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);--(31 downto 0);--(29  downto 0);
   signal delay_b      : std_logic_vector(TAG_CMD_DECODE_TIME-5 downto 0);
   signal rd_ena       : std_logic;
+  signal dataout_vld_o : std_logic;
   
   --signal one_c_delay :std_logic;
   --signal two_c_delay :std_logic;
@@ -494,10 +495,10 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				datain_vld <= '0';
 			elsif noc_cmd = "00011" or noc_cmd = "00101" then
-				if byte_ctr = "0000" then
-					datain_vld <= '0';
-				elsif sync_collector = "11" then
+				if sync_collector = "11" then
 					datain_vld <= '1';
+				elsif byte_ctr = "0000" then
+					datain_vld <= '0';
 				end if;
 			end if;
 		end if;
@@ -541,7 +542,7 @@ EVEN_P <= even_p_2;
         	            noc_write <= '0';
 			    	end if;
 			    elsif noc_cmd = "00100" then
-			    	if byte_ctr = "1111" and sync_collector= "11" then
+			    	if sync_collector= "11" then
 			    		noc_reg_rdy <= '1';
         	            noc_read <= '1';
 			    	else 
@@ -554,6 +555,13 @@ EVEN_P <= even_p_2;
         	        noc_read <= '0';   
 	    	    end if;
 			end if;
+		end if;
+	end process;
+	--one clock delay of noc_read to load data in noc_data_out register to output port
+	process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			dataout_vld_o <= dataout_vld;
 		end if;
 	end process;
 	--Write data from DATA port byte by byte to the noc_data_in register
@@ -571,14 +579,15 @@ EVEN_P <= even_p_2;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (dataout_vld,byte_ctr,noc_data_out)
-
+	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
     begin
-	    if dataout_vld = '1' then
-	        DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
-	    else
-	        DATA_OUT <= (others => '0');
-        end if;
+		if rising_edge(clk_e) then
+	    	if dataout_vld = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
+	    	else
+	    	    DATA_OUT <= (others => '0');
+        	end if;
+		end if;
 	end process;
     --This process writes lenth counter, noc address pointer counter, package
 	--counter and distance counter with data from tag line under the control of 
@@ -923,7 +932,7 @@ begin
 	end if;
 end process;
 
-CLK_O <= dataout_vld and clk_e;
+CLK_O <= dataout_vld_o and clk_e;
 
 process(clk_e)
 begin

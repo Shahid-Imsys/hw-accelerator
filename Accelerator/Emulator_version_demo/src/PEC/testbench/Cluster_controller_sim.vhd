@@ -289,14 +289,60 @@ end send15bits;
 
 procedure sendmemword (constant word : in mem_word)is
 begin
-  tag_in <= '1';
-  wait until rising_edge(clk_e);  --2 clock cycle extended pulse
+  data <= word(15);
+  wait until rising_edge(clk_e);
 wait for 5ns;
+  data <= word(14);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(13);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(12);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(11);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(10);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(9);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(8);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(7);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(6);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(5);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(4);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(3);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  tag_in <= '1';
+  data <= word(2);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(1);
   wait until rising_edge(clk_e);
 wait for 5ns;
   tag_in <= '0';
+  data <= word(0);
   wait until rising_edge(clk_e);
 wait for 5ns;
+end sendmemword;
+
+procedure sendlastmemword (constant word : in mem_word)is
+begin
   data <= word(15);
   wait until rising_edge(clk_e);
 wait for 5ns;
@@ -345,7 +391,20 @@ wait for 5ns;
   data <= word(0);
   wait until rising_edge(clk_e);
 wait for 5ns;
-end sendmemword;
+end sendlastmemword;
+
+  procedure sendreadpulse is
+  begin
+    tag_in <= '1';
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+    tag_in <= '0';
+    wait for 13*CLK_E_CYCLE;
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+  end sendreadpulse;
 
 procedure readmemword (signal outword : out out_word) is
 begin
@@ -410,10 +469,20 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+---Data trasnfer with sync pulses
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=63;
-for i in 0 to 63 loop
+for i in 0 to 62 loop
   sendmemword(conv_to_memword(param_pw(i)));
 end loop;
+  sendlastmemword(conv_to_memword(param_pw(63)));
 progress <=7;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -432,26 +501,10 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
---------------------16 words from now on
-wait for 16*CLK_E_CYCLE;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
+
+for i in 0 to 8 loop
+  sendreadpulse;
+end loop;
 
 wait for 300000ns;
 assert false report "Simulation End" severity Error;

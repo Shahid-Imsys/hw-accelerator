@@ -46,7 +46,6 @@ architecture tb of ionoc_tb is
           NOC_CMD      : in  std_logic_vector(7 downto 0);      -- Command byte
           GPP_CMD_ACK  : out std_logic;  -- GPP ready
           NOC_CMD_Flag : in  std_logic;  -- NOC asks to send byte
-          NOC_CMD_EN   : in  std_logic;  -- Command byte valid
           --
           TxFIFO_Ready : out std_logic;  -- Interface can accept a word from the TxIFO
           TxFIFO_Valid : in  std_logic;  -- TxFIFO has availble data which is presented on bus
@@ -64,19 +63,33 @@ architecture tb of ionoc_tb is
   type fsm_t is (
     reset,
     init,
-    send_cmd,
-    write_data,
-    poll_done1,
-    req_gpp_access,
-    poll_done2,
-    read_data,
-    poll_done3,
-    write_fifo_data_fr_noc,
-    write_fifo_data_fr_gpp1,
-    write_fifo_data_fr_gpp2,
-    poll_done4,
-    read_fifo_data_to_gpp,
-    poll_done5,
+    test1_wrio_addr,
+    test1_wrio_data,
+    test1_iowr_pollstatus,
+    --
+    test2_nocrd_flag,
+    test2_nocrd_ack,
+    test2_nocrd_pollstatus,
+    --
+    test3_nocwr_data,
+    test3_nocwr_flag,
+    test3_nocwr_ack,
+    --
+    test4_iord_pollstatus_set,
+    test4_iord_data,
+    test4_iord_pollstatus_reset,
+    --
+    test5_write_fifo_data_fr_noc,
+    test5_pollstatus_set,
+    --
+    test6_write_fifo_data_fr_gpp1,
+    test6_write_fifo_data_fr_gpp2,
+    test6_pollstatus_set,
+    test6_read_fifo_data,
+    test6_pollstatus_reset,
+    --
+    test7_read_fifo_data_to_gpp,
+    test7_pollstatus_reset,
     wait_done,
     done);
 
@@ -114,7 +127,6 @@ architecture tb of ionoc_tb is
   signal NOC_CMD_ACK  : std_logic                    := '0';
   signal NOC_CMD      : std_logic_vector(7 downto 0) := (others => '0');
   signal NOC_CMD_Flag : std_logic                    := '0';
-  signal NOC_CMD_EN   : std_logic                    := '0';
 
   signal GPP_CMD      : std_logic_vector(127 downto 0);
   signal GPP_CMD_Flag : std_logic;
@@ -166,15 +178,12 @@ begin
       idack        <= '1';
       --
       NOC_CMD_ACK  <= '0';
-      NOC_CMD_EN   <= '0';
       NOC_CMD      <= (others => '-');
       --
       TxFIFO_Valid <= '0';
-      RxFIFO_Ready <= '1';
-
-      if GPP_CMD_ACK = '1' then
-        NOC_CMD_Flag <= '0';
-      end if;
+      RxFIFO_Ready <= '0';
+      --
+      NOC_CMD_Flag <= '0';
 
       -- Delays
       fsm_d <= fsm;
@@ -186,6 +195,7 @@ begin
         when done =>
           if fsm_count = 32 then
             run <= '0';
+            --
             write(l, string'("Done"));
             writeline(output, l);
           end if;
@@ -202,11 +212,18 @@ begin
 
         when init =>
           if clk_count(1 downto 0) = "11" then
-            fsm       <= send_cmd;
+            fsm       <= test1_wrio_addr;
             fsm_count <= 0;
+            --
+            write(l, string'("[TEST START] - Test 1"));
+            writeline(output, l);
           end if;
 
-        when send_cmd =>
+        -------------------------------------------
+        -- TEST1 - GPP writes 128 bit data to NOC
+        -- Write 0x433F3B37332F2B27231F1B1778563412
+        -------------------------------------------
+        when test1_wrio_addr =>
           if fsm_count < 4 then
             idi   <= ionoc_cmd_address;
             ilioa <= '0';
@@ -214,12 +231,13 @@ begin
 
           if fsm_count = 3 then
             fsm_count <= 0;
-            fsm       <= write_data;
-            write(l, string'("IO bus is writing data to NOC interface"));
+            fsm       <= test1_wrio_data;
+            --
+            write(l, string'("GPP is writing data to NOC interface"));
             writeline(output, l);
           end if;
 
-        when write_data =>
+        when test1_wrio_data =>
 
           if fsm_count < 4 then
             idi   <= ionoc_cmd_address;
@@ -245,13 +263,15 @@ begin
           end if;
 
           if fsm_count = 67 then
-            fsm       <= poll_done1;
-            write(l, string'("Waiting for NOC to read command word"));
-            writeline(output, l);
+            fsm       <= test1_iowr_pollstatus;
             fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished writing word to NOC interface: 0x"));
+            write(l, string'("433F3B37332F2B27231F1B1778563412"));
+            writeline(output, l);
           end if;
 
-        when poll_done1 =>
+        when test1_iowr_pollstatus =>
           -- Poll status until word is read by noc
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
@@ -260,30 +280,111 @@ begin
             inext <= '0';
           end if;
 
-          if GPP_CMD_Flag = '1' and NOC_CMD_ACK = '1' then
-            fsm <= req_gpp_access;
-            write(l, string'("IO bus is waiting for NOC to present byte response"));
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(0) = '1' then
+              fsm <= test2_nocrd_flag;
+              --
+              write(l, string'("[STATUS] Word to NOC is pending"));
+              writeline(output, l);
+              --
+              write(l, string'("[TEST START] - Test 2"));
+              writeline(output, l);
+            else
+              write(l, string'("WARNING: Word to NOC not yet pending!"));
+              writeline(output, l);
+            end if;
+          end if;
+
+        -----------------------------------------------------
+        -- TEST2 - Present 128 bit data to NOC which reads it
+        -----------------------------------------------------
+        when test2_nocrd_flag =>
+          if GPP_CMD_Flag = '1' then
+            fsm         <= test2_nocrd_ack;
+            NOC_CMD_ACK <= '1';
+            --
+            write(l, string'("[NOC] Read 0x"));
+            hwrite(l, GPP_CMD);
             writeline(output, l);
+          end if;
+
+        when test2_nocrd_ack =>
+          NOC_CMD_ACK <= '1';
+          if GPP_CMD_Flag = '0' then
+            fsm <= test2_nocrd_pollstatus;
+            --
+            write(l, string'("NOC is done reading word"));
+            writeline(output, l);
+          end if;
+
+        when test2_nocrd_pollstatus =>
+          -- Poll status until word is read by noc
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else                          -- if fsm_count < 8 then
+            inext <= '0';
           end if;
 
           if fsm_count = 7 then
-            fsm_count   <= 0;
-            NOC_CMD_ACK <= '1';
-            write(l, string'("NOC_CMD_ACK high"));
-            writeline(output, l);
+            fsm_count <= 0;
+            if ido(0) = '0' and ido(2) = '1' then
+              fsm <= test3_nocwr_data;
+              --
+              write(l, string'("[STATUS] Word to NOC has been read"));
+              writeline(output, l);
+              --
+              write(l, string'("[TEST START] - Test 3"));
+              writeline(output, l);
+              --
+            else
+              write(l, string'("WARNING: Word to NOC not yet pending!"));
+              writeline(output, l);
+            end if;
           end if;
 
-        when req_gpp_access =>
+        -------------------------------------------
+        -- TEST3 - NOC writes 8 bit data to GPP
+        -- Write 0x77
+        -------------------------------------------
+        when test3_nocwr_data =>
+          fsm     <= test3_nocwr_flag;
+          NOC_CMD <= x"77";
+          --
+          write(l, string'("[NOC] Presenting data to NOC interface: 0x"));
+          write(l, string'("77"));
+          writeline(output, l);
+
+        when test3_nocwr_flag =>
           NOC_CMD_Flag <= '1';
-
+          NOC_CMD      <= x"77";
           if GPP_CMD_ACK = '1' then
-            fsm <= poll_done2;
-            write(l, string'("GPP will accept NOC comand byte"));
+            fsm <= test3_nocwr_ack;
+            --
+            write(l, string'("Interface ACK'd 0x"));
+            hwrite(l, NOC_CMD);
             writeline(output, l);
           end if;
 
-        when poll_done2 =>
-          -- Poll status until NOC has byte for GPP
+        when test3_nocwr_ack =>
+          if GPP_CMD_ACK = '0' then
+            fsm       <= test4_iord_pollstatus_set;
+            fsm_count <= 0;
+            --
+            write(l, string'("NOC is done writing byte"));
+            writeline(output, l);
+            --
+            write(l, string'("[TEST START] - Test 4"));
+            writeline(output, l);
+          end if;
+
+        -------------------------------------------
+        -- TEST4 - GPP reads 8 bit data from NOC
+        -- Expect 0x77
+        -------------------------------------------
+        when test4_iord_pollstatus_set =>
+          -- Poll status until byte is written by NOC
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
@@ -294,18 +395,17 @@ begin
           if fsm_count = 7 then
             fsm_count <= 0;
             if ido(1) = '1' then
-              fsm <= read_data;
-              write(l, string'("Reading NOC byte"));
+              fsm <= test4_iord_data;
+              --
+              write(l, string'("[STATUS] Byte to GPP is pending"));
               writeline(output, l);
             else
-              NOC_CMD_EN <= '1';
-              NOC_CMD    <= x"77";
-              write(l, string'("NOC flags byte available"));
+              write(l, string'("WARNING: Byte to GPP not yet pending!"));
               writeline(output, l);
             end if;
           end if;
 
-        when read_data =>
+        when test4_iord_data =>
           --
           if fsm_count < 4 then
             idi   <= ionoc_cmd_address;
@@ -316,16 +416,16 @@ begin
 
           if fsm_count = 7 then
             fsm_count <= 0;
-            fsm       <= poll_done3;
-            write(l, string'("IO-bus got 0x"));
+            fsm       <= test4_iord_pollstatus_reset;
+            write(l, string'("[GPP] Read 0x"));
             hwrite(l, ido);
             writeline(output, l);
-
-            write(l, string'("Waiting to idle status"));
+            --
+            write(l, string'("Waiting for idle status (no longer pending)"));
             writeline(output, l);
           end if;
 
-        when poll_done3 =>
+        when test4_iord_pollstatus_reset =>
           -- Poll status until there is nothing for the GPP
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
@@ -336,13 +436,31 @@ begin
 
           if fsm_count = 7 then
             fsm_count <= 0;
-            if ido(1 downto 0) = "00" then
-              fsm <= write_fifo_data_fr_noc;
+            if ido(1 downto 0) = "00" then  -- Or just bit 1
+              fsm <= test5_write_fifo_data_fr_noc;
+              --
+              write(l, string'("[STATUS] Byte to GPP is not pending"));
+              writeline(output, l);
+              --
+              write(l, string'("[TEST START] - Test 5"));
+              writeline(output, l);
+            else
+              write(l, string'("WARNING: Byte to GPP is still pending!"));
+              writeline(output, l);
             end if;
           end if;
 
-        when write_fifo_data_fr_noc =>
-          TxFIFO_Valid            <= '1';
+        -------------------------------------------
+        -- TEST5 - Write FIFO data from NOC
+        --
+        -------------------------------------------
+        when test5_write_fifo_data_fr_noc =>
+          TxFIFO_Valid <= '1';
+          if TxFIFO_Valid = '0' then
+            write(l, string'("[NOC] Presenting data to TxFIFO"));
+            writeline(output, l);
+          end if;
+          --
           for b in 0 to 15 loop
             TxFIFO_Data(8*b + 7 downto 8*b) <=
               conv_std_logic_vector(17 * b+1, 8);
@@ -352,14 +470,46 @@ begin
             if fsm_count = 1-1 then     -- nr_of_words - 1
               TxFIFO_Valid <= '0';
               --
-              fsm          <= write_fifo_data_fr_gpp1;
+              fsm          <= test5_pollstatus_set;
               fsm_count    <= 0;
+              --
+              write(l, string'("[TxFIFO] Data accepted"));
+              writeline(output, l);
             end if;
           else
             fsm_count <= fsm_count;     -- Keep
           end if;
 
-        when write_fifo_data_fr_gpp1 =>
+        when test5_pollstatus_set =>
+          -- Poll status until byte is available to the RxFIFO
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else                          -- if fsm_count < 8 then
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(7) = '1' then
+              fsm <= test6_write_fifo_data_fr_gpp1;
+              --
+              write(l, string'("[STATUS] TxFIFO Data from NOC is pending"));
+              writeline(output, l);
+              --
+              write(l, string'("[TEST START] - Test 6"));
+              writeline(output, l);
+            else
+              write(l, string'("WARNING: TxFIFO Data from NOC not yet pending!"));
+              writeline(output, l);
+            end if;
+          end if;
+
+        -------------------------------------------
+        -- TEST6 - Write FIFO data from GPP
+        --
+        -------------------------------------------
+        when test6_write_fifo_data_fr_gpp1 =>
           if fsm_count < 4 then
             idi   <= ionoc_data_address;
             ilioa <= '0';
@@ -367,12 +517,13 @@ begin
 
           if fsm_count = 3 then
             fsm_count <= 0;
-            fsm       <= write_fifo_data_fr_gpp2;
-            write(l, string'("IO bus is writing data to FIFO interface"));
+            fsm       <= test6_write_fifo_data_fr_gpp2;
+            --
+            write(l, string'("GPP is writing data to RxFIFO (interface buffer)"));
             writeline(output, l);
           end if;
 
-        when write_fifo_data_fr_gpp2 =>
+        when test6_write_fifo_data_fr_gpp2 =>
           ildout <= '0';
           if fsm_count = 0 then
             idi <= x"11";
@@ -384,19 +535,55 @@ begin
             idi <= x"33";
           elsif fsm_count < 12 then
             idi <= x"44";
-          elsif fsm_count < 68 then
+          elsif fsm_count < 64 then
             idi <= conv_std_logic_vector((fsm_count / 4) * 17 + 34, 8);
           end if;
 
-          if fsm_count = 67 then
-            fsm       <= poll_done4;
-            write(l, string'("Waiting for FIFO to read data"));
-            writeline(output, l);
+          if fsm_count = 63 then
+            fsm       <= test6_pollstatus_set;
             fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished writing data to interface: 0x"));
+            write(l, string'("[TBD]"));
+            writeline(output, l);
+            --
+            --write(l, string'("Waiting for RxFIFO to read data from interface"));
+            --writeline(output, l);
           end if;
 
-        when poll_done4 =>
-          -- Poll status until FIFO has read the data
+        when test6_pollstatus_set =>
+          -- Poll status until byte is available to the RxFIFO
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else                          -- if fsm_count < 8 then
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(6) = '1' then
+              fsm <= test6_read_fifo_data;
+              --
+              write(l, string'("[STATUS] Data to RxFIFO is pending"));
+              writeline(output, l);
+            else
+              write(l, string'("WARNING: Data to RxFIFO not yet pending!"));
+              writeline(output, l);
+            end if;
+          end if;
+
+        when test6_read_fifo_data =>
+          if RxFIFO_Valid = '1' then
+              fsm          <= test6_pollstatus_reset;
+              RxFIFO_Ready <= '1';
+              --
+              write(l, string'("[RxFIFO] Data accepted"));
+              writeline(output, l);
+          end if;
+
+        when test6_pollstatus_reset =>
+          -- Poll status until there is nothing for the RxFIFO
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
@@ -407,13 +594,29 @@ begin
           if fsm_count = 7 then
             fsm_count <= 0;
             if ido(6) = '0' then
-              fsm <= read_fifo_data_to_gpp;
-              write(l, string'("NOC has read FIFO word"));
+              fsm <= test7_read_fifo_data_to_gpp;
+              --
+              write(l, string'("[STATUS] Data to RxFIFO is no longer pending"));
+              writeline(output, l);
+              --
+              write(l, string'("[TEST START] - Test 7"));
+              writeline(output, l);
+            else
+              write(l, string'("WARNING: Data to RxFIFO is still pending!"));
               writeline(output, l);
             end if;
           end if;
 
-        when read_fifo_data_to_gpp =>
+        -------------------------------------------
+        -- TEST7 - Read FIFO data to GPP
+        --
+        -------------------------------------------
+        when test7_read_fifo_data_to_gpp =>
+          if fsm_count = 0 then
+            write(l, string'("GPP is reading data from interface buffer (from TxFIFO)"));
+            writeline(output, l);
+          end if;
+
           if fsm_count < 4 then
             idi   <= ionoc_data_address;
             ilioa <= '0';
@@ -423,18 +626,20 @@ begin
           end if;
 
           if fsm_count = 67 then
-            fsm       <= poll_done5;
-            -- write(l, string'(""));
-            -- writeline(output, l);
+            fsm       <= test7_pollstatus_reset;
             fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished reading data from the interface: 0x"));
+            write(l, string'("[TBD]"));
+            writeline(output, l);
           end if;
 
-        when poll_done5 =>
-          -- Poll status until FIFO has read the data
+        when test7_pollstatus_reset =>
+          -- Poll status until there is nothing for the RxFIFO
           if fsm_count < 4 then
             idi   <= ionoc_status_address;
             ilioa <= '0';
-          else
+          else                          -- if fsm_count < 8 then
             inext <= '0';
           end if;
 
@@ -442,7 +647,14 @@ begin
             fsm_count <= 0;
             if ido(7) = '0' then
               fsm <= wait_done;
-              write(l, string'("GPP has read FIFO word"));
+              --
+              write(l, string'("[STATUS] Data to GPP from TxFIFO is no longer pending"));
+              writeline(output, l);
+              --
+              --write(l, string'("[TEST START] - Test 8"));
+              --writeline(output, l);
+            else
+              write(l, string'("WARNING: Data from TxFIFO is still pending!"));
               writeline(output, l);
             end if;
           end if;
@@ -486,7 +698,6 @@ begin
       NOC_CMD      => NOC_CMD,
       GPP_CMD_ACK  => GPP_CMD_ACK,
       NOC_CMD_Flag => NOC_CMD_Flag,
-      NOC_CMD_EN   => NOC_CMD_EN,
       TxFIFO_Ready => TxFIFO_Ready,
       TxFIFO_Valid => TxFIFO_Valid,
       TxFIFO_Data  => TxFIFO_Data,

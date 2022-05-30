@@ -53,14 +53,13 @@ entity ionoc is
         idack        : in  std_logic;   -- I/O bus DMA Ack
         idreq        : out std_logic;   -- I/O bus DMA Request
         -- GPP to NOC
-        GPP_CMD      : out std_logic_vector(127 downto 0);    -- Command word
-        GPP_CMD_Flag : out std_logic;   -- Command word valid
-        NOC_CMD_ACK  : in  std_logic;   -- NOC ready
+        GPP_CMD      : out std_logic_vector(127 downto 0); -- Command word
+        GPP_CMD_Flag : out std_logic;                      -- Command word valid
+        NOC_CMD_ACK  : in  std_logic;                      -- NOC ready
         -- NOC to GPP
+        NOC_CMD_Flag : in  std_logic;   -- NOC command byte is valid
         NOC_CMD      : in  std_logic_vector(7 downto 0);      -- Command byte
-        GPP_CMD_ACK  : out std_logic;   -- GPP ready
-        NOC_CMD_Flag : in  std_logic;   -- NOC asks to send byte
-        NOC_CMD_EN   : in  std_logic;   -- Command byte valid
+        GPP_CMD_ACK  : out std_logic;   -- GPP ack of command byte
         --
         TxFIFO_Ready : out std_logic;  -- Interface can accept a word from the TxIFO
         TxFIFO_Valid : in  std_logic;  -- TxFIFO has availble data which is presented on bus
@@ -98,6 +97,7 @@ architecture rtl of ionoc is
   ---------------------------------------------------------
   -- noc_cmd_proc
   signal GPP_CMD_Flag_int   : std_logic;
+  signal GPP_CMD_ACK_int    : std_logic;
   --
   signal ionoc_rdcmd        : std_logic_vector(7 downto 0);
   --
@@ -122,7 +122,7 @@ architecture rtl of ionoc is
 begin
 
 -- Concurrent statements
-  GPP_CMD_Flag <= GPP_CMD_Flag_int;
+  GPP_CMD_ACK  <= GPP_CMD_ACK_int;
   TxFIFO_Ready <= '0' when ionoc_rddata_pending else '1';
 
 -- Interrupt in cmd available
@@ -134,7 +134,7 @@ begin
   ionoc_rdstatus(1) <= '1' when ionoc_byte_pending else
                        '0';  -- Byte is recieved from NOC, but not read by IO-bus
   ionoc_rdstatus(2) <= '1' when innoc_word_isread else
-                       '0';             -- Word is read by NOC
+                       '0';  -- Word is read by NOC
 
   ionoc_rdstatus(5 downto 3) <= (others => '0');
 
@@ -203,11 +203,12 @@ begin
   begin
     if rst_n = '0' then
       -- Outputs
-      GPP_CMD     <= (others => '0');
-      GPP_CMD_ACK <= '0';
+      GPP_CMD      <= (others => '0');
+      GPP_CMD_Flag <= '0';
 
       -- Process signals
       GPP_CMD_Flag_int <= '0';
+      GPP_CMD_ACK_int  <= '0';
 
       ionoc_rdcmd        <= (others => '0');
       --
@@ -219,14 +220,6 @@ begin
       innoc_word_isread  <= false;
 
     elsif rising_edge(clk_p) then
-
-      -- Defaults
-      GPP_CMD_ACK <= '0';
-
-      if NOC_CMD_ACK = '1' then
-        ionoc_word_pending <= false;    -- Reset flag when word is processed
-        innoc_word_isread  <= true;
-      end if;
 
       ------------------------------------------------------------
       -- Handle write index and word pending flag
@@ -249,40 +242,44 @@ begin
       -- New complete word from IO bus
       if ionoc_word_pending then
         GPP_CMD_Flag_int <= '1';
+        GPP_CMD_Flag     <= GPP_CMD_Flag_int;
         for b in ionoc_wrcmd'range loop
           GPP_CMD(8*b+7 downto 8*b) <= ionoc_wrcmd(b);
         end loop;
       end if;
 
       -- NOC has read the word
-      if GPP_CMD_Flag_int = '1' and NOC_CMD_ACK = '1' then
+      if NOC_CMD_ACK = '1' and ionoc_word_pending then
         -- GPP_CMD_Flag_int = '1' a bit redundant but more resistant against stray ACKs
         GPP_CMD_Flag_int <= '0';
+        GPP_CMD_Flag     <= '0';
+        --
+        ionoc_word_pending <= false;    -- Reset flag when word is processed
+        innoc_word_isread  <= true;
       end if;
 
       ------------------------------------------------------------
       --  Handle incomming command and byte pending flag
-
-      -- NOC has sent byte
-      if NOC_CMD_EN = '1' and not ionoc_byte_pending then
-        ionoc_byte_pending <= true;
-      end if;
 
       -- IO-bus has read byte
       if cmd_rd = '1' and clk_i_pos = '0' then
         ionoc_byte_pending <= false;
       end if;
 
-      -- NOC has command byte available
+      -- NOC has sent cmd
       if NOC_CMD_Flag = '1' and not ionoc_byte_pending then
-        GPP_CMD_ACK <= '1';
+        -- Store incomming byte
+        GPP_CMD_ACK_int    <= '1';
+        --
+        ionoc_rdcmd        <= NOC_CMD;
+        ionoc_byte_pending <= true;
       end if;
 
-      -- NOC has sent cmd
-      if NOC_CMD_EN = '1' and not ionoc_byte_pending then
-        -- Store incomming byte
-        ionoc_rdcmd <= NOC_CMD;
+      -- NOC has seen the ACK
+      if NOC_CMD_Flag = '0' and ionoc_byte_pending then
+        GPP_CMD_ACK_int <= '0';
       end if;
+
 
     end if;  -- clk_p
   end process;  -- noc_cmd_proc
@@ -315,19 +312,18 @@ begin
       elsif data_wr = '1' and clk_i_pos = '0' then
         -- IO bus writes to word cache
         ionoc_wrdata(ionoc_datawrindex) <= idi;
-        ionoc_wrdata_pending            <= false;
+        ionoc_wrdata_pending            <= false;  -- Reset pending flag when word is updated
         --
         if ionoc_datawrindex /= (ionoc_wrdata'length - 1) then
           ionoc_datawrindex    <= ionoc_datawrindex + 1;
-          ionoc_wrdata_pending <= false;  -- Reset pending flag when word is updated
         else
-          ionoc_wrdata_pending <= true;   -- Done!
           ionoc_datawrindex    <= 0;
+          ionoc_wrdata_pending <= true;   -- Done!
         end if;
       end if;
 
       -- FIFO Interface
-      if ionoc_wrdata_pending then
+      if ionoc_wrdata_pending and RxFIFO_Ready = '0' then
         RxFIFO_Valid <= '1';
         for b in ionoc_wrdata'range loop
           RxFIFO_Data(8*b + 7 downto 8*b) <= ionoc_wrdata(b);

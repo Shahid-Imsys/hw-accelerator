@@ -40,7 +40,7 @@ CLK_P            : in std_logic;     --PE clocks
 CLK_E            : in std_logic;     --PE's execution clock 
 RST_E            : out std_logic;
 
-CLK_O            : in std_logic;
+DDO_VLD            : in std_logic;
 
 TAG              : out std_logic;
 TAG_FB           : in std_logic;
@@ -203,6 +203,8 @@ constant kernels_len: std_logic_vector(14 DOWNTO 0) := "000000011010111";--215, 
 constant bias_len   : std_logic_vector(14 DOWNTO 0) := "000000000010001";--17, 18 words
 constant data_len   : std_logic_vector(14 DOWNTO 0) := "000111111111111";--4095, 4096 WORDS
 constant pw_out_len : std_logic_vector(14 downto 0) := "100011111111111";--18431, 18432 WORDS.
+constant CLK_P_CYCLE : time := 15 ns;
+constant CLK_E_CYCLE : time := 30 ns;
 
 begin 
 
@@ -324,6 +326,60 @@ wait for 5ns;
   data <= word(3);
   wait until rising_edge(clk_e);
 wait for 5ns;
+  tag_in <= '1';
+  data <= word(2);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(1);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  tag_in <= '0';
+  data <= word(0);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+end sendmemword;
+
+procedure sendlastmemword (constant word : in mem_word)is
+begin
+  data <= word(15);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(14);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(13);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(12);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(11);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(10);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(9);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(8);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(7);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(6);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(5);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(4);
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  data <= word(3);
+  wait until rising_edge(clk_e);
+wait for 5ns;
   data <= word(2);
   wait until rising_edge(clk_e);
 wait for 5ns;
@@ -333,16 +389,21 @@ wait for 5ns;
   data <= word(0);
   wait until rising_edge(clk_e);
 wait for 5ns;
-end sendmemword;
+end sendlastmemword;
 
-procedure readmemword (signal outword : out out_word) is
+procedure sendreadpulse is
 begin
-  for i in 0 to 294911 loop
-  outword(i) <= data_out;
+  tag_in <= '1';
   wait until rising_edge(clk_e);
-wait for 5ns;
-  end loop;
-end readmemword;
+  wait for 5ns;
+  wait until rising_edge(clk_e);
+  wait for 5ns;
+  tag_in <= '0';
+  wait for 13*CLK_E_CYCLE;
+  wait until rising_edge(clk_e);
+  wait for 5ns;
+end sendreadpulse;
+
 
 procedure sendpedata (constant word: in std_logic_vector(31 downto 0)) is
 begin
@@ -398,10 +459,19 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=63;
-for i in 0 to 63 loop
+for i in 0 to 62 loop
   sendmemword(conv_to_memword(param_pw(i)));
 end loop;
+  sendlastmemword(conv_to_memword(param_pw(63)));
 progress <=7;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -425,10 +495,19 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=4095;
-for i in 0 to 4095 loop
+for i in 0 to 4094 loop
   sendmemword(conv_to_memword(data_pw(i)));
 end loop;
+  sendlastmemword(conv_to_memword(data_pw(4095)));
 progress <=7;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -452,10 +531,19 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=215;
-for i in 0 to 215 loop
+for i in 0 to 214 loop
   sendmemword(conv_to_memword(kernel_pw(i)));
 end loop;
+  sendlastmemword(conv_to_memword(kernel_pw(215)));
 progress <=8;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -479,10 +567,19 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=17;
-for i in 0 to 17 loop
+for i in 0 to 16 loop
   sendmemword(conv_to_memword(bias_pw(i)));
 end loop;
+  sendlastmemword(conv_to_memword(bias_pw(17)));
 progress <=9;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -507,10 +604,19 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+tag_in <= '1';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
 progress <=41;
-for i in 0 to 255 loop
-sendmemword(conv_to_memword(ucode_pw(i)));
-end loop;
+for i in 0 to 254 loop
+  sendmemword(conv_to_memword(ucode_pw(i)));
+  end loop;
+    sendlastmemword(conv_to_memword(ucode_pw(255)));
 data <= (others => '0');
 progress <=5;
 wait until tag_fb = '0'; 
@@ -565,6 +671,11 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+
+for i in 0 to 18431 loop
+  sendreadpulse;
+end loop;
+  
 wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
@@ -574,7 +685,45 @@ wait until rising_edge(clk_e);
 
 assert false report "pec2_test_done, start to reading out data from CM" severity note;
 progress <= 294911; 
-            readmemword(outword);
+            --readmemword(outword);
+
+              
+  --for i in 0 to 18431 loop
+  --  out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
+  --                outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
+  --                outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
+  --                outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
+  --  wait for 1 ns;
+  --  assert (out_ram(i) = ref_out(i)) report "Incorrect output data in PEC2 "&integer'image(i) severity warning;
+  --  --assert (out_ram(i) /= ref_out(i)) report "Correct output data "&integer'image(j) severity note;
+  --end loop;
+
+           
+           
+  --progress <=5;
+ -- wait until tag_fb = '0';
+
+
+            --wait for 1000ns;
+  --TEST_DONE <= '1';
+--  finish; --assert false report "Simulation End" severity Error;          
+wait;
+
+end process;
+
+--read result
+process
+  procedure readmemword (signal outword : out out_word) is
+  begin
+    wait until ddo_vld = '1';
+    for i in 0 to 294911 loop
+    outword(i) <= data_out;
+    wait until rising_edge(clk_e);
+  wait for 5ns;
+    end loop;
+  end readmemword;
+begin
+  readmemword(outword);
 
               
   for i in 0 to 18431 loop
@@ -589,15 +738,12 @@ progress <= 294911;
 
             
             
-  progress <=5;
+  --progress <=5;
  -- wait until tag_fb = '0';
 
 
             wait for 1000ns;
   TEST_DONE <= '1';
---  finish; --assert false report "Simulation End" severity Error;          
---wait;
-
 end process;
 TAG<=tag_in;
 tag_out <= TAG_FB; 

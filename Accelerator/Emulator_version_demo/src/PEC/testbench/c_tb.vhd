@@ -43,7 +43,7 @@ component PEC_top
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
     RST_E  : in std_logic;
-	  clk_O  : out std_logic;
+	  DDO_VLD  : out std_logic;
 	  TAG    : in std_logic;
 	  TAG_FB : out std_logic;
     C_RDY  : out std_logic;
@@ -56,7 +56,7 @@ component PEC_top
     CLK_P            : in std_logic;     --PE clocks
     CLK_E            : in std_logic;     --PE's execution clock 
     RST_E            : out std_logic;
-    CLK_O            : in std_logic;
+    DDO_VLD            : in std_logic;
     TAG              : out std_logic;
     TAG_FB           : in std_logic;
     c_rdy            : in std_logic; 
@@ -71,7 +71,7 @@ component PEC_top
      CLK_P            : in std_logic;     --PE clocks
      CLK_E            : in std_logic;     --PE's execution clock 
      RST_E            : out std_logic;
-     CLK_O            : in std_logic;
+     DDO_VLD            : in std_logic;
      TAG              : out std_logic;
      TAG_FB           : in std_logic;
      c_rdy            : in std_logic;  
@@ -85,7 +85,7 @@ component PEC_top
  signal clk_e : std_logic;
   --signals for PEC1
  signal rst_e_1 : std_logic;
- signal clk_o_1 : std_logic;
+ signal ddo_vld_1 : std_logic;
  signal tag_1   : std_logic;
  signal tag_fb_1 : std_logic;
  signal c_rdy_1 : std_logic;
@@ -94,7 +94,7 @@ component PEC_top
  signal test_done_1: std_logic;
  --signals for PEC2
  signal rst_e_2 : std_logic;
- signal clk_o_2 : std_logic;
+ signal ddo_vld_2 : std_logic;
  signal tag_2   : std_logic;
  signal tag_fb_2 : std_logic;
  signal c_rdy_2 : std_logic;
@@ -132,7 +132,7 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_1,
-clk_o => clk_o_1,
+ddo_vld => ddo_vld_1,
 tag => tag_1,
 tag_fb => tag_fb_1,
 c_rdy => c_rdy_1,
@@ -144,7 +144,7 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_2,
-clk_o => clk_o_2,
+ddo_vld => ddo_vld_2,
 tag => tag_2,
 tag_fb => tag_fb_2,
 c_rdy => c_rdy_2,
@@ -156,7 +156,7 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_1,
-clk_o => clk_o_1,
+ddo_vld => ddo_vld_1,
 tag => tag_1,
 tag_fb => tag_fb_1,
 c_rdy => c_rdy_1,
@@ -169,7 +169,7 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_2,
-clk_o => clk_o_2,
+ddo_vld => ddo_vld_2,
 tag => tag_2,
 tag_fb => tag_fb_2,
 c_rdy => c_rdy_2,

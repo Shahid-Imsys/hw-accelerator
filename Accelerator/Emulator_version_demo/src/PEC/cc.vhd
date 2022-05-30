@@ -46,7 +46,7 @@ use work.all;
 
 entity cluster_controller is
 	generic(
-		TAG_CMD_DECODE_TIME : integer := 37     --Number of clock cycles for peci_busy to deassert
+		TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
 												--To be moved to defines
 		);
 
@@ -59,7 +59,7 @@ entity cluster_controller is
 	    --RST_P            : in std_logic;
 		RST_E            : in std_logic; --active low --For reset clk_e generator
 	--Clock outputs
-		CLK_O            : out std_logic;    --not needed in this version
+		DDO_VLD            : out std_logic;    --Output data valid port
 		EVEN_P           : out std_logic;    --To PE and network
 	--Tag line
 		TAG              : in std_logic;
@@ -239,6 +239,7 @@ end component;
   signal delay_c      : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);--(31 downto 0);--(29  downto 0);
   signal delay_b      : std_logic_vector(TAG_CMD_DECODE_TIME-5 downto 0);
   signal rd_ena       : std_logic;
+  signal dataout_vld_o : std_logic;
   
   --signal one_c_delay :std_logic;
   --signal two_c_delay :std_logic;
@@ -413,7 +414,7 @@ EVEN_P <= even_p_2;
 			    	delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
 			elsif noc_cmd = "00100" then
-				if noc_reg_rdy= '1' and len_ctr = "111111111111111" then  
+				if byte_ctr = "0000" and len_ctr = "111111111111111" then  
 					delay <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
 						delay_c(0) <= '1';
@@ -494,10 +495,10 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				datain_vld <= '0';
 			elsif noc_cmd = "00011" or noc_cmd = "00101" then
-				if byte_ctr = "0000" then
-					datain_vld <= '0';
-				elsif sync_collector = "11" then
+				if sync_collector = "11" then
 					datain_vld <= '1';
+				elsif byte_ctr = "0000" then
+					datain_vld <= '0';
 				end if;
 			end if;
 		end if;
@@ -541,7 +542,7 @@ EVEN_P <= even_p_2;
         	            noc_write <= '0';
 			    	end if;
 			    elsif noc_cmd = "00100" then
-			    	if byte_ctr = "1111" and sync_collector= "11" then
+			    	if sync_collector= "11" then
 			    		noc_reg_rdy <= '1';
         	            noc_read <= '1';
 			    	else 
@@ -556,6 +557,14 @@ EVEN_P <= even_p_2;
 			end if;
 		end if;
 	end process;
+	--one clock delay of noc_read to load data in noc_data_out register to output port
+	process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			dataout_vld_o <= dataout_vld;
+		end if;
+	end process;
+	DDO_VLD <= dataout_vld_o;
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e)--(noc_cmd, byte_ctr, delay, DATA)
 	begin
@@ -571,14 +580,15 @@ EVEN_P <= even_p_2;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (dataout_vld,byte_ctr,noc_data_out)
-
+	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
     begin
-	    if dataout_vld = '1' then
-	        DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
-	    else
-	        DATA_OUT <= (others => '0');
-        end if;
+		if rising_edge(clk_e) then
+	    	if dataout_vld = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
+	    	else
+	    	    DATA_OUT <= (others => '0');
+        	end if;
+		end if;
 	end process;
     --This process writes lenth counter, noc address pointer counter, package
 	--counter and distance counter with data from tag line under the control of 
@@ -923,7 +933,7 @@ begin
 	end if;
 end process;
 
-CLK_O <= dataout_vld and clk_e;
+--CLK_O <= dataout_vld_o and clk_e;
 
 process(clk_e)
 begin

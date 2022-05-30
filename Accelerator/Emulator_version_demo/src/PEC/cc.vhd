@@ -237,7 +237,7 @@ end component;
   signal write_count  : std_logic_vector(1 downto 0); --Wr req data counter
   --Delay signal
   signal delay_c      : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);--(31 downto 0);--(29  downto 0);
-  signal delay_b      : std_logic_vector(TAG_CMD_DECODE_TIME-5 downto 0);
+  signal delay_b      : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal rd_ena       : std_logic;
   signal dataout_vld_o : std_logic;
   

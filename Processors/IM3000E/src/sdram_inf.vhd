@@ -89,13 +89,17 @@ begin
   fix_toreq2_p : process (row_addr_2) is
   begin  -- process fix_toreq2_p
     toReq_c2                                   <= (others => '0');
-    toReq_c2(to_integer(unsigned(row_addr_2))) <= '1';
+    if unsigned(row_addr_2) < MEMNUM then -- Verify that adress is whitin memory.
+      toReq_c2(to_integer(unsigned(row_addr_2))) <= '1';
+      end if;
   end process fix_toreq2_p;
 
   fix_toreq1_p : process (row_addr_1) is
   begin  -- process fix_toreq2_p
     toReq_c1                                   <= (others => '0');
-    toReq_c1(to_integer(unsigned(row_addr_1))) <= '1';
+    if unsigned(row_addr_1) < MEMNUM then -- Verify that adress is whitin memory.
+      toReq_c1(to_integer(unsigned(row_addr_1))) <= '1';
+    end if;
   end process fix_toreq1_p;
 
   fix_to_req_g : for i in toReq_c2'range generate

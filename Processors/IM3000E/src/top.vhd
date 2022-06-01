@@ -78,12 +78,12 @@ entity top is
     );
   port (
     -- clocks and control signals
-    clk_p  : in std_logic;              -- clk input
+    clk_p  : in std_logic;                    -- clk input
     clk_rx : in std_logic;
     clk_tx : in std_logic;
 
     MRESET     : in  std_logic;         -- system reset, active low
-    rst_n      : in std_logic;
+    rst_n      : in  std_logic;
     MRSTOUT    : out std_logic;         -- Reset output
     MIRQOUT    : out std_logic;         -- interrupt request output
     MCKOUT0    : out std_logic;         -- for trace adapter
@@ -109,7 +109,7 @@ entity top is
     clock_in_off : out std_logic;
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;         -- Power on detector output (active high)
+    pwr_ok     : in  std_logic;  -- Power on detector output (active high)
     dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
     vdd_bmem   : in  std_logic;         -- Power for the BMEM block
     VCC18LP    : in  std_logic;         -- Power for the RTC block
@@ -117,10 +117,10 @@ entity top is
     ach_sel0   : out std_logic;         -- ADC channel select, bit 0
     ach_sel1   : out std_logic;         -- ADC channel select, bit 1
     ach_sel2   : out std_logic;         -- ADC channel select, bit 2
-    adc_bits   : in  std_logic;         -- Bitstream from the analog part of ADC
-    adc_ref2v  : out std_logic;         -- Select 2V internal ADC reference (1V)
-    adc_extref : out std_logic;         -- Select external ADC reference (internal)
-    adc_diff   : out std_logic;         -- Select differential ADC mode (single-ended)
+    adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
+    adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
+    adc_extref : out std_logic;  -- Select external ADC reference (internal)
+    adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
     dac1_bits  : out std_logic;         -- Bitstream to DAC1
@@ -229,208 +229,34 @@ architecture struct of top is
       );
   end component;
 
-
---ROM0
-  component SP180_4096X80BM1A
-    port(
-      A0   : in  std_logic;
-      A1   : in  std_logic;
-      A2   : in  std_logic;
-      A3   : in  std_logic;
-      A4   : in  std_logic;
-      A5   : in  std_logic;
-      A6   : in  std_logic;
-      A7   : in  std_logic;
-      A8   : in  std_logic;
-      A9   : in  std_logic;
-      A10  : in  std_logic;
-      A11  : in  std_logic;
-      DO0  : out std_logic;
-      DO1  : out std_logic;
-      DO2  : out std_logic;
-      DO3  : out std_logic;
-      DO4  : out std_logic;
-      DO5  : out std_logic;
-      DO6  : out std_logic;
-      DO7  : out std_logic;
-      DO8  : out std_logic;
-      DO9  : out std_logic;
-      DO10 : out std_logic;
-      DO11 : out std_logic;
-      DO12 : out std_logic;
-      DO13 : out std_logic;
-      DO14 : out std_logic;
-      DO15 : out std_logic;
-      DO16 : out std_logic;
-      DO17 : out std_logic;
-      DO18 : out std_logic;
-      DO19 : out std_logic;
-      DO20 : out std_logic;
-      DO21 : out std_logic;
-      DO22 : out std_logic;
-      DO23 : out std_logic;
-      DO24 : out std_logic;
-      DO25 : out std_logic;
-      DO26 : out std_logic;
-      DO27 : out std_logic;
-      DO28 : out std_logic;
-      DO29 : out std_logic;
-      DO30 : out std_logic;
-      DO31 : out std_logic;
-      DO32 : out std_logic;
-      DO33 : out std_logic;
-      DO34 : out std_logic;
-      DO35 : out std_logic;
-      DO36 : out std_logic;
-      DO37 : out std_logic;
-      DO38 : out std_logic;
-      DO39 : out std_logic;
-      DO40 : out std_logic;
-      DO41 : out std_logic;
-      DO42 : out std_logic;
-      DO43 : out std_logic;
-      DO44 : out std_logic;
-      DO45 : out std_logic;
-      DO46 : out std_logic;
-      DO47 : out std_logic;
-      DO48 : out std_logic;
-      DO49 : out std_logic;
-      DO50 : out std_logic;
-      DO51 : out std_logic;
-      DO52 : out std_logic;
-      DO53 : out std_logic;
-      DO54 : out std_logic;
-      DO55 : out std_logic;
-      DO56 : out std_logic;
-      DO57 : out std_logic;
-      DO58 : out std_logic;
-      DO59 : out std_logic;
-      DO60 : out std_logic;
-      DO61 : out std_logic;
-      DO62 : out std_logic;
-      DO63 : out std_logic;
-      DO64 : out std_logic;
-      DO65 : out std_logic;
-      DO66 : out std_logic;
-      DO67 : out std_logic;
-      DO68 : out std_logic;
-      DO69 : out std_logic;
-      DO70 : out std_logic;
-      DO71 : out std_logic;
-      DO72 : out std_logic;
-      DO73 : out std_logic;
-      DO74 : out std_logic;
-      DO75 : out std_logic;
-      DO76 : out std_logic;
-      DO77 : out std_logic;
-      DO78 : out std_logic;
-      DO79 : out std_logic;
-      CK   : in  std_logic;
-      CS   : in  std_logic;
-      OE   : in  std_logic
-      );
+  component mprom_memory00 is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      address : in  std_logic_vector(11 downto 0);
+      rom_do  : out std_logic_vector(79 downto 0);
+      oe      : in  std_logic;
+      clk_p   : in  std_logic;
+      cs      : in  std_logic;
+      -- test ports
+      test1  : in  std_logic;
+      rm  : in  std_logic_vector(3 downto 0);
+      rme  : in  std_logic);
   end component;
 
-
--- ROM1
-  component SP180_4096X80BM1B
-    port(
-      A0   : in  std_logic;
-      A1   : in  std_logic;
-      A2   : in  std_logic;
-      A3   : in  std_logic;
-      A4   : in  std_logic;
-      A5   : in  std_logic;
-      A6   : in  std_logic;
-      A7   : in  std_logic;
-      A8   : in  std_logic;
-      A9   : in  std_logic;
-      A10  : in  std_logic;
-      A11  : in  std_logic;
-      DO0  : out std_logic;
-      DO1  : out std_logic;
-      DO2  : out std_logic;
-      DO3  : out std_logic;
-      DO4  : out std_logic;
-      DO5  : out std_logic;
-      DO6  : out std_logic;
-      DO7  : out std_logic;
-      DO8  : out std_logic;
-      DO9  : out std_logic;
-      DO10 : out std_logic;
-      DO11 : out std_logic;
-      DO12 : out std_logic;
-      DO13 : out std_logic;
-      DO14 : out std_logic;
-      DO15 : out std_logic;
-      DO16 : out std_logic;
-      DO17 : out std_logic;
-      DO18 : out std_logic;
-      DO19 : out std_logic;
-      DO20 : out std_logic;
-      DO21 : out std_logic;
-      DO22 : out std_logic;
-      DO23 : out std_logic;
-      DO24 : out std_logic;
-      DO25 : out std_logic;
-      DO26 : out std_logic;
-      DO27 : out std_logic;
-      DO28 : out std_logic;
-      DO29 : out std_logic;
-      DO30 : out std_logic;
-      DO31 : out std_logic;
-      DO32 : out std_logic;
-      DO33 : out std_logic;
-      DO34 : out std_logic;
-      DO35 : out std_logic;
-      DO36 : out std_logic;
-      DO37 : out std_logic;
-      DO38 : out std_logic;
-      DO39 : out std_logic;
-      DO40 : out std_logic;
-      DO41 : out std_logic;
-      DO42 : out std_logic;
-      DO43 : out std_logic;
-      DO44 : out std_logic;
-      DO45 : out std_logic;
-      DO46 : out std_logic;
-      DO47 : out std_logic;
-      DO48 : out std_logic;
-      DO49 : out std_logic;
-      DO50 : out std_logic;
-      DO51 : out std_logic;
-      DO52 : out std_logic;
-      DO53 : out std_logic;
-      DO54 : out std_logic;
-      DO55 : out std_logic;
-      DO56 : out std_logic;
-      DO57 : out std_logic;
-      DO58 : out std_logic;
-      DO59 : out std_logic;
-      DO60 : out std_logic;
-      DO61 : out std_logic;
-      DO62 : out std_logic;
-      DO63 : out std_logic;
-      DO64 : out std_logic;
-      DO65 : out std_logic;
-      DO66 : out std_logic;
-      DO67 : out std_logic;
-      DO68 : out std_logic;
-      DO69 : out std_logic;
-      DO70 : out std_logic;
-      DO71 : out std_logic;
-      DO72 : out std_logic;
-      DO73 : out std_logic;
-      DO74 : out std_logic;
-      DO75 : out std_logic;
-      DO76 : out std_logic;
-      DO77 : out std_logic;
-      DO78 : out std_logic;
-      DO79 : out std_logic;
-      CK   : in  std_logic;
-      CS   : in  std_logic;
-      OE   : in  std_logic
-      );
+  component mprom_memory11 is
+    generic (
+      g_memory_type : memory_type_t := referens);
+    port (
+      address : in  std_logic_vector(11 downto 0);
+      rom_do  : out std_logic_vector(79 downto 0);
+      oe      : in  std_logic;
+      clk_p   : in  std_logic;
+      cs      : in  std_logic;
+      -- test ports
+      test1  : in  std_logic;
+      rm  : in  std_logic_vector(3 downto 0);
+      rme  : in  std_logic);
   end component;
 
   component mpram_memory is
@@ -907,205 +733,33 @@ begin
 
   -- mprom0, mprom1
   --  mprom00
-  mprom00 : SP180_4096X80BM1A
+  mprom00 : mprom_memory00
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0   => rom0_addr_sig(0),
-      A1   => rom0_addr_sig(1),
-      A2   => rom0_addr_sig(2),
-      A3   => rom0_addr_sig(3),
-      A4   => rom0_addr_sig(4),
-      A5   => rom0_addr_sig(5),
-      A6   => rom0_addr_sig(6),
-      A7   => rom0_addr_sig(7),
-      A8   => rom0_addr_sig(8),
-      A9   => rom0_addr_sig(9),
-      A10  => rom0_addr_sig(10),
-      A11  => rom0_addr_sig(11),
-      DO0  => mp_ROM0_DO(0),
-      DO1  => mp_ROM0_DO(1),
-      DO2  => mp_ROM0_DO(2),
-      DO3  => mp_ROM0_DO(3),
-      DO4  => mp_ROM0_DO(4),
-      DO5  => mp_ROM0_DO(5),
-      DO6  => mp_ROM0_DO(6),
-      DO7  => mp_ROM0_DO(7),
-      DO8  => mp_ROM0_DO(8),
-      DO9  => mp_ROM0_DO(9),
-      DO10 => mp_ROM0_DO(10),
-      DO11 => mp_ROM0_DO(11),
-      DO12 => mp_ROM0_DO(12),
-      DO13 => mp_ROM0_DO(13),
-      DO14 => mp_ROM0_DO(14),
-      DO15 => mp_ROM0_DO(15),
-      DO16 => mp_ROM0_DO(16),
-      DO17 => mp_ROM0_DO(17),
-      DO18 => mp_ROM0_DO(18),
-      DO19 => mp_ROM0_DO(19),
-      DO20 => mp_ROM0_DO(20),
-      DO21 => mp_ROM0_DO(21),
-      DO22 => mp_ROM0_DO(22),
-      DO23 => mp_ROM0_DO(23),
-      DO24 => mp_ROM0_DO(24),
-      DO25 => mp_ROM0_DO(25),
-      DO26 => mp_ROM0_DO(26),
-      DO27 => mp_ROM0_DO(27),
-      DO28 => mp_ROM0_DO(28),
-      DO29 => mp_ROM0_DO(29),
-      DO30 => mp_ROM0_DO(30),
-      DO31 => mp_ROM0_DO(31),
-      DO32 => mp_ROM0_DO(32),
-      DO33 => mp_ROM0_DO(33),
-      DO34 => mp_ROM0_DO(34),
-      DO35 => mp_ROM0_DO(35),
-      DO36 => mp_ROM0_DO(36),
-      DO37 => mp_ROM0_DO(37),
-      DO38 => mp_ROM0_DO(38),
-      DO39 => mp_ROM0_DO(39),
-      DO40 => mp_ROM0_DO(40),
-      DO41 => mp_ROM0_DO(41),
-      DO42 => mp_ROM0_DO(42),
-      DO43 => mp_ROM0_DO(43),
-      DO44 => mp_ROM0_DO(44),
-      DO45 => mp_ROM0_DO(45),
-      DO46 => mp_ROM0_DO(46),
-      DO47 => mp_ROM0_DO(47),
-      DO48 => mp_ROM0_DO(48),
-      DO49 => mp_ROM0_DO(49),
-      DO50 => mp_ROM0_DO(50),
-      DO51 => mp_ROM0_DO(51),
-      DO52 => mp_ROM0_DO(52),
-      DO53 => mp_ROM0_DO(53),
-      DO54 => mp_ROM0_DO(54),
-      DO55 => mp_ROM0_DO(55),
-      DO56 => mp_ROM0_DO(56),
-      DO57 => mp_ROM0_DO(57),
-      DO58 => mp_ROM0_DO(58),
-      DO59 => mp_ROM0_DO(59),
-      DO60 => mp_ROM0_DO(60),
-      DO61 => mp_ROM0_DO(61),
-      DO62 => mp_ROM0_DO(62),
-      DO63 => mp_ROM0_DO(63),
-      DO64 => mp_ROM0_DO(64),
-      DO65 => mp_ROM0_DO(65),
-      DO66 => mp_ROM0_DO(66),
-      DO67 => mp_ROM0_DO(67),
-      DO68 => mp_ROM0_DO(68),
-      DO69 => mp_ROM0_DO(69),
-      DO70 => mp_ROM0_DO(70),
-      DO71 => mp_ROM0_DO(71),
-      DO72 => mp_ROM0_DO(72),
-      DO73 => mp_ROM0_DO(73),
-      DO74 => mp_ROM0_DO(74),
-      DO75 => mp_ROM0_DO(75),
-      DO76 => mp_ROM0_DO(76),
-      DO77 => mp_ROM0_DO(77),
-      DO78 => mp_ROM0_DO(78),
-      DO79 => mp_ROM0_DO(79),
-      CK   => clk_p,
-      CS   => mp_ROM0_CS,
-      OE   => mp_ROM0_OE
+      address => mp_rom0_a(11 downto 0),
+      rom_do  => mp_rom0_do,
+      oe      => mp_rom0_oe,
+      clk_p   => clk_p,
+      cs      => mp_rom0_cs,
+      test1   => '0',
+      rm      => "0000",
+      rme     => '0'
       );
 
-
-
   --  mprom11
-  mprom11 : SP180_4096X80BM1B
+  mprom11 : mprom_memory11
+    generic map (
+      g_memory_type => g_memory_type)
     port map (
-      A0   => mp_ROM1_A(0),
-      A1   => mp_ROM1_A(1),
-      A2   => mp_ROM1_A(2),
-      A3   => mp_ROM1_A(3),
-      A4   => mp_ROM1_A(4),
-      A5   => mp_ROM1_A(5),
-      A6   => mp_ROM1_A(6),
-      A7   => mp_ROM1_A(7),
-      A8   => mp_ROM1_A(8),
-      A9   => mp_ROM1_A(9),
-      A10  => mp_ROM1_A(10),
-      A11  => mp_ROM1_A(11),
-      DO0  => mp_ROM1_DO(0),
-      DO1  => mp_ROM1_DO(1),
-      DO2  => mp_ROM1_DO(2),
-      DO3  => mp_ROM1_DO(3),
-      DO4  => mp_ROM1_DO(4),
-      DO5  => mp_ROM1_DO(5),
-      DO6  => mp_ROM1_DO(6),
-      DO7  => mp_ROM1_DO(7),
-      DO8  => mp_ROM1_DO(8),
-      DO9  => mp_ROM1_DO(9),
-      DO10 => mp_ROM1_DO(10),
-      DO11 => mp_ROM1_DO(11),
-      DO12 => mp_ROM1_DO(12),
-      DO13 => mp_ROM1_DO(13),
-      DO14 => mp_ROM1_DO(14),
-      DO15 => mp_ROM1_DO(15),
-      DO16 => mp_ROM1_DO(16),
-      DO17 => mp_ROM1_DO(17),
-      DO18 => mp_ROM1_DO(18),
-      DO19 => mp_ROM1_DO(19),
-      DO20 => mp_ROM1_DO(20),
-      DO21 => mp_ROM1_DO(21),
-      DO22 => mp_ROM1_DO(22),
-      DO23 => mp_ROM1_DO(23),
-      DO24 => mp_ROM1_DO(24),
-      DO25 => mp_ROM1_DO(25),
-      DO26 => mp_ROM1_DO(26),
-      DO27 => mp_ROM1_DO(27),
-      DO28 => mp_ROM1_DO(28),
-      DO29 => mp_ROM1_DO(29),
-      DO30 => mp_ROM1_DO(30),
-      DO31 => mp_ROM1_DO(31),
-      DO32 => mp_ROM1_DO(32),
-      DO33 => mp_ROM1_DO(33),
-      DO34 => mp_ROM1_DO(34),
-      DO35 => mp_ROM1_DO(35),
-      DO36 => mp_ROM1_DO(36),
-      DO37 => mp_ROM1_DO(37),
-      DO38 => mp_ROM1_DO(38),
-      DO39 => mp_ROM1_DO(39),
-      DO40 => mp_ROM1_DO(40),
-      DO41 => mp_ROM1_DO(41),
-      DO42 => mp_ROM1_DO(42),
-      DO43 => mp_ROM1_DO(43),
-      DO44 => mp_ROM1_DO(44),
-      DO45 => mp_ROM1_DO(45),
-      DO46 => mp_ROM1_DO(46),
-      DO47 => mp_ROM1_DO(47),
-      DO48 => mp_ROM1_DO(48),
-      DO49 => mp_ROM1_DO(49),
-      DO50 => mp_ROM1_DO(50),
-      DO51 => mp_ROM1_DO(51),
-      DO52 => mp_ROM1_DO(52),
-      DO53 => mp_ROM1_DO(53),
-      DO54 => mp_ROM1_DO(54),
-      DO55 => mp_ROM1_DO(55),
-      DO56 => mp_ROM1_DO(56),
-      DO57 => mp_ROM1_DO(57),
-      DO58 => mp_ROM1_DO(58),
-      DO59 => mp_ROM1_DO(59),
-      DO60 => mp_ROM1_DO(60),
-      DO61 => mp_ROM1_DO(61),
-      DO62 => mp_ROM1_DO(62),
-      DO63 => mp_ROM1_DO(63),
-      DO64 => mp_ROM1_DO(64),
-      DO65 => mp_ROM1_DO(65),
-      DO66 => mp_ROM1_DO(66),
-      DO67 => mp_ROM1_DO(67),
-      DO68 => mp_ROM1_DO(68),
-      DO69 => mp_ROM1_DO(69),
-      DO70 => mp_ROM1_DO(70),
-      DO71 => mp_ROM1_DO(71),
-      DO72 => mp_ROM1_DO(72),
-      DO73 => mp_ROM1_DO(73),
-      DO74 => mp_ROM1_DO(74),
-      DO75 => mp_ROM1_DO(75),
-      DO76 => mp_ROM1_DO(76),
-      DO77 => mp_ROM1_DO(77),
-      DO78 => mp_ROM1_DO(78),
-      DO79 => mp_ROM1_DO(79),
-      CK   => clk_p,
-      CS   => mp_ROM1_CS,
-      OE   => mp_ROM1_OE
+      address => mp_rom1_a(11 downto 0),
+      rom_do  => mp_rom1_do,
+      oe      => mp_rom1_oe,
+      clk_p   => clk_p,
+      cs      => mp_rom1_cs,
+      test1   => '0',
+      rm      => "0000",
+      rme     => '0'
       );
 
   mpram00 : mpram_memory
@@ -1262,7 +916,7 @@ begin
       rst_rtc       => rst_rtc,         -- Reset RTC counter byte
       en_fclk       => en_fclk,   -- Enable fast clocking of RTC counter byte
       fclk          => fclk,            -- Fast clock to RTC counter byte
-      ld_bmem       => ld_bmem,   -- Latch enable to the dis_bmem latch
+      ld_bmem       => ld_bmem,         -- Latch enable to the dis_bmem latch
       rtc_sel       => rtc_sel,         -- RTC byte select
       rtc_data      => rtc_data,        -- RTC data
       dis_bmem      => dis_bmem_int,
@@ -1307,7 +961,7 @@ begin
   dis_bmem <= dis_bmem_int;
 
   clock_in_off <= clk_in_off;
-  
+
   -----------------------------------------------------------------------------
   -- core
   -----------------------------------------------------------------------------
@@ -1373,8 +1027,8 @@ begin
       gmem_a       => c1_gmem_a,        --: out std_logic_vector(9 downto 0);
       gmem_d       => c1_gmem_d,        --: out std_logic_vector(7 downto 0);
       gmem_q       => c1_gmem_q,        --: in  std_logic_vector(7 downto 0);
-      gmem_ce_n    => c1_gmem_ce_n,   --: out std_logic;
-      gmem_we_n    => c1_gmem_we_n,   --: out std_logic;
+      gmem_ce_n    => c1_gmem_ce_n,     --: out std_logic;
+      gmem_we_n    => c1_gmem_we_n,     --: out std_logic;
       -- IOMEM signals
       iomem_a      => iomem_a,          --: out std_logic_vector(9 downto 0);
       iomem_d      => iomem_d,          --: out std_logic_vector(15 downto 0);
@@ -1446,10 +1100,10 @@ begin
       pd              => pd_s,  --: out std_logic_vector(2 downto 0);  -- pl_pd
       aaddr           => aaddr,  --: out std_logic_vector(4 downto 0);  -- pl_aaddr
       idreq           => idreq,         --: in  std_logic_vector(7 downto 0);
-      idi             => idi,   --: in  std_logic_vector(7 downto 0);
-      idack           => idack,  --: out std_logic_vector(7 downto 0);
+      idi             => idi,           --: in  std_logic_vector(7 downto 0);
+      idack           => idack,         --: out std_logic_vector(7 downto 0);
       ios_iden        => ios_iden,      --: out std_logic;
-      ios_ido         => ios_ido,  --: out std_logic_vector(7 downto 0);
+      ios_ido         => ios_ido,       --: out std_logic_vector(7 downto 0);
       ilioa           => ilioa,         --: out std_logic;
       ildout          => ildout,        --: out std_logic;
       inext           => inext,         --: out std_logic;
@@ -1464,7 +1118,7 @@ begin
       run_tiu         => run_tiu,       --: out std_logic;
       en_tstamp       => en_tstamp,     --: out std_logic_vector(1 downto 0);
       en_iobus        => en_iobus,      --: out std_logic_vector(1 downto 0);
-      ddqm            => ddqm,  --: out std_logic_vector(7  downto 0);
+      ddqm            => ddqm,          --: out std_logic_vector(7  downto 0);
       irq0            => irq0,  --: in  std_logic;  -- Interrupt request 0
       irq1            => irq1,  --: in  std_logic;  -- Interrupt request 1
       adc_ref2v       => adc_ref2v,  --: out  std_logic;      -- Select 2V internal ADC reference (1V)
@@ -1478,8 +1132,8 @@ begin
       mckout1_o       => MCKOUT1,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_en,
       msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
-      msdout_o        => MSDOUT,      --: out std_logic;  -- Serial data out
-      mrstout_o       => MRSTOUT,     --: out std_logic;  -- Reset out
+      msdout_o        => MSDOUT,        --: out std_logic;  -- Serial data out
+      mrstout_o       => MRSTOUT,       --: out std_logic;  -- Reset out
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
       mtest_i         => mtest_i,       --: in  std_logic;  -- Test mode---
       mbypass_i       => mbypass_i,     --: in  std_logic;  -- bypass PLL
@@ -1667,7 +1321,7 @@ begin
       ROM0_CS  => mp_ROM0_CS,           -- out std_logic;
       ROM0_OE  => mp_ROM0_OE,           -- out std_logic;
       --ROM1
-      ROM1_DO  => mp_ROM1_DO,   --: in  std_logic_vector (79 downto 0);
+      ROM1_DO  => mp_ROM1_DO,           --: in  std_logic_vector (79 downto 0);
       ROM1_A   => mp_ROM1_A,            --: out std_logic_vector (13 downto 0);
       ROM1_CS  => mp_ROM1_CS,           --: out std_logic;
       ROM1_OE  => mp_ROM1_OE,           --: out std_logic;

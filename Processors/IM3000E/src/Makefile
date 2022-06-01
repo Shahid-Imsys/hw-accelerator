@@ -56,6 +56,8 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/peri/OctoSPI.vhd \
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory00.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory11.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/ram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \

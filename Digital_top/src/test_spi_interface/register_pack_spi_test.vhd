@@ -2749,7 +2749,7 @@ package register_pack_spi_test is
 
   ---------------------------------------------------------------------------
   -- Register "mtest"
-  constant mtest_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+  constant mtest_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
 
   -- Field "ste"
   constant mtest_ste_size_c  : integer := 2;
@@ -2764,8 +2764,8 @@ package register_pack_spi_test is
   constant mtest_pd_lsb_c   : integer := 1;
   constant mtest_pd_msb_c   : integer := 1;
   subtype mtest_pd_t is std_ulogic;
-  constant mtest_pd_reset_c : mtest_pd_t := '0';
-  constant mtest_pd_scan_c  : mtest_pd_t := '0';
+  constant mtest_pd_reset_c : mtest_pd_t := '1';
+  constant mtest_pd_scan_c  : mtest_pd_t := '1';
 
   -- Field "pu"
   constant mtest_pu_size_c  : integer := 1;
@@ -2777,7 +2777,7 @@ package register_pack_spi_test is
 
   ---------------------------------------------------------------------------
   -- Register "mwake"
-  constant mwake_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+  constant mwake_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
 
   -- Field "ste"
   constant mwake_ste_size_c  : integer := 2;
@@ -2792,8 +2792,8 @@ package register_pack_spi_test is
   constant mwake_pd_lsb_c   : integer := 1;
   constant mwake_pd_msb_c   : integer := 1;
   subtype mwake_pd_t is std_ulogic;
-  constant mwake_pd_reset_c : mwake_pd_t := '0';
-  constant mwake_pd_scan_c  : mwake_pd_t := '0';
+  constant mwake_pd_reset_c : mwake_pd_t := '1';
+  constant mwake_pd_scan_c  : mwake_pd_t := '1';
 
   -- Field "pu"
   constant mwake_pu_size_c  : integer := 1;

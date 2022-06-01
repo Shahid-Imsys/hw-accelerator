@@ -364,7 +364,7 @@ begin  -- architecture rtl
         HCLK    => dco_clk(0),
         pll_locked => pll_locked,
         MRESET  => mreset,
-        MRSTOUT => mrstout,  -- Missing pad.
+        MRSTOUT => mrstout_n,  -- Missing pad.
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
         MCKOUT1 => MCKOUT1,
@@ -465,7 +465,7 @@ begin  -- architecture rtl
         pwr_ok   => pwr_ok,
         vdd_bmem => '0',
         VCC18LP  => '1',
-        rxout    => mrxout_out,
+        rxout    => mrxout,
         adc_bits => adc_bits
       );
 
@@ -1453,21 +1453,22 @@ begin  -- architecture rtl
         di  => mwake_in
         );
     
-    i_mrxout_pad : entity work.output_pad  
-      generic map (
-        direction => vertical)
-      port map (
-        -- PAD
-        pad => mrxout,
-        --GPIO
-        do  => mrxout_out,
-        ds  => pad_config.mrxout.ds & "00",
-        sr  => pad_config.mrxout.sr,
-        co  => pad_config.mrxout.co,
-        oe  => '1',
-        odp => pad_config.mrxout.odp,
-        odn => pad_config.mrxout.odn
-        );
+      
+    --i_mrxout_pad : entity work.output_pad  input in digital_top but output pad in excel-dok?
+    --  generic map (
+    --    direction => vertical)
+    --  port map (
+    --    -- PAD
+    --    pad => mrxout,
+    --    --GPIO
+    --    do  => mrxout_out,
+    --    ds  => "1000",
+    --    sr  => '1',
+    --    co  => '0',
+    --    oe  => '1',
+    --    odp => '0',
+    --    odn => '0'
+    --    );
 
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
      --  port map (

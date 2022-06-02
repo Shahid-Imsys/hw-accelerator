@@ -17,8 +17,6 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/clc.vhd \
 			 	  $(GPP_DIR_WIN)/clk_mux.vhd \
 			 	  $(GPP_DIR_WIN)/clk_gen.vhd \
-			 	  $(GPP_DIR_WIN)/pads/XMD.vhd \
-			 	  $(GPP_DIR_WIN)/pads/ZMA2GSD.vhd \
 			 	  $(GPP_DIR_WIN)/pads/YA2GSD.vhd \
 			 	  $(GPP_DIR_WIN)/iopads.vhd \
 			 	  $(GPP_DIR_WIN)/rtc.vhd \
@@ -58,6 +56,8 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/peri/OctoSPI.vhd \
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory00.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory11.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/ram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \

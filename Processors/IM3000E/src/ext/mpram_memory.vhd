@@ -251,10 +251,12 @@ begin  -- architecture str
   -- Use memories from ASIC implementation
   g_asic_memory : if g_memory_type = asic generate
 
+    -- pragma synthesis_off
     i_load_mpram : load_mpram
       generic map (
         initFile => g_file_name);
-
+    -- pragma synthesis_on
+    
     mpram_asic : SNPS_SP_HD_2Kx80
       port map (
         Q        => ram_do,

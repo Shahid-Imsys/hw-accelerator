@@ -26,37 +26,45 @@ architecture tb of ionoc_tb is
       ionoc_data_address   : std_logic_vector(7 downto 0) := x"47";
       MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
       );
-    port (clk_p        : in  std_logic;  -- Main clock
-          clk_i_pos    : in  std_logic;  --
-          rst_n        : in  std_logic;  -- Async reset
-          -- I/O bus
-          idi          : in  std_logic_vector (7 downto 0);     -- I/O bus in
-          ido          : out std_logic_vector (7 downto 0);     -- I/O bus out
-          iden         : out std_logic;  -- I/O bus enabled (in use)
-          ilioa        : in  std_logic;  -- I/O bus load I/O address
-          ildout       : in  std_logic;  -- I/O bus data output strobe
-          inext        : in  std_logic;  -- I/O bus data input  strobe
-          idack        : in  std_logic;  -- I/O bus DMA Ack
-          idreq        : out std_logic;  -- I/O bus DMA Request
-          -- GPP to NOC
-          GPP_CMD      : out std_logic_vector(127 downto 0);    -- Command word
-          GPP_CMD_Flag : out std_logic;  -- Command word valid
-          NOC_CMD_ACK  : in  std_logic;  -- NOC ready
-          -- NOC to GPP
-          NOC_CMD      : in  std_logic_vector(7 downto 0);      -- Command byte
-          GPP_CMD_ACK  : out std_logic;  -- GPP ready
-          NOC_CMD_Flag : in  std_logic;  -- NOC asks to send byte
-          --
-          TxFIFO_Ready : out std_logic;  -- Interface can accept a word from the TxIFO
-          TxFIFO_Valid : in  std_logic;  -- TxFIFO has availble data which is presented on bus
-          TxFIFO_Data  : in  std_logic_vector(127 downto 0);    -- TxFIFO data
-          --
-          RxFIFO_Ready : in  std_logic;  -- RxFIFO can accept a word from the IO-bus
-          RxFIFO_Valid : out std_logic;  -- Interface has availble data which is presented on bus
-          RxFIFO_Data  : out std_logic_vector(127 downto 0);    -- RxFIFO data
-          --
-          NOC_IRQ      : out std_logic  -- Interrupt on available data from NOC
-          );
+  port (-- Domain clk_p
+        ------------------------------------------------------
+        clk_p        : in  std_logic;   -- Main clock
+        clk_i_pos    : in  std_logic;   --
+        rst_n        : in  std_logic;   -- Async reset
+        -- I/O bus
+        idi          : in  std_logic_vector (7 downto 0);     -- I/O bus in
+        ido          : out std_logic_vector (7 downto 0);     -- I/O bus out
+        iden         : out std_logic;   -- I/O bus enabled (in use)
+        ilioa        : in  std_logic;   -- I/O bus load I/O address
+        ildout       : in  std_logic;   -- I/O bus data output strobe
+        inext        : in  std_logic;   -- I/O bus data input  strobe
+        idack        : in  std_logic;   -- I/O bus DMA Ack
+        idreq        : out std_logic;   -- I/O bus DMA Request
+        NOC_IRQ      : out std_logic;   -- Interrupt on available data from NOC
+        ------------------------------------------------------
+
+
+        -- Domain clk_noc
+        ------------------------------------------------------
+        clk_noc      : in  std_logic;                      -- NOC Clock
+        -- GPP to NOC
+        GPP_CMD      : out std_logic_vector(127 downto 0); -- Command word
+        GPP_CMD_Flag : out std_logic;                      -- Command word valid
+        NOC_CMD_ACK  : in  std_logic;                      -- NOC ready
+        -- NOC to GPP
+        NOC_CMD_Flag : in  std_logic;                      -- NOC command byte is valid
+        NOC_CMD      : in  std_logic_vector(7 downto 0);   -- Command byte
+        GPP_CMD_ACK  : out std_logic;                      -- GPP ack of command byte
+        --
+        TxFIFO_Ready : out std_logic;                      -- Interface can accept a word from the TxIFO
+        TxFIFO_Valid : in  std_logic;                      -- TxFIFO has availble data which is presented on bus
+        TxFIFO_Data  : in  std_logic_vector(127 downto 0); -- TxFIFO data
+        --
+        RxFIFO_Ready : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
+        RxFIFO_Valid : out std_logic;                      -- Interface has availble data which is presented on bus
+        RxFIFO_Data  : out std_logic_vector(127 downto 0)  -- RxFIFO data
+        ------------------------------------------------------
+        );
   end component;
 
   -- Types
@@ -99,7 +107,8 @@ architecture tb of ionoc_tb is
   -- TB SETTINGS
 
   -- Concurrent statementes
-  signal clk     : std_logic := '0';
+  signal clk_p   : std_logic := '0';
+  signal clk_noc : std_logic := '0';
   signal reset_n : std_logic := '0';
   --
 
@@ -118,6 +127,12 @@ architecture tb of ionoc_tb is
   signal inext     : std_logic;
   signal idack     : std_logic;
   signal idreq     : std_logic;
+  --
+  signal NOC_CMD_Flag_int : std_logic;
+  signal GPP_CMD_ACK_int  : std_logic;
+    --
+  signal TxFIFO_Valid_int : std_logic;
+  signal RxFIFO_Ready_int : std_logic;
 
 
   -- DUT
@@ -134,25 +149,37 @@ architecture tb of ionoc_tb is
   signal NOC_IRQ      : std_logic;
 
   signal TxFIFO_Ready : std_logic;
-  signal TxFIFO_Valid : std_logic;
+  signal TxFIFO_Valid : std_logic                      := '0';
   signal TxFIFO_Data  : std_logic_vector(127 downto 0) := (others => '0');
   --
   signal RxFIFO_Ready : std_logic                      := '0';
   signal RxFIFO_Valid : std_logic;
   signal RxFIFO_Data  : std_logic_vector(127 downto 0);
 
+  -- noc_proc
+  signal noc_cnt1     : integer   := 0;
+  signal CMD_ACK_int : std_logic := '0';
+  --
+  signal TxFIFO_Valid_f : boolean := false;
+  signal RxFIFO_Ready_f : boolean := false;
+
+
   -- Constants
-  constant clock_frequency_c : real := 300.0;  --MHz
-  constant clock_period_c    : time := 1 us / clock_frequency_c;
+  constant clock_frequency_c  : real := 300.0;  --MHz
+  constant clock_period_c     : time := 1 us / clock_frequency_c;
+  --
+  constant nocclk_frequency_c : real := 713.2;  --MHz
+  constant nocclk_period_c    : time := 1 us / nocclk_frequency_c;
 
 begin
 
-  clk     <= run and not clk after clock_period_c/2;
-  reset_n <= '1'             after 10 * clock_period_c;
+  clk_p   <= run and not clk_p   after clock_period_c/2;
+  clk_noc <= run and not clk_noc after nocclk_period_c/2;
+  reset_n <= '1'               after 10 * clock_period_c;
 
-  clk_proc : process(clk)
+  clk_proc : process(clk_p)
   begin
-    if rising_edge(clk) then
+    if rising_edge(clk_p) then
       --
       clk_count <= std_logic_vector(unsigned(clk_count) + 1);
       --
@@ -164,12 +191,12 @@ begin
     end if;
   end process;
 
-  test_proc : process(clk)
+  test_proc : process(clk_p)
     variable l   : line;
     variable row : integer := 0;
   begin
 
-    if rising_edge(clk) then
+    if rising_edge(clk_p) then
       -- Defaults
       idi          <= x"00";
       ilioa        <= '1';
@@ -177,13 +204,11 @@ begin
       inext        <= '1';
       idack        <= '1';
       --
-      NOC_CMD_ACK  <= '0';
-      NOC_CMD      <= (others => '-');
+      NOC_CMD          <= (others => '-');
+      NOC_CMD_Flag_int <= '0';
       --
-      TxFIFO_Valid <= '0';
-      RxFIFO_Ready <= '0';
-      --
-      NOC_CMD_Flag <= '0';
+      TxFIFO_Valid_int <= '0';
+      RxFIFO_Ready_int <= '0';
 
       -- Delays
       fsm_d <= fsm;
@@ -300,21 +325,21 @@ begin
         -- TEST2 - Present 128 bit data to NOC which reads it
         -----------------------------------------------------
         when test2_nocrd_flag =>
-          if GPP_CMD_Flag = '1' then
+          -- Wait for NOC to ack cmd
+          if CMD_ACK_int = '1' then
             fsm         <= test2_nocrd_ack;
-            NOC_CMD_ACK <= '1';
             --
-            write(l, string'("[NOC] Read 0x"));
-            hwrite(l, GPP_CMD);
+            write(l, string'("NOC is done reading word"));
             writeline(output, l);
           end if;
 
         when test2_nocrd_ack =>
-          NOC_CMD_ACK <= '1';
+        -- Wait for GPP to retract flag
           if GPP_CMD_Flag = '0' then
-            fsm <= test2_nocrd_pollstatus;
+            fsm       <= test2_nocrd_pollstatus;
+            fsm_count <= 0;
             --
-            write(l, string'("NOC is done reading word"));
+            write(l, string'("GPP is done presenting word"));
             writeline(output, l);
           end if;
 
@@ -337,9 +362,8 @@ begin
               --
               write(l, string'("[TEST START] - Test 3"));
               writeline(output, l);
-              --
             else
-              write(l, string'("WARNING: Word to NOC not yet pending!"));
+              write(l, string'("WARNING: Word to NOC not yet read!"));
               writeline(output, l);
             end if;
           end if;
@@ -357,9 +381,9 @@ begin
           writeline(output, l);
 
         when test3_nocwr_flag =>
-          NOC_CMD_Flag <= '1';
-          NOC_CMD      <= x"77";
-          if GPP_CMD_ACK = '1' then
+          NOC_CMD_Flag_int <= '1';
+          NOC_CMD          <= x"77";
+          if GPP_CMD_ACK_int = '1' then
             fsm <= test3_nocwr_ack;
             --
             write(l, string'("Interface ACK'd 0x"));
@@ -368,7 +392,7 @@ begin
           end if;
 
         when test3_nocwr_ack =>
-          if GPP_CMD_ACK = '0' then
+          if GPP_CMD_ACK_int = '0' then
             fsm       <= test4_iord_pollstatus_set;
             fsm_count <= 0;
             --
@@ -455,8 +479,8 @@ begin
         --
         -------------------------------------------
         when test5_write_fifo_data_fr_noc =>
-          TxFIFO_Valid <= '1';
-          if TxFIFO_Valid = '0' then
+          TxFIFO_Valid_int <= '1';
+          if TxFIFO_Valid_int = '0' then
             write(l, string'("[NOC] Presenting data to TxFIFO"));
             writeline(output, l);
           end if;
@@ -466,9 +490,9 @@ begin
               conv_std_logic_vector(17 * b+1, 8);
           end loop;
           --
-          if TxFIFO_Valid = '1' and TxFIFO_Ready = '1' then
+          if TxFIFO_Valid_int = '1' and TxFIFO_Valid_f then
             if fsm_count = 1-1 then     -- nr_of_words - 1
-              TxFIFO_Valid <= '0';
+              TxFIFO_Valid_int <= '0';
               --
               fsm          <= test5_pollstatus_set;
               fsm_count    <= 0;
@@ -574,9 +598,10 @@ begin
           end if;
 
         when test6_read_fifo_data =>
-          if RxFIFO_Valid = '1' then
-              fsm          <= test6_pollstatus_reset;
-              RxFIFO_Ready <= '1';
+          RxFIFO_Ready_int <= '1';
+          if RxFIFO_Ready_f then
+              fsm              <= test6_pollstatus_reset;
+              RxFIFO_Ready_int <= '0';
               --
               write(l, string'("[RxFIFO] Data accepted"));
               writeline(output, l);
@@ -671,8 +696,93 @@ begin
 
       end case;
 
-    end if;
-  end process;
+    end if; -- clk_p
+  end process; -- test_proc
+
+  noc_proc : process(clk_noc)
+    variable l   : line;
+    variable row : integer := 0;
+  begin
+
+    if rising_edge(clk_noc) then
+      -- Defaults
+      NOC_CMD_ACK  <= '0';
+
+      if noc_cnt1 < 32 then
+        noc_cnt1     <= noc_cnt1 + 1;
+      else
+        CMD_ACK_int <= '0';
+      end if;
+
+      -- GPP acks command from NOC
+      if GPP_CMD_ACK = '1' then
+        NOC_CMD_Flag    <= '0';
+        GPP_CMD_ACK_int <= '1';
+      elsif NOC_CMD_Flag_int = '1' then
+        if GPP_CMD_ACK_int = '0' then
+          NOC_CMD_Flag    <= '1';
+        end if;
+      elsif NOC_CMD_Flag_int = '0' then
+        GPP_CMD_ACK_int <= '0';
+      end if;
+
+      -- NOC acks command from GPP
+      if GPP_CMD_Flag = '1' and
+          NOC_CMD_ACK = '0' then
+        if noc_cnt1 = 0 then
+          noc_cnt1     <= 0;
+          NOC_CMD_ACK <= '1';
+          CMD_ACK_int <= '1'; -- int flag to other part of TB
+          --
+          write(l, string'("[NOC] Got command from GPP 0x"));
+          hwrite(l, GPP_CMD);
+          writeline(output, l);
+        else
+          noc_cnt1 <= noc_cnt1 - 1;
+        end if;
+      end if;
+
+      -- Check that GPP retracts CMD Flag
+      if GPP_CMD_Flag = '1' and
+          NOC_CMD_ACK = '1' then
+        if noc_cnt1 /= 0 then
+          write(l, string'("[NOC] WARNING GPP_CMD_Flag expexted low"));
+          writeline(output, l);
+        end if;
+      end if;
+
+      -----------------------------------------------------------------------
+
+      if RxFIFO_Ready_int = '1' and not RxFIFO_Ready_f then
+        RxFIFO_Ready_f <= true;
+        RxFIFO_Ready   <= '1';
+      end if;
+
+      if RxFIFO_Ready = '1' and RxFIFO_Valid = '1' then
+        RxFIFO_Ready <= '0';
+      end if;
+
+      if RxFIFO_Ready_int = '0' and RxFIFO_Ready_f then
+        RxFIFO_Ready_f <= false;
+      end if;
+
+      -----------------------------------------------------------------------
+
+      if TxFIFO_Valid_int = '1' and not TxFIFO_Valid_f then
+        TxFIFO_Valid_f <= true;
+        TxFIFO_Valid   <= '1';
+      end if;
+
+      if TxFIFO_Ready = '1' and TxFIFO_Valid = '1' then
+        TxFIFO_Valid <= '0';
+      end if;
+
+      if TxFIFO_Valid_int = '0' and TxFIFO_Valid_f then
+        TxFIFO_Valid_f <= false;
+      end if;
+
+    end if; -- clk_noc
+  end process; -- noc_proc
 
   DUT : ionoc
     generic map (
@@ -681,7 +791,7 @@ begin
       ionoc_data_address   => ionoc_data_address,
       MAX_BURST_LEN        => MAX_BURST_LEN)
     port map (
-      clk_p        => clk,
+      clk_p        => clk_p,
       clk_i_pos    => clk_i,
       rst_n        => reset_n,
       idi          => idi,
@@ -692,6 +802,9 @@ begin
       inext        => inext,
       idack        => idack,
       idreq        => idreq,
+      NOC_IRQ      => NOC_IRQ,
+      --
+      clk_noc      => clk_noc,
       GPP_CMD      => GPP_CMD,
       GPP_CMD_Flag => GPP_CMD_Flag,
       NOC_CMD_ACK  => NOC_CMD_ACK,
@@ -703,7 +816,7 @@ begin
       TxFIFO_Data  => TxFIFO_Data,
       RxFIFO_Ready => RxFIFO_Ready,
       RxFIFO_Valid => RxFIFO_Valid,
-      RxFIFO_Data  => RxFIFO_Data,
-      NOC_IRQ      => NOC_IRQ);
+      RxFIFO_Data  => RxFIFO_Data
+      );
 
 end tb;

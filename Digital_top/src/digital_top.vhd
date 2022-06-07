@@ -144,6 +144,8 @@ entity digital_top is
     ospi_rwds_in     : in  std_logic;
     ospi_rwds_out    : out std_logic;
     ospi_rwds_enable : out std_logic;
+    
+    dummy_output : out std_logic_vector(7 downto 0);
 
     -- SPI, chip control interface
     spi_sclk      : in  std_logic;
@@ -311,7 +313,6 @@ architecture rtl of digital_top is
   signal dummy_din  : std_logic_vector(127 downto 0);
   signal dummy_we   : std_logic_vector(108 downto 0);
 
-  signal ospi_dq_in_int  : std_logic_vector(7 downto 0);
   signal ospi_dq_out_int : std_logic_vector(7 downto 0);
 
   constant asic_c : memory_type_t := asic;
@@ -457,7 +458,7 @@ begin  -- architecture rtl
       ospi_out.ck_n    => ospi_ck_n,
       ospi_out.ck_p    => ospi_ck_p,
       ospi_out.reset_n => ospi_reset_n,
-      ospi_dq_in       => ospi_dq_in_int,
+      ospi_dq_in       => ospi_dq_in,
       ospi_dq_out      => ospi_dq_out_int,
       ospi_dq_enable   => ospi_dq_enable,
       ospi_rwds_in     => ospi_rwds_in,
@@ -512,7 +513,7 @@ begin  -- architecture rtl
                      xor dummy_dout_7(0);
 
         dummy_we       <= dummy_din(107 downto 0) & lvector(index);
-        ospi_dq_in_int <= dummy_we(7 downto 0);
+        dummy_output   <= dummy_we(7 downto 0);
 
         if index = 4767 then
           index := 0;
@@ -692,6 +693,7 @@ begin  -- architecture rtl
           BC1      => '0',
           BC2      => '0');
     end generate;
+    
     ve_bias_gen : for i in dummy_dout_6'range generate
       buf_bias : SNPS_RF_SP_UHS_64x64
         port map (
@@ -754,6 +756,10 @@ begin  -- architecture rtl
           BC1      => '0',
           BC2      => '0');
     end generate;
+  end generate;
+    
+   asic_dummy_output: if g_memory_type /= asic or g_simulation generate
+    dummy_output <= (others => '0');
   end generate;
 
 end architecture rtl;

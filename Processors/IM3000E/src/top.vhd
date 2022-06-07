@@ -84,6 +84,7 @@ entity top is
 
     MRESET     : in  std_logic;         -- system reset, active low
     rst_n      : in  std_logic;
+    c1_wdog_n  : out std_logic;
     MRSTOUT    : out std_logic;         -- Reset output
     MIRQOUT    : out std_logic;         -- interrupt request output
     MCKOUT0    : out std_logic;         -- for trace adapter
@@ -1008,6 +1009,7 @@ begin
       xout         => clk_p,  --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
       -- Power on signal
       pwr_ok       => pwr_ok,  --pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
+      core_wdog_n  => c1_wdog_n,
       ---------------------------------------------------------------------
       -- Memory signals
       ---------------------------------------------------------------------

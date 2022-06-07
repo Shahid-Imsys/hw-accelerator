@@ -325,7 +325,8 @@ architecture rtl of digital_top is
 
   signal cpu_rst_n    : std_logic;
   signal clock_in_off : std_logic;
-  signal clock_sel : std_logic;
+  signal clock_sel    : std_logic; 
+  signal c1_wdog_n    : std_logic;
 
   signal pi_data : std_logic_vector(7 downto 0);
 
@@ -345,6 +346,7 @@ begin  -- architecture rtl
 
       mreset_n => mreset,
       pwr_ok   => pwr_ok,
+      c1_wdog_n => c1_wdog_n,
 
       rst_n => cpu_rst_n,
 
@@ -380,6 +382,7 @@ begin  -- architecture rtl
       cpu_rst_n => cpu_rst_n,
 
       MRESET  => MRESET,
+      c1_wdog_n => c1_wdog_n,
       MRSTOUT => MRSTOUT,
       MIRQOUT => MIRQOUT,
       MCKOUT0 => MCKOUT0,

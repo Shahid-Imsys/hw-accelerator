@@ -94,7 +94,8 @@ entity core is
 		test_pll    : out std_logic;  -- PLL in test mode
     xout        : in  std_logic;  -- XOSC ref. clock output
     -- Power on signal
-    pwr_ok      : in  std_logic;  -- Power is on 
+    pwr_ok      : in  std_logic;  -- Power is on
+    core_wdog_n   : out std_logic;  -- Watchdog_reset.
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -823,6 +824,7 @@ begin
       curr_mpga     => curr_mpga,
       mar           => mar);
 
+  core_wdog_n <= wdog_n;
 ---------------------------------------------------------------------
 -- ALU
 ---------------------------------------------------------------------

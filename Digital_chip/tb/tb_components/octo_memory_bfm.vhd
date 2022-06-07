@@ -79,10 +79,10 @@ begin  -- architecture bfm
     4 when "1111",
     0 when others; -- Reserved!
 
-  check_double_drive_dq : process (cs) is
+  check_double_drive_dq : process (ck) is
     variable no_dd : boolean := true;
   begin  -- process check_double_drive_dq
-    if falling_edge(cs) then
+    if falling_edge(ck) then
       for i in dq'range loop
         if dq(i) = 'X' then
           no_dd := false;

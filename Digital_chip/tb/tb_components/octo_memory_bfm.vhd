@@ -255,12 +255,12 @@ begin  -- architecture bfm
 
         -- State write register
         when write_register =>
-          rwds <= 'Z';
+          rwds <= '1';
 
-          check_for_z;
-          assert rwds /= 'Z'
-            report "[Octo_BFM] No driving on RWDS in state write_register"
-            severity warning;
+          -- check_for_z;
+          -- assert rwds /= 'Z'
+          --   report "[Octo_BFM] No driving on RWDS in state write_register"
+          --   severity warning;
 
           if address = 0 then           -- ID0 register
             if counter = 1 then

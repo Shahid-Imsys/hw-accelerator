@@ -79,16 +79,19 @@ begin  -- architecture bfm
     4 when "1111",
     0 when others; -- Reserved!
 
-  check_double_drive_dq : process (dq) is
+  check_double_drive_dq : process (cs) is
     variable no_dd : boolean := true;
   begin  -- process check_double_drive_dq
-    for i in dq'range loop
-      if dq(i) = 'X' then
-        no_dd := false;
-      end if;
-    end loop;  -- i
+    if falling_edge(cs) then
+      for i in dq'range loop
+        if dq(i) = 'X' then
+          no_dd := false;
+        end if;
+      end loop;  -- i
 
-    assert no_dd report "[Octo_BFM] Double driving on signal dq" severity warning;
+      assert no_dd report "[Octo_BFM] Double driving on signal dq" severity warning;
+    end if;
+    
   end process check_double_drive_dq;
 
   p_deep_power_down : process (all) is

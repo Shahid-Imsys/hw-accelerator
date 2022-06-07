@@ -162,7 +162,9 @@ begin  -- architecture bfm
     elsif cs = '1' then                 -- wait_on_cs state
       command <= x"00";
       state   <= command_state_1;
-      if state /= command_state_1 and state /= wait_on_cs and state /= write_ddr then
+      if state = read_ddr then
+        state <= command_state_1;
+      elsif state /= command_state_1 and state /= wait_on_cs and state /= write_ddr then
         write(l, string'("[Octo_BFM] Warning, BFM in state "));
         write(l, state_t'image(state));
         write(l, string'(" when cs is high"));

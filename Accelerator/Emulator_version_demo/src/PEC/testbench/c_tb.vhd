@@ -21,6 +21,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.all;
+use std.env.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -41,7 +43,7 @@ component PEC_top
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
     RST_E  : in std_logic;
-	  clk_O  : out std_logic;
+	  DDO_VLD  : out std_logic;
 	  TAG    : in std_logic;
 	  TAG_FB : out std_logic;
     C_RDY  : out std_logic;
@@ -54,10 +56,11 @@ component PEC_top
     CLK_P            : in std_logic;     --PE clocks
     CLK_E            : in std_logic;     --PE's execution clock 
     RST_E            : out std_logic;
-    CLK_O            : in std_logic;
+    DDO_VLD            : in std_logic;
     TAG              : out std_logic;
     TAG_FB           : in std_logic;
-    c_rdy            : in std_logic;  
+    c_rdy            : in std_logic; 
+    TEST_DONE        : out std_logic; 
     DATA             : out std_logic_vector(7 downto 0);
     DATA_OUT         : in std_logic_vector(7 downto 0)
  );
@@ -68,10 +71,11 @@ component PEC_top
      CLK_P            : in std_logic;     --PE clocks
      CLK_E            : in std_logic;     --PE's execution clock 
      RST_E            : out std_logic;
-     CLK_O            : in std_logic;
+     DDO_VLD            : in std_logic;
      TAG              : out std_logic;
      TAG_FB           : in std_logic;
      c_rdy            : in std_logic;  
+     TEST_DONE        : out std_logic;
      DATA             : out std_logic_vector(7 downto 0);
      DATA_OUT         : in std_logic_vector(7 downto 0)
   );
@@ -81,20 +85,22 @@ component PEC_top
  signal clk_e : std_logic;
   --signals for PEC1
  signal rst_e_1 : std_logic;
- signal clk_o_1 : std_logic;
+ signal ddo_vld_1 : std_logic;
  signal tag_1   : std_logic;
  signal tag_fb_1 : std_logic;
  signal c_rdy_1 : std_logic;
  signal data_1 : std_logic_vector(7 downto 0);
  signal data_out_1 : std_logic_vector( 7 downto 0);
+ signal test_done_1: std_logic;
  --signals for PEC2
  signal rst_e_2 : std_logic;
- signal clk_o_2 : std_logic;
+ signal ddo_vld_2 : std_logic;
  signal tag_2   : std_logic;
  signal tag_fb_2 : std_logic;
  signal c_rdy_2 : std_logic;
  signal data_2 : std_logic_vector(7 downto 0);
  signal data_out_2 : std_logic_vector( 7 downto 0);
+ signal test_done_2: std_logic;
  
 begin
 
@@ -114,12 +120,19 @@ begin
     wait for 15 ns;
   end process;
 
+  process
+  begin
+    wait until (test_done_1 and test_done_2) = '1';
+    report "simulation end";
+    finish;
+  end process;
+
 cluster_1: PEC_top
 port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_1,
-clk_o => clk_o_1,
+ddo_vld => ddo_vld_1,
 tag => tag_1,
 tag_fb => tag_fb_1,
 c_rdy => c_rdy_1,
@@ -131,7 +144,7 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_2,
-clk_o => clk_o_2,
+ddo_vld => ddo_vld_2,
 tag => tag_2,
 tag_fb => tag_fb_2,
 c_rdy => c_rdy_2,
@@ -143,10 +156,11 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_1,
-clk_o => clk_o_1,
+ddo_vld => ddo_vld_1,
 tag => tag_1,
 tag_fb => tag_fb_1,
 c_rdy => c_rdy_1,
+test_done => test_done_1,
 data => data_1,
 data_out => data_out_1);
 
@@ -155,10 +169,11 @@ port map(
 clk_p => clk_p,
 clk_e => clk_e,
 rst_e => rst_e_2,
-clk_o => clk_o_2,
+ddo_vld => ddo_vld_2,
 tag => tag_2,
 tag_fb => tag_fb_2,
 c_rdy => c_rdy_2,
+test_done => test_done_2,
 data => data_2,
 data_out => data_out_2);
 

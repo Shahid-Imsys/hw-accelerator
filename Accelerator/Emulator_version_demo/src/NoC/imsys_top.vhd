@@ -185,20 +185,17 @@ component Noc_Top is
   );
   end component;
 
- component Cluster_top is
+ component PEC_top is
    Port( 
 	  CLK_P     : in std_logic;
 	  CLK_E     : in std_logic;
-      RST_P     : in std_logic;
       RST_E     : in std_logic;
 	  clk_O     : out std_logic;
 	  TAG       : in std_logic;
 	  TAG_FB    : out std_logic;
       C_RDY     : out std_logic;
       DATA      : in std_logic_vector(7 downto 0);
-      DATA_OUT  : out std_logic_vector(7 downto 0);
-      noc_cmd_t : out std_logic_vector(4 downto 0);
-	  rd_trig_t : out std_logic
+      DATA_OUT  : out std_logic_vector(7 downto 0)
   );
 end component;
     
@@ -206,8 +203,8 @@ component clk_wiz_0
 port
  (-- Clock in ports
   -- Clock out ports
-  clk_out1          : out    std_logic;
-  clk_out2          : out    std_logic;
+  clk_p          : out    std_logic;
+  clk_e          : out    std_logic;
   -- Status and control signals
   reset             : in     std_logic;
   locked            : out    std_logic;
@@ -215,22 +212,22 @@ port
  );
 end component;
 
-component ila_6
+--component ila_6
 
-port (
-	clk : IN STD_LOGIC;
-	probe0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
-	probe2 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
-	probe3 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
-	probe4 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-	probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-	probe9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
-);
-end component;
+--port (
+--	clk : IN STD_LOGIC;
+--	probe0 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+--	probe1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0); 
+--	probe2 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
+--	probe3 : IN STD_LOGIC_VECTOR(4 DOWNTO 0); 
+--	probe4 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--	probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--	probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--	probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--	probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+--	probe9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
+--);
+--end component;
 
 
 signal REF_CLK_i                         : std_logic;
@@ -469,7 +466,6 @@ signal short_cycle   : std_logic;
 -- to PADS
 signal mirqout_o     : std_logic;                       
 signal mckout1_o     : std_logic;   
-signal mckout1_o_en  : std_logic;                    
 signal msdout_o      : std_logic;                       
 signal mrstout_o     : std_logic;                       
 signal mexec_o       : std_logic;                       
@@ -699,17 +695,33 @@ signal noc_cmd1_t      : std_logic_vector (4 downto 0);
 signal noc_cmd2_t      : std_logic_vector (4 downto 0);
 signal rd_trig1_t      : std_logic;
 signal rd_trig2_t      : std_logic;
+signal C_RDY1          : std_logic;
+signal C_RDY2          : std_logic;
+signal PEC_ready_P1    : std_logic;
+signal PEC_ready_P2    : std_logic;
+signal PEC_ready_P3    : std_logic;
+signal PEC_ready_P4    : std_logic;
+signal PEC_ready_P5    : std_logic;
+signal PEC_ready_P6    : std_logic;
+--CDC SIGNALS
+signal READY           : std_logic;
+signal READY_P1        : std_logic;
+signal READY_P2        : std_logic;
+signal READY_P3        : std_logic;
+signal READY_extended  : std_logic;
+signal READY_meta      : std_logic;
+signal READY_d1        : std_logic;
 
-signal	probe0_i       : std_logic_vector(15 downto 0); 
-signal	probe1_i       : std_logic_vector(15 downto 0); 
-signal	probe2_i       : std_logic_vector(4 downto 0); 
-signal	probe3_i       : std_logic_vector(4 downto 0); 
-signal	probe4_i       : std_logic_vector(0 downto 0); 
-signal	probe5_i       : std_logic_vector(0 downto 0); 
-signal	probe6_i       : std_logic_vector(0 downto 0); 
-signal	probe7_i       : std_logic_vector(0 downto 0); 
-signal	probe8_i       : std_logic_vector(0 downto 0);
-signal	probe9_i       : std_logic_vector(0 downto 0);
+--signal	probe0_i       : std_logic_vector(15 downto 0); 
+--signal	probe1_i       : std_logic_vector(15 downto 0); 
+--signal	probe2_i       : std_logic_vector(4 downto 0); 
+--signal	probe3_i       : std_logic_vector(4 downto 0); 
+--signal	probe4_i       : std_logic_vector(0 downto 0); 
+--signal	probe5_i       : std_logic_vector(0 downto 0); 
+--signal	probe6_i       : std_logic_vector(0 downto 0); 
+--signal	probe7_i       : std_logic_vector(0 downto 0); 
+--signal	probe8_i       : std_logic_vector(0 downto 0);
+--signal	probe9_i       : std_logic_vector(0 downto 0);
 
 
 begin
@@ -717,8 +729,8 @@ begin
 mmcm_inst : clk_wiz_0
    port map ( 
   -- Clock out ports  
-   clk_out1 => clk_gen, --180MHz
-   clk_out2 => CLK_P,   --Fast clock 360MHz
+   clk_p => CLK_P,   --Fast clock 129.998 MHz
+   clk_e => clk_gen, --64.999 MHz
 
   -- Status and control signals                
    reset => Reset,
@@ -904,8 +916,41 @@ port map(
     pcie_wr_ctl_wrs_t               => pcie_wr_ctl_wrs_t        
 ); 
 
-PEC_ready               <= '0'; --not(TAG_FB1 or TAG_FB2);
 Reset                   <= not(MRESET);
+PEC_Ready       <= PEC_ready_P1 or PEC_ready_P2 or PEC_ready_P3 or PEC_ready_P4 or PEC_ready_P5 or PEC_ready_P6;
+
+    -- CLOCK DOMAIN CROSSING
+    process(CLK_P)
+    begin
+        if rising_edge(CLK_P) then
+            READY      <= C_RDY1 and C_RDY2;  
+            READY_P1   <= READY;
+            READY_P2   <= READY_P1;
+            READY_P3   <= READY_P2;
+            -- Extended the signal for 4 clock cycles not to miss the signal is destination clock domain.
+            READY_extended <= READY or READY_P1 or READY_P2 or READY_P3;             
+        end if;
+    end process;
+        
+    process(REF_CLK_i)
+    begin
+        if rising_edge(REF_CLK_i) then
+            READY_meta     <= READY_extended;
+            READY_d1       <= READY_meta;
+        end if;
+    end process;
+
+process(REF_CLK_i)
+begin
+if rising_edge(REF_CLK_i) then
+    PEC_ready_P1    <= READY_d1;
+    PEC_ready_P2    <= PEC_ready_P1;
+    PEC_ready_P3    <= PEC_ready_P2;
+    PEC_ready_P4    <= PEC_ready_P3;
+    PEC_ready_P5    <= PEC_ready_P4;
+    PEC_ready_P6    <= PEC_ready_P5;    
+end if;
+end process;
 
 --process(ref_clk)
 --begin
@@ -958,65 +1003,59 @@ port map(
         pcie_wr_ctl_wrs_t   => pcie_wr_ctl_wrs_t
 );
      
-Cluster_top_Inst1: Cluster_top
+Cluster_top_Inst1: PEC_top
 port map(
         CLK_P               => CLK_P,
         CLK_E               => REF_CLK_i,
         clk_O               => Gated_clk_from_PEC,      --Clock outputs   
-        RST_P               => '0',
         RST_E               => '0',
         TAG                 => Tag_Line,                --Tag line
         TAG_FB              => TAG_FB1,
-        C_RDY               => open,
+        C_RDY               => C_RDY1,
         DATA                => NOC_bus_Out(7 downto 0), --Data line
-        DATA_OUT            => NOC_bus_In(7 downto 0),
-        noc_cmd_t           => noc_cmd1_t, 
-	    rd_trig_t           => rd_trig1_t           
+        DATA_OUT            => NOC_bus_In(7 downto 0)        
 );
   
-Cluster_top_Inst2: Cluster_top
+Cluster_top_Inst2: PEC_top
 port map(
         CLK_P               => CLK_P,
         CLK_E               => REF_CLK_i,
         clk_O               => open,      --Clock outputs   
-        RST_P               => '0',
         RST_E               => '0',
         TAG                 => Tag_Line,                --Tag line
         TAG_FB              => TAG_FB2,
-        C_RDY               => open,
+        C_RDY               => C_RDY2,
         DATA                => NOC_bus_Out(15 downto 8), --Data line
-        DATA_OUT            => NOC_bus_In(15 downto 8),
-        noc_cmd_t           => noc_cmd2_t, 
-	    rd_trig_t           => rd_trig2_t                    
+        DATA_OUT            => NOC_bus_In(15 downto 8)                   
 );
 
-    probe0_i(15 downto 0) <= NOC_bus_In;
-    probe1_i(15 downto 0) <= NOC_bus_Out;
-    probe2_i(4 downto 0)  <= noc_cmd1_t;
-    probe3_i(4 downto 0)  <= noc_cmd2_t;
-    probe4_i(0)           <= rd_trig1_t;
-    probe5_i(0)           <= rd_trig2_t;
-    probe6_i(0)           <= Tag_Line;
-    probe7_i(0)           <= TAG_FB1;
-    probe8_i(0)           <= TAG_FB2;
-    probe9_i(0)           <= Tag_Line; 
+--    probe0_i(15 downto 0) <= NOC_bus_In;
+--    probe1_i(15 downto 0) <= NOC_bus_Out;
+--    probe2_i(4 downto 0)  <= noc_cmd1_t;
+--    probe3_i(4 downto 0)  <= noc_cmd2_t;
+--    probe4_i(0)           <= rd_trig1_t;
+--    probe5_i(0)           <= rd_trig2_t;
+--    probe6_i(0)           <= Tag_Line;
+--    probe7_i(0)           <= TAG_FB1;
+--    probe8_i(0)           <= TAG_FB2;
+--    probe9_i(0)           <= Tag_Line; 
 
 
-Ila_Imsys : ila_6
-port map
-(
-	clk => REF_CLK_i,
-	probe0 => probe0_i, 
-	probe1 => probe1_i, 
-	probe2 => probe2_i, 
-	probe3 => probe3_i, 
-	probe4 => probe4_i, 
-	probe5 => probe5_i, 
-	probe6 => probe6_i, 
-	probe7 => probe7_i, 
-	probe8 => probe8_i,
-	probe9 => probe9_i
-);
+--Ila_Imsys : ila_6
+--port map
+--(
+--	clk => REF_CLK_i,
+--	probe0 => probe0_i, 
+--	probe1 => probe1_i, 
+--	probe2 => probe2_i, 
+--	probe3 => probe3_i, 
+--	probe4 => probe4_i, 
+--	probe5 => probe5_i, 
+--	probe6 => probe6_i, 
+--	probe7 => probe7_i, 
+--	probe8 => probe8_i,
+--	probe9 => probe9_i
+--);
    
 
 end struct;

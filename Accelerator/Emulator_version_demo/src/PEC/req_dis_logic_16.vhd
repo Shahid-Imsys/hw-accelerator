@@ -50,7 +50,8 @@ entity req_dst_logic is
         REQ_RD_IN : in std_logic_vector(15 downto 0);
         ACK_SIG   : out std_logic_vector(15 downto 0);
         PE_REQ_IN    : in pe_req; -- pe_req(0) is the last PE (PE 64)
-        OUTPUT    : out std_logic_vector(31 downto 0); --Output to CC
+        CMD_OUTPUT    : out std_logic_vector(31 downto 0); --Command output to CC
+        DATA_OUTPUT   : out std_logic_vector(127 downto 0); --Data output to CC
         RD_FIFO   : in std_logic;
         FIFO_VLD  : out std_logic;
         --FOUR_WD_LEFT : out std_logic;
@@ -66,24 +67,26 @@ entity req_dst_logic is
 end entity req_dst_logic;
 
 architecture rtl of req_dst_logic is
-COMPONENT fifo_generator_1
-    PORT (
+COMPONENT fifo
+GENERIC(DATA_WIDTH,DATA_DEPTH,PROG_FULL_TRESHOLD : integer);
+PORT (
     clk : IN STD_LOGIC;
+    --rd_clk : IN STD_LOGIC;
     srst : IN STD_LOGIC;
-    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    din : IN STD_LOGIC_VECTOR(DATA_WIDTH-1 DOWNTO 0);
     wr_en : IN STD_LOGIC;
     rd_en : IN STD_LOGIC;
-    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dout : OUT STD_LOGIC_VECTOR(DATA_WIDTH-1 DOWNTO 0);
     full : OUT STD_LOGIC;
     almost_full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
     almost_empty : OUT STD_LOGIC;
-    prog_empty : OUT STD_LOGIC;
+    prog_full : OUT STD_LOGIC;
     valid      : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(9 downto 0);
-    wr_rst_busy : OUT STD_LOGIC;
-    rd_rst_busy : OUT STD_LOGIC
-  );
+    counter : OUT integer range DATA_DEPTH-1 downto 0
+    --wr_rst_busy : OUT STD_LOGIC;
+    --rd_rst_busy : OUT STD_LOGIC
+);
 END COMPONENT;
     --type pe_req_in is array (63 downto 0) of std_logic_vector(25 downto 0);
     signal id_num   : std_logic_vector(3 downto 0):="0000";
@@ -95,8 +98,8 @@ END COMPONENT;
     signal add_in_2 : std_logic_vector(3 downto 0):="0000";
     signal add_out  : std_logic_vector(3 downto 0);
     signal bs_out   : std_logic_vector(15 downto 0);
-    signal pe_mux_out : std_logic_vector(31 downto 0);
-    signal req_core  :  std_logic_vector(31 downto 0);
+    signal pe_mux_out : std_logic_vector(159 downto 0);
+    signal req_core  :  std_logic_vector(159 downto 0);
     signal wr      : std_logic;
     signal rd      : std_logic;
     signal full    : std_logic;
@@ -108,11 +111,13 @@ END COMPONENT;
 --    signal loop_c  : integer := 0;
     signal chain   : std_logic; --reserved for later use
     signal data_in_fifo : std_logic_vector(9 downto 0);
-    signal prog_empty_i : std_logic;
+    signal prog_full_i : std_logic;
     signal data_vld_out_i : std_logic_vector(15 downto 0);
     signal reset_i     : std_logic;
     signal req_to_noc_i : std_logic;
     signal req_rd_reg   : std_logic_vector(15 downto 0) := (others => '0');
+    signal valid_d : std_logic;
+    signal dout_d : std_logic_vector(159 downto 0);
 
 
 begin
@@ -275,13 +280,13 @@ process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
     if rising_edge(clk_p) then
         if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            --if wr_req = '1' then
-            --    id_num <= add_in_1;
-            --else
+            if REQ_SIG = (REQ_SIG'range => '0') AND REQ_RD_IN = (REQ_RD_IN'range => '0') then
+                id_num <= x"0";
+            else
                 if REQ_RD_IN = (REQ_RD_IN'range => '0') then
-                id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
+                    id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
                 end if;
-            --end if;
+            end if;
         end if;
     end if;
     
@@ -334,6 +339,16 @@ begin
     end if;
 end process;
 --wr <= poll_act;
+--Output delay for synchronization with clk_e
+process(clk_p)
+begin
+    if rising_edge(clk_p) then
+        FIFO_VLD <= valid_d;
+        CMD_OUTPUT <= dout_d(159 downto 128);
+        DATA_OUTPUT <= dout_d(127 downto 0);
+    end if;
+end process;
+
 req_core <= pe_mux_out;
 fifo_rdy <= almost_full and rd;
 rd       <= RD_FIFO;
@@ -360,22 +375,30 @@ begin
     end if;
 end process;
 --DATA_VLD_OUT <= data_vld_out_i; 
-request_fifo : fifo_generator_1
-  PORT MAP (
+request_fifo : fifo
+GENERIC MAP(
+    DATA_WIDTH => 160,
+    DATA_DEPTH => 1024,
+    PROG_FULL_TRESHOLD => 1023
+)
+PORT MAP (
     clk => clk_p,
+    --rd_clk => clk_p,
     srst => reset_i,
     din => req_core,
     wr_en => wr,
     rd_en => rd,
-    dout => output,
+    dout => dout_d,
     full => full,
     almost_full => almost_full,
     empty => empty,
     almost_empty => almost_empty,
-    prog_empty => prog_empty_i,
-    valid      => FIFO_VLD,
-    data_count => data_in_fifo,
-    wr_rst_busy => open,
-    rd_rst_busy => open
-  );
+    prog_full => prog_full_i,
+    valid      => valid_d,
+    counter => open
+    --wr_rst_busy => open,
+    --rd_rst_busy => open
+);
+
+
 end architecture;

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+**********************************************
+DTD for Virage Logic Corp integrator jobs xml files
+-->
+
+<!ELEMENT job (targetset*)>
+<!ATTLIST job name CDATA #IMPLIED>
+<!ELEMENT targetset (target*)>
+<!ATTLIST targetset name CDATA #REQUIRED>
+<!ATTLIST targetset enabled CDATA #REQUIRED>
+<!ELEMENT target (#PCDATA)>
+<!ATTLIST target name CDATA #REQUIRED>
+<!ATTLIST target status CDATA #IMPLIED>
+
+
+<!-- END OF DTD -->

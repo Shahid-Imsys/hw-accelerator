@@ -220,7 +220,7 @@ entity core is
     msdin_i     : in  std_logic;  -- Serial data in (debug) 
     msdout_o    : out std_logic;  -- Serial data out
     mrstout_o   : out std_logic;  -- Reset out
-    mxout_o     : out std_logic;  -- Oscillator test output
+    --mxout_o     : out std_logic;  -- Oscillator test output
     mexec_o     : out std_logic;  -- clk_e test output
     mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL
@@ -420,7 +420,7 @@ architecture struct of core is
   
   attribute syn_keep              : boolean;
   attribute syn_keep of pend_i    : signal is true;
-  -- To easy gate-level simulation
+  -- To ease gate-level simulation
   attribute syn_keep of dbus_int  : signal is true;
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;

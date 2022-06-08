@@ -17,15 +17,15 @@
 -- File       : io_mux.vhd
 -- Author     : Xing Zhao
 -- Company    : Imsys Technologies AB
--- Date       : 
+-- Date       :
 -------------------------------------------------------------------------------
 -- Description: This block multiplexes the 'idi', 'ido' buses from 'UARTs' and
 --              'Ethernet' to 'IOS'. It also selects the external 'idreq'
 --              and 'Eth' 'idreq' to 'IOS' as well as 'IOS's 'idack' to 'Eth'.
---              
+--
 -------------------------------------------------------------------------------
 -- TO-DO list :
---              
+--
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date					Version		Author	Description
@@ -52,38 +52,50 @@ entity io_mux is
     eth_ido       : in  std_logic_vector(7 downto 0);
     pdi_iden      : in  std_logic;
     pdi_ido       : in  std_logic_vector(7 downto 0);
+    ospi_iden     : in  std_logic;
+    ospi_ido      : in  std_logic_vector(7 downto 0);
+    ext_iden      : in  std_logic;
+    ext_ido       : in  std_logic_vector(7 downto 0);
     iden          : out std_logic;
     ido           : out std_logic_vector(7 downto 0);
     -- IDREQ
-    idreq         : in  std_logic_vector(7 downto 0);  -- external 'idreq' 
+    idreq         : in  std_logic_vector(7 downto 0);  -- external 'idreq'
     rx1_idreq     : in  std_logic;                     -- ETH 'idreq'
     rx2_idreq     : in  std_logic;                     -- ETH 'idreq'
     tx_idreq      : in  std_logic;                     -- ETH 'idreq'
     pdi_idreq     : in  std_logic;                     -- PDI 'idreq'
+    ospi_idreq    : in  std_logic;                     -- OSPI 'idreq'
+    ext_idreq     : in  std_logic;                     -- External 'idreq'
     ios_idreq     : out std_logic_vector(7 downto 0);  -- 'idreq' to 'IOS'
     -- IDACK
     idack         : in  std_logic_vector(7 downto 0);  -- from IOS
     rx1_idack     : out std_logic;                     -- idack to ETH
     rx2_idack     : out std_logic;                     -- idack to ETH
     tx_idack      : out std_logic;                     -- idack to ETH
-    pdi_idack     : out std_logic
+    pdi_idack     : out std_logic;                     -- idack to PDI
+    ospi_idack    : out std_logic;                     -- idack to OSPI
+    ext_idack     : out std_logic                      -- External idack
     );
 end io_mux;
 
 architecture rtl of io_mux is
+  signal iden_1hot : std_logic_vector(6 downto 0);
 begin  -- rtl
   -- Gate together all iden signals.
   iden <= ios_iden or uart1_iden or uart2_iden or uart3_iden or
-  				eth_iden or pdi_iden;
-         
+          eth_iden or pdi_iden or ospi_iden or ext_iden;
+
   -- Mux out ido, IOS drives when none else does.
-  with std_logic_vector'(pdi_iden, eth_iden, uart3_iden, uart2_iden, uart1_iden)
-  select ido <= uart1_ido when "00001",
-                uart2_ido when "00010",
-                uart3_ido when "00100",
-                eth_ido   when "01000",
-                pdi_ido   when "10000",
-                ios_ido   when others;
+  iden_1hot <= pdi_iden & eth_iden & uart3_iden & uart2_iden & uart1_iden & ospi_iden & ext_iden;
+  with iden_1hot select ido <=
+    ext_ido   when "0000001",
+    ospi_ido  when "0000010",
+    uart1_ido when "0000100",
+    uart2_ido when "0001000",
+    uart3_ido when "0010000",
+    eth_ido   when "0100000",
+    pdi_ido   when "1000000",
+    ios_ido   when others;
 
   -- Mux out 'idreq' to IOS, priority is eth > pdi > external.(?)
   ios_idreq(0) <= idreq(0);
@@ -97,5 +109,9 @@ begin  -- rtl
   rx2_idack <= idack(2) when en_eth = "11" else '1';
   tx_idack  <= idack(3) when en_eth /= "00" else '1';
   pdi_idack <= idack(4) when en_pdi = '1' else '1';
-  
+
+  -- No DMA support in OSPI or External
+  ospi_idack <= '1';
+  ext_idack  <= '1';
+
 end rtl;

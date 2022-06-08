@@ -1,0 +1,443 @@
+# Release Notes #
+All notable changes to 'ri_adpll_2gmp' will be documented in this file.
+This project adheres to Semantic Versioning (http://semver.org/).
+Please see (http://keepachangelog.com/) for how to write a changelog
+Please keep version numbering scheme,
+e.g. "## v1.2.3" exactly at beginning of line, it is parsed
+
+## v0.0.1 20170802_Wed_125614 (released by pilz) ##
+
+### Changed ###
+
+### Added ###
+- inital release of 'ri_adpll_2gmp'
+
+
+
+## v0.0.2 20171011_Wed_111824 (released by pilz) ##
+
+### Changed ###
+- RTL
+- Behavioral
+- Schmatics
+
+
+### Added ###
+- initial Release of RTL and behavioral with all features defined in documentation
+- sanity testcases passes
+
+
+
+## v0.0.3 20171107_Tue_095932 (released by pilz) ##
+
+### Changed ###
+
+### Added ###
+- first backend results
+- not DRC clean!
+- only for pin placement of SERDES IP
+
+
+## v0.0.4 20171107_Tue_104053 (released by pilz) ##
+
+### Changed ###
+- celldefines in behaviorals
+
+### Added ###
+
+
+## v0.0.5 20171113_Mon_193305 (released by pilz) ##
+
+### Changed ###
+-Custom macro shifted one standard cell rail in the north direction
+ due to DRC violation
+- Antenna violation left because of missing information in lef file
+
+### Added ###
+-generated regfile template
+
+
+
+## v0.0.6 20171130_Thu_200615 (released by pilz) ##
+
+### Changed ###
+-LVS clean
+
+
+## v0.0.7 20171218_Mon_152935 (released by pilz) ##
+
+### Changed ###
+-DDP (Schematic-->cdl netlist and Verilog behavioral): clk_core generated with two divider (corediv and outdiv)
+-LVS not clean!!! because layout is not adapted yet!!
+
+
+## v0.0.8 20180105_Fri_083100 (released by pilz) ##
+
+### Changed ###
+-DDP (Schematic-->cdl netlist and Verilog behavioral): clk_core generated with two divider (corediv and outdiv) OR only from corediv-->additional MUX
+-used new LIBs for pll_2gmp_ddp
+-LVS not clean!!! because layout is not adapted yet!!
+
+
+## v0.0.9 20180111_Thu_084247 (released by pilz) ##
+
+### Changed ###
+- Changes for HAL-->HAL clean
+- updated register file tempplate
+- new floorplan: 45x100 (v0.0.8: 75x60)
+
+
+## v0.0.10 20180124_Wed_134422 (released by pilz) ##
+
+### Changed ###
+- shifted TX pins to north side
+- DRC clean
+- LVS clean
+- Timing clean
+- Std-lib v1.1.0
+- PDK 1.3_1.0
+
+
+## v0.0.11 20180129_Mon_103052 (released by pilz) ##
+
+### Changed ###
+- Config Pins on west side on Metal2 (not C1)
+
+
+## v0.0.12 20180130_Tue_103809 (released by pilz) ##
+
+### Changed ###
+- Config Pins on west side on C2
+- DCO Pins on C2
+- DDP GDS with latest STD cell lib (v1.1.0)
+
+
+## v0.0.13 20180305_Mon_161713 (released by pilz) ##
+
+### Changed ###
+- Custom GDS: TAPBIASANT cells because of Antenna violation (supply) on Toplevel
+- Cutom GDS: renaming of STD cells
+
+### Added ###
+- Lib files for DDP
+
+
+## v0.0.14 20180308_Thu_161204 (released by pilz) ##
+
+### Changed ###
+- Fixed Antenna Violation in DCO
+
+
+## v0.0.15 20180313_Tue_123509 (released by pilz) ##
+
+### Changed ###
+- ENDROWANT* cells
+- fixed power vias on top edge (normal width)
+- tx* pins on north side shifted by some um
+
+## v0.0.16 20180314_Wed_124611 (released by pilz) ##
+
+### Changed ###
+- ENDROWANT* cells also in pg netlist
+
+
+## v0.0.17 20180316_Fri_161222 (released by pilz) ##
+
+### Changed ###
+- DRC+ fixes
+
+## v0.0.18 20180320_Tue_150314 (released by pilz) ##
+
+### Changed ###
+- Clock tree with smaller latency
+
+
+## v0.0.19 20180404_Wed_144937 (released by pilz) ##
+
+### Changed ###
+- BISC config included in adpll_config --> more config bits
+- BISC results included in status outputs --> more status bits
+- ack_o is 1'b1 if en_atpll_ctrl_i == 1'b0:
+--> assign adpll_status_ack_o = (ack_bisc && ack_ctrl) || (!en_adpll_ctrl_i);
+
+
+## v0.0.20 20181029_Mon_091852 (released by pilz) ##
+
+### Changed ###
+- minor changes in DDP behavioral: core_div without internal reset, sensitivity list of MUX in outdiv
+
+## v0.0.21 20181112_Mon_132627 (released by pilz) ##
+
+### Added ###
+- simplified behavioral for better simulator performance
+
+### Changed ###
+
+
+
+## v0.0.22 20181119_Mon_083004 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- warning message in behavioral simple with %m for hierchary
+
+
+## v0.0.23 20190103_Thu_130058 (released by pilz) ##
+
+### Added ###
+- DFT Scan insertion
+
+## v0.0.24 20190115_Tue_143025 (released by pilz) ##
+
+### Added ###
+- ZBB signoff and Lib generation
+
+
+## v0.0.25 20190116_Wed_143338 (released by pilz) ##
+
+### Changed ###
+- removed tpclk ports which came from DFT testpoint insertion
+
+
+## v0.1.0 20191008_Tue_142758 (released by pilz) ##
+
+### Changed ###
+- temporary release
+- RVT Controller
+- SLVT DCO
+- zbb 0d65 libs
+- behavioral_simple debugging: rotation of DCO
+- changed direcrory structure
+- LVS not clean
+- Mixed signal simulaton needed
+- complete functional verification needed
+
+
+## v0.1.1 20191009_Wed_083300 (released by pilz) ##
+
+### Changed ###
+- lib directory structure
+
+## v1.0.0 20191025_Fri_171230 (released by pilz) ##
+
+### Changed ###
+- new derating
+- LVS clean
+
+
+## v1.0.1 20191028_Mon_125340 (released by pilz) ##
+
+### Added ###
+- ctl file from synthesis
+- renaming thermo_decoder to ri_adpll_thermo_decoder
+
+### Changed ###
+- behavioral_simple: debugged non-printable character
+
+## v1.0.2 20191031_Thu_103914 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- fixed blokages over PG Pins in LEF file
+
+
+## v1.0.3 20191108_Fri_133908 (released by pilz) ##
+
+### Added ###
+- CDS Lib of Custom Macro
+
+### Changed ###
+- fixed DRC+ violation
+- Added some PG stripes
+
+
+
+## v1.0.4 20191126_Tue_103344 (released by pilz) ##
+
+### Added ###
+- Corner table
+
+### Changed ###
+- fixed lib files (VNW/VPW not primary power)
+- Synchronizer flow; placed close together, no buffer between ffs, 3 ffs for sync
+- new enable for lock detection because of timing viol. in netlist sim
+- LEC done
+
+
+## v1.0.5 20191218_Wed_094138 (released by pilz) ##
+
+### Added ###
+- Libs Submodule
+- DEF Topmodule
+
+### Changed ###
+
+
+## v1.0.6 20191218_Wed_111944 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- DEF debugging (removed JA and OI)
+
+
+## v1.0.7.2 20210329_Mon_153738 (released by hoeppner) ##
+
+### Added ###
+- C1/C2 PG pins-->timing/LEG neutral
+
+### Changed ###
+
+## v1.0.7.1 20210329_Mon_131335 (released by hoeppner) ##
+
+### Added ###
+- LDO abstract views
+
+### Changed ###
+
+## v1.0.7.2 20210329_Mon_153738 (released by hoeppner) ##
+
+### Added ###
+
+
+### Changed ###
+- LDO .v view updated
+
+## v1.0.7.3 20210408_Thu_170913 (released by hoeppner) ##
+
+### Added ###
+
+
+### Changed ###
+- adpll simple behaviroal update to v1.1.0 config
+
+
+
+
+## v1.1.0 20210520_Thu_120743 (released by pilz) ##
+
+### Added ###
+- new 9tg1 Custom macro
+- config vecror splitted
+- new Coarsetune based on counter
+- BIST for Coarsetune
+- behavioral_simple included in PLL toplevel--> selectable with RTL define
+- ACK status bit from FF
+- Fill GDS
+- documentation
+
+
+### Changed ###
+- 9tg1 libs
+- three scan chains with max
+- new main divider coding
+- removed BISC
+- release structure (splitted in sub libs)
+
+
+
+
+
+## v1.1.1 20210526_Wed_132652 (released by pilz) ##
+
+### Added ###
+
+
+### Changed ###
+- bugfix LDO behavioral
+- reduced bit width of clk_en_shift_reg
+
+
+
+## v1.1.2 20210622_Tue_134753 (released by pilz) ##
+
+### Added ###
+- LDO GDS
+- LDO CDL
+- corsetune compensation
+- additional PFD sync reg
+- status capture pulse with common sync pedge
+- Finetune BIST included
+
+### Changed ###
+- thermo register with separate shift clk_ctrl
+- more status bits (ct uf/of, additional finetune bit)
+
+
+## v1.1.3 20210729_Thu_154232 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- lock in changes
+- ref_clk_i pin moved to middle
+- separate scan_clk_i pin
+
+
+## v1.1.4 20210927_Mon_081054 (released by pilz) ##
+
+### Added ###
+- Coarse tune rounding features
+- added metastability filter to DDP
+
+### Changed ###
+- DCO count window reduced from 64 to 32
+- EMIR requirements
+
+
+## v1.1.5 20211005_Tue_152521 (released by pilz) ##
+
+### Added ###
+- Antenna diode on ref_clk_i pin
+- Exclude layer in DDP macro
+
+### Changed ###
+- removed not filled GDS from release
+
+
+## v1.1.6 20211012_Tue_115305 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- bugfix in LDO behavioral
+- reduced mac cap for clk_core in ddp lib
+
+
+## v1.1.7 20211013_Wed_125508 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- removed Fill shapes over C3
+
+
+## v1.1.7.1 20211019_Tue_173433 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- removed physical only cells from CDL and netlist
+
+
+## v1.1.8 20211206_Mon_172920 (released by pilz) ##
+
+### Added ###
+- config software (python script)
+- aging derates
+
+### Changed ###
+- EMIR fixes in PLL custom part
+- removed obsolet PG pins
+
+
+## v1.1.9 20211207_Tue_150926 (released by pilz) ##
+
+### Added ###
+
+### Changed ###
+- fixed LDO Restep DRC violation 
+
+

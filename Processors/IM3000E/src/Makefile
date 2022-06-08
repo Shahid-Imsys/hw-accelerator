@@ -1,7 +1,9 @@
 GPP_DIR=$(PROJECT_PATH)/Processors/IM3000E/src
 GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
-gpp_rtl: 
+IP_DIR=$(PROJECT_PATH)/Processors/IM3000E/fpga_synth/gpp
+
+gpp_rtl: mem_load_comp fpga_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \
 			 	  $(GPP_DIR_WIN)/gp_pkg.vhd \
 			 	  $(GPP_DIR_WIN)/fgendec.vhd \
@@ -41,8 +43,26 @@ gpp_rtl:
 			 	  $(GPP_DIR_WIN)/core2/acore.vhd \
 			 	  $(GPP_DIR_WIN)/mpmem_inf.vhd \
 			 	  $(GPP_DIR_WIN)/sdram_inf.vhd \
-			 	  $(GPP_DIR_WIN)/flash_inf.vhd \
+			 	  $(GPP_DIR_WIN)/peri/pdi.vhd \
+			 	  $(GPP_DIR_WIN)/peri/tiu.vhd \
+			 	  $(GPP_DIR_WIN)/peri/ports.vhd \
+			 	  $(GPP_DIR_WIN)/peri/port_mux.vhd \
+			 	  $(GPP_DIR_WIN)/peri/io_mux.vhd \
+			 	  $(GPP_DIR_WIN)/peri/uart.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_crc.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_rx.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth_tx.vhd \
+			 	  $(GPP_DIR_WIN)/peri/eth.vhd \
+			 	  $(GPP_DIR_WIN)/peri/adc.vhd \
+			 	  $(GPP_DIR_WIN)/peri/dac.vhd \
+			 	  $(GPP_DIR_WIN)/peri/OctoSPI.vhd \
+			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/ram_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \
+			 	  $(GPP_DIR_WIN)/ext/trace_memory.vhd \
+			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
@@ -53,7 +73,11 @@ gpp_rtl:
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1A.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_1024X8X1CM8.vhd
 
+mem_load_comp:
+	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v
 
-
+fpga_ip:
+	$(V_COMP) $(IP_DIR)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \
+		  $(IP_DIR)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
 
 #include $(GPP_DIR)/pads/Makefile

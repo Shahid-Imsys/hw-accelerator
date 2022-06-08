@@ -35,8 +35,11 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_arith.all;
 use IEEE.std_logic_unsigned.all;
 
+use work.gp_pkg.all;
+
 entity eth is
 	generic (
+        g_build_type   : memory_type_t := asic;
 		TX_CTL_ADR		: std_logic_vector(7 downto 0) := x"23"; --acts as CTL/STS
 		RX_CTL_ADR		: std_logic_vector(7 downto 0) := x"20"; --acts as CTL/STS
 		RX_DA_ADR			: std_logic_vector(7 downto 0) := x"21";
@@ -447,6 +450,7 @@ begin
 
   eth_tx1 : entity work.eth_tx
 		generic map (
+		    g_build_type => g_build_type,
 			TX_CTL_ADR	=> TX_CTL_ADR,
 			TX_SIZE			=> TX_SIZE)
 		port map (

@@ -67,8 +67,6 @@ entity tim is
 		-- Microinstruction fields
 		pl         : in  std_logic_vector(79 downto 0); -- Used for CALL SP & ACK SPREQ
 		
-		--pl_shin_pa : in  std_logic_vector(3 downto 0); -- Used for CALL SP & ACK SPREQ
-		--pl_alud    : in  std_logic_vector(2 downto 2); -- Only bit 2 used here
 		-- Static control inputs
 		en_i       : in  std_logic; -- Enable I/O clock when high
 		en_mckout1 : in  std_logic; -- Enable MCKOUT1 pin when high
@@ -260,32 +258,20 @@ begin
 	    if rst_nint = '0' then 
 		    rst_cn_int <= '0';
 	    elsif falling_edge(clk_p) then--change to falling edge
-		    if rst_cn_off = '1' then
-				rst_cn_int <= '1';
-			end if;      
-		end if;
+              if rst_cn_off = '1' then
+                rst_cn_int <= '1';
+              end if;      
+            end if;
 	end process rst_cn_gen;
 	rst_cn  <= rst_cn_int;
 	mrstout <= rst_cn_int;
 
---
---	process (clk_p)
---	begin 
---	    if rising_edge(clk_p) then--rising_edge(clk_req_gen_int)
---		    if rst_nint = '0' then
---			    pll_stable_cnt <= "000000000000000";
---			elsif pll_stable_cnt_off = '0' then 
---				pll_stable_cnt <= pll_stable_cnt + '1';
---			end if;
---		end if;
---	end process;	
---
---	pll_stable_cnt_off <= '1' when pll_stable_cnt = "111111111111111" else '0';
 
 	-- sel_pll_on uses the first two ffs of the rst_cn counter
 	-- to get enough PLL lock time. 
 	--sel_pll_on <= pll_stable_cnt_off; 
 	sel_pll_on <= '1' when rst_cn_cnt(1) = '1' else '0';  --at least 1 ms for PLL be stable
+        
 	-- Generate sel_pll, delays the use of PLL after en_pll
 	-- has acticated, to allow it to stabilize.
 	sel_pll_gen: process (clk_p, en_pll_int, rst_nint, clk_sel)

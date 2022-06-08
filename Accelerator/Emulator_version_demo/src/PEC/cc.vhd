@@ -45,58 +45,64 @@ use work.all;
 --use work.defines.all;
 
 entity cluster_controller is
-  port(
---Clock inputs
-      CLK_P            : in std_logic;     --PE clock, clock from the oscillator --0628
-	  CLK_E            : in std_logic;     --NOC clock
-	  --CLK_E_NEG        : in std_logic;     --Inverted clk_e
---Power reset input:
-      --RST_P            : in std_logic;
-	  RST_E            : in std_logic; --active low --For reset clk_e generator
---Clock outputs
-	  CLK_O            : out std_logic;    --not needed in this version
-	  EVEN_P           : out std_logic;    --To PE and network
---Tag line
-	  TAG              : in std_logic;
-	  TAG_FB           : out std_logic;
---Data line   
-	  DATA             : in std_logic_vector(7 downto 0);
-	  DATA_OUT         : out std_logic_vector(7 downto 0);
---PE Control
-      EXE              : out std_logic;   --Start execution
-	  RESUME           : out std_logic;   --Resume paused execution
---Feedback signals
-      C_RDY               : out std_logic;
-	  PE_RDY_0         : in std_logic;
-	  PE_RDY_1         : in std_logic;
-	  PE_RDY_2         : in std_logic;
-	  PE_RDY_3         : in std_logic;
-	  PE_RDY_4         : in std_logic;
-	  PE_RDY_5         : in std_logic;
-	  PE_RDY_6         : in std_logic;
-	  PE_RDY_7         : in std_logic;
-	  PE_RDY_8         : in std_logic;
-	  PE_RDY_9         : in std_logic;
-	  PE_RDY_10         : in std_logic;
-	  PE_RDY_11         : in std_logic;
-	  PE_RDY_12         : in std_logic;
-	  PE_RDY_13         : in std_logic;
-	  PE_RDY_14         : in std_logic;
-	  PE_RDY_15         : in std_logic;
---Request and distribution logic signals
-      RST_R            : out std_logic;  --Active low
-	  REQ_IN           : in std_logic;  --req to noc in reg logic
-	  REQ_FIFO          : in std_logic_vector(31 downto 0);
-	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
-	  DATA_VLD         : out std_logic;
-	  PE_UNIT          : out std_logic_vector(5 downto 0);
-	  BC               : out std_logic; --Broadcast handshake
-	  RD_FIFO          : out std_logic;
-	  FIFO_VLD         : in std_logic
-	  --FOUR_WD_LEFT     : in std_logic 
+	generic(
+		TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
+												--To be moved to defines
+		);
+
+  	port(
+	--Clock inputs
+      	CLK_P            : in std_logic;     --PE clock, clock from the oscillator --0628
+	  	CLK_E            : in std_logic;     --NOC clock
+	  	--CLK_E_NEG        : in std_logic;     --Inverted clk_e
+	--Power reset input:
+	    --RST_P            : in std_logic;
+		RST_E            : in std_logic; --active low --For reset clk_e generator
+	--Clock outputs
+		DDO_VLD            : out std_logic;    --Output data valid port
+		EVEN_P           : out std_logic;    --To PE and network
+	--Tag line
+		TAG              : in std_logic;
+		TAG_FB           : out std_logic;
+	--Data line   
+		DATA             : in std_logic_vector(7 downto 0);
+		DATA_OUT         : out std_logic_vector(7 downto 0);
+	--PE Control
+	    EXE              : out std_logic;   --Start execution
+		RESUME           : out std_logic;   --Resume paused execution
+	--Feedback signals
+	    C_RDY               : out std_logic;
+		PE_RDY_0         : in std_logic;
+		PE_RDY_1         : in std_logic;
+		PE_RDY_2         : in std_logic;
+		PE_RDY_3         : in std_logic;
+		PE_RDY_4         : in std_logic;
+		PE_RDY_5         : in std_logic;
+		PE_RDY_6         : in std_logic;
+		PE_RDY_7         : in std_logic;
+		PE_RDY_8         : in std_logic;
+		PE_RDY_9         : in std_logic;
+		PE_RDY_10         : in std_logic;
+		PE_RDY_11         : in std_logic;
+		PE_RDY_12         : in std_logic;
+		PE_RDY_13         : in std_logic;
+		PE_RDY_14         : in std_logic;
+		PE_RDY_15         : in std_logic;
+	--Request and distribution logic signals
+	    RST_R            : out std_logic;  --Active low
+		REQ_IN           : in std_logic;  --req to noc in reg logic
+		REQ_FIFO          : in std_logic_vector(31 downto 0);
+		DATA_FROM_PE     : in std_logic_vector(127 downto 0);
+		DATA_TO_PE       : out std_logic_vector(127 downto 0);
+		DATA_VLD         : out std_logic;
+		PE_UNIT          : out std_logic_vector(5 downto 0);
+		BC               : out std_logic; --Broadcast handshake
+		RD_FIFO          : out std_logic;
+		FIFO_VLD         : in std_logic
+		--FOUR_WD_LEFT     : in std_logic 
 
 
-	  ); 
+		); 
 end entity cluster_controller;
 	   
 architecture rtl of cluster_controller is
@@ -180,7 +186,7 @@ end component;
   signal pe_write  : std_logic;
   signal pe_read   : std_logic;
   signal delay     : std_logic:='0';  --Delay flipflop
-  signal rd_trig   : std_logic;       --Read case trigger
+  --signal rd_trig   : std_logic;       --Read case trigger
   signal req_int   : std_logic;      --Request type ff
   signal broadcast_int : std_logic;  --Broadcast to PE
   signal r_delay   :std_logic;  --First clock delay when read.
@@ -192,12 +198,15 @@ end component;
   signal bc_i : std_logic_vector(6 downto 0);
   signal cl_net_fifo_rd : std_logic;
   signal rd_fifo_i : std_logic;
+  signal datain_vld  : std_logic;
+  signal dataout_vld : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in      : reg; --Input register to memory
   signal mem_out     : reg; --Output register of memory    
   signal noc_data_in     : reg;                        --NOC data input register
   signal noc_data_out    : reg;                        --NOC data output register
+  signal sync_collector : std_logic_vector(1 downto 0);
   --signal data_out     : reg;
   signal pe_data_in      : reg;                     --Input register form pe side
   signal data_core_int : reg;                       --Data register for PE --pe_data_out
@@ -227,25 +236,15 @@ end component;
   signal b_cast_ctr   : std_logic_vector(5 downto 0);
   signal write_count  : std_logic_vector(1 downto 0); --Wr req data counter
   --Delay signal
-  signal delay_c      : std_logic_vector(33 downto 0);--(31 downto 0);--(29  downto 0);
-  signal delay_b      : std_logic_vector(37 downto 0);
+  signal delay_c      : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);--(31 downto 0);--(29  downto 0);
+  signal delay_b      : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal rd_ena       : std_logic;
+  signal dataout_vld_o : std_logic;
   
-  signal one_c_delay :std_logic;
-  signal two_c_delay :std_logic;
-  signal three_c_delay : std_logic;
+  --signal one_c_delay :std_logic;
+  --signal two_c_delay :std_logic;
+  --signal three_c_delay : std_logic;
   
-  signal addr_p_e : std_logic_vector(14 downto 0);
-  signal addr_p_e_1 : std_logic_vector(14 downto 0);
-  signal pe_write_e : std_logic;
-  signal pe_write_e_1 : std_logic;
-  signal pe_read_e : std_logic;
-  signal pe_read_e_1 : std_logic;
-  signal pe_read_e_d : std_logic;
-  signal pe_data_in_e : reg;
-  signal pe_data_in_e_1 : reg;
-  signal data_core_int_e : reg;
-  signal data_core_int_e_1 : reg;
   signal standby : std_logic;
   signal delay_p      : std_logic;
  
@@ -292,8 +291,8 @@ EVEN_P <= even_p_2;
 			peci_busy <= '0';
 	    elsif noc_reg_rdy= '1' and len_ctr = "000000000000000" then --Refresh when data transfer is finished
 			sig_fin <= '0';
-		elsif peci_busy = '0' then
-			tag_ctr_1 := 41; --40; --38;
+		elsif peci_busy = '0' and sig_fin = '0' then
+			tag_ctr_1 := TAG_CMD_DECODE_TIME; 
             if tag = '1' then
                 peci_busy <= '1'; 
             else
@@ -301,7 +300,7 @@ EVEN_P <= even_p_2;
 			end if;
         elsif peci_busy= '1' then
             tag_ctr_1 := tag_ctr_1-1;
-			if tag_ctr_1 = 35 then --34 then --32 then --5 for collecting data to NOC command buffer, 1 for transfer form buffer to NOC command register
+			if tag_ctr_1 = TAG_CMD_DECODE_TIME -6 then --5 for collecting data to NOC command buffer, 1 for transfer form buffer to NOC command register
 				sig_fin <= '1';
 			elsif tag_ctr_1 = 0 then
                 peci_busy <= '0';
@@ -330,7 +329,7 @@ EVEN_P <= even_p_2;
     			    elsif noc_cmd_ctr = 0 then
     			    noc_cmd <= noc_cmd_buf;
     			    end if;
-			    elsif peci_busy='0' and sig_fin='0' and delay='0' and rd_trig ='0'  then
+			    elsif peci_busy='0' and sig_fin='0' and delay='0' then
 					noc_cmd_ctr := 5;
 					noc_cmd <= (others => '0');
     		    else 
@@ -399,30 +398,30 @@ EVEN_P <= even_p_2;
 				    delay <= '0';
 			    elsif peci_busy = '1' and sig_fin = '1' then
 			    	delay_c(0) <= '1';
-		            for i in 0 to 32 loop--30 loop --28 loop
+		            for i in 0 to TAG_CMD_DECODE_TIME-10 loop
 			    		delay_c(i+1) <= delay_c(i);
 			    	end loop;
-					delay <= delay_c(32);--(31); --(29); --changed to assert one clock before data comes
+					delay <= delay_c(TAG_CMD_DECODE_TIME-9);--(31); --(29); --changed to assert one clock before data comes
 				end if;
 			elsif noc_cmd = "00101" then
 				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then  
 					delay <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then	
 			    	delay_b(0) <= '1';
-		            for i in 0 to 36 loop
+		            for i in 0 to TAG_CMD_DECODE_TIME-5 loop
 			    	    delay_b(i+1) <= delay_b(i);
 			    	end loop;
-			    	delay <= delay_b(37);
+			    	delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
 			elsif noc_cmd = "00100" then
-				if noc_reg_rdy= '1' and len_ctr = "111111111111111" then  
+				if byte_ctr = "0000" and len_ctr = "111111111111111" then  
 					delay <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
 						delay_c(0) <= '1';
-						for i in 0 to 28 loop
+						for i in 0 to TAG_CMD_DECODE_TIME-10 loop
 							delay_c(i+1) <= delay_c(i);
 						end loop;
-						delay <= delay_c(29);
+						delay <= delay_c(TAG_CMD_DECODE_TIME-9);
 				end if;
 		    else 
 		        delay_c <=(others => '0');
@@ -436,12 +435,12 @@ EVEN_P <= even_p_2;
     begin
 		if rising_edge(clk_e) then
             noc_delay <= noc_reg_rdy;
-			one_c_delay <= delay;
-			two_c_delay <= one_c_delay;
-			three_c_delay <= two_c_delay;
+			--one_c_delay <= delay;
+			--two_c_delay <= one_c_delay;
+			--three_c_delay <= two_c_delay;
 		end if;
 	end process; 
-	rd_trig <= (one_c_delay and two_c_delay and three_c_delay);	
+	--rd_trig <= (one_c_delay and two_c_delay and three_c_delay);	
 	
 	
 	--Byte counter calculation
@@ -454,13 +453,13 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				byte_ctr <= "0000";
 		    elsif noc_cmd = "00011" or noc_cmd = "00101" then
-	            if delay = '1' then
+	            if delay = '1' and datain_vld = '1' then
                  	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
 				else
 					byte_ctr <= "1111"; 
                 end if;
 			elsif noc_cmd = "00100" then
-				if delay = '1' or rd_trig = '1' then
+				if delay = '1'  and dataout_vld = '1'then
 					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
 				else
 					byte_ctr <= "1111"; 
@@ -470,6 +469,56 @@ EVEN_P <= even_p_2;
 		    end if;
 		end if;
 	end process;
+
+	
+	extended_sync_pulse_collector : process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			if noc_cmd = "01111" then
+				sync_collector <= (others => '0');
+			elsif noc_cmd = "00011" or noc_cmd = "00101" or noc_cmd = "00100" then
+				if delay = '1' then
+					sync_collector(0) <= tag;
+					sync_collector(1) <= sync_collector(0);
+				else
+					sync_collector <=(others => '0');
+				end if;
+			else
+				sync_collector <=(others => '0');
+			end if;
+		end if;
+	end process;
+
+	datain_valid_generator: process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			if noc_cmd = "01111" then
+				datain_vld <= '0';
+			elsif noc_cmd = "00011" or noc_cmd = "00101" then
+				if sync_collector = "11" then
+					datain_vld <= '1';
+				elsif byte_ctr = "0000" then
+					datain_vld <= '0';
+				end if;
+			end if;
+		end if;
+	end process;
+
+	dataout_vld_generator: process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			if noc_cmd ="01111" then
+				dataout_vld <= '0';
+			elsif noc_cmd = "00100" then
+				if noc_read = '1' then
+					dataout_vld <= '1';
+				elsif byte_ctr = "0000" then
+					dataout_vld <= '0';
+				end if;
+			end if;
+		end if;
+	end process;
+	
 	
 	--This process generates memory interaction signals to control the write or read.
 	mem_activation : process(clk_e)
@@ -493,7 +542,7 @@ EVEN_P <= even_p_2;
         	            noc_write <= '0';
 			    	end if;
 			    elsif noc_cmd = "00100" then
-			    	if byte_ctr = "1111" then
+			    	if sync_collector= "11" then
 			    		noc_reg_rdy <= '1';
         	            noc_read <= '1';
 			    	else 
@@ -508,6 +557,14 @@ EVEN_P <= even_p_2;
 			end if;
 		end if;
 	end process;
+	--one clock delay of noc_read to load data in noc_data_out register to output port
+	process(clk_e)
+	begin
+		if rising_edge(clk_e) then
+			dataout_vld_o <= dataout_vld;
+		end if;
+	end process;
+	DDO_VLD <= dataout_vld_o;
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e)--(noc_cmd, byte_ctr, delay, DATA)
 	begin
@@ -523,14 +580,13 @@ EVEN_P <= even_p_2;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (clk_e)
-
+	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
     begin
 		if rising_edge(clk_e) then
-	    	if rd_trig = '1' then
-	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)+3));
+	    	if dataout_vld = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
 	    	else
-	    	       DATA_OUT <= (others => '0');
+	    	    DATA_OUT <= (others => '0');
         	end if;
 		end if;
 	end process;
@@ -646,8 +702,8 @@ EVEN_P <= even_p_2;
 			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 			    	RD_FIFO <= '1';
 					standby <= '0';
-			    elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
-			    	RD_FIFO <= '1';
+			    --elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
+			    	--RD_FIFO <= '1';
 				elsif req_exe = '1' or cb_status = '1' then
                     standby <= '1';
 			    else
@@ -673,13 +729,13 @@ EVEN_P <= even_p_2;
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_addr_p <= REQ_FIFO(14 downto 0);
- 				req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
+ 				--req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
             elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
                 pe_req_type <= (others => '0');
 				req_addr_p <= (others => '0');
-				req_len_ctr_p <= (others => '0');
+				--req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
 
                 bc_i(0) <= '0';
@@ -740,9 +796,9 @@ EVEN_P <= even_p_2;
                         req_exe <= '0';
 			    	end if;
     
-			    	if write_count = "11" then
+			    	--if write_count = "11" then
 			    		write_req<= '0';
-			    	end if;
+			    	--end if;
                 end if;
 			end if;
 		end if;
@@ -773,26 +829,40 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' and fifo_vld = '1' then
-							pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-            	            pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+						elsif write_req = '1' then--and fifo_vld = '1' then
+							--pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
+            	            --pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
+							--write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
-							if write_count = "11" then
+							--if write_count = "11" then
 								pe_write <= '1';
-							else
-								pe_write <= '0';
-							end if;
+							--else
+								--pe_write <= '0';
+							--end if;
 						end if;
-					else
-						addr_p <= req_addr_p;
-						len_ctr_p <= req_len_ctr_p;
+					elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
+						addr_p <= REQ_FIFO(14 downto 0);
+						len_ctr_p <= std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);
+					elsif pe_req_type = "11" then  --Add trade off. For 4B version, the len_ctr is "11" but for 20B version, it is "00" instead.
+												   --Will delete when the micorocde is modified for 20B version with "00" in len_ctr field. 
+						len_ctr_p <= '0'& x"01";
+
 					end if;
 				end if;
 			end if;
 		end if;
+	end process;
+	--Data buffer
+	process(DATA_FROM_PE)
+	begin
+		for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
+			pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
+			pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
+			pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
+			pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
+		end loop;
 	end process;
 
 
@@ -839,14 +909,7 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 --Output Latch
-    process(clk_e)
-    begin
-        if rising_edge(clk_e) then
-            if noc_delay = '1' then
-                noc_data_out <= data_core_int;
-            end if;
-        end if;
-    end process;
+    noc_data_out <= data_core_int when noc_delay = '1';
 
 TAG_FB <= sig_fin or delay;
 ---------------------------------------------
@@ -870,7 +933,7 @@ begin
 	end if;
 end process;
 
-CLK_O <= (delay_p or rd_trig) and rd_ena;
+--CLK_O <= dataout_vld_o and clk_e;
 
 process(clk_e)
 begin

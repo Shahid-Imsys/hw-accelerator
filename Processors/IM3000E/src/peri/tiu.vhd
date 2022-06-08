@@ -647,8 +647,8 @@ begin
     process (clk_wr, reg_addr, capt_event)
     begin
       clk_param <= (others => '0');
-	    clk_param(0) <= capt_event;
-	    clk_param(1) <= capt_event;
+      clk_param(0) <= capt_event;
+      clk_param(1) <= capt_event;
       for i in 0 to TIM_CH_NBR-1 loop
         if reg_addr(3) = '0' and (i = conv_integer(reg_addr(2 downto 0))) and clk_wr = '1' then
           clk_param(i) <= '1';
@@ -704,13 +704,13 @@ begin
       if trst_n = '0' then
         trig_edge	<= (others => '0');
       elsif falling_edge(first_clk) then
-	      for i in 0 to TIM_CH_NBR-1 loop
-					if i = 0 then
-						trig_edge(i)	<= sync_0(i) and not sync_1(i) and not (cpt and ifl(i));
-					else
-						trig_edge(i)	<= sync_0(i) and not sync_1(i);
-					end if;
-	      end loop;
+        for i in 0 to TIM_CH_NBR-1 loop
+          if i = 0 then
+            trig_edge(i)	<= sync_0(i) and not sync_1(i) and not (cpt and ifl(i));
+          else
+            trig_edge(i)	<= sync_0(i) and not sync_1(i);
+          end if;
+        end loop;
       end if;
     end process;
     
@@ -735,8 +735,8 @@ begin
     process (first_clk)
     begin
       if rising_edge(first_clk) then
-				sync_0_rx1 <= cpe and tstamp_rx1 and not sync_1_rx1;
-				sync_1_rx1 <= ((cpe and tstamp_rx1) and sync_1_rx1) or sync_0_rx1;
+        sync_0_rx1 <= cpe and tstamp_rx1 and not sync_1_rx1;
+        sync_1_rx1 <= ((cpe and tstamp_rx1) and sync_1_rx1) or sync_0_rx1;
       end if;
     end process;
 
@@ -744,7 +744,7 @@ begin
     process (first_clk)
     begin
       if falling_edge(first_clk) then
-				trig_edge_rx1	<= sync_0_rx1 and not sync_1_rx1 and not (cpt and ifl(0));
+        trig_edge_rx1	<= sync_0_rx1 and not sync_1_rx1 and not (cpt and ifl(0));
       end if;
     end process;
 
@@ -753,12 +753,12 @@ begin
     -- interrupt. This event is generated only when cpt is set.    
     capt_event <= (trig_edge(0) or trig_edge_rx1) and cpt;  
 
-		-- capt_pend is used to tell the msa input mux to load msa from the
-		-- downctr rather than from wdata on the capt_event pulse.
-		capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
+    -- capt_pend is used to tell the msa input mux to load msa from the
+    -- downctr rather than from wdata on the capt_event pulse.
+    capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
 
-		-- This flipflop stores the source of capture. '0' means cpt_trig,
-		-- '1' means Ethernet timestamp.
+    -- This flipflop stores the source of capture. '0' means cpt_trig,
+    -- '1' means Ethernet timestamp.
     process (capt_event)
     begin
       if rising_edge(capt_event) then

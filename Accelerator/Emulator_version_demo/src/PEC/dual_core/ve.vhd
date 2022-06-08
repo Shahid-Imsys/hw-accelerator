@@ -34,6 +34,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.instructiontypes.all;
+use work.vetypes.all;
 --use work.cluster_pkg.all;
 
 entity ve is
@@ -73,6 +75,83 @@ end entity ve;
 
 architecture rtl of ve is
 
+component ve_wctrlpipe
+  port(
+      -- general
+    clk : in std_logic;
+    reset : in std_logic;
+    -- in
+    data0_addr_i : in std_logic_vector(7 downto 0);
+    data1_addr_i : in std_logic_vector(7 downto 0);
+    weight_addr_i : in std_logic_vector(7 downto 0);
+    data_ren_i : in std_logic;
+    data_wen_i : in std_logic;
+    weight_ren_i : in std_logic;
+    weight_wen_i : in std_logic;
+
+    data0_i : in std_logic_vector(31 downto 0);
+    data1_i : in std_logic_vector(31 downto 0);
+    weight_i : in std_logic_vector(63 downto 0);
+
+    memreg_c_i : in memreg_ctrl;
+    writebuff_c_i : in memreg_ctrl;
+    inst_i : in instruction;
+    ppinst_i : in ppctrl_t;
+    ppshiftinst_i : in ppshift_shift_ctrl;
+    addbiasinst_i : in ppshift_addbias_ctrl;
+    clipinst_i : in ppshift_clip_ctrl;
+    lzod_i : in  lzod_ctrl;
+    zpdata_i : in std_logic_vector(7 downto 0);
+    zpweight_i : in std_logic_vector(7 downto 0);
+    bias_i : in std_logic_vector(31 downto 0);
+
+    -- out
+    data0_addr_o : out std_logic_vector(7 downto 0);
+    data1_addr_o : out std_logic_vector(7 downto 0);
+    weight_addr_o : out std_logic_vector(7 downto 0);
+    data_ren_o : out std_logic;
+    data_wen_o : out std_logic;
+    weight_ren_o : out std_logic;
+    weight_wen_o : out std_logic;
+
+    outreg_o : out std_logic_vector(63 downto 0);
+    writebuffer_o : out std_logic_vector(63 downto 0);
+
+    -- en
+    stall : in unsigned(3 downto 0) := (others => '0');
+    en_o : out std_logic
+  );
+end component;
+
+component re
+  port(
+    clk              : in std_logic;
+    rst              : in std_logic;
+    clk_e_pos        : in std_logic;
+    clk_e_neg        : in std_logic;
+    mode_a           : in std_logic;
+    mode_b           : in std_logic;
+    mode_c           : in std_logic;
+    data_valid       : in std_logic;
+    re_start         : in std_logic;
+    bias_addr_assign : in std_logic;
+    re_source        : in std_logic;
+    re_addr_reload   : in std_logic;
+    re_loop_reg      : in std_logic_vector(7 downto 0);
+    re_saddr_l       : in std_logic_vector(7 downto 0);
+    re_saddr_r       : in std_logic_vector(7 downto 0);
+    re_saddr_a       : in std_logic_vector(7 downto 0);
+    re_saddr_b       : in std_logic_vector(7 downto 0);
+    bias_index_start : in std_logic_vector(7 downto 0);
+    re_ready         : out std_logic;
+    write_en_data    : out std_logic;
+    write_en_weight  : out std_logic;
+    write_en_bias    : out std_logic;
+    bias_index_wr    : out std_logic_vector(5 downto 0);
+    re_addr_data     : out std_logic_vector(7 downto 0);
+    re_addr_weight   : out std_logic_vector(7 downto 0)
+  );
+end component;
 
 COMPONENT accumulator
   PORT (
@@ -92,6 +171,23 @@ COMPONENT mul
     P : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
   );
 END COMPONENT;
+
+component mem is
+  generic (
+    width       : integer := 8;
+    addressbits : integer := 2;
+    columns     : integer := 4
+    );
+  port (
+    clk       : in  std_logic;
+    read_en   : in  std_logic;
+    write_en  : in  std_logic;
+    d_in      : in  std_logic_vector(width-1 downto 0);
+    address   : in  std_logic_vector(addressbits-1 downto 0);
+    d_out     : out std_logic_vector(width-1 downto 0)
+  );
+end component;
+
 COMPONENT dist_ram0
   PORT (
     addr : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -144,6 +240,8 @@ END COMPONENT;
     --------------------------------
     type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
     type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
+    signal re_addr_data   : std_logic_vector(7 downto 0);
+    signal re_addr_weight : std_logic_vector(7 downto 0);
     signal re_addr_l   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
     signal re_addr_r   : std_logic_vector(7 downto 0);
     signal re_saddr_l  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
@@ -185,11 +283,13 @@ END COMPONENT;
     signal dtm_data_reg : dtm_word;
     signal re_start_reg : std_logic; --RE start latch
     signal ve_start_reg : std_logic; --VE start latch
+    signal bias_addr_assign : std_logic; --enable signal for enbale the assignment of bias start address.
     signal re_addr_reload   : std_logic;
     signal ve_addr_reload   : std_logic;
     signal sclr_i        : std_logic; --For clear accumulator 0-7
-    signal buf_out_l  : std_logic_vector(63 downto 0);
-    signal buf_out_r  : std_logic_vector(63 downto 0);
+    signal data0  : std_logic_vector(31 downto 0);
+    signal data1  : std_logic_vector(31 downto 0);
+    signal weight  : std_logic_vector(63 downto 0);
     signal mul_in_l_0 : std_logic_vector(8 downto 0);
     signal mul_in_l_1 : std_logic_vector(8 downto 0);
     signal mul_in_l_2 : std_logic_vector(8 downto 0);
@@ -240,22 +340,22 @@ END COMPONENT;
     signal p_shifter_in : std_logic_vector(31 downto 0);
     signal p_clip_out : std_logic_vector(7 downto 0); --clip logic output
     signal bypass     : std_logic;
-    signal sram_in    : std_logic_vector(63 downto 0);
+    signal writebuffer    : std_logic_vector(63 downto 0);
     signal bias_in    : std_logic_vector(63 downto 0);
     signal mode_a_l  : std_logic;
     signal mode_b_l  : std_logic;
-    signal sram_l_we  : std_logic;
-    signal sram_r_we  : std_logic;
-    signal sram_b_we  : std_logic;
+    signal write_en_o  : std_logic;
+    signal write_en_w_o  : std_logic;
+    signal write_en_b_o  : std_logic;
     signal ve_clr_acc : std_logic; --clear accumulators
     signal mul_inn_ctl : std_logic;
     signal acc_inn_ctl : std_logic;
     signal pl_ve_byte : std_logic_vector(3 downto 0);
 
 
-    signal addr_p_l  : std_logic_vector(7 downto 0);
-    signal addr_p_r  : std_logic_vector(7 downto 0);
-    signal addr_p_b  : std_logic_vector(5 downto 0);
+    signal data0addr_to_memory  : std_logic_vector(7 downto 0);
+    signal weightaddr_to_memory  : std_logic_vector(7 downto 0);
+    signal biasaddr_to_memory  : std_logic_vector(5 downto 0);
     --multiplier control signals
     signal mctl_0 :  std_logic;
     signal mctl_1 :  std_logic;
@@ -295,6 +395,7 @@ END COMPONENT;
     signal load_dtm_out : std_logic;
     signal send_req_d : std_logic;
     signal set_fifo_push : std_logic;
+    signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
     --signal ve_push_dtm : std_logic; --0126
     --------------------------------
     --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
@@ -355,8 +456,6 @@ begin
     ve_clr_acc <= PL(93);
     pl_ve_byte <= PL(112 downto 109);
     --
-    --rst_i <= RST;
-    --sram_in <= VE_IN;
     reg_write: process(clk_p)
     begin
         if rising_edge(clk_p) then
@@ -386,6 +485,7 @@ begin
                     pp_ctl            <= (others => '0');  --Make it 8 bits
                     bias_index_end    <= (others => '0');
                     bias_index_start  <= (others => '0');
+                    bias_addr_assign  <= '0';
                     mul_ctl           <= (others => '0'); 
                 elsif reg_in = CONS_RE_START_ADDR_L then
                     re_saddr_l <= YBUS;
@@ -437,8 +537,11 @@ begin
                     bias_index_end <= YBUS;
                 elsif reg_in = CONS_BIAS_INDEX_START then
                     bias_index_start <= YBUS;
+                    bias_addr_assign <= '1';
                 elsif reg_in = CONS_MAC_SWITCH then
                     mul_ctl <= YBUS;
+                else
+                    bias_addr_assign <= '0';
                 end if;
             end if;
         end if;
@@ -447,36 +550,17 @@ begin
     --Latched signals
     --Some signals from pl registers are latched for receive engine and vector engine to operate
     --without control from pl. Latched signals are cleared when loop registers goes to 0. 
-    latch_signals: process(clk_p,re_start,re_addr_reload,ve_addr_reload,re_loop,ve_start,ve_loop, mode_a, mode_b,mode_c)
+    latch_signals: process(clk_p)
     begin
         if rising_edge(clk_p) then --latches at the rising_edge of clk_p. 
-            if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
-                re_start_reg <= '1';
-            elsif re_loop = (re_loop'range => '0') then 
-                re_start_reg <= '0';
-            end if;
-    
             if ve_start = '1' then
                 ve_start_reg <= '1';
             elsif ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then 
                 ve_start_reg <= '0';
             end if;
-            --mode a and b will be reflected by config registers when ve_starts
-            if re_start = '1' and mode_a = '1' then
-                mode_a_l <= '1';
-            elsif re_loop = (re_loop'range => '0') then
-                mode_a_l <= '0';
-            end if;
-    
-            if re_start= '1' and mode_b = '1' then
-                mode_b_l <= '1';
-            elsif re_loop = (re_loop'range => '0') then
-                mode_b_l <= '0';
-            end if;
-            --mode c latch signal --1210
-            if (re_start = '1' or ve_start = '1') and mode_c = '1' then
+            if ve_start = '1' and mode_c = '1' then
                 mode_c_l <= '1';
-            elsif re_loop = (re_loop'range => '0') and ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then
+            elsif ve_loop = (ve_loop'range => '0') and ve_oloop = (ve_oloop'range => '0') then
                 mode_c_l <= '0';
             end if;
         end if;
@@ -484,90 +568,6 @@ begin
 ----------------------------------------------------------------------------------
 --Address generation block
 ----------------------------------------------------------------------------------
-    --********************************
-    --Receive engine
-    --********************************
-    --Mode left and right for reveive engine, used to load srams from DTM. 
-    --Receive engine's loop counter is always used 
-    loop_ctr_reading: process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if RST = '0' then
-                re_loop <= (others => '0');
-            elsif re_start = '1' and clk_e_pos = '1' and re_source = '0' then
-                re_loop <= re_loop_reg;
-            elsif re_source = '0' and re_start_reg = '1' and re_loop /=(re_loop'range => '0') and DDI_VLD = '1' then
-                re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
-            end if;
-        end if;
-    end process;
-
-    receive_addr_write : process (clk_p) 
-    begin 
-        if rising_edge(clk_p) then
-            if RST = '0' then        --Active low or high?
-                re_addr_l<= (others => '0');
-                re_addr_r <= (others => '0');
-                --re_loop <= (others => '0');
-                bias_index_wr <= (others => '0');
-            elsif reg_in = CONS_BIAS_INDEX_START then
-                bias_index_wr <= YBUS(5 downto 0);
-            elsif re_source = '0' and re_addr_reload = '1' then
-                --re_loop <= re_loop_reg;
-                if mode_a_l = '1' and mode_b_l = '0'then
-                    re_addr_l <= re_saddr_l;
-                elsif mode_b_l = '1' and mode_a_l = '0'then
-                    re_addr_r <= re_saddr_r;
-                end if;
-            elsif re_source = '0' and re_start_reg = '1' and re_loop /= (re_loop'range => '0') and DDI_VLD = '1' then
-
-                --re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
-
-                if mode_a_l = '1' and mode_b_l = '0'then      
-                    re_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_l))+1,8));
-                end if;
-
-                if mode_b_l = '1' and mode_a_l = '0'then
-                    re_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_r))+1,8));
-                end if;
-                
-                if mode_a_l = '1' and mode_b_l = '1' then
-                    bias_index_wr <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_index_wr))+1,6));
-                end if;
-            end if;
-        end if;
-    end process;
-    --Mode a and b for reloading receive engine, mode bits are not latched.
-    --re_start, re_source and modes are written in one microinstruction.
-    --addr_reload, modes are written in one microinstruction.
-    pushback_addr_write : process(clk_p) --generate address counter a abd b
-    begin
-        if rising_edge(clk_p) then
-            if RST = '0' then
-                re_addr_a <= (others => '0');
-                re_addr_b <= (others => '0');
-            elsif clk_e_pos = '1'then --falling_edge of clock_e
-                --if RST = '0' then
-                --    re_addr_a <= (others => '0');
-                --    re_addr_b <= (others => '0');
-                if re_source = '1' and re_addr_reload = '1' then
-                    if mode_a = '1' then
-                        re_addr_a <= re_saddr_a;
-                    elsif mode_b = '1' then
-                        re_addr_b <= re_saddr_b;
-                    end if;
-                elsif re_addr_reload = '0' and re_source = '1' and re_start = '1' then
-                    if mode_a = '1'  then 
-                        re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
-                    elsif mode_b = '1' then
-                        re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
-                    end if;
-    
-                end if;
-            end if;
-        end if;
-    end process;
-
     --********************************
     --Vector engine
     --********************************
@@ -668,24 +668,18 @@ begin
                 curr_ring_addr <= YBUS;
             elsif ve_addr_reload = '1' then
                 curr_ring_addr <= curr_ring_addr;
-            --elsif re_start = '1' and mode_c = '1' and clk_e_pos = '1' then --clk_e synchronized
             elsif (re_start_reg = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
                 if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
                     curr_ring_addr <= ring_start_addr;
                 elsif (re_source = '0' and re_loop /= (re_loop'range => '0') and ddi_vld = '1') or re_source = '1' then
                     curr_ring_addr <= next_ring_addr;
                 end if;
-            --elsif ve_start_reg = '1' and config(6) = '1' then
             elsif ve_start_reg = '1' and mode_c_l = '1' then
                 if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
                     curr_ring_addr <= ring_start_addr;
                 elsif ve_loop /=(ve_loop'range => '0') then
                     curr_ring_addr <= next_ring_addr;
                 end if;
-                --ve_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_addr_r)+1),8));
-            --else   --The two signals are also used in other processes
-                --curr_ring_addr <= (others => 'Z');
-                --ve_addr_r <= (others => 'Z');
             end if;
         end if;
     end process;
@@ -693,146 +687,37 @@ begin
     --**********************
     --Address_MUX
     --**********************
-    --process(re_start,re_start_reg,re_source,mode_a_l,mode_b_l,ve_start,ve_start_reg,re_addr_l,re_addr_r,re_addr_a,re_addr_b,ve_addr_l,ve_addr_r,mode_c,
-            --curr_ring_addr,config,offset_l)
-    address_pointer_mux: process(re_start_reg,ve_start_reg, re_source, mode_a_l, mode_b_l,re_addr_l, ve_addr_r, mode_c_l, curr_ring_addr, depth_l, ve_addr_l,
-                                 re_addr_r,re_addr_a,re_addr_b)
+    address_pointer_mux: process(all)
     begin
-        --addr_p_l <= (others => 'X'); --Put inside else statements to make it inportable for the sorftware simulator
-        --addr_p_r <= (others => 'X'); --Put inside else statements to make it inportable for the sorftware simulator
-
-
         if ve_start_reg = '1' then 
-            --if config(6) = '1' then
-            addr_p_r <= ve_addr_r;
+            weightaddr_to_memory <= ve_addr_r;
             if mode_c_l = '1' then
-                addr_p_l <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
             else
-                addr_p_l <= ve_addr_l;
+                data0addr_to_memory <= ve_addr_l;
             end if; 
-        
-        elsif re_start_reg = '1' and re_source = '0' then --Use receive engine's address counter l and r
-            if mode_a_l = '1' and mode_b_l = '0' then
-                addr_p_l <= re_addr_l;
-                addr_p_r <= (others => '0');
-            elsif mode_b_l = '1' and mode_a_l = '0' then
-                addr_p_r <= re_addr_r;
-                addr_p_l <= (others => '0');
-            elsif mode_c_l = '1' then
-                addr_p_l <= curr_ring_addr;
-                addr_p_r <= (others => '0');
-            else
-                addr_p_l <= (others => '0');
-                addr_p_r <= (others => '0');
-            end if;
-        
-        elsif re_start_reg = '1' and re_source = '1' then --Use receive engine's address counter a and b --mode c added --2.0
-            addr_p_r <= (others => '0');
-            if mode_a_l = '1' then
-                addr_p_l <= re_addr_a;
-            elsif mode_b_l = '1' then
-                addr_p_l <= re_addr_b;
-            else
-                addr_p_l <= (others => '0');
-            end if;
         else
-            addr_p_l <= (others => '0');
-            addr_p_r <= (others => '0');
+            data0addr_to_memory <= re_addr_data;
+            weightaddr_to_memory <= re_addr_weight;
         end if;
     end process;
 
-    bias_address_pointer: process(clk_p)--sram_b_we, bias_index_wr, bias_index_rd, pp_stage_1)
+    bias_address_mux: process(clk_p)
     begin
         if rising_edge(clk_p) then
             if rst = '0' then
-                addr_p_b <= (others => '0');
+                biasaddr_to_memory <= (others => '0');
             else
-                if sram_b_we = '1' then
-                    addr_p_b <= bias_index_wr;
+                if write_en_b_o = '1' then
+                    biasaddr_to_memory <= bias_index_wr;
                 else
-                    if pp_stage_1 = '1' then
-                        addr_p_b <= bias_index_rd(7 downto 2);
+                    if o_mux_ena = '1' then
+                        biasaddr_to_memory <= bias_index_rd(7 downto 2);
                     end if;
                 end if;
             end if;
         end if;
     end process;
-
-    --Write enable signal to srams
-    --
-    write_enable_left: process(re_start_reg, ddi_vld, mode_a_l, mode_b_l, mode_c_l,re_start,clk_e_pos,re_source,mode_a, mode_b)
-    begin
-        if re_start_reg = '1' and ddi_vld = '1' and ((mode_a_l = '1' and mode_b_l = '0' ) or mode_c_l = '1')then
-            sram_l_we <= '1';
-        elsif re_start = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b ='1') then
-            sram_l_we <= '1';
-        else
-            sram_l_we <= '0';
-        end if;
-    end process;
-
-
-
-    write_enable_right: process(re_start_reg, ddi_vld, mode_a_l, mode_b_l)
-    begin
-        if re_start_reg = '1' and ddi_vld = '1' and mode_a_l = '0' and mode_b_l = '1' then
-            sram_r_we <= '1';
-        else
-            sram_r_we <= '0';
-        end if;
-    end process;
-
-    write_enable_bias: process(clk_p)--re_start_reg,ddi_vld,mode_a_l,mode_b_l)
-    begin
-        if rising_edge(clk_p) then 
-            if re_start_reg = '1' and ddi_vld = '1' and mode_a_l = '1' and mode_b_l = '1' then
-                sram_b_we <= '1';
-            else
-                sram_b_we <= '0';
-            end if;
-        end if;
-    end process;
-
-
-    --sram_l_we <= '1' when re_start = '1' and mode_c = '1' and clk_e_pos = '1' else
-    --             '1' when re_start_reg = '1' and mode_a_l = '1' and mode_b_l = '0' else 
-    --             '0';
-    --
-    --sram_r_we <= '1' when re_start_reg = '1' and mode_b_l = '1' and mode_a_l = '0' else
-    --             '0';
-    --
-    --addr_p_b <= bias_index_wr when sram_b_we = '1' else 
-    --            bias_index_rd(7 downto 2);
-    --
-    --sram_b_we <= '1' when re_start_reg = '1' and mode_a_l = '1' and mode_b_l = '1' else '0';
-
-    --sram_we : process(clk_p)
-    --begin
-    --    --if rising_edge(clk_p) then
-    --        if re_start_reg = '1' then
-    --            if mode_a_l = '1' then
-    --                sram_l_we <= '1';
-    --            elsif mode_b_l = '1' then
-    --                sram_r_we <= '1';
-    --            end if;
-    --        elsif re_start = '1' and mode_c = '1' then
-    --            sram_l_we <= clk_e_pos;         --Enables only half time of clk_e cycle. POS or NEG TBA
-    --        elsif re_start_reg = '0' then
-    --            sram_l_we <= '0';
-    --            sram_r_we <= '0';
-    --        end if;
-    --    --end if;
-    --end process;
-    --re_rdy signal, used as one condition pass flag. CHanges at the rising_edge of clk_e.
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if clk_e_pos = '0' then
-                RE_RDY <= not re_start_reg;
-            end if;
-        end if;
-    end process;
-    --RE_RDY <= not re_start_reg;
 
     --Clear accumulator signal
     acc_clear:process(clk_p)
@@ -842,45 +727,49 @@ begin
             if ve_start_reg = '1' and ve_oloop /= (ve_oloop'range => '0') and ve_loop = (ve_loop'range => '0') then
                 sclr_i_delay <= config(1);
             end if;
+            sclr_i <= not RST or ve_clr_acc or sclr_i_delay;
         end if;
     end process;
 
-    sclr_i <= not RST or ve_clr_acc or sclr_i_delay;
+    
 
 ---------------------------------------------------------------
 --Data Input MUX
 ---------------------------------------------------------------
---Left and right buffers
---sram_in(7 downto 0) <= dfy_reg(0) when re_source = '1' else VE_IN(7 downto 0);
---sram_in(15 downto 8) <= dfy_reg(1)when re_source = '1' else VE_IN(15 downto 8);
---sram_in(23 downto 16) <= dfy_reg(2)when re_source = '1' else VE_IN(23 downto 16);
---sram_in(31 downto 24) <= dfy_reg(3)when re_source = '1' else VE_IN(31 downto 24);
---sram_in(39 downto 32) <= dfy_reg(4)when re_source = '1' else VE_IN(39 downto 32);
---sram_in(47 downto 40) <= dfy_reg(5)when re_source = '1' else VE_IN(47 downto 40);
---sram_in(55 downto 48) <= dfy_reg(6)when re_source = '1' else VE_IN(55 downto 48);
---sram_in(63 downto 56) <= dfy_reg(7)when re_source = '1' else VE_IN(63 downto 56);
---Bias buffer --Always VE_IN
---Added clock trigger to sram_in 1215
 data_input: process(clk_p)
 begin
     if rising_edge(clk_p) then
-        sram_in <= ve_in;
-        bias_in <= sram_in; --Bias buffer --Always VE_IN
+        writebuffer <= ve_in;
+        bias_in <= writebuffer; --Bias buffer --Always VE_IN
         if re_source = '1' then
-            sram_in(7 downto 0) <= dfy_reg(0);
-            sram_in(15 downto 8) <= dfy_reg(1);
-            sram_in(23 downto 16) <= dfy_reg(2);
-            sram_in(31 downto 24) <= dfy_reg(3);
-            sram_in(39 downto 32) <= dfy_reg(4);
-            sram_in(47 downto 40) <= dfy_reg(5);
-            sram_in(55 downto 48) <= dfy_reg(6);
-            sram_in(63 downto 56) <= dfy_reg(7);
+            writebuffer(7 downto 0) <= dfy_reg(0);
+            writebuffer(15 downto 8) <= dfy_reg(1);
+            writebuffer(23 downto 16) <= dfy_reg(2);
+            writebuffer(31 downto 24) <= dfy_reg(3);
+            writebuffer(39 downto 32) <= dfy_reg(4);
+            writebuffer(47 downto 40) <= dfy_reg(5);
+            writebuffer(55 downto 48) <= dfy_reg(6);
+            writebuffer(63 downto 56) <= dfy_reg(7);
         end if;
     end if;
 end process;
 
-
-
+---------------------------------------------------------------
+----------read mux ------ TBD ------- temp solution -----------
+---------------------------------------------------------------
+process(all)
+begin
+  if re_rdy = '1' then
+    read_en_o <= '1';
+    read_en_w_o <= '1';
+    read_en_b_o <= '1';
+  else
+    read_en_o <= '0';
+    read_en_w_o <= '0';
+    read_en_b_o <= '0';
+  end if;
+end process;
+----mul need to be fix, remove gap-----
 ---------------------------------------------------------------
 --multiplier control logic:
 ---------------------------------------------------------------
@@ -888,55 +777,56 @@ process(clk_p) --Enable control signal, synchronized by the data flow
 begin
     if rising_edge(clk_p) then
         delay0 <= ve_start_reg;
-        mult_delay <= ve_start_reg;
+        mult_delay <= mul_inn_ctl;
     end if;
 end process;
- mctl_0 <= not mul_ctl(0) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_1 <= not mul_ctl(1) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_2 <= not mul_ctl(2) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_3 <= not mul_ctl(3) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_4 <= not mul_ctl(4) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_5 <= not mul_ctl(5) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_6 <= not mul_ctl(6) and ve_start_reg and mult_delay and mul_inn_ctl;
- mctl_7 <= not mul_ctl(7) and ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_0 <= not mul_ctl(0) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_1 <= not mul_ctl(1) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_2 <= not mul_ctl(2) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_3 <= not mul_ctl(3) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_4 <= not mul_ctl(4) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_5 <= not mul_ctl(5) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_6 <= not mul_ctl(6) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
+ mctl_7 <= not mul_ctl(7) and mult_delay;--ve_start_reg and mult_delay and mul_inn_ctl;
  process(clk_p)
  begin
      if rising_edge(clk_p) then
-         a_delay <= mult_delay;
-         acc_inn_ctl <= mul_inn_ctl;
+         a_delay <= delay0;
+         delay3(0) <= a_delay;
+         acc_inn_ctl <= mult_delay;
      end if;
  end process;
- actl_0 <= not mul_ctl(0) and a_delay and delay0 and acc_inn_ctl ;
- actl_1 <= not mul_ctl(1) and a_delay and delay0 and acc_inn_ctl ;
- actl_2 <= not mul_ctl(2) and a_delay and delay0 and acc_inn_ctl ;
- actl_3 <= not mul_ctl(3) and a_delay and delay0 and acc_inn_ctl ;
- actl_4 <= not mul_ctl(4) and a_delay and delay0 and acc_inn_ctl ;
- actl_5 <= not mul_ctl(5) and a_delay and delay0 and acc_inn_ctl ;
- actl_6 <= not mul_ctl(6) and a_delay and delay0 and acc_inn_ctl ;
- actl_7 <= not mul_ctl(7) and a_delay and delay0 and acc_inn_ctl ;
+ actl_0 <= not mul_ctl(0) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_1 <= not mul_ctl(1) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_2 <= not mul_ctl(2) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_3 <= not mul_ctl(3) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_4 <= not mul_ctl(4) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_5 <= not mul_ctl(5) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_6 <= not mul_ctl(6) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
+ actl_7 <= not mul_ctl(7) and acc_inn_ctl;--and a_delay and delay0 and acc_inn_ctl ;
  bypass <= '0';
 
 --Zero point substractor, always active
 
 --Left substractor
-mul_in_l_0 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(7 downto 0)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_1 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(15 downto 8)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_2 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(23 downto 16)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_3 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(31 downto 24)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_4 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(39 downto 32)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_5 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(47 downto 40)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_6 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(55 downto 48)))-to_integer(unsigned(zp_data)),9));
-mul_in_l_7 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_l(63 downto 56)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_0 <= std_logic_vector(to_signed(to_integer(unsigned(data1(7 downto 0)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_1 <= std_logic_vector(to_signed(to_integer(unsigned(data1(15 downto 8)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_2 <= std_logic_vector(to_signed(to_integer(unsigned(data1(23 downto 16)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_3 <= std_logic_vector(to_signed(to_integer(unsigned(data1(31 downto 24)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_4 <= std_logic_vector(to_signed(to_integer(unsigned(data0(7 downto 0)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_5 <= std_logic_vector(to_signed(to_integer(unsigned(data0(15 downto 8)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_6 <= std_logic_vector(to_signed(to_integer(unsigned(data0(23 downto 16)))-to_integer(unsigned(zp_data)),9));
+mul_in_l_7 <= std_logic_vector(to_signed(to_integer(unsigned(data0(31 downto 24)))-to_integer(unsigned(zp_data)),9));
 
 --Right substractor
-mul_in_r_0 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(7 downto 0)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_1 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(15 downto 8)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_2 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(23 downto 16)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_3 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(31 downto 24)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_4 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(39 downto 32)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_5 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(47 downto 40)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_6 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(55 downto 48)))-to_integer(unsigned(zp_weight)),9));
-mul_in_r_7 <= std_logic_vector(to_signed(to_integer(unsigned(buf_out_r(63 downto 56)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_0 <= std_logic_vector(to_signed(to_integer(unsigned(weight(7 downto 0)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_1 <= std_logic_vector(to_signed(to_integer(unsigned(weight(15 downto 8)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_2 <= std_logic_vector(to_signed(to_integer(unsigned(weight(23 downto 16)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_3 <= std_logic_vector(to_signed(to_integer(unsigned(weight(31 downto 24)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_4 <= std_logic_vector(to_signed(to_integer(unsigned(weight(39 downto 32)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_5 <= std_logic_vector(to_signed(to_integer(unsigned(weight(47 downto 40)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_6 <= std_logic_vector(to_signed(to_integer(unsigned(weight(55 downto 48)))-to_integer(unsigned(zp_weight)),9));
+mul_in_r_7 <= std_logic_vector(to_signed(to_integer(unsigned(weight(63 downto 56)))-to_integer(unsigned(zp_weight)),9));
 
 --Accumulator Latch
 process(clk_p) --Enable signal, two clock delay after the acc_latch control signal is asserted.
@@ -1015,7 +905,7 @@ begin
     if rising_edge(clk_p) then
         --if latch_ena = '1' then
             --o_mux_ena <= '1';
-        if a_delay = '1' and delay0 = '1' and acc_inn_ctl = '1' and (ve_start_reg = '0' or mult_delay = '0' or mul_inn_ctl = '0') then
+        if delay3(0) = '1' and a_delay = '1' and acc_inn_ctl = '1' and (delay0 = '0' or a_delay = '0' or mult_delay = '0') then
             o_mux_ena <= '1';
         elsif ve_out_p = '0' then --11 clock delay of config(7)
             o_mux_ena <= '0';
@@ -1310,54 +1200,93 @@ accu_0 : accumulator
     B => mul_in_r_7,
     P => mul_out_7
   );
-  --substract_i <= '0';
-  --mac_0 : xbip_multadd_0
-  --PORT MAP (
-  --  CLK => CLK_P,
-  --  CE => mctl_0,
-  --  SCLR => sclr_i,
-  --  A => buf_out_l(7 downto 0),
-  --  B => buf_out_r(7 downto 0),
-  --  C => acc_out_0,
-  --  SUBTRACT => substract_i,
-  --  P => acc_out_0,
-  --  PCOUT => pcout_i
-  --);
-  --mac_7 : xbip_multadd_0
-  --PORT MAP (
-  --  CLK => CLK_P,
-  --  CE => mctl_7,
-  --  SCLR => sclr_i,
-  --  A => buf_out_l(63 downto 56),
-  --  B => buf_out_r(63 downto 56),
-  --  C => mul_out_7,
-  --  SUBTRACT => open,
-  --  P => acc_out_7,
-  --  PCOUT => open
-  --);
-  buf_0 : dist_ram0
-  PORT MAP (
-    addr => addr_p_l,
-    di => sram_in,
-    clk => clk_p,
-    we => sram_l_we, --
-    do => buf_out_l
+--data mem(splited in high and low part)--
+  databuf_0 : mem
+  generic map(
+    width       => 32,
+    addressbits => 8,
+    columns     => 2
+  )
+  port map (
+    clk       => clk_p,
+    read_en   => read_en_o,
+    write_en  => write_en_o,
+    d_in      => writebuffer(63 downto 32),
+    address   => data0addr_to_memory,
+    d_out     => data0
   );
-  buf_1 : dist_ram0
-  PORT MAP (
-    addr =>addr_p_r,
-    di => sram_in,
-    clk => clk_p,
-    we => sram_r_we,
-    do => buf_out_r
+  databuf_1 : mem
+  generic map(
+    width       => 32,
+    addressbits => 8,
+    columns     => 2
+  )
+  port map(
+    clk       => clk_p,
+    read_en   => read_en_o,
+    write_en  => write_en_o,
+    d_in      => writebuffer(31 downto 0),
+    address   => data0addr_to_memory,
+    d_out     => data1
   );
-  buf_bias : dist_ram1
-  PORT MAP (
-    clk => clk_p,
-    addr => addr_p_b,
-    do => bias_buf_out,
-    we => sram_b_we,
-    di => bias_in
+--bias mem--
+  buf_bias : mem
+  generic map(
+    width       => 64,
+    addressbits => 6,
+    columns     => 4
+  )
+  port map(
+    clk       => clk_p,
+    read_en   => read_en_b_o,
+    write_en  => write_en_b_o,
+    d_in      => bias_in,--writebuffer,
+    address   => biasaddr_to_memory,
+    d_out     => bias_buf_out
+  );
+--weight mem--
+  buf_weight : mem
+  generic map (
+    width       => 64,
+    addressbits => 8,
+    columns     => 4
+  )
+  port map (
+    clk       => clk_p,
+    read_en   => read_en_w_o,
+    write_en  => write_en_w_o,
+    d_in      => writebuffer,
+    address   => weightaddr_to_memory,
+    d_out     => weight
+  );
+
+  re_i : re
+  port map(
+    clk              => clk_p,
+    rst              => rst,
+    clk_e_pos        => clk_e_pos,
+    clk_e_neg        => clk_e_neg,
+    mode_a           => mode_a,
+    mode_b           => mode_b,
+    mode_c           => mode_c,
+    data_valid       => DDI_VLD,
+    re_start         => re_start,
+    bias_addr_assign => bias_addr_assign,
+    re_source        => re_source,
+    re_addr_reload   => re_addr_reload,
+    re_loop_reg      => re_loop_reg,
+    re_saddr_l       => re_saddr_l,
+    re_saddr_r       => re_saddr_r,
+    re_saddr_a       => re_saddr_a,
+    re_saddr_b       => re_saddr_b,
+    bias_index_start => bias_index_start,
+    re_ready         => re_rdy,
+    write_en_data    => write_en_o,
+    write_en_weight  => write_en_w_o,
+    write_en_bias    => write_en_b_o,
+    bias_index_wr    => bias_index_wr,
+    re_addr_data     => re_addr_data,
+    re_addr_weight   => re_addr_weight
   );
 
 

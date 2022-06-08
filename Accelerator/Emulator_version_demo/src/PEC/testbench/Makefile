@@ -8,9 +8,10 @@ cluster_sim:
 cluster_tb:
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/c_tb.vhd
 
-cluster_pw_8pes_tb: cluster_tb
-	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_V2/*  .
-	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/Cluster_pw_8pes.vhd
+cluster_pw_pec1_tb: cluster_tb
+	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_complete/*  .
+	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/Cluster_pw_pec1.vhd 
+	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/Cluster_pw_pec2.vhd
 
 
 

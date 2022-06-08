@@ -6,7 +6,7 @@ rtl: pec_rtl
 
 etb: tb elab
 
-tb: cluster_pw_8pes_tb 
+tb: cluster_pw_pec1_tb 
 
 elab:
 	xelab --debug typical c_tb

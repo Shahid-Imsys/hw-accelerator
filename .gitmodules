@@ -1,5 +1,5 @@
 [submodule "fw-test-im3000e"]
-	branch = tmp-yliu
+	branch = tmp-isal-test
 	path = fw-test-im3000e
 	url = https://imsystech@dev.azure.com/imsystech/Imsystech/_git/fw-test-im3000e
 [submodule "fw-im3000e"]

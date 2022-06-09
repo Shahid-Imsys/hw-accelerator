@@ -75,53 +75,53 @@ end entity ve;
 
 architecture rtl of ve is
 
-component ve_wctrlpipe
-  port(
-      -- general
-    clk : in std_logic;
-    reset : in std_logic;
-    -- in
-    data0_addr_i : in std_logic_vector(7 downto 0);
-    data1_addr_i : in std_logic_vector(7 downto 0);
-    weight_addr_i : in std_logic_vector(7 downto 0);
-    data_ren_i : in std_logic;
-    data_wen_i : in std_logic;
-    weight_ren_i : in std_logic;
-    weight_wen_i : in std_logic;
-
-    data0_i : in std_logic_vector(31 downto 0);
-    data1_i : in std_logic_vector(31 downto 0);
-    weight_i : in std_logic_vector(63 downto 0);
-
-    memreg_c_i : in memreg_ctrl;
-    writebuff_c_i : in memreg_ctrl;
-    inst_i : in instruction;
-    ppinst_i : in ppctrl_t;
-    ppshiftinst_i : in ppshift_shift_ctrl;
-    addbiasinst_i : in ppshift_addbias_ctrl;
-    clipinst_i : in ppshift_clip_ctrl;
-    lzod_i : in  lzod_ctrl;
-    zpdata_i : in std_logic_vector(7 downto 0);
-    zpweight_i : in std_logic_vector(7 downto 0);
-    bias_i : in std_logic_vector(31 downto 0);
-
-    -- out
-    data0_addr_o : out std_logic_vector(7 downto 0);
-    data1_addr_o : out std_logic_vector(7 downto 0);
-    weight_addr_o : out std_logic_vector(7 downto 0);
-    data_ren_o : out std_logic;
-    data_wen_o : out std_logic;
-    weight_ren_o : out std_logic;
-    weight_wen_o : out std_logic;
-
-    outreg_o : out std_logic_vector(63 downto 0);
-    writebuffer_o : out std_logic_vector(63 downto 0);
-
-    -- en
-    stall : in unsigned(3 downto 0) := (others => '0');
-    en_o : out std_logic
-  );
-end component;
+--component ve_wctrlpipe
+--  port(
+--      -- general
+--    clk : in std_logic;
+--    reset : in std_logic;
+--    -- in
+--    data0_addr_i : in std_logic_vector(7 downto 0);
+--    data1_addr_i : in std_logic_vector(7 downto 0);
+--    weight_addr_i : in std_logic_vector(7 downto 0);
+--    data_ren_i : in std_logic;
+--    data_wen_i : in std_logic;
+--    weight_ren_i : in std_logic;
+--    weight_wen_i : in std_logic;
+--
+--    data0_i : in std_logic_vector(31 downto 0);
+--    data1_i : in std_logic_vector(31 downto 0);
+--    weight_i : in std_logic_vector(63 downto 0);
+--
+--    memreg_c_i : in memreg_ctrl;
+--    writebuff_c_i : in memreg_ctrl;
+--    inst_i : in instruction;
+--    ppinst_i : in ppctrl_t;
+--    ppshiftinst_i : in ppshift_shift_ctrl;
+--    addbiasinst_i : in ppshift_addbias_ctrl;
+--    clipinst_i : in ppshift_clip_ctrl;
+--    lzod_i : in  lzod_ctrl;
+--    zpdata_i : in std_logic_vector(7 downto 0);
+--    zpweight_i : in std_logic_vector(7 downto 0);
+--    bias_i : in std_logic_vector(31 downto 0);
+--
+--    -- out
+--    data0_addr_o : out std_logic_vector(7 downto 0);
+--    data1_addr_o : out std_logic_vector(7 downto 0);
+--    weight_addr_o : out std_logic_vector(7 downto 0);
+--    data_ren_o : out std_logic;
+--    data_wen_o : out std_logic;
+--    weight_ren_o : out std_logic;
+--    weight_wen_o : out std_logic;
+--
+--    outreg_o : out std_logic_vector(63 downto 0);
+--    writebuffer_o : out std_logic_vector(63 downto 0);
+--
+--    -- en
+--    stall : in unsigned(3 downto 0) := (others => '0');
+--    en_o : out std_logic
+--  );
+--end component;
 
 component re
   port(

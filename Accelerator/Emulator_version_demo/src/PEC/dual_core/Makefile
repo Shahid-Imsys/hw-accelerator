@@ -11,7 +11,9 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/sct.vhd \
 				  $(DUAL_CORE_DIR_WIN)/stack9x14.vhd \
 				  $(DUAL_CORE_DIR_WIN)/mpgm.vhd \
-				  $(DUAL_CORE_DIR_WIN)/debug_trace.vhd 
+				  $(DUAL_CORE_DIR_WIN)/debug_trace.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem.vhdl \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhdl
 	$(COMP) $(COMP_RTL_FLAGS) $(DUAL_CORE_DIR_WIN)/alu.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/clc.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/clk_gen.vhd \
@@ -35,6 +37,8 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/sdram_inf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/single_top.vhd \
 				  $(DUAL_CORE_DIR_WIN)/tim.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhdl \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/ve.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/acmdr.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/ampgm.vhd \

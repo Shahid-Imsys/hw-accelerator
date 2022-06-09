@@ -738,7 +738,8 @@ begin
     generic map (
       g_memory_type => g_memory_type)
     port map (
-      address => mp_rom0_a(11 downto 0),
+      --address => mp_rom0_a(11 downto 0),
+      address => rom0_addr_sig,
       rom_do  => mp_rom0_do,
       oe      => mp_rom0_oe,
       clk_p   => clk_p,

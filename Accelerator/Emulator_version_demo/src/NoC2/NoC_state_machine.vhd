@@ -54,8 +54,7 @@ entity Noc_State_Machine is
         Control_Data_Out        : out std_logic_vector(7 downto 0);
         PEC_TS_Reg              : out std_logic_vector(15 downto 0);              
         Load_NOC_cmd_reg        : out std_logic;
-        En_TP_write             : out std_logic;
-        En_TP_read              : out std_logic;
+        En_TP                   : out std_logic;
         Reset_TPC               : out std_logic;
         TP_Interchange          : out std_logic;
         NOC_Ready               : out std_logic;
@@ -63,7 +62,8 @@ entity Noc_State_Machine is
         En_IO_Ctrl              : out std_logic;
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
-        Load_TSDiv16_reg        : out std_logic              
+        Load_TSDiv16_reg        : out std_logic;
+        ERROR                   : out std_logic              
     );
 end Noc_State_Machine;
 
@@ -290,8 +290,7 @@ begin
             Address_Counter             <= (others => '0');
             TP_Interchange              <= '0';
             Load_NOC_cmd_reg            <= '0';
-            En_TP_write                 <= '0';
-            En_TP_read                  <= '0';
+            En_TP                       <= '0';
             Reset_TPC                   <= '0';
             En_IO_Ctrl                  <= '0';
             Load_RM_Address             <= '0';
@@ -316,14 +315,13 @@ begin
             Load_Return_Reg1            <= Decoder1(5);
             Load_Return_Reg2            <= Decoder1(6);
             Step_BC                     <= Decoder1(7);
-            TP_Interchange              <= Decoder1(8);
             load_program_mem            <= Decoder1(10);
             
             Load_NOC_reg_i              <= Mem_Out(12);
-            Sync_pulse                  <= Mem_Out(13);
-            En_TP_write                 <= Mem_Out(14);
+            TP_Interchange              <= Mem_Out(13);
+            En_TP                       <= Mem_Out(14);
             En_RM_i                     <= Mem_Out(15);
-            En_TP_read                  <= Mem_Out(16);
+            Sync_pulse                  <= Mem_Out(16);
             En_IO_Data                  <= Mem_Out(17);
             
             Start_TAG_Shift_i           <= Decoder2(0) and Mem_Out(0); 
@@ -339,7 +337,8 @@ begin
             Load_REQ_FF                 <= Decoder2(1) and Mem_Out(2);
             Load_Boot_FF                <= Decoder2(1) and Mem_Out(3);
             FF_data                     <= Decoder2(1) and Mem_Out(4);
-            Reset_Boot_as_counter       <= Decoder2(1) and Mem_Out(5);                  
+            Reset_Boot_as_counter       <= Decoder2(1) and Mem_Out(5);
+            ERROR                       <= Decoder2(1) and Mem_Out(6);                  
             
             Step_LC                     <= Decoder2(2) and Mem_Out(2);
             Decr_TC                     <= Decoder2(2) and Mem_Out(4);

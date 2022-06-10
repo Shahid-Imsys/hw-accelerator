@@ -11,7 +11,7 @@ entity ldlinvcontroller is
     clk : in std_logic;
     start : in std_logic;
     en_i : in std_logic;
-    nt : in std_logic_vector(4 downto 0);
+    nt : in std_logic_vector(4 downto 0) := "00011";
     done : out std_logic;
 
     data0_addr_o : out std_logic_vector(7 downto 0);
@@ -31,7 +31,7 @@ entity ldlinvcontroller is
     clipinst_o : out ppshift_clip_ctrl;
     zpdata_o : out std_logic_vector(7 downto 0);
     zpweight_o : out std_logic_vector(7 downto 0);
-    bias_o : out std_logic_vector(63 downto 0);
+    bias_o : out std_logic_vector(31 downto 0);
 
     en_max_o : out unsigned(3 downto 0)
   );
@@ -98,7 +98,7 @@ architecture rtl of ldlinvcontroller is
   signal clipinst : ppshift_clip_ctrl;
   signal zpdata : std_logic_vector(7 downto 0);
   signal zpweight : std_logic_vector(7 downto 0);
-  signal bias : std_logic_vector(63 downto 0);
+  signal bias : std_logic_vector(31 downto 0);
 
 begin
   --counters-----------------------------------------------------------------
@@ -155,7 +155,8 @@ begin
   end process;
   ---------------------------------------------------------------------------
   --states-------------------------------------------------------------------
-  process (all)
+  --process (all) --TODO
+  process (state, i_is_max, j_is_max, i, c_is_max, prev_state, r_is_max, start)
   begin
     case state is
       when rzero =>
@@ -219,7 +220,8 @@ begin
   end process;
   ---------------------------------------------------------------------------
   --counter control----------------------------------------------------------
-  process (all)
+  --process (all)
+  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
   begin
     r_ce <= '0';
     r_reset <= '0';
@@ -248,7 +250,8 @@ begin
     end case;
   end process;
 
-  process (all)
+  --process (all)
+  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
   begin
     c_ce <= '0';
     c_reset <= '0';
@@ -277,7 +280,8 @@ begin
     end case;
   end process;
 
-  process (all)
+  --process (all)
+  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
   begin
     i_ce <= '0';
     i_reset <= '0';
@@ -310,7 +314,8 @@ begin
     end case;
   end process;
 
-  process (all)
+  --process (all)
+  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
   begin
     j_ce <= '0';
     j_reset <= '0';
@@ -361,7 +366,8 @@ begin
   sum_index_tmp <= (r + c) * (3 + r + c)/2;
   sum_index <= sum_index_tmp(7 downto 0);
 
-  process (all)
+  --process (all)
+  process(r, state)
   begin
     if r = 0 then
       data_read_addr_sel <= d;
@@ -390,7 +396,8 @@ begin
   weight_write_addr <= dest_index;
   ---------------------------------------------------------------------------
   --instructions-------------------------------------------------------------
-  process (all)
+  --process (all)
+  process (state, i, j, j_is_max)
   begin
     data_read_enable <= '0';
     data_write_enable <= '0';
@@ -499,7 +506,8 @@ begin
   end process;
   ---------------------------------------------------------------------------
 
-  process (all)
+  --process (all)
+  process(state, i, j_is_max, nt, r, c_is_max, r_is_max)
   begin
     stall1 <= '0';
     stall2 <= '0';
@@ -513,7 +521,8 @@ begin
     end if;
   end process;
 
-  process (all)
+  --process (all)
+  process(state, c_is_max, c, nt, stall1, stall2, i)
   begin
     en_max <= x"0";
     if state = writing and c_is_max = '1' and c = 1 and nt = "00010" then -- special case for 2x2 matrix

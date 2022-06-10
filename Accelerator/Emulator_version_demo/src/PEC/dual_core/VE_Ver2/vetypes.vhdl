@@ -51,7 +51,7 @@ package vetypes is
 
   type acc_t is (keep, acc);
   type addo_t is (zero, acc);
-  type adde_t is (zero, acc, odd, odd8);
+  type adde_t is (zero, acc, odd, odd8, abs16);
   type reg_t is (keep, add, acc);
 
   type ppodd_t is (zero, add, add8, left);
@@ -62,21 +62,21 @@ package vetypes is
   type clip_t is (none, clip8, clip16, clipone16, clipzero);
   type outreg_t is (none, out7, out6, out5, out4, out3, out2, out1, out0, out76, out54, out32, out10);
   type quant_t is (trunc, round, unbiased);
-
-  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum,
+  type lzod_t is (none, store1, store2);
+  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sumall, sum,
                     select7, select6, select5, select4, select3, select2, select1,
                     select0, unitri, sum16, sum16left);
   function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
 
-  --alias matadd00 is add32 [return ppctrl_t];
-  --alias fftadd0 is add32 [return ppctrl_t];
-  --alias matadd11 is add10 [return ppctrl_t];
-  --alias fftadd1 is add10 [return ppctrl_t];
-  --alias matadd01 is add21 [return ppctrl_t];
-  --alias matadd10 is add21 [return ppctrl_t];
-  --alias matmul is fftsub1 [return ppctrl_t];
-  --alias sum16first is fftsub1 [return ppctrl_t];
-  --alias zero is pass [return ppacc_t];
+  -- alias matadd00 is add32 [return ppctrl_t];
+  -- alias fftadd0 is add32 [return ppctrl_t];
+  -- alias matadd11 is add10 [return ppctrl_t];
+  -- alias fftadd1 is add10 [return ppctrl_t];
+  -- alias matadd01 is add21 [return ppctrl_t];
+  -- alias matadd10 is add21 [return ppctrl_t];
+  -- alias matmul is fftsub1 [return ppctrl_t];
+  -- alias sum16first is fftsub1 [return ppctrl_t];
+  -- alias zero is pass [return ppacc_t];
 
   type addmul_ctrl is record
     signl0    : sign_t;
@@ -186,6 +186,11 @@ package vetypes is
     clip      : clip_t;
     outreg    : outreg_t;
   end record ppshift_clip_ctrl;
+
+  type lzod_ctrl is record
+    word : std_logic_vector(1 downto 0);
+    store : lzod_t;
+  end record lzod_ctrl;
 
   type memreg_ctrl is record
     swap      : swap_t;

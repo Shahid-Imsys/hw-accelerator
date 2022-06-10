@@ -5,9 +5,6 @@ use ieee.numeric_std.all;
 use work.vetypes.all;
 
 entity vearith is
-  generic (
-    pipestages_addmul : integer := 1
-    );
   port(
     clk         : in  std_logic;
     enable_add     : in  std_logic;

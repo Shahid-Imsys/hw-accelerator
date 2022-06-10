@@ -10,7 +10,7 @@ entity ppshift is
     enable_shift    : in  std_logic;
     enable_add_bias : in  std_logic;
     enable_clip     : in  std_logic;
-    bias            : in  std_logic_vector(15 downto 0);
+    bias            : in  std_logic_vector(31 downto 0);
     sum             : in  signed(32 downto 0);
     shift_ctrl      : in  ppshift_shift_ctrl;
     bias_add_ctrl   : in  ppshift_addbias_ctrl;

@@ -32,7 +32,7 @@ begin  -- architecture str
 
   
   vertical_g : if direction = vertical generate
-    i_v_pad : RIIO_EG1D80V_GPIO_LVT28_V
+    i_v_pad : RIIO_EG1D80V_GPIO_RVT28_V
       port map (
         -- PAD
         PAD_B => pad,
@@ -55,7 +55,7 @@ begin  -- architecture str
         );
 
   elsif direction = horizontal generate
-    i_h_pad : RIIO_EG1D80V_GPIO_LVT28_H
+    i_h_pad : RIIO_EG1D80V_GPIO_RVT28_H
       port map (
         -- PAD
         PAD_B => pad,

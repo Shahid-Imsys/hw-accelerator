@@ -10,7 +10,7 @@ package pad_instance_package is
       PAD : inout std_logic);
   end component;
 
-  component RIIO_EG1D80V_GPO_LVT28_H
+  component RIIO_EG1D80V_GPO_RVT28_H
     port (
       -- PAD
       PAD_B : inout std_logic;
@@ -28,7 +28,7 @@ package pad_instance_package is
       );
   end component;
 
-  component RIIO_EG1D80V_GPO_LVT28_V
+  component RIIO_EG1D80V_GPO_RVT28_V
     port (
       -- PAD
       PAD_B : inout std_logic;
@@ -46,7 +46,7 @@ package pad_instance_package is
       );
   end component;
 
-  component RIIO_EG1D80V_GPI_LVT28_V
+  component RIIO_EG1D80V_GPI_RVT28_V
     port (
       -- PAD
       PAD_B : inout std_logic;
@@ -59,7 +59,7 @@ package pad_instance_package is
       );
   end component;
 
-  component RIIO_EG1D80V_GPI_LVT28_H
+  component RIIO_EG1D80V_GPI_RVT28_H
     port (
       -- PAD
       PAD_B : inout std_logic;
@@ -72,7 +72,7 @@ package pad_instance_package is
       );
   end component;
   
-  component RIIO_EG1D80V_GPIO_LVT28_V
+  component RIIO_EG1D80V_GPIO_RVT28_V
     port (
       -- PAD
       PAD_B : inout std_logic;
@@ -94,7 +94,7 @@ package pad_instance_package is
       );
   end component;
 
-  component RIIO_EG1D80V_GPIO_LVT28_H
+  component RIIO_EG1D80V_GPIO_RVT28_H
     port (
       -- PAD
       PAD_B : inout std_logic;

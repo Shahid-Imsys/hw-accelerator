@@ -249,5 +249,13 @@ with inst select decoded <=
             acc3 => (acc => keep, add => zero, reg => keep),
             acc2 => (acc => keep, add => odd8, reg => keep),
             acc1 => (acc => keep, add => zero, reg => keep),
-            acc0 => (acc => keep, add => odd8, reg => keep)) when mulcf;
+            acc0 => (acc => keep, add => odd8, reg => keep)) when mulcf,
+            (acc7 => (acc => keep, add => zero, reg => keep),
+            acc6 => (acc => keep, add => abs16, reg => add),
+            acc5 => (acc => keep, add => zero, reg => keep),
+            acc4 => (acc => keep, add => abs16, reg => add),
+            acc3 => (acc => keep, add => zero, reg => keep),
+            acc2 => (acc => keep, add => abs16, reg => add),
+            acc1 => (acc => keep, add => zero, reg => keep),
+            acc0 => (acc => keep, add => abs16, reg => add)) when abs16;
 end architecture;

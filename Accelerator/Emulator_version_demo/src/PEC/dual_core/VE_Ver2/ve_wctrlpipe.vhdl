@@ -20,6 +20,9 @@ entity ve_wctrlpipe is
     data_wen_i : in std_logic;
     weight_ren_i : in std_logic;
     weight_wen_i : in std_logic;
+    enable_shift : in std_logic;
+    enable_add_bias : in std_logic;
+    enable_clip : in std_logic;
 
     data0_i : in std_logic_vector(31 downto 0);
     data1_i : in std_logic_vector(31 downto 0);
@@ -32,9 +35,10 @@ entity ve_wctrlpipe is
     ppshiftinst_i : in ppshift_shift_ctrl;
     addbiasinst_i : in ppshift_addbias_ctrl;
     clipinst_i : in ppshift_clip_ctrl;
+    lzod_i : in  lzod_ctrl;
     zpdata_i : in std_logic_vector(7 downto 0);
     zpweight_i : in std_logic_vector(7 downto 0);
-    bias_i : in std_logic_vector(15 downto 0);
+    bias_i : in std_logic_vector(31 downto 0);
 
     -- out
     data0_addr_o : out std_logic_vector(7 downto 0);
@@ -59,6 +63,7 @@ architecture rtl of ve_wctrlpipe is
   constant en_delay : integer := 11; --10
   constant read_delay : integer := 0;
   constant memreg_c_delay : integer := 1;
+  constant lzod_delay : integer := 2;
   constant zpdata_delay : integer := 2;
   constant zpweight_delay : integer := 2;
   constant inst_delay : integer := 4;
@@ -73,7 +78,11 @@ architecture rtl of ve_wctrlpipe is
   signal en : std_logic;
   signal en_cntr : unsigned(3 downto 0) := (others => '0');
   type en_array is array (0 to en_delay) of std_logic;
+  type pp_en_array is array (0 to ppshiftinst_delay) of std_logic;
   signal en_pipe : en_array := (others => '0');
+  signal enable_shift_pipe : pp_en_array;
+  signal enable_add_bias_pipe : pp_en_array;
+  signal enable_clipp_pipe : pp_en_array;
   -- piped signals
   type addr_array is array (0 to write_delay) of std_logic_vector(7 downto 0);
   signal data0_addr_pipe : addr_array := (others => (others => '0'));
@@ -87,6 +96,8 @@ architecture rtl of ve_wctrlpipe is
   signal memreg_c_pipe : memreg_c_array;
   type writebuff_c_array is array (0 to writebuff_c_delay) of memreg_ctrl;
   signal writebuff_c_pipe : writebuff_c_array;
+  type lzod_array is array (0 to lzod_delay) of lzod_ctrl;
+  signal lzod_pipe : lzod_array;
   type inst_array is array (0 to inst_delay) of instruction;
   signal inst_pipe : inst_array;
   type ppinst_array is array (0 to ppinst_delay) of ppctrl_t;
@@ -101,7 +112,7 @@ architecture rtl of ve_wctrlpipe is
   signal zpdata_pipe : zpdata_array  := (others => (others => '0'));
   type zpweight_array is array (0 to zpweight_delay) of std_logic_vector(7 downto 0);
   signal zpweight_pipe : zpweight_array  := (others => (others => '0'));
-  type bias_array is array (0 to bias_delay) of std_logic_vector(15 downto 0);
+  type bias_array is array (0 to bias_delay) of std_logic_vector(31 downto 0);
   signal bias_pipe : bias_array  := (others => (others => '0'));
 
   -- components
@@ -128,9 +139,10 @@ architecture rtl of ve_wctrlpipe is
     shift_ctrl       : in  ppshift_shift_ctrl;
     bias_add_ctrl    : in  ppshift_addbias_ctrl;
     clip_ctrl        : in  ppshift_clip_ctrl;
+    lzo_ctrl         : in  lzod_ctrl;
     zpdata           : in  std_logic_vector(7 downto 0);
     zpweight         : in  std_logic_vector(7 downto 0);
-    bias             : in  std_logic_vector(15 downto 0);
+    bias             : in  std_logic_vector(31 downto 0);
     outreg           : out std_logic_vector(63 downto 0);
     writebuffer      : out std_logic_vector(63 downto 0)
   );
@@ -149,15 +161,16 @@ port map (
   enable_mul       => '1',
   enable_acc       => '1',
   enable_sum       => '1',
-  enable_shift     => '1',
-  enable_add_bias  => '1',
-  enable_clip      => '1',
+  enable_shift     => enable_shift_pipe(ppshiftinst_delay),
+  enable_add_bias  => enable_add_bias_pipe(ppshiftinst_delay),
+  enable_clip      => enable_clipp_pipe(ppshiftinst_delay),
   enable_writebuff => '1',
   data0            => data0_i,
   data1            => data1_i,
   weight           => weight_i,
   memctrl          => memreg_c_pipe(memreg_c_delay),
   wbctrl           => writebuff_c_pipe(writebuff_c_delay),
+  lzo_ctrl         => lzod_pipe(lzod_delay),
   inst_addmul      => inst_pipe(inst_delay-2),
   inst_acc         => inst_pipe(inst_delay),
   ppinst           => ppinst_pipe(ppinst_delay),
@@ -260,6 +273,20 @@ port map (
     end if;
   end process;
 
+  lzod_pipeline : process (clk)
+  begin
+    if rising_edge(clk) then
+      if en_pipe(0) = '1' then
+        lzod_pipe(0) <= lzod_i;
+      end if;
+      for i in 1 to lzod_delay loop
+        if en_pipe(i) = '1' then
+          lzod_pipe(i) <= lzod_pipe(i - 1);
+        end if;
+      end loop;
+    end if;
+  end process;
+
   writebuff_c_pipeline : process (clk)
   begin
     if rising_edge(clk) then
@@ -307,10 +334,16 @@ port map (
     if rising_edge(clk) then
       if en_pipe(0) = '1' then
         ppshiftinst_pipe(0) <= ppshiftinst_i;
+        enable_shift_pipe(0) <= enable_shift;
+        enable_add_bias_pipe(0) <= enable_add_bias;
+        enable_clipp_pipe(0) <= enable_clip;
       end if;
       for i in 1 to ppshiftinst_delay loop
         if en_pipe(i) = '1' then
           ppshiftinst_pipe(i) <= ppshiftinst_pipe(i - 1);
+          enable_shift_pipe(i) <= enable_shift_pipe(i - 1);
+          enable_add_bias_pipe(i) <= enable_add_bias_pipe(i - 1);
+          enable_clipp_pipe(i) <= enable_clipp_pipe(i - 1);
         end if;
       end loop;
     end if;

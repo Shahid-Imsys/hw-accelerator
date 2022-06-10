@@ -22,7 +22,6 @@ architecture first of addmul is
   signal addl, addr                         : signed(8 downto 0);  -- Registered adder result
   signal mulres                             : signed(17 downto 0);  -- Registered multiplier result
   signal mulen                              : enable_t;  -- Delayed control signals
-  signal mul_enable                         : std_logic;
 begin
 
 -- Signed/unsigned

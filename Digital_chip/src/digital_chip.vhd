@@ -174,7 +174,7 @@ architecture rtl of digital_chip is
       );
   end component;
 
-  component ri_adpll_gf22fdx_2gmp_behavioral
+  component ri_adpll_gf22fdx_2gmp
     generic (
       ADPLL_STATUS_BITS : integer := 21);
     port (
@@ -223,7 +223,7 @@ architecture rtl of digital_chip is
       bist_fail_fine_o       : out std_logic  --
      --1:BIST fail for finetune (monotony error or BIST was not correct started); 0:BIST pass
       );
-  end component ri_adpll_gf22fdx_2gmp_behavioral;
+  end component ri_adpll_gf22fdx_2gmp;
 
   signal pll_locked : std_logic;
   signal dco_clk    : std_logic_vector(7 downto 0);
@@ -306,7 +306,7 @@ architecture rtl of digital_chip is
 
 begin  -- architecture rtl
 
-  i_pll : ri_adpll_gf22fdx_2gmp_behavioral
+  i_pll : ri_adpll_gf22fdx_2gmp
     port map (
       ref_clk_i              => pll_ref_clk_in,
       scan_clk_i             => '0',

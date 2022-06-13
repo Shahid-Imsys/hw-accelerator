@@ -65,7 +65,7 @@ entity core is
     clk_d_pos       : in  std_logic;  -- DRAM clock
     clk_s_pos       : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
-    rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
+    --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     en_d        : out std_logic;  -- Enable clk_d
     fast_d      : out std_logic;  -- clk_d speed select 
@@ -753,7 +753,7 @@ begin
 	  );
         
   rst_cn <= rst_cn_int;
-  rst_n <= rst_n_int;
+  --rst_n <= rst_n_int;
   clk_e_pos <= clk_e_pos_int;
   clk_e_neg <= clk_e_neg_int;
 

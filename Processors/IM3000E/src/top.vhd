@@ -381,7 +381,7 @@ architecture struct of top is
   signal pll_pdn         : std_logic;   --added by HYX,20141115
   signal erxclk          : std_logic;
   signal etxclk          : std_logic;
-  signal int_rst_n       : std_logic;
+  --signal int_rst_n       : std_logic;
   signal rst_cn          : std_logic;
   signal en_d            : std_logic;
   signal fast_d          : std_logic;
@@ -980,7 +980,7 @@ begin
       clk_d_pos    => clk_d_pos,        --: in  std_logic;  -- DRAM clock
       clk_s_pos    => clk_s_pos,        --: in  std_logic;  -- SP clock
       -- Control outputs to the clock block
-      rst_n        => int_rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
+      --rst_n        => int_rst_n,  --: out std_logic;  -- Asynchronous reset to clk_gen
       rst_cn       => rst_cn,  --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
       en_d         => en_d,             --: out std_logic;  -- Enable clk_d
       fast_d       => fast_d,  --: out std_logic;  -- clk_d speed select

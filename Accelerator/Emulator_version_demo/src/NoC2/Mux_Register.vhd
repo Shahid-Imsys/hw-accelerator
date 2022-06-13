@@ -43,9 +43,9 @@ begin
 
     NOC_reg_mux_ctrl        <= Mux_reg(1 downto 0);
     NOC_data_mux_ctrl       <= Mux_reg(2);
-    Data_Dir                <= Mux_reg(3);
-    NOC_bus_out_mux_ctrl    <= Mux_reg(4);
-    Loop_reg_mux_ctrl       <= Mux_reg(5);
+    Data_Dir                <= Mux_reg(4);
+    NOC_bus_out_mux_ctrl    <= Mux_reg(5);
+    Loop_reg_mux_ctrl       <= Mux_reg(6);
     R_W_RM                  <= Mux_reg(7);
 
     process(clk, Reset)

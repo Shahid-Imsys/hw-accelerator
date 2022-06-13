@@ -169,7 +169,7 @@ begin
 
     for i in ram_do'range loop
       c1_data_inner <= ram_do(i) when data_en_c1(i) = '1';
-      c1_data_inner <= ram_do(i) when data_en_c2(i) = '1';
+      c2_data_inner <= ram_do(i) when data_en_c2(i) = '1';
     end loop;  -- i
   end process choose_ram_data_p;
 

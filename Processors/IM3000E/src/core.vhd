@@ -65,7 +65,7 @@ entity core is
     clk_d_pos       : in  std_logic;  -- DRAM clock
     clk_s_pos       : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
-    rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
+    --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     en_d        : out std_logic;  -- Enable clk_d
     fast_d      : out std_logic;  -- clk_d speed select 
@@ -94,7 +94,8 @@ entity core is
 		test_pll    : out std_logic;  -- PLL in test mode
     xout        : in  std_logic;  -- XOSC ref. clock output
     -- Power on signal
-    pwr_ok      : in  std_logic;  -- Power is on 
+    pwr_ok      : in  std_logic;  -- Power is on
+    core_wdog_n   : out std_logic;  -- Watchdog_reset.
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -752,7 +753,7 @@ begin
 	  );
         
   rst_cn <= rst_cn_int;
-  rst_n <= rst_n_int;
+  --rst_n <= rst_n_int;
   clk_e_pos <= clk_e_pos_int;
   clk_e_neg <= clk_e_neg_int;
 
@@ -823,6 +824,7 @@ begin
       curr_mpga     => curr_mpga,
       mar           => mar);
 
+  core_wdog_n <= wdog_n;
 ---------------------------------------------------------------------
 -- ALU
 ---------------------------------------------------------------------

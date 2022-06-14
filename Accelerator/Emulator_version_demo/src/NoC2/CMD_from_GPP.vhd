@@ -39,7 +39,8 @@ entity CMD_from_GPP is
         Length                  : out std_logic_vector(15 downto 0);
         Address                 : out std_logic_vector(31 downto 0);        
         CMD_FF                  : out std_logic;
-        TSDiv16_Reg             : out std_logic_vector(11 downto 0)
+        TSDiv16_Reg             : out std_logic_vector(11 downto 0);
+        NOC_CMD_ACK             : out std_logic
     );
 end CMD_from_GPP;
 
@@ -48,6 +49,7 @@ architecture Behavioral of CMD_from_GPP is
     signal  GPP_CMD_Reg         : std_logic_vector(127 downto 0);
     signal  Length_i            : std_logic_vector(15 downto 0);
     signal  Length_plus         : std_logic_vector(15 downto 0);
+    signal  FF_Ack              : std_logic;
     
 begin
 
@@ -61,6 +63,8 @@ begin
     CM_Address1     <= GPP_CMD_Reg(78 downto 64);
     Address         <= GPP_CMD_Reg(111 downto 80);
     Padding_Data    <= GPP_CMD_Reg(119 downto 112);
+    
+    NOC_CMD_ACK     <= FF_Ack;
     
     process(clk, Reset)
     begin
@@ -77,6 +81,7 @@ begin
             if Load_TSDiv16_Reg = '1' then
                 TSDiv16_Reg     <= Length_plus(15 downto 4);
             end if;
+            FF_Ack     <= Load_GPP_CMD_reg;
         end if;
     end process;           
 

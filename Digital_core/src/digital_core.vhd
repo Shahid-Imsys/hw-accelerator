@@ -43,6 +43,7 @@ entity digital_core is
     cpu_rst_n : in std_logic;
 
     MRESET     : in  std_logic;         -- system reset, active low
+    c1_wdog_n  : out std_logic;
     MRSTOUT    : out std_logic;
     MIRQOUT    : out std_logic;         -- interrupt request output
     MCKOUT0    : out std_logic;         -- for trace adapter
@@ -162,6 +163,7 @@ begin  -- architecture rtl
       clk_tx    => clk_tx,
       MRESET    => MRESET,
       rst_n     => cpu_rst_n,
+      c1_wdog_n => c1_wdog_n,
       MRSTOUT   => MRSTOUT,
       MIRQOUT   => MIRQOUT,
       MCKOUT0   => MCKOUT0,

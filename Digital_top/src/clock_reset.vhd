@@ -18,7 +18,8 @@ entity clock_reset is
 
     mreset_n     : in  std_logic;   -- system reset, active low
     pwr_ok       : in  std_logic;   -- Power OK
-
+    c1_wdog_n    : in std_logic;
+    
     rst_n : out std_logic;  -- main reste, sync to clk_p
     
     --etxclk : in std_logic;
@@ -75,7 +76,7 @@ begin  -- architecture rtl
     );
 
 
-  main_rst_n <= (spi_override_pll_locked or pll_locked) and common_rst_n;
+  main_rst_n <= (spi_override_pll_locked or pll_locked) and common_rst_n and c1_wdog_n;
 
   
   i_main_rst_n : entity work.reset_sync

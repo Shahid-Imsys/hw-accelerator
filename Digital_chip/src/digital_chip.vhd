@@ -85,9 +85,9 @@ entity digital_chip is
 
     -- IM4000 Boot interface
     pa0_sin : inout std_logic;
-    pa5_sin : inout std_logic;
-    pa6_sin : inout std_logic;
-    pa7_sin : inout std_logic;
+    pa5_cs_n : inout std_logic;
+    pa6_sck : inout std_logic;
+    pa7_sout : inout std_logic;
 
     -- I/O bus
 
@@ -1210,7 +1210,7 @@ begin  -- architecture rtl
         direction => vertical)
       port map (
         -- PAD
-        pad => pa5_sin,
+        pad => pa5_cs_n,
         -- GPIO
         do  => pa_o(5),
         ds  => pad_config.pa5_cs_n.ds & "00",
@@ -1230,7 +1230,7 @@ begin  -- architecture rtl
         direction => vertical)
       port map (
         -- PAD
-        pad => pa6_sin,
+        pad => pa6_sck,
         -- GPIO
         do  => pa_o(6),
         ds  => pad_config.pa6_sck.ds & "00",
@@ -1250,7 +1250,7 @@ begin  -- architecture rtl
         direction => vertical)
       port map (
         -- PAD
-        pad => pa7_sin,
+        pad => pa7_sout,
         -- GPIO
         do  => pa_o(7),
         ds  => pad_config.pa7_sout.ds & "00",

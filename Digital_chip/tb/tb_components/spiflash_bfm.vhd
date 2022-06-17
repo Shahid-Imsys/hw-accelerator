@@ -349,7 +349,7 @@ begin
         end case;
 
         state_cs      <= idle;
-        do_int        <= '0';
+        do_int        <= 'Z';
         state_fall    <= idle;
         instruction_v := (others => '0');
         address_v     := (others => '0');

@@ -184,7 +184,7 @@ begin
       tmp(3) := now;
     elsif falling_edge(pulseout(3)) then
       if (now - tmp(3) = timer3_pls) then
-        write(output, string'("Timer 2 pulseout test OK" & lf));
+        write(output, string'("Timer 3 (driven by timer 2) pulseout test OK" & lf));
       else
         write(output, string'("Timer 3 (driven by timer 2) pulseout fail. Pulse active for: " & time'image(now - tmp(3)) & ", should be: " & time'image(timer3_pls) & lf));
         test_pass <= false;

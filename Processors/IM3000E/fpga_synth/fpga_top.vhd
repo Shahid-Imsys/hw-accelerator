@@ -24,6 +24,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 use work.gp_pkg.all;
+use work.data_types_pack.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -81,7 +82,11 @@ entity fpga_top is
     -- VCU118
     VCU118_Clk300M_p : in  std_logic;
     VCU118_Clk300M_n : in  std_logic;
-    LED              : out std_logic_vector (7 downto 0)
+    LED              : out std_logic_vector (7 downto 0);
+    
+    --pmod1            : inout std_logic_vector(7 downto 0);  -- J53 male vertical
+    pmod0_in         : in    std_logic_vector(2 downto 0); -- J52 female angeled
+    pmod0_out        : out   std_logic_vector(4 downto 3) -- J52 female angeled
     );
 end fpga_top;
 
@@ -209,7 +214,15 @@ architecture rtl of fpga_top is
       ospi_dq_enable   : out std_logic;
       ospi_rwds_in     : in  std_logic;
       ospi_rwds_out    : out std_logic;
-      ospi_rwds_enable : out std_logic
+      ospi_rwds_enable : out std_logic;
+
+      -- SPI, chip control interface
+      spi_sclk      : in  std_logic;
+      spi_cs_n      : in  std_logic;
+      spi_mosi      : in  std_logic;
+      spi_miso      : out std_logic;
+      spi_miso_oe_n : out std_logic;
+      pad_config    : out pad_config_record_t
       );
   end component;
 
@@ -248,16 +261,16 @@ architecture rtl of fpga_top is
   signal clk_a      : std_logic;        -- out
 
   -- Ports
-  signal pa_i : std_logic_vector(7 downto 0);
-  signal pb_i : std_logic_vector(7 downto 0);
-  signal pc_i : std_logic_vector(7 downto 0);
-  signal pd_i : std_logic_vector(7 downto 0);
-  signal pe_i : std_logic_vector(7 downto 0);
-  signal pf_i : std_logic_vector(7 downto 0);
-  signal pg_i : std_logic_vector(7 downto 0);
-  signal ph_i : std_logic_vector(7 downto 0);
-  signal pi_i : std_logic_vector(7 downto 0);
-  signal pj_i : std_logic_vector(7 downto 0);
+  signal pa_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pb_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pc_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pd_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pe_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pf_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pg_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal ph_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pi_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pj_i : std_logic_vector(7 downto 0) := (others => '0');
 
   signal pa_o : std_logic_vector(7 downto 0);
   signal pb_o : std_logic_vector(7 downto 0);
@@ -298,6 +311,13 @@ architecture rtl of fpga_top is
   signal OSPI_RWDS_i : std_logic;
   signal OSPI_RWDS_o : std_logic;
   signal OSPI_RWDS_e : std_logic;
+  
+  signal spi_sclk      : std_logic;
+  signal spi_cs_n      : std_logic;
+  signal spi_mosi      : std_logic;
+  signal spi_miso      : std_logic;
+  signal spi_miso_oe_n : std_logic;
+  signal pad_config    : pad_config_record_t;
 
   signal HCLK     : std_logic;
   signal clk_200m : std_logic;
@@ -314,18 +334,34 @@ begin
   LED(5)          <= not pa_o(5) when pa_en(5) = '1' else not PA5_CS_N;
   LED(4)          <= not pa_o(0) when pa_en(0) = '1' else not PA0_SIN;
   LED(3 downto 0) <= std_logic_vector(counter34(28 downto 25));
+  
+  --
+  spi_sclk <= pmod0_in(0);       
+  spi_cs_n <= pmod0_in(1);       
+  spi_mosi <= pmod0_in(2);      
+  --
+  pmod0_out(3) <= spi_miso;
+  pmod0_out(4) <= spi_miso_oe_n;
+
+
+  -- pad_config
 
   PA7_SOUT <= pa_p(7);
-  pa_i(7)  <= PA7_SOUT;
+  pa_i(7)  <='0'; -- PA7_SOUT;
 
   PA6_SCK <= pa_p(6);
-  pa_i(6) <= PA6_SCK;
+  pa_i(6) <= '0'; -- PA6_SCK;
 
   PA5_CS_N <= pa_p(5);
-  pa_i(5)  <= PA5_CS_N;
+  pa_i(5)  <= '0'; -- PA5_CS_N;
+  
+  pa_i(4) <= '1';
+  pa_i(3) <= '0';
+  pa_i(2) <= '0';
+  pa_i(1) <= '1';
 
   PA0_SIN <= pa_p(0);
-  pa_i(0) <= PA0_SIN;
+  pa_i(0) <= '1'; -- PA0_SIN;
 
   UTX     <= pj_p(0);
   pj_i(0) <= UTX;
@@ -412,8 +448,8 @@ begin
       )
     port map (
       hclk        => HCLK,
-      pll_ref_clk => '0',
-      pll_locked  => '0',
+      pll_ref_clk => HCLK,
+      pll_locked  => '1',
       MRESET      => MRESET,
       MRSTOUT     => MRSTOUT,
       MIRQOUT     => MIRQOUT,
@@ -495,7 +531,14 @@ begin
       ospi_dq_enable   => OSPI_DQ_e,
       ospi_rwds_in     => OSPI_RWDS_i,
       ospi_rwds_out    => OSPI_RWDS_o,
-      ospi_rwds_enable => OSPI_RWDS_e
+      ospi_rwds_enable => OSPI_RWDS_e,
+      
+      spi_sclk      => spi_sclk,
+      spi_cs_n      => spi_cs_n,
+      spi_mosi      => spi_mosi,
+      spi_miso      => spi_miso,
+      spi_miso_oe_n => spi_miso_oe_n,
+      pad_config    => pad_config
       );
 
 end rtl;

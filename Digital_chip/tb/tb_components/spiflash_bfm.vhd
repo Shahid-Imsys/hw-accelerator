@@ -96,6 +96,8 @@ architecture rtl of spiflash_bfm is
     wait for 1 ps;
   end procedure;
 
+  signal do_int : std_logic;
+  
   signal page  : page_type;
   signal ram   : ram_type := (others => (others => (others => '1')));
   signal reg   : reg_type := (others => (others => '0'));
@@ -112,6 +114,10 @@ begin
 
   reg(0)(1) <= WEL;
   reg(0)(0) <= BUSY;
+
+  do <= 'Z' when cs_n = '1' else
+        'Z' when hold_n = '0' else
+        do_int;
 
   process
 
@@ -265,7 +271,7 @@ begin
             if (bitcnt_v < 0) then
               bitcnt_v := 7;
             end if;
-            do     <= reg(0)(bitcnt_v);
+            do_int     <= reg(0)(bitcnt_v);
             bitcnt_v := bitcnt_v - 1;
 
           -- Read status register 2
@@ -273,7 +279,7 @@ begin
             if (bitcnt_v < 0) then
               bitcnt_v := 7;
             end if;
-            do     <= reg(1)(bitcnt_v);
+            do_int    <= reg(1)(bitcnt_v);
             bitcnt_v := bitcnt_v - 1;
 
           -- Read status register 3
@@ -281,7 +287,7 @@ begin
             if (bitcnt_v > 7) then
               bitcnt_v := 0;
             end if;
-            do     <= reg(2)(bitcnt_v);
+            do_int <= reg(2)(bitcnt_v);
             bitcnt_v := bitcnt_v + 1;
 
           -- Read data
@@ -299,7 +305,7 @@ begin
               end if;
               bitcnt_v := 7;
             end if;
-            do     <= ram(pagecnt_v)(bytecnt_v)(bitcnt_v);
+            do_int <= ram(pagecnt_v)(bytecnt_v)(bitcnt_v);
             bitcnt_v := bitcnt_v - 1;
 
           when others =>
@@ -343,7 +349,7 @@ begin
         end case;
 
         state_cs      <= idle;
-        do            <= '0';
+        do_int        <= 'Z';
         state_fall    <= idle;
         instruction_v := (others => '0');
         address_v     := (others => '0');

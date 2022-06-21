@@ -142,3 +142,31 @@ create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports
 
 set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
 
+
+set_property PACKAGE_PIN AY14 [get_ports {pmod0_in[0]}]
+set_property PACKAGE_PIN AY15 [get_ports {pmod0_in[1]}]
+set_property PACKAGE_PIN AW15 [get_ports {pmod0_in[2]}]
+set_property PACKAGE_PIN AV15 [get_ports {pmod0_out[3]}]
+set_property PACKAGE_PIN AV16 [get_ports {pmod0_out[4]}]
+
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {pmod0_in_IBUF[0]_inst/O}]
+
+set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[0]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[1]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[2]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[3]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[4]}]
+
+create_clock -period 100.000 -name SPI_SCK -waveform {0.000 50.000} [get_ports {pmod0_in[0]}]
+set_clock_groups -name SPI_CLK -asynchronous -group [get_clocks SPI_SCK]
+
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[0]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[1]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[2]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[3]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[4]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[5]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[6]/*}] 2
+#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[7]/*}] 2
+
+# create_generated_clock -name im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q -source [get_pins im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q] -multiply_by 1 [get_pins im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q]

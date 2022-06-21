@@ -635,14 +635,14 @@ begin
       elsif rising_edge(clk_p) then
 
         if sft_reg_ld = '1' then
-          sft_reg(8 downto 1) <= dtp;
+--          sft_reg(8 downto 1) <= dtp;
           sft_reg(0)          <= sft_in_sel(1) or sft_in_sel(0);
           --
-          if asy_comm = '0' then
-            sft_out <= dtp(7);
-          else
+--          if asy_comm = '0' then
+--            sft_out <= dtp(7);
+--          else
             sft_out <= '0';
-          end if;
+--          end if;
 
         elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then
           -- Rising edge of sft_clk (after double regs)

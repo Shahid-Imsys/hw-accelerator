@@ -310,7 +310,7 @@ begin  -- architecture rtl
     port map (
       ref_clk_i              => pll_ref_clk_in,
       scan_clk_i             => '0',
-      reset_q_i              => preset_n,  --asynchronous reset
+      reset_q_i              => pwr_ok,  --asynchronous reset
       en_adpll_ctrl_i        => '1',  --enable controller
       clk_core_o             => open,  --low speed core clock output
       pll_locked_o           => pll_locked,  --lock signal

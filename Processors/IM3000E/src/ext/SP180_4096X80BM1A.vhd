@@ -118,7 +118,7 @@ architecture struct of SP180_4096X80BM1A is
           return ROM;
 	end function;
 
-	signal ROM	: rom_type := init_rom_from_file("mprom0.data");
+	signal ROM	: rom_type := init_rom_from_file("../../../src/ext/ISAL/mprom0.data");
 	signal addr	: std_logic_vector(11 downto 0);
 	signal data	: std_logic_vector(79 downto 0) := (others => '0');  --
                                                                              --BSN

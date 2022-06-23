@@ -146,6 +146,9 @@ architecture rtl of ports is
 
   constant IRQ_ADC : integer := 2;
 
+  signal adc_run_d : std_logic;
+  signal adc_run_int : std_logic;
+  
   signal dtp      : std_logic_vector(7 downto 0);      -- data to ports
   signal we_ctrl  : std_logic;          -- write enable control
   signal we_data  : std_logic;          -- write enable data
@@ -743,21 +746,31 @@ begin
 
   -- Let the ADC run free in modes 11,10. In mode 01, initiate a new
   -- sample using a pulse from timer 4. Mode 00 is reset.
-  process (adc_mode_int, pulseout(4), adc_edge)
+  process (adc_mode_int, pulseout(4), adc_edge, adc_run_d)
   begin
+    adc_run_int <= adc_run_d;
     if adc_mode_int(1) = '1' then
-      adc_run <= '1';
+      adc_run_int <= '1';
     elsif adc_mode_int(0) = '1' then
       if pulseout(4) = '1' then
-        adc_run <= '1';
+        adc_run_int <= '1';
       elsif adc_edge = '1' then
-        adc_run <= '0';
+        adc_run_int <= '0';
       end if;
     else
-      adc_run <= '0';
+      adc_run_int <= '0';
     end if;
   end process;
 
+  adc_run <= adc_run_int;
+  
+  process (clk_p)
+  begin
+    if rising_edge(clk_p) then
+      adc_run_d <= adc_run_int;
+    end if;
+  end process;
+  
   adc_en <= '1' when adc_mode_int /= "00" else
             '0';
 

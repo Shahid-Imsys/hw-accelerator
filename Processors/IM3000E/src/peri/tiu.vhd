@@ -429,20 +429,23 @@ begin
 			-- whether a timer is active or not. When not active, no clk_t pulses
 			-- are generated for this timer.
 			-- When a timer counts to zero, it turns itself off if its rep bit is
-			-- set to zero. The onff flipflop is reset synchronously at the same
-			-- time the dwnctr reloads or wraps, on the last clk_t pulse.
+			-- set to zero. 
 			-- A driving timer with its rep bit set can be forced to turn itself
 			-- off anyway by the driven timer, if the latter sets the former's
 			-- ctrldrvg(0) line high. 
-      process (clk_t(i), turn_off_n(i), turn_on(i), trst_n)
+      process (clk_p, trst_n)
       begin
-        if (turn_on(i) = '1') then
-          onff(i) <= '1';
-        elsif (turn_off_n(i) = '0' or trst_n = '0') then
+        if  trst_n = '0' then
           onff(i) <= '0';
-        elsif rising_edge(clk_t(i)) then
-          if (cnt_zero(i) = '1' and rep = '0') or ctrldrvg(i)(0) = '1' then
+        elsif rising_edge(clk_p) then
+          if (turn_on(i) = '1') then
+            onff(i) <= '1';
+          elsif (turn_off_n(i) = '0') then
             onff(i) <= '0';
+          else
+            if (cnt_zero(i) = '1' and rep = '0') or ctrldrvg(i)(0) = '1' then
+              onff(i) <= '0';
+            end if;
           end if;
         end if;
       end process;
@@ -632,12 +635,14 @@ begin
     -- This process creates a clkpulse for writing in parameter registers.
     -- It is distributed to the params block in every timer, but writing
     -- will be performed only in the timer selected by wr(i).
-    process (first_clk, trst_n)
+    process (first_clk)
     begin
-      if (trst_n = '0') then
-        clk_wr <= '0';
-      elsif rising_edge(first_clk) then
-				clk_wr <= reg_wr;
+      if rising_edge(first_clk) then
+        if (trst_n = '0' or rst_en = '0') then
+          clk_wr <= '0';
+        else
+          clk_wr <= reg_wr;
+        end if;
       end if;
     end process;
 

@@ -131,6 +131,7 @@ architecture rtl of tiu is
   signal trig_edge  : std_logic_vector(TIM_CH_NBR-1 downto 0);
   signal toggle_out : std_logic_vector(TIM_CH_NBR-1 downto 0);
   signal ff         : std_logic_vector(7 downto 0);
+  signal ff_old     : std_logic_vector(7 downto 0); -- TEMPORARY TESTING SIGNAL
   signal frd        : std_logic_vector(TIM_CH_NBR-1 downto 0);
 
 begin
@@ -542,31 +543,52 @@ begin
 
   begin
 
+  -----------------------------------
+  -- TEST SEGMENT
+  -----------------------------------
   -- Frequency divider
     process (first_clk, trst_n)
     begin
       if (trst_n = '0') then
-        ff(0) <= '0';
+        ff_old(0) <= '0';
       elsif rising_edge(first_clk) then
-        if run = '1' or ff(0) = '1' then
-          ff(0) <= not ff(0);
+        if run = '1' or ff_old(0) = '1' then
+          ff_old(0) <= not ff_old(0);
         end if;
       end if;
     end process;
 
-    freq: for i in 1 to 7 generate
-      div: block
+    freq_old: for i in 1 to 7 generate
+      div_old: block
       begin
-        process (ff(i-1), trst_n)
+        process (ff_old(i-1), trst_n)
         begin 
           if trst_n = '0' then 
-            ff(i) <= '0';
-          elsif falling_edge(ff(i-1)) then
-            ff(i) <= not ff(i);
+            ff_old(i) <= '0';
+          elsif falling_edge(ff_old(i-1)) then
+            ff_old(i) <= not ff_old(i);
           end if;
         end process;
-      end block div;
-    end generate freq;
+      end block div_old;
+    end generate freq_old;
+  -----------------------------------
+  -- TEST SEGMENT
+  -----------------------------------
+
+  -- Frequency divider
+    process (first_clk, trst_n)
+    begin
+      if (trst_n = '0') then
+        ff <= (others => '0');
+      elsif rising_edge(first_clk) then
+        if run = '1' then
+          ff <= ff + 1;
+        else
+          ff(0) <= '0';
+        end if;
+          assert ff = ff_old report "ff error" severity error;
+      end if;
+    end process;
 
     process(ff)
       variable tmp : std_logic_vector(7 downto 0);

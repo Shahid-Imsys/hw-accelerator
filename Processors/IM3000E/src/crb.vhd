@@ -263,7 +263,7 @@ architecture rtl of crb is
   signal pl_sig15 : std_logic_vector(3 downto 0);
 begin
   pl_sig15 <= pl(6)&pl(54)&pl(27)&pl(49);
-  process (clk_p, rst_cn)
+  process (clk_p, rst_cn, pa_i)
   begin
     if rst_cn = '0' then
       -- CCFF register

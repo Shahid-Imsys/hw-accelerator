@@ -132,7 +132,9 @@ architecture rtl of ios_dma is
   signal even_out   : std_logic_vector(7 downto 0);   -- Even output register for IOMEM
   signal odd_out    : std_logic_vector(7 downto 0);   -- Odd output register for IOMEM
   signal ido_le     : std_logic;  -- Latch enable for the ido_mem bus latch
-  signal ido_sel    : std_logic;  -- IOMEM half select for the ido_mem bus
+  signal ido_sel    : std_logic;  -- IOMEM half select for the ido_mem bus  
+  signal ido_mem_d  : std_logic_vector(7 downto 0);  
+  signal ido_mem_int: std_logic_vector(7 downto 0); 
   signal out_sel    : std_logic;  -- Output register half select
   signal i_dir_sel  : std_logic;  -- i_direct bus half select
   attribute syn_keep              : boolean;
@@ -530,17 +532,29 @@ begin
   
   -- Read IOMEM data from the selected half is latched here while being
   -- presented on the I/O bus.
-  ido_mem_latch: process (iomem_q, ido_sel, ido_le)
+  ido_mem_latch: process (iomem_q, ido_sel, ido_le, ido_mem_d)
     variable id_mux : std_logic_vector(7 downto 0);
   begin
+    ido_mem_int <= ido_mem_d;
     if ido_le = '1' then
       if ido_sel = '1' then
-        ido_mem <= iomem_q(15 downto 8);
+        ido_mem_int <= iomem_q(15 downto 8);
       else
-        ido_mem <= iomem_q(7 downto 0);
+        ido_mem_int <= iomem_q(7 downto 0);
       end if;
     end if;
   end process ido_mem_latch;
+
+  ido_mem <= ido_mem_int;
+  
+  latch_removal_ido_mem: process (clk_p, rst_en) is
+  begin  -- process latc_removal_ido_mem
+    if rst_en = '0' then  		-- asynchronous reset (active low)
+      ido_mem_d <= (others => '0');
+    elsif rising_edge(clk_p) then  -- rising clock edge
+      ido_mem_d <= ido_mem_int;
+    end if;
+  end process latch_removal_ido_mem;
 
   -- On processor side read accesses, save low bit of logical address (or
   -- rather the current piop pointer, since the logical address has changed

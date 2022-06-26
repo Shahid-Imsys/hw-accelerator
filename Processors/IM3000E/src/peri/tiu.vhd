@@ -135,7 +135,7 @@ architecture rtl of tiu is
   signal ff_old      : std_logic_vector(7 downto 0);  -- TEMPORARY TESTING SIGNAL
   signal frd         : std_logic_vector(TIM_CH_NBR-1 downto 0);
 
-  signal tiu_test : std_logic;
+  signal tiu_test : std_logic_vector(TIM_CH_NBR-1 downto 0);
   
 begin
 
@@ -265,6 +265,7 @@ begin
       signal wai_coi      : std_logic;  -- Wait at coincidence
       signal wai_ff       : std_logic;  -- Disable downcount
       signal dwnctr       : std_logic_vector(4 downto 0);  -- Downcounter
+      signal tiu_test_2   : std_logic_vector(4 downto 0);  -- Downcounter
       signal ld_dwnctr    : std_logic;  -- Load cond for ctr
       signal msa          : std_logic_vector(4 downto 0);  -- mantissa
       signal reqi         : std_logic;  -- Req irpt when ctr=0
@@ -341,22 +342,26 @@ begin
       -- or single timer's wai field should be used.
       -- The cpt_trig event is edge triggered when wai(0) is set, else level
       -- triggered.
-      process (clk_t(i), trst_n, cpt_trig_int(i), onff(i))
+
+      process (clk_p, trst_n, cpt_trig_int(i), onff(i))
       begin
         if trst_n = '0' or (cpt_trig_int(i) = '1' and onff(i) = '1') then
           wai_ff <= '0';
-        elsif rising_edge(clk_t(i)) then
-          if wai(1 downto 0) = "00" then
-            wai_ff <= '0';
-          elsif wai(2) = '0' and begintime(i) = '1' then
-            wai_ff <= '1';
-          elsif wai(2 downto 1) = "01" and wai_start = '1' then
-            wai_ff <= '1';
-          elsif wai(2 downto 1) = "11" and wai_coi = '1' then
-            wai_ff <= '1';
+        elsif rising_edge(clk_p) then
+          if clk_t(i) = '1' then
+            if wai(1 downto 0) = "00" then
+              wai_ff <= '0';
+            elsif wai(2) = '0' and begintime(i) = '1' then
+              wai_ff <= '1';
+            elsif wai(2 downto 1) = "01" and wai_start = '1' then
+              wai_ff <= '1';
+            elsif wai(2 downto 1) = "11" and wai_coi = '1' then
+              wai_ff <= '1';
+            end if;
           end if;
         end if;
       end process;
+      
       wai_edge(i) <= wai(0);
 
       wai_start <= '1' when begintime(i) = '1' else
@@ -367,19 +372,20 @@ begin
 
       ------- Counter ----------------------------------
       -- This is the 5-bit downcounter of a timer. 
-      process(clk_t(i), onff(i))
+      process(clk_p, onff(i))
       begin
         if onff(i) = '0' then
           dwnctr <= "00000";
-        elsif rising_edge(clk_t(i)) then
-          if ld_dwnctr = '1' then
-            dwnctr <= msa;
-          elsif wai_ff = '0' then
-            dwnctr <= dwnctr - 1;
+        elsif falling_edge(clk_p) then
+          if genclk(i) = '1' then
+            if ld_dwnctr = '1' then
+              dwnctr <= msa;
+            elsif wai_ff = '0' then
+              dwnctr <= dwnctr - 1;
+            end if;
           end if;
         end if;
       end process;
-
       -- When a timer counts to zero, it either reloads itself from msa or
       -- wraps around. A single timer is always reloaded, a driving timer
       -- is reloaded only if its ctrldrvg(1) line is held low by the driven
@@ -421,11 +427,18 @@ begin
         -- Generation of parallel data interface clock. When used for LCD
         -- driver, the data clock rate is the double of pixel clock rate and it
         -- is gated with Venable and Henable(Ch7 and Ch5).
-        pdi_clk <= (first_clk and toggle_out(5) and toggle_out(7))
+        -- pdi_clk <= (first_clk and toggle_out(5) and toggle_out(7))
+        --            when exp(i) = "000" and lcd = '1' else
+        --            (ff(conv_integer(exp(i)) - 1) and toggle_out(5) and
+        --             toggle_out(7)) when lcd = '1' else
+        --            toggle_out(i);
+
+        pdi_clk <= (first_clock and toggle_out(5) and toggle_out(7))
                    when exp(i) = "000" and lcd = '1' else
                    (ff(conv_integer(exp(i)) - 1) and toggle_out(5) and
                     toggle_out(7)) when lcd = '1' else
                    toggle_out(i);
+        
       end generate lowest_ch;
 
       ------- On/off ctrl ------------------------------
@@ -457,12 +470,14 @@ begin
       -- begintime from the activation of a timer until the first clk_t after
       -- onff goes from 0 -> 1. It is used mainly to make sure the dwnctr
       -- value is ignored on the first clock.
-      process (clk_t(i), turn_off_n(i), onff(i))
+      process (clk_p, turn_off_n(i), onff(i))
       begin
         if (turn_off_n(i) = '0' or onff(i) = '0') then
           bff <= '0';
-        elsif rising_edge(clk_t(i)) then
-          bff <= onff(i);
+        elsif falling_edge(clk_p) then
+          if genclk(i) = '1' then
+            bff <= onff(i);
+          end if;
         end if;
       end process;
       begintime(i) <= onff(i) and not bff;
@@ -472,19 +487,21 @@ begin
       -- only) if reqi is enabled. When capture is enabled, timer 0 generates
       -- only capture interrupt, not end time interrupt.
       -- Note: capture interrupt is async set because external event nature.
-      process (reset_ifl_n(i), trst_n, reqi, capt_event, clk_t(i))
+      process (reset_ifl_n(i), trst_n, reqi, capt_event, clk_p)
       begin
         if (reset_ifl_n(i) = '0' or trst_n = '0') then
           ifl(i) <= '0';
         elsif i = 0 and capt_event = '1' and reqi = '1' then
-          ifl(i) <= '1';    -- Timer 0 generates interrupt on capture
-        elsif rising_edge(clk_t(i)) then
-          if i = 0 and reqi = '1' and cnt_zero(i) = '1' and cpt = '0' then
-            ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
-          elsif i = 1 and reqi = '1' and (cnt_zero(i) = '1' or (cnt_half = '1' and cpt = '1')) then
-            ifl(i) <= '1';  -- Timer 1 generates wrap interrupt twice per lap in capture mode
-          elsif i > 1 and reqi = '1' and cnt_zero(i) = '1' then
-            ifl(i) <= '1';  -- Timers 2-7 generate wrap interrupt once per lap
+          ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
+        elsif falling_edge(clk_p) then
+          if genclk(i) = '1' then
+            if i = 0 and reqi = '1' and cnt_zero(i) = '1' and cpt = '0' then
+              ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
+            elsif i = 1 and reqi = '1' and (cnt_zero(i) = '1' or (cnt_half = '1' and cpt = '1')) then
+              ifl(i) <= '1';  -- Timer 1 generates wrap interrupt twice per lap in capture mode
+            elsif i > 1 and reqi = '1' and cnt_zero(i) = '1' then
+              ifl(i) <= '1';  -- Timers 2-7 generate wrap interrupt once per lap
+            end if;
           end if;
         end if;
       end process;
@@ -719,7 +736,7 @@ begin
         end if;
       end if;
     end process;
-
+ 
   end block tic;
 
   ----------------------------------------------------------------------------

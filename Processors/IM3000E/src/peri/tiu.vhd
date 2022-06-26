@@ -491,17 +491,19 @@ begin
       begin
         if (reset_ifl_n(i) = '0' or trst_n = '0') then
           ifl(i) <= '0';
-        elsif i = 0 and capt_event = '1' and reqi = '1' then
-          ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
         elsif falling_edge(clk_p) then
-          if genclk(i) = '1' then
-            if i = 0 and reqi = '1' and cnt_zero(i) = '1' and cpt = '0' then
-              ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
-            elsif i = 1 and reqi = '1' and (cnt_zero(i) = '1' or (cnt_half = '1' and cpt = '1')) then
-              ifl(i) <= '1';  -- Timer 1 generates wrap interrupt twice per lap in capture mode
-            elsif i > 1 and reqi = '1' and cnt_zero(i) = '1' then
-              ifl(i) <= '1';  -- Timers 2-7 generate wrap interrupt once per lap
-            end if;
+	  if i = 0 and capt_event = '1' and reqi = '1' then
+	    ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
+	  else
+	    if genclk(i) = '1' then
+	      if i = 0 and reqi = '1' and cnt_zero(i) = '1' and cpt = '0' then
+		ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
+	      elsif i = 1 and reqi = '1' and (cnt_zero(i) = '1' or (cnt_half = '1' and cpt = '1')) then
+		ifl(i) <= '1';  -- Timer 1 generates wrap interrupt twice per lap in capture mode
+	      elsif i > 1 and reqi = '1' and cnt_zero(i) = '1' then
+		ifl(i) <= '1';  -- Timers 2-7 generate wrap interrupt once per lap
+	      end if;
+	    end if;
           end if;
         end if;
       end process;

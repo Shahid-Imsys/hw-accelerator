@@ -66,27 +66,6 @@ end;
 
 architecture rtl of cmdr is
 
-    COMPONENT fifo
-    GENERIC(DATA_WIDTH,DATA_DEPTH,PROG_FULL_TRESHOLD : integer);
-    PORT (
-        clk : IN STD_LOGIC;
-        srst : IN STD_LOGIC;
-        din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        wr_en : IN STD_LOGIC;
-        rd_en : IN STD_LOGIC;
-        dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-        full : OUT STD_LOGIC;
-        almost_full : OUT STD_LOGIC;
-        empty : OUT STD_LOGIC;
-        almost_empty : OUT STD_LOGIC;
-        prog_full : OUT STD_LOGIC;
-        valid      : OUT STD_LOGIC;
-        counter : OUT integer range DATA_DEPTH-1 downto 0
-        --wr_rst_busy : OUT STD_LOGIC;
-        --rd_rst_busy : OUT STD_LOGIC
-    );
-    end COMPONENT;
-
     --control fields
     signal pl_dbus_s     : std_logic_vector(4 downto 0);
     signal pl_dfm_byte    : std_logic_vector(3 downto 0);
@@ -405,34 +384,6 @@ begin
 
     empty <= '1' when col_ctr = 5 else '0';
     fifo_full <= '1' when col_ctr = 0 else '0';
-
-                
-
-
-
-    --req_fifo : fifo
-    --GENERIC MAP(
-    --    DATA_WIDTH => 32,
-    --    DATA_DEPTH => 8,
-    --    PROG_FULL_TRESHOLD => 5
-    --)
-    --PORT MAP (
-    --    clk => clk_p,
-    --    srst => srst,
-    --    din => dtm_reg,
-    --    wr_en => fifo_wr_en,
-    --    rd_en => fifo_rd_en,
-    --    dout => DOUT,
-    --    full => open,
-    --    almost_full => open,
-    --    empty => empty,
-    --    almost_empty => open,
-    --    prog_full => fifo_full,
-    --    valid      => open,
-    --    counter => open
-    --    --wr_rst_busy => open,
-    --    --rd_rst_busy => open
-    --);
     
 end architecture;
 

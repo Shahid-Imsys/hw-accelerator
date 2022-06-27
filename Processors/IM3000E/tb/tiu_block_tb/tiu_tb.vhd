@@ -102,7 +102,7 @@ architecture rtl of tiu_tb is
 
 begin
 
-  clk_p <= not clk_p after clk_period_half;
+  clk_p <= not clk_p after 6 ns;
 
   i_tiu : tiu
   port map
@@ -126,6 +126,7 @@ begin
   reset : process
   begin
     wait for clk_period;
+    wait for clk_period_half;
     rst_en     <= '1';
     tiu_enable <= '1';
     wait;
@@ -278,6 +279,13 @@ begin
     stop;
   end process;
 
-  test_done <= test_time0_done and test_time1_done and test_time2_done and test_time3_done and test_time4_done;
+  test_done <=  test_time0_done and 
+                test_time1_done and 
+                test_time2_done and 
+                test_time3_done and 
+                test_time4_done and 
+                test_time5_done and 
+                test_time6_done and 
+                test_time7_done;
 
 end architecture;

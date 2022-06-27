@@ -613,7 +613,7 @@ begin
             ff(0) <= '0';
           end if;
         end if;
-        assert ff = ff_old report "ff error" severity error;
+        --assert ff = ff_old report "ff error" severity error;
       end if;
     end process;
 

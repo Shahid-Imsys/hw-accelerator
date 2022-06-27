@@ -740,8 +740,8 @@ begin  -- architecture rtl
       root_memory_inst : SNPS_SP_HD_8Kx128
         port map (
           Q        => dummy_dout_8(i),
-          ADR      => dummy_addr(13 downto 0),
-          D        => dummy_din(7 downto 0),
+          ADR      => dummy_addr(12 downto 0),
+          D        => dummy_din(127 downto 0),
           WE       => dummy_we(77 + i),
           ME       => '1',
           CLK      => hclk,

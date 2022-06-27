@@ -28,9 +28,13 @@ ls:
 	ls Tmpgm*.lst | cut -d'.' -f2
 
 clean:
-	rm -rf $(WORK_LIB)
-	rm -rf transcript
-	rm -rf *.wlf
+	rm -rf $(WORK_LIB).*
+	rm -rf xelab*
+	rm -rf xsim*
+	rm -rf xvhdl*
+	rm -rf xvlog*
+	rm -rf vivado*
+	rm mpram*
 
 include $(PROJECT_PATH)/Digital_chip/tb/main_tb/Makefile
 include $(PROJECT_PATH)/Digital_chip/src/Makefile

@@ -252,59 +252,12 @@ end component;
     signal bias_addr_assign : std_logic; --enable signal for enbale the assignment of bias start address.
     signal re_addr_reload   : std_logic;
     signal ve_addr_reload   : std_logic;
-    signal sclr_i        : std_logic; --For clear accumulator 0-7
     signal data0  : std_logic_vector(31 downto 0);
     signal data1  : std_logic_vector(31 downto 0);
     signal weight  : std_logic_vector(63 downto 0);
-    signal mul_in_l_0 : std_logic_vector(8 downto 0);
-    signal mul_in_l_1 : std_logic_vector(8 downto 0);
-    signal mul_in_l_2 : std_logic_vector(8 downto 0);
-    signal mul_in_l_3 : std_logic_vector(8 downto 0);
-    signal mul_in_l_4 : std_logic_vector(8 downto 0);
-    signal mul_in_l_5 : std_logic_vector(8 downto 0);
-    signal mul_in_l_6 : std_logic_vector(8 downto 0);
-    signal mul_in_l_7 : std_logic_vector(8 downto 0);
-    signal mul_in_r_0 : std_logic_vector(8 downto 0);
-    signal mul_in_r_1 : std_logic_vector(8 downto 0);
-    signal mul_in_r_2 : std_logic_vector(8 downto 0);
-    signal mul_in_r_3 : std_logic_vector(8 downto 0);
-    signal mul_in_r_4 : std_logic_vector(8 downto 0);
-    signal mul_in_r_5 : std_logic_vector(8 downto 0);
-    signal mul_in_r_6 : std_logic_vector(8 downto 0);
-    signal mul_in_r_7 : std_logic_vector(8 downto 0);
-    signal mul_out_0  : std_logic_vector(17 downto 0);
-    signal mul_out_1  : std_logic_vector(17 downto 0);
-    signal mul_out_2  : std_logic_vector(17 downto 0);
-    signal mul_out_3  : std_logic_vector(17 downto 0);
-    signal mul_out_4  : std_logic_vector(17 downto 0);
-    signal mul_out_5  : std_logic_vector(17 downto 0);
-    signal mul_out_6  : std_logic_vector(17 downto 0);
-    signal mul_out_7  : std_logic_vector(17 downto 0);
-    signal acc_out_0  : std_logic_vector(31 downto 0);
-    signal acc_out_1  : std_logic_vector(31 downto 0);
-    signal acc_out_2  : std_logic_vector(31 downto 0);
-    signal acc_out_3  : std_logic_vector(31 downto 0);
-    signal acc_out_4  : std_logic_vector(31 downto 0);
-    signal acc_out_5  : std_logic_vector(31 downto 0);
-    signal acc_out_6  : std_logic_vector(31 downto 0);
-    signal acc_out_7  : std_logic_vector(31 downto 0);
-    signal acc_out_a  : std_logic_vector(31 downto 0);
-    signal acc_reg_0  : std_logic_vector(31 downto 0);
-    signal acc_reg_1  : std_logic_vector(31 downto 0);
-    signal acc_reg_2  : std_logic_vector(31 downto 0);
-    signal acc_reg_3  : std_logic_vector(31 downto 0);
-    signal acc_reg_4  : std_logic_vector(31 downto 0);
-    signal acc_reg_5  : std_logic_vector(31 downto 0);
-    signal acc_reg_6  : std_logic_vector(31 downto 0);
-    signal acc_reg_7  : std_logic_vector(31 downto 0);
-    signal acc_reg_a  : std_logic_vector(31 downto 0);
     signal bias_buf_out : std_logic_vector(63 downto 0);
     signal bias_mux_out : std_logic_vector(31 downto 0);
     signal bias_mux     : std_logic_vector(1 downto 0);
-    signal p_adder_out : std_logic_vector(31 downto 0); --Adder output in post processing block
-    signal p_shifter_out : std_logic_vector(31 downto 0); --shifter output in post processing block
-    signal p_shifter_in : std_logic_vector(31 downto 0);
-    signal p_clip_out : std_logic_vector(7 downto 0); --clip logic output
     signal bypass     : std_logic;
     signal writebuffer    : std_logic_vector(63 downto 0);
     signal mem_data_in : std_logic_vector(63 downto 0);
@@ -313,8 +266,6 @@ end component;
     signal mode_b_l  : std_logic;
     signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
     signal ve_clr_acc : std_logic; --clear accumulators
-    signal mul_inn_ctl : std_logic;
-    signal acc_inn_ctl : std_logic;
     signal pl_ve_byte : std_logic_vector(3 downto 0);
 
 
@@ -322,28 +273,7 @@ end component;
     signal data1addr_to_memory : std_logic_vector(7 downto 0);
     signal weightaddr_to_memory : std_logic_vector(7 downto 0);
     signal biasaddr_to_memory : std_logic_vector(5 downto 0);
-    --multiplier control signals
-    signal mctl_0 :  std_logic;
-    signal mctl_1 :  std_logic;
-    signal mctl_2 :  std_logic;
-    signal mctl_3 :  std_logic;
-    signal mctl_4 :  std_logic;
-    signal mctl_5 :  std_logic;
-    signal mctl_6 :  std_logic;
-    signal mctl_7 :  std_logic;
-    signal mult_delay : std_logic;
-    --accumulator control signals
-    signal actl_0 : std_logic;
-    signal actl_1 : std_logic;
-    signal actl_2 : std_logic;
-    signal actl_3 : std_logic;
-    signal actl_4 : std_logic;
-    signal actl_5 : std_logic;
-    signal actl_6 : std_logic;
-    signal actl_7 : std_logic;
-    signal a_delay : std_logic;
     --data flow control signals
-    signal latch_ena : std_logic;
     signal o_mux_ena : std_logic;
     signal pp_stage_1 : std_logic; --stage one control, for shifter and bias buffer read signal
     signal pp_stage_2 : std_logic; --stage two control, for adder and bias mux.
@@ -355,7 +285,6 @@ end component;
     signal output_ena : std_logic;
     signal ve_out_c : std_logic_vector(2 downto 0); --output byte counter to post processor
     signal output_c : std_logic_vector(3 downto 0); --output byte counter 
-    signal sclr_i_delay : std_logic;
     signal mode_c_l : std_logic;
     --output control signals
     signal load_dtm_out : std_logic;
@@ -412,8 +341,6 @@ end component;
     --------------------------------------------------------
     --Delay FFs
     --------------------------------------------------------
-    signal delay0 : std_logic; --
-    signal delay1 : std_logic;
     signal delay3 : std_logic_vector(9 downto 0);
 
 

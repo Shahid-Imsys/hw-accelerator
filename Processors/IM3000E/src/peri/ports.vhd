@@ -146,6 +146,9 @@ architecture rtl of ports is
 
   constant IRQ_ADC : integer := 2;
 
+  signal adc_run_d : std_logic;
+  signal adc_run_int : std_logic;
+  
   signal dtp      : std_logic_vector(7 downto 0);      -- data to ports
   signal we_ctrl  : std_logic;          -- write enable control
   signal we_data  : std_logic;          -- write enable data
@@ -187,6 +190,9 @@ architecture rtl of ports is
   signal port_irq_ff    : std_logic_vector(5 downto 0);
   signal port_irq       : std_logic_vector(5 downto 0);
   signal port_irq_en    : std_logic_vector(5 downto 0);  --add by maning
+
+  signal dac_data_d : dac_data_type;
+  signal dac_data_int : dac_data_type;
 begin
   -- The dtp latch opens in the middle of a cycle that writes to
   -- a port register and closes at the end, holding data for the
@@ -704,21 +710,35 @@ begin
   -- When dac_timer is set, data is only loaded when there is a pulse from
   -- timer 2, otherwise it is loaded continously. dac_sel determines which
   -- channel that is loaded: none, ch0, ch1 or both (ch1 inverted).
-  process (dac_timer, dac_sel, pulseout(2), po_int(PORT_DA_H), po_int(PORT_AD_L))
+  process (dac_timer, dac_sel, pulseout(2), po_int(PORT_DA_H), po_int(PORT_AD_L), dac_data_d)
   begin
+    dac_data_int(1) <= dac_data_d(1);
+    dac_data_int(0) <= dac_data_d(0);
     if dac_timer = '0' or pulseout(2) = '1' then
       if dac_sel(0) = '1' then
-        dac_data(0) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
+        dac_data_int(0) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
       end if;
       if dac_sel(1) = '1' then
         if dac_sel(0) = '0' then
-          dac_data(1) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
+          dac_data_int(1) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
         else
-          dac_data(1) <= not (po_int(PORT_DA_H) & po_int(PORT_AD_L));
+          dac_data_int(1) <= not (po_int(PORT_DA_H) & po_int(PORT_AD_L));
         end if;
       end if;
     end if;
   end process;
+
+  dac_data <= dac_data_int;
+  
+  latch_removal: process (clk_p, rst_en) is
+  begin  -- process latch_removal
+    if rst_en = '0' then                -- asynchronous reset (active low)
+      dac_data_d <= (others => (others => '0'));
+    elsif clk_p'event and clk_p = '1' then  -- rising clock edge
+      dac_data_d(1) <= dac_data_int(1);
+      dac_data_d(0) <= dac_data_int(0);
+    end if;
+  end process latch_removal;
 
   -- Detect rising edges of adc_done.
 --      process (clk_e)
@@ -743,21 +763,31 @@ begin
 
   -- Let the ADC run free in modes 11,10. In mode 01, initiate a new
   -- sample using a pulse from timer 4. Mode 00 is reset.
-  process (adc_mode_int, pulseout(4), adc_edge)
+  process (adc_mode_int, pulseout(4), adc_edge, adc_run_d)
   begin
+    adc_run_int <= adc_run_d;
     if adc_mode_int(1) = '1' then
-      adc_run <= '1';
+      adc_run_int <= '1';
     elsif adc_mode_int(0) = '1' then
       if pulseout(4) = '1' then
-        adc_run <= '1';
+        adc_run_int <= '1';
       elsif adc_edge = '1' then
-        adc_run <= '0';
+        adc_run_int <= '0';
       end if;
     else
-      adc_run <= '0';
+      adc_run_int <= '0';
     end if;
   end process;
 
+  adc_run <= adc_run_int;
+  
+  process (clk_p)
+  begin
+    if rising_edge(clk_p) then
+      adc_run_d <= adc_run_int;
+    end if;
+  end process;
+  
   adc_en <= '1' when adc_mode_int /= "00" else
             '0';
 

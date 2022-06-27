@@ -341,6 +341,7 @@ end component;
     --------------------------------------------------------
     --Delay FFs
     --------------------------------------------------------
+    signal a_delay : std_logic;
     signal delay3 : std_logic_vector(9 downto 0);
 
 
@@ -488,7 +489,6 @@ begin
                 ve_addr_r <= (others => '0');
                 ve_loop <= (others => '0');
                 ve_oloop <= (others => '0');
-                mul_inn_ctl <= '0';
             --Add reload function without starting the engine, 1210
             elsif ve_addr_reload = '1' and clk_e_pos = '1' then
                 ve_loop <= ve_loop_reg;

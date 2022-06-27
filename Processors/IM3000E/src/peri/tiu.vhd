@@ -347,7 +347,7 @@ begin
       begin
         if trst_n = '0' or (cpt_trig_int(i) = '1' and onff(i) = '1') then
           wai_ff <= '0';
-        elsif rising_edge(clk_p) then
+        elsif falling_edge(clk_p) then
           if clk_t(i) = '1' then
             if wai(1 downto 0) = "00" then
               wai_ff <= '0';
@@ -454,7 +454,7 @@ begin
       begin
         if trst_n = '0' then
           onff(i) <= '0';
-        elsif rising_edge(clk_p) then
+        elsif falling_edge(clk_p) then
           if (turn_on(i) = '1') then
             onff(i) <= '1';
           elsif (turn_off_n(i) = '0') then

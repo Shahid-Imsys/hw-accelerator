@@ -75,6 +75,7 @@ architecture rtl of tiu_tb is
   constant timer7_pls : time := (timer7_msa+1)*(2**(timer7_exp + 1))*clk_period;
 
   signal clk_p     : std_logic := '0'; 
+  signal clk_p_int : std_logic := '0'; 
   signal clk_c_en  : std_logic := '1';
   signal rst_en    : std_logic := '0';
   signal reg_wr    : std_logic := '0';

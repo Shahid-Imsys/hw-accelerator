@@ -286,7 +286,7 @@ begin
       -- pulse when there is a capture event, in which case the capt_pend
       -- signal is high and msa should be loaded from the downctr instead.
       -- No other parameters are loaded in this case.
-      process (clk_param(i), trst_n)
+      process (clk_p, trst_n)
       begin
         if trst_n = '0' then
           exp(i) <= (others => '0');
@@ -298,22 +298,24 @@ begin
           evt(i) <= '0';
           drv(i) <= '0';
           wai    <= (others => '0');
-        elsif rising_edge(clk_param(i)) then
-          if i < 2 and capt_pend = '1' then
-            msa <= dwnctr;
-          else
-            case reg_addr(5 downto 4) is
-              when "00" => exp(i) <= wdata(7 downto 5);
-                           msa <= wdata(4 downto 0);
-              when "01" => reqi <= wdata(7);
-                           tgl <= wdata(6 downto 5);
+        elsif rising_edge(clk_p) then
+          if (clk_param(i) = '1') then 
+            if i < 2 and capt_pend = '1' then
+              msa <= dwnctr;
+            else
+              case reg_addr(5 downto 4) is
+                when "00" => exp(i) <= wdata(7 downto 5);
+                             msa <= wdata(4 downto 0);
+                when "01" => reqi <= wdata(7);
+                             tgl <= wdata(6 downto 5);
                            coi <= wdata(4 downto 0);
-              when "10" => rep <= wdata(7);
-                           evt(i) <= wdata(6);
-                           drv(i) <= wdata(5);
-                           wai    <= wdata(4 downto 2);
-              when others => null;
-            end case;
+                when "10" => rep <= wdata(7);
+                             evt(i) <= wdata(6);
+                             drv(i) <= wdata(5);
+                             wai    <= wdata(4 downto 2);
+                when others => null;
+              end case;
+            end if;
           end if;
         end if;
       end process;

@@ -546,7 +546,10 @@ begin
   end process ido_mem_latch;
 
   ido_mem <= ido_mem_int;
-  
+
+
+  -- This process is inserted to force the process ido_mem_latch not to
+  -- generate a latch in synthesis.
   latch_removal_ido_mem: process (clk_p, rst_en) is
   begin  -- process latc_removal_ido_mem
     if rst_en = '0' then  		-- asynchronous reset (active low)

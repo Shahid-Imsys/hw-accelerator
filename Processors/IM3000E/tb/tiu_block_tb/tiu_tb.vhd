@@ -54,7 +54,7 @@ architecture rtl of tiu_tb is
 
   -- Exp values of timers under test
   -- Will affect counter clock frequency: base_freq/2**exp
-  constant timer0_exp : integer range 0 to 7 := 0;
+  constant timer0_exp : integer range 0 to 7 := 1;
   constant timer1_exp : integer range 0 to 7 := 1;
   constant timer2_exp : integer range 0 to 7 := 0;
   constant timer3_exp : integer range 0 to 4 := 0; -- driven, viable options: 0, 1, 2, 4
@@ -100,6 +100,9 @@ architecture rtl of tiu_tb is
   signal test_reset_done : boolean := false;
   signal test_reg_pass   : boolean := true;
   signal test_pass       : boolean := true;
+
+  signal read_reg_tmp : std_logic_vector(7 downto 0);
+  signal read_reg_cnt : std_logic_vector(3 downto 0) := (others => '0');
 
 begin
 
@@ -310,15 +313,16 @@ end process;
 
 read_reg : process
 begin
-  wait on tiu_out;
+  wait until rising_edge(clk_p);
+  read_reg_tmp <= wdata;
+  wait until falling_edge(clk_p);
   if (reg_addr(5 downto 3) = ("000" or "001" or "010" or "100")) then
-    wait for 1 ps;
-    if (tiu_out /= wdata) then
+    if (tiu_out /= read_reg_tmp) then
       write(output, string'("Register r/w error, reg_addr: " & to_string(reg_addr) & lf));
       test_reg_pass <= false;
     end if;
-    assert tiu_out = wdata report ("tiu_out: " & to_string(tiu_out) & ", wdata: " & to_string(wdata)) severity error;
   end if;
+  read_reg_cnt <= std_logic_vector(unsigned(read_reg_cnt) + 1);
 end process;
 
 test_done_1 <= test_time0_done and

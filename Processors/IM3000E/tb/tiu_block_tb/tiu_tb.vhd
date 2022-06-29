@@ -5,44 +5,42 @@ use std.textio.all;
 use std.env.stop;
 
 entity tiu_tb is
-  end;          
+end;
 
 architecture rtl of tiu_tb is
 
   component tiu is
-    port 
-    (
+    port (
 
       -- Interface to host  
-      clk_p      : in  std_logic;
-      clk_c_en   : in  std_logic;  -- Clock 133.3 MHz
-      rst_en     : in  std_logic;  -- Asynchronous master reset
-      reg_wr     : in  std_logic;  -- High when reg_addr is written with '1' in bit 7
-      wdata      : in  std_logic_vector(7 downto 0); -- Data to write in timer
-      reg_addr   : in  std_logic_vector(7 downto 0); -- Register address
-      run        : in  std_logic;  -- Holding this low keeps the counters from
-                                   -- changing, without destroying parameters.
-                                   -- Parameters can be loaded.
-      tiu_enable : in  std_logic;   -- Shall be low at initial reset, and when
-                                    -- timer system is not used. Must be high
-                                    -- when loading paramenters and when using
-                                    -- timer system. Signal trst_n is derived
-                                    -- from this signal.
+      clk_p    : in std_logic;
+      clk_c_en : in std_logic;                    -- Clock 133.3 MHz
+      rst_en   : in std_logic;                    -- Asynchronous master reset
+      reg_wr   : in std_logic;                    -- High when reg_addr is written with '1' in bit 7
+      wdata    : in std_logic_vector(7 downto 0); -- Data to write in timer
+      reg_addr : in std_logic_vector(7 downto 0); -- Register address
+      run      : in std_logic;                    -- Holding this low keeps the counters from
+      -- changing, without destroying parameters.
+      -- Parameters can be loaded.
+      tiu_enable : in std_logic; -- Shall be low at initial reset, and when
+      -- timer system is not used. Must be high
+      -- when loading paramenters and when using
+      -- timer system. Signal trst_n is derived
+      -- from this signal.
 
       -- Outputs:
-      tiu_irq    : out std_logic;   -- Interrupt request from timer unit
-      tiu_out    : out std_logic_vector(7 downto 0); -- Output, to DSL
-      pdi_clk    : out std_logic;   -- clock to parallel data interface 
-                                    -- Interface to I/O port logic 
-      cpt_trig   : in  std_logic_vector(7 downto 0);  -- external trigger or
-                                                      -- capture
-      tstamp_rx1 : in  std_logic;   -- timestamp signal from Ethernet ch 1
+      tiu_irq : out std_logic;                    -- Interrupt request from timer unit
+      tiu_out : out std_logic_vector(7 downto 0); -- Output, to DSL
+      pdi_clk : out std_logic;                    -- clock to parallel data interface 
+      -- Interface to I/O port logic 
+      cpt_trig : in std_logic_vector(7 downto 0); -- external trigger or
+      -- capture
+      tstamp_rx1 : in std_logic;                    -- timestamp signal from Ethernet ch 1
       pulseout   : out std_logic_vector(7 downto 0) -- Outputs to port logic
-    ); 
+    );
   end component;
 
-  constant clk_period      : time := 12 ns;
-  constant clk_period_half : time := clk_period / 2;
+  constant clk_period : time := 12 ns;
 
   -- Starting values of timers under test
   constant timer0_msa : integer range 0 to 31 := 7;
@@ -56,41 +54,44 @@ architecture rtl of tiu_tb is
 
   -- Exp values of timers under test
   -- Will affect counter clock frequency: base_freq/2**exp
-  constant timer0_exp : integer range 0 to 7  := 0;
-  constant timer1_exp : integer range 0 to 7  := 1;
-  constant timer2_exp : integer range 0 to 7  := 0;
-  constant timer3_exp : integer range 0 to 4  := 0; -- driven, viable options: 0, 1, 2, 4
-  constant timer4_exp : integer range 0 to 7  := 0;
-  constant timer5_exp : integer range 0 to 7  := 0;
-  constant timer6_exp : integer range 0 to 7  := 0;
-  constant timer7_exp : integer range 0 to 7  := 0;
+  constant timer0_exp : integer range 0 to 7 := 1;
+  constant timer1_exp : integer range 0 to 7 := 1;
+  constant timer2_exp : integer range 0 to 7 := 0;
+  constant timer3_exp : integer range 0 to 4 := 0; -- driven, viable options: 0, 1, 2, 4
+  constant timer4_exp : integer range 0 to 7 := 0;
+  constant timer5_exp : integer range 0 to 7 := 0;
+  constant timer6_exp : integer range 0 to 7 := 0;
+  constant timer7_exp : integer range 0 to 7 := 0;
 
-  constant timer0_pls : time := (timer0_msa+1)*(2**(timer0_exp + 1))*clk_period;
-  constant timer1_pls : time := (timer1_msa+1)*(2**(timer1_exp + 1))*clk_period;
-  constant timer2_pls : time := (timer2_msa+1)*(2**(timer2_exp + 1))*clk_period;
-  constant timer3_pls : time := (timer3_msa+1)*(timer2_msa + 1)*(2**(timer2_exp + 1))*clk_period;
-  constant timer4_pls : time := (timer4_msa+1)*(2**(timer4_exp + 1))*clk_period;
-  constant timer5_pls : time := (timer5_msa+1)*(2**(timer5_exp + 1))*clk_period;
-  constant timer6_pls : time := (timer6_msa+1)*(2**(timer6_exp + 1))*clk_period;
-  constant timer7_pls : time := (timer7_msa+1)*(2**(timer7_exp + 1))*clk_period;
+  constant timer0_pls : time := (timer0_msa + 1) * (2 ** (timer0_exp + 1)) * clk_period;
+  constant timer1_pls : time := (timer1_msa + 1) * (2 ** (timer1_exp + 1)) * clk_period;
+  constant timer2_pls : time := (timer2_msa + 1) * (2 ** (timer2_exp + 1)) * clk_period;
+  constant timer3_pls : time := (timer3_msa + 1) * (timer2_msa + 1) * (2 ** (timer2_exp + 1)) * clk_period;
+  constant timer4_pls : time := (timer4_msa + 1) * (2 ** (timer4_exp + 1)) * clk_period;
+  constant timer5_pls : time := (timer5_msa + 1) * (2 ** (timer5_exp + 1)) * clk_period;
+  constant timer6_pls : time := (timer6_msa + 1) * (2 ** (timer6_exp + 1)) * clk_period;
+  constant timer7_pls : time := (timer7_msa + 1) * (2 ** (timer7_exp + 1)) * clk_period;
 
-  signal clk_p     : std_logic := '0'; 
-  signal clk_c_en  : std_logic := '1';
-  signal rst_en    : std_logic := '0';
-  signal reg_wr    : std_logic := '0';
-  signal wdata     : std_logic_vector(7 downto 0) := (others => '0');
-  signal reg_addr  : std_logic_vector(7 downto 0) := (others => '0');
-  signal run       : std_logic := '1';
-  signal tiu_enable: std_logic := '0';
-  signal tiu_irq   : std_logic; 
-  signal tiu_out   : std_logic_vector(7 downto 0); 
-  signal pdi_clk   : std_logic; 
-  signal cpt_trig  : std_logic_vector(7 downto 0);
-  signal tstamp_rx1: std_logic; 
-  signal pulseout  : std_logic_vector(7 downto 0);
+  signal clk_p      : std_logic                    := '0';
+  signal clk_c_en   : std_logic                    := '1';
+  signal rst_en     : std_logic                    := '0';
+  signal reg_wr     : std_logic                    := '0';
+  signal wdata      : std_logic_vector(7 downto 0) := (others => '0');
+  signal reg_addr   : std_logic_vector(7 downto 0) := (others => '0');
+  signal run        : std_logic                    := '1';
+  signal tiu_enable : std_logic                    := '0';
+  signal tiu_irq    : std_logic;
+  signal tiu_out    : std_logic_vector(7 downto 0);
+  signal pdi_clk    : std_logic;
+  signal cpt_trig   : std_logic_vector(7 downto 0);
+  signal tstamp_rx1 : std_logic;
+  signal pulseout   : std_logic_vector(7 downto 0);
 
-  signal test_done : boolean := false;
-  signal test_pass : boolean := true;
+  signal trst_n  : std_logic;
+  signal trst_n1 : std_logic;
+
+  signal test_done_1     : boolean := false;
+  signal test_done_2     : boolean := false;
   signal test_time0_done : boolean := false;
   signal test_time1_done : boolean := false;
   signal test_time2_done : boolean := false;
@@ -99,10 +100,18 @@ architecture rtl of tiu_tb is
   signal test_time5_done : boolean := false;
   signal test_time6_done : boolean := false;
   signal test_time7_done : boolean := false;
+  signal test_reset_done : boolean := false;
+  signal test_reg_pass   : boolean := true;
+  signal test_pass       : boolean := true;
+
+  signal read_reg_tmp : std_logic_vector(7 downto 0);
+  signal read_reg_cnt : std_logic_vector(7 downto 0) := (others => '0');
+  signal reg_addr_chk : std_logic_vector(2 downto 0);
 
 begin
 
-  clk_p <= not clk_p after 6 ns;
+  clk_p        <= not clk_p after 6 ns;
+  reg_addr_chk <= reg_addr(5 downto 3);
 
   i_tiu : tiu
   port map
@@ -126,24 +135,36 @@ begin
   reset : process
   begin
     wait for clk_period;
-    wait for clk_period_half;
+    wait until rising_edge(clk_p);
     rst_en     <= '1';
     tiu_enable <= '1';
+
+    wait until test_done_1;
+    wait until rising_edge(clk_p);
+    rst_en <= '0';
+
+    wait for clk_period;
+    wait until rising_edge(clk_p);
+    rst_en          <= '1';
+    test_reset_done <= true;
+    write(output, string'("Reset" & lf));
+
     wait;
   end process;
 
   init : process
-    procedure write_reg (addr_in : in std_logic_vector(7 downto 0);
-                         data_in : in std_logic_vector(7 downto 0)) is
+    procedure write_reg (
+      addr_in : in std_logic_vector(7 downto 0);
+      data_in : in std_logic_vector(7 downto 0)) is
     begin
+      wait until rising_edge(clk_p);
       reg_wr   <= addr_in(7);
       reg_addr <= addr_in;
       wdata    <= data_in;
-      wait for clk_period;
     end procedure;
 
   begin
-    wait until rst_en = '1';
+    wait until rising_edge(rst_en);
     wait for clk_period;
     write_reg("10000000", std_logic_vector(to_unsigned(timer0_exp, 3)) & std_logic_vector(to_unsigned(timer0_msa, 5)));
     write_reg("10000001", std_logic_vector(to_unsigned(timer1_exp, 3)) & std_logic_vector(to_unsigned(timer1_msa, 5)));
@@ -163,114 +184,136 @@ begin
     write_reg("10010111", "00100000"); -- set tgl of counter 7 to 01
     write_reg("10100010", "00100000"); -- set drv of counter 2 to 1
     write_reg("10101000", "11111111"); -- enable all counters
-    wait;
+    wait for clk_period;
+    if (test_reg_pass) then
+      write(output, string'("Register r/w test OK" & lf));
+    else
+      write(output, string'("Register r/w test FAIL" & lf));
+    end if;
+
   end process;
 
-  test_time : process(pulseout)
+  test_time : process (pulseout, rst_en, test_reg_pass)
     type tmp_t is array (0 to 7) of time;
     variable tmp : tmp_t := (others => 0 ns);
   begin
-    if rising_edge(pulseout(0)) then
-      tmp(0) := now;
-    elsif falling_edge(pulseout(0)) then
-      if (now - tmp(0) = timer0_pls) then
-        write(output, string'("Timer 0 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 0 pulseout FAIL. Pulse active for: " & time'image(now - tmp(0)) & ", should be: " & time'image(timer0_pls) & lf));
-        test_pass <= false;
-      end if;
-      test_time0_done <= true;
-    end if;
+    if (rst_en = '0') then
+      test_time0_done <= false;
+      test_time1_done <= false;
+      test_time2_done <= false;
+      test_time3_done <= false;
+      test_time4_done <= false;
+      test_time5_done <= false;
+      test_time6_done <= false;
+      test_time7_done <= false;
 
-    if rising_edge(pulseout(1)) then
-      tmp(1) := now;
-    elsif falling_edge(pulseout(1)) then
-      if (now - tmp(1) = timer1_pls) then
-        write(output, string'("Timer 1 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 1 pulseout FAIL. Pulse active for: " & time'image(now - tmp(1)) & ", should be: " & time'image(timer1_pls) & lf));
-        test_pass <= false;
+    else
+      if rising_edge(pulseout(0)) then
+        tmp(0) := now;
+      elsif falling_edge(pulseout(0)) then
+        if (now - tmp(0) = timer0_pls) then
+          write(output, string'("Timer 0 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 0 pulseout FAIL. Pulse active for: " & time'image(now - tmp(0)) & ", should be: " & time'image(timer0_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time0_done <= true;
       end if;
-      test_time1_done <= true;
-    end if;
 
-    if rising_edge(pulseout(2)) then
-      tmp(2) := now;
-    elsif falling_edge(pulseout(2)) then
-      if (now - tmp(2) = timer2_pls) then
-        write(output, string'("Timer 2 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 2 pulseout FAIL. Pulse active for: " & time'image(now - tmp(2)) & ", should be: " & time'image(timer2_pls) & lf));
-        test_pass <= false;
+      if rising_edge(pulseout(1)) then
+        tmp(1) := now;
+      elsif falling_edge(pulseout(1)) then
+        if (now - tmp(1) = timer1_pls) then
+          write(output, string'("Timer 1 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 1 pulseout FAIL. Pulse active for: " & time'image(now - tmp(1)) & ", should be: " & time'image(timer1_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time1_done <= true;
       end if;
-      test_time2_done <= true;
-    end if;
 
-    if rising_edge(pulseout(3)) then
-      tmp(3) := now;
-    elsif falling_edge(pulseout(3)) then
-      if (now - tmp(3) = timer3_pls) then
-        write(output, string'("Timer 3 (driven by timer 2) pulseout test OK" & lf));
-      else
-        write(output, string'("Timer 3 (driven by timer 2) pulseout fail. Pulse active for: " & time'image(now - tmp(3)) & ", should be: " & time'image(timer3_pls) & lf));
-        test_pass <= false;
+      if rising_edge(pulseout(2)) then
+        tmp(2) := now;
+      elsif falling_edge(pulseout(2)) then
+        if (now - tmp(2) = timer2_pls) then
+          write(output, string'("Timer 2 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 2 pulseout FAIL. Pulse active for: " & time'image(now - tmp(2)) & ", should be: " & time'image(timer2_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time2_done <= true;
       end if;
-      test_time3_done <= true;
-    end if;
 
-    if rising_edge(pulseout(4)) then
-      tmp(4) := now;
-    elsif falling_edge(pulseout(4)) then
-      if (now - tmp(4) = timer4_pls) then
-        write(output, string'("Timer 4 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 4 pulseout FAIL. Pulse active for: " & time'image(now - tmp(4)) & ", should be: " & time'image(timer4_pls) & lf));
-        test_pass <= false;
+      if rising_edge(pulseout(3)) then
+        tmp(3) := now;
+      elsif falling_edge(pulseout(3)) then
+        if (now - tmp(3) = timer3_pls) then
+          write(output, string'("Timer 3 (driven by timer 2) pulseout test OK" & lf));
+        else
+          write(output, string'("Timer 3 (driven by timer 2) pulseout fail. Pulse active for: " & time'image(now - tmp(3)) & ", should be: " & time'image(timer3_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time3_done <= true;
       end if;
-      test_time4_done <= true;
-    end if;
 
-    if rising_edge(pulseout(5)) then
-      tmp(5) := now;
-    elsif falling_edge(pulseout(5)) then
-      if (now - tmp(5) = timer5_pls) then
-        write(output, string'("Timer 5 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 5 pulseout FAIL. Pulse active for: " & time'image(now - tmp(5)) & ", should be: " & time'image(timer5_pls) & lf));
-        test_pass <= false;
+      if rising_edge(pulseout(4)) then
+        tmp(4) := now;
+      elsif falling_edge(pulseout(4)) then
+        if (now - tmp(4) = timer4_pls) then
+          write(output, string'("Timer 4 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 4 pulseout FAIL. Pulse active for: " & time'image(now - tmp(4)) & ", should be: " & time'image(timer4_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time4_done <= true;
       end if;
-      test_time5_done <= true;
-    end if;
 
-    if rising_edge(pulseout(6)) then
-      tmp(6) := now;
-    elsif falling_edge(pulseout(6)) then
-      if (now - tmp(6) = timer6_pls) then
-        write(output, string'("Timer 6 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 6 pulseout FAIL. Pulse active for: " & time'image(now - tmp(6)) & ", should be: " & time'image(timer6_pls) & lf));
-        test_pass <= false;
+      if rising_edge(pulseout(5)) then
+        tmp(5) := now;
+      elsif falling_edge(pulseout(5)) then
+        if (now - tmp(5) = timer5_pls) then
+          write(output, string'("Timer 5 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 5 pulseout FAIL. Pulse active for: " & time'image(now - tmp(5)) & ", should be: " & time'image(timer5_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time5_done <= true;
       end if;
-      test_time6_done <= true;
-    end if;
 
-    if rising_edge(pulseout(7)) then
-      tmp(7) := now;
-    elsif falling_edge(pulseout(7)) then
-      if (now - tmp(7) = timer7_pls) then
-        write(output, string'("Timer 7 pulseout test OK" & lf));
-      else
-        write(output, string("Timer 7 pulseout FAIL. Pulse active for: " & time'image(now - tmp(7)) & ", should be: " & time'image(timer7_pls) & lf));
+      if rising_edge(pulseout(6)) then
+        tmp(6) := now;
+      elsif falling_edge(pulseout(6)) then
+        if (now - tmp(6) = timer6_pls) then
+          write(output, string'("Timer 6 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 6 pulseout FAIL. Pulse active for: " & time'image(now - tmp(6)) & ", should be: " & time'image(timer6_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time6_done <= true;
+      end if;
+
+      if rising_edge(pulseout(7)) then
+        tmp(7) := now;
+      elsif falling_edge(pulseout(7)) then
+        if (now - tmp(7) = timer7_pls) then
+          write(output, string'("Timer 7 pulseout test OK" & lf));
+        else
+          write(output, string("Timer 7 pulseout FAIL. Pulse active for: " & time'image(now - tmp(7)) & ", should be: " & time'image(timer7_pls) & lf));
+          test_pass <= false;
+        end if;
+        test_time7_done <= true;
+      end if;
+
+      if (test_reg_pass /= true) then
         test_pass <= false;
       end if;
-      test_time7_done <= true;
     end if;
 
   end process;
 
   test_stop : process
   begin
-    wait until test_done;
+    wait until test_done_2;
     if (test_pass) then
       write(output, string'("Test PASS" & lf));
     else
@@ -279,13 +322,44 @@ begin
     stop;
   end process;
 
-  test_done <=  test_time0_done and 
-                test_time1_done and 
-                test_time2_done and 
-                test_time3_done and 
-                test_time4_done and 
-                test_time5_done and 
-                test_time6_done and 
-                test_time7_done;
+  read_reg : process (clk_p, trst_n1)
+  begin
+    if (rising_edge(clk_p)) then
+      if (trst_n1 = '1') then
+        if (reg_addr_chk = ("000" or "001" or "010" or "100")) then
+          read_reg_cnt <= std_logic_vector(unsigned(read_reg_cnt) + 1);
+          if (tiu_out /= wdata) then
+            write(output, string'("Register r/w error, reg_cnt: " & to_string(read_reg_cnt) & lf));
+            test_reg_pass <= false;
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+
+  process (clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if (rst_en = '0') then
+        trst_n  <= '0';
+        trst_n1 <= '0';
+      elsif clk_c_en = '1' then
+        trst_n  <= tiu_enable;
+        trst_n1 <= trst_n;
+      end if;
+    end if;
+  end process;
+
+  test_done_1 <= test_time0_done and
+    test_time1_done and
+    test_time2_done and
+    test_time3_done and
+    test_time4_done and
+    test_time5_done and
+    test_time6_done and
+    test_time7_done;
+
+  test_done_2 <= test_done_1 and
+    test_reset_done;
 
 end architecture;

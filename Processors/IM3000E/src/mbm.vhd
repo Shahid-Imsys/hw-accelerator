@@ -271,7 +271,9 @@ begin
 
   mbmd <= mbmd_int;
   
-  process (clk_p, rst_en) is
+  -- This process is inserted to force the process ido_mem_latch not to
+  -- generate a latch.
+  latch_removal_mbmd_p:process (clk_p, rst_en) is
   begin
     if rst_en = '0' then
       mbmd_d <= (others => '0');

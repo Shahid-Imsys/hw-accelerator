@@ -491,11 +491,9 @@ begin
       -- Note: capture interrupt is async set because external event nature.
       process (reset_ifl_n(i), trst_n, reqi, capt_event, clk_p)
       begin
-        if (reset_ifl_n(i) = '0' or trst_n = '0') then
-          ifl(i) <= '0';
-        elsif falling_edge(clk_p) then
-	  if i = 0 and capt_event = '1' and reqi = '1' then
-	    ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
+        if falling_edge(clk_p) then
+	  if i = 0 and (reset_ifl_n(i) = '0' or trst_n = '0') then
+	    ifl(i) <= '0';
 	  else
 	    if genclk(i) = '1' then
 	      if i = 0 and reqi = '1' and cnt_zero(i) = '1' and cpt = '0' then
@@ -508,6 +506,13 @@ begin
 	    end if;
           end if;
         end if;
+
+	if i = 0 and capt_event = '1' and reqi = '1' then
+	  ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
+	elsif i > 0 and  (reset_ifl_n(i) = '0' or trst_n = '0') then
+	  ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
+	end if;
+	
       end process;
 
       ch_1 : if i = 1 generate

@@ -730,7 +730,9 @@ begin
 
   dac_data <= dac_data_int;
   
-  latch_removal: process (clk_p, rst_en) is
+  -- This process is inserted to force the process ido_mem_latch not to
+  -- generate a latch in synthesis.
+  latch_removal_p: process (clk_p, rst_en) is
   begin  -- process latch_removal
     if rst_en = '0' then                -- asynchronous reset (active low)
       dac_data_d <= (others => (others => '0'));
@@ -738,7 +740,7 @@ begin
       dac_data_d(1) <= dac_data_int(1);
       dac_data_d(0) <= dac_data_int(0);
     end if;
-  end process latch_removal;
+  end process latch_removal_p;
 
   -- Detect rising edges of adc_done.
 --      process (clk_e)

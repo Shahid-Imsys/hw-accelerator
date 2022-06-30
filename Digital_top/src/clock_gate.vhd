@@ -44,7 +44,7 @@ begin  -- rtl
 
   fpga_clockgate: if fpga_g generate    
     nextstate <= en or scan_mode;
-    clk_out <= IQ and clk;
+    clk_out <= iq and clk;
 
     -----------------------------------------------------------------------------
     -- Latch
@@ -61,7 +61,7 @@ begin  -- rtl
   -- Thsi shall be chnaged later with a proper clockgate cell.
   asic_clockgate: if not fpga_g generate
     nextstate <= en or scan_mode;
-    clk_out <= IQ and clk;
+    clk_out <= iq and clk;
 
     -----------------------------------------------------------------------------
     -- Latch

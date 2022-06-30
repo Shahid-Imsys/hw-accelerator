@@ -689,29 +689,27 @@ EVEN_P <= even_p_2;
      RST_R <= rst_i;
 
  -- Fetch data from req_fifo
-    process(clk_p)
+  process(clk_p)
          --Save 1 clock to handle the request
 	begin
 		if rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				RD_FIFO <= '0';
-                standby <= '1';
-            elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
-                
-
-			    if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
-			    	RD_FIFO <= '1';
-					standby <= '0';
-			    --elsif req_exe = '1' and write_req = '1' and write_count /= "11" then --write case
-			    	--RD_FIFO <= '1';
-				elsif req_exe = '1' or cb_status = '1' then
-                    standby <= '1';
-			    else
+        standby <= '1';
+      elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
+			  if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
+			  	RD_FIFO <= '1';
+				  standby <= '0';		
+				elsif REQ_IN = '1' and write_req = '1' then
+					RD_FIFO <= '1';
+		    elsif req_exe = '1' or cb_status = '1' then
+          standby <= '1';
+			  else
 					RD_FIFO <= '0';
-			    end if;
+			  end if;
 			else
 				RD_FIFO <= '0';
-            end if;
+      end if;
 		end if;
 	end process;
 
@@ -721,24 +719,18 @@ EVEN_P <= even_p_2;
  		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				pe_req_type <= (others => '0');
-				req_addr_p <= (others => '0');
 				req_len_ctr_p <= (others => '0');
 				req_last <= (others => '0');
-                bc_i <= (others => '0');
+        bc_i <= (others => '0');
 
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
- 				req_addr_p <= REQ_FIFO(14 downto 0);
- 				--req_len_ctr_p <=std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);--additional one bits for maximum transfer case
  				req_last <= REQ_FIFO(29 downto 24);
-                bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
-            elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
-                pe_req_type <= (others => '0');
-				req_addr_p <= (others => '0');
-				--req_len_ctr_p <= (others => '0');
+        bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
+      elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
+        pe_req_type <= (others => '0');
 				req_last <= (others => '0');
-
-                bc_i(0) <= '0';
+				bc_i(0) <= '0';
 
  			end if;
 			for i in 0 to 5 loop
@@ -781,25 +773,25 @@ EVEN_P <= even_p_2;
 			        	end if;
 			        elsif pe_req_type = "11" then	
 			        	id_num <= req_last;
-                        write_req <= '1';
+                write_req <= '1';
 			        	if len_ctr_p /= "000000000" then
 			        		req_exe <= '1';
 			        	end if;
 			        end if;
                 elsif req_bexe = '1' then  --Reset broadcast signals
-                    if len_ctr_p = "000000001" then
-                        req_bexe <= '0';
-			    		cb_status <= '0';
-                    end if;
+                  if len_ctr_p = "000000001" then
+                    req_bexe <= '0';
+			    					cb_status <= '0';
+                  end if;
                 elsif req_exe = '1' then --Reset unicast signals
 			    	if len_ctr_p = "000000001" then
-                        req_exe <= '0';
+              req_exe <= '0';
 			    	end if;
     
 			    	--if write_count = "11" then
 			    		write_req<= '0';
 			    	--end if;
-                end if;
+          end if;
 			end if;
 		end if;
 	end process;
@@ -855,14 +847,16 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 	--Data buffer
-	process(DATA_FROM_PE)
+	process(clk_p)--DATA_FROM_PE)
 	begin
-		for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
-			pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
-			pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
-			pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
-			pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
-		end loop;
+		if rising_edge(clk_p) then
+			for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
+				pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
+				pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
+				pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
+				pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
+			end loop;
+		end if;
 	end process;
 
 

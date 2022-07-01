@@ -149,24 +149,92 @@ set_property PACKAGE_PIN AW15 [get_ports {pmod0_in[2]}]
 set_property PACKAGE_PIN AV15 [get_ports {pmod0_out[3]}]
 set_property PACKAGE_PIN AV16 [get_ports {pmod0_out[4]}]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {pmod0_in_IBUF[0]_inst/O}]
-
 set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[0]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[1]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_in[2]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[3]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[4]}]
 
+# No PMOD is clock capable, so override this requirement. Should be ok, the SPI clock is slow.
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {pmod0_in_IBUF[0]_inst/O}]
+
 create_clock -period 100.000 -name SPI_SCK -waveform {0.000 50.000} [get_ports {pmod0_in[0]}]
 set_clock_groups -name SPI_CLK -asynchronous -group [get_clocks SPI_SCK]
 
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[0]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[1]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[2]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[3]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[4]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[5]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[6]/*}] 2
-#set_multicycle_path -from [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/timer/prescaler.ff_reg[0]/C}] -to [get_pins {im4000_inst/i_digital_core/i_im4000_top/peri01/ports/gsi.sft_reg_reg[7]/*}] 2
+set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXCTL]
+set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD0]
+set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD1]
+set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD3]
 
-# create_generated_clock -name im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q -source [get_pins im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q] -multiply_by 1 [get_pins im4000_inst/i_digital_core/i_im4000_top/peri01/timer/tic.clk_wr_reg/Q]
+set_input_delay -clock [get_clocks ENET_RXCLK] -max -add_delay 5.000 [get_ports ENET_RXCTL]
+set_input_delay -clock [get_clocks ENET_RXCLK] -max -add_delay 5.000 [get_ports ENET_RXD0]
+set_input_delay -clock [get_clocks ENET_RXCLK] -max -add_delay 5.000 [get_ports ENET_RXD1]
+set_input_delay -clock [get_clocks ENET_RXCLK] -max -add_delay 5.000 [get_ports ENET_RXD3]
+
+set_output_delay -clock [get_clocks ENET_TXCLK] -min -add_delay -2.000 [get_ports ENET_TXCTL]
+set_output_delay -clock [get_clocks ENET_TXCLK] -min -add_delay -2.000 [get_ports ENET_TXD0]
+set_output_delay -clock [get_clocks ENET_TXCLK] -min -add_delay -2.000 [get_ports ENET_TXD1]
+set_output_delay -clock [get_clocks ENET_TXCLK] -min -add_delay -2.000 [get_ports ENET_TXD3]
+
+set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports ENET_TXCTL]
+set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports ENET_TXD0]
+set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports ENET_TXD1]
+set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports ENET_TXD3]
+
+# CS
+#set_input_delay -clock [get_clocks SPI_SCK] -min -add_delay 48.000 [get_ports {pmod0_in[1]}]
+#set_input_delay -clock [get_clocks SPI_SCK] -max -add_delay 52.000 [get_ports {pmod0_in[1]}]
+
+# MOSI
+#set_input_delay -clock [get_clocks SPI_SCK] -min -add_delay 48.000 [get_ports {pmod0_in[2]}]
+#set_input_delay -clock [get_clocks SPI_SCK] -max -add_delay 52.000 [get_ports {pmod0_in[2]}]
+
+
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports OSPI_RWDS]
+
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports OSPI_RWDS]
+
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_Out[*]}]
+
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDC]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDC]
+
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 2.000 [get_ports ENET_MDIO]
+set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.00 [get_ports ENET_MDIO]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDIO]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDIO]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_RST_N]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_RST_N]
+
+set_input_delay -clock [get_clocks SPI_SCK] 10.0 [get_ports {{pmod0_in[*]}}]
+set_output_delay -clock [get_clocks SPI_SCK] 1.0 [get_ports {{pmod0_out[*]}}]
+
+# SPI CS to OE
+set_false_path -from [get_ports {pmod0_in[1]}] -to [get_ports {pmod0_out[4]}]
+
+# From IM3000C
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart1_int_reg]
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart2_int_reg]
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart3_int_reg]
+
+# Ports
+set_false_path -to [get_ports *LED*]
+
+set_false_path -from [get_ports URX]
+set_false_path -from [get_ports MRESET]
+set_false_path -from [get_ports MIRQ0]
+set_false_path -from [get_ports MSDIN]
+
+set_false_path -to [get_ports UTX]
+set_false_path -to [get_ports MCKOUT0]
+set_false_path -to [get_ports MSDOUT]
+set_false_path -to [get_ports MIRQOUT]
+
+

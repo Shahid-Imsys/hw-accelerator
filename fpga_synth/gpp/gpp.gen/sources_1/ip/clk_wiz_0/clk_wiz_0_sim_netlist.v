@@ -1,10 +1,10 @@
 // Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
-// Date        : Thu Apr 21 09:04:58 2022
+// Date        : Thu Apr 21 09:04:57 2022
 // Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
-// Command     : write_verilog -force -mode funcsim
-//               /home/markar/checkouts/ImSys/testMaster/Processors/IM3000E/fpga_synth/gpp/gpp.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim -rename_top clk_wiz_0 -prefix
+//               clk_wiz_0_ clk_wiz_0_sim_netlist.v
 // Design      : clk_wiz_0
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -31,7 +31,7 @@ module clk_wiz_0
   (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_n;
   (* IBUF_LOW_PWR *) (* RTL_KEEP = "yes" *) wire clk_in1_p;
 
-  clk_wiz_0_clk_wiz inst
+  clk_wiz_0_clk_wiz_0_clk_wiz inst
        (.clk_100M(clk_100M),
         .clk_200M(clk_200M),
         .clk_50M(clk_50M),
@@ -39,7 +39,7 @@ module clk_wiz_0
         .clk_in1_p(clk_in1_p));
 endmodule
 
-module clk_wiz_0_clk_wiz
+module clk_wiz_0_clk_wiz_0_clk_wiz
    (clk_200M,
     clk_100M,
     clk_50M,

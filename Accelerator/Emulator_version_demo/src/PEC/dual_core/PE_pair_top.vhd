@@ -4,6 +4,7 @@ use work.all;
 use work.gp_pkg.all;
 
 entity PE_pair_top is
+  generic ( USE_ASIC_MEMORIES : boolean := true );
   port (
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;
@@ -48,6 +49,26 @@ entity PE_pair_top is
 end PE_pair_top;
 
 architecture struct of PE_pair_top is
+
+  component SNPS_RF_SP_UHS_256x64 is
+    port (
+      Q        : out std_logic_vector(63 downto 0);
+      ADR      : in  std_logic_vector(7 downto 0);
+      D        : in  std_logic_vector(63 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
 
   --RAM 0
   component SU180_256X128X1BM1A
@@ -647,6 +668,7 @@ architecture struct of PE_pair_top is
   signal mp_RAM0_DO     :  std_logic_vector (127 downto 0);
   signal mp_RAM0_DI     :  std_logic_vector (127 downto 0);
   signal mp_RAM0_A      :  std_logic_vector (7 downto 0);
+  signal mp_RAM0_WE     :  std_logic;
   signal mp_RAM0_WEB    :  std_logic;   
   signal mp_RAM0_OE     :  std_logic;
   signal mp_RAM0_CS     :  std_logic;                  
@@ -751,6 +773,9 @@ begin
   c2_d_dqo <= C2_IN_D;
   C2_RDY   <= core2_rdy;
   
+  
+  mp_RAM0_WE <= mp_RAM0_CS and not mp_RAM0_WEB;
+  
 
  -----------------------------------------------------------------------------
  -----------------------------------------------------------------------------
@@ -760,6 +785,48 @@ begin
   -----------------------------------------------------------------------------
   -- Instantiation of memories
   -----------------------------------------------------------------------------
+
+ram0_asic_gen : if USE_ASIC_MEMORIES generate
+  mpram00a : SNPS_RF_SP_UHS_256x64
+        port map (
+          Q        => mp_RAM0_DO(63 downto 0),
+          ADR      => mp_RAM0_A,
+          D        => mp_RAM0_DI(63 downto 0),
+          WE       => mp_RAM0_WE,
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+
+  mpram00b : SNPS_RF_SP_UHS_256x64
+        port map (
+          Q        => mp_RAM0_DO(127 downto 64),
+          ADR      => mp_RAM0_A,
+          D        => mp_RAM0_DI(127 downto 64),
+          WE       => mp_RAM0_WE,
+          ME       => '1',
+          CLK      => hclk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
+end generate;
+
+ram0_sim_gen : if not USE_ASIC_MEMORIES generate
 
   mpram00: SU180_256X128X1BM1A
   PORT MAP (
@@ -1032,6 +1099,7 @@ begin
       CS          => mp_RAM0_CS     ,               
       OE          => std_logic'('1')                
       );
+end generate;
 
 --  -----------------------------------------------------------------------------
 --  -- Real time clock  !!! SEPARATELY POWERED !!!

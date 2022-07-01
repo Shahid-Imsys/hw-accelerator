@@ -40,6 +40,9 @@ use work.vetypes.all;
 --use work.cluster_pkg.all;
 
 entity ve is
+    generic(
+        USE_ASIC_MEMORIES : boolean := true
+    );
     port(
         --Control inputs
         CLK_P:                 in std_logic;
@@ -173,6 +176,65 @@ component mem is
   );
 end component;
 
+component SNPS_RF_SP_UHS_256x64 is
+    port (
+      Q        : out std_logic_vector(63 downto 0);
+      ADR      : in  std_logic_vector(7 downto 0);
+      D        : in  std_logic_vector(63 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+end component;
+
+component SNPS_RF_SP_UHS_256x32 is
+    port (
+      Q        : out std_logic_vector(31 downto 0);
+      ADR      : in  std_logic_vector(7 downto 0);
+      D        : in  std_logic_vector(31 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+end component;
+
+component SNPS_RF_SP_UHS_64x64 is
+    port (
+      Q        : out std_logic_vector(63 downto 0);
+      ADR      : in  std_logic_vector(5 downto 0);
+      D        : in  std_logic_vector(63 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
     --------------------------------
     --PL signals
     --------------------------------
@@ -776,6 +838,88 @@ clipinst_i <= (clip8, out0);
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
 ---------------------------------------------------------------
+buf_asic_gen : if USE_ASIC_MEMORIES generate
+--data mem(splited in high and low part)--
+  databuf_0 : SNPS_RF_SP_UHS_256x32
+  port map (
+      Q        => data0,
+      ADR      => data0addr_to_memory,
+      D        => mem_data_in(63 downto 32),
+      WE       => write_en_o,
+      ME       => '1',
+      CLK      => clk_p,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+
+  databuf_1 : SNPS_RF_SP_UHS_256x32
+  port map (
+      Q        => data1,
+      ADR      => data1addr_to_memory,
+      D        => mem_data_in(31 downto 0),
+      WE       => write_en_o,
+      ME       => '1',
+      CLK      => clk_p,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+
+--weight mem--
+  buf_weight : SNPS_RF_SP_UHS_256x64
+  port map (
+      Q        => weight,
+      ADR      => weightaddr_to_memory,
+      D        => mem_data_in,
+      WE       => write_en_w_o,
+      ME       => '1',
+      CLK      => clk_p,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+
+--bias mem--
+  buf_bias : SNPS_RF_SP_UHS_64x64
+  port map (
+      Q        => bias_buf_out,
+      ADR      => biasaddr_to_memory,
+      D        => bias_in,--writebuffer
+      WE       => write_en_b_o,
+      ME       => '1',
+      CLK      => clk_p,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+end generate;
+
+buf_sim_gen : if not USE_ASIC_MEMORIES generate
 --data mem(splited in high and low part)--
   databuf_0 : mem
   generic map(
@@ -805,21 +949,6 @@ clipinst_i <= (clip8, out0);
     address   => data1addr_to_memory,
     d_out     => data1
   );
---bias mem--
-  buf_bias : mem
-  generic map(
-    width       => 64,
-    addressbits => 6,
-    columns     => 4
-  )
-  port map(
-    clk       => clk_p,
-    read_en   => read_en_b_o,
-    write_en  => write_en_b_o,
-    d_in      => bias_in,--writebuffer,
-    address   => biasaddr_to_memory,
-    d_out     => bias_buf_out
-  );
 --weight mem--
   buf_weight : mem
   generic map (
@@ -835,6 +964,23 @@ clipinst_i <= (clip8, out0);
     address   => weightaddr_to_memory,
     d_out     => weight
   );
+  
+--bias mem--
+  buf_bias : mem
+  generic map(
+    width       => 64,
+    addressbits => 6,
+    columns     => 4
+  )
+  port map(
+    clk       => clk_p,
+    read_en   => read_en_b_o,
+    write_en  => write_en_b_o,
+    d_in      => bias_in,--writebuffer,
+    address   => biasaddr_to_memory,
+    d_out     => bias_buf_out
+  );
+end generate;
 
   re_i : re
   port map(
@@ -978,12 +1124,3 @@ begin
 end process;
 
 end architecture;  
-                    
-
-                 
-    
-
-
-
-
-

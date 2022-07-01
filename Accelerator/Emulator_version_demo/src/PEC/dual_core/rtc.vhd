@@ -45,6 +45,8 @@ use ieee.std_logic_unsigned.all;
 --use work.all;
 
 entity rtc is
+  generic(
+    USE_ASIC_MEMORIES   : boolean := true );
   port (
     --gmem1
     c1_gmem_a         : in    std_logic_vector(9 downto 0);
@@ -160,6 +162,9 @@ architecture rtl of rtc is
   signal lp_rst_cnt_off_int  : std_logic;
   signal pwr_on_rst_n  : std_logic;
   
+  signal c1_gmem_we_iso_1 : std_logic;
+  signal c2_gmem_we_iso_1 : std_logic;
+  
   TYPE states IS (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
   SIGNAL next_state : states;
   SIGNAL current_state : states;
@@ -262,6 +267,26 @@ architecture rtl of rtc is
   end component;  
 
    -- gmem
+  component SNPS_RF_SP_UHS_1024x8 is
+    port (
+      Q        : out std_logic_vector(7 downto 0);
+      ADR      : in  std_logic_vector(9 downto 0);
+      D        : in  std_logic_vector(7 downto 0);
+      WE       : in  std_logic;
+      ME       : in  std_logic;
+      CLK      : in  std_logic;
+      TEST1    : in  std_logic;
+      TEST_RNM : in  std_logic;
+      RME      : in  std_logic;
+      RM       : in  std_logic_vector(3 downto 0);
+      WA       : in  std_logic_vector(1 downto 0);
+      WPULSE   : in  std_logic_vector(2 downto 0);
+      LS       : in  std_logic;
+      BC0      : in  std_logic;
+      BC1      : in  std_logic;
+      BC2      : in  std_logic);
+  end component;
+   
   component SY180_1024X8X1CM8     
     port(
       A0                         :   IN   std_logic;
@@ -455,9 +480,14 @@ begin  -- rtl
     --  RAM0_WEB_iso_1      =>   RAM0_WEB_iso_1,
     --  RAM0_CS_iso_0       =>   RAM0_CS_iso_0
 
-      );      
+      );
+      
+  c1_gmem_we_iso_1 <= not c1_gmem_we_n_iso_1;
+  c2_gmem_we_iso_1 <= not c2_gmem_we_n_iso_1;
 
   -- gmem
+gmem_sim_gen : if not USE_ASIC_MEMORIES generate
+
   -- gmem1
   gmem1: SY180_1024X8X1CM8
   PORT MAP (
@@ -527,6 +557,51 @@ begin  -- rtl
       CSB         => c2_gmem_ce_n_iso_1                               
       );
 
+end generate;
+
+gmem_asic_gen : if USE_ASIC_MEMORIES generate
+  
+  -- gmem1
+  gmem1: SNPS_RF_SP_UHS_1024x8
+  port map (
+      Q        => c1_gmem_q,
+      ADR      => c1_gmem_a_iso_0,
+      D        => c1_gmem_d_iso_0,
+      WE       => c1_gmem_we_iso_1,
+      ME       => '1', -- c1_gmem_ce_n_iso_1
+      CLK      => clk_mux_out_iso_1,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+
+  -- gmem2
+  gmem2: SNPS_RF_SP_UHS_1024x8
+  port map (
+      Q        => c2_gmem_q,
+      ADR      => c2_gmem_a_iso_0,
+      D        => c2_gmem_d_iso_0,
+      WE       => c2_gmem_we_iso_1,
+      ME       => '1', -- c2_gmem_ce_n_iso_1
+      CLK      => clk_mux_out_iso_1,
+      TEST1    => '0',
+      TEST_RNM => '0',
+      RME      => '0',
+      RM       => (others => '0'),
+      WA       => (others => '0'),
+      WPULSE   => (others => '0'),
+      LS       => '0',
+      BC0      => '0',
+      BC1      => '0',
+      BC2      => '0');
+
+end generate;
 
   -- bmem  !!! SEPARATELY POWERED !!!
   --bmem: SY180_512X8X1CM8

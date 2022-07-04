@@ -10,10 +10,12 @@ use work.gp_pkg.all;
 
 entity ionoc_tb is
   generic (
-    ionoc_status_address : std_logic_vector(7 downto 0) := x"45";
-    ionoc_cmd_address    : std_logic_vector(7 downto 0) := x"46";
-    ionoc_data_address   : std_logic_vector(7 downto 0) := x"47";
-    MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
+    ionoc_status_address  : std_logic_vector(7 downto 0) := x"45";
+    ionoc_cmd_address     : std_logic_vector(7 downto 0) := x"46";
+    ionoc_data_address    : std_logic_vector(7 downto 0) := x"47";
+    ionoc_addr_address    : std_logic_vector(7 downto 0) := x"48";
+    ionoc_length_address  : std_logic_vector(7 downto 0) := x"49";
+    ionoc_datadir_address : std_logic_vector(7 downto 0) := x"4A"
     );
 end entity;
 
@@ -21,10 +23,12 @@ architecture tb of ionoc_tb is
 
   component ionoc is
     generic (
-      ionoc_status_address : std_logic_vector(7 downto 0) := x"45";
-      ionoc_cmd_address    : std_logic_vector(7 downto 0) := x"46";
-      ionoc_data_address   : std_logic_vector(7 downto 0) := x"47";
-      MAX_BURST_LEN        : integer                      := 2  -- Must be even power of 2
+      ionoc_status_address  : std_logic_vector(7 downto 0) := x"45";
+      ionoc_cmd_address     : std_logic_vector(7 downto 0) := x"46";
+      ionoc_data_address    : std_logic_vector(7 downto 0) := x"47";
+      ionoc_addr_address    : std_logic_vector(7 downto 0) := x"48";
+      ionoc_length_address  : std_logic_vector(7 downto 0) := x"49";
+      ionoc_datadir_address : std_logic_vector(7 downto 0) := x"4A"
       );
   port (-- Domain clk_p
         ------------------------------------------------------
@@ -62,7 +66,21 @@ architecture tb of ionoc_tb is
         --
         RxFIFO_Ready : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
         RxFIFO_Valid : out std_logic;                      -- Interface has availble data which is presented on bus
-        RxFIFO_Data  : out std_logic_vector(127 downto 0)  -- RxFIFO data
+        RxFIFO_Data  : out std_logic_vector(127 downto 0); -- RxFIFO data
+        -- FIFO Level signals
+        TxFIFO_READY_1 : in  std_logic;                     -- 1 word
+        TxFIFO_READY_2 : in  std_logic;                     -- 16 words
+        TxFIFO_READY_3 : in  std_logic;                     -- 24 words
+        --
+        RxFIFO_READY_1  : in  std_logic;                    -- 1 word
+        RxFIFO_READY_2  : in  std_logic;                    -- 16 words
+        RxFIFO_READY_3  : in  std_logic;                    -- 24 words
+        -- NOC Data interface
+        NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request
+        NOC_LENGTH    : in  std_logic_vector(15 downto 0);  -- Length of NOC data request
+        NOC_DATA_DIR  : in  std_logic;                      -- Direction of NOC data request
+        NOC_WRITE_REQ : in  std_logic;                      -- NOC address and lenth is valid
+        IO_WRITE_ACK  : out std_logic                       --
         ------------------------------------------------------
         );
   end component;
@@ -98,6 +116,18 @@ architecture tb of ionoc_tb is
     --
     test7_read_fifo_data_to_gpp,
     test7_pollstatus_reset,
+    --
+    test8_read_fifo_data_to_noc,
+    --
+    test9_issue_request,
+    test9_request_processed,
+    --
+    test10_pollstatus_Set,
+    test10_read_io_request_to_gpp_1,
+    test10_read_io_request_to_gpp_2,
+    test10_read_io_request_to_gpp_3,
+    test10_pollstatus_reset,
+    --
     wait_done,
     done);
 
@@ -130,9 +160,11 @@ architecture tb of ionoc_tb is
   --
   signal NOC_CMD_Flag_int : std_logic;
   signal GPP_CMD_ACK_int  : std_logic;
-    --
+  --
   signal TxFIFO_Valid_int : std_logic;
   signal RxFIFO_Ready_int : std_logic;
+  --
+  signal IORequest_int    : std_logic;
 
 
   -- DUT
@@ -155,13 +187,30 @@ architecture tb of ionoc_tb is
   signal RxFIFO_Ready : std_logic                      := '0';
   signal RxFIFO_Valid : std_logic;
   signal RxFIFO_Data  : std_logic_vector(127 downto 0);
+  --
+  signal NOC_ADDRESS   : std_logic_vector(31 downto 0) := (others => '0');
+  signal NOC_LENGTH    : std_logic_vector(15 downto 0) := (others => '0');
+  signal NOC_DATA_DIR  : std_logic := '0';
+  signal NOC_CTRL_EN   : std_logic := '0';
+  signal NOC_DATA_EN   : std_logic := '0';
+  signal NOC_WRITE_REQ : std_logic := '0';
+  signal IO_WRITE_ACK  : std_logic := '0';
+  signal FIFO_READY_1  : std_logic := '0';
+  signal FIFO_READY_2  : std_logic := '0';
+  signal FIFO_READY_3  : std_logic := '0';
 
   -- noc_proc
-  signal noc_cnt1     : integer   := 0;
-  signal CMD_ACK_int : std_logic := '0';
+  signal noc_cnt1       : integer   := 0;
+  signal CMD_ACK_int    : std_logic := '0';
   --
   signal TxFIFO_Valid_f : boolean := false;
   signal RxFIFO_Ready_f : boolean := false;
+  --
+  signal IORequest_f    : boolean := false;
+
+
+  -- clk_proc
+  signal ido_buf        : std_logic_vector(127 downto 0) :=  (others => '0');
 
 
   -- Constants
@@ -188,6 +237,14 @@ begin
       else
         clk_i <= '1';
       end if;
+
+      if clk_i = '0' and
+         inext = '0' and
+         iden  = '1'
+      then
+        ido_buf <= ido & ido_buf(127 downto 8);
+      end if;
+
     end if;
   end process;
 
@@ -209,6 +266,8 @@ begin
       --
       TxFIFO_Valid_int <= '0';
       RxFIFO_Ready_int <= '0';
+      --
+      IORequest_int    <= '0';
 
       -- Delays
       fsm_d <= fsm;
@@ -462,6 +521,10 @@ begin
             fsm_count <= 0;
             if ido(1 downto 0) = "00" then  -- Or just bit 1
               fsm <= test5_write_fifo_data_fr_noc;
+              for b in 0 to 15 loop
+                TxFIFO_Data(8*b + 7 downto 8*b) <=
+                  conv_std_logic_vector(17 * b+1, 8);
+              end loop;
               --
               write(l, string'("[STATUS] Byte to GPP is not pending"));
               writeline(output, l);
@@ -479,16 +542,13 @@ begin
         --
         -------------------------------------------
         when test5_write_fifo_data_fr_noc =>
+          --
           TxFIFO_Valid_int <= '1';
           if TxFIFO_Valid_int = '0' then
-            write(l, string'("[NOC] Presenting data to TxFIFO"));
+            write(l, string'("[NOC] Presenting data to TxFIFO: 0x"));
+            hwrite(l, TxFIFO_Data );
             writeline(output, l);
           end if;
-          --
-          for b in 0 to 15 loop
-            TxFIFO_Data(8*b + 7 downto 8*b) <=
-              conv_std_logic_vector(17 * b+1, 8);
-          end loop;
           --
           if TxFIFO_Valid_int = '1' and TxFIFO_Valid_f then
             if fsm_count = 1-1 then     -- nr_of_words - 1
@@ -568,7 +628,7 @@ begin
             fsm_count <= 0;
             --
             write(l, string'("GPP has finished writing data to interface: 0x"));
-            write(l, string'("[TBD]"));
+            hwrite(l, RxFIFO_Data);
             writeline(output, l);
             --
             --write(l, string'("Waiting for RxFIFO to read data from interface"));
@@ -655,7 +715,7 @@ begin
             fsm_count <= 0;
             --
             write(l, string'("GPP has finished reading data from the interface: 0x"));
-            write(l, string'("[TBD]"));
+            hwrite(l, ido_buf);
             writeline(output, l);
           end if;
 
@@ -671,15 +731,172 @@ begin
           if fsm_count = 7 then
             fsm_count <= 0;
             if ido(7) = '0' then
-              fsm <= wait_done;
+              fsm <= test8_read_fifo_data_to_noc;
               --
               write(l, string'("[STATUS] Data to GPP from TxFIFO is no longer pending"));
               writeline(output, l);
               --
-              --write(l, string'("[TEST START] - Test 8"));
-              --writeline(output, l);
+              write(l, string'("[TEST START] - Test 8"));
+              writeline(output, l);
             else
               write(l, string'("WARNING: Data from TxFIFO is still pending!"));
+              writeline(output, l);
+            end if;
+          end if;
+
+        -------------------------------------------
+        -- TEST8 - Read RxFIFO data to NOC
+        --
+        -------------------------------------------
+        when test8_read_fifo_data_to_noc =>
+          fsm <= test9_issue_request;
+          write(l, string'("Test 8 is on hold until FIFO RTL is available"));
+          writeline(output, l);
+          --
+          write(l, string'("[TEST START] - Test 9"));
+          writeline(output, l);
+
+        -------------------------------------------
+        -- TEST9 - Send IO request to adapter
+        --
+        -------------------------------------------
+        when test9_issue_request =>
+          IORequest_int <= '1';
+          --
+          NOC_ADDRESS   <= x"1234_8765";
+          NOC_LENGTH    <= x"1337";
+          NOC_DATA_DIR  <= '1';
+          --
+          if IORequest_f then
+            fsm <= test9_request_processed;
+            --
+            write(l, string'("NOC is requesting IO operation"));
+            writeline(output, l);
+          end if;
+
+        when test9_request_processed =>
+          if not IORequest_f then
+            fsm       <= test10_pollstatus_Set;
+            fsm_count <= 0;
+            --
+            write(l, string'("NOC IO operation completed"));
+            writeline(output, l);
+            --
+            write(l, string'("[TEST START] - Test 10"));
+            writeline(output, l);
+          end if;
+
+        when test10_pollstatus_Set =>
+          -- Poll status until word is read by noc
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(3) = '1' then
+              fsm <= test10_read_io_request_to_gpp_1;
+              --
+              write(l, string'("[STATUS] IO Request from NOC is pending"));
+              writeline(output, l);
+            else
+              assert false report "IO Request not visible to IO bus!" severity failure;
+            end if;
+          end if;
+
+        when test10_read_io_request_to_gpp_1 =>
+          if fsm_count = 0 then
+            write(l, string'("GPP is reading IO request from interface buffer (address)"));
+            writeline(output, l);
+          end if;
+
+          if fsm_count < 4 then
+            idi   <= ionoc_addr_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+            -- TODO Combine and print bytes
+          end if;
+
+          if fsm_count = 5+4*4 then
+            fsm       <= test10_read_io_request_to_gpp_2;
+            fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished reading data from the interface: 0x"));
+            hwrite(l, ido_buf(127 downto 127-31));
+            writeline(output, l);
+          end if;
+
+        when test10_read_io_request_to_gpp_2 =>
+          if fsm_count = 0 then
+            write(l, string'("GPP is reading IO request from interface buffer (length)"));
+            writeline(output, l);
+          end if;
+
+          if fsm_count < 4 then
+            idi   <= ionoc_length_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+            -- TODO Combine and print bytes
+          end if;
+
+          if fsm_count = 5+4*2 then
+            fsm       <= test10_read_io_request_to_gpp_3;
+            fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished reading data from the interface: 0x"));
+            hwrite(l, ido_buf(127 downto 127-15));
+            writeline(output, l);
+          end if;
+
+        when test10_read_io_request_to_gpp_3 =>
+          if fsm_count = 0 then
+            write(l, string'("GPP is reading IO request from interface buffer (data direction)"));
+            writeline(output, l);
+          end if;
+
+          if fsm_count < 4 then
+            idi   <= ionoc_datadir_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+            -- TODO Combine and print bytes
+          end if;
+
+          if fsm_count = 5+8*1 then
+            fsm       <= test10_pollstatus_reset;
+            fsm_count <= 0;
+            --
+            write(l, string'("GPP has finished reading data from the interface: 0x"));
+            hwrite(l, ido_buf(127 downto 127-7));
+            writeline(output, l);
+          end if;
+
+        when test10_pollstatus_reset =>
+          -- Poll status until there is nothing for the RxFIFO
+          if fsm_count < 4 then
+            idi   <= ionoc_status_address;
+            ilioa <= '0';
+          else
+            inext <= '0';
+          end if;
+
+          if fsm_count = 7 then
+            fsm_count <= 0;
+            if ido(3) = '0' then
+              fsm <= wait_done;
+              --
+              write(l, string'("[STATUS] IO Request is no longer pending"));
+              writeline(output, l);
+              --
+              --write(l, string'("[TEST START] - Test 11"));
+              --writeline(output, l);
+            else
+              write(l, string'("WARNING: Request is still pending!"));
               writeline(output, l);
             end if;
           end if;
@@ -706,7 +923,8 @@ begin
 
     if rising_edge(clk_noc) then
       -- Defaults
-      NOC_CMD_ACK  <= '0';
+      NOC_CMD_ACK   <= '0';
+      NOC_WRITE_REQ <= '0';
 
       if noc_cnt1 < 32 then
         noc_cnt1     <= noc_cnt1 + 1;
@@ -781,15 +999,36 @@ begin
         TxFIFO_Valid_f <= false;
       end if;
 
+      -----------------------------------------------------------------------
+
+      if IORequest_int = '1' and not IORequest_f then
+        IORequest_f <= true;
+      end if;
+      --
+      if IORequest_int = '0' and IORequest_f then
+        NOC_WRITE_REQ <= '1';
+      end if;
+      --
+      if NOC_WRITE_REQ = '1' and IO_WRITE_ACK = '0' then
+        NOC_WRITE_REQ <= '1';
+      end if;
+      --
+      if IO_WRITE_ACK = '1' then
+        IORequest_f   <= false;
+        NOC_WRITE_REQ <= '0';
+      end if;
+
     end if; -- clk_noc
   end process; -- noc_proc
 
   DUT : ionoc
     generic map (
-      ionoc_status_address => ionoc_status_address,
-      ionoc_cmd_address    => ionoc_cmd_address,
-      ionoc_data_address   => ionoc_data_address,
-      MAX_BURST_LEN        => MAX_BURST_LEN)
+      ionoc_status_address  => ionoc_status_address,
+      ionoc_cmd_address     => ionoc_cmd_address,
+      ionoc_data_address    => ionoc_data_address,
+      ionoc_addr_address    => ionoc_addr_address,
+      ionoc_length_address  => ionoc_length_address,
+      ionoc_datadir_address => ionoc_datadir_address)
     port map (
       clk_p        => clk_p,
       clk_i_pos    => clk_i,
@@ -804,19 +1043,30 @@ begin
       idreq        => idreq,
       NOC_IRQ      => NOC_IRQ,
       --
-      clk_noc      => clk_noc,
-      GPP_CMD      => GPP_CMD,
-      GPP_CMD_Flag => GPP_CMD_Flag,
-      NOC_CMD_ACK  => NOC_CMD_ACK,
-      NOC_CMD      => NOC_CMD,
-      GPP_CMD_ACK  => GPP_CMD_ACK,
-      NOC_CMD_Flag => NOC_CMD_Flag,
-      TxFIFO_Ready => TxFIFO_Ready,
-      TxFIFO_Valid => TxFIFO_Valid,
-      TxFIFO_Data  => TxFIFO_Data,
-      RxFIFO_Ready => RxFIFO_Ready,
-      RxFIFO_Valid => RxFIFO_Valid,
-      RxFIFO_Data  => RxFIFO_Data
+      clk_noc       => clk_noc,
+      GPP_CMD       => GPP_CMD,
+      GPP_CMD_Flag  => GPP_CMD_Flag,
+      NOC_CMD_ACK   => NOC_CMD_ACK,
+      NOC_CMD       => NOC_CMD,
+      GPP_CMD_ACK   => GPP_CMD_ACK,
+      NOC_CMD_Flag  => NOC_CMD_Flag,
+      TxFIFO_Ready  => TxFIFO_Ready,
+      TxFIFO_Valid  => TxFIFO_Valid,
+      TxFIFO_Data   => TxFIFO_Data,
+      RxFIFO_Ready  => RxFIFO_Ready,
+      RxFIFO_Valid  => RxFIFO_Valid,
+      RxFIFO_Data   => RxFIFO_Data,
+      TxFIFO_READY_1 => '0',
+      TxFIFO_READY_2 => '0',
+      TxFIFO_READY_3 => '0',
+      RxFIFO_READY_1 => '0',
+      RxFIFO_READY_2 => '0',
+      RxFIFO_READY_3 => '0',
+      NOC_ADDRESS   => NOC_ADDRESS,
+      NOC_LENGTH    => NOC_LENGTH,
+      NOC_DATA_DIR  => NOC_DATA_DIR,
+      NOC_WRITE_REQ => NOC_WRITE_REQ,
+      IO_WRITE_ACK  => IO_WRITE_ACK
       );
 
 end tb;

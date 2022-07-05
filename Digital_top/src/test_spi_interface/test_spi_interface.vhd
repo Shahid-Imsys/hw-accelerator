@@ -9,7 +9,6 @@ use work.project_settings.all;
 entity test_spi_interface is
   port (
     rst_n               : in  std_ulogic;
-    spi_rst_n_i         : in  std_ulogic;
     sclk_int            : in  std_ulogic;
     sclk_n              : in  std_ulogic;
     cs_n                : in  std_ulogic;

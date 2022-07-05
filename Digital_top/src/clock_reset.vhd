@@ -10,17 +10,19 @@ entity clock_reset is
     pll_ref_clk : in std_ulogic;
     spi_sclk : in  std_logic;
     clk_p   : out std_logic;
+    clk_p_n : out std_logic;
     clk_rx  : out std_logic;
     clk_tx  : out std_logic;
     sclk : out std_logic;
     sclk_n : out std_logic;
     
-
+    pre_spi_rst_n : in std_logic;
     mreset_n     : in  std_logic;   -- system reset, active low
     pwr_ok       : in  std_logic;   -- Power OK
     c1_wdog_n    : in std_logic;
     
     rst_n : out std_logic;  -- main reste, sync to clk_p
+    spi_rst_n : out std_logic;
     
     --etxclk : in std_logic;
     --erxclk : in std_logic;
@@ -49,6 +51,9 @@ architecture rtl of clock_reset is
   signal main_rst_n : std_logic;
   
   signal sel_pll_all      : std_logic;
+
+  signal clock_p_puls : std_logic;
+  signal clock_p_n_puls : std_logic;
   
 begin  -- architecture rtl
 
@@ -88,6 +93,8 @@ begin  -- architecture rtl
     rst_n       => rst_n
     );
 
+  spi_rst_n <= pre_spi_rst_n and pwr_ok;
+    
   ---------------------------------------
   -- Clock section
   --------------------------------------
@@ -112,9 +119,19 @@ begin  -- architecture rtl
       fpga_g =>  fpga_g)
     port map (
       clk => clk_mux_out_int,
-      en  => not clock_in_off,
+      en  => clock_p_puls,
       scan_mode => scan_mode,
       clk_out => clk_p
+      );
+  
+  i_clock_gate_n : entity work.clock_gate  
+    generic map (
+      fpga_g =>  fpga_g)
+    port map (
+      clk => clk_mux_out_int,
+      en  => clock_p_n_puls,
+      scan_mode => scan_mode,
+      clk_out => clk_p_n
       );
 
 
@@ -144,4 +161,30 @@ begin  -- architecture rtl
   sclk <= spi_sclk;
   sclk_n <= not spi_sclk;
 
+
+  clock_divide_p: process (clk_mux_out_int, rst_n) is
+    variable counter : integer range 0 to 1;
+  begin  -- process clock_divide_p
+    if rst_n = '0' then  		-- asynchronous reset (active low)
+      clock_p_puls <= '0';
+      clock_p_n_puls <= '0';
+      counter := 0;
+    elsif rising_edge(clk_mux_out_int) then
+      clock_p_puls <= '0';
+      clock_p_n_puls <= '0';
+
+      if clock_in_off then
+	clock_p_puls <= '0';
+	clock_p_n_puls <= '0';
+	counter := 0;
+      elsif counter = 0 then
+	clock_p_puls <= '1';
+	counter := counter + 1;
+      elsif counter = 1 then
+	clock_p_n_puls <= '1';
+	counter := 0;
+      end if;
+    end if;
+  end process clock_divide_p;
+  
 end architecture rtl;

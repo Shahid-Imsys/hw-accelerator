@@ -106,7 +106,7 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
           Q        => DataOut,
           ADR      => std_logic_vector(Address),
           D        => DataIn,
-          WE       => we,
+          WE       => we(0),
           ME       => '1',
           CLK      => clk,
           TEST1    => '0',

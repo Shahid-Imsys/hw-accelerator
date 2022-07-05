@@ -1,7 +1,7 @@
 GPP_DIR=$(PROJECT_PATH)/Processors/IM3000E/src
 GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
-IP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/fpga_synth/gpp
+IP_DIR_WIN=$(PROJECT_PATH_WIN)/fpga_synth/gpp
 
 gpp_rtl: mem_load_comp fpga_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \

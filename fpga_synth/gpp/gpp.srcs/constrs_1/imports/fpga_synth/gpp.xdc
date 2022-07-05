@@ -134,15 +134,6 @@ set_property IOSTANDARD LVCMOS18 [get_ports MIRQ0]
 set_property IOSTANDARD LVCMOS18 [get_ports MRESET]
 set_property IOSTANDARD LVCMOS18 [get_ports MSDIN]
 
-create_clock -period 20.000 -name ENET_TXCLK -waveform {0.000 10.000} [get_ports ENET_TXCLK]
-
-set_clock_groups -name ENET_TXCLK -asynchronous -group [get_clocks ENET_TXCLK]
-
-create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports ENET_RXCLK]
-
-set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
-
-
 set_property PACKAGE_PIN AY14 [get_ports {pmod0_in[0]}]
 set_property PACKAGE_PIN AY15 [get_ports {pmod0_in[1]}]
 set_property PACKAGE_PIN AW15 [get_ports {pmod0_in[2]}]
@@ -158,8 +149,36 @@ set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[4]}]
 # No PMOD is clock capable, so override this requirement. Should be ok, the SPI clock is slow.
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {pmod0_in_IBUF[0]_inst/O}]
 
+create_clock -period 20.000 -name ENET_TXCLK -waveform {0.000 10.000} [get_ports ENET_TXCLK]
+set_clock_groups -name ENET_TXCLK -asynchronous -group [get_clocks ENET_TXCLK]
+
+create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports ENET_RXCLK]
+set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
+
 create_clock -period 100.000 -name SPI_SCK -waveform {0.000 50.000} [get_ports {pmod0_in[0]}]
 set_clock_groups -name SPI_CLK -asynchronous -group [get_clocks SPI_SCK]
+
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 2.000 [get_ports ENET_MDIO]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_MDIO]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDIO]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDIO]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDC]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDC]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_RST_N]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_RST_N]
+
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD3]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD3]
+
 
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXCTL]
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD0]
@@ -190,31 +209,24 @@ set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports
 #set_input_delay -clock [get_clocks SPI_SCK] -max -add_delay 52.000 [get_ports {pmod0_in[2]}]
 
 
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports OSPI_RWDS]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports OSPI_RWDS]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports OSPI_RWDS]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_DQ[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports OSPI_RWDS]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_Out[*]}]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDC]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDC]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports UTX]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports UTX]
 
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 2.000 [get_ports ENET_MDIO]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.00 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_RST_N]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_RST_N]
-
-set_input_delay -clock [get_clocks SPI_SCK] 10.0 [get_ports {{pmod0_in[*]}}]
-set_output_delay -clock [get_clocks SPI_SCK] 1.0 [get_ports {{pmod0_out[*]}}]
+set_input_delay -clock [get_clocks SPI_SCK] 10.000 [get_ports {pmod0_in[*]}]
+set_output_delay -clock [get_clocks SPI_SCK] 1.000 [get_ports {pmod0_out[*]}]
 
 # SPI CS to OE
 set_false_path -from [get_ports {pmod0_in[1]}] -to [get_ports {pmod0_out[4]}]
@@ -236,5 +248,3 @@ set_false_path -to [get_ports UTX]
 set_false_path -to [get_ports MCKOUT0]
 set_false_path -to [get_ports MSDOUT]
 set_false_path -to [get_ports MIRQOUT]
-
-

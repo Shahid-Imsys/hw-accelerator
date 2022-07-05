@@ -134,15 +134,6 @@ set_property IOSTANDARD LVCMOS18 [get_ports MIRQ0]
 set_property IOSTANDARD LVCMOS18 [get_ports MRESET]
 set_property IOSTANDARD LVCMOS18 [get_ports MSDIN]
 
-create_clock -period 20.000 -name ENET_TXCLK -waveform {0.000 10.000} [get_ports ENET_TXCLK]
-
-set_clock_groups -name ENET_TXCLK -asynchronous -group [get_clocks ENET_TXCLK]
-
-create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports ENET_RXCLK]
-
-set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
-
-
 set_property PACKAGE_PIN AY14 [get_ports {pmod0_in[0]}]
 set_property PACKAGE_PIN AY15 [get_ports {pmod0_in[1]}]
 set_property PACKAGE_PIN AW15 [get_ports {pmod0_in[2]}]
@@ -158,8 +149,36 @@ set_property IOSTANDARD LVCMOS18 [get_ports {pmod0_out[4]}]
 # No PMOD is clock capable, so override this requirement. Should be ok, the SPI clock is slow.
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets {pmod0_in_IBUF[0]_inst/O}]
 
+create_clock -period 20.000 -name ENET_TXCLK -waveform {0.000 10.000} [get_ports ENET_TXCLK]
+set_clock_groups -name ENET_TXCLK -asynchronous -group [get_clocks ENET_TXCLK]
+
+create_clock -period 20.000 -name ENET_RXCLK -waveform {0.000 10.000} [get_ports ENET_RXCLK]
+set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
+
 create_clock -period 100.000 -name SPI_SCK -waveform {0.000 50.000} [get_ports {pmod0_in[0]}]
 set_clock_groups -name SPI_CLK -asynchronous -group [get_clocks SPI_SCK]
+
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 2.000 [get_ports ENET_MDIO]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_MDIO]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDIO]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDIO]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDC]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDC]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_RST_N]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_RST_N]
+
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD3]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD3]
+
 
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXCTL]
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD0]
@@ -190,31 +209,24 @@ set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports
 #set_input_delay -clock [get_clocks SPI_SCK] -max -add_delay 52.000 [get_ports {pmod0_in[2]}]
 
 
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 3.000 [get_ports OSPI_RWDS]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports OSPI_RWDS]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports OSPI_RWDS]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_DQ[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports OSPI_RWDS]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.500 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_Out[*]}]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDC]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDC]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports UTX]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports UTX]
 
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 2.000 [get_ports ENET_MDIO]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 5.00 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_MDIO]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports ENET_RST_N]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay  0.500 [get_ports ENET_RST_N]
-
-set_input_delay -clock [get_clocks SPI_SCK] 10.0 [get_ports {{pmod0_in[*]}}]
-set_output_delay -clock [get_clocks SPI_SCK] 1.0 [get_ports {{pmod0_out[*]}}]
+set_input_delay -clock [get_clocks SPI_SCK] 10.000 [get_ports {pmod0_in[*]}]
+set_output_delay -clock [get_clocks SPI_SCK] 1.000 [get_ports {pmod0_out[*]}]
 
 # SPI CS to OE
 set_false_path -from [get_ports {pmod0_in[1]}] -to [get_ports {pmod0_out[4]}]
@@ -238,3 +250,65 @@ set_false_path -to [get_ports MSDOUT]
 set_false_path -to [get_ports MIRQOUT]
 
 
+create_debug_core u_ila_0 ila
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 4 [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER true [get_debug_cores u_ila_0]
+set_property C_DATA_DEPTH 16384 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL true [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 4 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list fpga_pll_inst/inst/clk_100M]]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+set_property port_width 3 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[2]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+set_property port_width 7 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[6]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+set_property port_width 7 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[6]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+set_property port_width 8 [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[6]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+set_property port_width 8 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[6]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+set_property port_width 8 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[6]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+set_property port_width 32 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[6]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[7]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[8]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[9]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[10]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[11]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[12]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[13]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[14]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[15]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[16]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[17]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[18]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[19]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[20]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[21]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[22]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[23]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[24]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[25]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[26]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[27]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[28]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[29]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[30]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+set_property port_width 8 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[0]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[1]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[2]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[3]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[4]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[5]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[6]} {im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
+set_property port_width 1 [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_sel]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+set_property port_width 1 [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/peri01/ospi_iden]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/peri01/inext_int_reg]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
+set_property port_width 1 [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/core1/ildout]]
+set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+connect_debug_port dbg_hub/clk [get_nets clk_100m]

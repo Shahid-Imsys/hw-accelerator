@@ -40,6 +40,7 @@ entity tiu is
 
     -- Interface to host  
     clk_p      : in std_logic;
+    clk_p_n    : in std_logic;
     clk_c_en   : in std_logic;          -- Clock 133.3 MHz
     rst_en     : in std_logic;          -- Asynchronous master reset
     reg_wr     : in std_logic;  -- High when reg_addr is written with '1' in bit 7

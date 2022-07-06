@@ -79,6 +79,7 @@ entity top is
   port (
     -- clocks and control signals
     clk_p  : in std_logic;                    -- clk input
+    clk_p_n: in std_logic;                    -- clk input
     clk_rx : in std_logic;
     clk_tx : in std_logic;
 
@@ -971,6 +972,7 @@ begin
     port map(
       -- Clocks to/from clock block
       clk_p        => clk_p,            --: in  std_logic;  -- PLL clock
+      clk_p_n      => clk_p_n,          --: in  std_logic;  -- PLL clock
       clk_c_en     => clk_c_en,         --: in  std_logic;  -- CP clock
       even_c       => even_c,
       --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2
@@ -1394,6 +1396,7 @@ begin
       g_build_type => g_memory_type)
     port map(
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n,
       clk_c_en    => clk_c_en,
       clk_e_pos   => clk_e_pos,
       clk_e_neg   => clk_e_neg,

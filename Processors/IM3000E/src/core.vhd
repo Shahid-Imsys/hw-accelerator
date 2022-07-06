@@ -56,6 +56,7 @@ entity core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
+    clk_p_n     : in  std_logic;  -- PLL clock
     clk_c_en    : in  std_logic;  -- CP clock
     even_c      : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2 

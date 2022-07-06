@@ -50,6 +50,7 @@ entity peri is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;
+    clk_p_n     : in  std_logic;
     clk_c_en    : in  std_logic;
     clk_e_pos   : in  std_logic;        -- Execution clock
     clk_e_neg   : in  std_logic;        -- Execution clock
@@ -325,6 +326,7 @@ begin  -- struct
   timer : entity work.tiu
     port map(
       clk_p      => clk_p,
+      clk_p_n    => clk_p_n,
       clk_c_en   => clk_c_en,
       rst_en     => rst_en,
       reg_wr     => reg_wr,

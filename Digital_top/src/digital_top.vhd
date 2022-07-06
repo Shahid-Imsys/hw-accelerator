@@ -317,9 +317,10 @@ architecture rtl of digital_top is
 
   constant asic_c : memory_type_t := asic;
 
-  signal clk_p_cpu : std_logic;
-  signal clk_rx    : std_logic;
-  signal clk_tx    : std_logic;
+  signal clk_p_cpu   : std_logic;
+  signal clk_p_cpu_n : std_logic;
+  signal clk_rx      : std_logic;
+  signal clk_tx      : std_logic;
 
   signal sclk   : std_logic;
   signal sclk_n : std_logic;
@@ -355,6 +356,7 @@ begin  -- architecture rtl
       spi_rst_n => spi_rst_n,
 
       clk_p  => clk_p_cpu,
+      clk_p_n => clk_p_cpu_n,
       clk_rx => clk_rx,
       clk_tx => clk_tx,
       sclk   => sclk,
@@ -380,6 +382,7 @@ begin  -- architecture rtl
       )
     port map (
       clk_p_cpu => clk_p_cpu,
+      clk_p_cpu_n => clk_p_cpu_n,
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
 

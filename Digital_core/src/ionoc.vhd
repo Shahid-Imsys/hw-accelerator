@@ -79,14 +79,6 @@ entity ionoc is
     RxFIFO_Ready  : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
     RxFIFO_Valid  : out std_logic;                      -- Interface has availble data which is presented on bus
     RxFIFO_Data   : out std_logic_vector(127 downto 0); -- RxFIFO data
-    -- FIFO Level signals
-    TxFIFO_READY_1 : in  std_logic;                     -- 1 word
-    TxFIFO_READY_2 : in  std_logic;                     -- 16 words
-    TxFIFO_READY_3 : in  std_logic;                     -- 24 words
-    --
-    RxFIFO_READY_1  : in  std_logic;                    -- 1 word
-    RxFIFO_READY_2  : in  std_logic;                    -- 16 words
-    RxFIFO_READY_3  : in  std_logic;                    -- 24 words
     -- NOC Data interface - for NOC request of data trx
     NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request
     NOC_LENGTH    : in  std_logic_vector(15 downto 0);  -- Length of NOC data request

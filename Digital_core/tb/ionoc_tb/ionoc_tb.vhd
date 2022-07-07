@@ -159,9 +159,6 @@ architecture tb of ionoc_tb is
   signal fsm       : fsm_t     := reset;
   signal fsm_d     : fsm_t     := reset;
   signal fsm_count : integer   := 0;
-
-  signal clk_count        : std_logic_vector(7 downto 0) := x"00";
-  signal clk_i            : std_logic                    := '0';
   --
   signal idi              : std_logic_vector (7 downto 0);
   signal ilioa            : std_logic;
@@ -222,6 +219,8 @@ architecture tb of ionoc_tb is
 
 
   -- clk_proc
+  signal clk_count        : std_logic_vector(7 downto 0) := x"00";
+  signal clk_i            : std_logic                    := '0';
   signal ido_buf : std_logic_vector(127 downto 0) := (others => '0');
 
 

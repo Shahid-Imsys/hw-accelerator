@@ -56,7 +56,8 @@ use ieee.std_logic_unsigned.all;
 entity tim is
   port(
     -- Clock
-    clk_p     : in  std_logic;          -- clock buffer to PLL 
+    clk_p     : in  std_logic;          -- clock buffer to PLL
+    clk_p_n   : in  std_logic;          -- clock buffer to PLL
     even_c    : in  std_logic;
     clk_c_en  : in  std_logic;          -- PLL clock input
     --clk_c2_pos  : out  std_logic; -- clk_c / 2 
@@ -195,20 +196,20 @@ begin
 
   reset_iso_clear <= pwr_ok and rst_cn_int;  --reset isolate will be cleared if power ok and reset is finished
 
-  process (clk_p, rst_nint_int0, reset_core_n)
+  process (clk_p_n, rst_nint_int0, reset_core_n)
   begin
     if rst_nint_int0 = '0' or reset_core_n = '0' then
       rst_nint_int1 <= '0';
       rst_nint      <= '0';
-    elsif falling_edge(clk_p) then
+    elsif rising_edge(clk_p_n) then
       rst_nint_int1 <= '1';
       rst_nint      <= rst_nint_int1;
     end if;
   end process;
 
-  process (clk_p)
+  process (clk_p_n)
   begin
-    if falling_edge(clk_p) then
+    if rising_edge(clk_p_n) then
       mtest_i_int0 <= mtest_i;
       mtest_i_int1 <= mtest_i_int0;
     end if;
@@ -253,11 +254,11 @@ begin
   rst_cn_off <= '1' when rst_cn_cnt = "111" or rst_cn_cnt1 = "11111" else '0';
   -- Generate rst_cn, releases when rst_cn_cnt has reached
   -- its final state. mrstout is the same as rst_cn.
-  rst_cn_gen : process (clk_p, rst_nint)
+  rst_cn_gen : process (clk_p_n, rst_nint)
   begin
     if rst_nint = '0' then
       rst_cn_int <= '0';
-    elsif falling_edge(clk_p) then      --change to falling edge
+    elsif rising_edge(clk_p_n) then      --change to falling edge
       if rst_cn_off = '1' then
         rst_cn_int <= '1';
       end if;
@@ -505,9 +506,9 @@ begin
     end if;
   end process;
 
-  process (clk_p)
+  process (clk_p_n)
   begin
-    if falling_edge(clk_p) then
+    if rising_edge(clk_p_n) then
       if en_mckout1 = '0' then
         ff2x <= '0';
       elsif prescale1 = '0' & speed_ps1(3 downto 1) then

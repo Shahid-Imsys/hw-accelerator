@@ -683,6 +683,7 @@ begin
     port map (
       -- Clock
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n, 
       even_c      => even_c,
       clk_c_en       => clk_c_en,            
       --clk_c2_pos      => clk_c2_pos,            

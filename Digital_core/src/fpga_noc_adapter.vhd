@@ -120,32 +120,35 @@ architecture rtl of fpga_noc_adapter is
       --------------------------------------------------
 
 
-      -- Domain clk_noc
-      -------------------------------------------------------
-      clk_noc       : in  std_logic;                       -- NOC Clock
+      -- Domain clk_noc (NOC)
+      ------------------------------------------------------
+      clk_noc       : in  std_logic;                      -- NOC Clock
       -- GPP CMD to NOC
-      GPP_CMD       : out std_logic_vector(127 downto 0);  -- Command word
-      GPP_CMD_Flag  : out std_logic;                       -- Command word valid
-      NOC_CMD_ACK   : in  std_logic;                       -- NOC ready
+      GPP_CMD       : out std_logic_vector(127 downto 0); -- Command word
+      GPP_CMD_Flag  : out std_logic;                      -- Command word valid
+      NOC_CMD_ACK   : in  std_logic;                      -- NOC ready
       -- NOC CMD to GPP
-      NOC_CMD_Flag  : in  std_logic;                       -- NOC command byte is valid
-      NOC_CMD       : in  std_logic_vector(7 downto 0);    -- Command byte
-      GPP_CMD_ACK   : out std_logic;                       -- GPP ack of command byte
-      -- NOC TxFIFO, read by IONOC
-      TxFIFO_Ready  : out std_logic;                       -- Interface can accept a word from the TxIFO
-      TxFIFO_Valid  : in  std_logic;                       -- TxFIFO has availble data which is presented on bus
-      TxFIFO_Data   : in  std_logic_vector(127 downto 0);  -- TxFIFO data
-      -- NOC RxFIFO, written to by IONOC
-      RxFIFO_Ready  : in  std_logic;                       -- RxFIFO can accept a word from the IO-bus
-      RxFIFO_Valid  : out std_logic;                       -- Interface has availble data which is presented on bus
-      RxFIFO_Data   : out std_logic_vector(127 downto 0);  -- RxFIFO data
+      NOC_CMD_Flag  : in  std_logic;                      -- NOC command byte is valid
+      NOC_CMD       : in  std_logic_vector(7 downto 0);   -- Command byte
+      GPP_CMD_ACK   : out std_logic;                      -- GPP ack of command byte
       -- NOC Data interface - for NOC request of data trx
-      NOC_ADDRESS   : in  std_logic_vector(31 downto 0);   -- Memory address of NOC data request
-      NOC_LENGTH    : in  std_logic_vector(15 downto 0);   -- Length of NOC data request
-      NOC_DATA_DIR  : in  std_logic;                       -- Direction of NOC data request
-      NOC_WRITE_REQ : in  std_logic;                       -- NOC address, length and data direction is valid
-      IO_WRITE_ACK  : out std_logic                        -- NOC data parameters have been read and can now be updated
-     --------------------------------------------------------
+      NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request
+      NOC_LENGTH    : in  std_logic_vector(15 downto 0);  -- Length of NOC data request
+      NOC_DATA_DIR  : in  std_logic;                      -- Direction of NOC data request
+      NOC_WRITE_REQ : in  std_logic;                      -- NOC address, length and data direction is valid
+      IO_WRITE_ACK  : out std_logic;                      -- NOC data parameters have been read and can now be updated
+
+      -- Domain clk_noc (FIFOS)
+      ------------------------------------------------------
+      -- NOC TxFIFO, read by IONOC
+      TxFIFO_Ready  : out std_logic;                      -- Interface can accept a word from the TxIFO
+      TxFIFO_Valid  : in  std_logic;                      -- TxFIFO has availble data which is presented on bus
+      TxFIFO_Data   : in  std_logic_vector(127 downto 0); -- TxFIFO data
+      -- NOC RxFIFO, written to by IONOC
+      RxFIFO_Ready  : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
+      RxFIFO_Valid  : out std_logic;                      -- Interface has availble data which is presented on bus
+      RxFIFO_Data   : out std_logic_vector(127 downto 0)  -- RxFIFO data
+      ------------------------------------------------------
       );
   end component;
 

@@ -63,8 +63,11 @@ architecture tb of uart_tb is
   
 
   
-  signal start_bit     : time := 27.2 ns * 1.5;
-  signal bit_length    : time := 27.2 ns;
+  -- signal start_bit     : time := 27.2 ns * 1.5;
+  -- signal bit_length    : time := 27.2 ns;
+  
+  signal bit_length    : time := 27.2 ns * 2;
+  signal start_bit     : time := bit_length * 1.5;
   signal new_byte      : std_ulogic;
   signal received_byte : integer;
   signal tx_data       : integer;

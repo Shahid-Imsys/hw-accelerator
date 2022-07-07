@@ -36,9 +36,10 @@ entity digital_core is
     g_clock_frequency : integer);
 
   port (
-    clk_p_cpu : in std_logic;           -- clk input
-    clk_rx    : in std_logic;
-    clk_tx    : in std_logic;
+    clk_p_cpu   : in std_logic;           -- clk input
+    clk_p_cpu_n : in std_logic;           -- clk input
+    clk_rx      : in std_logic;
+    clk_tx      : in std_logic;
 
     cpu_rst_n : in std_logic;
 
@@ -159,6 +160,7 @@ begin  -- architecture rtl
       )
     port map (
       clk_p     => clk_p_cpu,
+      clk_p_n   => clk_p_cpu_n,
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
       MRESET    => MRESET,

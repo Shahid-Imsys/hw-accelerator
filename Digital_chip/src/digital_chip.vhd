@@ -39,9 +39,10 @@ entity digital_chip is
     -- PLL reference clock
     pll_ref_clk : inout  std_logic;
     -- reset pins
-    preset_n    : inout  std_logic;  -- Power on reset
-    mreset_n    : inout  std_logic;  -- Functional reset
-    mrstout_n   : inout  std_logic;  -- reset output for external components
+    spi_rst_n   : inout std_logic;  -- reset for spi-block.
+    preset_n    : inout std_logic;  -- Power on reset
+    mreset_n    : inout std_logic;  -- Functional reset
+    mrstout_n   : inout std_logic;  -- reset output for external components
 
     -- Ethernet Interface
     enet_mdio : inout std_logic;
@@ -230,6 +231,7 @@ architecture rtl of digital_chip is
 
   signal pll_ref_clk_in : std_logic;
 
+  signal pre_spi_rst_n : std_logic;
   signal mreset : std_logic;
   signal mrstout : std_logic;
 
@@ -363,6 +365,7 @@ begin  -- architecture rtl
         pll_ref_clk    => pll_ref_clk_in,
         HCLK    => dco_clk(0),
         pll_locked => pll_locked,
+        pre_spi_rst_n => pre_spi_rst_n,
         MRESET  => mreset,
         MRSTOUT => mrstout_n,  -- Missing pad.
         MIRQOUT => mirqout_out,
@@ -1153,6 +1156,20 @@ begin  -- architecture rtl
         pd  => '0',
         pu  => '0',
         di  => pwr_ok
+        );
+
+    i_spi_reset_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => spi_rst_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pre_spi_rst_n
         );
 
     i_mreset_n_pad : entity work.input_pad

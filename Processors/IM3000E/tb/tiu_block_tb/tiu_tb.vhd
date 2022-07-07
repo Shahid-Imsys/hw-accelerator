@@ -13,7 +13,8 @@ architecture rtl of tiu_tb is
     port (
 
       -- Interface to host  
-      clk_p    : in std_logic;
+      clk_p    : in std_logic; 
+      clk_p_n    : in std_logic;
       clk_c_en : in std_logic;                    -- Clock 133.3 MHz
       rst_en   : in std_logic;                    -- Asynchronous master reset
       reg_wr   : in std_logic;                    -- High when reg_addr is written with '1' in bit 7
@@ -73,6 +74,7 @@ architecture rtl of tiu_tb is
   constant timer7_pls : time := (timer7_msa + 1) * (2 ** (timer7_exp + 1)) * clk_period;
 
   signal clk_p      : std_logic                    := '0';
+  signal clk_p_n    : std_logic                    := '1';
   signal clk_c_en   : std_logic                    := '1';
   signal rst_en     : std_logic                    := '0';
   signal reg_wr     : std_logic                    := '0';
@@ -111,12 +113,14 @@ architecture rtl of tiu_tb is
 begin
 
   clk_p        <= not clk_p after 6 ns;
+  clk_p_n      <= not clk_p;
   reg_addr_chk <= reg_addr(5 downto 3);
 
   i_tiu : tiu
   port map
   (
     clk_p      => clk_p,
+    clk_p_n    => clk_p_n,
     clk_c_en   => clk_c_en,
     rst_en     => rst_en,
     reg_wr     => reg_wr,

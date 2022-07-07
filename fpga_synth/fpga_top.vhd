@@ -112,6 +112,7 @@ architecture rtl of fpga_top is
       hclk        : in  std_logic;      -- clk input
       pll_ref_clk : in  std_logic;
       pll_locked  : in  std_logic;
+      pre_spi_rst_n : in std_logic;
       MRESET      : in  std_logic;      -- system reset, active low
       MRSTOUT     : out std_logic;
       MIRQOUT     : out std_logic;      -- interrupt request output
@@ -450,6 +451,7 @@ begin
       hclk        => HCLK,
       pll_ref_clk => HCLK,
       pll_locked  => '1',
+      pre_spi_rst_n => '1',
       MRESET      => MRESET,
       MRSTOUT     => MRSTOUT,
       MIRQOUT     => MIRQOUT,

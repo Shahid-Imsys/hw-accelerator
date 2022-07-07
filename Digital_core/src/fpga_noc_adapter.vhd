@@ -34,7 +34,7 @@ use ieee.numeric_std.all;
 
 entity fpga_noc_adapter is
   generic (
-    ionoc_fifo_depth_bits : integer                      := 4;  -- Each FIFO is 2^x-1 = 15 words deep
+    ionoc_fifo_depth_bits : integer                      := 4;  -- Each FIFO is 2^x = 16 words deep
     ionoc_status_address  : std_logic_vector(7 downto 0) := x"45";
     ionoc_cmd_address     : std_logic_vector(7 downto 0) := x"46";
     ionoc_data_address    : std_logic_vector(7 downto 0) := x"47";
@@ -76,8 +76,8 @@ entity fpga_noc_adapter is
 
     ------ DATA interface -------
     NOC_DATA_EN  : in  std_logic;                       -- Enable traffic to (IO_DATA) or from (NOC_DATA) the NOC, dep on NOC_DATA_DIR
-    NOC_DATA     : in  std_logic_vector(127 downto 0);  -- Data to the TxFIFO
     NOC_DATA_DIR : in  std_logic;                       -- Direction of NOC data transfer to/from FIFOs
+    NOC_DATA     : in  std_logic_vector(127 downto 0);  -- Data to the TxFIFO
     IO_DATA      : out std_logic_vector(127 downto 0);  -- Data from the RxFIFO
     FIFO_READY   : out std_logic_vector(5 downto 0);    -- FIFO level, filled or remaining dep on NO_DATA_DIR
 
@@ -174,6 +174,10 @@ architecture rtl of fpga_noc_adapter is
   constant NOC_IO_DIR_RX : std_logic := '0'; -- Data is written to RxFIFO
   constant NOC_IO_DIR_TX : std_logic := '1'; -- Data is read from TxFIFO
 
+  -- Level constants
+  constant TxFIFO_FULL : std_logic_vector(ionoc_fifo_depth_bits downto 0) :=
+    "10000"; -- (ionoc_fifo_depth_bits => '1', others => '0');
+
   -- NOC TxFIFO, read by IONOC
   signal TxFIFO_Ready : std_logic;
   signal TxFIFO_Valid : std_logic;
@@ -202,11 +206,11 @@ begin
 
   -- Tx FIFO ( NOC --> FIFO --> GPP )
   NOC_DATA_Valid <= NOC_DATA_EN when NOC_DATA_DIR = NOC_DATA_DIR_TX else '0';
-  NOC_DATA_Ready <= '0' when TxFIFO_Level == 2 ** ionoc_fifo_depth_bits else '1';
+  NOC_DATA_Ready <= '0' when TxFIFO_Level = TxFIFO_FULL else '1';
 
   tx_fifo_inst : sync_fifo
     port map(
-      areset_n  => reset_n,
+      areset_n  => rst_n,
       clk       => clk_noc,
       in_ready  => NOC_DATA_Ready,
       in_valid  => NOC_DATA_Valid,
@@ -222,7 +226,7 @@ begin
 
   rx_fifo_inst : sync_fifo
     port map(
-      areset_n  => reset_n,
+      areset_n  => rst_n,
       clk       => clk_noc,
       in_ready  => RxFIFO_Ready,
       in_valid  => RxFIFO_Valid,
@@ -244,8 +248,8 @@ begin
       ionoc_datadir_address => ionoc_datadir_address)
     port map (
       clk_p         => clk_p,
-      clk_i_pos     => clk_i,
-      rst_n         => reset_n,
+      clk_i_pos     => clk_i_pos,
+      rst_n         => rst_n,
       idi           => idi,
       ido           => ido,
       iden          => iden,

@@ -449,7 +449,7 @@ begin
   dfy_dest_sel   <= PL (118 downto 116); --DEST_BYTE
   re_start       <= PL(100);
   ve_start       <= PL(95); --VE_ST
-  acc_latch      <= PL(94); --ACCTOREG --To be removed
+  --acc_latch      <= PL(94); --ACCTOREG --To be removed
   re_source      <= PL(96); --RE_DFY_SRC --
   reg_in         <= PL(105 downto 101);
   mode_a         <= PL(98);

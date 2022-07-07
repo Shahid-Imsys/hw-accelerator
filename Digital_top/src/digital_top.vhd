@@ -41,6 +41,7 @@ entity digital_top is
     hclk        : in  std_logic;        -- clk input
     pll_ref_clk : in  std_logic;
     pll_locked  : in  std_logic;
+    pre_spi_rst_n   : in  std_logic;  
     MRESET      : in  std_logic;        -- system reset, active low
     MRSTOUT     : out std_logic;
     MIRQOUT     : out std_logic;        -- interrupt request output
@@ -163,7 +164,6 @@ architecture rtl of digital_top is
   component test_spi_interface is
     port (
       rst_n       : in  std_ulogic;
-      spi_rst_n_i : in  std_ulogic;
       sclk_int    : in  std_ulogic;
       sclk_n      : in  std_ulogic;
       cs_n        : in  std_ulogic;
@@ -317,13 +317,15 @@ architecture rtl of digital_top is
 
   constant asic_c : memory_type_t := asic;
 
-  signal clk_p_cpu : std_logic;
-  signal clk_rx    : std_logic;
-  signal clk_tx    : std_logic;
+  signal clk_p_cpu   : std_logic;
+  signal clk_p_cpu_n : std_logic;
+  signal clk_rx      : std_logic;
+  signal clk_tx      : std_logic;
 
   signal sclk   : std_logic;
   signal sclk_n : std_logic;
 
+  signal spi_rst_n    : std_logic;
   signal cpu_rst_n    : std_logic;
   signal clock_in_off : std_logic;
   signal clock_sel    : std_logic; 
@@ -345,13 +347,16 @@ begin  -- architecture rtl
       pll_ref_clk => pll_ref_clk,
       spi_sclk    => spi_sclk,
 
+      pre_spi_rst_n => pre_spi_rst_n,
       mreset_n => mreset,
       pwr_ok   => pwr_ok,
       c1_wdog_n => c1_wdog_n,
 
       rst_n => cpu_rst_n,
+      spi_rst_n => spi_rst_n,
 
       clk_p  => clk_p_cpu,
+      clk_p_n => clk_p_cpu_n,
       clk_rx => clk_rx,
       clk_tx => clk_tx,
       sclk   => sclk,
@@ -377,6 +382,7 @@ begin  -- architecture rtl
       )
     port map (
       clk_p_cpu => clk_p_cpu,
+      clk_p_cpu_n => clk_p_cpu_n,
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
 
@@ -476,8 +482,7 @@ begin  -- architecture rtl
   i_test_spi_interface : test_spi_interface
     port map
     (
-      rst_n       => pwr_ok,
-      spi_rst_n_i => pwr_ok,
+      rst_n       => spi_rst_n,
       sclk_int    => sclk,
       sclk_n      => sclk_n,
       cs_n        => spi_cs_n,

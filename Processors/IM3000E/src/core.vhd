@@ -56,6 +56,7 @@ entity core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
+    clk_p_n     : in  std_logic;  -- PLL clock
     clk_c_en    : in  std_logic;  -- CP clock
     even_c      : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2 
@@ -682,6 +683,7 @@ begin
     port map (
       -- Clock
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n, 
       even_c      => even_c,
       clk_c_en       => clk_c_en,            
       --clk_c2_pos      => clk_c2_pos,            

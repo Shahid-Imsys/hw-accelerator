@@ -56,6 +56,7 @@ architecture tb of register_test_tb is
       emem_d7    : inout std_logic;
 
       -- SPI, chip control interface
+      spi_rst_n : inout std_logic;
       spi_sclk : inout std_logic;
       spi_cs_n : inout std_logic;
       spi_mosi : inout std_logic;
@@ -70,9 +71,9 @@ architecture tb of register_test_tb is
 
       -- IM4000 Boot interface
       pa0_sin : inout std_logic;
-      pa5_sin : inout std_logic;
-      pa6_sin : inout std_logic;
-      pa7_sin : inout std_logic;
+      pa5_cs_n : inout std_logic;
+      pa6_sck : inout std_logic;
+      pa7_sout : inout std_logic;
 
       -- I/O bus
 
@@ -172,6 +173,7 @@ architecture tb of register_test_tb is
   constant osc_period    : time := 1 us / osc_frequency;
   signal osc_clk         : std_ulogic := '0';
 
+  signal spi_rst_n       : std_ulogic := '0';
   signal sclk            : std_logic := '0';
   signal rst_n           : std_logic := '0';
   signal cs_n            : std_logic := '1';
@@ -225,6 +227,7 @@ begin  -- tb
     emem_d7    => emem_d7,
 
     -- SPI, chip control interface
+    spi_rst_n => spi_rst_n,
     spi_sclk => sclk,
     spi_cs_n => cs_n,
     spi_mosi => mosi,
@@ -239,9 +242,9 @@ begin  -- tb
 
     -- IM4000 Boot interface
     pa0_sin => pa0_sin,
-    pa5_sin => pa5_sin,
-    pa6_sin => pa6_sin,
-    pa7_sin => pa7_sin,
+    pa5_cs_n => pa5_sin,
+    pa6_sck => pa6_sin,
+    pa7_sout => pa7_sin,
 
     -- I/O bus
 
@@ -402,10 +405,12 @@ begin  -- tb
     cs_n <= '1';
     mosi <= '0';
     sclk <= '0';
-    
+
+    spi_rst_n <= '0';
     rst_n <= '0';
     wait for 100 ns;
     rst_n <= '1';
+    spi_rst_n <= '1';
 
     wait for 100 ns;
 
@@ -424,6 +429,18 @@ begin  -- tb
 
     write_register_test (x"00", all_tests_passed, all_register_list);
     write_register_test (x"FF", all_tests_passed, all_register_list);
+
+    spi_rst_n <= '0';
+    wait for 20 ns;
+    spi_rst_n <= '1';
+    
+    -- Check all reset values
+    write(l, string'("Reset value check strats"));
+    writeline(output, l);
+    for i in all_register_list'range loop
+      spi_read(all_register_list(i).address, data);
+      all_tests_passed := check_reset_values(data, all_register_list(i)) and all_tests_passed;       
+    end loop;  -- i
 
     wait for 100 ns;
 

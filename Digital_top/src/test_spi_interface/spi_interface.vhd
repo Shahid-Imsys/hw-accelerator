@@ -16,7 +16,6 @@ entity spi_interface is
     clk       : in  std_ulogic;         -- Clock from microcontroller spi
     nclk      : in  std_ulogic;         -- Invers clk
     spi_rst_n : in  std_ulogic;
-    rst_n     : in  std_ulogic;
     cs_n      : in  std_ulogic;
     mosi      : in  std_ulogic;         -- Master output Slave input
     miso      : out std_ulogic;         -- Master input Slave Output

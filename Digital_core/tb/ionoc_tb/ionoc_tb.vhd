@@ -204,9 +204,6 @@ architecture tb of ionoc_tb is
   signal NOC_DATA_EN   : std_logic                      := '0';
   signal NOC_WRITE_REQ : std_logic                      := '0';
   signal IO_WRITE_ACK  : std_logic                      := '0';
-  signal FIFO_READY_1  : std_logic                      := '0';
-  signal FIFO_READY_2  : std_logic                      := '0';
-  signal FIFO_READY_3  : std_logic                      := '0';
 
   -- noc_proc
   signal noc_cnt1       : integer   := 0;

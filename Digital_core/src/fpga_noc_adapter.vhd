@@ -79,7 +79,8 @@ entity fpga_noc_adapter is
     NOC_DATA_DIR : in  std_logic;                       -- Direction of NOC data transfer to/from FIFOs
     NOC_DATA     : in  std_logic_vector(127 downto 0);  -- Data to the TxFIFO
     IO_DATA      : out std_logic_vector(127 downto 0);  -- Data from the RxFIFO
-    FIFO_READY   : out std_logic_vector(5 downto 0);    -- FIFO level, filled or remaining dep on NO_DATA_DIR
+    --
+    FIFO_READY   : out std_logic_vector(ionoc_fifo_depth_bits downto 0); -- FIFO level, filled or remaining dep on NO_DATA_DIR
 
     ------ IO interface --------
     NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request

@@ -88,6 +88,16 @@ package register_pack_spi_test is
   constant mtest_address_c         : integer := 16#4A#;
   constant mwake_address_c         : integer := 16#4B#;
   constant mrxout_address_c        : integer := 16#4C#;
+  constant pll_1_address_c         : integer := 16#4D#;
+  constant pll_2_address_c         : integer := 16#4E#;
+  constant pll_cp_address_c        : integer := 16#4F#;
+  constant pll_ft_address_c        : integer := 16#50#;
+  constant pll_3_address_c         : integer := 16#51#;
+  constant pll_4_address_c         : integer := 16#52#;
+  constant pll_5_address_c         : integer := 16#53#;
+  constant adpll_status0_address_c : integer := 16#54#;
+  constant adpll_status1_address_c : integer := 16#55#;
+  constant adpll_status2_address_c : integer := 16#56#;
 
   -- Register and field constants
 
@@ -2847,6 +2857,254 @@ package register_pack_spi_test is
   constant mrxout_odn_reset_c : mrxout_odn_t := '0';
   constant mrxout_odn_scan_c  : mrxout_odn_t := '0';
 
+  ---------------------------------------------------------------------------
+  -- Register "pll_1"
+  constant pll_1_reset_c : register_t := std_ulogic_vector(to_unsigned(16#71#, register_t'length));
+
+  -- Field "main_div_n1"
+  constant pll_1_main_div_n1_size_c  : integer := 1;
+  constant pll_1_main_div_n1_lsb_c   : integer := 6;
+  constant pll_1_main_div_n1_msb_c   : integer := 6;
+  subtype pll_1_main_div_n1_t is std_ulogic;
+  constant pll_1_main_div_n1_reset_c : pll_1_main_div_n1_t := '1';
+  constant pll_1_main_div_n1_scan_c  : pll_1_main_div_n1_t := '1';
+
+  -- Field "main_div_n2"
+  constant pll_1_main_div_n2_size_c  : integer := 2;
+  constant pll_1_main_div_n2_lsb_c   : integer := 4;
+  constant pll_1_main_div_n2_msb_c   : integer := 5;
+  subtype pll_1_main_div_n2_t is std_ulogic_vector(pll_1_main_div_n2_size_c - 1 downto 0);
+  constant pll_1_main_div_n2_reset_c : pll_1_main_div_n2_t := std_ulogic_vector(to_unsigned(3, pll_1_main_div_n2_t'length));
+  constant pll_1_main_div_n2_scan_c  : pll_1_main_div_n2_t := std_ulogic_vector(to_unsigned(3, pll_1_main_div_n2_t'length));
+
+  -- Field "main_div_n3"
+  constant pll_1_main_div_n3_size_c  : integer := 2;
+  constant pll_1_main_div_n3_lsb_c   : integer := 2;
+  constant pll_1_main_div_n3_msb_c   : integer := 3;
+  subtype pll_1_main_div_n3_t is std_ulogic_vector(pll_1_main_div_n3_size_c - 1 downto 0);
+  constant pll_1_main_div_n3_reset_c : pll_1_main_div_n3_t := std_ulogic_vector(to_unsigned(0, pll_1_main_div_n3_t'length));
+  constant pll_1_main_div_n3_scan_c  : pll_1_main_div_n3_t := std_ulogic_vector(to_unsigned(0, pll_1_main_div_n3_t'length));
+
+  -- Field "main_div_n4"
+  constant pll_1_main_div_n4_size_c  : integer := 2;
+  constant pll_1_main_div_n4_lsb_c   : integer := 0;
+  constant pll_1_main_div_n4_msb_c   : integer := 1;
+  subtype pll_1_main_div_n4_t is std_ulogic_vector(pll_1_main_div_n4_size_c - 1 downto 0);
+  constant pll_1_main_div_n4_reset_c : pll_1_main_div_n4_t := std_ulogic_vector(to_unsigned(1, pll_1_main_div_n4_t'length));
+  constant pll_1_main_div_n4_scan_c  : pll_1_main_div_n4_t := std_ulogic_vector(to_unsigned(1, pll_1_main_div_n4_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_2"
+  constant pll_2_reset_c : register_t := std_ulogic_vector(to_unsigned(16#04#, register_t'length));
+
+  -- Field "open_loop"
+  constant pll_2_open_loop_size_c  : integer := 1;
+  constant pll_2_open_loop_lsb_c   : integer := 7;
+  constant pll_2_open_loop_msb_c   : integer := 7;
+  subtype pll_2_open_loop_t is std_ulogic;
+  constant pll_2_open_loop_reset_c : pll_2_open_loop_t := '0';
+  constant pll_2_open_loop_scan_c  : pll_2_open_loop_t := '0';
+
+  -- Field "out_div_sel"
+  constant pll_2_out_div_sel_size_c  : integer := 2;
+  constant pll_2_out_div_sel_lsb_c   : integer := 5;
+  constant pll_2_out_div_sel_msb_c   : integer := 6;
+  subtype pll_2_out_div_sel_t is std_ulogic_vector(pll_2_out_div_sel_size_c - 1 downto 0);
+  constant pll_2_out_div_sel_reset_c : pll_2_out_div_sel_t := std_ulogic_vector(to_unsigned(0, pll_2_out_div_sel_t'length));
+  constant pll_2_out_div_sel_scan_c  : pll_2_out_div_sel_t := std_ulogic_vector(to_unsigned(0, pll_2_out_div_sel_t'length));
+
+  -- Field "ci"
+  constant pll_2_ci_size_c  : integer := 5;
+  constant pll_2_ci_lsb_c   : integer := 0;
+  constant pll_2_ci_msb_c   : integer := 4;
+  subtype pll_2_ci_t is std_ulogic_vector(pll_2_ci_size_c - 1 downto 0);
+  constant pll_2_ci_reset_c : pll_2_ci_t := std_ulogic_vector(to_unsigned(4, pll_2_ci_t'length));
+  constant pll_2_ci_scan_c  : pll_2_ci_t := std_ulogic_vector(to_unsigned(4, pll_2_ci_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_cp"
+  constant pll_cp_reset_c : register_t := std_ulogic_vector(to_unsigned(16#30#, register_t'length));
+
+  -- Field "cp"
+  constant pll_cp_cp_size_c  : integer := 8;
+  constant pll_cp_cp_lsb_c   : integer := 0;
+  constant pll_cp_cp_msb_c   : integer := 7;
+  subtype pll_cp_cp_t is std_ulogic_vector(pll_cp_cp_size_c - 1 downto 0);
+  constant pll_cp_cp_reset_c : pll_cp_cp_t := std_ulogic_vector(to_unsigned(16#30#, pll_cp_cp_t'length));
+  constant pll_cp_cp_scan_c  : pll_cp_cp_t := std_ulogic_vector(to_unsigned(16#30#, pll_cp_cp_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_ft"
+  constant pll_ft_reset_c : register_t := std_ulogic_vector(to_unsigned(16#80#, register_t'length));
+
+  -- Field "ft"
+  constant pll_ft_ft_size_c  : integer := 8;
+  constant pll_ft_ft_lsb_c   : integer := 0;
+  constant pll_ft_ft_msb_c   : integer := 7;
+  subtype pll_ft_ft_t is std_ulogic_vector(pll_ft_ft_size_c - 1 downto 0);
+  constant pll_ft_ft_reset_c : pll_ft_ft_t := std_ulogic_vector(to_unsigned(16#80#, pll_ft_ft_t'length));
+  constant pll_ft_ft_scan_c  : pll_ft_ft_t := std_ulogic_vector(to_unsigned(16#80#, pll_ft_ft_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_3"
+  constant pll_3_reset_c : register_t := std_ulogic_vector(to_unsigned(16#08#, register_t'length));
+
+  -- Field "divcore_sel"
+  constant pll_3_divcore_sel_size_c  : integer := 2;
+  constant pll_3_divcore_sel_lsb_c   : integer := 6;
+  constant pll_3_divcore_sel_msb_c   : integer := 7;
+  subtype pll_3_divcore_sel_t is std_ulogic_vector(pll_3_divcore_sel_size_c - 1 downto 0);
+  constant pll_3_divcore_sel_reset_c : pll_3_divcore_sel_t := std_ulogic_vector(to_unsigned(0, pll_3_divcore_sel_t'length));
+  constant pll_3_divcore_sel_scan_c  : pll_3_divcore_sel_t := std_ulogic_vector(to_unsigned(0, pll_3_divcore_sel_t'length));
+
+  -- Field "coarse"
+  constant pll_3_coarse_size_c  : integer := 6;
+  constant pll_3_coarse_lsb_c   : integer := 0;
+  constant pll_3_coarse_msb_c   : integer := 5;
+  subtype pll_3_coarse_t is std_ulogic_vector(pll_3_coarse_size_c - 1 downto 0);
+  constant pll_3_coarse_reset_c : pll_3_coarse_t := std_ulogic_vector(to_unsigned(8, pll_3_coarse_t'length));
+  constant pll_3_coarse_scan_c  : pll_3_coarse_t := std_ulogic_vector(to_unsigned(8, pll_3_coarse_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_4"
+  constant pll_4_reset_c : register_t := std_ulogic_vector(to_unsigned(16#85#, register_t'length));
+
+  -- Field "auto_coarsetune"
+  constant pll_4_auto_coarsetune_size_c  : integer := 1;
+  constant pll_4_auto_coarsetune_lsb_c   : integer := 7;
+  constant pll_4_auto_coarsetune_msb_c   : integer := 7;
+  subtype pll_4_auto_coarsetune_t is std_ulogic;
+  constant pll_4_auto_coarsetune_reset_c : pll_4_auto_coarsetune_t := '1';
+  constant pll_4_auto_coarsetune_scan_c  : pll_4_auto_coarsetune_t := '1';
+
+  -- Field "enforce_lock"
+  constant pll_4_enforce_lock_size_c  : integer := 1;
+  constant pll_4_enforce_lock_lsb_c   : integer := 6;
+  constant pll_4_enforce_lock_msb_c   : integer := 6;
+  subtype pll_4_enforce_lock_t is std_ulogic;
+  constant pll_4_enforce_lock_reset_c : pll_4_enforce_lock_t := '0';
+  constant pll_4_enforce_lock_scan_c  : pll_4_enforce_lock_t := '0';
+
+  -- Field "pfd_select"
+  constant pll_4_pfd_select_size_c  : integer := 1;
+  constant pll_4_pfd_select_lsb_c   : integer := 5;
+  constant pll_4_pfd_select_msb_c   : integer := 5;
+  subtype pll_4_pfd_select_t is std_ulogic;
+  constant pll_4_pfd_select_reset_c : pll_4_pfd_select_t := '0';
+  constant pll_4_pfd_select_scan_c  : pll_4_pfd_select_t := '0';
+
+  -- Field "lock_window_sel"
+  constant pll_4_lock_window_sel_size_c  : integer := 1;
+  constant pll_4_lock_window_sel_lsb_c   : integer := 4;
+  constant pll_4_lock_window_sel_msb_c   : integer := 4;
+  subtype pll_4_lock_window_sel_t is std_ulogic;
+  constant pll_4_lock_window_sel_reset_c : pll_4_lock_window_sel_t := '0';
+  constant pll_4_lock_window_sel_scan_c  : pll_4_lock_window_sel_t := '0';
+
+  -- Field "div_core_mux_sel"
+  constant pll_4_div_core_mux_sel_size_c  : integer := 1;
+  constant pll_4_div_core_mux_sel_lsb_c   : integer := 3;
+  constant pll_4_div_core_mux_sel_msb_c   : integer := 3;
+  subtype pll_4_div_core_mux_sel_t is std_ulogic;
+  constant pll_4_div_core_mux_sel_reset_c : pll_4_div_core_mux_sel_t := '0';
+  constant pll_4_div_core_mux_sel_scan_c  : pll_4_div_core_mux_sel_t := '0';
+
+  -- Field "filter_shift"
+  constant pll_4_filter_shift_size_c  : integer := 2;
+  constant pll_4_filter_shift_lsb_c   : integer := 1;
+  constant pll_4_filter_shift_msb_c   : integer := 2;
+  subtype pll_4_filter_shift_t is std_ulogic_vector(pll_4_filter_shift_size_c - 1 downto 0);
+  constant pll_4_filter_shift_reset_c : pll_4_filter_shift_t := std_ulogic_vector(to_unsigned(2, pll_4_filter_shift_t'length));
+  constant pll_4_filter_shift_scan_c  : pll_4_filter_shift_t := std_ulogic_vector(to_unsigned(2, pll_4_filter_shift_t'length));
+
+  -- Field "en_fast_lock"
+  constant pll_4_en_fast_lock_size_c  : integer := 1;
+  constant pll_4_en_fast_lock_lsb_c   : integer := 0;
+  constant pll_4_en_fast_lock_msb_c   : integer := 0;
+  subtype pll_4_en_fast_lock_t is std_ulogic;
+  constant pll_4_en_fast_lock_reset_c : pll_4_en_fast_lock_t := '1';
+  constant pll_4_en_fast_lock_scan_c  : pll_4_en_fast_lock_t := '1';
+
+  ---------------------------------------------------------------------------
+  -- Register "pll_5"
+  constant pll_5_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "sar_limit"
+  constant pll_5_sar_limit_size_c  : integer := 3;
+  constant pll_5_sar_limit_lsb_c   : integer := 4;
+  constant pll_5_sar_limit_msb_c   : integer := 6;
+  subtype pll_5_sar_limit_t is std_ulogic_vector(pll_5_sar_limit_size_c - 1 downto 0);
+  constant pll_5_sar_limit_reset_c : pll_5_sar_limit_t := std_ulogic_vector(to_unsigned(0, pll_5_sar_limit_t'length));
+  constant pll_5_sar_limit_scan_c  : pll_5_sar_limit_t := std_ulogic_vector(to_unsigned(0, pll_5_sar_limit_t'length));
+
+  -- Field "set_op_lock"
+  constant pll_5_set_op_lock_size_c  : integer := 1;
+  constant pll_5_set_op_lock_lsb_c   : integer := 3;
+  constant pll_5_set_op_lock_msb_c   : integer := 3;
+  subtype pll_5_set_op_lock_t is std_ulogic;
+  constant pll_5_set_op_lock_reset_c : pll_5_set_op_lock_t := '0';
+  constant pll_5_set_op_lock_scan_c  : pll_5_set_op_lock_t := '0';
+
+  -- Field "disable_lock"
+  constant pll_5_disable_lock_size_c  : integer := 1;
+  constant pll_5_disable_lock_lsb_c   : integer := 2;
+  constant pll_5_disable_lock_msb_c   : integer := 2;
+  subtype pll_5_disable_lock_t is std_ulogic;
+  constant pll_5_disable_lock_reset_c : pll_5_disable_lock_t := '0';
+  constant pll_5_disable_lock_scan_c  : pll_5_disable_lock_t := '0';
+
+  -- Field "ref_bypass"
+  constant pll_5_ref_bypass_size_c  : integer := 1;
+  constant pll_5_ref_bypass_lsb_c   : integer := 1;
+  constant pll_5_ref_bypass_msb_c   : integer := 1;
+  subtype pll_5_ref_bypass_t is std_ulogic;
+  constant pll_5_ref_bypass_reset_c : pll_5_ref_bypass_t := '0';
+  constant pll_5_ref_bypass_scan_c  : pll_5_ref_bypass_t := '0';
+
+  -- Field "ct_compensation"
+  constant pll_5_ct_compensation_size_c  : integer := 1;
+  constant pll_5_ct_compensation_lsb_c   : integer := 0;
+  constant pll_5_ct_compensation_msb_c   : integer := 0;
+  subtype pll_5_ct_compensation_t is std_ulogic;
+  constant pll_5_ct_compensation_reset_c : pll_5_ct_compensation_t := '0';
+  constant pll_5_ct_compensation_scan_c  : pll_5_ct_compensation_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "adpll_status0"
+  constant adpll_status0_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "adpll_status_0"
+  constant adpll_status0_adpll_status_0_size_c  : integer := 8;
+  constant adpll_status0_adpll_status_0_lsb_c   : integer := 0;
+  constant adpll_status0_adpll_status_0_msb_c   : integer := 7;
+  subtype adpll_status0_adpll_status_0_t is std_ulogic_vector(adpll_status0_adpll_status_0_size_c - 1 downto 0);
+  constant adpll_status0_adpll_status_0_reset_c : adpll_status0_adpll_status_0_t := std_ulogic_vector(to_unsigned(0, adpll_status0_adpll_status_0_t'length));
+  constant adpll_status0_adpll_status_0_scan_c  : adpll_status0_adpll_status_0_t := std_ulogic_vector(to_unsigned(0, adpll_status0_adpll_status_0_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "adpll_status1"
+  constant adpll_status1_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "adpll_status_1"
+  constant adpll_status1_adpll_status_1_size_c  : integer := 8;
+  constant adpll_status1_adpll_status_1_lsb_c   : integer := 0;
+  constant adpll_status1_adpll_status_1_msb_c   : integer := 7;
+  subtype adpll_status1_adpll_status_1_t is std_ulogic_vector(adpll_status1_adpll_status_1_size_c - 1 downto 0);
+  constant adpll_status1_adpll_status_1_reset_c : adpll_status1_adpll_status_1_t := std_ulogic_vector(to_unsigned(0, adpll_status1_adpll_status_1_t'length));
+  constant adpll_status1_adpll_status_1_scan_c  : adpll_status1_adpll_status_1_t := std_ulogic_vector(to_unsigned(0, adpll_status1_adpll_status_1_t'length));
+
+  ---------------------------------------------------------------------------
+  -- Register "adpll_status2"
+  constant adpll_status2_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "adpll_status_2"
+  constant adpll_status2_adpll_status_2_size_c  : integer := 5;
+  constant adpll_status2_adpll_status_2_lsb_c   : integer := 0;
+  constant adpll_status2_adpll_status_2_msb_c   : integer := 4;
+  subtype adpll_status2_adpll_status_2_t is std_ulogic_vector(adpll_status2_adpll_status_2_size_c - 1 downto 0);
+  constant adpll_status2_adpll_status_2_reset_c : adpll_status2_adpll_status_2_t := std_ulogic_vector(to_unsigned(0, adpll_status2_adpll_status_2_t'length));
+  constant adpll_status2_adpll_status_2_scan_c  : adpll_status2_adpll_status_2_t := std_ulogic_vector(to_unsigned(0, adpll_status2_adpll_status_2_t'length));
+
   component register_block_spi_test
 
     port (
@@ -3160,6 +3418,32 @@ package register_pack_spi_test is
           mrxout_co : out mrxout_co_t;
           mrxout_odp : out mrxout_odp_t;
           mrxout_odn : out mrxout_odn_t;
+          pll_1_main_div_n1 : out pll_1_main_div_n1_t;
+          pll_1_main_div_n2 : out pll_1_main_div_n2_t;
+          pll_1_main_div_n3 : out pll_1_main_div_n3_t;
+          pll_1_main_div_n4 : out pll_1_main_div_n4_t;
+          pll_2_open_loop : out pll_2_open_loop_t;
+          pll_2_out_div_sel : out pll_2_out_div_sel_t;
+          pll_2_ci : out pll_2_ci_t;
+          pll_cp_cp : out pll_cp_cp_t;
+          pll_ft_ft : out pll_ft_ft_t;
+          pll_3_divcore_sel : out pll_3_divcore_sel_t;
+          pll_3_coarse : out pll_3_coarse_t;
+          pll_4_auto_coarsetune : out pll_4_auto_coarsetune_t;
+          pll_4_enforce_lock : out pll_4_enforce_lock_t;
+          pll_4_pfd_select : out pll_4_pfd_select_t;
+          pll_4_lock_window_sel : out pll_4_lock_window_sel_t;
+          pll_4_div_core_mux_sel : out pll_4_div_core_mux_sel_t;
+          pll_4_filter_shift : out pll_4_filter_shift_t;
+          pll_4_en_fast_lock : out pll_4_en_fast_lock_t;
+          pll_5_sar_limit : out pll_5_sar_limit_t;
+          pll_5_set_op_lock : out pll_5_set_op_lock_t;
+          pll_5_disable_lock : out pll_5_disable_lock_t;
+          pll_5_ref_bypass : out pll_5_ref_bypass_t;
+          pll_5_ct_compensation : out pll_5_ct_compensation_t;
+          adpll_status0_adpll_status_0 : in  adpll_status0_adpll_status_0_t;
+          adpll_status1_adpll_status_1 : in  adpll_status1_adpll_status_1_t;
+          adpll_status2_adpll_status_2 : in  adpll_status2_adpll_status_2_t;
 
 
           -- SPI Interface

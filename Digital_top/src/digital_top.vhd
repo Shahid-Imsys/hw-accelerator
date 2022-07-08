@@ -154,7 +154,9 @@ entity digital_top is
     spi_mosi      : in  std_logic;
     spi_miso      : out std_logic;
     spi_miso_oe_n : out std_logic;
-    pad_config    : out pad_config_record_t
+    pad_config    : out pad_config_record_t;
+    pll_config    : out pll_registers_record_t;
+    adpll_config  : in adpll_registers_record_t
     );
 
 end entity digital_top;
@@ -163,14 +165,16 @@ architecture rtl of digital_top is
 
   component test_spi_interface is
     port (
-      rst_n       : in  std_ulogic;
-      sclk_int    : in  std_ulogic;
-      sclk_n      : in  std_ulogic;
-      cs_n        : in  std_ulogic;
-      mosi        : in  std_ulogic;
-      miso        : out std_ulogic;
-      miso_oe_n   : out std_ulogic;
-      pad_config  : out pad_config_record_t
+      rst_n        : in  std_ulogic;
+      sclk_int     : in  std_ulogic;
+      sclk_n       : in  std_ulogic;
+      cs_n         : in  std_ulogic;
+      mosi         : in  std_ulogic;
+      miso         : out std_ulogic;
+      miso_oe_n    : out std_ulogic;
+      pad_config   : out pad_config_record_t;
+      pll_config   : out pll_registers_record_t;
+      adpll_config : in adpll_registers_record_t
       );
   end component;
 
@@ -482,14 +486,16 @@ begin  -- architecture rtl
   i_test_spi_interface : test_spi_interface
     port map
     (
-      rst_n       => spi_rst_n,
-      sclk_int    => sclk,
-      sclk_n      => sclk_n,
-      cs_n        => spi_cs_n,
-      mosi        => spi_mosi,
-      miso        => spi_miso,
-      miso_oe_n   => spi_miso_oe_n,
-      pad_config  => pad_config
+      rst_n        => spi_rst_n,
+      sclk_int     => sclk,
+      sclk_n       => sclk_n,
+      cs_n         => spi_cs_n,
+      mosi         => spi_mosi,
+      miso         => spi_miso,
+      miso_oe_n    => spi_miso_oe_n,
+      pad_config   => pad_config,
+      pll_config   => pll_config,
+      adpll_config => adpll_config
       );
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!

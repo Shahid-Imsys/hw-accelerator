@@ -317,6 +317,32 @@ entity register_block_spi_test is
           mrxout_co : out mrxout_co_t;
           mrxout_odp : out mrxout_odp_t;
           mrxout_odn : out mrxout_odn_t;
+          pll_1_main_div_n1 : out pll_1_main_div_n1_t;
+          pll_1_main_div_n2 : out pll_1_main_div_n2_t;
+          pll_1_main_div_n3 : out pll_1_main_div_n3_t;
+          pll_1_main_div_n4 : out pll_1_main_div_n4_t;
+          pll_2_open_loop : out pll_2_open_loop_t;
+          pll_2_out_div_sel : out pll_2_out_div_sel_t;
+          pll_2_ci : out pll_2_ci_t;
+          pll_cp_cp : out pll_cp_cp_t;
+          pll_ft_ft : out pll_ft_ft_t;
+          pll_3_divcore_sel : out pll_3_divcore_sel_t;
+          pll_3_coarse : out pll_3_coarse_t;
+          pll_4_auto_coarsetune : out pll_4_auto_coarsetune_t;
+          pll_4_enforce_lock : out pll_4_enforce_lock_t;
+          pll_4_pfd_select : out pll_4_pfd_select_t;
+          pll_4_lock_window_sel : out pll_4_lock_window_sel_t;
+          pll_4_div_core_mux_sel : out pll_4_div_core_mux_sel_t;
+          pll_4_filter_shift : out pll_4_filter_shift_t;
+          pll_4_en_fast_lock : out pll_4_en_fast_lock_t;
+          pll_5_sar_limit : out pll_5_sar_limit_t;
+          pll_5_set_op_lock : out pll_5_set_op_lock_t;
+          pll_5_disable_lock : out pll_5_disable_lock_t;
+          pll_5_ref_bypass : out pll_5_ref_bypass_t;
+          pll_5_ct_compensation : out pll_5_ct_compensation_t;
+          adpll_status0_adpll_status_0 : in  adpll_status0_adpll_status_0_t;
+          adpll_status1_adpll_status_1 : in  adpll_status1_adpll_status_1_t;
+          adpll_status2_adpll_status_2 : in  adpll_status2_adpll_status_2_t;
 
 
           -- SPI Interface
@@ -637,6 +663,32 @@ architecture rtl of register_block_spi_test  is
     signal s_mrxout_co : mrxout_co_t;
     signal s_mrxout_odp : mrxout_odp_t;
     signal s_mrxout_odn : mrxout_odn_t;
+    signal s_pll_1_main_div_n1 : pll_1_main_div_n1_t;
+    signal s_pll_1_main_div_n2 : pll_1_main_div_n2_t;
+    signal s_pll_1_main_div_n3 : pll_1_main_div_n3_t;
+    signal s_pll_1_main_div_n4 : pll_1_main_div_n4_t;
+    signal s_pll_2_open_loop : pll_2_open_loop_t;
+    signal s_pll_2_out_div_sel : pll_2_out_div_sel_t;
+    signal s_pll_2_ci : pll_2_ci_t;
+    signal s_pll_cp_cp : pll_cp_cp_t;
+    signal s_pll_ft_ft : pll_ft_ft_t;
+    signal s_pll_3_divcore_sel : pll_3_divcore_sel_t;
+    signal s_pll_3_coarse : pll_3_coarse_t;
+    signal s_pll_4_auto_coarsetune : pll_4_auto_coarsetune_t;
+    signal s_pll_4_enforce_lock : pll_4_enforce_lock_t;
+    signal s_pll_4_pfd_select : pll_4_pfd_select_t;
+    signal s_pll_4_lock_window_sel : pll_4_lock_window_sel_t;
+    signal s_pll_4_div_core_mux_sel : pll_4_div_core_mux_sel_t;
+    signal s_pll_4_filter_shift : pll_4_filter_shift_t;
+    signal s_pll_4_en_fast_lock : pll_4_en_fast_lock_t;
+    signal s_pll_5_sar_limit : pll_5_sar_limit_t;
+    signal s_pll_5_set_op_lock : pll_5_set_op_lock_t;
+    signal s_pll_5_disable_lock : pll_5_disable_lock_t;
+    signal s_pll_5_ref_bypass : pll_5_ref_bypass_t;
+    signal s_pll_5_ct_compensation : pll_5_ct_compensation_t;
+    signal s_adpll_status0_adpll_status_0 : adpll_status0_adpll_status_0_t;
+    signal s_adpll_status1_adpll_status_1 : adpll_status1_adpll_status_1_t;
+    signal s_adpll_status2_adpll_status_2 : adpll_status2_adpll_status_2_t;
 
     signal s_address : integer range 0 to (2**7) - 1;
 
@@ -951,6 +1003,29 @@ begin
       s_mrxout_co <= mrxout_co_reset_c;
       s_mrxout_odp <= mrxout_odp_reset_c;
       s_mrxout_odn <= mrxout_odn_reset_c;
+      s_pll_1_main_div_n1 <= pll_1_main_div_n1_reset_c;
+      s_pll_1_main_div_n2 <= pll_1_main_div_n2_reset_c;
+      s_pll_1_main_div_n3 <= pll_1_main_div_n3_reset_c;
+      s_pll_1_main_div_n4 <= pll_1_main_div_n4_reset_c;
+      s_pll_2_open_loop <= pll_2_open_loop_reset_c;
+      s_pll_2_out_div_sel <= pll_2_out_div_sel_reset_c;
+      s_pll_2_ci <= pll_2_ci_reset_c;
+      s_pll_cp_cp <= pll_cp_cp_reset_c;
+      s_pll_ft_ft <= pll_ft_ft_reset_c;
+      s_pll_3_divcore_sel <= pll_3_divcore_sel_reset_c;
+      s_pll_3_coarse <= pll_3_coarse_reset_c;
+      s_pll_4_auto_coarsetune <= pll_4_auto_coarsetune_reset_c;
+      s_pll_4_enforce_lock <= pll_4_enforce_lock_reset_c;
+      s_pll_4_pfd_select <= pll_4_pfd_select_reset_c;
+      s_pll_4_lock_window_sel <= pll_4_lock_window_sel_reset_c;
+      s_pll_4_div_core_mux_sel <= pll_4_div_core_mux_sel_reset_c;
+      s_pll_4_filter_shift <= pll_4_filter_shift_reset_c;
+      s_pll_4_en_fast_lock <= pll_4_en_fast_lock_reset_c;
+      s_pll_5_sar_limit <= pll_5_sar_limit_reset_c;
+      s_pll_5_set_op_lock <= pll_5_set_op_lock_reset_c;
+      s_pll_5_disable_lock <= pll_5_disable_lock_reset_c;
+      s_pll_5_ref_bypass <= pll_5_ref_bypass_reset_c;
+      s_pll_5_ct_compensation <= pll_5_ct_compensation_reset_c;
     elsif clk 'event and clk = '1' then  -- rising clock edge
       if enable = '1' then
         case s_address is
@@ -1487,6 +1562,53 @@ begin
               s_mrxout_odp <= data_in(mrxout_odp_msb_c);
               s_mrxout_odn <= data_in(mrxout_odn_msb_c);
             end if;
+          when pll_1_address_c => 
+            if write_cmd = '1' then
+              s_pll_1_main_div_n1 <= data_in(pll_1_main_div_n1_msb_c);
+              s_pll_1_main_div_n2 <= data_in(pll_1_main_div_n2_msb_c downto pll_1_main_div_n2_lsb_c);
+              s_pll_1_main_div_n3 <= data_in(pll_1_main_div_n3_msb_c downto pll_1_main_div_n3_lsb_c);
+              s_pll_1_main_div_n4 <= data_in(pll_1_main_div_n4_msb_c downto pll_1_main_div_n4_lsb_c);
+            end if;
+          when pll_2_address_c => 
+            if write_cmd = '1' then
+              s_pll_2_open_loop <= data_in(pll_2_open_loop_msb_c);
+              s_pll_2_out_div_sel <= data_in(pll_2_out_div_sel_msb_c downto pll_2_out_div_sel_lsb_c);
+              s_pll_2_ci <= data_in(pll_2_ci_msb_c downto pll_2_ci_lsb_c);
+            end if;
+          when pll_cp_address_c => 
+            if write_cmd = '1' then
+              s_pll_cp_cp <= data_in(pll_cp_cp_msb_c downto pll_cp_cp_lsb_c);
+            end if;
+          when pll_ft_address_c => 
+            if write_cmd = '1' then
+              s_pll_ft_ft <= data_in(pll_ft_ft_msb_c downto pll_ft_ft_lsb_c);
+            end if;
+          when pll_3_address_c => 
+            if write_cmd = '1' then
+              s_pll_3_divcore_sel <= data_in(pll_3_divcore_sel_msb_c downto pll_3_divcore_sel_lsb_c);
+              s_pll_3_coarse <= data_in(pll_3_coarse_msb_c downto pll_3_coarse_lsb_c);
+            end if;
+          when pll_4_address_c => 
+            if write_cmd = '1' then
+              s_pll_4_auto_coarsetune <= data_in(pll_4_auto_coarsetune_msb_c);
+              s_pll_4_enforce_lock <= data_in(pll_4_enforce_lock_msb_c);
+              s_pll_4_pfd_select <= data_in(pll_4_pfd_select_msb_c);
+              s_pll_4_lock_window_sel <= data_in(pll_4_lock_window_sel_msb_c);
+              s_pll_4_div_core_mux_sel <= data_in(pll_4_div_core_mux_sel_msb_c);
+              s_pll_4_filter_shift <= data_in(pll_4_filter_shift_msb_c downto pll_4_filter_shift_lsb_c);
+              s_pll_4_en_fast_lock <= data_in(pll_4_en_fast_lock_msb_c);
+            end if;
+          when pll_5_address_c => 
+            if write_cmd = '1' then
+              s_pll_5_sar_limit <= data_in(pll_5_sar_limit_msb_c downto pll_5_sar_limit_lsb_c);
+              s_pll_5_set_op_lock <= data_in(pll_5_set_op_lock_msb_c);
+              s_pll_5_disable_lock <= data_in(pll_5_disable_lock_msb_c);
+              s_pll_5_ref_bypass <= data_in(pll_5_ref_bypass_msb_c);
+              s_pll_5_ct_compensation <= data_in(pll_5_ct_compensation_msb_c);
+            end if;
+          when adpll_status0_address_c => 
+          when adpll_status1_address_c => 
+          when adpll_status2_address_c => 
           when others => null;
         end case;
       end if;
@@ -1551,7 +1673,13 @@ begin
                                 s_pg6_in_pd, s_pg6_in_pu, s_pg7_out_ds, s_pg7_out_sr, s_pg7_out_co, s_pg7_out_odp,
                                 s_pg7_out_odn, s_pg7_in_ste, s_pg7_in_pd, s_pg7_in_pu, s_mtest_ste, s_mtest_pd, s_mtest_pu,
                                 s_mwake_ste, s_mwake_pd, s_mwake_pu, s_mrxout_ds, s_mrxout_sr, s_mrxout_co, s_mrxout_odp,
-                                s_mrxout_odn)
+                                s_mrxout_odn, s_pll_1_main_div_n1, s_pll_1_main_div_n2, s_pll_1_main_div_n3,
+                                s_pll_1_main_div_n4, s_pll_2_open_loop, s_pll_2_out_div_sel, s_pll_2_ci, s_pll_cp_cp, s_pll_ft_ft,
+                                s_pll_3_divcore_sel, s_pll_3_coarse, s_pll_4_auto_coarsetune, s_pll_4_enforce_lock,
+                                s_pll_4_pfd_select, s_pll_4_lock_window_sel, s_pll_4_div_core_mux_sel, s_pll_4_filter_shift,
+                                s_pll_4_en_fast_lock, s_pll_5_sar_limit, s_pll_5_set_op_lock, s_pll_5_disable_lock,
+                                s_pll_5_ref_bypass, s_pll_5_ct_compensation, s_adpll_status0_adpll_status_0,
+                                s_adpll_status1_adpll_status_1, s_adpll_status2_adpll_status_2)
   begin
     data_out <= (others => '0');
 
@@ -1940,6 +2068,42 @@ begin
           data_out(mrxout_co_msb_c) <= s_mrxout_co;
           data_out(mrxout_odp_msb_c) <= s_mrxout_odp;
           data_out(mrxout_odn_msb_c) <= s_mrxout_odn;
+        when pll_1_address_c => 
+          data_out(pll_1_main_div_n1_msb_c) <= s_pll_1_main_div_n1;
+          data_out(pll_1_main_div_n2_msb_c downto pll_1_main_div_n2_lsb_c) <= s_pll_1_main_div_n2;
+          data_out(pll_1_main_div_n3_msb_c downto pll_1_main_div_n3_lsb_c) <= s_pll_1_main_div_n3;
+          data_out(pll_1_main_div_n4_msb_c downto pll_1_main_div_n4_lsb_c) <= s_pll_1_main_div_n4;
+        when pll_2_address_c => 
+          data_out(pll_2_open_loop_msb_c) <= s_pll_2_open_loop;
+          data_out(pll_2_out_div_sel_msb_c downto pll_2_out_div_sel_lsb_c) <= s_pll_2_out_div_sel;
+          data_out(pll_2_ci_msb_c downto pll_2_ci_lsb_c) <= s_pll_2_ci;
+        when pll_cp_address_c => 
+          data_out(pll_cp_cp_msb_c downto pll_cp_cp_lsb_c) <= s_pll_cp_cp;
+        when pll_ft_address_c => 
+          data_out(pll_ft_ft_msb_c downto pll_ft_ft_lsb_c) <= s_pll_ft_ft;
+        when pll_3_address_c => 
+          data_out(pll_3_divcore_sel_msb_c downto pll_3_divcore_sel_lsb_c) <= s_pll_3_divcore_sel;
+          data_out(pll_3_coarse_msb_c downto pll_3_coarse_lsb_c) <= s_pll_3_coarse;
+        when pll_4_address_c => 
+          data_out(pll_4_auto_coarsetune_msb_c) <= s_pll_4_auto_coarsetune;
+          data_out(pll_4_enforce_lock_msb_c) <= s_pll_4_enforce_lock;
+          data_out(pll_4_pfd_select_msb_c) <= s_pll_4_pfd_select;
+          data_out(pll_4_lock_window_sel_msb_c) <= s_pll_4_lock_window_sel;
+          data_out(pll_4_div_core_mux_sel_msb_c) <= s_pll_4_div_core_mux_sel;
+          data_out(pll_4_filter_shift_msb_c downto pll_4_filter_shift_lsb_c) <= s_pll_4_filter_shift;
+          data_out(pll_4_en_fast_lock_msb_c) <= s_pll_4_en_fast_lock;
+        when pll_5_address_c => 
+          data_out(pll_5_sar_limit_msb_c downto pll_5_sar_limit_lsb_c) <= s_pll_5_sar_limit;
+          data_out(pll_5_set_op_lock_msb_c) <= s_pll_5_set_op_lock;
+          data_out(pll_5_disable_lock_msb_c) <= s_pll_5_disable_lock;
+          data_out(pll_5_ref_bypass_msb_c) <= s_pll_5_ref_bypass;
+          data_out(pll_5_ct_compensation_msb_c) <= s_pll_5_ct_compensation;
+        when adpll_status0_address_c => 
+          data_out(adpll_status0_adpll_status_0_msb_c downto adpll_status0_adpll_status_0_lsb_c) <= s_adpll_status0_adpll_status_0;
+        when adpll_status1_address_c => 
+          data_out(adpll_status1_adpll_status_1_msb_c downto adpll_status1_adpll_status_1_lsb_c) <= s_adpll_status1_adpll_status_1;
+        when adpll_status2_address_c => 
+          data_out(adpll_status2_adpll_status_2_msb_c downto adpll_status2_adpll_status_2_lsb_c) <= s_adpll_status2_adpll_status_2;
         when others => null;
       end case;
     end if;
@@ -2252,6 +2416,32 @@ begin
   mrxout_co <= s_mrxout_co;
   mrxout_odp <= s_mrxout_odp;
   mrxout_odn <= s_mrxout_odn;
+  pll_1_main_div_n1 <= s_pll_1_main_div_n1;
+  pll_1_main_div_n2 <= s_pll_1_main_div_n2;
+  pll_1_main_div_n3 <= s_pll_1_main_div_n3;
+  pll_1_main_div_n4 <= s_pll_1_main_div_n4;
+  pll_2_open_loop <= s_pll_2_open_loop;
+  pll_2_out_div_sel <= s_pll_2_out_div_sel;
+  pll_2_ci <= s_pll_2_ci;
+  pll_cp_cp <= s_pll_cp_cp;
+  pll_ft_ft <= s_pll_ft_ft;
+  pll_3_divcore_sel <= s_pll_3_divcore_sel;
+  pll_3_coarse <= s_pll_3_coarse;
+  pll_4_auto_coarsetune <= s_pll_4_auto_coarsetune;
+  pll_4_enforce_lock <= s_pll_4_enforce_lock;
+  pll_4_pfd_select <= s_pll_4_pfd_select;
+  pll_4_lock_window_sel <= s_pll_4_lock_window_sel;
+  pll_4_div_core_mux_sel <= s_pll_4_div_core_mux_sel;
+  pll_4_filter_shift <= s_pll_4_filter_shift;
+  pll_4_en_fast_lock <= s_pll_4_en_fast_lock;
+  pll_5_sar_limit <= s_pll_5_sar_limit;
+  pll_5_set_op_lock <= s_pll_5_set_op_lock;
+  pll_5_disable_lock <= s_pll_5_disable_lock;
+  pll_5_ref_bypass <= s_pll_5_ref_bypass;
+  pll_5_ct_compensation <= s_pll_5_ct_compensation;
+  s_adpll_status0_adpll_status_0 <= adpll_status0_adpll_status_0;
+  s_adpll_status1_adpll_status_1 <= adpll_status1_adpll_status_1;
+  s_adpll_status2_adpll_status_2 <= adpll_status2_adpll_status_2;
 
 end rtl;
 

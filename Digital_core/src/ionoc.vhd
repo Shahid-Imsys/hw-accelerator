@@ -234,7 +234,7 @@ begin
   ido <= ionoc_rdcmd when cmd_sel = '1' else
          ionoc_rdbyte    when data_sel = '1' else
          ionoc_rdaddr    when addr_sel = '1' else
-         ionoc_rdlength  when addr_sel = '1' else
+         ionoc_rdlength  when length_sel = '1' else
          ionoc_rddatadir when datadir_sel = '1' else
          ionoc_rdstatus;  -- when status_sel = '1' else
 
@@ -627,9 +627,7 @@ begin
         end loop;
       end if;
       --
-      if RxFIFO_Valid_int = '1' then
-        RxFIFO_Valid <= '1';
-      end if;
+      RxFIFO_Valid <= RxFIFO_Valid_int;
       --
       if ionoc_rxfifo_valid_f = '1' and
         not ionoc_wrdata_pending then
@@ -639,7 +637,6 @@ begin
       if RxFIFO_Ready = '1' and
         RxFIFO_Valid_int = '1' then
         RxFIFO_Valid_int     <= '0';
-        RxFIFO_Valid         <= '0';
         ionoc_rxfifo_valid_f <= '1';
       end if;
 

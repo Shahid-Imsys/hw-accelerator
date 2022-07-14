@@ -994,7 +994,14 @@ begin
     end if;
   end process;
 --Output Latch
-  noc_data_out <= data_core_int when noc_delay = '1';
+  process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if noc_delay = '1' then
+        noc_data_out <= data_core_int;
+      end if;
+    end if;
+  end process;
 
   TAG_FB  <= sig_fin or delay;
 ---------------------------------------------

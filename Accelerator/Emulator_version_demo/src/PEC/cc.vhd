@@ -253,10 +253,6 @@ architecture rtl of cluster_controller is
   signal rd_ena          : std_logic;
   signal dataout_vld_o   : std_logic;
 
-  --signal one_c_delay :std_logic;
-  --signal two_c_delay :std_logic;
-  --signal three_c_delay : std_logic;
-
   signal standby : std_logic;
   signal delay_p : std_logic;
 
@@ -340,7 +336,6 @@ begin
       elsif peci_busy = '1' and sig_fin = '0' then
         if noc_cmd_ctr /= 0 then
           noc_cmd        <= (others => '1');
-          --noc_cmd <= noc_cmd_buf;
           noc_cmd_buf(0) <= tag;
           for i in 0 to 3 loop
             noc_cmd_buf(i+1) <= noc_cmd_buf(i);
@@ -354,7 +349,6 @@ begin
         noc_cmd     <= (others => '0');
       else
         noc_cmd_ctr := 5;
-      --noc_cmd <= (others => '0');
       end if;
     end if;
   end process;
@@ -413,7 +407,6 @@ begin
         delay_c <= (others => '0');
         delay_b <= (others => '0');
       elsif noc_cmd = "00011" then
-
         if noc_reg_rdy = '1' and len_ctr = "000000000000000" then
           delay <= '0';
         elsif peci_busy = '1' and sig_fin = '1' then
@@ -455,12 +448,8 @@ begin
   begin
     if rising_edge(clk_e) then
       noc_delay <= noc_reg_rdy;
-    --one_c_delay <= delay;
-    --two_c_delay <= one_c_delay;
-    --three_c_delay <= two_c_delay;
     end if;
   end process;
-  --rd_trig <= (one_c_delay and two_c_delay and three_c_delay); 
 
 
   --Byte counter calculation
@@ -742,7 +731,6 @@ begin
         req_len_ctr_p <= (others => '0');
         req_last      <= (others => '0');
         bc_i          <= (others => '0');
-
       elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
         pe_req_type <= REQ_FIFO(31 downto 30);
         req_last    <= REQ_FIFO(29 downto 24);
@@ -751,7 +739,6 @@ begin
         pe_req_type <= (others => '0');
         req_last    <= (others => '0');
         bc_i(0)     <= '0';
-
       end if;
       for i in 0 to 5 loop
         bc_i(i+1) <= bc_i(i);
@@ -807,10 +794,7 @@ begin
           if len_ctr_p = "000000001" then
             req_exe <= '0';
           end if;
-
-          --if write_count = "11" then
           write_req <= '0';
-        --end if;
         end if;
       end if;
     end if;
@@ -841,18 +825,9 @@ begin
               if pe_write = '0' then
                 pe_read <= '1';
               end if;
-            elsif write_req = '1' then  --and fifo_vld = '1' then
-                                         --pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-              --pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-              --pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-              --pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-                            --write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+            elsif write_req = '1' then  
               len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1, 9));
-                                        --if write_count = "11" then
               pe_write  <= '1';
-                                        --else
-                                        --pe_write <= '0';
-                                        --end if;
             end if;
           elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
             addr_p    <= REQ_FIFO(14 downto 0);
@@ -1007,9 +982,9 @@ begin
 ---------------------------------------------
 --Cluster ready indecator
 ---------------------------------------------
-  c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
-             PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
-             PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
+  c_rdy_i <= PE_RDY_0  and PE_RDY_1  and PE_RDY_2  and PE_RDY_3  and
+             PE_RDY_4  and PE_RDY_5  and PE_RDY_6  and PE_RDY_7  and
+             PE_RDY_8  and PE_RDY_9  and PE_RDY_10 and PE_RDY_11 and
              PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
 
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;

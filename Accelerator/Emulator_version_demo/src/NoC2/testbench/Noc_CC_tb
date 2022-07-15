@@ -1,0 +1,514 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 13.06.2022 11:42:01
+-- Design Name: 
+-- Module Name: Top_TB - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.all;
+use std.textio.all;
+use std.env.all;
+
+entity Noc_CC_tb is
+--  Port ( );
+end Noc_CC_tb;
+
+architecture Behavioral of Noc_CC_tb is
+
+    component Top is
+    port(
+	    clk                  : in  std_logic;
+	    Reset                : in  std_logic;
+        PEC_Ready            : in  std_logic; 
+        GPP_CMD_ACK          : in  std_logic;
+        GPP_CMD_Flag         : in  std_logic;
+        GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
+        --Output 
+        NOC_CMD_flag         : out std_logic;
+        NOC_CMD_Data         : out std_logic_vector(7 downto 0);
+        --IO INTERFACE SIGNALS
+        IO_data              : in  std_logic_vector(127 downto 0);
+        NOC_data             : out std_logic_vector(127 downto 0);
+        NOC_Address          : out std_logic_vector(31 downto 0);           
+        NOC_Length           : out std_logic_vector(15 downto 0);
+        NOC_WRITE_REQ        : out std_logic;
+        IO_WRITE_ACK         : in  std_logic;
+        FIFO_Ready1          : in  std_logic;
+        FIFO_Ready2          : in  std_logic;
+        FIFO_Ready3          : in  std_logic;
+        NOC_DATA_DIR         : out std_logic;
+        NOC_DATA_EN          : out std_logic;
+        NOC_CTRL_EN          : out std_logic                    
+      );
+    end component; 
+    
+    type program_mem_type   is array (511 downto 0) of std_logic_vector(127 downto 0);
+	type program_mem_type_b is array (511 downto 0) of bit_vector(127 downto 0);
+	
+    type data_in_type is array (63 downto 0) of std_logic_vector(127 downto 0);
+    type data_in_type_b is array (63 downto 0) of bit_vector(127 downto 0); 
+    
+    type out_word   is array (63 downto 0) of std_logic_vector(127 downto 0);   
+	
+    impure function init_program_mem_from_file (ram_file_name : in string) return program_mem_type is
+    FILE ram_file : text is in ram_file_name;
+    variable ram_file_line : line;
+    variable RAM_B : program_mem_type_b;
+    variable RAM :program_mem_type;
+    begin
+        for i in 0 to 511 loop
+            readline(ram_file, ram_file_line);
+            read(ram_file_line, RAM_B(i));
+            RAM(i) := to_stdlogicvector(RAM_B(i));
+        end loop;
+    return RAM;
+    end function;
+    
+    impure function init_input_from_file (ram_file_name : in string) return data_in_type is
+      FILE ram_file : text is in ram_file_name;
+      variable ram_file_line : line;
+      variable RAM_B : data_in_type_b;
+      variable RAM :data_in_type;
+      begin
+        for i in 0 to 63 loop
+          readline(ram_file, ram_file_line);
+          read(ram_file_line, RAM_B(i));
+          RAM(i) := to_stdlogicvector(RAM_B(i));
+        end loop;
+      return RAM;
+    end function;    
+
+    signal program_mem_data  : program_mem_type := init_program_mem_from_file("program_mem_code.ascii");
+    signal data_Input        : data_in_type := init_input_from_file("input_data.ascii");   	   
+    
+    signal    clk           : std_logic;
+    signal    Reset         : std_logic;
+    signal    IO_data       : std_logic_vector(127 downto 0);
+    signal    FIFO_Ready1   : std_logic;
+    signal    FIFO_Ready2   : std_logic;
+    signal    FIFO_Ready3   : std_logic;
+    signal    NOC_DATA_DIR  : std_logic;
+    signal    IO_WRITE_ACK  : std_logic;
+    signal    PEC_Ready     : std_logic;
+    signal    GPP_CMD_ACK   : std_logic;
+    signal    GPP_CMD_Flag  : std_logic;
+    signal    GPP_CMD_Data  : std_logic_vector(127 downto 0);  
+    signal    NOC_DATA_EN   : std_logic;
+    signal    NOC_CTRL_EN   : std_logic;
+    signal    NOC_CMD_flag  : std_logic;
+    signal    NOC_CMD_Data  : std_logic_vector(7 downto 0);
+    signal    NOC_Address   : std_logic_vector(31 downto 0);
+    signal    NOC_Length    : std_logic_vector(15 downto 0);
+    signal    NOC_WRITE_REQ : std_logic;
+    signal    NOC_data      : std_logic_vector(127 downto 0); 
+    signal    progress      : integer := 0;
+    signal    i             : integer := 0;
+    signal    j             : integer := 0; 
+    signal    outword       : out_word; 
+                  
+begin
+    
+    UUT: Top port map (clk => clk, Reset => Reset, IO_data => IO_data, FIFO_Ready1 => FIFO_Ready1, FIFO_Ready2 => FIFO_Ready2, FIFO_Ready3 => FIFO_Ready3,NOC_DATA_DIR => NOC_DATA_DIR, PEC_Ready => PEC_Ready, GPP_CMD_ACK => GPP_CMD_ACK, GPP_CMD_Flag => GPP_CMD_Flag, GPP_CMD_Data => GPP_CMD_Data, NOC_DATA_EN => NOC_DATA_EN, NOC_CTRL_EN => NOC_CTRL_EN, NOC_CMD_flag => NOC_CMD_flag, NOC_CMD_Data => NOC_CMD_Data, NOC_Address => NOC_Address, NOC_Length => NOC_Length, NOC_WRITE_REQ => NOC_WRITE_REQ, IO_WRITE_ACK => IO_WRITE_ACK, NOC_data => NOC_data); 
+
+    process
+    begin  
+        Reset               <= '0';
+        IO_WRITE_ACK        <= '0';
+        FIFO_Ready1         <= '0'; 
+        FIFO_ready2         <= '0';
+        FIFO_Ready3         <= '0';
+        IO_data             <= (others => '0'); 
+        GPP_CMD_Flag        <= '0';
+        GPP_CMD_ACK         <= '0';              
+        wait for 50 ns;    
+        Reset               <= '1';   
+        wait for 40 ns;    
+        Reset               <= '0';
+        wait for 300 ns;  
+        GPP_CMD_Flag        <= '1';
+        GPP_CMD_Data        <= x"000000000000000000000000007D000E";          
+        wait for 100 ns;
+        GPP_CMD_Flag        <= '0';                   
+        wait for 200 ns;
+        IO_WRITE_ACK        <= '1';
+        wait for 40 ns;
+        IO_WRITE_ACK        <= '0';
+        wait for 200 ns;
+        FIFO_ready2         <= '1';
+        wait for 80 ns;
+        FIFO_ready2         <= '0';
+        
+        for j in 0 to 7 loop
+            for i in 0 to 15 loop
+              IO_data <= program_mem_data(i+j*16);
+              wait until rising_edge(clk);
+              wait for 100 ns;              
+            end loop;
+              FIFO_ready2         <= '1';
+              progress            <= progress + 16;              
+              wait for 100 ns;
+              FIFO_ready2         <= '0';
+        end loop;
+        
+           -----------------------------EM->MUX->RM----------------------------        
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"00000000000000000000000000400010";          
+--        wait for 100 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 400 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0';
+--        wait for 100 ns;    ----Based on this wait time, fifo_ready can come when code line 49 or 4A is being executed. But when adding adapter FIFO this will be fixed.
+--        -----------------------------Write data ----------------------------
+--        FIFO_ready2         <= '1';
+--        wait until rising_edge(clk);
+--        wait for 40ns;
+--        FIFO_ready2         <= '0';   --***
+--        wait for 40ns;
+--        IO_data             <= data_Input(0);
+--        wait for 20ns;        
+
+--        for i in 1 to 9 loop
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;
+--        FIFO_ready3         <= '1';    --*** 
+--        for i in 10 to 15 loop
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;        
+--        FIFO_ready3         <= '0';    --***    
+
+--        for j in 1 to 3 loop
+--            for i in 0 to 8 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;
+--            FIFO_ready3         <= '1';    --*** 
+--            for i in 9 to 15 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;        
+--            FIFO_ready3         <= '0';    --***
+--        end loop;
+        
+--        FIFO_ready2         <= '0';                                                
+--        wait for 300 ns;
+--        ------------------------READ RM->MUX->EM---------------------------
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"0000000000000000000000000040001A";          
+--        wait for 200 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 200 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0'; 
+--        wait for 220 ns;
+--        FIFO_ready2         <= '1';
+--        wait for 300 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0'; 
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 700ns; 
+        -----------------------------EM->MUX->RM---------------------------        
+        ---------------------------------END-------------------------------        
+        -------------------------------------------------------------------        
+--      -----------------------------EM->TP->RM----------------------------        
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"00000000000000000000000000400012";          
+--        wait for 100 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 400 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0';
+--        wait for 100 ns;    ----Based on this wait time, fifo_ready can come when code line 49 or 4A is being executed. But when adding adapter FIFO this will be fixed.
+--        -----------------------------Write data ----------------------------
+--        FIFO_ready2         <= '1';
+--        progress            <= 0;
+--        wait until rising_edge(clk);
+--        wait for 40ns;
+--        FIFO_ready2         <= '0';   --***
+--        wait for 60ns;
+--        IO_data             <= data_Input(0);
+--        wait for 20ns;
+        
+--        for i in 1 to 9 loop
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;
+--        FIFO_ready3         <= '1';    --*** 
+--        for i in 10 to 15 loop
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;        
+--        FIFO_ready3         <= '0';    --***    
+
+--        for j in 1 to 3 loop
+--            for i in 0 to 8 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;
+--            FIFO_ready3         <= '1';    --*** 
+--            for i in 9 to 15 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;        
+--            FIFO_ready3         <= '0';    --***
+--        end loop;
+        
+--        FIFO_ready2         <= '0';                                                
+--        wait for 300 ns;
+--        ------------------------READ RM->TP->EM---------------------------
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"0000000000000000000000000040001C";          
+--        wait for 200 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 400 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0'; 
+--        wait for 220 ns;
+--        FIFO_ready2         <= '1';
+--        wait for 300 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0'; 
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 700ns;
+--        ------------------------------EM->TP->RM---------------------------        
+--        ---------------------------------END-------------------------------        
+--        ------------------------------------------------------------------- 
+
+        ------------------------EM->MUX->CM unicast------------------------        
+        GPP_CMD_Flag        <= '1';
+        GPP_CMD_Data        <= x"00000000000000000000000000400014"; --x"00000000000000000000000000400014";         
+        wait for 100 ns;
+        GPP_CMD_Flag        <= '0';                   
+        wait for 400 ns;        
+        IO_WRITE_ACK        <= '1';
+        wait for 40 ns;
+        IO_WRITE_ACK        <= '0';
+        wait for 980 ns;    ----Based on this wait time, fifo_ready can come when code line 49 or 4A is being executed. But when adding adapter FIFO this will be fixed.
+        -----------------------------Write data ----------------------------
+        FIFO_ready2         <= '1';
+        IO_data             <= data_Input(0);
+        progress            <= 0;
+        wait until rising_edge(clk);
+        wait for 100ns;
+        FIFO_ready2         <= '0';   --***
+        wait for 20ns;
+
+        for i in 1 to 9 loop
+          IO_data <= data_Input(i);
+          wait until rising_edge(clk);
+          wait for 20ns;
+        end loop;
+        FIFO_ready3         <= '1';    --*** 
+        for i in 10 to 15 loop
+          IO_data <= data_Input(i);
+          wait until rising_edge(clk);
+          wait for 20ns;
+        end loop;        
+        FIFO_ready3         <= '0';    --***    
+
+        for j in 1 to 3 loop
+            for i in 0 to 8 loop
+              IO_data <= data_Input(i+j*16);
+              wait until rising_edge(clk);
+              wait for 20ns;
+            end loop;
+            FIFO_ready3         <= '1';    --*** 
+            for i in 9 to 15 loop
+              IO_data <= data_Input(i+j*16);
+              wait until rising_edge(clk);
+              wait for 20ns;
+            end loop;        
+            FIFO_ready3         <= '0';    --***
+        end loop;
+        
+        FIFO_ready2         <= '0';                                                
+        wait for 300 ns;
+        ------------------------READ CM->MUX->EM--------------------------
+        GPP_CMD_Flag        <= '1';
+        GPP_CMD_Data        <= x"0000000000000000000000000040001E";          
+        wait for 200 ns;
+        GPP_CMD_Flag        <= '0';                   
+        wait for 400 ns;        
+        IO_WRITE_ACK        <= '1';
+        wait for 40 ns;
+        IO_WRITE_ACK        <= '0'; 
+        wait for 220 ns;
+        FIFO_ready2         <= '1';
+        wait for 300 ns;
+        FIFO_ready3         <= '1';  --*****
+        wait for 40 ns;
+        FIFO_ready3         <= '0'; 
+        wait for 280 ns;
+        FIFO_ready3         <= '1';  --*****
+        wait for 40 ns;
+        FIFO_ready3         <= '0';
+        wait for 280 ns;
+        FIFO_ready3         <= '1';  --*****
+        wait for 40 ns;
+        FIFO_ready3         <= '0';
+        wait for 700ns;
+        ------------------------------CM->MUX->EM--------------------------        
+        ---------------------------------END-------------------------------        
+        -------------------------------------------------------------------
+
+        ------------------------EM->TP->CM unicast------------------------        
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"00000000000000000000000000400018";        
+--        wait for 100 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 400 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0';
+--        wait for 1280 ns;--980 ns;    ----Based on this wait time, fifo_ready can come when code line 49 or 4A is being executed. But when adding adapter FIFO this will be fixed.
+--        -----------------------------Write data ----------------------------
+--        FIFO_ready2         <= '1';
+--        IO_data             <= data_Input(0);
+--        progress            <= 0;
+--        wait until rising_edge(clk);
+--        wait for 100ns;      
+--        FIFO_ready2         <= '0';   --***
+--        wait for 20ns;
+
+--        for i in 1 to 8 loop          --changed from 1 to 9 loop in EM->MUX->CM because it has one less line oof code before checking fifo_ready3
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;
+--        FIFO_ready3         <= '1';    --*** 
+--        for i in 9 to 15 loop
+--          IO_data <= data_Input(i);
+--          wait until rising_edge(clk);
+--          wait for 20ns;
+--        end loop;        
+--        FIFO_ready3         <= '0';    --***    
+
+--        for j in 1 to 3 loop
+--            for i in 0 to 8 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;
+--            FIFO_ready3         <= '1';    --*** 
+--            for i in 9 to 15 loop
+--              IO_data <= data_Input(i+j*16);
+--              wait until rising_edge(clk);
+--              wait for 20ns;
+--            end loop;        
+--            FIFO_ready3         <= '0';    --***
+--        end loop;
+        
+--        FIFO_ready2         <= '0';                                                
+--        wait for 300 ns;
+--        ------------------------READ CM->TP->EM--------------------------
+--        GPP_CMD_Flag        <= '1';
+--        GPP_CMD_Data        <= x"00000000000000000000000000400020";          
+--        wait for 200 ns;
+--        GPP_CMD_Flag        <= '0';                   
+--        wait for 400 ns;        
+--        IO_WRITE_ACK        <= '1';
+--        wait for 40 ns;
+--        IO_WRITE_ACK        <= '0'; 
+--        wait for 220 ns;
+--        FIFO_ready2         <= '1';
+--        wait for 300 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0'; 
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 280 ns;
+--        FIFO_ready3         <= '1';  --*****
+--        wait for 40 ns;
+--        FIFO_ready3         <= '0';
+--        wait for 700ns;
+        ------------------------------CM->TP->EM--------------------------        
+        ---------------------------------END-------------------------------        
+        -------------------------------------------------------------------
+
+               
+        --------------------------Assertion--------------------------
+        for j in 0 to 63 loop
+          assert (outword(j) = data_Input(j)) report "Incorrect output data in "&integer'image(j) severity warning;
+          wait for 1 ns;
+        end loop;
+        -------------------------------------------------------------           
+        wait for 1000000ns;                                  
+    end process;
+
+    process(clk)
+    begin
+        if rising_edge(clk) then
+          if NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1C" then
+            outword(i) <= NOC_data;
+            i  <= i +1;
+          elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1A" then
+            outword(i) <= NOC_data;
+            i  <= i +1; 
+          elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1E" then
+            outword(i) <= NOC_data;
+            i  <= i +1; 
+          elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"20" then
+            outword(i) <= NOC_data;
+            i  <= i +1;                        
+          end if; 
+        end if;   
+    end process;
+    
+    process
+    begin
+        clk <= '0';
+        for i in 1 to 30000000 loop
+            wait for 10ns;
+            clk <= not clk;
+        end loop;
+        wait;
+    end process;        
+
+end Behavioral;

@@ -4,7 +4,9 @@ all: work  rtl tb elab
 
 rtl: pec_rtl 
 
-tb: cluster_pw_8pes_tb 
+etb: tb elab
+
+tb: cluster_pw_pec1_tb 
 
 elab:
 	xelab --debug typical c_tb

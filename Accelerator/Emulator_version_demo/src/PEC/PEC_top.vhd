@@ -34,15 +34,15 @@ use work.cluster_pkg.all;
 
 entity PEC_top is
   Port ( 
-	  CLK_P : in std_logic;
-	  CLK_E  : in std_logic;
-      RST_E  : in std_logic;
-	  clk_O  : out std_logic;
-	  TAG    : in std_logic;
-	  TAG_FB : out std_logic;
-      C_RDY  : out std_logic;
-      DATA   : in std_logic_vector(7 downto 0);
-      DATA_OUT  : out std_logic_vector(7 downto 0)
+	  CLK_P    : in std_logic;
+	  CLK_E    : in std_logic;
+      RST_E    : in std_logic;
+	  DDO_VLD  : out std_logic;
+	  TAG      : in std_logic;
+	  TAG_FB   : out std_logic;
+      C_RDY    : out std_logic;
+      DATA     : in std_logic_vector(7 downto 0);
+      DATA_OUT : out std_logic_vector(7 downto 0)
   );
 end PEC_top;
 
@@ -51,50 +51,50 @@ architecture struct of PEC_top is
 component cluster_controller
 port(
 --Clock inputs
-	  CLK_P            : in std_logic;     --PE clocks
-	  CLK_E            : in std_logic;     --PE's execution clock
+	  CLK_P        : in std_logic;     --PE clocks
+	  CLK_E        : in std_logic;     --PE's execution clock
 --Asychronized resets
-      RST_E            : in std_logic; 
+      RST_E        : in std_logic; 
 --Clock outputs
-	  CLK_O            : out std_logic;
-      EVEN_P           : out std_logic;
+	  DDO_VLD      : out std_logic;
+      EVEN_P       : out std_logic;
 --Tag line
-	  TAG              : in std_logic;
-	  TAG_FB           : out std_logic;
+	  TAG          : in std_logic;
+	  TAG_FB       : out std_logic;
 --Data line   
-	  DATA             : in std_logic_vector(7 downto 0);
-	  DATA_OUT         : out std_logic_vector(7 downto 0);
-	  EXE              : out std_logic;   --Start execution
-	  RESUME           : out std_logic;   --Resume paused execution
+	  DATA         : in std_logic_vector(7 downto 0);
+	  DATA_OUT     : out std_logic_vector(7 downto 0);
+	  EXE          : out std_logic;   --Start execution
+	  RESUME       : out std_logic;   --Resume paused execution
 --Feedback signals
-      C_RDY               : out std_logic;
-	  PE_RDY_0         : in std_logic;
-	  PE_RDY_1         : in std_logic;
-	  PE_RDY_2         : in std_logic;
-	  PE_RDY_3         : in std_logic;
-	  PE_RDY_4         : in std_logic;
-	  PE_RDY_5         : in std_logic;
-	  PE_RDY_6         : in std_logic;
-	  PE_RDY_7         : in std_logic;
-	  PE_RDY_8         : in std_logic;
-	  PE_RDY_9         : in std_logic;
-	  PE_RDY_10         : in std_logic;
-	  PE_RDY_11         : in std_logic;
-	  PE_RDY_12         : in std_logic;
-	  PE_RDY_13         : in std_logic;
-	  PE_RDY_14         : in std_logic;
-	  PE_RDY_15         : in std_logic;
+      C_RDY        : out std_logic;
+	  PE_RDY_0     : in std_logic;
+	  PE_RDY_1     : in std_logic;
+	  PE_RDY_2     : in std_logic;
+	  PE_RDY_3     : in std_logic;
+	  PE_RDY_4     : in std_logic;
+	  PE_RDY_5     : in std_logic;
+	  PE_RDY_6     : in std_logic;
+	  PE_RDY_7     : in std_logic;
+	  PE_RDY_8     : in std_logic;
+	  PE_RDY_9     : in std_logic;
+	  PE_RDY_10    : in std_logic;
+	  PE_RDY_11    : in std_logic;
+	  PE_RDY_12    : in std_logic;
+	  PE_RDY_13    : in std_logic;
+	  PE_RDY_14    : in std_logic;
+	  PE_RDY_15    : in std_logic;
 --PE request
-      RST_R            : out std_logic;  --Active low
-	  REQ_IN           : in std_logic;  --req to noc in reg logic
-	  REQ_FIFO          : in std_logic_vector(31 downto 0);
-      DATA_FROM_PE      : in std_logic_vector(127 downto 0);
-	  DATA_TO_PE       : out std_logic_vector(127 downto 0);
-	  DATA_VLD         : out std_logic;
-	  PE_UNIT          : out std_logic_vector(5 downto 0);
-	  BC              : out std_logic;
-	  RD_FIFO          : out std_logic;
-	  FIFO_VLD         : in std_logic
+      RST_R        : out std_logic;  --Active low
+	  REQ_IN       : in std_logic;  --req to noc in reg logic
+	  REQ_FIFO     : in std_logic_vector(31 downto 0);
+      DATA_FROM_PE : in std_logic_vector(127 downto 0);
+	  DATA_TO_PE   : out std_logic_vector(127 downto 0);
+	  DATA_VLD     : out std_logic;
+	  PE_UNIT      : out std_logic_vector(5 downto 0);
+	  BC           : out std_logic;
+	  RD_FIFO      : out std_logic;
+	  FIFO_VLD     : in std_logic
 
 	  ); 
 	  end component;
@@ -167,33 +167,33 @@ component PE_pair_top
     );
 	end component;
 
-signal even_p_i : std_logic;
-signal clk_o_i : std_logic;
-signal tag_out_i : std_logic;
-signal data_out_i : std_logic_vector(7 downto 0);
-signal rst_i : std_logic;
-signal req_in_i : std_logic;
-signal req_fifo_i : std_logic_vector(31 downto 0);
-signal data_fifo_i : std_logic_vector(127 downto 0);
-signal data_to_pe_i       : std_logic_vector(127 downto 0);
-signal data_vld_i  : std_logic;
+signal even_p_i       : std_logic;
+signal ddo_vld_i      : std_logic;
+signal tag_out_i      : std_logic;
+signal data_out_i     : std_logic_vector(7 downto 0);
+signal rst_i          : std_logic;
+signal req_in_i       : std_logic;
+signal req_fifo_i     : std_logic_vector(31 downto 0);
+signal data_fifo_i    : std_logic_vector(127 downto 0);
+signal data_to_pe_i   : std_logic_vector(127 downto 0);
+signal data_vld_i     : std_logic;
 signal data_vld_to_pe : std_logic_vector(15 downto 0);
-signal pe_unit_i    : std_logic_vector(5 downto 0);
-signal bc_i         : std_logic;
-signal rd_fifo_i    : std_logic;
-signal fifo_vld_i   : std_logic;
-signal req_sig_i    : std_logic_vector(15 downto 0);
-signal req_rd_i     : std_logic_vector(15 downto 0);
-signal ack_sig_i    : std_logic_vector(15 downto 0);
-signal pe_rdy_reg   : std_logic_vector(15 downto 0);
+signal pe_unit_i      : std_logic_vector(5 downto 0);
+signal bc_i           : std_logic;
+signal rd_fifo_i      : std_logic;
+signal fifo_vld_i     : std_logic;
+signal req_sig_i      : std_logic_vector(15 downto 0);
+signal req_rd_i       : std_logic_vector(15 downto 0);
+signal ack_sig_i      : std_logic_vector(15 downto 0);
+signal pe_rdy_reg     : std_logic_vector(15 downto 0);
 signal pe_req_in_i    : pe_req;
 signal pe_data_out_i  : pe_data;
-signal exe : std_logic;
-signal resume : std_logic;
+signal exe            : std_logic;
+signal resume         : std_logic;
 
 begin
 
-    CLK_O <= clk_o_i;
+    DDO_VLD <= ddo_vld_i;
     TAG_FB <= tag_out_i;
     DATA_OUT <= data_out_i; 
     ------------------END----------------------------
@@ -203,7 +203,7 @@ port map(
 	CLK_P => clk_p,
 	CLK_E => clk_e,
 	--CLK_E_NEG => clk_e_neg_i,
-	CLK_O => clk_o_i,
+	DDO_VLD => ddo_vld_i,
     EVEN_P => even_p_i,
     RST_E  => rst_e,
     --RST_P  => rst_p,

@@ -34,13 +34,13 @@ use std.env.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity Cluster2_sim is
+entity Cluster_sim is
 Port (
 CLK_P            : in std_logic;     --PE clocks
 CLK_E            : in std_logic;     --PE's execution clock 
 RST_E            : out std_logic;
 
-DDO_VLD            : in std_logic;
+CLK_O            : in std_logic;
 
 TAG              : out std_logic;
 TAG_FB           : in std_logic;
@@ -50,9 +50,9 @@ TEST_DONE        : out std_logic;
 DATA             : out std_logic_vector(7 downto 0);
 DATA_OUT         : in std_logic_vector(7 downto 0)
  );
-end Cluster2_sim;
+end Cluster_sim;
 
-architecture Behavioral of Cluster2_sim is
+architecture Behavioral of Cluster_sim is
     type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
     type out_word   is array (294911 downto 0) of std_logic_vector(7 downto 0);
    	type ram_type   is array (255 downto 0) of std_logic_vector(127 downto 0);
@@ -61,7 +61,7 @@ architecture Behavioral of Cluster2_sim is
     type bias_in    is array (17 downto 0) of std_logic_vector(127 downto 0);
     type param_in   is array (63 downto 0) of std_logic_vector(127 downto 0);
     type result_out is array (18431 downto 0) of std_logic_vector(127 downto 0);
-	type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
     type data_in_b  is array (4095 downto 0) of bit_vector(127 downto 0);
     type kernels_b  is array (215 downto 0) of bit_vector(127 downto 0);
     type bias_in_b  is array (17 downto 0) of bit_vector(127 downto 0);
@@ -162,11 +162,11 @@ architecture Behavioral of Cluster2_sim is
 	    end function;
 
 signal ucode_pw  : ram_type := init_ram_from_file("test_mp_pec.ascii");--("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
-signal data_pw   : data_in := init_input_from_file("test_in_pec_2.ascii");
+signal data_pw   : data_in := init_input_from_file("test_in_pec_1.ascii");
 signal kernel_pw : kernels_in := init_kernel_from_file("test_k_pec.ascii");
 signal bias_pw   : bias_in := init_bias_from_file("test_bias_pec.ascii");
 signal param_pw  : param_in := init_param_from_file("test_params_pec.ascii");
-signal ref_out   : result_out := init_out_from_file("test_out_pec_2.ascii");
+signal ref_out   : result_out := init_out_from_file("test_out_pec_1.ascii");
 signal clk_e_neg_i : std_logic;
 signal tag_in  : std_logic;
 signal tag_out : std_logic;
@@ -203,6 +203,8 @@ constant kernels_len: std_logic_vector(14 DOWNTO 0) := "000000011010111";--215, 
 constant bias_len   : std_logic_vector(14 DOWNTO 0) := "000000000010001";--17, 18 words
 constant data_len   : std_logic_vector(14 DOWNTO 0) := "000111111111111";--4095, 4096 WORDS
 constant pw_out_len : std_logic_vector(14 downto 0) := "100011111111111";--18431, 18432 WORDS.
+constant test_length : std_logic_vector(14 downto 0) := "000000000001000";--8
+constant test_address : std_logic_vector(14 downto 0) := "000000100000001";--1
 constant CLK_P_CYCLE : time := 15 ns;
 constant CLK_E_CYCLE : time := 30 ns;
 
@@ -391,19 +393,27 @@ wait for 5ns;
 wait for 5ns;
 end sendlastmemword;
 
-procedure sendreadpulse is
-begin
-  tag_in <= '1';
-  wait until rising_edge(clk_e);
-  wait for 5ns;
-  wait until rising_edge(clk_e);
-  wait for 5ns;
-  tag_in <= '0';
-  wait for 13*CLK_E_CYCLE;
-  wait until rising_edge(clk_e);
-  wait for 5ns;
-end sendreadpulse;
+  procedure sendreadpulse is
+  begin
+    tag_in <= '1';
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+    tag_in <= '0';
+    wait for 13*CLK_E_CYCLE;
+    wait until rising_edge(clk_e);
+    wait for 5ns;
+  end sendreadpulse;
 
+procedure readmemword (signal outword : out out_word) is
+begin
+  for i in 0 to 294911 loop
+  outword(i) <= data_out;
+  wait until rising_edge(clk_e);
+wait for 5ns;
+  end loop;
+end readmemword;
 
 procedure sendpedata (constant word: in std_logic_vector(31 downto 0)) is
 begin
@@ -459,6 +469,7 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+---Data trasnfer with sync pulses
 tag_in <= '1';
 wait until rising_edge(clk_e);
 wait for 5 ns;
@@ -482,6 +493,22 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
+sendNOCcommand(READ);
+send15bits(test_length);
+send15bits(test_address);
+tag_in <= '0';
+wait until rising_edge(clk_e);
+wait for 5 ns;
+wait until rising_edge(clk_e);
+wait for 5 ns;
+
+for i in 0 to 8 loop
+  sendreadpulse;
+end loop;
+
+wait for 300000ns;
+assert false report "Simulation End" severity Error;
+-------------------------------------------------------------------------------stop here------------------------------------------------------------------------------------
 --input
 sendNOCcommand(WRITEC);
 send15bits(data_len);
@@ -495,19 +522,10 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
-wait until rising_edge(clk_e);
-wait for 5 ns;
 progress <=4095;
-for i in 0 to 4094 loop
+for i in 0 to 4095 loop
   sendmemword(conv_to_memword(data_pw(i)));
 end loop;
-  sendlastmemword(conv_to_memword(data_pw(4095)));
 progress <=7;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -531,19 +549,10 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
-wait until rising_edge(clk_e);
-wait for 5 ns;
 progress <=215;
-for i in 0 to 214 loop
+for i in 0 to 215 loop
   sendmemword(conv_to_memword(kernel_pw(i)));
 end loop;
-  sendlastmemword(conv_to_memword(kernel_pw(215)));
 progress <=8;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -567,19 +576,10 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
-wait until rising_edge(clk_e);
-wait for 5 ns;
 progress <=17;
-for i in 0 to 16 loop
+for i in 0 to 17 loop
   sendmemword(conv_to_memword(bias_pw(i)));
 end loop;
-  sendlastmemword(conv_to_memword(bias_pw(17)));
 progress <=9;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -604,19 +604,10 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-tag_in <= '1';
-wait until rising_edge(clk_e);
-wait for 5 ns;
-wait until rising_edge(clk_e);
-wait for 5 ns;
-tag_in <= '0';
-wait until rising_edge(clk_e);
-wait for 5 ns;
 progress <=41;
-for i in 0 to 254 loop
-  sendmemword(conv_to_memword(ucode_pw(i)));
-  end loop;
-    sendlastmemword(conv_to_memword(ucode_pw(255)));
+for i in 0 to 255 loop
+sendmemword(conv_to_memword(ucode_pw(i)));
+end loop;
 data <= (others => '0');
 progress <=5;
 wait until tag_fb = '0'; 
@@ -671,11 +662,6 @@ wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
-
-for i in 0 to 18431 loop
-  sendreadpulse;
-end loop;
-  
 wait until rising_edge(clk_e);
 wait for 5 ns;
 wait until rising_edge(clk_e);
@@ -683,47 +669,9 @@ wait for 5 ns;
 wait until rising_edge(clk_e);
             wait for 5 ns;
 
-assert false report "pec2_test_done, start to reading out data from CM" severity note;
+assert false report "test" severity note;
 progress <= 294911; 
-            --readmemword(outword);
-
-              
-  --for i in 0 to 18431 loop
-  --  out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
-  --                outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
-  --                outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
-  --                outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
-  --  wait for 1 ns;
-  --  assert (out_ram(i) = ref_out(i)) report "Incorrect output data in PEC2 "&integer'image(i) severity warning;
-  --  --assert (out_ram(i) /= ref_out(i)) report "Correct output data "&integer'image(j) severity note;
-  --end loop;
-
-           
-           
-  --progress <=5;
- -- wait until tag_fb = '0';
-
-
-            --wait for 1000ns;
-  --TEST_DONE <= '1';
---  finish; --assert false report "Simulation End" severity Error;          
-wait;
-
-end process;
-
---read result
-process
-  procedure readmemword (signal outword : out out_word) is
-  begin
-    wait until ddo_vld = '1';
-    for i in 0 to 294911 loop
-    outword(i) <= data_out;
-    wait until rising_edge(clk_e);
-  wait for 5ns;
-    end loop;
-  end readmemword;
-begin
-  readmemword(outword);
+            readmemword(outword);
 
               
   for i in 0 to 18431 loop
@@ -732,18 +680,21 @@ begin
                   outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &
                   outword(16*i+12) & outword(16*i+13) & outword(16*i+14) & outword(16*i+15);
     wait for 1 ns;
-    assert (out_ram(i) = ref_out(i)) report "Incorrect output data in PEC2 "&integer'image(i) severity warning;
+    assert (out_ram(i) = ref_out(i)) report "Incorrect output data in PEC1 "&integer'image(i) severity warning;
     --assert (out_ram(i) /= ref_out(i)) report "Correct output data "&integer'image(j) severity note;
   end loop;
 
             
             
-  --progress <=5;
+  progress <=5;
  -- wait until tag_fb = '0';
 
 
             wait for 1000ns;
   TEST_DONE <= '1';
+--  finish; --assert false report "Simulation End" severity Error;          
+--wait;
+
 end process;
 TAG<=tag_in;
 tag_out <= TAG_FB; 

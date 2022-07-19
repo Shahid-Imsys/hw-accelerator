@@ -33,7 +33,7 @@ entity Noc_State_Machine is
         TS                      : in  std_logic_vector(15 downto 0);
         TSDiv16_Reg             : in  std_logic_vector(11 downto 0);
         PEC_Ready               : in  std_logic;
-        Write_ack               : in  std_logic;
+        WRITE_ACK               : in  std_logic;
         CMD_FF                  : in  std_logic;
         Opcode                  : in  std_logic_vector(11 downto 0);
         Loop_reg_mux_ctrl       : in  std_logic;
@@ -203,7 +203,7 @@ begin
     Jump_condition_Mux          <= not(CMD_FF)           when Mem_Out(26 downto 24) = "000" else 
                                    not(FIFO_Ready1)      when Mem_Out(26 downto 24) = "001" else
                                    not(FIFO_Ready2)      when Mem_Out(26 downto 24) = "010" else
-                                   not(Write_ack)        when Mem_Out(26 downto 24) = "011" else 
+                                   not(WRITE_ACK)        when Mem_Out(26 downto 24) = "011" else 
                                    not(FIFO_Ready3)      when Mem_Out(26 downto 24) = "100" else 
                                    TC_equal_Zero         when Mem_Out(26 downto 24) = "101" else
                                    LC_Equal_LR_extend    when Mem_Out(26 downto 24) = "110" else '0';

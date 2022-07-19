@@ -88,7 +88,7 @@ begin
         elsif rising_edge(clk) then
             Tag_shift_p                 <= TAG_shift_i;           
             if Load_TAG_Cmd_reg = '1' then
-                PEC_Reg(52 downto 47)   <= PEC_CMD;  -- to add one cycle for CC command buffer
+                PEC_Reg(52 downto 47)   <= PEC_CMD;  
                 PEC_Reg(46)             <= '0';      -- to add one cycle for CC command buffer
                 PEC_CMD_Ready           <= '1';
             end if;

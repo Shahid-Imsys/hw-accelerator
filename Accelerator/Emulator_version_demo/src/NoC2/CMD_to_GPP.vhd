@@ -30,7 +30,6 @@ entity CMD_to_GPP is
         ERROR                   : in  std_logic;
         GPP_CMD_ACK             : in  std_logic;
         NOC_CMD_flag            : out std_logic;
-        En_CMD                  : out std_logic;
         NOC_CMD_Data            : out std_logic_vector(7 downto 0)
     );
 end CMD_to_GPP;
@@ -89,6 +88,7 @@ begin
             
         elsif rising_edge(clk) then
             PEC_ready_P             <= PEC_ready;
+            NOC_CMD_flag_i          <= not(GPP_CMD_ACK) and NOC_CMD_FF_value;
         
             if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '1')) then
                 NOC_Ready_FF        <= '1';

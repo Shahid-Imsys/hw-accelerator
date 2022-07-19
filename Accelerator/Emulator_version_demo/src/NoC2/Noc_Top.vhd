@@ -39,17 +39,15 @@ entity Noc_Top is
         --Output 
         En_IO_Data           : out std_logic;
         En_IO_ctrl           : out std_logic;
-        Sync_pulse           : out std_logic;
-        En_CMD               : out std_logic;        
         NOC_CMD_flag         : out std_logic;
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
-        Address              : out std_logic_vector(31 downto 0);               
+        address              : out std_logic_vector(31 downto 0);               
         Length               : out std_logic_vector(15 downto 0);
         Noc_bus_out          : out std_logic_vector(127 downto 0);
         Tag_Line             : out std_logic;
-        Write_REQ            : out std_logic;
-        Noc_data_mux         : out std_logic_vector(127 downto 0);
-        Mux_Demux_out1       : out std_logic_vector(127 downto 0)
+        NOC_WRITE_REQ        : out std_logic;
+       	NOC_data             : out std_logic_vector(127 downto 0);
+       	NOC_DATA_DIR         : out std_logic
   );
 end Noc_Top;
 
@@ -133,7 +131,6 @@ architecture structural of Noc_Top is
         ERROR                   : in  std_logic;
         GPP_CMD_ACK             : in  std_logic;
         NOC_CMD_flag            : out std_logic;
-        En_CMD                  : out std_logic;
         NOC_CMD_Data            : out std_logic_vector(7 downto 0)
     );
     end component;
@@ -285,6 +282,7 @@ architecture structural of Noc_Top is
     signal TP_Interchange       : std_logic;
     signal NOC_Ready            : std_logic;
     signal Sync_pulse_i         : std_logic;
+    signal Sync_pulse_i_p       : std_logic;
     signal load_Mode_reg        : std_logic;
     signal Load_TSDiv16_reg     : std_logic;              
 
@@ -318,7 +316,7 @@ architecture structural of Noc_Top is
     signal byte_counter         : std_logic_vector(4 downto 0);
     --Mux_Register
     signal NOC_data_mux_ctrl    : std_logic;
-    signal Tag_Line_pre         : std_logic;
+    signal Tag_Line_i           : std_logic;
     --
     signal REQ_FF               : std_logic; 
     signal Mode_reg             : std_logic_vector(3 downto 0);
@@ -326,12 +324,16 @@ architecture structural of Noc_Top is
     signal En_IO_Data_SM        : std_logic;
     signal En_TP_write          : std_logic;
     signal En_TP_Read           : std_logic;
+    signal Mux_Demux_out1       : std_logic_vector(127 downto 0);
+    signal Noc_data_mux         : std_logic_vector(127 downto 0);
     
 begin
 
-    Tag_Line        <= Tag_Line_pre or Sync_pulse_i;
-    Sync_pulse      <= Sync_pulse_i;
-    Write_REQ       <= REQ_FF;
+    Tag_Line        <= Tag_Line_i or Sync_pulse_i or Sync_pulse_i_p;
+    NOC_WRITE_REQ   <= REQ_FF;
+    
+    NOC_data        <= Mux_Demux_out1 when NOC_data_mux_ctrl = '1' else Noc_data_mux;  --????????need to check code
+    NOC_DATA_DIR    <= Data_Direction;
     
 	process(clk, Reset)
 	begin
@@ -344,7 +346,8 @@ begin
 			end if;
 			if (load_Mode_reg = '1') then
 		        Mode_reg <= Control_Data_Out(3 downto 0);
-		    end if;    
+		    end if;
+		    Sync_pulse_i_p    <= Sync_pulse_i;    
 		end if;	
 	end process;
 	
@@ -434,7 +437,6 @@ begin
         ERROR                   => ERROR,
         GPP_CMD_ACK             => GPP_CMD_ACK,
         NOC_CMD_flag            => NOC_CMD_flag,         --NOC output?
-        En_CMD                  => En_CMD,               --NOC output?
         NOC_CMD_Data            => NOC_CMD_Data          --NOC output?
     );
     
@@ -553,7 +555,7 @@ begin
         PEC_AS1                 => CM_Address1,
         PEC_TS                  => PEC_TS_Reg,
         PEC_CMD                 => Control_Data_Out(5 downto 0),
-        Tag_Line                => Tag_Line_pre,
+        Tag_Line                => Tag_Line_i,
         TAG_shift               => TAG_shift
     );
                    

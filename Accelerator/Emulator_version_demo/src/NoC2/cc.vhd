@@ -46,7 +46,7 @@ use work.all;
 
 entity cluster_controller is
 	generic(
-		TAG_CMD_DECODE_TIME : integer := 53     --azzzz38 "to add addr2 in tag line"  --Number of clock cycles for peci_busy to deassert
+		TAG_CMD_DECODE_TIME : integer := 52 --53     --azzzz38 "to add addr2 in tag line"  --Number of clock cycles for peci_busy to deassert
 												--To be moved to defines
 		);
 
@@ -242,11 +242,7 @@ end component;
   signal delay_pipe   : std_logic_vector(7 downto 0);  --for delay between tag shift finishes and sync pulse comes
   signal rd_ena       : std_logic;
   signal dataout_vld_o : std_logic;
-  
-  --signal one_c_delay :std_logic;
-  --signal two_c_delay :std_logic;
-  --signal three_c_delay : std_logic;
-  
+ 
   signal standby : std_logic;
   signal delay_p : std_logic;
   signal delay2  : std_logic;
@@ -400,9 +396,10 @@ EVEN_P <= even_p_2;
 				delay2 <= '0';
 				delay_c <= (others => '0');
 				delay_b <= (others => '0');
-			elsif noc_cmd = "00011" then			
+			elsif noc_cmd = "00011" then		--azzz WriteBlockC	
 			    if noc_reg_rdy= '1' and len_ctr = "000000000000001" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "000000000000000")
 				    delay <= '0';
+				    delay2 <= '0';
 			    elsif peci_busy = '1' and sig_fin = '1' then
 			    	delay_c(0) <= '1';
 		            for i in 0 to TAG_CMD_DECODE_TIME-10 loop
@@ -418,9 +415,10 @@ EVEN_P <= even_p_2;
 			    
 			    delay2 <= delay_pipe(4); 			
 				
-			elsif noc_cmd = "00101" then
+			elsif noc_cmd = "00101" then     --azzz WriteBlockB
 				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then 
 					delay <= '0';
+					delay2 <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then	
 			    	delay_b(0) <= '1';
 		            for i in 0 to TAG_CMD_DECODE_TIME-5 loop
@@ -428,9 +426,10 @@ EVEN_P <= even_p_2;
 			    	end loop;
 			    	delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
-			elsif noc_cmd = "00100" then
-				if byte_ctr = "0000" and len_ctr = "000000000000001" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
+			elsif noc_cmd = "00100" then     --azzz ReadBlock
+				if byte_ctr = "0000" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
 					delay <= '0';
+					delay2 <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
 						delay_c(0) <= '1';
 						for i in 0 to TAG_CMD_DECODE_TIME-10 loop
@@ -569,7 +568,7 @@ EVEN_P <= even_p_2;
 			    	else 
 			    		noc_reg_rdy <= '0';
         	            noc_read <= '0';
-			    	end if;
+			    	end if;   
 			    else 
 			    	noc_reg_rdy <='0';
         	        noc_write <= '0';
@@ -629,23 +628,23 @@ EVEN_P <= even_p_2;
 			dist_reg <= (others => '0'); 
 		elsif sig_fin = '1' and delay = '0' then
 		    if noc_cmd = "00011" or noc_cmd = "00100" then
-		    	tag_ctr_2 <= tag_ctr_2 - 1;
-		    	if tag_ctr_2 >= 30 then --azzzz 15 then  to add addr2 in tag line
-		    		len_ctr(0) <= tag; 
-		    		for i in 0 to 13 loop
-		    			len_ctr(i+1)<= len_ctr(i);
-		    		end loop;
-		    	elsif tag_ctr_2 < 30 and tag_ctr_2 >= 15 then    --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
-		    		addr_n(0) <= tag;
-		    		for i in 0 to 13 loop
-		    			addr_n(i+1)<= addr_n(i);
-		    		end loop;
-		    	elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then     --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
-		    		addr2_n(0) <= tag;
-		    		for i in 0 to 13 loop
-		    			addr2_n(i+1)<= addr2_n(i);
-		    		end loop;		    		
-		    	end if;
+                tag_ctr_2 <= tag_ctr_2 - 1;
+                if tag_ctr_2 >= 30 then --azzzz 15 then  to add addr2 in tag line
+                    len_ctr(0) <= tag; 
+                    for i in 0 to 13 loop
+                        len_ctr(i+1)<= len_ctr(i);
+                    end loop;
+                elsif tag_ctr_2 < 30 and tag_ctr_2 >= 15 then    --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
+                    addr_n(0) <= tag;
+                    for i in 0 to 13 loop
+                        addr_n(i+1)<= addr_n(i);
+                    end loop;
+                elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then     --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
+                    addr2_n(0) <= tag;
+                    for i in 0 to 13 loop
+                        addr2_n(i+1)<= addr2_n(i);
+                    end loop;		    		
+                end if;
 		    elsif noc_cmd = "00101" then
 		    	tag_ctr_3<= tag_ctr_3-1;
 		    	if tag_ctr_3 > 22 then
@@ -1020,4 +1019,3 @@ end architecture rtl;
 -----------------------------------------------------------
 
 --CM Address Arbiter expects NOC side have higher priority then PE side. 
-

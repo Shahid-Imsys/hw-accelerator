@@ -11,9 +11,12 @@ entity accumulatoreven is
     mul     : in  signed(17 downto 0);
     mul_odd : in  signed(17 downto 0);
     ctrl    : in  acce_ctrl;
-    result  : out signed(31 downto 0)
+    result  : out signed(31 downto 0);
+    sign_o  : out std_logic
     );
 end entity;
+
+-- TODO: add output for sign
 
 architecture first of accumulatoreven is
   signal accumulator : signed(31 downto 0);
@@ -58,10 +61,12 @@ begin
   begin
     if rising_edge(clk) then
       if en = '1' then
+        sign_o <= sign;
         if ctrl.reg = add then
           result <= add_res;
-        elsif ctrl.reg = acc then
-          result <= accumulator;
+          --TODO
+        --elsif ctrl.reg = acc then
+        --  result <= accumulator;
         end if;
       end if;
     end if;

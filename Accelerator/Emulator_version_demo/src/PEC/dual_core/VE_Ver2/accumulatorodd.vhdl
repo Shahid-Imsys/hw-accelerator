@@ -45,8 +45,9 @@ begin
       if en = '1' then
         if ctrl.reg = add then
           result <= add_res;
-        elsif ctrl.reg = acc then
-          result <= accumulator;
+          --TODO
+        --elsif ctrl.reg = acc then
+        --  result <= accumulator;
         end if;
       end if;
     end if;

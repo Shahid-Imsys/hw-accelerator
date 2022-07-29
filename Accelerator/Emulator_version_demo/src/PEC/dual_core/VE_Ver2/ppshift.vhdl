@@ -10,11 +10,15 @@ entity ppshift is
     enable_shift    : in  std_logic;
     enable_add_bias : in  std_logic;
     enable_clip     : in  std_logic;
-    bias            : in  std_logic_vector(31 downto 0);
+    bias            : in  std_logic_vector(15 downto 0);
     sum             : in  signed(32 downto 0);
     shift_ctrl      : in  ppshift_shift_ctrl;
     bias_add_ctrl   : in  ppshift_addbias_ctrl;
     clip_ctrl       : in  ppshift_clip_ctrl;
+    lod_res         : in  ppshift_shift_ctrl;
+    lod_neg         : in  std_logic;
+    shift_result    : out std_logic_vector(15 downto 0); -- For division
+    clip_result     : out std_logic_vector(15 downto 0); -- For feedback
     outreg          : out std_logic_vector(63 downto 0)
     );
 end entity;
@@ -45,6 +49,8 @@ architecture first of ppshift is
   signal to_clip         : signed(31 downto 0);
   signal outreg_en       : std_logic_vector(7 downto 0);  -- Binary enable bits
   signal delayed_enable  : enable_t;
+  signal lod_neg_delayed : std_logic;
+  signal bias_add_ctrl2  : ppacc_t;
   signal clipresult      : std_logic_vector(15 downto 0);
   signal outreg_int      : std_logic_vector(63 downto 0);
   signal fill, roundbit  : std_logic;
@@ -55,12 +61,15 @@ architecture first of ppshift is
   signal sticky1         : std_logic;
   signal sticky          : std_logic;
   signal shift_bits      : unsigned(4 downto 0);
+  signal shift_dir       : shift_t;
   alias clipresult_short is clipresult(7 downto 0);
 begin
 
-  process(sum, shift_ctrl.shift_dir)
+  -- TODO: add abs sign
+
+  process(sum, shift_dir)
   begin
-    if shift_ctrl.shift_dir = left then
+    if shift_dir = left then
       for i in 1 to 33 loop
         beforeshift(i) <= sum(33-i);
       end loop;
@@ -70,8 +79,12 @@ begin
     end if;
   end process;
 
-  shift_bits <= to_unsigned(shift_ctrl.shift, 5);
-  fill       <= beforeshift(33) when shift_ctrl.shift_dir = right else '0';
+  shift_bits <= to_unsigned(lod_res.shift, 5) when shift_ctrl.use_lod = '1'
+                else to_unsigned(shift_ctrl.shift, 5);
+  shift_dir <= lod_res.shift_dir when shift_ctrl.use_lod = '1'
+               else shift_ctrl.shift_dir;
+
+  fill       <= beforeshift(33) when shift_dir = right else '0';
 
   -- Shift by 16
   stage16(33 downto 18) <= (others => fill)          when shift_bits(4) = '1' else beforeshift(33 downto 18);
@@ -109,9 +122,9 @@ begin
 
   aftershift <= stage1;
 
-  process(aftershift, shift_ctrl.shift_dir)
+  process(aftershift, shift_dir)
   begin
-    if shift_ctrl.shift_dir = left then
+    if shift_dir = left then
       for i in 1 to 33 loop
         shiftresult_tmp(i) <= aftershift(34-i);
         shiftresult_tmp(0) <= aftershift(0);
@@ -121,11 +134,14 @@ begin
     end if;
   end process;
 
+  shift_result <= std_logic_vector(shiftresult_tmp(32 downto 17));
+
   process(clk)
   begin
     if rising_edge(clk) then
       if enable_shift = '1' then
         delayed_enable <= shift_ctrl.acce;
+        lod_neg_delayed <= lod_neg;
         if shift_ctrl.acce = enable then
           shiftresult <= shiftresult_tmp;
           sticky      <= sticky1;
@@ -134,12 +150,15 @@ begin
     end if;
   end process;
 
-  with bias_add_ctrl.acc select addinput0 <=
+  bias_add_ctrl2 <= negate when (lod_neg_delayed = '1') else bias_add_ctrl.acc;
+
+
+  with bias_add_ctrl2 select addinput0 <=
     resize(signed(bias), 33) when addbias,
     cone                     when negate,
     czero                    when pass;
 
-  with bias_add_ctrl.acc select addinput1 <=
+  with bias_add_ctrl2 select addinput1 <=
     shiftresult(33 downto 1)     when addbias,
     not shiftresult(33 downto 1) when negate,
     shiftresult(33 downto 1)     when pass;
@@ -196,7 +215,7 @@ begin
         clipresult <= czero16;
       when none =>
         -- pass result on
-        clipresult <= std_logic_vector(to_clip(15 downto 0));  
+        clipresult <= std_logic_vector(to_clip(15 downto 0));
     end case;
   end process;
 
@@ -223,6 +242,7 @@ begin
     end if;
   end process;
 
+  clip_result <= clipresult;
   outreg <= outreg_int;
-  
+
 end architecture;

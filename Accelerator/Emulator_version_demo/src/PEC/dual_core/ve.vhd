@@ -270,6 +270,30 @@ architecture rtl of ve is
     );
   end component;
 
+  component fftcontroller
+    port(
+      clk          : in  std_logic;
+      en           : in  std_logic;
+      start        : in  std_logic;
+      stages       : in  unsigned(2 downto 0);  -- N = 2^(stages + 2), at most 7
+      data0addr    : out std_logic_vector(7 downto 0);
+      data1addr    : out std_logic_vector(7 downto 0);
+      tfaddr       : out std_logic_vector(7 downto 0);
+      read_en      : out std_logic;
+      write_en     : out std_logic;
+      memreg_c     : out memreg_ctrl;
+      writebuff_c  : out memreg_ctrl;
+      done         : out std_logic;
+      finalstage   : out std_logic;
+      inst_arith   : out instruction;
+      inst_add     : out ppctrl_t;
+      inst_shift   : out ppshift_shift_ctrl;
+      inst_addbias : out ppshift_addbias_ctrl;
+      inst_clip    : out ppshift_clip_ctrl;
+      stall        : out unsigned(3 downto 0)
+    );
+  end component;
+
   --------------------------------
   --PL signals
   --------------------------------
@@ -280,7 +304,7 @@ architecture rtl of ve is
   signal re_rdy_int : std_logic;
   --Vector engine signals
   signal ve_rdy_int : std_logic;
-  signal ve_start : std_logic;
+  signal ve_start, conv_start, fft_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(2 downto 0);
   --signal wr_st_addr:std_logic; --TBD
   --signal wr_offset : std_logic;--TBD
@@ -302,26 +326,22 @@ architecture rtl of ve is
   --------------------------------
   type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
   type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
+  type mode_latch is (re, conv, fft, matrix);
   signal re_addr_data   : std_logic_vector(7 downto 0);
   signal re_addr_weight : std_logic_vector(7 downto 0);
-  signal re_addr_l   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
-  signal re_addr_r   : std_logic_vector(7 downto 0);
-  signal re_saddr_l  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
-  signal re_saddr_r  : std_logic_vector(7 downto 0);
+  signal re_addr_l, re_addr_r   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
+  signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
   signal re_loop_reg : std_logic_vector(7 downto 0); --receive engine's loop counter register
-  signal re_loop     : std_logic_vector(7 downto 0); --receive engine's loop counter
-  signal re_saddr_a   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source
-  signal re_saddr_b   : std_logic_vector(7 downto 0); 
-  signal re_addr_a   : std_logic_vector(7 downto 0); 
-  signal re_addr_b   : std_logic_vector(7 downto 0); 
-  signal ve_addr_l   : std_logic_vector(7 downto 0); --data to address pointer left
-  signal ve_saddr_l  : std_logic_vector(7 downto 0); --Left starting address register
-  signal ve_addr_r   : std_logic_vector(7 downto 0);
-  signal ve_saddr_r  : std_logic_vector(7 downto 0);
-  signal ve_loop     : std_logic_vector(7 downto 0);
-  signal ve_oloop    : std_logic_vector(7 downto 0);
-  signal ve_loop_reg : std_logic_vector(7 downto 0);
-  signal ve_oloop_reg : std_logic_vector(7 downto 0);
+  signal re_loop, re_ctr     : std_logic_vector(7 downto 0); --receive engine's loop counter
+  signal re_saddr_a, re_saddr_b   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source
+  signal re_addr_a, re_addr_b   : std_logic_vector(7 downto 0); 
+  signal ve_addr_l, ve_addr_r   : std_logic_vector(7 downto 0); --data to address pointer left
+  signal ve_saddr_l, ve_saddr_r  : std_logic_vector(7 downto 0); --Left starting address register
+  signal ve_loop, ve_oloop, loop_ctr, oloop_ctr     : std_logic_vector(7 downto 0);
+  signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
+  signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
+  signal fft_stages : unsigned(2 downto 0);
+  signal fft_en, fft_busy, finalstage : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -389,13 +409,27 @@ architecture rtl of ve is
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
-  signal memreg_c_i : memreg_ctrl;
-  signal writebuff_c_i : memreg_ctrl;
-  signal inst_i : instruction;
-  signal ppinst_i : ppctrl_t;
-  signal ppshiftinst_i : ppshift_shift_ctrl;
-  signal addbiasinst_i : ppshift_addbias_ctrl;
-  signal clipinst_i : ppshift_clip_ctrl;
+  signal memreg_c_i       : memreg_ctrl;
+  signal conv_memreg_c    : memreg_ctrl;
+  signal fft_memreg_c     : memreg_ctrl;
+  signal writebuff_c_i    : memreg_ctrl;
+  signal conv_writebuff_c : memreg_ctrl;
+  signal fft_writebuff_c  : memreg_ctrl;
+  signal inst_i           : instruction;
+  signal conv_inst        : instruction;
+  signal fft_inst         : instruction;
+  signal ppinst_i         : ppctrl_t;
+  signal conv_ppinst      : ppctrl_t;
+  signal fft_ppinst       : ppctrl_t;
+  signal ppshiftinst_i    : ppshift_shift_ctrl;
+  signal conv_ppshiftinst : ppshift_shift_ctrl;
+  signal fft_ppshiftinst  : ppshift_shift_ctrl;
+  signal addbiasinst_i    : ppshift_addbias_ctrl;
+  signal conv_addbiasinst : ppshift_addbias_ctrl;
+  signal fft_addbiasinst  : ppshift_addbias_ctrl;
+  signal clipinst_i       : ppshift_clip_ctrl;
+  signal conv_clipinst    : ppshift_clip_ctrl;
+  signal fft_clipinst     : ppshift_clip_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
   signal stall : unsigned(3 downto 0) := (others => '0');
   signal en_i : std_logic;
@@ -447,8 +481,8 @@ begin
   --Not latched signals are used only in one microinstruction time (clk_e) together with 
   --re_start and ve_start signals and mode abcd or relaod signal. 
   dfy_dest_sel   <= PL (118 downto 116); --DEST_BYTE
-  re_start       <= PL(100);
-  ve_start       <= PL(95); --VE_ST
+  re_start       <= PL(100);--RE or VE mode latch
+  ve_start       <= PL(95); --RE or VE_ST
   --acc_latch      <= PL(94); --ACCTOREG --To be removed
   re_source      <= PL(96); --RE_DFY_SRC --
   reg_in         <= PL(105 downto 101);
@@ -571,7 +605,24 @@ begin
       end if;
     end if;
   end process;
-    
+  
+  RE_VE_latch : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if re_start = '1' then
+        mode_latch <= "re";
+      else 
+        if ve_clr_acc = '1' and re_start = '0' then  
+          mode_latch <= "fft";
+        elsif ve_clr_acc = '0' and re_start = '0' then
+          mode_latch <= "conv";
+        else 
+          mode_latch <= "matrix";
+        end if;
+      end if;
+    end if;
+  end process;
+
   --********************************
   --Mode c. Shared by RE and VE
   --********************************
@@ -608,25 +659,28 @@ begin
   --**********************
   address_pointer_mux: process(all)
   begin
-    if conv_busy = '1' then 
-      weightaddr_to_memory <= weight_addr_o;
-      if mode_c_l = '1' then
-        data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-        data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-      else
-        data0addr_to_memory <= data0_addr_o;
-        data1addr_to_memory <= data1_addr_o;
-      end if; 
-    else
-      weightaddr_to_memory <= re_addr_weight;
-      if mode_c_l = '1' then
-        data0addr_to_memory <= curr_ring_addr;
-        data1addr_to_memory <= curr_ring_addr;
-      else
-        data0addr_to_memory <= re_addr_data;
-        data1addr_to_memory <= re_addr_data;
-      end if;
-    end if;
+    case mode_latch is 
+      when "re" => weightaddr_to_memory <= re_addr_weight;
+                   if mode_c_l = '1' then
+                     data0addr_to_memory <= curr_ring_addr;
+                     data1addr_to_memory <= curr_ring_addr;
+                   else
+                     data0addr_to_memory <= re_addr_data;
+                     data1addr_to_memory <= re_addr_data;
+                   end if;
+      when "conv" => weightaddr_to_memory <= weight_addr_o;
+                   if mode_c_l = '1' then
+                     data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                     data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                   else
+                     data0addr_to_memory <= data0_addr_o;
+                     data1addr_to_memory <= data1_addr_o;
+                   end if; 
+      when "fft" => weightaddr_to_memory <= ve_fftaddr_tf;
+                    data0addr_to_memory  <= ve_fftaddr_d0;
+                    data1addr_to_memory  >= ve_fftaddr_d1;
+      when "matrix" => null;-- for now
+    end case;
   end process;
 
   bias_address_mux: process(clk_p)
@@ -644,6 +698,53 @@ begin
         end if;
       end if;
     end if;
+  end process;
+
+  startncounter_demux : process(all)
+  begin
+    conv_start <= '0';
+    fft_start  <= '0';
+    re_start   <= '0';
+    loop_ctr   <= x"00";
+    oloop_ctr  <= x"00";
+    fft_stages <= "000";
+    re_ctr     <= x"00";
+    case mode_latch is
+      when "conv" => conv_start <= ve_start;
+                     loop_ctr   <= ve_loop_reg;
+                     oloop_ctr  <= ve_oloop_reg;
+      when "fft"  => fft_start  <= ve_start;
+                     fft_stages <= unsigned(ve_loop_reg(2 downto 0));
+      when others => re_start   <= ve_start;
+                     re_ctr     <= re_loop_reg;
+    end case;
+  end process;
+
+  instruction_mux : process(all)
+  begin
+    case mode_latch is
+      when "conv" => memreg_c_i    <= conv_memreg_c;
+                     writebuff_c_i <= conv_writebuff_c;
+                     inst_i        <= conv_inst;
+                     ppinst_i      <= conv_ppinst;
+                     ppshiftinst_i <= conv_ppshiftinst;
+                     addbiasinst_i <= conv_addbiasinst;
+                     clipinst_i    <= conv_clipinst;
+      when "fft"  => memreg_c_i    <= fft_memreg_c;
+                     writebuff_c_i <= fft_writebuff_c;
+                     inst_i        <= fft_inst;
+                     ppinst_i      <= fft_ppinst;
+                     ppshiftinst_i <= fft_ppshiftinst;
+                     addbiasinst_i <= fft_addbiasinst;
+                     clipinst_i    <= fft_clipinst;
+      when others => memreg_c_i    <= (noswap, hold, hold);
+                     writebuff_c_i <= (noswap, hold, hold);
+                     inst_i        <= nop;
+                     ppinst_i      <= nop;
+                     ppshiftinst_i <= (hold, 0, '0', left);
+                     addbiasinst_i <= (pass, unbiased);
+                     clipinst_i    <= (none, none);
+    end case;
   end process;
 
 ---------------------------------------------------------------
@@ -673,9 +774,14 @@ begin
   process(all)
   begin
     if re_busy = '0' then
-      data_read_enable_i <= '1';
-      weight_read_enable_i <= '1';
-      read_en_b_o <= '1';
+      if mode_latch = "conv" then
+        data_read_enable_i <= '1';
+        weight_read_enable_i <= '1';
+        read_en_b_o <= '1';
+      else if mode_latch = "fft" then
+        data_read_enable_i <= fft_read_en;
+        weight_read_enable_i <= fft_read_en;
+        read_en_b_o <= fft_read_en;
     else
       data_read_enable_i <= '0';
       weight_read_enable_i <= '0';
@@ -835,78 +941,101 @@ begin
   end generate;
 
   re_i : re
-  port map(
-    clk              => clk_p,
-    rst              => rst,
-    clk_e_pos        => clk_e_pos,
-    clk_e_neg        => clk_e_neg,
-    mode_a           => mode_a,
-    mode_b           => mode_b,
-    mode_c           => mode_c,
-    data_valid       => DDI_VLD,
-    re_start         => re_start,
-    bias_addr_assign => bias_addr_assign,
-    re_source        => re_source,
-    re_addr_reload   => re_addr_reload,
-    re_loop_reg      => re_loop_reg,
-    re_saddr_l       => re_saddr_l,
-    re_saddr_r       => re_saddr_r,
-    re_saddr_a       => re_saddr_a,
-    re_saddr_b       => re_saddr_b,
-    bias_index_start => bias_index_start,
-    re_busy          => re_busy,
-    write_en_data    => write_en_o,
-    write_en_weight  => write_en_w_o,
-    write_en_bias    => write_en_b_o,
-    mode_c_l         => remode_c_l,
-    bias_index_wr    => bias_index_wr,
-    re_loop_counter  => re_loop,
-    re_addr_data     => re_addr_data,
-    re_addr_weight   => re_addr_weight
-  );
+    port map(
+      clk              => clk_p,
+      rst              => rst,
+      clk_e_pos        => clk_e_pos,
+      clk_e_neg        => clk_e_neg,
+      mode_a           => mode_a,
+      mode_b           => mode_b,
+      mode_c           => mode_c,
+      data_valid       => DDI_VLD,
+      re_start         => re_start,
+      bias_addr_assign => bias_addr_assign,
+      re_source        => re_source,
+      re_addr_reload   => re_addr_reload,
+      re_loop_reg      => re_ctr,
+      re_saddr_l       => re_saddr_l,
+      re_saddr_r       => re_saddr_r,
+      re_saddr_a       => re_saddr_a,
+      re_saddr_b       => re_saddr_b,
+      bias_index_start => bias_index_start,
+      re_busy          => re_busy,
+      write_en_data    => write_en_o,
+      write_en_weight  => write_en_w_o,
+      write_en_bias    => write_en_b_o,
+      mode_c_l         => remode_c_l,
+      bias_index_wr    => bias_index_wr,
+      re_loop_counter  => re_loop,
+      re_addr_data     => re_addr_data,
+      re_addr_weight   => re_addr_weight
+    );
 
   convcontroller_i : convcontroller
-  port map(
-    clk              => clk_p,
-    rst              => rst,
-    clk_e_pos        => clk_e_pos,
-    start            => ve_start,
-    mode_a           => mode_a,
-    mode_b           => mode_b,
-    mode_c           => mode_c,
-    addr_reload      => ve_addr_reload,
-    bias_addr_assign => bias_addr_assign,
-    config           => config,
-    pp_ctl           => pp_ctl,
-    conv_saddr_l     => ve_saddr_l,
-    conv_saddr_r     => ve_saddr_r,
-    loop_counter     => ve_loop_reg,
-    oloop_counter    => ve_oloop_reg,
-    bias_index_start => bias_index_start,
-    bias_index_end   => bias_index_end,
-    scale            => scale,
-    conv_loop_ctr    => ve_loop,
-    data_addr        => ve_addr_l,
-    weight_addr      => ve_addr_r,
-    bias_addr        => bias_index_rd,
-    bias_mux         => bias_mux,
-    mode_c_l         => vemode_c_l,
-    data_rd_en       => open, -----------
-    data_wr_en       => open, -- TBD
-    weight_rd_en     => open, --
-    weight_wr_en     => open, -----------
-    enable_shift     => shifter_ena,
-    enable_add_bias  => adder_ena,
-    enable_clip      => clip_ena,
-    memreg_c         => memreg_c_i,
-    writebuff_c      => writebuff_c_i,
-    inst             => inst_i,
-    ppinst           => ppinst_i,
-    ppshiftinst      => ppshiftinst_i,
-    addbiasinst      => addbiasinst_i,
-    clipinst         => clipinst_i,
-    busy             => conv_busy
-  );
+    port map(
+      clk              => clk_p,
+      rst              => rst,
+      clk_e_pos        => clk_e_pos,
+      start            => conv_start,
+      mode_a           => mode_a,
+      mode_b           => mode_b,
+      mode_c           => mode_c,
+      addr_reload      => ve_addr_reload,
+      bias_addr_assign => bias_addr_assign,
+      config           => config,
+      pp_ctl           => pp_ctl,
+      conv_saddr_l     => ve_saddr_l,
+      conv_saddr_r     => ve_saddr_r,
+      loop_counter     => loop_ctr,
+      oloop_counter    => oloop_ctr,
+      bias_index_start => bias_index_start,
+      bias_index_end   => bias_index_end,
+      scale            => scale,
+      conv_loop_ctr    => ve_loop,
+      data_addr        => ve_addr_l,
+      weight_addr      => ve_addr_r,
+      bias_addr        => bias_index_rd,
+      bias_mux         => bias_mux,
+      mode_c_l         => vemode_c_l,
+      data_rd_en       => open, -----------
+      data_wr_en       => open, -- TBD
+      weight_rd_en     => open, --
+      weight_wr_en     => open, -----------
+      enable_shift     => shifter_ena,
+      enable_add_bias  => adder_ena,
+      enable_clip      => clip_ena,
+      memreg_c         => conv_memreg_c,
+      writebuff_c      => conv_writebuff_c,
+      inst             => conv_inst,
+      ppinst           => conv_ppinst,
+      ppshiftinst      => conv_ppshiftinst,
+      addbiasinst      => conv_addbiasinst,
+      clipinst         => conv_clipinst,
+      busy             => conv_busy
+    );
+
+  fftcontroller_i : fftcontroller
+    port map(
+      clk          => clk_p,
+      en           => fft_en,
+      start        => fft_start,
+      stages       => fft_stages,  -- N = 2^(stages + 2), at most 7
+      data0addr    => ve_fftaddr_d0, --data address comes out from fft controller
+      data1addr    => ve_fftaddr_d1, --data address comes out from fft controller
+      tfaddr       => ve_fftaddr_tf, --TF address comes out from fft controller
+      read_en      => fft_read_en,
+      write_en     => fft_write_en,
+      memreg_c     => fft_memreg_c,
+      writebuff_c  => fft_writebuff_c,
+      done         => fft_busy,
+      finalstage   => finalstage,
+      inst_arith   => fft_inst,
+      inst_add     => fft_ppinst,
+      inst_shift   => fft_ppshiftinst,
+      inst_addbias => fft_addbiasinst,
+      inst_clip    => fft_clipinst,
+      stall        => stall
+    );
 
   ve_wctrlpipe_inst : ve_wctrlpipe
     port map(

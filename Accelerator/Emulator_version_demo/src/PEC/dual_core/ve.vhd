@@ -326,7 +326,8 @@ architecture rtl of ve is
   --------------------------------
   type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
   type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
-  type mode_latch is (re, conv, fft, matrix);
+  type mode is (re_mode, conv, fft, matrix);
+  signal mode_latch : mode;
   signal re_addr_data   : std_logic_vector(7 downto 0);
   signal re_addr_weight : std_logic_vector(7 downto 0);
   signal re_addr_l, re_addr_r   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
@@ -409,6 +410,7 @@ architecture rtl of ve is
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
+  signal fft_read_en, fft_write_en : std_logic;
   signal memreg_c_i       : memreg_ctrl;
   signal conv_memreg_c    : memreg_ctrl;
   signal fft_memreg_c     : memreg_ctrl;
@@ -610,14 +612,14 @@ begin
   begin
     if rising_edge(clk_p) then
       if re_start = '1' then
-        mode_latch <= "re";
+        mode_latch <= re_mode;
       else 
         if ve_clr_acc = '1' and re_start = '0' then  
-          mode_latch <= "fft";
+          mode_latch <= fft;
         elsif ve_clr_acc = '0' and re_start = '0' then
-          mode_latch <= "conv";
+          mode_latch <= conv;
         else 
-          mode_latch <= "matrix";
+          mode_latch <= matrix;
         end if;
       end if;
     end if;
@@ -660,26 +662,26 @@ begin
   address_pointer_mux: process(all)
   begin
     case mode_latch is 
-      when "re" => weightaddr_to_memory <= re_addr_weight;
-                   if mode_c_l = '1' then
-                     data0addr_to_memory <= curr_ring_addr;
-                     data1addr_to_memory <= curr_ring_addr;
-                   else
-                     data0addr_to_memory <= re_addr_data;
-                     data1addr_to_memory <= re_addr_data;
-                   end if;
-      when "conv" => weightaddr_to_memory <= weight_addr_o;
-                   if mode_c_l = '1' then
-                     data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                     data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                   else
-                     data0addr_to_memory <= data0_addr_o;
-                     data1addr_to_memory <= data1_addr_o;
-                   end if; 
-      when "fft" => weightaddr_to_memory <= ve_fftaddr_tf;
-                    data0addr_to_memory  <= ve_fftaddr_d0;
-                    data1addr_to_memory  >= ve_fftaddr_d1;
-      when "matrix" => null;-- for now
+      when re_mode => weightaddr_to_memory <= re_addr_weight;
+                        if mode_c_l = '1' then
+                          data0addr_to_memory <= curr_ring_addr;
+                          data1addr_to_memory <= curr_ring_addr;
+                        else
+                          data0addr_to_memory <= re_addr_data;
+                          data1addr_to_memory <= re_addr_data;
+                        end if;
+      when conv    => weightaddr_to_memory <= weight_addr_o;
+                        if mode_c_l = '1' then
+                          data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                          data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                        else
+                          data0addr_to_memory <= data0_addr_o;
+                          data1addr_to_memory <= data1_addr_o;
+                        end if; 
+      when fft     => weightaddr_to_memory <= ve_fftaddr_tf;
+                        data0addr_to_memory  <= ve_fftaddr_d0;
+                        data1addr_to_memory  <= ve_fftaddr_d1;
+      when matrix  => null;-- for now
     end case;
   end process;
 
@@ -723,14 +725,14 @@ begin
   instruction_mux : process(all)
   begin
     case mode_latch is
-      when "conv" => memreg_c_i    <= conv_memreg_c;
+      when conv => memreg_c_i    <= conv_memreg_c;
                      writebuff_c_i <= conv_writebuff_c;
                      inst_i        <= conv_inst;
                      ppinst_i      <= conv_ppinst;
                      ppshiftinst_i <= conv_ppshiftinst;
                      addbiasinst_i <= conv_addbiasinst;
                      clipinst_i    <= conv_clipinst;
-      when "fft"  => memreg_c_i    <= fft_memreg_c;
+      when fft  => memreg_c_i    <= fft_memreg_c;
                      writebuff_c_i <= fft_writebuff_c;
                      inst_i        <= fft_inst;
                      ppinst_i      <= fft_ppinst;
@@ -774,14 +776,15 @@ begin
   process(all)
   begin
     if re_busy = '0' then
-      if mode_latch = "conv" then
+      if mode_latch = conv then
         data_read_enable_i <= '1';
         weight_read_enable_i <= '1';
         read_en_b_o <= '1';
-      else if mode_latch = "fft" then
+      elsif mode_latch = fft then
         data_read_enable_i <= fft_read_en;
         weight_read_enable_i <= fft_read_en;
         read_en_b_o <= fft_read_en;
+      end if;
     else
       data_read_enable_i <= '0';
       weight_read_enable_i <= '0';

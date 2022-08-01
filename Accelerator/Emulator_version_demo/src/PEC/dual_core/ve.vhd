@@ -712,10 +712,10 @@ begin
     fft_stages <= "000";
     re_ctr     <= x"00";
     case mode_latch is
-      when "conv" => conv_start <= ve_start;
+      when conv => conv_start <= ve_start;
                      loop_ctr   <= ve_loop_reg;
                      oloop_ctr  <= ve_oloop_reg;
-      when "fft"  => fft_start  <= ve_start;
+      when fft  => fft_start  <= ve_start;
                      fft_stages <= unsigned(ve_loop_reg(2 downto 0));
       when others => re_start   <= ve_start;
                      re_ctr     <= re_loop_reg;

@@ -72,50 +72,51 @@ architecture rtl of ve is
 
   component ve_wctrlpipe
     port(
-      -- general
-      clk             : in std_logic;
-      reset           : in std_logic;
+      clk              : in std_logic;
       -- in
-      data0_addr_i    : in std_logic_vector(7 downto 0);
-      data1_addr_i    : in std_logic_vector(7 downto 0);
-      weight_addr_i   : in std_logic_vector(7 downto 0);
-      data_ren_i      : in std_logic;
-      data_wen_i      : in std_logic;
-      weight_ren_i    : in std_logic;
-      weight_wen_i    : in std_logic;
-      enable_shift    : in std_logic;
-      enable_add_bias : in std_logic;
-      enable_clip     : in std_logic;
+      data0_addr_i     : in std_logic_vector(7 downto 0);
+      data1_addr_i     : in std_logic_vector(7 downto 0);
+      weight_addr_i    : in std_logic_vector(7 downto 0);
+      bias_addr_i      : in std_logic_vector(5 downto 0);
+      bias_addr_ctrl_i : in bias_addr_t;
+      data_ren_i       : in std_logic;
+      data_wen_i       : in std_logic;
+      weight_ren_i     : in std_logic;
+      weight_wen_i     : in std_logic;
+      bias_ren_i       : in std_logic;
 
-      data0_i         : in std_logic_vector(31 downto 0);
-      data1_i         : in std_logic_vector(31 downto 0);
-      weight_i        : in std_logic_vector(63 downto 0);
-
-      memreg_c_i      : in memreg_ctrl;
-      writebuff_c_i   : in memreg_ctrl;
-      inst_i          : in instruction;
-      ppinst_i        : in ppctrl_t;
-      ppshiftinst_i   : in ppshift_shift_ctrl;
-      addbiasinst_i   : in ppshift_addbias_ctrl;
-      clipinst_i      : in ppshift_clip_ctrl;
-      lzod_i          : in lzod_ctrl;
-      zpdata_i        : in std_logic_vector(7 downto 0);
-      zpweight_i      : in std_logic_vector(7 downto 0);
-      bias_i          : in std_logic_vector(31 downto 0);
+      data0_i          : in std_logic_vector(31 downto 0);
+      data1_i          : in std_logic_vector(31 downto 0);
+      weight_i         : in std_logic_vector(63 downto 0);
+  
+      memreg_c_i       : in memreg_ctrl;
+      writebuff_c_i    : in memreg_ctrl;
+      inst_i           : in instruction;
+      ppinst_i         : in ppctrl_t;
+      ppshiftinst_i    : in ppshift_shift_ctrl;
+      addbiasinst_i    : in ppshift_addbias_ctrl;
+      clipinst_i       : in ppshift_clip_ctrl;
+      lzod_i           : in lzod_ctrl;
+      feedback_ctrl_i  : in feedback_t;
+      zpdata_i         : in std_logic_vector(7 downto 0);
+      zpweight_i       : in std_logic_vector(7 downto 0);
+      bias_i           : in std_logic_vector(63 downto 0);
       -- out
-      data0_addr_o    : out std_logic_vector(7 downto 0);
-      data1_addr_o    : out std_logic_vector(7 downto 0);
-      weight_addr_o   : out std_logic_vector(7 downto 0);
-      data_ren_o      : out std_logic;
-      data_wen_o      : out std_logic;
-      weight_ren_o    : out std_logic;
-      weight_wen_o    : out std_logic;
-      outreg_o        : out std_logic_vector(63 downto 0);
-      writebuffer_o   : out std_logic_vector(63 downto 0);
+      data0_addr_o     : out std_logic_vector(7 downto 0);
+      data1_addr_o     : out std_logic_vector(7 downto 0);
+      weight_addr_o    : out std_logic_vector(7 downto 0);
+      bias_addr_o      : out std_logic_vector(5 downto 0);
+      data_ren_o       : out std_logic;
+      data_wen_o       : out std_logic;
+      weight_ren_o     : out std_logic;
+      weight_wen_o     : out std_logic;
+      bias_ren_o       : out std_logic;
+      outreg_o         : out std_logic_vector(63 downto 0);
+      writebuffer_o    : out std_logic_vector(63 downto 0);
       -- en
-      stall           : in  unsigned(3 downto 0) := (others => '0');
-      en_o            : out std_logic
-      );
+      stall            : in unsigned(3 downto 0) := (others => '0');
+      en_o             : out std_logic
+    );
   end component;
 
   component mem is
@@ -131,7 +132,7 @@ architecture rtl of ve is
       d_in     : in  std_logic_vector(width-1 downto 0);
       address  : in  std_logic_vector(addressbits-1 downto 0);
       d_out    : out std_logic_vector(width-1 downto 0)
-      );
+    );
   end component;
 
   component SNPS_RF_SP_UHS_256x64 is
@@ -223,7 +224,7 @@ architecture rtl of ve is
       re_loop_counter  : out std_logic_vector(7 downto 0);
       re_addr_data     : out std_logic_vector(7 downto 0);
       re_addr_weight   : out std_logic_vector(7 downto 0)
-  );
+    );
   end component;
 
   component convcontroller
@@ -359,7 +360,9 @@ architecture rtl of ve is
   signal bias_index_end : std_logic_vector(7 downto 0);
   signal bias_index_start : std_logic_vector(7 downto 0);
   signal bias_index_wr : std_logic_vector(5 downto 0);
-  signal bias_index_rd : std_logic_vector(7 downto 0);
+  signal data0_addr_i, data1_addr_i : std_logic_vector(7 downto 0);
+  signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
+  signal bias_index_rd, bias_addr_o : std_logic_vector(7 downto 0);
   signal fw_layer   : std_logic_vector(23 downto 0); --feed forward layer, 24 bits.
   signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
   signal dfy_reg   : dfy_word;    --pushback(DFY) register
@@ -381,7 +384,12 @@ architecture rtl of ve is
   signal bias_in    : std_logic_vector(63 downto 0);
   signal mode_a_l  : std_logic;
   signal mode_b_l  : std_logic;
+  signal read_en_b_i : std_logic;
+  signal data_write_enable_i, weight_write_enable_i : std_logic;
   signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
+  signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
+  signal read_en_to_mux, read_en_w_to_mux : std_logic;
+  signal write_en_to_mux, write_en_w_to_mux : std_logic;
   signal ve_clr_acc : std_logic; --clear accumulators
   signal pl_ve_byte : std_logic_vector(3 downto 0);
 
@@ -462,14 +470,14 @@ architecture rtl of ve is
   constant CONS_CONFIG           : std_logic_vector(4 downto 0) := "1"&x"1"; --write config register for both ring mode and inner-outer loop mode
   constant CONS_RING_END         : std_logic_vector(4 downto 0) := "1"&x"2"; --Ring mode end address
   constant CONS_RING_START       : std_logic_vector(4 downto 0) := "1"&x"3"; --Ring mode start address. 
-  constant CONS_CURR_RING        : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
+  --constant CONS_CURR_RING        : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
   constant CONS_ZP_DATA          : std_logic_vector(4 downto 0) := "1"&x"4"; --Zero point value for data register, signed
   constant CONS_ZP_WEIGHT        : std_logic_vector(4 downto 0) := "1"&x"5"; --Zero point value for weight register, signed
   constant CONS_SCALE            : std_logic_vector(4 downto 0) := "1"&x"6"; --Scale factor for shifter
   constant CONS_PP_CTL           : std_logic_vector(4 downto 0) := "1"&x"7"; --Controls the bypass of different logics inside post processors
   constant CONS_BIAS_INDEX_END   : std_logic_vector(4 downto 0) := "1"&x"8"; --End indexing of the bias 
   constant CONS_BIAS_INDEX_START : std_logic_vector(4 downto 0) := "1"&x"9"; --Start indexing of the bias
-  constant CONS_MAC_SWITCH       : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
+  --constant CONS_MAC_SWITCH       : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
   --------------------------------------------------------
   --Delay FFs
   --------------------------------------------------------
@@ -579,8 +587,8 @@ begin
         elsif reg_in = CONS_BIAS_INDEX_START then
           bias_index_start <= YBUS;
           bias_addr_assign <= '1';
-        elsif reg_in = CONS_MAC_SWITCH then
-          mul_ctl <= YBUS;
+        --elsif reg_in = CONS_MAC_SWITCH then
+        --  mul_ctl <= YBUS;
         else
           bias_addr_assign <= '0';
         end if;
@@ -659,10 +667,29 @@ begin
   --**********************
   --Address_MUX
   --**********************
-  address_pointer_mux: process(all)
+  addrfromctrl_pointer_mux : process(all)
+  begin
+    case mode_latch is
+      when re_mode => data0_addr_i  <= x"00";
+                      data1_addr_i  <= x"00";
+                      weight_addr_i <= x"00";
+      when conv    => data0_addr_i  <= ve_addr_l;
+                      data1_addr_i  <= ve_addr_l;
+                      weight_addr_i <= ve_addr_r;
+      when fft     => data0_addr_i  <= ve_fftaddr_d0;
+                      data1_addr_i  <= ve_fftaddr_d1;
+                      weight_addr_i <= ve_fftaddr_tf;
+      when others  => data0_addr_i  <= x"00";
+                      data1_addr_i  <= x"00";
+                      weight_addr_i <= x"00";
+    end case;
+  end process;
+  
+  addrtomem_pointer_mux: process(all)
   begin
     case mode_latch is 
-      when re_mode => weightaddr_to_memory <= re_addr_weight;
+      when re_mode => biasaddr_to_memory <= bias_addr_i;
+                      weightaddr_to_memory <= re_addr_weight;
                         if mode_c_l = '1' then
                           data0addr_to_memory <= curr_ring_addr;
                           data1addr_to_memory <= curr_ring_addr;
@@ -670,7 +697,8 @@ begin
                           data0addr_to_memory <= re_addr_data;
                           data1addr_to_memory <= re_addr_data;
                         end if;
-      when conv    => weightaddr_to_memory <= weight_addr_o;
+      when others  => biasaddr_to_memory <= bias_addr_o;
+                      weightaddr_to_memory <= weight_addr_o;
                         if mode_c_l = '1' then
                           data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
                           data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
@@ -678,10 +706,10 @@ begin
                           data0addr_to_memory <= data0_addr_o;
                           data1addr_to_memory <= data1_addr_o;
                         end if; 
-      when fft     => weightaddr_to_memory <= ve_fftaddr_tf;
-                        data0addr_to_memory  <= ve_fftaddr_d0;
-                        data1addr_to_memory  <= ve_fftaddr_d1;
-      when matrix  => null;-- for now
+      --when fft     => weightaddr_to_memory <= ve_fftaddr_tf;
+      --                data0addr_to_memory  <= ve_fftaddr_d0;
+      --                data1addr_to_memory  <= ve_fftaddr_d1;
+      --when matrix  => null;-- for now
     end case;
   end process;
 
@@ -689,13 +717,13 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
-        biasaddr_to_memory <= (others => '0');
+        bias_addr_i <= (others => '0');
       else
-        if write_en_b_o = '1' then
-          biasaddr_to_memory <= bias_index_wr;
+        if bwen_from_re = '1' then
+          bias_addr_i <= bias_index_wr;
         else
           if ve_loop = x"01" then
-            biasaddr_to_memory <= bias_index_rd(7 downto 2);
+            bias_addr_i <= bias_index_rd;
           end if;
         end if;
       end if;
@@ -712,10 +740,10 @@ begin
     fft_stages <= "000";
     re_ctr     <= x"00";
     case mode_latch is
-      when conv => conv_start <= ve_start;
+      when conv   => conv_start <= ve_start;
                      loop_ctr   <= ve_loop_reg;
                      oloop_ctr  <= ve_oloop_reg;
-      when fft  => fft_start  <= ve_start;
+      when fft    => fft_start  <= ve_start;
                      fft_stages <= unsigned(ve_loop_reg(2 downto 0));
       when others => re_start   <= ve_start;
                      re_ctr     <= re_loop_reg;
@@ -725,14 +753,14 @@ begin
   instruction_mux : process(all)
   begin
     case mode_latch is
-      when conv => memreg_c_i    <= conv_memreg_c;
+      when conv   => memreg_c_i    <= conv_memreg_c;
                      writebuff_c_i <= conv_writebuff_c;
                      inst_i        <= conv_inst;
                      ppinst_i      <= conv_ppinst;
                      ppshiftinst_i <= conv_ppshiftinst;
                      addbiasinst_i <= conv_addbiasinst;
                      clipinst_i    <= conv_clipinst;
-      when fft  => memreg_c_i    <= fft_memreg_c;
+      when fft    => memreg_c_i    <= fft_memreg_c;
                      writebuff_c_i <= fft_writebuff_c;
                      inst_i        <= fft_inst;
                      ppinst_i      <= fft_ppinst;
@@ -773,25 +801,56 @@ begin
 ---------------------------------------------------------------
 ----------read mux ------ TBD ------- temp solution -----------
 ---------------------------------------------------------------
-  process(all)
+  rw_from_control_mux : process(all)
   begin
     if re_busy = '0' then
       if mode_latch = conv then
         data_read_enable_i <= '1';
+        data_write_enable_i <= '0';
         weight_read_enable_i <= '1';
-        read_en_b_o <= '1';
+        weight_write_enable_i <= '0';
+        read_en_b_i <= '1';
       elsif mode_latch = fft then
         data_read_enable_i <= fft_read_en;
+        data_write_enable_i <= fft_write_en;
         weight_read_enable_i <= fft_read_en;
-        read_en_b_o <= fft_read_en;
+        weight_write_enable_i <= fft_write_en;
+        read_en_b_i <= '0';
       end if;
     else
       data_read_enable_i <= '0';
+      data_write_enable_i <= dwen_from_re;
       weight_read_enable_i <= '0';
-      read_en_b_o <= '0';
+      weight_write_enable_i <= wwen_from_re;
+      read_en_b_i <= '0';
     end if;
   end process;
 
+  rw_to_mem_mux : process(all)
+  begin
+    if mode_latch = re_mode then
+      read_en_o    <= read_en_to_mux;
+      write_en_o   <= dwen_from_re;
+      read_en_w_o  <= read_en_w_to_mux;
+      write_en_w_o <= wwen_from_re;
+      read_en_b_o  <= '0';
+      write_en_b_o <= bwen_from_re;
+    elsif mode_latch = fft then
+      read_en_o    <= read_en_to_mux;
+      write_en_o   <= write_en_to_mux;
+      read_en_w_o  <= read_en_w_to_mux;
+      write_en_w_o <= write_en_w_to_mux;
+      read_en_b_o  <= '0';
+      write_en_b_o <= '0';
+    else
+      read_en_o    <= '0';
+      write_en_o   <= '0';
+      read_en_w_o  <= '0';
+      write_en_w_o <= '0';
+      read_en_b_o  <= '0';
+      write_en_b_o <= '0';
+    end if;
+  end process;
   bypass <= '0';
 
 --bias data selector
@@ -964,9 +1023,9 @@ begin
       re_saddr_b       => re_saddr_b,
       bias_index_start => bias_index_start,
       re_busy          => re_busy,
-      write_en_data    => write_en_o,
-      write_en_weight  => write_en_w_o,
-      write_en_bias    => write_en_b_o,
+      write_en_data    => dwen_from_re,
+      write_en_weight  => wwen_from_re,
+      write_en_bias    => bwen_from_re,
       mode_c_l         => remode_c_l,
       bias_index_wr    => bias_index_wr,
       re_loop_counter  => re_loop,
@@ -1043,17 +1102,16 @@ begin
   ve_wctrlpipe_inst : ve_wctrlpipe
     port map(
       clk             => clk_p,
-      reset           => rst,
-      data0_addr_i    => ve_addr_l,     --data0_addr_i,
-      data1_addr_i    => ve_addr_l,     --data1_addr_i,
-      weight_addr_i   => ve_addr_r,     --weight_addr_i,
+      data0_addr_i    => data0_addr_i,
+      data1_addr_i    => data1_addr_i,
+      weight_addr_i   => weight_addr_i,
+      bias_addr_i     => bias_addr_i, --in std_logic_vector(7 downto 0);
+      bias_addr_ctrl_i=> ctrl, --in bias_addr_t;
       data_ren_i      => data_read_enable_i,
-      data_wen_i      => write_en_o,    --data_write_enable_i,
+      data_wen_i      => data_write_enable_i,
       weight_ren_i    => weight_read_enable_i,
-      weight_wen_i    => write_en_w_o,  --weight_write_enable_i,
-      enable_shift    => shifter_ena,
-      enable_add_bias => adder_ena,
-      enable_clip     => clip_ena,
+      weight_wen_i    => weight_write_enable_i,
+      bias_ren_i      => read_en_b_i, --in std_logic;
       data0_i         => data0,
       data1_i         => data1,
       weight_i        => weight,
@@ -1065,16 +1123,19 @@ begin
       addbiasinst_i   => addbiasinst_i,
       clipinst_i      => clipinst_i,
       lzod_i          => ("00", none),
+      feedback_ctrl_i => clip_to_1, --in feedback_t;
       zpdata_i        => zp_data,
       zpweight_i      => zp_weight,
-      bias_i          => bias_mux_out,
+      bias_i          => bias_buf_out,
       data0_addr_o    => data0_addr_o,
       data1_addr_o    => data1_addr_o,  -- for now data0 and 1 use the same address.
       weight_addr_o   => weight_addr_o,
-      data_ren_o      => read_en_o,
-      data_wen_o      => open,          --data_write_enable_o,
-      weight_ren_o    => read_en_w_o,
-      weight_wen_o    => open,          --weight_write_enable_o,
+      bias_addr_o     => bias_addr_o,  --biasaddr_to_memory, --out std_logic_vector(5 downto 0);
+      data_ren_o      => read_en_to_mux,
+      data_wen_o      => write_en_to_mux,          
+      weight_ren_o    => read_en_w_to_mux,
+      weight_wen_o    => write_en_w_to_mux,
+      bias_ren_o      => read_en_b_o, --out std_logic;          
       outreg_o        => outreg,
       writebuffer_o   => writebuffer,
       stall           => stall,

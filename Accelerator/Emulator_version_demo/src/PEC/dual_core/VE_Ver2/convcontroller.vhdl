@@ -73,7 +73,7 @@ begin
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
-  ppshiftinst   <= (enable, to_integer(unsigned(scale)), right);
+  ppshiftinst   <= (enable, to_integer(unsigned(scale)), '0',right);
   addbiasinst   <= (addbias, trunc);
   clipinst      <= (clip8, out0);
 

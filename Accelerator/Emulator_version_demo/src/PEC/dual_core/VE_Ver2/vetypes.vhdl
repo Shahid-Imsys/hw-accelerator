@@ -69,7 +69,7 @@ package vetypes is
   type lzod_t is (none, store1, store2, store3);
   --type lzod_out_t is (none, val, diff, nrit, nrit2, det1, det2);
   type lzod_out_t is (none, val, nrit, nrit2, det1);
-  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum,
+  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum, sumall,
                     select7, select6, select5, select4, select3, select2, select1,
                     select0, unitri, sum16, sum16left, matmulleft, nrit);
   function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;

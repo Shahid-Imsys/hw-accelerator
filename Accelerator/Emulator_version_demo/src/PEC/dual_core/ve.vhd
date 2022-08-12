@@ -41,7 +41,7 @@ use work.vetypes.all;
 
 entity ve is
   generic(
-    USE_ASIC_MEMORIES : boolean := true
+    USE_ASIC_MEMORIES : boolean := false
     );
   port(
     --Control inputs
@@ -77,7 +77,7 @@ architecture rtl of ve is
       data0_addr_i     : in std_logic_vector(7 downto 0);
       data1_addr_i     : in std_logic_vector(7 downto 0);
       weight_addr_i    : in std_logic_vector(7 downto 0);
-      bias_addr_i      : in std_logic_vector(5 downto 0);
+      bias_addr_i      : in std_logic_vector(7 downto 0);
       bias_addr_ctrl_i : in bias_addr_t;
       data_ren_i       : in std_logic;
       data_wen_i       : in std_logic;
@@ -121,9 +121,10 @@ architecture rtl of ve is
 
   component mem is
     generic (
-      width       : integer := 8;
-      addressbits : integer := 2;
-      columns     : integer := 4
+      load_filename : string;
+      width         : integer := 32;
+      addressbits   : integer := 2;
+      columns       : integer := 4
       );
     port (
       clk      : in  std_logic;
@@ -131,7 +132,8 @@ architecture rtl of ve is
       write_en : in  std_logic;
       d_in     : in  std_logic_vector(width-1 downto 0);
       address  : in  std_logic_vector(addressbits-1 downto 0);
-      d_out    : out std_logic_vector(width-1 downto 0)
+      d_out    : out std_logic_vector(width-1 downto 0);
+      load_mem : in std_logic
     );
   end component;
 
@@ -220,7 +222,7 @@ architecture rtl of ve is
       write_en_weight  : out std_logic;
       write_en_bias    : out std_logic;
       mode_c_l         : out std_logic;
-      bias_index_wr    : out std_logic_vector(5 downto 0);
+      bias_index_wr    : out std_logic_vector(7 downto 0);
       re_loop_counter  : out std_logic_vector(7 downto 0);
       re_addr_data     : out std_logic_vector(7 downto 0);
       re_addr_weight   : out std_logic_vector(7 downto 0)
@@ -359,10 +361,10 @@ architecture rtl of ve is
   signal pp_ctl  : std_logic_vector(7 downto 0); --expand this 8 bits, 1209
   signal bias_index_end : std_logic_vector(7 downto 0);
   signal bias_index_start : std_logic_vector(7 downto 0);
-  signal bias_index_wr : std_logic_vector(5 downto 0);
   signal data0_addr_i, data1_addr_i : std_logic_vector(7 downto 0);
   signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
-  signal bias_index_rd, bias_addr_o : std_logic_vector(7 downto 0);
+  signal bias_index_rd, bias_index_wr : std_logic_vector(7 downto 0);
+  signal bias_addr_o : std_logic_vector(5 downto 0);
   signal fw_layer   : std_logic_vector(23 downto 0); --feed forward layer, 24 bits.
   signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
   signal dfy_reg   : dfy_word;    --pushback(DFY) register
@@ -379,8 +381,8 @@ architecture rtl of ve is
   signal bias_mux_out : std_logic_vector(31 downto 0);
   signal bias_mux     : std_logic_vector(1 downto 0);
   signal bypass     : std_logic;
-  signal writebuffer    : std_logic_vector(63 downto 0);
-  signal mem_data_in : std_logic_vector(63 downto 0);
+  signal writebuffer : std_logic_vector(63 downto 0);
+  signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
   signal bias_in    : std_logic_vector(63 downto 0);
   signal mode_a_l  : std_logic;
   signal mode_b_l  : std_logic;
@@ -392,6 +394,10 @@ architecture rtl of ve is
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
   signal ve_clr_acc : std_logic; --clear accumulators
   signal pl_ve_byte : std_logic_vector(3 downto 0);
+  --fft test data
+  constant fft256_rand_data0  : string := "fft256_data0.dat";
+  constant fft256_rand_data1  : string := "fft256_data1.dat";
+  constant fft256_rand_weight : string := "fft256_weight.dat";
 
 
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
@@ -667,6 +673,14 @@ begin
   --**********************
   --Address_MUX
   --**********************
+  data_to_mem_mux : process(all)
+  begin
+    case mode_latch is
+      when re_mode => data_to_mem <= mem_data_in;
+      when others  => data_to_mem <= writebuffer; 
+    end case;
+  end process;
+
   addrfromctrl_pointer_mux : process(all)
   begin
     case mode_latch is
@@ -688,7 +702,7 @@ begin
   addrtomem_pointer_mux: process(all)
   begin
     case mode_latch is 
-      when re_mode => biasaddr_to_memory <= bias_addr_i;
+      when re_mode => biasaddr_to_memory <= bias_addr_i(5 downto 0);
                       weightaddr_to_memory <= re_addr_weight;
                         if mode_c_l = '1' then
                           data0addr_to_memory <= curr_ring_addr;
@@ -943,54 +957,61 @@ begin
 --data mem(splited in high and low part)--
     databuf_0 : mem
       generic map(
-        width       => 32,
-        addressbits => 8,
-        columns     => 2
+        load_filename => fft256_rand_data0,
+        width         => 32,
+        addressbits   => 8,
+        columns       => 4
         )
       port map (
         clk      => clk_p,
         read_en  => read_en_o,
         write_en => write_en_o,
-        d_in     => mem_data_in(63 downto 32),
+        d_in     => data_to_mem(63 downto 32),
         address  => data0addr_to_memory,
-        d_out    => data0
+        d_out    => data0,
+        load_mem => DDI_VLD
         );
     databuf_1 : mem
       generic map(
-        width       => 32,
-        addressbits => 8,
-        columns     => 2
+        load_filename => fft256_rand_data1,
+        width         => 32,
+        addressbits   => 8,
+        columns       => 4
         )
       port map(
         clk      => clk_p,
         read_en  => read_en_o,
         write_en => write_en_o,
-        d_in     => mem_data_in(31 downto 0),
+        d_in     => data_to_mem(31 downto 0),
         address  => data1addr_to_memory,
-        d_out    => data1
+        d_out    => data1,
+        load_mem => DDI_VLD
         );
 --weight mem--
     buf_weight : mem
       generic map (
-        width       => 64,
-        addressbits => 8,
-        columns     => 4
+        load_filename => fft256_rand_weight,
+        width         => 64,
+        addressbits   => 8,
+        columns       => 8
         )
       port map (
         clk      => clk_p,
         read_en  => read_en_w_o,
         write_en => write_en_w_o,
-        d_in     => mem_data_in,
+        d_in     => data_to_mem,
         address  => weightaddr_to_memory,
-        d_out    => weight
+        d_out    => weight,
+        load_mem => DDI_VLD
         );
 
 --bias mem--
     buf_bias : mem
       generic map(
-        width       => 64,
-        addressbits => 6,
-        columns     => 4
+        load_filename => fft256_rand_weight,
+        width         => 64,
+        addressbits   => 6,
+        columns       => 8
         )
       port map(
         clk      => clk_p,
@@ -998,7 +1019,8 @@ begin
         write_en => write_en_b_o,
         d_in     => bias_in,            --writebuffer,
         address  => biasaddr_to_memory,
-        d_out    => bias_buf_out
+        d_out    => bias_buf_out,
+        load_mem => '0'
         );
   end generate;
 
@@ -1079,7 +1101,7 @@ begin
   fftcontroller_i : fftcontroller
     port map(
       clk          => clk_p,
-      en           => fft_en,
+      en           => '1',--fft_en,
       start        => fft_start,
       stages       => fft_stages,  -- N = 2^(stages + 2), at most 7
       data0addr    => ve_fftaddr_d0, --data address comes out from fft controller
@@ -1122,7 +1144,7 @@ begin
       ppshiftinst_i   => ppshiftinst_i,
       addbiasinst_i   => addbiasinst_i,
       clipinst_i      => clipinst_i,
-      lzod_i          => ("00", none),
+      lzod_i          => ("00", none, none),
       feedback_ctrl_i => clip_to_1, --in feedback_t;
       zpdata_i        => zp_data,
       zpweight_i      => zp_weight,

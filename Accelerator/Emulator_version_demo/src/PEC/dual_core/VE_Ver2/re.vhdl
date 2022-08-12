@@ -29,7 +29,7 @@ entity re is
     write_en_weight  : out std_logic;
     write_en_bias    : out std_logic;
     mode_c_l         : out std_logic;
-    bias_index_wr    : out std_logic_vector(5 downto 0);
+    bias_index_wr    : out std_logic_vector(7 downto 0);
     re_loop_counter  : out std_logic_vector(7 downto 0);
     re_addr_data     : out std_logic_vector(7 downto 0);
     re_addr_weight   : out std_logic_vector(7 downto 0)
@@ -40,7 +40,7 @@ architecture receive_engine of re is
   --signals
   signal mode_a_l        : std_logic;
   signal mode_b_l        : std_logic;
-  signal bias_addr_reg   : std_logic_vector(5 downto 0);
+  signal bias_addr_reg   : std_logic_vector(7 downto 0);
   signal ring_end_addr   : std_logic_vector(7 downto 0);
   signal ring_start_addr : std_logic_vector(7 downto 0);
   signal curr_ring_addr  : std_logic_vector(7 downto 0);
@@ -113,7 +113,7 @@ begin
         re_addr_r <= (others => '0');
         bias_addr_reg <= (others => '0');
       elsif bias_addr_assign = '1' then
-        bias_addr_reg <= bias_index_start(5 downto 0);
+        bias_addr_reg <= bias_index_start;
       elsif re_source = '0' and re_addr_reload = '1' then
         if mode_a_l = '1' and mode_b_l = '0'then
           re_addr_l <= re_saddr_l;
@@ -128,7 +128,7 @@ begin
           re_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_r))+1,8));
         end if;
         if mode_a_l = '1' and mode_b_l = '1' then
-          bias_addr_reg <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_addr_reg))+1,6));
+          bias_addr_reg <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_addr_reg))+1,8));
         end if;
       end if;
     end if;

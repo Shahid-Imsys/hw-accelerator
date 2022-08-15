@@ -351,7 +351,7 @@ begin
         if trst_n = '0' or (cpt_trig_int(i) = '1' and onff(i) = '1') then
           wai_ff <= '0';
         elsif rising_edge(clk_p_n) then
-          if clk_t(i) = '1' then
+          if genclk(i) = '1' then
             if wai(1 downto 0) = "00" then
               wai_ff <= '0';
             elsif wai(2) = '0' and begintime(i) = '1' then

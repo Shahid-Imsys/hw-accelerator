@@ -179,8 +179,10 @@ architecture rtl of fpga_noc_adapter is
   constant NOC_IO_DIR_TX : std_logic := '1'; -- Data is read from TxFIFO
 
   -- Level constants
-  constant TxFIFO_FULL : std_logic_vector(ionoc_fifo_depth_bits downto 0) :=
-    "10000"; -- (ionoc_fifo_depth_bits => '1', others => '0');
+  constant FIFO_FULL : integer := 2**ionoc_fifo_depth_bits;
+
+  -- Level logic
+  signal FIFO_READY_int : integer range 0 to 2**ionoc_fifo_depth_bits := 0;
 
   -- NOC TxFIFO, read by IONOC
   signal TxFIFO_Ready : std_logic;
@@ -206,11 +208,13 @@ architecture rtl of fpga_noc_adapter is
 begin
 
   -- NOC interface
-  FIFO_READY <= TxFIFO_Level when NOC_DATA_DIR = NOC_DATA_DIR_TX else RxFIFO_Level;
+  FIFO_READY     <= std_logic_vector(to_unsigned(FIFO_READY_int, FIFO_READY'length));
+  FIFO_READY_int <= (FIFO_FULL - to_integer(unsigned(TxFIFO_Level))) when NOC_DATA_DIR = NOC_DATA_DIR_TX
+                    else to_integer(unsigned(RxFIFO_Level));
 
   -- Tx FIFO ( NOC --> FIFO --> GPP )
   NOC_DATA_Valid <= NOC_DATA_EN when NOC_DATA_DIR = NOC_DATA_DIR_TX else '0';
-  NOC_DATA_Ready <= '0' when TxFIFO_Level = TxFIFO_FULL else '1';
+  NOC_DATA_Ready <= '0' when unsigned(TxFIFO_Level) = FIFO_FULL else '1';
 
   tx_fifo_inst : sync_fifo
     port map(

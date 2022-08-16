@@ -3,12 +3,12 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.numeric_std_unsigned.all;
 
-entity sync_fifo is 
+entity sync_fifo is
   generic (
     WIDTH : integer := 8;   -- Data width in bits
-    BITS : integer := 4     -- fifo depth equal to 2^BITS + 1
+    BITS : integer := 4     -- fifo depth equal to 2^BITS
   );
-  
+
   port (
     areset_n : in std_logic;
     clk : in std_logic;
@@ -22,32 +22,32 @@ entity sync_fifo is
   );
 end sync_fifo;
 
-architecture fpga of sync_fifo is 
+architecture fpga of sync_fifo is
   type mem_t is array (2**BITS-1 downto 0) of std_logic_vector(WIDTH-1 downto 0);
-  
+
   signal mem : mem_t := (others => (others => '0'));
-  
+
   signal wptr : unsigned(BITS downto 0) := (others => '0');
   signal rptr : unsigned(BITS downto 0) := (others => '0');
-  
+
   signal full : std_logic;
-  signal empty : std_logic;   -- does not include ftwt reg
+  signal empty : std_logic;
 
   signal fwft_ready : std_logic;
 
 begin
 
-  -- state combinatorials 
+  -- state combinatorials
 
-  full <= '1' when (wptr(BITS-1 downto 0) = rptr(BITS-1 downto 0)) and (wptr(BITS) /= rptr(BITS)) else
+  full <= '1' when (wptr(BITS-1 downto 0) = (rptr(BITS-1 downto 0) - 1)) and (wptr(BITS) /= rptr(BITS)) else
           '0';
-  empty <= '1' when wptr = rptr else 
+  empty <= '1' when wptr = rptr else
            '0';
-  level <= to_slv(2**BITS + 1, level'length) when full else
+  level <= to_slv(2**BITS, level'length) when full else
            to_slv(1, level'length) when (out_valid and empty) or fwft_ready else
            (others => '0') when empty else
-           std_logic_vector(signed(wptr) - signed(rptr) + 1);
-  
+           std_logic_vector(wptr - rptr + 1);
+
   -- write machine
 
   process (clk, areset_n) begin
@@ -61,7 +61,7 @@ begin
     end if;
   end process;
 
-  in_ready <= not full;
+  in_ready <= '0' when level = to_slv(2**BITS, level'length) else '1';
 
   -- read machine
 

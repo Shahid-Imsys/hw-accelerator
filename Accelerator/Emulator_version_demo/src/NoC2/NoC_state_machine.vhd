@@ -33,15 +33,16 @@ entity Noc_State_Machine is
         TS                      : in  std_logic_vector(15 downto 0);
         TSDiv16_Reg             : in  std_logic_vector(11 downto 0);
         PEC_Ready               : in  std_logic;
-        WRITE_ACK               : in  std_logic;
+        IO_WRITE_ACK            : in  std_logic;
         CMD_FF                  : in  std_logic;
         Opcode                  : in  std_logic_vector(11 downto 0);
         Loop_reg_mux_ctrl       : in  std_logic;
+        PEC_WE                  : in  std_logic;
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
         Load_REQ_FF             : out std_logic;        
-        Load_GPP_CMD_Reg        : out std_logic;
+        Load_GPP_CMD            : out std_logic;
         Reset_MDC               : out std_logic;
         Load_MD_Reg             : out std_logic;
         Step_MDC                : out std_logic;
@@ -49,7 +50,9 @@ entity Noc_State_Machine is
         Start_Tag_Shift         : out std_logic;                        
         Load_Tag_Shift_Counter  : out std_logic;                      
         Step_BC                 : out std_logic;  
-        Reset_BC                : out std_logic;        
+        Reset_BC                : out std_logic;
+        Load_IR                 : out std_logic;
+        Reset_IR                : out std_logic;        
         Load_Mux_Reg            : out std_logic; 
         Control_Data_Out        : out std_logic_vector(7 downto 0);
         PEC_TS_Reg              : out std_logic_vector(15 downto 0);              
@@ -63,7 +66,8 @@ entity Noc_State_Machine is
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
         Load_TSDiv16_reg        : out std_logic;
-        ERROR                   : out std_logic              
+        ERROR                   : out std_logic;
+        Write_REQ               : out std_logic
     );
 end Noc_State_Machine;
 
@@ -136,8 +140,10 @@ architecture Behavioral of Noc_State_Machine is
     signal  Mux1,Mux2               : std_logic_vector(8 downto 0);
     signal  LC_Equal_LR_latch       : std_logic; 
     signal  LC_Equal_LR_extend      : std_logic;
+    signal  PEC_WE_latch            : std_logic;
+    signal  PEC_WE_extend           : std_logic;
     --internal signals
-	signal  Load_GPP_CMD_Reg_i      : std_logic;
+	signal  Load_GPP_CMD_i          : std_logic;
 	signal  Reset_MDC_i             : std_logic;
 	signal  Reset_LC_i              : std_logic;
 	signal  Reset_BC_i              : std_logic;
@@ -153,11 +159,12 @@ architecture Behavioral of Noc_State_Machine is
 	signal  Load_Mux_Reg_i          : std_logic;
 	signal  TC_mux_ctrl             : std_logic;
 	signal  MSB_as                  : std_logic;
-	signal  FF_data                 : std_logic;	
+	signal  FF_data                 : std_logic;
+	signal  FF                      : std_logic;	
 	
 begin
 
-    Load_GPP_CMD_Reg      <= Load_GPP_CMD_Reg_i;
+    Load_GPP_CMD          <= Load_GPP_CMD_i;
     Reset_MDC             <= Reset_MDC_i;
     Reset_LC              <= Reset_LC_i;
     Reset_BC              <= Reset_BC_i;
@@ -189,29 +196,29 @@ begin
       douta => program_mem_out
     );
     
-    mem_out                     <= program_mem_out when boot_FF = '1' else boot_mem_out;
-    ena_boot_mem                <= not(boot_FF);
+    mem_out                     <= program_mem_out when FF = '0' else boot_mem_out;
+    ena_boot_mem                <= not(boot_FF) or FF;
     program_mem_we(0)           <= '0' when load_program_mem= '0' else '1';
     program_mem_addr_mux        <= std_logic_vector(Address_Counter) when boot_FF = '1' else std_logic_vector(boot_as_counter);
-    program_mem_data_mux        <= IO_data(27 downto 0)   when boot_as_counter(1 downto 0) = "00" else
-                                   IO_data(59 downto 32)  when boot_as_counter(1 downto 0) = "01" else
-                                   IO_data(91 downto 64)  when boot_as_counter(1 downto 0) = "10" else
-                                   IO_data(123 downto 96) when boot_as_counter(1 downto 0) = "11";
+    program_mem_data_mux        <= IO_data(27 downto 0)    when boot_as_counter(1 downto 0) = "00" else
+                                   IO_data(59 downto 32)   when boot_as_counter(1 downto 0) = "01" else
+                                   IO_data(91 downto 64)   when boot_as_counter(1 downto 0) = "10" else
+                                   IO_data(123 downto 96)  when boot_as_counter(1 downto 0) = "11";
 
     TCx16                       <= std_logic_vector(Transfer_Counter) & "0000"; --TC_Mux & "0000";     --TS & "0000";
-    Loop_Mux                    <= x"000" & Control_Data when Loop_reg_mux_ctrl= '0' else (TCx16);
-    Jump_condition_Mux          <= not(CMD_FF)           when Mem_Out(26 downto 24) = "000" else 
-                                   not(FIFO_Ready1)      when Mem_Out(26 downto 24) = "001" else
-                                   not(FIFO_Ready2)      when Mem_Out(26 downto 24) = "010" else
-                                   not(WRITE_ACK)        when Mem_Out(26 downto 24) = "011" else 
-                                   not(FIFO_Ready3)      when Mem_Out(26 downto 24) = "100" else 
-                                   TC_equal_Zero         when Mem_Out(26 downto 24) = "101" else
-                                   LC_Equal_LR_extend    when Mem_Out(26 downto 24) = "110" else '0';
+    Loop_Mux                    <= x"000" & Control_Data   when Loop_reg_mux_ctrl= '0' else (TCx16);
+    Jump_condition_Mux          <= not(CMD_FF)             when Mem_Out(26 downto 24) = "000" else 
+                                   not(FIFO_Ready1)        when Mem_Out(26 downto 24) = "001" else
+                                   not(FIFO_Ready2)        when Mem_Out(26 downto 24) = "010" else
+                                   not(IO_WRITE_ACK)       when Mem_Out(26 downto 24) = "011" else 
+                                   not(FIFO_Ready3)        when Mem_Out(26 downto 24) = "100" else 
+                                   TC_equal_Zero           when Mem_Out(26 downto 24) = "101" else
+                                   LC_Equal_LR_extend      when Mem_Out(26 downto 24) = "110" else '0';
 
-    Wait_condition_Mux          <= LC_Equal_LR_extend    when (Mem_Out(21 downto 20) = "01" and Mem_Out(23)= '1') else 
-                                   not(TAG_shift)        when (Mem_Out(21 downto 20) = "10" and Mem_Out(23)= '1') else
-                                   TC_equal_Zero         when (Mem_Out(21 downto 20) = "10" and Mem_Out(23)= '1') else
-                                   '0'; -- else 1?                                                                                                                            
+    Wait_condition_Mux          <= PEC_WE_extend           when (Mem_Out(21 downto 20) = "00" and Mem_Out(23)= '1') else 
+                                   LC_Equal_LR_extend      when (Mem_Out(21 downto 20) = "01" and Mem_Out(23)= '1') else 
+                                   not(TAG_shift)          when (Mem_Out(21 downto 20) = "10" and Mem_Out(23)= '1') else
+                                   TC_equal_Zero           when (Mem_Out(21 downto 20) = "11" and Mem_Out(23)= '1') else '0';
    
     AS_Counter_Mux              <= '0' & Opcode(7 downto 0)           when Mem_Out(23) = '1' else Mux1;
     Mux1                        <= Mux2                               when Mem_Out(21 downto 20) = "00" else
@@ -220,9 +227,10 @@ begin
                                    Return_Reg2                        when Mem_Out(21 downto 20) = "11" else (others => '0');                      
     Mux2                        <= Return_Reg2                        when Jump_condition_Mux = '1' else Return_Reg1;
 
-    Cond_Jump                   <= '1' when Mem_Out(23 downto 20) = "0101" or Mem_Out(23 downto 20) = "0111" or Mem_Out(23 downto 20) = "1000" else '0';
+--    Cond_Jump                   <= '1' when Mem_Out(23 downto 20) = "0101" or Mem_Out(23 downto 20) = "0111" or Mem_Out(23 downto 20) = "1000" else '0';
+    Cond_Jump                   <= '1' when Mem_Out(23 downto 20) = "0101" or Mem_Out(23 downto 20) = "0110" or Mem_Out(23 downto 20) = "0111"  else '0';
     UnCond_Jump                 <= '1' when Mem_Out(23 downto 20) = "0001" or Mem_Out(23 downto 20) = "0010" or Mem_Out(23 downto 20) = "0011" or Mem_Out(23 downto 20) = "0100" or Mem_Out(23 downto 20) = "1100" else '0';
-    Cond_Wait                   <= '1' when (Mem_Out(21 downto 20) = "01" and Mem_Out(23)= '1') or (Mem_Out(21 downto 20) = "10" and Mem_Out(23)= '1') or (Mem_Out(21 downto 20) = "11" and Mem_Out(23)= '1') else '0';
+    Cond_Wait                   <= '1' when (Mem_Out(21 downto 20) = "01" and Mem_Out(23)= '1') or (Mem_Out(21 downto 20) = "10" and Mem_Out(23)= '1') or (Mem_Out(21 downto 20) = "11" and Mem_Out(23)= '1') or (Mem_Out(21 downto 20) = "00" and Mem_Out(23)= '1') else '0';
     Load_AS_Counter             <= (Jump_condition_Mux and Cond_Jump) or UnCond_Jump;
     Enable_AS_Counter           <=  Wait_condition_Mux or not(Cond_Wait);
 
@@ -252,6 +260,7 @@ begin
     LC_Equal_LR                 <= '1' when Loop_Counter = unsigned(Loop_Register) and Loop_Counter > 0 else '0';
     LC_Equal_LR_extend          <= LC_Equal_LR or LC_Equal_LR_latch;
     TC_Equal_Zero               <= '1' when Transfer_Counter = x"0000" else '0';
+    PEC_WE_extend               <= PEC_WE or PEC_WE_latch;
     
 
     process(clk, reset)
@@ -263,6 +272,7 @@ begin
             Load_PCIe_CMD_Reg_i         <= '0';
             Control_Data_Out            <= (others => '0');
             LC_Equal_LR_latch           <= '0';
+            PEC_WE_latch                <= '0';
             Control_Data                <= (others => '0');               
             Load_Mux_Reg_i              <= '0';
             Load_LR                     <= '0';
@@ -277,7 +287,7 @@ begin
             En_IO_Data                  <= '0';
             Start_TAG_Shift_i           <= '0';
             Load_TC                     <= '0';
-            Load_GPP_CMD_Reg_i          <= '0';  
+            Load_GPP_CMD_i              <= '0';  
             Reset_MDC_i                 <= '0';           
             Step_LC                     <= '0';
             Decr_TC                     <= '0';
@@ -301,8 +311,9 @@ begin
             Load_TSDiv16_reg            <= '0';
             
         elsif rising_edge(clk) then
-        
+            FF                          <= not(boot_FF);
             LC_Equal_LR_latch           <= LC_Equal_LR;
+            PEC_WE_latch                <= PEC_WE;
             Control_Data                <= Mem_Out(7 downto 0);
             Control_Data_Out            <= Mem_Out(7 downto 0);
             MSB_as                      <= Mem_Out(27);
@@ -315,6 +326,8 @@ begin
             Load_Return_Reg1            <= Decoder1(5);
             Load_Return_Reg2            <= Decoder1(6);
             Step_BC                     <= Decoder1(7);
+            Load_IR                     <= Decoder1(8);
+            Load_GPP_CMD_i              <= Decoder1(9);
             load_program_mem            <= Decoder1(10);
             
             Load_NOC_reg_i              <= Mem_Out(12);
@@ -326,21 +339,19 @@ begin
             
             Start_TAG_Shift_i           <= Decoder2(0) and Mem_Out(0); 
             Load_RM_Address             <= Decoder2(0) and Mem_Out(1);
-            En_IO_Ctrl                  <= Decoder2(0) and Mem_Out(2);
             Reset_TPC                   <= Decoder2(0) and Mem_Out(3);            
             Load_TC                     <= Decoder2(0) and Mem_Out(4);
             TC_mux_ctrl                 <= Decoder2(0) and Mem_Out(5);
-            Load_TSDiv16_reg            <= Decoder2(0) and Mem_Out(6);
             				
-            Load_GPP_CMD_Reg_i          <= Decoder2(1) and Mem_Out(0);
             NOC_Ready                   <= Decoder2(1) and Mem_Out(1);
-            Load_REQ_FF                 <= Decoder2(1) and Mem_Out(2);
+            Write_REQ                   <= Decoder2(1) and Mem_Out(2);
             Load_Boot_FF                <= Decoder2(1) and Mem_Out(3);
             FF_data                     <= Decoder2(1) and Mem_Out(4);
             Reset_Boot_as_counter       <= Decoder2(1) and Mem_Out(5);
             ERROR                       <= Decoder2(1) and Mem_Out(6);                  
             
             Step_LC                     <= Decoder2(2) and Mem_Out(2);
+            Reset_IR                    <= Decoder2(2) and Mem_Out(3);
             Decr_TC                     <= Decoder2(2) and Mem_Out(4);
             Reset_LC_i                  <= Decoder2(2) and Mem_Out(5);
             Reset_BC_i                  <= Decoder2(2) and Mem_Out(6); 

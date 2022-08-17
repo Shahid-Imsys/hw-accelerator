@@ -661,7 +661,8 @@ begin
         ionoc_txfifo_valid_f <= '0';
       end if;
       --
-      if ionoc_txfifo_valid_f = '0' and
+      if TxFIFO_Valid = '0' and
+        ionoc_txfifo_valid_f = '0' and
         not ionoc_rddata_pending then
         -- Data is cumsumed, prepare for next word
         TxFIFO_Ready <= '1';

@@ -86,6 +86,10 @@ architecture tb of fpga_noc_adapter_tb is
     reset,
     init,
     --
+    test0a,
+    test0b,
+    test0c,
+    --
     test1a,
     test1b,
     --
@@ -135,6 +139,7 @@ architecture tb of fpga_noc_adapter_tb is
   signal clk_p   : std_logic := '0';
   signal clk_noc : std_logic := '0';
   signal reset_n : std_logic := '0';
+  signal rst_n   : std_logic := '0'; -- Combination of reset sources
   --
 
   -- test_proc
@@ -145,6 +150,7 @@ architecture tb of fpga_noc_adapter_tb is
   signal gpp_action : gpp_action_t := idle;
   signal gpp_wrdata : std_logic_vector(127 downto 0);
   signal gpp_rddata : std_logic_vector(127 downto 0) := (others => '0');
+  signal test_reset : std_logic := '1';
 
   -- gpp_proc
   signal idi              : std_logic_vector (7 downto 0);
@@ -215,6 +221,9 @@ begin
   clk_p   <= run and not clk_p   after clock_period_c/2;
   clk_noc <= run and not clk_noc after nocclk_period_c/2;
   reset_n <= '1'                 after 10 * clock_period_c;
+
+  -- Combine reset sources
+  rst_n <= reset_n and test_reset;
 
   clk_proc : process(clk_p)
   begin
@@ -491,6 +500,8 @@ begin
       NOC_WRITE_REQ <= '0';
       NOC_DATA_EN   <= '0';
 
+      test_reset    <= '1';
+
       -- Delays
       fsm_d <= fsm;
 
@@ -518,10 +529,8 @@ begin
 
         when init =>
           if clk_count(1 downto 0) = "11" then
-            fsm       <= test1a;
-            fsm_count <= 0;
-            --
-            write(l, string'("[TEST START] - Test 1  (Start of GPP to NOC sequence)"));
+            fsm <= test0a;
+            write(l, string'("[TEST START] - Test 0 - Write past limit of TxFIFO"));
             writeline(output, l);
           end if;
 
@@ -533,12 +542,60 @@ begin
           end if;
 
         -------------------------------------------
+        -- TEST0 - FIFO bashing
+        -------------------------------------------
+        when test0a =>
+          NOC_DATA_DIR <= '1';
+
+          if NOC_DATA_DIR = '0' then
+            NOC_DATA <= (others => '0');
+          else
+            if unsigned( FIFO_READY ) = 0 then
+              fsm <= test0b;
+            end if;
+            --
+            NOC_DATA    <= std_logic_vector( unsigned(NOC_DATA) + 1 );
+            NOC_DATA_EN <= '1';
+            --
+            -- write(l, string'("[TxFIFO] Level: "));
+            -- write(l, to_integer( unsigned( FIFO_READY ) ) );
+            -- writeline(output, l);
+          end if;
+
+        when test0b =>
+          NOC_DATA_DIR <= '0';
+
+          if NOC_DATA_DIR = '1' then
+            NOC_DATA <= (others => '0');
+          else
+            if unsigned( FIFO_READY ) = 0 then
+              fsm <= test0c;
+              --
+              test_reset <= '0';
+            end if;
+            --
+            NOC_DATA    <= std_logic_vector( unsigned(NOC_DATA) + 1 );
+            NOC_DATA_EN <= '1';
+            --
+            -- write(l, string'("[RxFIFO] Level: "));
+            -- write(l, to_integer( unsigned( FIFO_READY ) ) );
+            -- writeline(output, l);
+          end if;
+
+        when test0c =>
+            write(l, string'("[TEST START] - Test 1  (Start of GPP to NOC sequence)"));
+            writeline(output, l);
+            --
+            fsm       <= test1a;
+            fsm_count <= 0;
+
+        -------------------------------------------
         -- TEST1 - NOC requests data from some address (to RxFIFO)
         -------------------------------------------
         when test1a =>
-          NOC_ADDRESS  <= x"12345678";
-          NOC_LENGTH   <= x"0123";
-          NOC_IO_DIR   <= '0'; -- Data dir is towards NOC
+          NOC_ADDRESS <= x"12345678";
+          NOC_LENGTH  <= x"0123";
+          NOC_IO_DIR  <= '0'; -- Data dir is towards NOC
 
           if fsm_count > 0 then
             NOC_WRITE_REQ <= '1';
@@ -782,13 +839,16 @@ begin
 
         when test6b =>
           if io_bus_action = done then
-            gpp_action <= idle;
             ----------------------------------------
             fsm       <= wait_done;
             fsm_count <= 0;
             write(l, string'("[WAIT_DONE]"));
             writeline(output, l);
           end if;
+
+        -------------------------------------------
+        -- END OF TESTS
+        -------------------------------------------
 
         when others =>
           fsm_count <= 0;
@@ -824,7 +884,7 @@ begin
     port map (
       clk_p         => clk_p,
       clk_i_pos     => clk_i,
-      rst_n         => reset_n,
+      rst_n         => rst_n,
       idi           => idi,
       ido           => ido,
       iden          => iden,

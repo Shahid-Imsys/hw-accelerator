@@ -453,20 +453,18 @@ begin
       -- A driving timer with its rep bit set can be forced to turn itself
       -- off anyway by the driven timer, if the latter sets the former's
       -- ctrldrvg(0) line high. 
-      process (clk_p_n, trst_n)
+      process (clk_p_n, trst_n, turn_on(i), turn_off_n(i))
       begin
         if trst_n = '0' then
           onff(i) <= '0';
-        elsif rising_edge(clk_p_n) then
-          if (turn_on(i) = '1') then
+        elsif (turn_on(i) = '1') then
             onff(i) <= '1';
-          elsif (turn_off_n(i) = '0') then
+        elsif (turn_off_n(i) = '0') then
             onff(i) <= '0';
-          else
+        elsif rising_edge(clk_p_n) then
             if (cnt_zero(i) = '1' and rep = '0') or ctrldrvg(i)(0) = '1' then
               onff(i) <= '0';
             end if;
-          end if;
         end if;
       end process;
 
@@ -576,38 +574,6 @@ begin
 
   begin
 
-    -----------------------------------
-    -- TEST SEGMENT
-    -----------------------------------
-    -- Frequency divider
-    -- process (first_clk, trst_n)
-    -- begin
-    --   if (trst_n = '0') then
-    --     ff_old(0) <= '0';
-    --   elsif rising_edge(first_clk) then
-    --     if run = '1' or ff_old(0) = '1' then
-    --       ff_old(0) <= not ff_old(0);
-    --     end if;
-    --   end if;
-    -- end process;
-
-    -- freq_old : for i in 1 to 7 generate
-    --   div_old : block
-    --   begin
-    --     process (ff_old(i-1), trst_n)
-    --     begin
-    --       if trst_n = '0' then
-    --         ff_old(i) <= '0';
-    --       elsif falling_edge(ff_old(i-1)) then
-    --         ff_old(i) <= not ff_old(i);
-    --       end if;
-    --     end process;
-    --   end block div_old;
-    -- end generate freq_old;
-    -----------------------------------
-    -- TEST SEGMENT
-    -----------------------------------
-
     -- Frequency divider
     process (clk_p_n, trst_n)
     begin
@@ -621,7 +587,6 @@ begin
             ff(0) <= '0';
           end if;
         end if;
-        --assert ff = ff_old report "ff error" severity error;
       end if;
     end process;
 
@@ -693,16 +658,6 @@ begin
     -- This process creates a clkpulse for writing in parameter registers.
     -- It is distributed to the params block in every timer, but writing
     -- will be performed only in the timer selected by wr(i).
-    -- process (first_clk)
-    -- begin
-    --   if rising_edge(first_clk) then
-    --     if (trst_n = '0' or rst_en = '0') then
-    --       tiu_test <= '0';
-    --     else
-    --       tiu_test <= reg_wr;
-    --     end if;
-    --   end if;
-    -- end process;
 
     process (clk_p_n)
     begin

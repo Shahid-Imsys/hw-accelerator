@@ -453,18 +453,20 @@ begin
       -- A driving timer with its rep bit set can be forced to turn itself
       -- off anyway by the driven timer, if the latter sets the former's
       -- ctrldrvg(0) line high. 
-      process (clk_p_n, trst_n, turn_on(i), turn_off_n(i))
+      process (clk_p_n, trst_n)
       begin
         if trst_n = '0' then
           onff(i) <= '0';
-        elsif (turn_on(i) = '1') then
-            onff(i) <= '1';
-        elsif (turn_off_n(i) = '0') then
-            onff(i) <= '0';
         elsif rising_edge(clk_p_n) then
+          if (turn_on(i) = '1') then
+            onff(i) <= '1';
+          elsif (turn_off_n(i) = '0') then
+            onff(i) <= '0';
+          else
             if (cnt_zero(i) = '1' and rep = '0') or ctrldrvg(i)(0) = '1' then
               onff(i) <= '0';
             end if;
+          end if;
         end if;
       end process;
 

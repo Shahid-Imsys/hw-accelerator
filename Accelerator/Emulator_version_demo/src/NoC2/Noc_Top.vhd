@@ -19,31 +19,30 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity Noc_Top is
   Port (
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;
         IO_data              : in  std_logic_vector(127 downto 0);
-        FIFO_Ready1          : in  std_logic;
-        FIFO_Ready2          : in  std_logic;
-        FIFO_Ready3          : in  std_logic;
-        Write_ACK            : in  std_logic;                
+        FIFO_Ready           : in  std_logic_vector(5 downto 0);
+        IO_WRITE_ACK         : in  std_logic;                
         PEC_Ready            : in  std_logic; 
         GPP_CMD_ACK          : in  std_logic;
         GPP_CMD_Flag         : in  std_logic;
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
-        --from NOC bus 
-        Write_enable         : in  std_logic;
-        NOC_bus_in           : in  std_logic_vector(127 downto 0);
+        -- NOC PEC INTEFACE
+        PEC_WE               : in  std_logic;
+        PEC_byte_data        : in  std_logic_vector(127 downto 0);
+        Noc_byte_data        : out std_logic_vector(127 downto 0);
         --Output 
-        En_IO_Data           : out std_logic;
+        NOC_DATA_EN          : out std_logic;
         En_IO_ctrl           : out std_logic;
         NOC_CMD_flag         : out std_logic;
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
-        address              : out std_logic_vector(31 downto 0);               
-        Length               : out std_logic_vector(15 downto 0);
-        Noc_bus_out          : out std_logic_vector(127 downto 0);
+        NOC_Address          : out std_logic_vector(31 downto 0);               
+        NOC_Length           : out std_logic_vector(15 downto 0);
         Tag_Line             : out std_logic;
         NOC_WRITE_REQ        : out std_logic;
        	NOC_data             : out std_logic_vector(127 downto 0);
@@ -63,17 +62,18 @@ architecture structural of Noc_Top is
         FIFO_Ready3             : in  std_logic;        
         TAG_shift               : in  std_logic;                    
         TS                      : in  std_logic_vector(15 downto 0);
-        TSDiv16_Reg             : in  std_logic_vector(11 downto 0);        
+        TSDiv16_Reg             : in  std_logic_vector(11 downto 0);
         PEC_Ready               : in  std_logic;
-        Write_ack               : in  std_logic;
+        IO_WRITE_ACK            : in  std_logic;
         CMD_FF                  : in  std_logic;
         Opcode                  : in  std_logic_vector(11 downto 0);
         Loop_reg_mux_ctrl       : in  std_logic;
+        PEC_WE                  : in  std_logic;
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
-        Load_REQ_FF             : out std_logic;          
-        Load_GPP_CMD_Reg        : out std_logic;
+        Load_REQ_FF             : out std_logic;        
+        Load_GPP_CMD            : out std_logic;
         Reset_MDC               : out std_logic;
         Load_MD_Reg             : out std_logic;
         Step_MDC                : out std_logic;
@@ -81,7 +81,9 @@ architecture structural of Noc_Top is
         Start_Tag_Shift         : out std_logic;                        
         Load_Tag_Shift_Counter  : out std_logic;                      
         Step_BC                 : out std_logic;  
-        Reset_BC                : out std_logic;        
+        Reset_BC                : out std_logic;
+        Load_IR                 : out std_logic;
+        Reset_IR                : out std_logic;        
         Load_Mux_Reg            : out std_logic; 
         Control_Data_Out        : out std_logic_vector(7 downto 0);
         PEC_TS_Reg              : out std_logic_vector(15 downto 0);              
@@ -95,7 +97,8 @@ architecture structural of Noc_Top is
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
         Load_TSDiv16_reg        : out std_logic;
-        ERROR                   : out std_logic                                   
+        ERROR                   : out std_logic;
+        Write_REQ               : out std_logic                                  
     );
     end component;
         
@@ -104,9 +107,9 @@ architecture structural of Noc_Top is
         clk                     : in  std_logic;
         Reset                   : in  std_logic;
         GPP_CMD_Flag            : in  std_logic;
-        Load_GPP_CMD_reg        : in  std_logic;
-        Load_TSDiv16_reg        : in  std_logic;
+        Load_GPP_CMD            : in  std_logic;
         GPP_CMD_Data            : in  std_logic_vector(127 downto 0);
+        Control_data            : in  std_logic_vector(7 downto 0);        
         Opcode                  : out std_logic_vector(7  downto 0);
         Switch_ctrl             : out std_logic_vector(7 downto 0);
         Transfer_size           : out std_logic_vector(15 downto 0);
@@ -114,11 +117,13 @@ architecture structural of Noc_Top is
         CM_Address0             : out std_logic_vector(14 downto 0);
         CM_Address1             : out std_logic_vector(14 downto 0);
         Padding_Data            : out std_logic_vector(7 downto 0);
-        Length                  : out std_logic_vector(15 downto 0);
-        Address                 : out std_logic_vector(31 downto 0);        
-        CMD_FF                  : out std_logic;
+        NOC_Length              : out std_logic_vector(15 downto 0);
+        NOC_Address             : out std_logic_vector(31 downto 0);        
         TSDiv16_Reg             : out std_logic_vector(11 downto 0);
-        NOC_CMD_ACK             : out std_logic
+        CMD_FF                  : out std_logic;        
+        NOC_CMD_ACK             : out std_logic;
+        Address_steps           : out std_logic_vector(113 downto 0);
+        End_values              : out std_logic_vector(113 downto 0)        
     );
     end component;
   
@@ -205,7 +210,8 @@ architecture structural of Noc_Top is
         Decoder                 : in  std_logic_vector(15 downto 0);
         switch_input_muxes      : in  std_logic_vector(2 downto 0);
         switch_Noc_bus_mux      : in  std_logic;
-        Noc_bus_out             : out std_logic_vector(127 downto 0);
+        EN_Noc_byte_data        : in  std_logic;
+        Noc_byte_data           : out std_logic_vector(127 downto 0);
         switch_out              : out std_logic_vector(127 downto 0)    
     );        
     end component;
@@ -216,8 +222,10 @@ architecture structural of Noc_Top is
 	    Reset                   : in  std_logic;
 	    Reset_BC                : in  std_logic;
 	    Step_BC                 : in  std_logic;
+	    RM_as_mux               : in  std_logic;
+	    RM_byte_as              : in  std_logic_vector(3 downto 0);	    
 	    Decoder                 : out std_logic_vector(15 downto 0);
-	    byte_counter            : out std_logic_vector(4 downto 0)
+	    byte_counter            : out std_logic_vector(3 downto 0)
     );
     end component;
     
@@ -229,6 +237,7 @@ architecture structural of Noc_Top is
         Control_Data            : in  std_logic_vector(7 downto 0);
         NOC_reg_mux_ctrl        : out std_logic_vector(1 downto 0);
         NOC_data_mux_ctrl       : out std_logic;
+        RM_as_mux               : out std_logic;
         Data_dir                : out std_logic;
         NOC_bus_out_mux_ctrl    : out std_logic;
         Loop_reg_mux_ctrl       : out std_logic;
@@ -264,7 +273,7 @@ architecture structural of Noc_Top is
     signal Load_NOC_Reg         : std_logic;
     signal Load_PEC_Reg         : std_logic;
     signal Load_REQ_FF          : std_logic;
-    signal Load_GPP_CMD_Reg     : std_logic;
+    signal Load_GPP_CMD         : std_logic;
     signal Reset_MDC            : std_logic;
     signal Load_MD_Reg          : std_logic;
     signal Step_MDC             : std_logic;
@@ -284,7 +293,9 @@ architecture structural of Noc_Top is
     signal Sync_pulse_i         : std_logic;
     signal Sync_pulse_i_p       : std_logic;
     signal load_Mode_reg        : std_logic;
-    signal Load_TSDiv16_reg     : std_logic;              
+    signal Load_TSDiv16_reg     : std_logic;
+    signal ERROR                : std_logic;
+    signal Write_REQ            : std_logic;                  
 
     --CMD_From_GPP
     signal Switch_ctrl          : std_logic_vector(7 downto 0); 
@@ -294,7 +305,8 @@ architecture structural of Noc_Top is
     signal Padding_Data         : std_logic_vector(7 downto 0);
     signal TSDiv16_Reg          : std_logic_vector(11 downto 0);
     signal NOC_CMD_ACK          : std_logic;
-    signal ERROR                : std_logic;
+    signal Address_steps        : std_logic_vector(113 downto 0);
+    signal End_values           : std_logic_vector(113 downto 0);    
     --MUX_DEMUX
     signal Switch_Data          : std_logic_vector(127 downto 0);
     signal Mux_Demux_out0       : std_logic_vector(127 downto 0);
@@ -306,6 +318,10 @@ architecture structural of Noc_Top is
     signal RM_Data_Out          : std_logic_vector(127 downto 0);
     --NoC_INPUT_REG
     signal NoC_Input_reg_Out    : std_logic_vector(127 downto 0);
+    signal NoC_Input_reg_Out_p  : std_logic_vector(127 downto 0);
+    signal NoC_Input_reg_Out_p2 : std_logic_vector(127 downto 0);
+    signal NoC_Input_reg_Out_p3 : std_logic_vector(127 downto 0);
+    
     --NOC REG
     signal NOC_reg_mux_ctrl     : std_logic_vector(1 downto 0);
     signal Noc_Reg_out          : std_logic_vector(127 downto 0);
@@ -313,13 +329,14 @@ architecture structural of Noc_Top is
     signal Decoder              : std_logic_vector(15 downto 0);
     signal NOC_bus_out_mux_ctrl : std_logic;
     --Byte_counter_decoder
-    signal byte_counter         : std_logic_vector(4 downto 0);
+    signal byte_counter         : std_logic_vector(3 downto 0);
     --Mux_Register
     signal NOC_data_mux_ctrl    : std_logic;
     signal Tag_Line_i           : std_logic;
+    signal RM_as_mux            : std_logic;
     --
     signal REQ_FF               : std_logic; 
-    signal Mode_reg             : std_logic_vector(3 downto 0);
+    signal Mode_reg             : std_logic_vector(4 downto 0);
     signal Enable_Root_memory   : std_logic;
     signal En_IO_Data_SM        : std_logic;
     signal En_TP_write          : std_logic;
@@ -327,10 +344,24 @@ architecture structural of Noc_Top is
     signal Mux_Demux_out1       : std_logic_vector(127 downto 0);
     signal Noc_data_mux         : std_logic_vector(127 downto 0);
     
+    signal FF2_input            : std_logic;
+    signal FF2_output           : std_logic;
+    signal FF1                  : std_logic;
+    signal EN_Noc_byte_data     : std_logic;
+    signal FIFO_Ready1          : std_logic;
+    signal FIFO_Ready2          : std_logic;
+    signal FIFO_Ready3          : std_logic;
+    signal FIFO_Ready4          : std_logic_vector(5 downto 0);
+    
+    --RM ADDRESS GEN
+    signal Load_IR              : std_logic;
+    signal Reset_IR             : std_logic;
+
+	signal RM_byte_as           : std_logic_vector(3 downto 0);    
+
 begin
 
     Tag_Line        <= Tag_Line_i or Sync_pulse_i or Sync_pulse_i_p;
-    NOC_WRITE_REQ   <= REQ_FF;
     
     NOC_data        <= Mux_Demux_out1 when NOC_data_mux_ctrl = '1' else Noc_data_mux;  --????????need to check code
     NOC_DATA_DIR    <= Data_Direction;
@@ -345,17 +376,41 @@ begin
                 REQ_FF   <= Control_Data_Out(0);
 			end if;
 			if (load_Mode_reg = '1') then
-		        Mode_reg <= Control_Data_Out(3 downto 0);
+		        Mode_reg <= Control_Data_Out(4 downto 0);
 		    end if;
-		    Sync_pulse_i_p    <= Sync_pulse_i;    
+		    Sync_pulse_i_p    <= Sync_pulse_i;
+		    		    
+		    NoC_Input_reg_Out_p   <= NoC_Input_reg_Out;
+		    NoC_Input_reg_Out_p2  <= NoC_Input_reg_Out_p;
+		    NoC_Input_reg_Out_p3  <= NoC_Input_reg_Out_p2;
 		end if;	
 	end process;
 	
 	--MODE LOGIC
-	En_IO_Data             <= Mode_reg(0) and En_IO_Data_SM;
+	NOC_DATA_EN            <= Mode_reg(0) and En_IO_Data_SM;
 	Enable_Root_memory     <= Mode_reg(1) and En_RM;
 	En_TP_read             <= Mode_reg(2) and En_TP;
 	En_TP_write            <= Mode_reg(3) and En_TP;
+	EN_Noc_byte_data       <= Mode_reg(4);
+	
+	--REQ LOGIC
+	FF2_input              <= (FF1 nor reset) and (Write_REQ or FF2_output);
+	NOC_WRITE_REQ          <= FF2_output;
+	process(clk, reset)
+	begin
+		if reset = '1' then
+            FF1         <= '0';
+            FF2_output  <= '0';
+		elsif rising_edge (clk) then
+		    FF1   <= IO_WRITE_ACK;
+		    FF2_output    <= FF2_input;
+		end if;
+    end process;
+    
+    --FIFO READY LOGIC
+    FIFO_Ready1 <= FIFO_Ready(0) or FIFO_Ready(1) or FIFO_Ready(2) or FIFO_Ready(3)	or FIFO_Ready(4) or FIFO_Ready(5);		    
+	FIFO_Ready2 <= FIFO_Ready(4) or FIFO_Ready(5);
+	FIFO_Ready3 <= '1' when FIFO_Ready >= "111000" else '0';
         
     Noc_State_Machine_Inst: Noc_State_Machine
     port map
@@ -370,16 +425,17 @@ begin
         TS                      => Transfer_size,
         TSDiv16_Reg             => TSDiv16_Reg,
         PEC_Ready               => PEC_Ready,
-        Write_ack               => Write_ack,
+        IO_WRITE_ACK            => IO_WRITE_ACK,
         CMD_FF                  => CMD_FF,
         Opcode                  => Opcode,
         Loop_reg_mux_ctrl       => Loop_reg_mux_ctrl,
+        PEC_WE                  => PEC_WE,
         --OUTPIUT
         Load_RM_Address         => Load_RM_Address,
         Load_NOC_Reg            => Load_NOC_Reg,
         Load_PEC_Reg            => Load_PEC_Reg,
         Load_REQ_FF             => Load_REQ_FF,                
-        Load_GPP_CMD_Reg        => Load_GPP_CMD_Reg,
+        Load_GPP_CMD            => Load_GPP_CMD,
         Reset_MDC               => Reset_MDC,
         Load_MD_Reg             => Load_MD_Reg,
         Step_MDC                => Step_MDC,
@@ -387,7 +443,9 @@ begin
         Start_Tag_Shift         => Start_Tag_Shift,              
         Load_Tag_Shift_Counter  => Load_Tag_Shift_Counter,    
         Step_BC                 => Step_BC,            
-        Reset_BC                => Reset_BC,          
+        Reset_BC                => Reset_BC,
+        Load_IR                 => Load_IR,
+        Reset_IR                => Reset_IR,         
         Load_Mux_Reg            => Load_Mux_Reg,  
         Control_Data_Out        => Control_Data_Out,
         PEC_TS_Reg              => PEC_TS_Reg,                     
@@ -401,7 +459,8 @@ begin
         Sync_pulse              => Sync_pulse_i,
         load_Mode_reg           => load_Mode_reg,
         Load_TSDiv16_reg        => Load_TSDiv16_reg,
-        ERROR                   => ERROR                               
+        ERROR                   => ERROR,
+        Write_REQ               => Write_REQ                             
     );
     
     CMD_from_GPP_Inst: CMD_from_GPP
@@ -410,9 +469,9 @@ begin
         clk                     => clk,
         Reset                   => Reset,
         GPP_CMD_Flag            => GPP_CMD_Flag,
-        Load_GPP_CMD_reg        => Load_GPP_CMD_reg,
-        Load_TSDiv16_reg        => Load_TSDiv16_reg,
+        Load_GPP_CMD            => Load_GPP_CMD,
         GPP_CMD_Data            => GPP_CMD_Data,        --INPUT to Noc_top?
+        Control_data            => Control_Data_Out,
         Opcode                  => Opcode(7 downto 0),  --LOWER bits of OPCODE?
         Switch_ctrl             => Switch_ctrl,
         Transfer_size           => Transfer_size,
@@ -420,11 +479,13 @@ begin
         CM_Address0             => CM_Address0,
         CM_Address1             => CM_Address1,
         Padding_Data            => Padding_Data,        --INPUT to where?
-        Length                  => Length,              --INPUT to where?
-        Address                 => Address,             --INPUT to where?
-        CMD_FF                  => CMD_FF,
+        NOC_Length              => NOC_Length,          --INPUT to where?
+        NOC_Address             => NOC_Address,             --INPUT to where?
         TSDiv16_Reg             => TSDiv16_Reg,
-        NOC_CMD_ACK             => NOC_CMD_ACK       
+        CMD_FF                  => CMD_FF,        
+        NOC_CMD_ACK             => NOC_CMD_ACK,
+        Address_steps           => Address_steps,
+        End_values              => End_values      
     );
     
     CMD_to_GPP_Inst: CMD_to_GPP
@@ -483,8 +544,8 @@ begin
     (
         clk                     => clk,
         Reset                   => Reset,    
-        write_enable            => write_enable,
-        NoC_Input_reg_In        => NOC_bus_in,
+        write_enable            => PEC_WE,
+        NoC_Input_reg_In        => PEC_byte_data,
         NoC_Input_reg_Out       => NoC_Input_reg_Out
     );
     
@@ -494,7 +555,7 @@ begin
         clk                     => clk,
         Reset                   => Reset,      
         Mux_select              => NOC_reg_mux_ctrl,   
-        Input_reg_data          => NoC_Input_reg_Out,
+        Input_reg_data          => NoC_Input_reg_Out_p3,
         Root_Memory_data        => RM_Data_Out,
         TP_data                 => Noc_reg_mux,
         Mux_Demux_data          => Mux_Demux_out0,
@@ -511,7 +572,8 @@ begin
         Decoder                 => Decoder,
         switch_input_muxes      => Switch_ctrl(2 downto 0),  ---???? 3 or 8?
         switch_Noc_bus_mux      => NOC_bus_out_mux_ctrl,
-        Noc_bus_out             => Noc_bus_out,
+        EN_Noc_byte_data        => EN_Noc_byte_data,
+        Noc_byte_data           => Noc_byte_data,
         switch_out              => switch_data
     );
     
@@ -522,6 +584,8 @@ begin
         Reset                   => Reset,
 	    Reset_BC                => Reset_BC,
 	    Step_BC                 => Step_BC,
+	    RM_as_mux               => RM_as_mux,
+	    RM_byte_as              => RM_byte_as,    
 	    Decoder                 => Decoder,
 	    byte_counter            => byte_counter    
     );
@@ -535,6 +599,7 @@ begin
         Control_Data            => Control_Data_Out,
         NOC_reg_mux_ctrl        => NOC_reg_mux_ctrl,
         NOC_data_mux_ctrl       => NOC_data_mux_ctrl,
+        RM_as_mux               => RM_as_mux,
         Data_dir                => Data_Direction,
         NOC_bus_out_mux_ctrl    => NOC_bus_out_mux_ctrl,
         Loop_reg_mux_ctrl       => Loop_reg_mux_ctrl,

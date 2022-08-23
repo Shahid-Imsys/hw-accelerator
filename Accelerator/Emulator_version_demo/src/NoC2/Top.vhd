@@ -37,9 +37,7 @@ entity Top is
         NOC_Length           : out std_logic_vector(15 downto 0);
         NOC_WRITE_REQ        : out std_logic;
         IO_WRITE_ACK         : in  std_logic;
-        FIFO_Ready1          : in  std_logic;
-        FIFO_Ready2          : in  std_logic;
-        FIFO_Ready3          : in  std_logic;
+        FIFO_Ready           : in  std_logic_vector(5 downto 0);
         NOC_DATA_DIR         : out std_logic;
         NOC_DATA_EN          : out std_logic;
         NOC_CTRL_EN          : out std_logic
@@ -53,25 +51,23 @@ architecture Behavioral of Top is
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;
         IO_data              : in  std_logic_vector(127 downto 0);
-        FIFO_Ready1          : in  std_logic;
-        FIFO_Ready2          : in  std_logic;
-        FIFO_Ready3          : in  std_logic;
-        WRITE_ACK            : in  std_logic;                
+        FIFO_Ready           : in  std_logic_vector(5 downto 0);
+        IO_WRITE_ACK         : in  std_logic;                
         PEC_Ready            : in  std_logic; 
         GPP_CMD_ACK          : in  std_logic;
         GPP_CMD_Flag         : in  std_logic;
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
-        --from NOC bus 
-        Write_enable         : in  std_logic;
-        NOC_bus_in           : in  std_logic_vector(127 downto 0);
+        -- NOC PEC INTEFACE
+        PEC_WE               : in  std_logic;
+        PEC_byte_data        : in  std_logic_vector(127 downto 0);
+        Noc_byte_data        : out std_logic_vector(127 downto 0);
         --Output 
-        En_IO_Data           : out std_logic;
+        NOC_DATA_EN          : out std_logic;
         En_IO_ctrl           : out std_logic;
         NOC_CMD_flag         : out std_logic;
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
-        Address              : out std_logic_vector(31 downto 0);               
-        Length               : out std_logic_vector(15 downto 0);
-        Noc_bus_out          : out std_logic_vector(127 downto 0);
+        NOC_Address          : out std_logic_vector(31 downto 0);               
+        NOC_Length           : out std_logic_vector(15 downto 0);    
         Tag_Line             : out std_logic;
         NOC_WRITE_REQ        : out std_logic;
         NOC_data             : out std_logic_vector(127 downto 0);
@@ -130,10 +126,10 @@ architecture Behavioral of Top is
     );
     end component;
     
-    signal NOC_bus_in   : std_logic_vector(127 downto 0):= (others => '0');
-    signal Noc_bus_out  : std_logic_vector(127 downto 0):= (others => '0');
-    signal Tag_Line     : std_logic;
-    signal Write_enable : std_logic;
+    signal PEC_byte_data : std_logic_vector(127 downto 0):= (others => '0');
+    signal Noc_byte_data : std_logic_vector(127 downto 0):= (others => '0');
+    signal Tag_Line      : std_logic;
+    signal PEC_WE        : std_logic;
      
 begin
 
@@ -143,25 +139,23 @@ begin
         clk                     => clk,
         Reset                   => Reset,
         IO_data                 => IO_data,
-        FIFO_Ready1             => FIFO_Ready1,
-        FIFO_Ready2             => FIFO_Ready2,
-        FIFO_Ready3             => FIFO_Ready3,
-        Write_ACK               => IO_WRITE_ACK,
+        FIFO_Ready              => FIFO_Ready,
+        IO_WRITE_ACK            => IO_WRITE_ACK,
         PEC_Ready               => PEC_Ready,
         GPP_CMD_ACK             => GPP_CMD_ACK,
         GPP_CMD_Flag            => GPP_CMD_Flag,
         GPP_CMD_Data            => GPP_CMD_Data,
-        --from NOC bus 
-        Write_enable            => Write_enable,
-        NOC_bus_in              => NOC_bus_in,
+        --NOC PEC INTEFACE 
+        PEC_WE                  => PEC_WE,
+        PEC_byte_data           => PEC_byte_data, 
+        Noc_byte_data           => Noc_byte_data,
         --Output 
-        En_IO_Data              => NOC_DATA_EN,
+        NOC_DATA_EN             => NOC_DATA_EN,
         En_IO_ctrl              => NOC_CTRL_EN ,
         NOC_CMD_flag            => NOC_CMD_flag,
         NOC_CMD_Data            => NOC_CMD_Data,  
-        Address                 => NOC_Address,
-        Length                  => NOC_Length,
-        Noc_bus_out             => Noc_bus_out,
+        NOC_Address             => NOC_Address,
+        NOC_Length              => NOC_Length,
         Tag_Line                => Tag_Line,
         NOC_WRITE_REQ           => NOC_WRITE_REQ,
         Noc_data                => NOC_data,
@@ -177,14 +171,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(7 downto 0),
-        DATA_OUT                => NOC_bus_in(7 downto 0),
+        DATA                    => Noc_byte_data(7 downto 0),
+        DATA_OUT                => PEC_byte_data(7 downto 0),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -228,14 +222,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs 
-        DDO_VLD                 => Write_enable,       
+        DDO_VLD                 => PEC_WE,       
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(15 downto 8),
-        DATA_OUT                => NOC_bus_in(15 downto 8),
+        DATA                    => Noc_byte_data(15 downto 8),
+        DATA_OUT                => PEC_byte_data(15 downto 8),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -279,14 +273,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs 
-        DDO_VLD                 => Write_enable,       
+        DDO_VLD                 => PEC_WE,       
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(23 downto 16),
-        DATA_OUT                => NOC_bus_in(23 downto 16),
+        DATA                    => Noc_byte_data(23 downto 16),
+        DATA_OUT                => PEC_byte_data(23 downto 16),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -330,14 +324,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(31 downto 24),
-        DATA_OUT                => NOC_bus_in(31 downto 24),
+        DATA                    => Noc_byte_data(31 downto 24),
+        DATA_OUT                => PEC_byte_data(31 downto 24),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -381,14 +375,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(39 downto 32),
-        DATA_OUT                => NOC_bus_in(39 downto 32),
+        DATA                    => Noc_byte_data(39 downto 32),
+        DATA_OUT                => PEC_byte_data(39 downto 32),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -432,14 +426,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(47 downto 40),
-        DATA_OUT                => NOC_bus_in(47 downto 40),
+        DATA                    => Noc_byte_data(47 downto 40),
+        DATA_OUT                => PEC_byte_data(47 downto 40),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -483,14 +477,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(55 downto 48),
-        DATA_OUT                => NOC_bus_in(55 downto 48),
+        DATA                    => Noc_byte_data(55 downto 48),
+        DATA_OUT                => PEC_byte_data(55 downto 48),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -534,14 +528,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(63 downto 56),
-        DATA_OUT                => NOC_bus_in(63 downto 56),
+        DATA                    => Noc_byte_data(63 downto 56),
+        DATA_OUT                => PEC_byte_data(63 downto 56),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -587,14 +581,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(71 downto 64),
-        DATA_OUT                => NOC_bus_in(71 downto 64),
+        DATA                    => Noc_byte_data(71 downto 64),
+        DATA_OUT                => PEC_byte_data(71 downto 64),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -638,14 +632,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs 
-        DDO_VLD                 => Write_enable,       
+        DDO_VLD                 => PEC_WE,       
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(79 downto 72),
-        DATA_OUT                => NOC_bus_in(79 downto 72),
+        DATA                    => Noc_byte_data(79 downto 72),
+        DATA_OUT                => PEC_byte_data(79 downto 72),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -689,14 +683,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs 
-        DDO_VLD                 => Write_enable,       
+        DDO_VLD                 => PEC_WE,       
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(87 downto 80),
-        DATA_OUT                => NOC_bus_in(87 downto 80),
+        DATA                    => Noc_byte_data(87 downto 80),
+        DATA_OUT                => PEC_byte_data(87 downto 80),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -740,14 +734,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(95 downto 88),
-        DATA_OUT                => NOC_bus_in(95 downto 88),
+        DATA                    => Noc_byte_data(95 downto 88),
+        DATA_OUT                => PEC_byte_data(95 downto 88),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -791,14 +785,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(103 downto 96),
-        DATA_OUT                => NOC_bus_in(103 downto 96),
+        DATA                    => Noc_byte_data(103 downto 96),
+        DATA_OUT                => PEC_byte_data(103 downto 96),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -842,14 +836,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(111 downto 104),
-        DATA_OUT                => NOC_bus_in(111 downto 104),
+        DATA                    => Noc_byte_data(111 downto 104),
+        DATA_OUT                => PEC_byte_data(111 downto 104),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -893,14 +887,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(119 downto 112),
-        DATA_OUT                => NOC_bus_in(119 downto 112),
+        DATA                    => Noc_byte_data(119 downto 112),
+        DATA_OUT                => PEC_byte_data(119 downto 112),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,
@@ -944,14 +938,14 @@ begin
 --Power reset input:        
         RST_E                   => Reset,
 --Clock outputs
-        DDO_VLD                 => Write_enable,        
+        DDO_VLD                 => PEC_WE,        
         EVEN_P                  => open,
 --Tag line        
         TAG                     => Tag_Line,    
         TAG_FB                  => open,
 --Data line        
-        DATA                    => Noc_bus_out(127 downto 120),
-        DATA_OUT                => NOC_bus_in(127 downto 120),
+        DATA                    => Noc_byte_data(127 downto 120),
+        DATA_OUT                => PEC_byte_data(127 downto 120),
 --PE Control        
         EXE                     => open,
         RESUME                  => open,

@@ -584,6 +584,7 @@ EVEN_P <= even_p_2;
 			dataout_vld_o <= dataout_vld;
 		end if;
 	end process;
+	
 	DDO_VLD <= dataout_vld_o;
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e)--(noc_cmd, byte_ctr, delay, DATA)

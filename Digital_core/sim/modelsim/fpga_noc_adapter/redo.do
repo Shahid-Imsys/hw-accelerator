@@ -1,5 +1,5 @@
 do compile.do
 
 restart -f
-#run 300 ns
+#run 1000 ns
 run -all

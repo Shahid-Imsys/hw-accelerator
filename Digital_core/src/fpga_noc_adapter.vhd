@@ -114,7 +114,7 @@ architecture rtl of fpga_noc_adapter is
       iden      : out std_logic;                      -- I/O bus enabled (in use)
       ilioa     : in  std_logic;                      -- I/O bus load I/O address
       ildout    : in  std_logic;                      -- I/O bus data output strobe
-      inext     : in  std_logic;                      -- I/O bus data input  strobe
+      inext     : in  std_logic;                      -- I/O bus data input strobe
       idack     : in  std_logic;                      -- I/O bus DMA Ack
       idreq     : out std_logic;                      -- I/O bus DMA Request
       NOC_IRQ   : out std_logic;                      -- Interrupt on available data from NOC
@@ -142,7 +142,7 @@ architecture rtl of fpga_noc_adapter is
       -- Domain clk_noc (FIFOS)
       ------------------------------------------------------
       -- NOC TxFIFO, read by IONOC
-      TxFIFO_Ready  : out std_logic;                      -- Interface can accept a word from the TxIFO
+      TxFIFO_Ready  : out std_logic;                      -- Interface can accept a word from the TxFIFO
       TxFIFO_Valid  : in  std_logic;                      -- TxFIFO has availble data which is presented on bus
       TxFIFO_Data   : in  std_logic_vector(127 downto 0); -- TxFIFO data
       -- NOC RxFIFO, written to by IONOC
@@ -179,14 +179,14 @@ architecture rtl of fpga_noc_adapter is
   constant NOC_IO_DIR_TX : std_logic := '1'; -- Data is read from TxFIFO
 
   -- Level constants
-  constant TxFIFO_FULL : std_logic_vector(ionoc_fifo_depth_bits downto 0) :=
-    "10000"; -- (ionoc_fifo_depth_bits => '1', others => '0');
+  constant FIFO_FULL : integer := 2**ionoc_fifo_depth_bits;
 
   -- NOC TxFIFO, read by IONOC
-  signal TxFIFO_Ready : std_logic;
-  signal TxFIFO_Valid : std_logic;
-  signal TxFIFO_Data  : std_logic_vector(127 downto 0);
-  signal TxFIFO_Level : std_logic_vector(ionoc_fifo_depth_bits downto 0);
+  signal TxFIFO_Ready     : std_logic;
+  signal TxFIFO_Valid     : std_logic;
+  signal TxFIFO_Data      : std_logic_vector(127 downto 0);
+  signal TxFIFO_Level     : std_logic_vector(ionoc_fifo_depth_bits downto 0);
+  signal TxFIFO_Level_int : integer range 0 to 2**ionoc_fifo_depth_bits := 0;
 
   -- NOC RxFIFO, written to by IONOC
   signal RxFIFO_Ready : std_logic;
@@ -196,7 +196,6 @@ architecture rtl of fpga_noc_adapter is
 
   -- TxFIFO logic
   signal NOC_DATA_Valid : std_logic;
-  signal NOC_DATA_Ready : std_logic;
 
   -- RxFIFO logic
   -- signal IO_DATA_Valid : std_logic;
@@ -206,17 +205,18 @@ architecture rtl of fpga_noc_adapter is
 begin
 
   -- NOC interface
-  FIFO_READY <= TxFIFO_Level when NOC_DATA_DIR = NOC_DATA_DIR_TX else RxFIFO_Level;
+  FIFO_READY       <= RxFIFO_Level when NOC_DATA_DIR = NOC_DATA_DIR_RX else
+                      std_logic_vector(to_unsigned(TxFIFO_Level_int, FIFO_READY'length));
+  TxFIFO_Level_int <= (FIFO_FULL - to_integer(unsigned(TxFIFO_Level))) ;
 
   -- Tx FIFO ( NOC --> FIFO --> GPP )
   NOC_DATA_Valid <= NOC_DATA_EN when NOC_DATA_DIR = NOC_DATA_DIR_TX else '0';
-  NOC_DATA_Ready <= '0' when TxFIFO_Level = TxFIFO_FULL else '1';
 
   tx_fifo_inst : sync_fifo
     port map(
       areset_n  => rst_n,
       clk       => clk_noc,
-      in_ready  => NOC_DATA_Ready,
+      in_ready  => open,
       in_valid  => NOC_DATA_Valid,
       in_data   => NOC_DATA,
       out_ready => TxFIFO_Ready,

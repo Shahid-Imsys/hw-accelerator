@@ -348,10 +348,10 @@ begin
         if rising_edge(pulseout(0)) then
           tmp(0) := now;
         elsif falling_edge(pulseout(0)) then
-          if (now - tmp(0) = ((delay_cycles + 3) * 12 ns)) or (now - tmp(0) = ((delay_cycles + 4) * 12 ns)) then
+          if (now - tmp(0) = ((delay_cycles + 1) * 12 ns)) or (now - tmp(0) = ((delay_cycles + 2) * 12 ns)) then
             write(output, string("Timer 0 delayed start test OK" & lf));
           else
-            write(output, string("Timer 0 delayed start test FAIL" & lf));
+            write(output, string("Timer 0 delayed start test FAIL. Expected delays: " & integer'image(((delay_cycles + 3) * 12)) & " ns or " & integer'image(((delay_cycles + 4) * 12)) & " ns. Actual delay: " & time'image(now - tmp(0)) & lf));
             test_pass <= false;
           end if;
           test_delay_done <= true;

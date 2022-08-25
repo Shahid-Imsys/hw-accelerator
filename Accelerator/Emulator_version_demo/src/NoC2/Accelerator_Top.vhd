@@ -21,7 +21,10 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity Accelerator_Top is
-  Port (
+    Generic(
+      USE_ASIC_MEMORIES      : boolean := false
+    );
+    Port (
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
@@ -47,6 +50,9 @@ end Accelerator_Top;
 architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
+    Generic(
+      USE_ASIC_MEMORIES      : boolean := false
+    );
     Port(
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;
@@ -136,6 +142,9 @@ architecture Behavioral of Accelerator_Top is
 begin
 
     Noc_Top_Inst: Noc_Top
+    Generic map(
+      USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES
+    )
     port map
     (
         clk                     => clk,

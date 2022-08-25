@@ -34,27 +34,30 @@ entity digital_top is
 
   generic (
     g_memory_type     : memory_type_t := asic;
-    g_simulation      : boolean := false;
+    g_simulation      : boolean       := false;
     g_clock_frequency : integer);
 
   port (
-    hclk        : in  std_logic;        -- clk input
-    pll_ref_clk : in  std_logic;
-    pll_locked  : in  std_logic;
-    pre_spi_rst_n   : in  std_logic;  
-    MRESET      : in  std_logic;        -- system reset, active low
-    MRSTOUT     : out std_logic;
-    MIRQOUT     : out std_logic;        -- interrupt request output
-    MCKOUT0     : out std_logic;        -- for trace adapter
-    MCKOUT1     : out std_logic;        -- programable clock out
-    mckout1_en  : out std_logic;        -- Enable signal for MCKOUT1 pad.
-    MTEST       : in  std_logic;        -- Active high
-    MBYPASS     : in  std_logic;
-    MIRQ0       : in  std_logic;        -- Active low
-    MIRQ1       : in  std_logic;        -- Active low
+    hclk          : in  std_logic;      -- clk input
+    
+    clk_noc       : in  std_logic;
+    
+    pll_ref_clk   : in  std_logic;
+    pll_locked    : in  std_logic;
+    pre_spi_rst_n : in  std_logic;
+    MRESET        : in  std_logic;      -- system reset, active low
+    MRSTOUT       : out std_logic;
+    MIRQOUT       : out std_logic;      -- interrupt request output
+    MCKOUT0       : out std_logic;      -- for trace adapter
+    MCKOUT1       : out std_logic;      -- programable clock out
+    mckout1_en    : out std_logic;      -- Enable signal for MCKOUT1 pad.
+    MTEST         : in  std_logic;      -- Active high
+    MBYPASS       : in  std_logic;
+    MIRQ0         : in  std_logic;      -- Active low
+    MIRQ1         : in  std_logic;      -- Active low
     -- SW debug
-    MSDIN       : in  std_logic;        -- serial data in (debug)
-    MSDOUT      : out std_logic;        -- serial data out
+    MSDIN         : in  std_logic;      -- serial data in (debug)
+    MSDOUT        : out std_logic;      -- serial data out
 
     MWAKEUP_LP : in  std_logic;         -- Active high
     MLP_PWR_OK : in  std_logic;
@@ -144,9 +147,9 @@ entity digital_top is
     ospi_rwds_in     : in  std_logic;
     ospi_rwds_out    : out std_logic;
     ospi_rwds_enable : out std_logic;
-    
+
     dummy_output : out std_logic_vector(7 downto 0);
-    
+
     led_clk : out std_logic;
 
     -- SPI, chip control interface
@@ -157,8 +160,8 @@ entity digital_top is
     spi_miso_oe_n : out std_logic;
     pad_config    : out pad_config_record_t;
     pll_config    : out pll_registers_record_t;
-    adpll_config  : in adpll_registers_record_t
-    );    
+    adpll_config  : in  adpll_registers_record_t
+    );
 end entity digital_top;
 
 architecture rtl of digital_top is
@@ -174,7 +177,7 @@ architecture rtl of digital_top is
       miso_oe_n    : out std_ulogic;
       pad_config   : out pad_config_record_t;
       pll_config   : out pll_registers_record_t;
-      adpll_config : in adpll_registers_record_t
+      adpll_config : in  adpll_registers_record_t
       );
   end component;
 
@@ -303,15 +306,15 @@ architecture rtl of digital_top is
   type slv64 is array(natural range <>) of std_logic_vector(63 downto 0);
   type slv128 is array(natural range <>) of std_logic_vector(127 downto 0);
 
-  signal dummy_dout_1 : slv64(7 downto 0);
+  signal dummy_dout_1  : slv64(7 downto 0);
   signal dummy_dout_2a : slv8(7 downto 0);
   signal dummy_dout_2b : slv8(7 downto 0);
-  signal dummy_dout_3 : std_logic_vector(31 downto 0);
-  signal dummy_dout_4 : slv64(15 downto 0);
-  signal dummy_dout_5 : slv64(15 downto 0);
-  signal dummy_dout_6 : slv64(15 downto 0);
-  signal dummy_dout_7 : slv128(3 downto 0);
-  signal dummy_dout_8 : slv128(3 downto 0);
+  signal dummy_dout_3  : std_logic_vector(31 downto 0);
+  signal dummy_dout_4  : slv64(15 downto 0);
+  signal dummy_dout_5  : slv64(15 downto 0);
+  signal dummy_dout_6  : slv64(15 downto 0);
+  signal dummy_dout_7  : slv128(3 downto 0);
+  signal dummy_dout_8  : slv128(3 downto 0);
 
   signal dummy_addr : std_logic_vector(13 downto 0);
   signal dummy_din  : std_logic_vector(127 downto 0);
@@ -332,7 +335,7 @@ architecture rtl of digital_top is
   signal spi_rst_n    : std_logic;
   signal cpu_rst_n    : std_logic;
   signal clock_in_off : std_logic;
-  signal clock_sel    : std_logic; 
+  signal clock_sel    : std_logic;
   signal c1_wdog_n    : std_logic;
 
   signal pi_data : std_logic_vector(7 downto 0);
@@ -340,86 +343,86 @@ architecture rtl of digital_top is
 begin  -- architecture rtl
 
   ospi_dq_out <= ospi_dq_out_int;
-  
+
   led_clk <= clk_p_cpu;
 
-clk_rst_asic_gen : if g_memory_type /= fpga generate
+  clk_rst_asic_gen : if g_memory_type /= fpga generate
 
-  i_clock_reset : entity work.clock_reset
+    i_clock_reset : entity work.clock_reset
 
-    generic map (
-      fpga_g => (asic_c = fpga))
+      generic map (
+        fpga_g => (asic_c = fpga))
 
-    port map (
-      pll_clk     => hclk,
-      pll_ref_clk => pll_ref_clk,
-      spi_sclk    => spi_sclk,
+      port map (
+        pll_clk     => hclk,
+        pll_ref_clk => pll_ref_clk,
+        spi_sclk    => spi_sclk,
 
-      pre_spi_rst_n => pre_spi_rst_n,
-      mreset_n => mreset,
-      pwr_ok   => pwr_ok,
-      c1_wdog_n => c1_wdog_n,
+        pre_spi_rst_n => pre_spi_rst_n,
+        mreset_n      => mreset,
+        pwr_ok        => pwr_ok,
+        c1_wdog_n     => c1_wdog_n,
 
-      rst_n => cpu_rst_n,
-      spi_rst_n => spi_rst_n,
+        rst_n     => cpu_rst_n,
+        spi_rst_n => spi_rst_n,
 
-      clk_p  => clk_p_cpu,
-      clk_p_n => clk_p_cpu_n,
-      clk_rx => clk_rx,
-      clk_tx => clk_tx,
-      sclk   => sclk,
-      sclk_n => sclk_n,
+        clk_p   => clk_p_cpu,
+        clk_p_n => clk_p_cpu_n,
+        clk_rx  => clk_rx,
+        clk_tx  => clk_tx,
+        sclk    => sclk,
+        sclk_n  => sclk_n,
 
-      pg_1_i => pg_i(1),
-      pf_1_i => pf_i(1),
+        pg_1_i => pg_i(1),
+        pf_1_i => pf_i(1),
 
-      clock_in_off => clock_in_off,
-      sel_pll => clock_sel,
-      spi_sel_pll  => '1',
+        clock_in_off => clock_in_off,
+        sel_pll      => clock_sel,
+        spi_sel_pll  => '1',
 
-      spi_override_pll_locked => '0',
-      pll_locked              => pll_locked,
+        spi_override_pll_locked => '0',
+        pll_locked              => pll_locked,
 
-      scan_mode => mtest
-      );
-end generate;
+        scan_mode => mtest
+        );
+  end generate;
 
-clk_rst_fpga_gen : if g_memory_type = fpga generate
+  clk_rst_fpga_gen : if g_memory_type = fpga generate
 
-  i_clock_reset : entity work.fpga_clock_reset
+    i_clock_reset : entity work.fpga_clock_reset
 
-  port map (
-    clk_in   => hclk,
-    spi_sclk => spi_sclk,
-    --
-    clk_p   => clk_p_cpu,
-    clk_p_n => clk_p_cpu_n,
-    clk_rx  => clk_rx,
-    clk_tx  => clk_tx,
-    sclk    => sclk,
-    sclk_n  => sclk_n,
-    --
-    pre_spi_rst_n => pre_spi_rst_n,
-    mreset_n => mreset,
-    pwr_ok   => pwr_ok,
-    c1_wdog_n => c1_wdog_n,
-    --  
-    rst_n => cpu_rst_n,
-    spi_rst_n => spi_rst_n,
-    --
-    pg_1_i => pg_i(1),
-    pf_1_i => pf_i(1),
-    --
-    clock_in_off => clock_in_off,
-    sel_pll      => clock_sel,
-    spi_sel_pll  => '1',
-    --
-    spi_override_pll_locked => '0',
-    pll_locked              => pll_locked,
-    --
-    scan_mode => mtest
-    );
-end generate;
+      port map (
+        clk_in                  => hclk,
+        spi_sclk                => spi_sclk,
+        --
+        clk_p                   => clk_p_cpu,
+        clk_p_n                 => clk_p_cpu_n,
+        clk_rx                  => clk_rx,
+        clk_tx                  => clk_tx,
+        sclk                    => sclk,
+        sclk_n                  => sclk_n,
+        --
+        pre_spi_rst_n           => pre_spi_rst_n,
+        mreset_n                => mreset,
+        pwr_ok                  => pwr_ok,
+        c1_wdog_n               => c1_wdog_n,
+        --  
+        rst_n                   => cpu_rst_n,
+        spi_rst_n               => spi_rst_n,
+        --
+        pg_1_i                  => pg_i(1),
+        pf_1_i                  => pf_i(1),
+        --
+        clock_in_off            => clock_in_off,
+        sel_pll                 => clock_sel,
+        spi_sel_pll             => '1',
+        --
+        spi_override_pll_locked => '0',
+        pll_locked              => pll_locked,
+        --
+        scan_mode               => mtest
+        );
+  end generate;
 
   i_digital_core : entity work.digital_core
     generic map (
@@ -427,25 +430,26 @@ end generate;
       g_clock_frequency => g_clock_frequency  -- system clock frequency in MHz
       )
     port map (
-      clk_p_cpu => clk_p_cpu,
+      clk_p_cpu   => clk_p_cpu,
       clk_p_cpu_n => clk_p_cpu_n,
-      clk_rx    => clk_rx,
-      clk_tx    => clk_tx,
+      clk_noc     => clk_noc,
+      clk_rx      => clk_rx,
+      clk_tx      => clk_tx,
 
       cpu_rst_n => cpu_rst_n,
 
-      MRESET  => MRESET,
+      MRESET    => MRESET,
       c1_wdog_n => c1_wdog_n,
-      MRSTOUT => MRSTOUT,
-      MIRQOUT => MIRQOUT,
-      MCKOUT0 => MCKOUT0,
-      MCKOUT1 => MCKOUT1,
-      MTEST   => MTEST,
-      MIRQ0   => MIRQ0,
-      MIRQ1   => MIRQ1,
+      MRSTOUT   => MRSTOUT,
+      MIRQOUT   => MIRQOUT,
+      MCKOUT0   => MCKOUT0,
+      MCKOUT1   => MCKOUT1,
+      MTEST     => MTEST,
+      MIRQ0     => MIRQ0,
+      MIRQ1     => MIRQ1,
       -- SW debug
-      MSDIN   => MSDIN,
-      MSDOUT  => MSDOUT,
+      MSDIN     => MSDIN,
+      MSDOUT    => MSDOUT,
 
       clock_in_off => clock_in_off,
       clock_sel    => clock_sel,
@@ -541,13 +545,13 @@ end generate;
       );
 
   -- All "dummy" named instances and signals are temporary and are to be soon removed!!
-  
-  asic_dummy_memories: if g_memory_type = asic and not g_simulation generate
-  
-    dummy_signal_proc: process( hclk )
-        variable offset :  integer := 0;
-        variable index   : integer := 0;
-        variable lvector : std_logic_vector(4767 downto 0);
+
+  asic_dummy_memories : if g_memory_type = asic and not g_simulation generate
+
+    dummy_signal_proc : process(hclk)
+      variable offset  : integer := 0;
+      variable index   : integer := 0;
+      variable lvector : std_logic_vector(4767 downto 0);
 
     begin
       if false then
@@ -565,8 +569,8 @@ end generate;
                      xor dummy_dout_7(1)
                      xor dummy_dout_7(0);
 
-        dummy_we       <= dummy_din(107 downto 0) & lvector(index);
-        dummy_output   <= dummy_we(7 downto 0);
+        dummy_we     <= dummy_din(107 downto 0) & lvector(index);
+        dummy_output <= dummy_we(7 downto 0);
 
         if index = 4767 then
           index := 0;
@@ -589,7 +593,7 @@ end generate;
           lvector(i*8 + 7 + offset downto i*8 + offset) := dummy_dout_2b(i);
         end loop;
 
-        offset := offset + 64;
+        offset                           := offset + 64;
         lvector(offset+31 downto offset) := dummy_dout_3;
 
         offset := offset + 32;
@@ -645,7 +649,7 @@ end generate;
     end generate;
 
     gmem1_gen : for i in dummy_dout_2a'range generate
-      gmem1: SNPS_RF_SP_UHS_1024x8
+      gmem1 : SNPS_RF_SP_UHS_1024x8
         port map (
           Q        => dummy_dout_2a(i),
           ADR      => dummy_addr(9 downto 0),
@@ -664,9 +668,9 @@ end generate;
           BC1      => '0',
           BC2      => '0');
     end generate;
-    
+
     gmem2_gen : for i in dummy_dout_2b'range generate
-      gmem2: SNPS_RF_SP_UHS_1024x8
+      gmem2 : SNPS_RF_SP_UHS_1024x8
         port map (
           Q        => dummy_dout_2b(i),
           ADR      => dummy_addr(9 downto 0),
@@ -746,7 +750,7 @@ end generate;
           BC1      => '0',
           BC2      => '0');
     end generate;
-    
+
     ve_bias_gen : for i in dummy_dout_6'range generate
       buf_bias : SNPS_RF_SP_UHS_64x64
         port map (
@@ -810,8 +814,8 @@ end generate;
           BC2      => '0');
     end generate;
   end generate;
-    
-   asic_dummy_output: if g_memory_type /= asic or g_simulation generate
+
+  asic_dummy_output : if g_memory_type /= asic or g_simulation generate
     dummy_output <= (others => '0');
   end generate;
 

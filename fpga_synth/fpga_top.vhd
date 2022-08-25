@@ -109,6 +109,7 @@ architecture rtl of fpga_top is
 
     port (
       hclk        : in  std_logic;      -- clk input
+      clk_noc     : in  std_logic;
       pll_ref_clk : in  std_logic;
       pll_locked  : in  std_logic;
       pre_spi_rst_n : in std_logic;
@@ -326,6 +327,8 @@ architecture rtl of fpga_top is
   signal clk_200m : std_logic;
   signal clk_100m : std_logic;
   signal clk_50m  : std_logic;
+  
+  signal clk_noc  : std_logic;
 
   signal led_clk : std_logic;
 
@@ -448,15 +451,17 @@ begin
       clk_100M  => clk_100M,
       clk_50M   => clk_50M );
 
-  HCLK   <= clk_100m;
+  HCLK    <= clk_100m;
+  clk_noc <= clk_200m;
 
-  im4000_inst : digital_top
+  digital_top_inst : digital_top
     generic map (
       g_memory_type     => fpga,
       g_clock_frequency => 100          -- Frequency in MHz
       )
     port map (
       hclk        => HCLK,
+      clk_noc     => clk_noc,
       pll_ref_clk => HCLK,
       pll_locked  => '1',
       pre_spi_rst_n => '1',

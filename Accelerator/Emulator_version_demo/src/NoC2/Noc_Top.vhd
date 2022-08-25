@@ -24,31 +24,33 @@ use IEEE.NUMERIC_STD.ALL;
 entity Noc_Top is
   Port (
 	    clk                  : in  std_logic;
-	    Reset                : in  std_logic;
-        IO_data              : in  std_logic_vector(127 downto 0);
-        FIFO_Ready           : in  std_logic_vector(5 downto 0);
-        IO_WRITE_ACK         : in  std_logic;                
+	    Reset                : in  std_logic;      	
         PEC_Ready            : in  std_logic; 
-        GPP_CMD_ACK          : in  std_logic;
-        GPP_CMD_Flag         : in  std_logic;
-        GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
-        -- NOC PEC INTEFACE
+        --NOC PEC INTERFACE
         PEC_WE               : in  std_logic;
         PEC_byte_data        : in  std_logic_vector(127 downto 0);
         Noc_byte_data        : out std_logic_vector(127 downto 0);
-        --Output 
-        NOC_DATA_EN          : out std_logic;
-        En_IO_ctrl           : out std_logic;
-        NOC_CMD_flag         : out std_logic;
+        Tag_Line             : out std_logic;        
+        --ACCELERATOR INTERFACE
+        --Command interface signals
+        GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
+        GPP_CMD_Flag         : in  std_logic;
+        NOC_CMD_flag         : out std_logic;
+        GPP_CMD_ACK          : in  std_logic;        
+        --Data/control interface signals
+        IO_data              : in  std_logic_vector(127 downto 0);
+        NOC_data             : out std_logic_vector(127 downto 0);
         NOC_Address          : out std_logic_vector(31 downto 0);               
-        NOC_Length           : out std_logic_vector(15 downto 0);
-        Tag_Line             : out std_logic;
-        NOC_WRITE_REQ        : out std_logic;
-       	NOC_data             : out std_logic_vector(127 downto 0);
-       	NOC_DATA_DIR         : out std_logic
+        NOC_Length           : out std_logic_vector(15 downto 0);    
+        FIFO_Ready           : in  std_logic_vector(5 downto 0);
+        NOC_DATA_DIR         : out std_logic;
+        NOC_DATA_EN          : out std_logic;
+        NOC_WRITE_REQ        : out std_logic;        
+        IO_WRITE_ACK         : in  std_logic         	
   );
 end Noc_Top;
+
 
 architecture structural of Noc_Top is
 
@@ -93,7 +95,6 @@ architecture structural of Noc_Top is
         TP_Interchange          : out std_logic;
         NOC_Ready               : out std_logic;
         En_IO_Data              : out std_logic;
-        En_IO_Ctrl              : out std_logic;
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
         Load_TSDiv16_reg        : out std_logic;
@@ -320,7 +321,6 @@ architecture structural of Noc_Top is
     signal NoC_Input_reg_Out    : std_logic_vector(127 downto 0);
     signal NoC_Input_reg_Out_p  : std_logic_vector(127 downto 0);
     signal NoC_Input_reg_Out_p2 : std_logic_vector(127 downto 0);
-    signal NoC_Input_reg_Out_p3 : std_logic_vector(127 downto 0);
     
     --NOC REG
     signal NOC_reg_mux_ctrl     : std_logic_vector(1 downto 0);
@@ -352,6 +352,8 @@ architecture structural of Noc_Top is
     signal FIFO_Ready2          : std_logic;
     signal FIFO_Ready3          : std_logic;
     signal FIFO_Ready4          : std_logic_vector(5 downto 0);
+    signal PEC_WE_p1            : std_logic;
+    signal PEC_WE_p2            : std_logic;
     
     --RM ADDRESS GEN
     signal Load_IR              : std_logic;
@@ -382,7 +384,9 @@ begin
 		    		    
 		    NoC_Input_reg_Out_p   <= NoC_Input_reg_Out;
 		    NoC_Input_reg_Out_p2  <= NoC_Input_reg_Out_p;
-		    NoC_Input_reg_Out_p3  <= NoC_Input_reg_Out_p2;
+		    
+		    PEC_WE_p2     <= PEC_WE_p1;
+		    PEC_WE_p1     <= PEC_WE;
 		end if;	
 	end process;
 	
@@ -455,7 +459,6 @@ begin
         TP_Interchange          => TP_Interchange,        
         NOC_Ready               => NOC_Ready,
         En_IO_Data              => En_IO_Data_SM,
-        En_IO_Ctrl              => En_IO_Ctrl,
         Sync_pulse              => Sync_pulse_i,
         load_Mode_reg           => load_Mode_reg,
         Load_TSDiv16_reg        => Load_TSDiv16_reg,
@@ -544,7 +547,7 @@ begin
     (
         clk                     => clk,
         Reset                   => Reset,    
-        write_enable            => PEC_WE,
+        write_enable            => PEC_WE_p2, --PEC_WE_p1,--aaac1 PEC_WE_p2,--PEC_WE,
         NoC_Input_reg_In        => PEC_byte_data,
         NoC_Input_reg_Out       => NoC_Input_reg_Out
     );
@@ -555,7 +558,7 @@ begin
         clk                     => clk,
         Reset                   => Reset,      
         Mux_select              => NOC_reg_mux_ctrl,   
-        Input_reg_data          => NoC_Input_reg_Out_p3,
+        Input_reg_data          => NoC_Input_reg_Out, --NoC_Input_reg_Out_p, --aaac1 NoC_Input_reg_Out, --NoC_Input_reg_Out_p2,
         Root_Memory_data        => RM_Data_Out,
         TP_data                 => Noc_reg_mux,
         Mux_Demux_data          => Mux_Demux_out0,

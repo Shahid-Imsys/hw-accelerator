@@ -62,7 +62,6 @@ entity Noc_State_Machine is
         TP_Interchange          : out std_logic;
         NOC_Ready               : out std_logic;
         En_IO_Data              : out std_logic;
-        En_IO_Ctrl              : out std_logic;
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
         Load_TSDiv16_reg        : out std_logic;
@@ -302,7 +301,6 @@ begin
             Load_NOC_cmd_reg            <= '0';
             En_TP                       <= '0';
             Reset_TPC                   <= '0';
-            En_IO_Ctrl                  <= '0';
             Load_RM_Address             <= '0';
             boot_FF                     <= '0';
             NOC_Ready                   <= '0';

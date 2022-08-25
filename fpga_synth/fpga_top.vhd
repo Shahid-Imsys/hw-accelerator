@@ -83,10 +83,9 @@ entity fpga_top is
     VCU118_Clk300M_p : in  std_logic;
     VCU118_Clk300M_n : in  std_logic;
     LED              : out std_logic_vector (7 downto 0);
-    
-    --pmod1            : inout std_logic_vector(7 downto 0);  -- J53 male vertical
-    pmod0_in         : in    std_logic_vector(2 downto 0); -- J52 female angeled
-    pmod0_out        : out   std_logic_vector(4 downto 3) -- J52 female angeled
+
+    pmod0_in         : in  std_logic_vector(2 downto 0); -- J52 female angeled
+    pmod0_out        : out std_logic_vector(4 downto 3)  -- J52 female angeled
     );
 end fpga_top;
 
@@ -216,6 +215,8 @@ architecture rtl of fpga_top is
       ospi_rwds_in     : in  std_logic;
       ospi_rwds_out    : out std_logic;
       ospi_rwds_enable : out std_logic;
+      
+      led_clk        : out std_logic;
 
       -- SPI, chip control interface
       spi_sclk      : in  std_logic;
@@ -312,7 +313,7 @@ architecture rtl of fpga_top is
   signal OSPI_RWDS_i : std_logic;
   signal OSPI_RWDS_o : std_logic;
   signal OSPI_RWDS_e : std_logic;
-  
+
   signal spi_sclk      : std_logic;
   signal spi_cs_n      : std_logic;
   signal spi_mosi      : std_logic;
@@ -321,12 +322,20 @@ architecture rtl of fpga_top is
   signal pad_config    : pad_config_record_t;
 
   signal HCLK     : std_logic;
+  signal HCLK_n   : std_logic;
   signal clk_200m : std_logic;
   signal clk_100m : std_logic;
   signal clk_50m  : std_logic;
 
+  signal led_clk : std_logic;
+
   signal counter34 : unsigned(33 downto 0) := (others => '0');
 
+  attribute mark_debug                : string;
+  attribute mark_debug of OSPI_DQ_i   : signal is "true";
+  attribute mark_debug of OSPI_RWDS_i : signal is "true";
+  attribute mark_debug of OSPI_DQ_e   : signal is "true";
+  attribute mark_debug of OSPI_RWDS_e : signal is "true";
 
 begin
 
@@ -334,12 +343,12 @@ begin
   LED(6)          <= not pa_o(6) when pa_en(6) = '1' else not PA6_SCK;
   LED(5)          <= not pa_o(5) when pa_en(5) = '1' else not PA5_CS_N;
   LED(4)          <= not pa_o(0) when pa_en(0) = '1' else not PA0_SIN;
-  LED(3 downto 0) <= std_logic_vector(counter34(28 downto 25));
-  
+  LED(3 downto 0) <= std_logic_vector(counter34(27 downto 24));
+
   --
-  spi_sclk <= pmod0_in(0);       
-  spi_cs_n <= pmod0_in(1);       
-  spi_mosi <= pmod0_in(2);      
+  spi_sclk     <= pmod0_in(0);
+  spi_cs_n     <= pmod0_in(1);
+  spi_mosi     <= pmod0_in(2);
   --
   pmod0_out(3) <= spi_miso;
   pmod0_out(4) <= spi_miso_oe_n;
@@ -348,21 +357,21 @@ begin
   -- pad_config
 
   PA7_SOUT <= pa_p(7);
-  pa_i(7)  <='0'; -- PA7_SOUT;
+  pa_i(7)  <= '0';                      -- PA7_SOUT;
 
   PA6_SCK <= pa_p(6);
-  pa_i(6) <= '0'; -- PA6_SCK;
+  pa_i(6) <= '0';                       -- PA6_SCK;
 
   PA5_CS_N <= pa_p(5);
-  pa_i(5)  <= '0'; -- PA5_CS_N;
-  
+  pa_i(5)  <= '0';                      -- PA5_CS_N;
+
   pa_i(4) <= '1';
   pa_i(3) <= '0';
   pa_i(2) <= '0';
   pa_i(1) <= '1';
 
   PA0_SIN <= pa_p(0);
-  pa_i(0) <= '1'; -- PA0_SIN;
+  pa_i(0) <= '1';                       -- PA0_SIN;
 
   UTX     <= pj_p(0);
   pj_i(0) <= UTX;
@@ -388,27 +397,27 @@ begin
   ENET_TXCTL <= pf_p(0);                -- RMII TX_EN to TX_CTL
   ENET_TXD0  <= pf_p(2);
   ENET_TXD1  <= pf_p(3);
-  ENET_TXD2  <= '0';         -- RMII Not used ( TODO GND or floating? )
+  ENET_TXD2  <= '0';                    -- RMII Not used ( TODO GND or floating? )
   ENET_TXD3  <= pg_p(0);                -- RMII TX_ER to TXD3
 
   pg_i(1) <= ENET_RXCLK;
   pf_i(4) <= ENET_RXCTL;                -- RMII DV to RX_CTL
   pf_i(6) <= ENET_RXD0;
   pf_i(7) <= ENET_RXD1;
-  --pg_i(6) <= ENET_RXD2; -- RMII Not used
+  --pg_i(6) <= ENET_RXD2;                 -- RMII Not used
   pf_i(5) <= ENET_RXD3;                 -- RMII RX_ER to RXD3
 
   -- Analog in
-  pwr_ok   <= '1';  -- Active high, not described in data book DEV7026
+  pwr_ok   <= '1';                      -- Active high, not described in data book DEV7026
   vdd_bmem <= '0';                      -- Seems to be NC in top
   VCC18LP  <= '0';                      -- Power for the RTC block. NC in top
   rxout    <= '0';                      -- 32KHz oscillator input, NC in rtc
   adc_bits <= '0';                      -- AC input stream
 
-  MTEST      <= '0';  -- Active high, disabled (But what does it do?)
+  MTEST      <= '0';                    -- Active high, disabled (But what does it do?)
   MBYPASS    <= '1';                    -- Bypass PLL (use ext clock)
   MIRQ1      <= '1';                    -- Active low
-  MWAKEUP_LP <= '0';  -- Active high, not described in data book DEV7026
+  MWAKEUP_LP <= '0';                    -- Active high, not described in data book DEV7026
   MLP_PWR_OK <= '1';                    -- Presumably active high??
 
   port_out_z_gen : for i in 0 to 7 generate
@@ -424,9 +433,9 @@ begin
     pj_p(i) <= pj_o(i) when pj_en(i) = '1' else 'Z';
   end generate;
 
-  LED_cnt_proc : process(HCLK)
+  LED_cnt_proc : process(led_clk)
   begin
-    if rising_edge(HCLK) then
+    if rising_edge(led_clk) then
       counter34 <= counter34 + 1;
     end if;
   end process;
@@ -437,10 +446,9 @@ begin
       clk_in1_n => VCU118_Clk300M_n,
       clk_200M  => clk_200M,
       clk_100M  => clk_100M,
-      clk_50M   => clk_50M
-      );
+      clk_50M   => clk_50M );
 
-  HCLK <= clk_100m;
+  HCLK   <= clk_100m;
 
   im4000_inst : digital_top
     generic map (
@@ -534,7 +542,9 @@ begin
       ospi_rwds_in     => OSPI_RWDS_i,
       ospi_rwds_out    => OSPI_RWDS_o,
       ospi_rwds_enable => OSPI_RWDS_e,
-      
+
+      led_clk => led_clk,
+
       spi_sclk      => spi_sclk,
       spi_cs_n      => spi_cs_n,
       spi_mosi      => spi_mosi,

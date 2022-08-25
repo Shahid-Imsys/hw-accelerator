@@ -65,6 +65,7 @@ architecture rtl of tiu_tb is
   constant timer7_exp : integer range 0 to 7 := 0;
 
   constant delay_cycles : integer := 10;
+  constant pulse_cycles : integer := 75;
 
   constant timer0_pls : time := (timer0_msa + 1) * (2 ** (timer0_exp + 1)) * clk_period;
   constant timer1_pls : time := (timer1_msa + 1) * (2 ** (timer1_exp + 1)) * clk_period;
@@ -106,12 +107,15 @@ architecture rtl of tiu_tb is
   signal test_time7_done : boolean := false;
   signal test_reset_done : boolean := false;
   signal test_delay_done : boolean := false;
+  signal test_cpt_done   : boolean := false;
+  signal test_cpt_pass   : boolean := true;
   signal test_reg_pass   : boolean := true;
   signal test_pass       : boolean := true;
 
   signal read_reg_tmp : std_logic_vector(7 downto 0);
   signal read_reg_cnt : std_logic_vector(7 downto 0) := (others => '0');
   signal reg_addr_chk : std_logic_vector(2 downto 0);
+  signal reg_data_out : std_logic_vector(7 downto 0);
 
   signal clk_pll : std_logic := '0';
 
@@ -174,6 +178,15 @@ begin
     test_reset_done <= true;
     write(output, string'("Reset" & lf));
 
+    wait until test_delay_done;
+    wait until rising_edge(clk_p);
+    rst_en <= '0';
+
+    wait for clk_period;
+    wait until rising_edge(clk_p);
+    rst_en <= '1';
+    write(output, string'("Reset" & lf));
+
     wait;
   end process;
 
@@ -187,6 +200,19 @@ begin
       reg_addr <= addr_in;
       wdata    <= data_in;
     end procedure;
+
+    procedure read_reg (
+      addr_in         : in std_logic_vector(7 downto 0);
+      signal data_out : out std_logic_vector(7 downto 0)) is
+    begin
+      wait until rising_edge(clk_p);
+      reg_wr   <= '0';
+      reg_addr <= addr_in;
+      wait for clk_period;
+      data_out <= tiu_out;
+    end procedure;
+
+    variable tmp : std_logic_vector(7 downto 0);
 
   begin
     wait until rising_edge(rst_en);
@@ -227,9 +253,40 @@ begin
     cpt_trig(0) <= '1';
     wait for clk_period;
     cpt_trig(0) <= '0';
+
+    wait until rising_edge(rst_en);
+    write_reg("10100000", "00100100"); -- set wai and drv of timer 0 to 1
+    write_reg("10010000", "10000000"); -- set wai and drv of timer 0 to 1
+    write_reg("10000000", "00000111"); -- set msa of timer 0 to 7
+    write_reg("10000001", "00000111"); -- set msa of timer 1 to 7
+    write_reg("01111111", "00000000");
+    write_reg("10001000", "00100000"); -- set cpt_en to 1
+
+    write_reg("10101000", "00000011"); -- enable timer 0
+
+    wait for clk_period * delay_cycles;
+    cpt_trig(0) <= '1';
+    wait for clk_period * pulse_cycles;
+    cpt_trig(0) <= '0';
+    wait for clk_period;
+    read_reg("00000000", reg_data_out);
+    wait for 1 ps;
+    tmp := reg_data_out;
+    read_reg("00000001", reg_data_out);
+    wait for 1 ps;
+
+    if ((((31 - (to_integer(unsigned(tmp))) + 32 * (31 - to_integer(unsigned(reg_data_out)))) * 2) = pulse_cycles) or
+      (((31 - (to_integer(unsigned(tmp))) + 32 * (31 - to_integer(unsigned(reg_data_out)))) * 2) = pulse_cycles + 1)) then
+      write(output, string'("Interval measurement test OK" & lf));
+    else
+      write(output, string'("Interval measurement test FAIL, result: " & integer'image((62 - (to_integer(unsigned(tmp)) + to_integer(unsigned(reg_data_out)))) * 2) & lf));
+      test_cpt_pass <= false;
+    end if;
+    test_cpt_done <= true;
+    wait;
   end process;
 
-  test_time : process (pulseout, rst_en, test_reg_pass)
+  test_time : process (pulseout, rst_en, test_reg_pass, tiu_irq)
     type tmp_t is array (0 to 7) of time;
     variable tmp : tmp_t := (others => 0 ns);
   begin
@@ -344,7 +401,7 @@ begin
         if (test_reg_pass /= true) then
           test_pass <= false;
         end if;
-      else
+      else -- test_reset_done
         if rising_edge(pulseout(0)) then
           tmp(0) := now;
         elsif falling_edge(pulseout(0)) then
@@ -357,19 +414,25 @@ begin
           test_delay_done <= true;
         end if;
       end if;
+      --if (test_delay_done) then
+      --  if
+
     end if;
 
   end process;
 
-  test_stop : process
+  test_stop : process (clk_p)
   begin
-    wait until test_done_2;
-    if (test_pass) then
-      write(output, string'("Test PASS" & lf));
-    else
-      write(output, string'("Test FAIL" & lf));
+    if rising_edge(clk_p) then
+      if (test_done_1 and test_done_2 and test_cpt_done) then
+        if (test_pass and test_cpt_pass) then
+          write(output, string'("Test PASS" & lf));
+        else
+          write(output, string'("Test FAIL" & lf));
+        end if;
+        stop;
+      end if;
     end if;
-    stop;
   end process;
 
   read_reg : process (clk_p, trst_n1)
@@ -400,16 +463,18 @@ begin
     end if;
   end process;
 
-  test_done_1 <= test_time0_done and
+  test_done_1 <= test_done_1 or
+    (test_time0_done and
     test_time1_done and
     test_time2_done and
     test_time3_done and
     test_time4_done and
     test_time5_done and
     test_time6_done and
-    test_time7_done;
+    test_time7_done);
 
-  test_done_2 <= test_reset_done and
-    test_delay_done;
+  test_done_2 <= test_done_2 or
+    (test_reset_done and
+    test_delay_done);
 
 end architecture;

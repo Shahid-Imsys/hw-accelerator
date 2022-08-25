@@ -82,7 +82,6 @@ entity digital_top is
     dac1_en    : out std_logic;         -- Enable for DAC1
     clk_a      : out std_logic;         -- Clock to the DAC's and ADC
 
-
     -- Port A
     pa_i  : in  std_logic_vector(7 downto 0);
     pa_en : out std_logic_vector(7 downto 0);
@@ -147,6 +146,8 @@ entity digital_top is
     ospi_rwds_enable : out std_logic;
     
     dummy_output : out std_logic_vector(7 downto 0);
+    
+    led_clk : out std_logic;
 
     -- SPI, chip control interface
     spi_sclk      : in  std_logic;
@@ -157,8 +158,7 @@ entity digital_top is
     pad_config    : out pad_config_record_t;
     pll_config    : out pll_registers_record_t;
     adpll_config  : in adpll_registers_record_t
-    );
-
+    );    
 end entity digital_top;
 
 architecture rtl of digital_top is
@@ -340,6 +340,10 @@ architecture rtl of digital_top is
 begin  -- architecture rtl
 
   ospi_dq_out <= ospi_dq_out_int;
+  
+  led_clk <= clk_p_cpu;
+
+clk_rst_asic_gen : if g_memory_type /= fpga generate
 
   i_clock_reset : entity work.clock_reset
 
@@ -378,6 +382,44 @@ begin  -- architecture rtl
 
       scan_mode => mtest
       );
+end generate;
+
+clk_rst_fpga_gen : if g_memory_type = fpga generate
+
+  i_clock_reset : entity work.fpga_clock_reset
+
+  port map (
+    clk_in   => hclk,
+    spi_sclk => spi_sclk,
+    --
+    clk_p   => clk_p_cpu,
+    clk_p_n => clk_p_cpu_n,
+    clk_rx  => clk_rx,
+    clk_tx  => clk_tx,
+    sclk    => sclk,
+    sclk_n  => sclk_n,
+    --
+    pre_spi_rst_n => pre_spi_rst_n,
+    mreset_n => mreset,
+    pwr_ok   => pwr_ok,
+    c1_wdog_n => c1_wdog_n,
+    --  
+    rst_n => cpu_rst_n,
+    spi_rst_n => spi_rst_n,
+    --
+    pg_1_i => pg_i(1),
+    pf_1_i => pf_i(1),
+    --
+    clock_in_off => clock_in_off,
+    sel_pll      => clock_sel,
+    spi_sel_pll  => '1',
+    --
+    spi_override_pll_locked => '0',
+    pll_locked              => pll_locked,
+    --
+    scan_mode => mtest
+    );
+end generate;
 
   i_digital_core : entity work.digital_core
     generic map (

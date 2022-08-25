@@ -300,23 +300,21 @@ begin
           drv(i) <= '0';
           wai    <= (others => '0');
         elsif rising_edge(clk_p) then
-          if (clk_param(i) = '1') then 
-            if i < 2 and capt_pend = '1' then
-              msa <= dwnctr;
-            else
-              case reg_addr(5 downto 4) is
-                when "00" => exp(i) <= wdata(7 downto 5);
-                             msa <= wdata(4 downto 0);
-                when "01" => reqi <= wdata(7);
-                             tgl <= wdata(6 downto 5);
-                           coi <= wdata(4 downto 0);
-                when "10" => rep <= wdata(7);
-                             evt(i) <= wdata(6);
-                             drv(i) <= wdata(5);
-                             wai    <= wdata(4 downto 2);
-                when others => null;
-              end case;
-            end if;
+          if i < 2 and cpt = '1' and capt_pend = '1' then
+            msa <= dwnctr;
+          elsif (clk_param(i) = '1') then 
+            case reg_addr(5 downto 4) is
+              when "00" => exp(i) <= wdata(7 downto 5);
+                           msa <= wdata(4 downto 0);
+              when "01" => reqi <= wdata(7);
+                           tgl <= wdata(6 downto 5);
+                         coi <= wdata(4 downto 0);
+              when "10" => rep <= wdata(7);
+                           evt(i) <= wdata(6);
+                           drv(i) <= wdata(5);
+                           wai    <= wdata(4 downto 2);
+              when others => null;
+            end case;
           end if;
         end if;
       end process;
@@ -511,7 +509,7 @@ begin
 	if i = 0 and capt_event = '1' and reqi = '1' then
 	  ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
 	elsif i > 0 and  (reset_ifl_n(i) = '0' or trst_n = '0') then
-	  ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
+	  ifl(i) <= '0';  -- Timer 0 does not generate wrap interrupt in capture mode
 	end if;
 	
       end process;
@@ -528,15 +526,14 @@ begin
       process (tgl, chain_coi(i), chain_zero(i), begintime(i))
       begin
         case tgl is
-          when "00" => tgl_set <= '0';
-                       tgl_reset <= '0';
-          when "01" => tgl_set <= begintime(i);
-                       tgl_reset <= chain_zero(i);
-          when "10" => tgl_set <= chain_coi(i);
-                       tgl_reset <= not chain_coi(i);
-          when "11" => tgl_set <= chain_coi(i);
-                       tgl_reset <= chain_zero(i);
-          when others => null;
+          when "00" =>   tgl_set <= '0';
+                         tgl_reset <= '0';
+          when "01" =>   tgl_set <= begintime(i);
+                         tgl_reset <= chain_zero(i);
+          when "10" =>   tgl_set <= chain_coi(i);
+                         tgl_reset <= not chain_coi(i);
+          when others => tgl_set <= chain_coi(i);
+                         tgl_reset <= chain_zero(i);
         end case;
       end process;
                  
@@ -681,8 +678,6 @@ begin
     process (clk_wr, reg_addr, capt_event)
     begin
       clk_param    <= (others => '0');
-      clk_param(0) <= capt_event;
-      clk_param(1) <= capt_event;
       for i in 0 to TIM_CH_NBR-1 loop
         if reg_addr(3) = '0' and (i = conv_integer(reg_addr(2 downto 0))) and clk_wr = '1' then
           clk_param(i) <= '1';
@@ -715,6 +710,7 @@ begin
     signal sync_0_rx1    : std_logic;
     signal sync_1_rx1    : std_logic;
     signal trig_edge_rx1 : std_logic;
+    signal cpt_prev      : std_logic;
 
   begin
     -- These flipflops detect positive edge of 'capture' inputs from ports,
@@ -795,11 +791,33 @@ begin
     -- capt_event is the second event (the end of a signal pulse or a signal
     -- with delay phase), which is used to copy a counter value and generate
     -- interrupt. This event is generated only when cpt is set.    
-    capt_event <= (trig_edge(0) or trig_edge_rx1) and cpt;
+    process (clk_p, trst_n)
+    begin
+      if (trst_n = '0') then
+        capt_event <= '0';
+      elsif rising_edge(clk_p) then
+        capt_event <= capt_pend and cpt;
+      end if;
+    end process;
 
     -- capt_pend is used to tell the msa input mux to load msa from the
     -- downctr rather than from wdata on the capt_event pulse.
-    capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
+    --capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
+
+    process (clk_p, trst_n)
+    begin
+      if (trst_n = '0') then
+        cpt_prev  <= '0';
+        capt_pend <= '0';
+      elsif rising_edge(clk_p) then
+        cpt_prev  <= cpt_trig(0);
+        capt_pend <= '0';
+        if (cpt_prev = '1' and cpt_trig(0) = '0') then
+          capt_pend <= '1';
+        end if;
+      end if;
+    end process;
+
 
     -- This flipflop stores the source of capture. '0' means cpt_trig,
     -- '1' means Ethernet timestamp.

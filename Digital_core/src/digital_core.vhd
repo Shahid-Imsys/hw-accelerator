@@ -33,6 +33,7 @@ entity digital_core is
 
   generic (
     g_memory_type         : memory_type_t := asic;
+    USE_ASIC_MEMORIES     : boolean       := false;
     ionoc_fifo_depth_bits : integer       := 4;  -- Each FIFO is 2^x = 16 words deep
     g_clock_frequency     : integer);
 
@@ -272,7 +273,7 @@ begin  -- architecture rtl
 
   noc_top_inst : Accelerator_Top
     generic map(
-      USE_ASIC_MEMORIES => true )
+      USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
     port map (
       clk           => clk_noc,
       Reset         => cpu_rst_n,

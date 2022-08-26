@@ -34,9 +34,9 @@ entity digital_top is
 
   generic (
     g_memory_type     : memory_type_t := asic;
+    USE_ASIC_MEMORIES : boolean       := false;
     g_simulation      : boolean       := false;
     g_clock_frequency : integer);
-
   port (
     hclk          : in  std_logic;      -- clk input
     
@@ -426,8 +426,10 @@ begin  -- architecture rtl
 
   i_digital_core : entity work.digital_core
     generic map (
-      g_memory_type     => g_memory_type,
-      g_clock_frequency => g_clock_frequency  -- system clock frequency in MHz
+      g_memory_type         => g_memory_type,
+      USE_ASIC_MEMORIES     => USE_ASIC_MEMORIES,
+      ionoc_fifo_depth_bits => 5,
+      g_clock_frequency     => g_clock_frequency  -- system clock frequency in MHz
       )
     port map (
       clk_p_cpu   => clk_p_cpu,

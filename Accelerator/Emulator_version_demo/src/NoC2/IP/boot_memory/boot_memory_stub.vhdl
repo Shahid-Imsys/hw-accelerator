@@ -1,13 +1,13 @@
--- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
--- Date        : Tue Aug 16 11:19:47 2022
--- Host        : azadeh running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               C:/Users/azade/projects/project_noc2_cc/ip/boot_memory/boot_memory_stub.vhdl
+-- Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
+-- Date        : Fri Aug 26 13:57:23 2022
+-- Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
+-- Command     : write_vhdl -force -mode synth_stub -rename_top boot_memory -prefix
+--               boot_memory_ boot_memory_stub.vhdl
 -- Design      : boot_memory
 -- Purpose     : Stub declaration of top-level module interface
--- Device      : xcku5p-ffvb676-2-e
+-- Device      : xcvu9p-flga2104-2L-e
 -- --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -28,6 +28,6 @@ attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
 attribute black_box_pad_pin of stub : architecture is "clka,ena,addra[7:0],douta[27:0]";
 attribute x_core_info : string;
-attribute x_core_info of stub : architecture is "blk_mem_gen_v8_4_2,Vivado 2018.3";
+attribute x_core_info of stub : architecture is "blk_mem_gen_v8_4_5,Vivado 2021.2";
 begin
 end;

@@ -62,7 +62,10 @@ begin
 
   latch_signals: process(clk)
   begin
-      if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+    if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+      if rst = '0' then
+        re_busy <= '0';
+      else
         if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
           re_busy <= '1';
         elsif re_loop = (re_loop'range => '0') then 
@@ -86,6 +89,7 @@ begin
           mode_c_l <= '0';
         end if;
       end if;
+    end if;
   end process;
 ----------------------------------------------------------------------------------
 --Address generation block
@@ -196,33 +200,33 @@ begin
   --
   write_enable_left: process(all)
   begin
-      if re_busy = '1' and data_valid = '1' and ((mode_a_l = '1' and mode_b_l = '0' ) or mode_c_l = '1')then
-        write_en_data <= '1';
-      elsif re_start = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b ='1') then
-        write_en_data <= '1';
-      else
-        write_en_data <= '0';
-      end if;
+    if re_busy = '1' and data_valid = '1' and ((mode_a_l = '1' and mode_b_l = '0' ) or mode_c_l = '1')then
+      write_en_data <= '1';
+    elsif re_start = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b ='1') then
+      write_en_data <= '1';
+    else
+      write_en_data <= '0';
+    end if;
   end process;
 
   write_enable_right: process(all)
   begin
-      if re_busy = '1' and data_valid = '1' and mode_a_l = '0' and mode_b_l = '1' then
-        write_en_weight <= '1';
-      else
-        write_en_weight <= '0';
-      end if;
+    if re_busy = '1' and data_valid = '1' and mode_a_l = '0' and mode_b_l = '1' then
+      write_en_weight <= '1';
+    else
+      write_en_weight <= '0';
+    end if;
   end process;
 
   write_enable_bias: process(clk)
   begin
-      if rising_edge(clk) then 
-          if re_busy = '1' and data_valid = '1' and mode_a_l = '1' and mode_b_l = '1' then
-            write_en_bias <= '1';
-          else
-            write_en_bias <= '0';
-          end if;
+    if rising_edge(clk) then 
+      if re_busy = '1' and data_valid = '1' and mode_a_l = '1' and mode_b_l = '1' then
+        write_en_bias <= '1';
+      else
+        write_en_bias <= '0';
       end if;
+    end if;
   end process;
                   
 

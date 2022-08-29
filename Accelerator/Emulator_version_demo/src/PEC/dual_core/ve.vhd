@@ -307,12 +307,8 @@ architecture rtl of ve is
   signal re_rdy_int : std_logic;
   --Vector engine signals
   signal ve_rdy_int : std_logic;
-  signal ve_start, conv_start, fft_start : std_logic;
+  signal start, conv_start, fft_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(2 downto 0);
-  --signal wr_st_addr:std_logic; --TBD
-  --signal wr_offset : std_logic;--TBD
-  --signal wr_jump   : std_logic;--TBD
-  --signal wr_depth  : std_logic;--TBD
   --signal mac_switch : std_logic;
   --Shared signals
   signal mode_a : std_logic; --mode A activate
@@ -322,7 +318,8 @@ architecture rtl of ve is
   signal remode_c_l : std_logic; --receive engine's mode c latch signal
   signal vemode_c_l : std_logic; --vector engine's mode c latch signal
   signal reload : std_logic; --reload address counters 
-  signal reg_in : std_logic_vector(4 downto 0); --parameter register set field, including loop counter.
+  signal reg_in : std_logic_vector(5 downto 0); --parameter register set field, including loop counter.
+  signal rv_switch : std_logic; --Used to control VE's work mode, RE mode or VE mode.
     
   --------------------------------
   --Registers
@@ -330,7 +327,9 @@ architecture rtl of ve is
   type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
   type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
   type mode is (re_mode, conv, fft, matrix);
+  type read_state is (waiting, reading_dmem, reading_wmem);
   signal mode_latch : mode;
+  signal fft_read_state : read_state;
   signal re_addr_data   : std_logic_vector(7 downto 0);
   signal re_addr_weight : std_logic_vector(7 downto 0);
   signal re_addr_l, re_addr_r   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
@@ -345,7 +344,7 @@ architecture rtl of ve is
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
-  signal fft_en, fft_busy, finalstage : std_logic;
+  signal fft_en, fft_done, finalstage : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -372,8 +371,8 @@ architecture rtl of ve is
   signal re_busy : std_logic; --RE start latch
   signal conv_busy : std_logic; --VE start latch
   signal bias_addr_assign : std_logic; --enable signal for enbale the assignment of bias start address.
-  signal re_addr_reload   : std_logic;
-  signal ve_addr_reload   : std_logic;
+  signal re_addr_reload, ve_addr_reload, addr_reload  : std_logic;
+  signal conv_enable : std_logic;
   signal data0  : std_logic_vector(31 downto 0);
   signal data1  : std_logic_vector(31 downto 0);
   signal weight  : std_logic_vector(63 downto 0);
@@ -384,6 +383,7 @@ architecture rtl of ve is
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
   signal bias_in    : std_logic_vector(63 downto 0);
+  signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
   signal mode_a_l  : std_logic;
   signal mode_b_l  : std_logic;
   signal read_en_b_i : std_logic;
@@ -392,6 +392,8 @@ architecture rtl of ve is
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
   signal read_en_to_mux, read_en_w_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
+  signal au_offset0, au_offset1, au_offset2, au_offset3 : std_logic_vector(7 downto 0);
+  signal au_cmp0, au_cmp1, au_cmp2, au_cmp3 : std_logic_vector(7 downto 0);
   signal ve_clr_acc : std_logic; --clear accumulators
   signal pl_ve_byte : std_logic_vector(3 downto 0);
   --fft test data
@@ -422,6 +424,9 @@ architecture rtl of ve is
   signal send_req_d : std_logic;
   signal set_fifo_push : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
+  signal rdout_addr_data, rdout_addr_weight : std_logic_vector(7 downto 0);
+  signal doutrd_en, woutrd_en : std_logic;
+  signal dmem_read_done, wmem_read_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
   signal fft_read_en, fft_write_en : std_logic;
@@ -452,37 +457,47 @@ architecture rtl of ve is
   signal data0_addr_o : std_logic_vector(7 downto 0);
   signal data1_addr_o : std_logic_vector(7 downto 0);
   signal weight_addr_o : std_logic_vector(7 downto 0);
+  signal fft_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
   --------------------------------
   --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
   --------------------------------
-  constant CONS_NON_ACT          : std_logic_vector(4 downto 0) := "0"&x"0";
-  constant CONS_RE_START_ADDR_L  : std_logic_vector(4 downto 0) := "0"&x"1"; --write left starting address of receive engine
-  constant CONS_RE_START_ADDR_R  : std_logic_vector(4 downto 0) := "0"&x"2"; --write right starting address of recieve engine
-  constant CONS_RE_LC            : std_logic_vector(4 downto 0) := "0"&x"3"; --write receive engine's loop counter
-  constant CONS_DFY_ADDR_A       : std_logic_vector(4 downto 0) := "0"&x"4"; --push back address from DFY
-  constant CONS_DFY_ADDR_B       : std_logic_vector(4 downto 0) := "0"&x"5"; --push back address from DFY, B mode
-  constant CONS_VE_START_ADDR_L  : std_logic_vector(4 downto 0) := "0"&x"6"; --vector engine's left starting address
-  constant CONS_VE_START_ADDR_R  : std_logic_vector(4 downto 0) := "0"&x"7"; --vector engine's right starting address
-  constant CONS_VE_LC            : std_logic_vector(4 downto 0) := "0"&x"8"; --vector engine's INNER loop counter
-  constant CONS_VE_OFFSET_L      : std_logic_vector(4 downto 0) := "0"&x"9"; --left offset
-  constant CONS_VE_OFFSET_R      : std_logic_vector(4 downto 0) := "0"&x"a"; --right offset
-  constant CONS_VE_DEPTH_L       : std_logic_vector(4 downto 0) := "0"&x"b"; --left depth
-  constant CONS_VE_JUMP_L        : std_logic_vector(4 downto 0) := "0"&x"c"; --left jump
-  constant CONS_DFY_REG_SHIFT_IN : std_logic_vector(4 downto 0) := "0"&x"d"; --write DFY
-  constant CONS_DFY_REG_PARALLEL : std_logic_vector(4 downto 0) := "0"&x"e"; --write DFY in parallel from mac registers
-  constant CONS_DTM_REG_SHIFT_IN : std_logic_vector(4 downto 0) := "0"&x"f"; --Write DTM --?
-  constant CONS_VE_OLC           : std_logic_vector(4 downto 0) := "1"&x"0"; --write vector engine's OUTER loop counter
-  constant CONS_CONFIG           : std_logic_vector(4 downto 0) := "1"&x"1"; --write config register for both ring mode and inner-outer loop mode
-  constant CONS_RING_END         : std_logic_vector(4 downto 0) := "1"&x"2"; --Ring mode end address
-  constant CONS_RING_START       : std_logic_vector(4 downto 0) := "1"&x"3"; --Ring mode start address. 
+  constant CONS_NON_ACT          : std_logic_vector(5 downto 0) := "00"&x"0";
+  constant CONS_RE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"1"; --write left starting address of receive engine
+  constant CONS_RE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"2"; --write right starting address of recieve engine
+  constant CONS_RE_LC            : std_logic_vector(5 downto 0) := "00"&x"3"; --write receive engine's loop counter
+  constant CONS_DFY_ADDR_A       : std_logic_vector(5 downto 0) := "00"&x"4"; --push back address from DFY
+  constant CONS_DFY_ADDR_B       : std_logic_vector(5 downto 0) := "00"&x"5"; --push back address from DFY, B mode
+  constant CONS_VE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"6"; --vector engine's left starting address
+  constant CONS_VE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"7"; --vector engine's right starting address
+  constant CONS_VE_LC            : std_logic_vector(5 downto 0) := "00"&x"8"; --vector engine's INNER loop counter
+  constant CONS_VE_OFFSET_L      : std_logic_vector(5 downto 0) := "00"&x"9"; --left offset
+  constant CONS_VE_OFFSET_R      : std_logic_vector(5 downto 0) := "00"&x"a"; --right offset
+  constant CONS_VE_DEPTH_L       : std_logic_vector(5 downto 0) := "00"&x"b"; --left depth
+  constant CONS_VE_JUMP_L        : std_logic_vector(5 downto 0) := "00"&x"c"; --left jump
+  constant CONS_DFY_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"d"; --write DFY
+  constant CONS_DFY_REG_PARALLEL : std_logic_vector(5 downto 0) := "00"&x"e"; --write DFY in parallel from mac registers
+  constant CONS_DTM_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"f"; --Write DTM --?
+  constant CONS_VE_OLC           : std_logic_vector(5 downto 0) := "01"&x"0"; --write vector engine's OUTER loop counter
+  constant CONS_CONFIG           : std_logic_vector(5 downto 0) := "01"&x"1"; --write config register for both ring mode and inner-outer loop mode
+  constant CONS_RING_END         : std_logic_vector(5 downto 0) := "01"&x"2"; --Ring mode end address
+  constant CONS_RING_START       : std_logic_vector(5 downto 0) := "01"&x"3"; --Ring mode start address. 
   --constant CONS_CURR_RING        : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
-  constant CONS_ZP_DATA          : std_logic_vector(4 downto 0) := "1"&x"4"; --Zero point value for data register, signed
-  constant CONS_ZP_WEIGHT        : std_logic_vector(4 downto 0) := "1"&x"5"; --Zero point value for weight register, signed
-  constant CONS_SCALE            : std_logic_vector(4 downto 0) := "1"&x"6"; --Scale factor for shifter
-  constant CONS_PP_CTL           : std_logic_vector(4 downto 0) := "1"&x"7"; --Controls the bypass of different logics inside post processors
-  constant CONS_BIAS_INDEX_END   : std_logic_vector(4 downto 0) := "1"&x"8"; --End indexing of the bias 
-  constant CONS_BIAS_INDEX_START : std_logic_vector(4 downto 0) := "1"&x"9"; --Start indexing of the bias
+  constant CONS_ZP_DATA          : std_logic_vector(5 downto 0) := "01"&x"4"; --Zero point value for data register, signed
+  constant CONS_ZP_WEIGHT        : std_logic_vector(5 downto 0) := "01"&x"5"; --Zero point value for weight register, signed
+  constant CONS_SCALE            : std_logic_vector(5 downto 0) := "01"&x"6"; --Scale factor for shifter
+  constant CONS_PP_CTL           : std_logic_vector(5 downto 0) := "01"&x"7"; --Controls the bypass of different logics inside post processors
+  constant CONS_BIAS_INDEX_END   : std_logic_vector(5 downto 0) := "01"&x"8"; --End indexing of the bias 
+  constant CONS_BIAS_INDEX_START : std_logic_vector(5 downto 0) := "01"&x"9"; --Start indexing of the bias
+
+  constant CONS_AU_OFFSET0       : std_logic_vector(5 downto 0) := "10"&x"0"; --add on offset0 of addressing unit
+  constant CONS_AU_OFFSET1       : std_logic_vector(5 downto 0) := "10"&x"1"; --add on offset1 of addressing unit
+  constant CONS_AU_OFFSET2       : std_logic_vector(5 downto 0) := "10"&x"2"; --add on offset2 of addressing unit
+  constant CONS_AU_OFFSET3       : std_logic_vector(5 downto 0) := "10"&x"3"; --add on offset4 of addressing unit
+  constant CONS_AU_CMP0          : std_logic_vector(5 downto 0) := "10"&x"4"; --compare value0 of addressing unit
+  constant CONS_AU_CMP1          : std_logic_vector(5 downto 0) := "10"&x"5"; --compare value1 of addressing unit
+  constant CONS_AU_CMP2          : std_logic_vector(5 downto 0) := "10"&x"6"; --compare value2 of addressing unit
+  constant CONS_AU_CMP3          : std_logic_vector(5 downto 0) := "10"&x"7"; --compare value3 of addressing unit
   --constant CONS_MAC_SWITCH       : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
   --------------------------------------------------------
   --Delay FFs
@@ -497,17 +512,15 @@ begin
   --Not latched signals are used only in one microinstruction time (clk_e) together with 
   --re_start and ve_start signals and mode abcd or relaod signal. 
   dfy_dest_sel   <= PL (118 downto 116); --DEST_BYTE
-  re_start       <= PL(100);--RE or VE mode latch
-  ve_start       <= PL(95); --RE or VE_ST
-  --acc_latch      <= PL(94); --ACCTOREG --To be removed
+  start          <= PL(95); 
+  rv_switch      <= PL(94); -- RE mode or VE mode
   re_source      <= PL(96); --RE_DFY_SRC --
-  reg_in         <= PL(105 downto 101);
+  reg_in         <= PL(105 downto 100);
   mode_a         <= PL(98);
   mode_b         <= PL(97);
   mode_c         <= PL(92);
-  --addr_reload <= PL(99); 
-  re_addr_reload <= PL(99);
-  ve_addr_reload <= PL(107);
+  addr_reload    <= PL(99); 
+  conv_enable    <= PL(107);
   ve_clr_acc     <= PL(93);
   pl_ve_byte     <= PL(112 downto 109);
   --
@@ -593,6 +606,22 @@ begin
         elsif reg_in = CONS_BIAS_INDEX_START then
           bias_index_start <= YBUS;
           bias_addr_assign <= '1';
+        elsif reg_in = CONS_AU_OFFSET0 then
+          au_offset0 <= YBUS;
+        elsif reg_in = CONS_AU_OFFSET1 then
+          au_offset1 <= YBUS;
+        elsif reg_in = CONS_AU_OFFSET2 then
+          au_offset2 <= YBUS;
+        elsif reg_in = CONS_AU_OFFSET3 then
+          au_offset3 <= YBUS;
+        elsif reg_in = CONS_AU_CMP0 then
+          au_cmp0 <= YBUS;
+        elsif reg_in = CONS_AU_CMP1 then
+          au_cmp1 <= YBUS;
+        elsif reg_in = CONS_AU_CMP2 then
+          au_cmp2 <= YBUS;
+        elsif reg_in = CONS_AU_CMP3 then
+          au_cmp3 <= YBUS;
         --elsif reg_in = CONS_MAC_SWITCH then
         --  mul_ctl <= YBUS;
         else
@@ -607,7 +636,9 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
-      if clk_e_pos = '0' then
+      if rst = '0' then
+        re_rdy <= '1';
+      elsif clk_e_pos = '0' then
         re_rdy <= not re_busy;
       end if;
     end if;
@@ -616,24 +647,28 @@ begin
   process(clk_p) --Added clock confinement for ve_rdy
   begin
     if rising_edge(clk_p) then
-      if clk_e_pos = '0' then
-        ve_rdy <= not conv_busy;
+      if rst = '0' then
+        ve_rdy <= '1';
+      elsif clk_e_pos = '0' then
+        ve_rdy <= not conv_busy and fft_done_pipe(10);
       end if;
     end if;
   end process;
   
-  RE_VE_latch : process(clk_p)
+  RE_VE_switch : process(clk_p)
   begin
     if rising_edge(clk_p) then
-      if re_start = '1' then
+      if rv_switch = '1' and ve_rdy = '1' then
         mode_latch <= re_mode;
-      else 
-        if ve_clr_acc = '1' and re_start = '0' then  
-          mode_latch <= fft;
-        elsif ve_clr_acc = '0' and re_start = '0' then
-          mode_latch <= conv;
-        else 
-          mode_latch <= matrix;
+      else
+        if re_rdy = '1' then
+          if ve_clr_acc = '1' and rv_switch = '0' then  
+            mode_latch <= fft;
+          elsif conv_enable = '1' and rv_switch = '0' then
+            mode_latch <= conv;
+          elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+            mode_latch <= matrix;
+          end if;
         end if;
       end if;
     end if;
@@ -652,7 +687,7 @@ begin
         curr_ring_addr <= (others => '0');
       elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
         curr_ring_addr <= YBUS;
-      elsif ve_addr_reload = '1' then
+      elsif addr_reload = '1' then
         curr_ring_addr <= curr_ring_addr;
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
@@ -711,7 +746,7 @@ begin
                           data0addr_to_memory <= re_addr_data;
                           data1addr_to_memory <= re_addr_data;
                         end if;
-      when others  => biasaddr_to_memory <= bias_addr_o;
+      when conv    => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
                         if mode_c_l = '1' then
                           data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
@@ -720,10 +755,19 @@ begin
                           data0addr_to_memory <= data0_addr_o;
                           data1addr_to_memory <= data1_addr_o;
                         end if; 
-      --when fft     => weightaddr_to_memory <= ve_fftaddr_tf;
-      --                data0addr_to_memory  <= ve_fftaddr_d0;
-      --                data1addr_to_memory  <= ve_fftaddr_d1;
-      --when matrix  => null;-- for now
+      when fft     => if fft_done_pipe(10) = '1' then
+                        weightaddr_to_memory <= rdout_addr_weight;
+                        data0addr_to_memory  <= rdout_addr_data;
+                        data1addr_to_memory  <= rdout_addr_data;
+                      else
+                        weightaddr_to_memory <= weight_addr_o;
+                        data0addr_to_memory  <= data0_addr_o;
+                        data1addr_to_memory  <= data1_addr_o;
+                      end if;
+      when others  => biasaddr_to_memory <= bias_addr_o;
+                      weightaddr_to_memory <= weight_addr_o;
+                      data0addr_to_memory  <= data0_addr_o;
+                      data1addr_to_memory  <= data1_addr_o;-- for now
     end case;
   end process;
 
@@ -746,21 +790,25 @@ begin
 
   startncounter_demux : process(all)
   begin
-    conv_start <= '0';
-    fft_start  <= '0';
-    re_start   <= '0';
-    loop_ctr   <= x"00";
-    oloop_ctr  <= x"00";
-    fft_stages <= "000";
-    re_ctr     <= x"00";
+    conv_start     <= '0';
+    fft_start      <= '0';
+    re_start       <= '0';
+    loop_ctr       <= x"00";
+    oloop_ctr      <= x"00";
+    fft_stages     <= "000";
+    re_ctr         <= x"00";
+    re_addr_reload <= '0';
+    ve_addr_reload <= '0';
     case mode_latch is
-      when conv   => conv_start <= ve_start;
-                     loop_ctr   <= ve_loop_reg;
-                     oloop_ctr  <= ve_oloop_reg;
-      when fft    => fft_start  <= ve_start;
-                     fft_stages <= unsigned(ve_loop_reg(2 downto 0));
-      when others => re_start   <= ve_start;
-                     re_ctr     <= re_loop_reg;
+      when conv   => conv_start     <= start;
+                     ve_addr_reload <= addr_reload;
+                     loop_ctr       <= ve_loop_reg;
+                     oloop_ctr      <= ve_oloop_reg;
+      when fft    => fft_start      <= start;
+                     fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
+      when others => re_start       <= start;
+                     re_addr_reload <= addr_reload;
+                     re_ctr         <= re_loop_reg;
     end case;
   end process;
 
@@ -842,27 +890,33 @@ begin
 
   rw_to_mem_mux : process(all)
   begin
+    read_en_o    <= '0';
+    write_en_o   <= '0';
+    read_en_w_o  <= '0';
+    write_en_w_o <= '0';
+    read_en_b_o  <= '0';
+    write_en_b_o <= '0';
     if mode_latch = re_mode then
       read_en_o    <= read_en_to_mux;
       write_en_o   <= dwen_from_re;
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= wwen_from_re;
-      read_en_b_o  <= '0';
       write_en_b_o <= bwen_from_re;
+    elsif mode_latch = conv then
+      read_en_o    <= '1';
+      write_en_o   <= '1';
+      read_en_w_o  <= '1';
+      write_en_w_o <= '1';
+      read_en_b_o  <= '1';
     elsif mode_latch = fft then
       read_en_o    <= read_en_to_mux;
       write_en_o   <= write_en_to_mux;
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= write_en_w_to_mux;
-      read_en_b_o  <= '0';
-      write_en_b_o <= '0';
-    else
-      read_en_o    <= '0';
-      write_en_o   <= '0';
-      read_en_w_o  <= '0';
-      write_en_w_o <= '0';
-      read_en_b_o  <= '0';
-      write_en_b_o <= '0';
+      if fft_done_pipe(10) = '1' then
+        read_en_o   <= doutrd_en;
+        read_en_w_o <= woutrd_en;
+      end if;
     end if;
   end process;
   bypass <= '0';
@@ -1111,7 +1165,7 @@ begin
       write_en     => fft_write_en,
       memreg_c     => fft_memreg_c,
       writebuff_c  => fft_writebuff_c,
-      done         => fft_busy,
+      done         => fft_done,
       finalstage   => finalstage,
       inst_arith   => fft_inst,
       inst_add     => fft_ppinst,
@@ -1178,6 +1232,98 @@ begin
     end if;
   end process;
 
+  fft_read_states : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        fft_read_state <= waiting;
+        doutrd_en <= '0';
+        woutrd_en <= '0';
+      else
+        case fft_read_state is 
+          when waiting =>
+            if fft_done_pipe(10) = '1' and dmem_read_done = '0' then
+              doutrd_en <= '1';
+              fft_read_state <= reading_dmem;
+            end if;
+          when reading_dmem =>
+            if rdout_addr_data = x"ff" and wmem_read_done = '0' then
+              doutrd_en <= '0';
+              woutrd_en <= '1';
+              fft_read_state <= reading_wmem;
+            end if;
+          when reading_wmem =>
+            if rdout_addr_weight = x"ff" then
+              woutrd_en <= '0';
+              fft_read_state <= waiting;
+            end if;
+          when others => fft_read_state <= waiting;
+        end case;
+      end if;
+    end if;
+  end process;
+
+  fft_readout : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      fft_done_pipe(0) <= fft_done;
+      for i in 0 to 9 loop
+        fft_done_pipe(i+1) <= fft_done_pipe(i);
+      end loop;
+      if rst = '0' then
+        dmem_read_done <= '0';
+        wmem_read_done <= '0';
+        rdout_addr_data <= x"00";
+        rdout_addr_weight <= x"00";
+        fft_done_pipe <= (others => '0');
+      else
+        if fft_read_state = waiting then
+          if fft_start = '1' then
+            dmem_read_done <= '0';
+            wmem_read_done <= '0';
+          end if;
+        elsif fft_read_state = reading_dmem then        
+          if rdout_addr_data = x"ff" then
+            dmem_read_done <= '1';
+            rdout_addr_data <= x"00";
+          else 
+            rdout_addr_data <= std_logic_vector(unsigned(rdout_addr_data)+1);
+          end if;
+        elsif fft_read_state = reading_wmem then
+          if rdout_addr_weight = x"ff" then
+            wmem_read_done <= '1';
+            rdout_addr_weight <= x"00";
+          else 
+            rdout_addr_weight <= std_logic_vector(unsigned(rdout_addr_weight)+1);
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+
+  process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if fft_done_pipe(10) = '1' then
+        if CLK_E_NEG = '0' then
+          if doutrd_en = '1' then
+            fft_result(127 downto 64) <= data0 & data1; 
+          elsif woutrd_en = '1' then
+            fft_result(127 downto 64) <= weight;
+          end if;
+        else
+          if doutrd_en = '1' then
+            fft_result(63 downto 0) <= data0 & data1; 
+          elsif woutrd_en = '1' then
+            fft_result(63 downto 0) <= weight;
+          end if;
+        end if;
+      else
+        fft_result <= (others => '0');
+      end if;
+    end if;
+  end process;
+
   process(clk_p,dtm_data_reg)
   begin
     if rising_edge(clk_p) then
@@ -1213,8 +1359,16 @@ begin
     end if;
     --output to dtm
     for i in 0 to 15 loop
-      VE_OUT_DTM(8*i+7 downto 8*i) <= dtm_data_reg(i);
+      ve_out_reg(8*i+7 downto 8*i) <= dtm_data_reg(i);
     end loop;
+  end process;
+
+  out_mux : process(all)
+  begin
+    case mode_latch is 
+      when fft => VE_OUT_DTM <= fft_result when clk_e_neg = '1' else (others => '0');
+      when others => VE_OUT_DTM <= ve_out_reg;
+    end case;
   end process;
 
   dtm_ctl_out : process(pp_ctl, load_dtm_out, set_fifo_push)

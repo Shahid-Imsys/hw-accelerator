@@ -79,18 +79,18 @@ begin
 
   latch_signals: process(clk)
   begin
-      if rising_edge(clk) then --latches at the rising_edge of clk_p. 
-          if start = '1' then
-            busy <= '1';
-          elsif conv_oloop = (conv_oloop'range => '0') then 
-            busy <= '0';
-          end if;
-          if start = '1' and mode_c = '1' then
-            mode_c_l <= '1';
-          elsif conv_oloop = (conv_oloop'range => '0') then
-            mode_c_l <= '0';
-          end if;
+    if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+      if start = '1' then
+        busy <= '1';
+      elsif conv_oloop = (conv_oloop'range => '0') then 
+        busy <= '0';
       end if;
+      if start = '1' and mode_c = '1' then
+        mode_c_l <= '1';
+      elsif conv_oloop = (conv_oloop'range => '0') then
+        mode_c_l <= '0';
+      end if;
+    end if;
   end process;
 
   --Mode left and right

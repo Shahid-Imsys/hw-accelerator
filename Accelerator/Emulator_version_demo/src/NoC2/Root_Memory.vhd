@@ -140,7 +140,7 @@ architecture Behavioral of Root_Memory is
       BC2      : in  std_logic);
   end component;
 
-  component root_mem
+  component blk_mem_gen_0
     port (
       clka    : in std_logic;
       ena     : in std_logic;
@@ -197,7 +197,7 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
 
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
 
-    Root_Memory_Inst : root_mem
+    Root_Memory_Inst : blk_mem_gen_0
     port map (
         clka    => clk,
         ena     => mem_enable,

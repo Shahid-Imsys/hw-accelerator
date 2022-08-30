@@ -504,6 +504,7 @@ architecture struct of top is
   -- core driven
   signal dbus      : std_logic_vector(7 downto 0);
   signal rst_en    : std_logic;
+  signal wdog2_n   : std_logic;
   --signal rst_en2     : std_logic;
   signal pd_s      : std_logic_vector(2 downto 0);
   signal aaddr     : std_logic_vector(4 downto 0);
@@ -648,19 +649,6 @@ architecture struct of top is
   signal ram_do  : main_ram_data_t;
   signal ram_cs  : main_ram_cs_t;
   signal ram_web : main_ram_web_t;
-
-  attribute mark_debug : string;
-  attribute mark_debug of c1_mprom_a: signal is "true";  
-  attribute mark_debug of c1_mprom_ce: signal is "true";
-  attribute mark_debug of c1_mpram_a: signal is "true";  
-  attribute mark_debug of c1_mpram_ce: signal is "true";
-  attribute mark_debug of c1_mpram_d: signal is "true";
-  attribute mark_debug of c2_mprom_a: signal is "true";  
-  attribute mark_debug of c2_mprom_ce: signal is "true";
-  attribute mark_debug of c2_mpram_a: signal is "true";  
-  attribute mark_debug of c2_mpram_ce: signal is "true";
-  attribute mark_debug of c2_mpram_d: signal is "true";
-  attribute mark_debug of c2_core2_en: signal is "true";
 
 begin
 
@@ -1237,6 +1225,7 @@ begin
       --  Signals to/from Peripheral block
       --dfp           => dfp     -- BSV
       dfp        => "00100000",         -- BSV          ,
+      wdog2_n    => wdog2_n,
       --dbus        : out std_logic_vector(7 downto 0);
       --rst_en      : out std_logic;
       --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
@@ -1425,6 +1414,7 @@ begin
       dbus        => dbus,
       dfp         => dfp,
       rst_en      => rst_en,
+      wdog2_n     => wdog2_n,
       --rst_en2     => rst_en2,
       pl_pd       => pd_s,
       pl_aaddr    => aaddr,

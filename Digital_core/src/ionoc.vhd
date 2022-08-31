@@ -221,7 +221,7 @@ begin
 -----------------------
   ionoc_rdstatus(5 downto 4) <= (others => '0'); -- Not in use
 -----------------------
-  ionoc_rdstatus(6)          <= '1' when ionoc_wrdata_pending else
+  ionoc_rdstatus(6) <= '1' when ionoc_wrdata_pending else
                        '0';  -- There is written data not read by RxFIFO
   ionoc_rdstatus(7) <= '1' when ionoc_rddata_pending else
                        '0';  -- There is data read from TxFIFO available

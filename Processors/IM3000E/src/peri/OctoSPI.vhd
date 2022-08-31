@@ -370,7 +370,7 @@ begin
       case ospi_fsm is
         when idle =>
           ospi_counter <= (others => '0');
-          -- Make "copy" of current parameters, so they cannoit change during operation
+          -- Make "copy" of current parameters, so they cannot change during operation
           ospi_cmd     <= cmd_reg;
           ospi_addr    <= addr_reg;
           ospi_flags   <= flags_reg;

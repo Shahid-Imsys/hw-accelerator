@@ -217,7 +217,7 @@ architecture rtl of fpga_top is
       ospi_rwds_in     : in  std_logic;
       ospi_rwds_out    : out std_logic;
       ospi_rwds_enable : out std_logic;
-      
+
       led_clk        : out std_logic;
 
       -- SPI, chip control interface
@@ -328,7 +328,7 @@ architecture rtl of fpga_top is
   signal clk_200m : std_logic;
   signal clk_100m : std_logic;
   signal clk_50m  : std_logic;
-  
+
   signal clk_noc  : std_logic;
 
   signal led_clk : std_logic;

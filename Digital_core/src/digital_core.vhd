@@ -364,15 +364,15 @@ begin  -- architecture rtl
       clock_sel    => clock_sel,
 
       -- IO-bus interface to NOC adapter
-      ext_i_pos  => open,
-      ext_ido    => (others => '0'),
-      ext_iden   => '0',
-      ext_idreq  => '1',
-      ext_idack  => open,
-      ext_ilioa  => open,
-      ext_ildout => open,
-      ext_inext  => open,
-      ext_idi    => open,
+      ext_i_pos  => clk_i_pos,
+      ext_ido    => ext_ido,
+      ext_iden   => ext_iden,
+      ext_idreq  => ext_idreq,
+      ext_idack  => ext_idack,
+      ext_ilioa  => ext_ilioa,
+      ext_ildout => ext_ildout,
+      ext_inext  => ext_inext,
+      ext_idi    => ext_idi,
 
       -- Port A
       pa_i  => pa_i,

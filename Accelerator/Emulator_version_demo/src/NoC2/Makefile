@@ -20,5 +20,4 @@ noc2_rtl:
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Root_Memory.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Switch.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Tag_Line_Block.vhd
-	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Top.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Transpose_unit.vhd

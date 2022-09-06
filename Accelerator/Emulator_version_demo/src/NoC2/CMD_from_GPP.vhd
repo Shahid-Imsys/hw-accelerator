@@ -49,8 +49,8 @@ end CMD_from_GPP;
 architecture Behavioral of CMD_from_GPP is
 
     signal  GPP_CMD_Reg         : std_logic_vector(127 downto 0);
-    signal  GPP_CMD_Reg2        : std_logic_vector(119 downto 0);
-    signal  GPP_CMD_Reg3        : std_logic_vector(119 downto 0);
+    signal  GPP_CMD_Reg2        : std_logic_vector(113 downto 0);
+    signal  GPP_CMD_Reg3        : std_logic_vector(113 downto 0);
     signal  NOC_Length_i        : std_logic_vector(15 downto 0);
     signal  NOC_Length_plus     : std_logic_vector(15 downto 0);
     signal  FF_Ack              : std_logic;
@@ -71,8 +71,8 @@ begin
     
     NOC_CMD_ACK     <= FF_Ack;
     
-    Address_steps   <= GPP_CMD_Reg2(113 downto 0);
-    End_values      <= GPP_CMD_Reg3(113 downto 0);
+    Address_steps   <= GPP_CMD_Reg2;
+    End_values      <= GPP_CMD_Reg3;
     
     process(clk, Reset)
     begin
@@ -86,10 +86,10 @@ begin
                 FF              <= '1';
             end if;
             if Load_GPP_CMD = '1' and Control_data(1) = '1' then
-                GPP_CMD_Reg2    <= GPP_CMD_Data(119 downto 0);
+                GPP_CMD_Reg2    <= GPP_CMD_Data(113 downto 0);
             end if;
             if Load_GPP_CMD = '1' and Control_data(2) = '1' then
-                GPP_CMD_Reg3    <= GPP_CMD_Data(119 downto 0);
+                GPP_CMD_Reg3    <= GPP_CMD_Data(113 downto 0);
             end if;                       
             CMD_FF              <= GPP_CMD_Flag;
             NOC_Length_plus     <= std_logic_vector(unsigned(NOC_Length_i) + x"000F");

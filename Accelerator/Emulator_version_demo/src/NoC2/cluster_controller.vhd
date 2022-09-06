@@ -210,6 +210,7 @@ end component;
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
   signal rd_ena         : std_logic;
   signal dataout_vld_o  : std_logic;
+  signal continuous_mode: std_logic;
  
   signal standby        : std_logic;
   signal delay2         : std_logic;
@@ -287,14 +288,14 @@ EVEN_P <= even_p_2;
     			    noc_cmd_buf <= (others => '0');
     		    elsif peci_busy = '1' and sig_fin = '0' then
     			    if noc_cmd_ctr /= 0 then
-    			    noc_cmd <= (others => '1');
-    			    noc_cmd_buf(0)<= tag;
-    			    for i in 0 to 3 loop
-    			    noc_cmd_buf(i+1) <= noc_cmd_buf(i);
-    			    end loop;
-    			    noc_cmd_ctr := noc_cmd_ctr -1;
+                        noc_cmd <= (others => '1');
+                        noc_cmd_buf(0)<= tag;
+                        for i in 0 to 3 loop
+                        noc_cmd_buf(i+1) <= noc_cmd_buf(i);
+                        end loop;
+                        noc_cmd_ctr := noc_cmd_ctr -1;
     			    elsif noc_cmd_ctr = 0 then
-    			    noc_cmd <= noc_cmd_buf;
+    			        noc_cmd <= noc_cmd_buf;
     			    end if;
 			    elsif peci_busy='0' and sig_fin='0' and delay2='0' then
 					noc_cmd_ctr := 5;
@@ -440,7 +441,7 @@ EVEN_P <= even_p_2;
 					byte_ctr <= "1111"; 
                 end if;
 			elsif noc_cmd = "00100" then
-				if delay = '1'  and dataout_vld_o = '1'then
+				if delay = '1'  and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
 					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
 				else
 					byte_ctr <= "1111"; 
@@ -480,7 +481,7 @@ EVEN_P <= even_p_2;
 					datain_vld <= '1';
 				elsif byte_ctr = "0000" then
 					datain_vld <= '0';
-				end if;
+				end if;		 	
 			end if;
 		end if;
 	end process;
@@ -493,7 +494,7 @@ EVEN_P <= even_p_2;
 			elsif noc_cmd = "00100" then
 				if noc_read = '1' then
 					dataout_vld <= '1';
-				elsif byte_ctr = "0001" then
+				elsif byte_ctr = "0000" then --"0001" then
 					dataout_vld <= '0';
 				end if;
 			else
@@ -533,13 +534,16 @@ EVEN_P <= even_p_2;
         	            noc_read <= '0';
 			    	end if;   
 			    else 
-			    	noc_reg_rdy <='0';
-        	        noc_write <= '0';
-        	        noc_read <= '0';   
+			    	noc_reg_rdy     <='0';
+        	        noc_write       <= '0';
+        	        noc_read        <= '0';
 	    	    end if;
 			end if;
 		end if;
 	end process;
+	
+	continuous_mode <= '1' when dataout_vld = '1' and sync_collector= "11" else
+	                   '0' when dataout_vld = '0' and sync_collector= "11";
 	
 	--one clock delay of noc_read to load data in noc_data_out register to output port
 	process(clk_e)
@@ -549,7 +553,7 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 	
-	DDO_VLD <= dataout_vld;--aaac1 was dataout_vld_o
+	DDO_VLD <= dataout_vld;  --aaac1 was dataout_vld_o
 	
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e)--(noc_cmd, byte_ctr, delay, DATA)
@@ -569,8 +573,8 @@ EVEN_P <= even_p_2;
 	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
     begin
 		if rising_edge(clk_e) then
-	    	if dataout_vld_o = '1' then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
-	    	    DATA_OUT <= noc_data_out_p(to_integer(unsigned(byte_ctr)));
+	    	if dataout_vld_o = '1' or (dataout_vld='1' and continuous_mode = '1') then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));--noc_data_out_p(to_integer(unsigned(byte_ctr)));
 	    	else
 	    	    DATA_OUT <= (others => '0');
         	end if;
@@ -887,6 +891,7 @@ EVEN_P <= even_p_2;
  	end if;
  end process;
 
+
  --Data MUX
  --Input MUX
     process(noc_reg_rdy, pe_data_in, noc_data_in)
@@ -928,6 +933,7 @@ if rising_edge(clk_e) then
     noc_data_out_p  <= noc_data_out;
 end if;
 end process;
+
 				
 	--Memory blocks
     clustermem : CMEM_32KX16

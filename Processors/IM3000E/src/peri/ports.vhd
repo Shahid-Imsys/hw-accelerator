@@ -653,9 +653,12 @@ begin
             sft_out <= '0';
           end if;
 
-        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then
-          -- Rising edge of sft_clk (after double regs)
+        -- Falling edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then  
           sft_out <= sft_reg(8);
+
+        -- Rising edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '1' and sft_clk_d(0) = '0' then  
 
           if pulseout(7) = '0' then
             case sft_in_sel is

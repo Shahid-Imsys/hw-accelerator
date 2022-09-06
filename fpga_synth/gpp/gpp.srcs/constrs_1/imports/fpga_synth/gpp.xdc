@@ -158,6 +158,24 @@ set_clock_groups -name ENET_RXCLK -asynchronous -group [get_clocks ENET_RXCLK]
 create_clock -period 100.000 -name SPI_SCK -waveform {0.000 50.000} [get_ports {pmod0_in[0]}]
 set_clock_groups -name SPI_CLK -asynchronous -group [get_clocks SPI_SCK]
 
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 2.000 [get_ports ENET_MDIO]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_MDIO]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDIO]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDIO]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_MDC]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_MDC]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports ENET_RST_N]
+#set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.500 [get_ports ENET_RST_N]
+
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXCTL]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD0]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD1]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports ENET_RXD3]
+#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports ENET_RXD3]
+
 
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXCTL]
 set_input_delay -clock [get_clocks ENET_RXCLK] -min -add_delay 3.000 [get_ports ENET_RXD0]
@@ -188,28 +206,46 @@ set_output_delay -clock [get_clocks ENET_TXCLK] -max -add_delay 5.000 [get_ports
 #set_input_delay -clock [get_clocks SPI_SCK] -max -add_delay 52.000 [get_ports {pmod0_in[2]}]
 
 
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports OSPI_RWDS]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports {OSPI_DQ[*]}]
+set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports OSPI_RWDS]
 
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports OSPI_RWDS]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_Out[*]}]
 
 set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 3.000 [get_ports UTX]
 set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 5.000 [get_ports UTX]
 
-#set_output_delay -clock [get_clocks SPI_SCK] 1.000 [get_ports {pmod0_out[*]}]
+set_input_delay -clock [get_clocks SPI_SCK] 10.000 [get_ports {pmod0_in[*]}]
+set_output_delay -clock [get_clocks SPI_SCK] 1.000 [get_ports {pmod0_out[*]}]
 
-# set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 1.000 [get_ports {OSPI_DQ[*]}]
-#set_input_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay 1.000 [get_ports OSPI_RWDS]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max 2.000 [get_ports {OSPI_DQ[*]}]
-set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -max 2.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports OSPI_RWDS]
 
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay 0.200 [get_ports {OSPI_Out[*]}]
 
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] 1.000 [get_ports {OSPI_DQ[*]}]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] 1.000 [get_ports OSPI_RWDS]
-set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] 1.000 [get_ports {OSPI_Out[*]}]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports OSPI_RWDS]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports {OSPI_DQ[*]}]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports OSPI_RWDS]
-#set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay -0.250 [get_ports {OSPI_Out[*]}]
+
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -min -add_delay -1.000 [get_ports {OSPI_Out[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay -0.300 [get_ports {OSPI_DQ[*]}]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay -0.300 [get_ports OSPI_RWDS]
+set_output_delay -clock [get_clocks -of_objects [get_pins fpga_pll_inst/inst/mmcme4_adv_inst/CLKOUT1]] -max -add_delay -0.300 [get_ports {OSPI_Out[*]}]
 
 
 set_input_delay -clock [get_clocks clk_100M_clk_wiz_0] -min -add_delay 2.000 [get_ports ENET_MDIO]
@@ -238,6 +274,10 @@ set_output_delay -clock [get_clocks clk_100M_clk_wiz_0] -max -add_delay 0.100 [g
 # SPI CS to OE
 set_false_path -from [get_ports {pmod0_in[1]}] -to [get_ports {pmod0_out[4]}]
 
+# From IM3000C
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart1_int_reg]
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart2_int_reg]
+set_false_path -from [get_cells im4000_inst/i_digital_core/i_im4000_top/core1/crb/en_uart3_int_reg]
 
 # Ports
 set_false_path -to [get_ports *LED*]
@@ -313,198 +353,3 @@ connect_debug_port u_ila_0/probe39 [get_nets [list im4000_inst/i_digital_core/i_
 connect_debug_port u_ila_0/probe40 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_RWDS_o]]
 connect_debug_port u_ila_0/probe41 [get_nets [list im4000_inst/i_digital_core/i_im4000_top/peri01/ospi/rst_n]]
 
-
-
-connect_debug_port u_ila_0/probe12 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[0]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[1]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[2]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[3]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[4]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[5]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[6]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[7]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[8]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[9]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[10]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[11]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[12]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[13]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[14]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[15]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[16]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[17]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[18]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[19]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[20]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[21]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[22]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[23]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[24]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[25]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[26]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[27]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[28]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[29]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[30]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[31]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[32]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[33]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[34]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[35]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[36]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[37]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[38]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[39]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[40]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[41]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[42]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[43]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[44]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[45]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[46]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[47]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[48]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[49]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[50]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[51]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[52]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[53]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[54]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[55]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[56]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[57]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[58]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[59]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[60]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[61]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[62]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[63]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[64]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[65]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[66]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[67]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[68]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[69]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[70]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[71]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[72]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[73]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[74]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[75]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[76]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[77]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[78]} {digital_top_inst/i_digital_core/i_im4000_top/core2/pl[79]}]]
-connect_debug_port u_ila_0/probe22 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_ce[0]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_ce[1]}]]
-connect_debug_port u_ila_0/probe24 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[0]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[1]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[2]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[3]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[4]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[5]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[6]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[7]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[8]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[9]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[10]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[11]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[12]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_a[13]}]]
-connect_debug_port u_ila_0/probe25 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[0]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[1]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[2]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[3]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[4]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[5]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[6]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[7]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[8]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[9]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[10]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[11]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[12]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[13]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[14]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[15]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[16]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[17]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[18]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[19]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[20]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[21]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[22]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[23]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[24]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[25]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[26]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[27]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[28]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[29]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[30]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[31]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[32]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[33]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[34]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[35]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[36]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[37]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[38]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[39]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[40]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[41]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[42]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[43]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[44]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[45]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[46]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[47]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[48]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[49]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[50]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[51]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[52]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[53]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[54]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[55]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[56]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[57]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[58]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[59]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[60]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[61]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[62]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[63]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[64]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[65]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[66]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[67]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[68]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[69]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[70]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[71]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[72]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[73]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[74]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[75]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[76]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[77]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[78]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mpram_d[79]}]]
-connect_debug_port u_ila_0/probe26 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c2_mprom_ce[0]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mprom_ce[1]}]]
-
-
-create_debug_core u_ila_0 ila
-set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
-set_property ALL_PROBE_SAME_MU_CNT 4 [get_debug_cores u_ila_0]
-set_property C_ADV_TRIGGER true [get_debug_cores u_ila_0]
-set_property C_DATA_DEPTH 8192 [get_debug_cores u_ila_0]
-set_property C_EN_STRG_QUAL true [get_debug_cores u_ila_0]
-set_property C_INPUT_PIPE_STAGES 2 [get_debug_cores u_ila_0]
-set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
-set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
-set_property port_width 1 [get_debug_ports u_ila_0/clk]
-connect_debug_port u_ila_0/clk [get_nets [list fpga_pll_inst/inst/clk_100M]]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
-set_property port_width 80 [get_debug_ports u_ila_0/probe0]
-connect_debug_port u_ila_0/probe0 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[0]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[1]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[2]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[3]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[4]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[5]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[6]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[7]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[8]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[9]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[10]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[11]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[12]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[13]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[14]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[15]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[16]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[17]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[18]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[19]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[20]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[21]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[22]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[23]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[24]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[25]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[26]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[27]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[28]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[29]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[30]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[31]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[32]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[33]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[34]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[35]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[36]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[37]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[38]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[39]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[40]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[41]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[42]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[43]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[44]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[45]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[46]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[47]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[48]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[49]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[50]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[51]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[52]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[53]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[54]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[55]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[56]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[57]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[58]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[59]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[60]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[61]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[62]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[63]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[64]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[65]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[66]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[67]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[68]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[69]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[70]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[71]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[72]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[73]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[74]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[75]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[76]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[77]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[78]} {digital_top_inst/i_digital_core/i_im4000_top/core1/pl[79]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-set_property port_width 8 [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[0]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[1]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[2]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[3]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[4]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[5]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[6]} {digital_top_inst/i_digital_core/i_im4000_top/core1/ybus[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-set_property port_width 8 [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list {OSPI_DQ_i[0]} {OSPI_DQ_i[1]} {OSPI_DQ_i[2]} {OSPI_DQ_i[3]} {OSPI_DQ_i[4]} {OSPI_DQ_i[5]} {OSPI_DQ_i[6]} {OSPI_DQ_i[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-set_property port_width 2 [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c2_mprom_a[7]} {digital_top_inst/i_digital_core/i_im4000_top/c2_mprom_a[8]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-set_property port_width 80 [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[0]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[1]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[2]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[3]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[4]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[5]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[6]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[7]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[8]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[9]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[10]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[11]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[12]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[13]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[14]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[15]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[16]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[17]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[18]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[19]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[20]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[21]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[22]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[23]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[24]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[25]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[26]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[27]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[28]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[29]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[30]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[31]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[32]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[33]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[34]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[35]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[36]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[37]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[38]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[39]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[40]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[41]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[42]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[43]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[44]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[45]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[46]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[47]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[48]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[49]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[50]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[51]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[52]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[53]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[54]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[55]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[56]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[57]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[58]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[59]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[60]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[61]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[62]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[63]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[64]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[65]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[66]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[67]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[68]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[69]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[70]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[71]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[72]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[73]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[74]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[75]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[76]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[77]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[78]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_d[79]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-set_property port_width 11 [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[0]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[1]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[2]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[3]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[4]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[5]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[6]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[7]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[8]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[9]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_a[10]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
-set_property port_width 2 [get_debug_ports u_ila_0/probe6]
-connect_debug_port u_ila_0/probe6 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_ce[0]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_ce[1]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
-set_property port_width 2 [get_debug_ports u_ila_0/probe7]
-connect_debug_port u_ila_0/probe7 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_ce[0]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mpram_ce[1]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
-set_property port_width 13 [get_debug_ports u_ila_0/probe8]
-connect_debug_port u_ila_0/probe8 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[0]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[1]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[2]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[3]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[4]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[5]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[6]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[7]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[8]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[9]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[10]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[11]} {digital_top_inst/i_digital_core/i_im4000_top/c1_mprom_a[12]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
-set_property port_width 8 [get_debug_ports u_ila_0/probe9]
-connect_debug_port u_ila_0/probe9 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[0]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[1]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[2]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[3]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[4]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[5]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[6]} {digital_top_inst/i_digital_core/i_im4000_top/core1/dbus_int[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
-set_property port_width 3 [get_debug_ports u_ila_0/probe10]
-connect_debug_port u_ila_0/probe10 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_fsm[2]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
-set_property port_width 8 [get_debug_ports u_ila_0/probe11]
-connect_debug_port u_ila_0/probe11 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ido[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
-set_property port_width 8 [get_debug_ports u_ila_0/probe12]
-connect_debug_port u_ila_0/probe12 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_out[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
-set_property port_width 8 [get_debug_ports u_ila_0/probe13]
-connect_debug_port u_ila_0/probe13 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/idi[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
-set_property port_width 32 [get_debug_ports u_ila_0/probe14]
-connect_debug_port u_ila_0/probe14 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[7]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[8]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[9]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[10]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[11]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[12]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[13]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[14]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[15]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[16]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[17]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[18]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[19]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[20]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[21]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[22]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[23]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[24]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[25]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[26]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[27]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[28]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[29]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[30]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_addr[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
-set_property port_width 8 [get_debug_ports u_ila_0/probe15]
-connect_debug_port u_ila_0/probe15 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_i[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
-set_property port_width 8 [get_debug_ports u_ila_0/probe16]
-connect_debug_port u_ila_0/probe16 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_cmd[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe17]
-set_property port_width 9 [get_debug_ports u_ila_0/probe17]
-connect_debug_port u_ila_0/probe17 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[7]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_counter[8]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe18]
-set_property port_width 8 [get_debug_ports u_ila_0/probe18]
-connect_debug_port u_ila_0/probe18 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[6]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_o[7]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe19]
-set_property port_width 4 [get_debug_ports u_ila_0/probe19]
-connect_debug_port u_ila_0/probe19 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_latency[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_latency[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_latency[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_latency[3]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe20]
-set_property port_width 7 [get_debug_ports u_ila_0/probe20]
-connect_debug_port u_ila_0/probe20 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_rdindex[6]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe21]
-set_property port_width 7 [get_debug_ports u_ila_0/probe21]
-connect_debug_port u_ila_0/probe21 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[0]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[1]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[2]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[3]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[4]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[5]} {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ospi_length[6]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe22]
-set_property port_width 1 [get_debug_ports u_ila_0/probe22]
-connect_debug_port u_ila_0/probe22 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/c2_core2_en]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe23]
-set_property port_width 1 [get_debug_ports u_ila_0/probe23]
-connect_debug_port u_ila_0/probe23 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/core2/alu/flag_yan]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe24]
-set_property port_width 1 [get_debug_ports u_ila_0/probe24]
-connect_debug_port u_ila_0/probe24 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/core1/alu/flag_yan]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe25]
-set_property port_width 1 [get_debug_ports u_ila_0/probe25]
-connect_debug_port u_ila_0/probe25 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/core2/alu/flag_yz]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe26]
-set_property port_width 1 [get_debug_ports u_ila_0/probe26]
-connect_debug_port u_ila_0/probe26 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/core1/alu/flag_yz]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe27]
-set_property port_width 1 [get_debug_ports u_ila_0/probe27]
-connect_debug_port u_ila_0/probe27 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/flags_sel]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe28]
-set_property port_width 1 [get_debug_ports u_ila_0/probe28]
-connect_debug_port u_ila_0/probe28 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ildout]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe29]
-set_property port_width 1 [get_debug_ports u_ila_0/probe29]
-connect_debug_port u_ila_0/probe29 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/ilioa]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe30]
-set_property port_width 1 [get_debug_ports u_ila_0/probe30]
-connect_debug_port u_ila_0/probe30 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/inext]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe31]
-set_property port_width 1 [get_debug_ports u_ila_0/probe31]
-connect_debug_port u_ila_0/probe31 [get_nets [list OSPI_DQ_e]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe32]
-set_property port_width 1 [get_debug_ports u_ila_0/probe32]
-connect_debug_port u_ila_0/probe32 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_DQ_e]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe33]
-set_property port_width 1 [get_debug_ports u_ila_0/probe33]
-connect_debug_port u_ila_0/probe33 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_Out[CK_n]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe34]
-set_property port_width 1 [get_debug_ports u_ila_0/probe34]
-connect_debug_port u_ila_0/probe34 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_Out[CK_p]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe35]
-set_property port_width 1 [get_debug_ports u_ila_0/probe35]
-connect_debug_port u_ila_0/probe35 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_Out[CS_n]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe36]
-set_property port_width 1 [get_debug_ports u_ila_0/probe36]
-connect_debug_port u_ila_0/probe36 [get_nets [list {digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_Out[RESET_n]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe37]
-set_property port_width 1 [get_debug_ports u_ila_0/probe37]
-connect_debug_port u_ila_0/probe37 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_RWDS_e]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe38]
-set_property port_width 1 [get_debug_ports u_ila_0/probe38]
-connect_debug_port u_ila_0/probe38 [get_nets [list OSPI_RWDS_e]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe39]
-set_property port_width 1 [get_debug_ports u_ila_0/probe39]
-connect_debug_port u_ila_0/probe39 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_RWDS_i]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe40]
-set_property port_width 1 [get_debug_ports u_ila_0/probe40]
-connect_debug_port u_ila_0/probe40 [get_nets [list OSPI_RWDS_i]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe41]
-set_property port_width 1 [get_debug_ports u_ila_0/probe41]
-connect_debug_port u_ila_0/probe41 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/OSPI_RWDS_o]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe42]
-set_property port_width 1 [get_debug_ports u_ila_0/probe42]
-connect_debug_port u_ila_0/probe42 [get_nets [list digital_top_inst/i_digital_core/i_im4000_top/peri01/ospi/rst_n]]
-set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
-set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
-set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
-connect_debug_port dbg_hub/clk [get_nets clk_100m]

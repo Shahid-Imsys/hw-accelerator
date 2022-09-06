@@ -367,10 +367,9 @@ begin  -- architecture rtl
         g_simulation => g_simulation
         )
       port map (
-        hclk          => dco_clk(0),
-        clk_noc       => '0',
-        pll_ref_clk   => pll_ref_clk_in,
-        pll_locked    => pll_locked,
+        pll_ref_clk    => pll_ref_clk_in,
+        HCLK    => dco_clk(0),
+        pll_locked => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
         MRESET  => mreset,
         MRSTOUT => mrstout_n,  -- Missing pad.

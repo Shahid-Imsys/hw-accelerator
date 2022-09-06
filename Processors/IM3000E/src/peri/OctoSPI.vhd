@@ -319,9 +319,8 @@ begin
   OSPI_Out.CK_n <= not clk_out_int;
   --
   ospi_fsm_proc : process(clk_p, rst_n)
-    variable rd_trig     : boolean;
-    variable wr_trig     : boolean;
-    variable latency_int : integer range 0 to 15;
+    variable rd_trig : boolean;
+    variable wr_trig : boolean;
   begin
     if rst_n = '0' then
       OSPI_Out.RESET_n <= '0';
@@ -371,10 +370,10 @@ begin
       case ospi_fsm is
         when idle =>
           ospi_counter <= (others => '0');
-          -- Make "copy" of current parameters, so they cannot change during operation
-          ospi_cmd   <= cmd_reg;
-          ospi_addr  <= addr_reg;
-          ospi_flags <= flags_reg;
+          -- Make "copy" of current parameters, so they cannoit change during operation
+          ospi_cmd     <= cmd_reg;
+          ospi_addr    <= addr_reg;
+          ospi_flags   <= flags_reg;
 
           flag_done <= '1';
 
@@ -409,24 +408,11 @@ begin
               ospi_fsm <= wr_addr;
             end if;
 
-            if latency_reg(2 downto 0) = "000" then
-              latency_int := 0;
-            
+            if OSPI_RWDS_i = '1' then
+              ospi_latency <= unsigned(latency_reg(2 downto 0)) & "0";
             else
-              latency_int := to_integer(unsigned(latency_reg(2 downto 0)));
-              
-              -- High RWDS is double the latency
-              if OSPI_RWDS_i = '1' then
-                  latency_int := 2 * latency_int;
-              end if;  
-
-              -- Writes require one extra cc
-              if ospi_flags(OSPI_FLAG_RW_BIT) = '1' then
-                latency_int := latency_int + 1;
-              end if;
+              ospi_latency <= "0" & unsigned(latency_reg(2 downto 0));
             end if;
-            
-            ospi_latency <= to_unsigned(latency_int, ospi_latency'length);
           end if;
 
         when wr_addr =>

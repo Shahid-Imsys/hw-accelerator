@@ -67,7 +67,6 @@ entity peri is
     dbus        : in  std_logic_vector(7 downto 0);
     dfp         : out std_logic_vector(7 downto 0);
     rst_en      : in  std_logic;
-    wdog2_n     : in  std_logic;
     --rst_en2     : in  std_logic;
     pl_pd       : in  std_logic_vector(2 downto 0);
     pl_aaddr    : in  std_logic_vector(4 downto 0);
@@ -411,7 +410,6 @@ begin  -- struct
       rx1_irq    => rx1_irq,
       rx2_irq    => rx2_irq,
       tx_irq     => tx_irq,
-      wdog2_n    => wdog2_n,
       -- timer signals
       tiu_out    => tiu_out,
       pulseout   => pulseout,

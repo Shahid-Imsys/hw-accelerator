@@ -22,6 +22,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity Noc_Top is
+    Generic(
+        USE_ASIC_MEMORIES    : boolean := false
+  );    
   Port (
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;      	
@@ -168,6 +171,9 @@ architecture structural of Noc_Top is
     end component;
     
     component Root_Memory is
+        Generic(
+            USE_ASIC_MEMORIES     : boolean := false
+      );        
     Port(
         clk                     : in  std_logic;
         Reset                   : in  std_logic;
@@ -529,6 +535,9 @@ begin
     );
     
     Root_Memory_Inst: Root_Memory
+    generic map
+    (
+        USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )    
     port map
     (
         clk                     => clk,

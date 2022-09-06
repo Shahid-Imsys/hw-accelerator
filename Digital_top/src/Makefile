@@ -8,6 +8,7 @@ digital_top_rtl: digital_core_rtl
 				  $(DIG_TOP_DIR_WIN)/test_spi_interface/project_settings.vhd \
 				  $(DIG_TOP_DIR_WIN)/test_spi_interface/register_pack_spi_test.vhd \
 				  $(DIG_TOP_DIR_WIN)/test_spi_interface/data_types_pack.vhd \
+				  $(DIG_TOP_DIR_WIN)/fpga_clock_reset.vhd \
 				  $(DIG_TOP_DIR_WIN)/clock_reset.vhd \
 				  $(DIG_TOP_DIR_WIN)/digital_top.vhd \
 				  $(DIG_TOP_DIR_WIN)/test_spi_interface/register_block_spi_test.vhd \

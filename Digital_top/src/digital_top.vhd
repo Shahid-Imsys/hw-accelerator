@@ -166,6 +166,9 @@ end entity digital_top;
 
 architecture rtl of digital_top is
 
+  attribute keep_hierarchy : string;
+  attribute keep_hierarchy of rtl: architecture is "no";
+
   component test_spi_interface is
     port (
       rst_n        : in  std_ulogic;

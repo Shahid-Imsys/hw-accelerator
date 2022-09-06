@@ -219,25 +219,27 @@ architecture rtl of digital_core is
       USE_ASIC_MEMORIES   : boolean := false
     );
     port (
-      clk           : in  std_logic;
-      Reset         : in  std_logic;
-      PEC_Ready     : in  std_logic;
-      GPP_CMD_ACK   : in  std_logic;
-      GPP_CMD_Flag  : in  std_logic;
-      GPP_CMD_Data  : in  std_logic_vector(127 downto 0);
-      NOC_CMD_flag  : out std_logic;
-      NOC_CMD_Data  : out std_logic_vector(7 downto 0);
-      --IO INTERFACE SIGNALS
-      IO_data       : in  std_logic_vector(127 downto 0);
-      NOC_data      : out std_logic_vector(127 downto 0);
-      NOC_Address   : out std_logic_vector(31 downto 0);
-      NOC_Length    : out std_logic_vector(15 downto 0);
-      NOC_WRITE_REQ : out std_logic;
-      IO_WRITE_ACK  : in  std_logic;
-      FIFO_Ready    : in  std_logic_vector(5 downto 0);
-      NOC_DATA_DIR  : out std_logic;
-      NOC_DATA_EN   : out std_logic
-      );
+	    clk                  : in  std_logic;
+	    Reset                : in  std_logic;
+        PEC_Ready            : in  std_logic;
+        --Command interface signals 
+        GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
+        NOC_CMD_Data         : out std_logic_vector(7 downto 0);
+        GPP_CMD_Flag         : in  std_logic;
+        NOC_CMD_ACK          : out std_logic;
+        NOC_CMD_flag         : out std_logic;
+        GPP_CMD_ACK          : in  std_logic;
+        --Data/control interface signals
+        IO_data              : in  std_logic_vector(127 downto 0);
+        NOC_data             : out std_logic_vector(127 downto 0);
+        NOC_Address          : out std_logic_vector(31 downto 0);           
+        NOC_Length           : out std_logic_vector(15 downto 0);
+        FIFO_Ready           : in  std_logic_vector(5 downto 0);
+        NOC_DATA_DIR         : out std_logic;
+        NOC_DATA_EN          : out std_logic;        
+        NOC_WRITE_REQ        : out std_logic;
+        IO_WRITE_ACK         : in  std_logic
+  );
   end component;
 
 -- noc_adapter_inst
@@ -271,6 +273,8 @@ architecture rtl of digital_core is
 
 begin  -- architecture rtl
 
+  NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
+
   noc_top_inst : Accelerator_Top
     generic map(
       USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
@@ -282,6 +286,7 @@ begin  -- architecture rtl
       GPP_CMD_Flag  => GPP_CMD_Flag,
       GPP_CMD_Data  => GPP_CMD,
       NOC_CMD_flag  => NOC_CMD_flag,
+      NOC_CMD_ACK   => NOC_CMD_ACK,
       NOC_CMD_Data  => NOC_CMD,
       IO_data       => IO_data,
       NOC_data      => NOC_data,

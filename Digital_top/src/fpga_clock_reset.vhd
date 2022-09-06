@@ -79,7 +79,7 @@ begin  -- architecture rtl
   i_eth_rx_clock_gate : entity work.clock_gate
     
     generic map (
-      fpga_g =>  fpga_g)
+      fpga_g => fpga_g)
     port map (
       clk => pg_1_i,
       en  => '1',
@@ -90,7 +90,7 @@ begin  -- architecture rtl
   i_eth_tx_clock_gate : entity work.clock_gate
     
     generic map (
-      fpga_g =>  fpga_g)
+      fpga_g => fpga_g)
     port map (
       clk => pf_1_i,
       en  => '1',

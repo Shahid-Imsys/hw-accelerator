@@ -1,10 +1,10 @@
 -- Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2021.2 (lin64) Build 3367213 Tue Oct 19 02:47:39 MDT 2021
--- Date        : Fri Aug 26 15:27:55 2022
+-- Date        : Fri Aug 26 15:27:54 2022
 -- Host        : AliceSim running 64-bit Ubuntu 20.04.4 LTS
--- Command     : write_vhdl -force -mode synth_stub
---               /home/markar/checkouts/ImSys/testMaster/Accelerator/Emulator_version_demo/src/NoC2/IP/program_memory/program_memory_stub.vhdl
+-- Command     : write_vhdl -force -mode synth_stub -rename_top program_memory -prefix
+--               program_memory_ program_memory_stub.vhdl
 -- Design      : program_memory
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xcvu9p-flga2104-2L-e

@@ -22,9 +22,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity Noc_Top is
-  Generic(
-        USE_ASIC_MEMORIES    : boolean := false
-  );
   Port (
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;      	
@@ -39,6 +36,7 @@ entity Noc_Top is
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
         GPP_CMD_Flag         : in  std_logic;
+        NOC_CMD_ACK          : out std_logic;
         NOC_CMD_flag         : out std_logic;
         GPP_CMD_ACK          : in  std_logic;        
         --Data/control interface signals
@@ -170,9 +168,6 @@ architecture structural of Noc_Top is
     end component;
     
     component Root_Memory is
-    Generic(
-          USE_ASIC_MEMORIES     : boolean := false
-    );
     Port(
         clk                     : in  std_logic;
         Reset                   : in  std_logic;
@@ -311,7 +306,6 @@ architecture structural of Noc_Top is
     signal CM_Address1          : std_logic_vector(14 downto 0);
     signal Padding_Data         : std_logic_vector(7 downto 0);
     signal TSDiv16_Reg          : std_logic_vector(11 downto 0);
-    signal NOC_CMD_ACK          : std_logic;
     signal Address_steps        : std_logic_vector(113 downto 0);
     signal End_values           : std_logic_vector(113 downto 0);    
     --MUX_DEMUX
@@ -357,7 +351,6 @@ architecture structural of Noc_Top is
     signal FIFO_Ready1          : std_logic;
     signal FIFO_Ready2          : std_logic;
     signal FIFO_Ready3          : std_logic;
-    signal FIFO_Ready4          : std_logic_vector(5 downto 0);
     signal PEC_WE_p1            : std_logic;
     signal PEC_WE_p2            : std_logic;
     
@@ -536,9 +529,6 @@ begin
     );
     
     Root_Memory_Inst: Root_Memory
-    generic map
-    (
-        USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
     port map
     (
         clk                     => clk,
@@ -556,7 +546,7 @@ begin
     (
         clk                     => clk,
         Reset                   => Reset,    
-        write_enable            => PEC_WE_p2, --PEC_WE_p1,--aaac1 PEC_WE_p2,--PEC_WE,
+        write_enable            => PEC_WE_p2, --PEC_WE_p1,--PEC_WE,
         NoC_Input_reg_In        => PEC_byte_data,
         NoC_Input_reg_Out       => NoC_Input_reg_Out
     );

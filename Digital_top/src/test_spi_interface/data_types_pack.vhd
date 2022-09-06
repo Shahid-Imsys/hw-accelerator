@@ -50,7 +50,7 @@ package data_types_pack is
     emem_d7     : inoutput_pad_config_record_t;
     emem_clk    : output_pad_config_record_t;
     emem_rwds   : inoutput_pad_config_record_t;
-    emem_cs_n   : inoutput_pad_config_record_t;
+    emem_cs_n   : output_pad_config_record_t;
     emem_rst_n  : output_pad_config_record_t;
     aout0       : output_pad_config_record_t;
     aout1       : output_pad_config_record_t;
@@ -71,9 +71,6 @@ package data_types_pack is
     spi_mosi    : input_pad_config_record_t;
     spi_miso    : output_pad_config_record_t;
     pll_ref_clk : input_pad_config_record_t;
-    preset_n    : input_pad_config_record_t;
-    mreset_n    : input_pad_config_record_t;
-    mrstout_n   : output_pad_config_record_t;
     pa0_sin     : inoutput_pad_config_record_t;
     pa5_cs_n    : inoutput_pad_config_record_t;
     pa6_sck     : inoutput_pad_config_record_t;

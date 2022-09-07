@@ -79,6 +79,7 @@ entity peri is
     ext_iden    : in  std_logic;
     ext_idreq   : in  std_logic;
     ext_idack   : out std_logic;
+    ext_irq     : in  std_logic;
     --
     ilioa       : in  std_logic;
     ildout      : in  std_logic;
@@ -412,6 +413,7 @@ begin  -- struct
       rx2_irq    => rx2_irq,
       tx_irq     => tx_irq,
       wdog2_n    => wdog2_n,
+      noc_irq    => ext_irq,
       -- timer signals
       tiu_out    => tiu_out,
       pulseout   => pulseout,

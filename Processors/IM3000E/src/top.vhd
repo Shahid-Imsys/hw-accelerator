@@ -140,7 +140,7 @@ entity top is
     ext_ildout : out std_logic;
     ext_inext  : out std_logic;
     ext_idi    : out std_logic_vector(7 downto 0);
-
+    ext_irq    : in  std_logic;
 
     -- Port A
     pa_i  : in  std_logic_vector(7 downto 0);
@@ -1425,6 +1425,7 @@ begin
       ext_iden    => ext_iden,
       ext_idreq   => ext_idreq,
       ext_idack   => ext_idack,
+      ext_irq     => ext_irq,
       ilioa       => ilioa,
       ildout      => ildout,
       inext       => inext,

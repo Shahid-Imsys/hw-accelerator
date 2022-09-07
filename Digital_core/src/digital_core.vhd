@@ -378,6 +378,7 @@ begin  -- architecture rtl
       ext_ildout => ext_ildout,
       ext_inext  => ext_inext,
       ext_idi    => ext_idi,
+      ext_irq    => NOC_IRQ,
 
       -- Port A
       pa_i  => pa_i,

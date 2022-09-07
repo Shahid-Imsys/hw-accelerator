@@ -108,7 +108,8 @@ entity ports is
     rx1_irq    : in  std_logic;
     rx2_irq    : in  std_logic;
     tx_irq     : in  std_logic;
-    wdog2_n    : in std_logic;
+    wdog2_n    : in  std_logic;
+    noc_irq    : in  std_logic;
     -- signals to/from TIU(timer)
     tiu_out    : in  std_logic_vector(7 downto 0);
     pulseout   : in  std_logic_vector(7 downto 0);
@@ -434,17 +435,17 @@ begin
   -- 4. Processor set the mask bit again to enable further interrupt.
 
   -- Re-assign interrupt control registers.
-  pi_int(PORT_IRQ0) <= irq0_src;        -- Read source vector using DPORT
-  irq0_en           <= pen_int(PORT_IRQ0);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ0) <= irq0_src;           -- Read source vector using DPORT
+  irq0_en           <= pen_int(PORT_IRQ0); -- Write and read enable register using CPORT
 
-  pi_int(PORT_IRQ1) <= irq1_src;        -- Read source vector using DPORT
-  irq1_en           <= pen_int(PORT_IRQ1);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ1) <= irq1_src;           -- Read source vector using DPORT
+  irq1_en           <= pen_int(PORT_IRQ1); -- Write and read enable register using CPORT
 
   -- Put together interrupt source vectors.
   irq0_src(7 downto 3) <= rx1_irq & rx2_irq & tx_irq & port_irq(1 downto 0);
   irq0_src(IRQ_ADC)    <= adc_irq;
   irq0_src(1 downto 0) <= tiu_irq & (not mirq0_i);
-  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & (not wdog2_n) & port_irq(4 downto 2) & (not mirq1_i);
+  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & (not wdog2_n) & noc_irq & port_irq(3 downto 2) & (not mirq1_i);
 
   -- Mask interrupt sources with interrupt enable registers
   -- and gate them together to form two interrupt request lines

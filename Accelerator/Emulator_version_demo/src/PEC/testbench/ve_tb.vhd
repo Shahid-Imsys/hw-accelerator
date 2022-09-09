@@ -58,6 +58,7 @@ component ve
 end component;
 
 type mem is array(511 downto 0) of std_logic_vector(127 downto 0);
+type processes is (load_para, exe, re_mode_l, re_mode_r, re_mode_a, re_mode_b, ve_mode_l, ve_mode_r, FFT);
 signal virtual_mem : mem;
 signal data_counter : unsigned(8 downto 0) := '0' & x"00";
 signal clk_p : std_logic;
@@ -73,7 +74,7 @@ signal read_out_done : std_logic;
 signal ve_in : std_logic_vector(63 downto 0);
 signal ve_out_d : std_logic_vector(7 downto 0);
 signal ve_out_dtm : std_logic_vector(127 downto 0);
-signal progress : integer;
+signal progress : processes;
 signal debug   : integer;
 
 
@@ -86,6 +87,9 @@ constant au_test_cmp0 : std_logic_vector(127 downto 0) := x"00000240000000000000
 constant au_test_cmp1 : std_logic_vector(127 downto 0) := x"00000250000000000000000000000000";
 constant au_test_cmp2 : std_logic_vector(127 downto 0) := x"00000260000000000000000000000000";
 constant au_test_cmp3 : std_logic_vector(127 downto 0) := x"00000270000000000000000000000000";
+constant re_saddr_l : std_logic_vector(127 downto 0)   := x"00000010000000000000000000000000";
+constant re_saddr_r : std_logic_vector(127 downto 0)   := x"00000020000000000000000000000000";
+constant pp_ctl     : std_logic_vector(127 downto 0)   := x"00000170000000000000000000000000";
 --write post processing relevant registers 54-59
 constant word_54 : std_logic_vector(127 downto 0) := "00000000000000000000001010000000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
 constant word_55 : std_logic_vector(127 downto 0) := "00000000000000000000001010100000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
@@ -124,11 +128,24 @@ begin
 rst <= '0';
 --Reset
 wait for 300 ns;
-DDI_VLD <= '1'; 
-wait for 30 ns;
-DDI_VLD <= '0';
+--DDI_VLD <= '1'; 
+--wait for 30 ns;
+--DDI_VLD <= '0';
 rst <= '1';
 wait for 60 ns;
+pl(94) <= '1';
+wait for 30 ns;
+pl(94) <= '0'; 
+pl(95) <= '1'; --start
+pl(96) <= '0'; --resource 0
+pl(98) <= '0'; --mode a 
+pl(97) <= '1'; --mode b 
+wait for 30 ns;
+pl(95) <= '0'; --start
+pl(98) <= '0'; --mode a off
+pl(97) <= '0'; --mode b off
+wait for 30 ns;
+progress <= re_mode_r;
 pl <= au_test_offset0;
 wait for 30 ns;
 ybus <= x"03";
@@ -143,7 +160,7 @@ ybus <= x"01";
 wait for 30 ns;
 pl <= au_test_offset3;
 wait for 30 ns;
-ybus <= x"00";
+ybus <= x"03";
 wait for 30 ns;
 pl <= au_test_cmp0;
 wait for 30 ns;
@@ -159,22 +176,64 @@ ybus <= x"02";
 wait for 30 ns;
 pl <= au_test_cmp3;
 wait for 30 ns;
-ybus <= x"00";
+ybus <= x"03";
 wait for 30 ns;
-progress <= 1;
-pl(94)<= '0';
-pl(93) <= '1';
+pl <= re_saddr_r;
 wait for 30 ns;
-progress <= 2;
-pl <= load_lc;
+ybus <= x"03";
 wait for 30 ns;
-ybus <= x"06";
-progress <= 3;
-Pl(95) <= '1';
-wait for 30 ns;
-pl(95) <= '0';
+DDI_VLD <= '1'; 
+for i in 0 to 54 loop
+  ve_in <= std_logic_vector(to_unsigned(i, 64));
+  wait for 30 ns;
+end loop;
+DDI_VLD <= '0';
+wait for 90 ns;
 
-wait until read_out_done = '1';
+progress <= re_mode_a;
+pl <= au_test_offset0;
+wait for 30 ns;
+ybus <= x"01";
+wait for 30 ns;
+pl <= au_test_offset1;
+wait for 30 ns;
+ybus <= x"03";
+wait for 30 ns;
+pl <= au_test_offset2;
+wait for 30 ns;
+ybus <= x"02";
+wait for 30 ns;
+pl <= au_test_offset3;
+wait for 30 ns;
+ybus <= x"01";
+wait for 30 ns;
+
+pl(94) <= '1';
+wait for 30 ns;
+pl(94) <= '0'; 
+wait for 30 ns;
+pl <= pp_ctl;
+wait for 30 ns;
+ybus <= x"08";
+wait for 30 ns;
+pl(95) <= '1'; --start
+pl(96) <= '1'; --resource 0
+pl(98) <= '1'; --mode a 
+pl(97) <= '0'; --mode b 
+wait for 3000 ns;
+--pl(94)<= '0';
+--pl(93) <= '1';
+--wait for 30 ns;
+--progress <= ;
+--pl <= load_lc;
+--wait for 30 ns;
+--ybus <= x"06";
+--progress <= ;
+--Pl(95) <= '1';
+--wait for 30 ns;
+--pl(95) <= '0';
+--
+--wait until read_out_done = '1';
 report "simulation end";
 finish;
 end process;

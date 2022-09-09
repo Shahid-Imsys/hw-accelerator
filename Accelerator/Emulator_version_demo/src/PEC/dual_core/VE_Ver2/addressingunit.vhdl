@@ -5,13 +5,23 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity addressing_unit is 
+  generic(
+    simulation : boolean := true
+  );
   port(
     clk : in std_logic;
     rst : in std_logic;
     en  : in std_logic;
+    start : in std_logic;
     load : in std_logic;
-    config_in : in unsigned(7 downto 0);
-    set_up : in std_logic_vector(2 downto 0);
+    cmp0        : in unsigned(7 downto 0);
+    cmp1        : in unsigned(7 downto 0);
+    cmp2        : in unsigned(7 downto 0);
+    cmp3        : in unsigned(7 downto 0);
+    add_offset0 : in unsigned(7 downto 0);
+    add_offset1 : in unsigned(7 downto 0);
+    add_offset2 : in unsigned(7 downto 0);
+    add_offset3 : in unsigned(7 downto 0);
     baseaddress : in std_logic_vector(7 downto 0);
 
     done : out std_logic;
@@ -22,22 +32,17 @@ end entity;
 
 architecture addressing of addressing_unit is 
   --signal list
+  --signal load        : std_logic;
   signal rst_first   : std_logic;
   signal rst_second  : std_logic;
   signal rst_fourth  : std_logic;
   signal rst_third   : std_logic;
-  signal cmp0        : unsigned(7 downto 0);
-  signal cmp1        : unsigned(7 downto 0);
-  signal cmp2        : unsigned(7 downto 0);
-  signal cmp3        : unsigned(7 downto 0);
-  signal add_offset0 : unsigned(7 downto 0);
-  signal add_offset1 : unsigned(7 downto 0);
-  signal add_offset2 : unsigned(7 downto 0);
-  signal add_offset3 : unsigned(7 downto 0);
+  signal done_int    : std_logic;
   signal first       : unsigned(7 downto 0);
   signal second      : unsigned(7 downto 0);
   signal third       : unsigned(7 downto 0);
   signal fourth      : unsigned(7 downto 0);
+  signal clockcycle  : integer         := 0;
 
   alias load_second : std_logic is rst_first;
   alias load_third  : std_logic is rst_second;
@@ -45,20 +50,45 @@ architecture addressing of addressing_unit is
 
 begin
 
-  finaladdress <= std_logic_vector(unsigned(baseaddress) + first + second + third + fourth);
+  finaladdress <= std_logic_vector(unsigned(baseaddress) + first + second + third + fourth) when done = '0' and load = '1'
+                                                                                            else (others => '0');
 
-  config_mux : process(all)
+  done_int <= rst_first and rst_second and rst_third and rst_fourth when en = '1'
+                                                                    else '1';
+
+
+  -- Clock cycle counter for debug
+  process(clk)
   begin
-    case set_up is 
-      when "000"  => add_offset0 <= config_in;
-      when "001"  => add_offset1 <= config_in;
-      when "010"  => add_offset2 <= config_in;
-      when "011"  => add_offset3 <= config_in;
-      when "100"  => cmp0        <= config_in;
-      when "101"  => cmp1        <= config_in;
-      when "110"  => cmp2        <= config_in;
-      when others => cmp3        <= config_in;
-    end case;
+    if rising_edge(clk) then
+      if simulation then
+        if start = '1' then
+          clockcycle <= 0;
+        else
+          clockcycle <= clockcycle + 1;
+        end if;
+      end if;
+    end if;
+  end process;
+
+  process(clk)
+  begin
+    if rising_edge(clk) then
+      if rst = '0' then
+        done <= '1';
+      else
+        if start = '1' then
+          done <= '0';
+          --if en = '0' then
+          --  done <= '1';
+          --else
+          --  done <= '0';
+          --end if;
+        elsif done_int = '1' then
+          done <= '1';
+        end if;
+      end if;
+    end if;
   end process;
 
   rst_gen : process(all)
@@ -146,7 +176,6 @@ begin
           fourth <= add_offset3 + fourth;
         end if;
       end if;
-      done <= rst_first and rst_second and rst_third and rst_fourth;
     end if;
   end process;
 

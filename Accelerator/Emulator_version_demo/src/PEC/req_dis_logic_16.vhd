@@ -157,20 +157,20 @@ begin
 --Activation 
 process (clk_p)
 begin 
-    if rising_edge(clk_p) then
-        if reset_i = '1' then
-            poll_act <= '0';
-        else
-            if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
-                poll_act <= '1'; 
-                if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
-                    poll_act <= '0';
-                end if;
-            else
-                poll_act <= '0';
-            end if;
+  if rising_edge(clk_p) then
+    if reset_i = '1' then
+      poll_act <= '0';
+    else
+      if fifo_rdy='0' and req_sig /= (req_sig'range => '0') then 
+        poll_act <= '1'; 
+        if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
+          poll_act <= '0';
         end if;
+      else
+        poll_act <= '0';
+      end if;
     end if;
+  end if;
 end process;
 --poll_act <= '0' when reset_i = '1' else
 --            '1' when fifo_rdy = '0' and req_sig /= (req_sig'range => '0') else
@@ -178,34 +178,32 @@ end process;
 
 process(clk_p)
 begin
-    if rising_edge (clk_p) then
-        if EVEN_P = '1'then
-            if req_rd_reg /= (req_rd_reg'range => '0') then
-            req_to_noc_i <= '1';
-            else
-            req_to_noc_i <= '0';
-            end if;
-        end if;
+  if rising_edge (clk_p) then
+    if EVEN_P = '1'then
+      if req_rd_reg /= (req_rd_reg'range => '0') then
+      req_to_noc_i <= '1';
+      else
+      req_to_noc_i <= '0';
+      end if;
     end if;
+  end if;
 end process;
 REQ_TO_NOC <= not empty or req_to_noc_i;
 --ID Number Register and write controller
 process(reset_i,poll_act,id_num,req_sig)
 begin
-    --if rising_edge(clk_p) then
-    if reset_i = '1' then
-        ack_sig_i <= (others => '0');
-    elsif poll_act = '1' then
-        ack_sig_i <=(others => '0'); ---handshake ?
-        if req_sig(to_integer(15 - unsigned(id_num))) = '1' then
-            ack_sig_i(to_integer(unsigned(id_num))) <= '1';
-        else
-            ack_sig_i(to_integer(unsigned(id_num))) <= '0';
-        end if;
+  if reset_i = '1' then
+    ack_sig_i <= (others => '0');
+  elsif poll_act = '1' then
+    ack_sig_i <=(others => '0'); ---handshake ?
+    if req_sig(to_integer(15 - unsigned(id_num))) = '1' then
+      ack_sig_i(to_integer(unsigned(id_num))) <= '1';
     else
-        ack_sig_i <=(others => '0');
+      ack_sig_i(to_integer(unsigned(id_num))) <= '0';
     end if;
-    --end if;
+  else
+    ack_sig_i <=(others => '0');
+  end if;
 end process;
 
 ACK_SIG <= ack_sig_i;
@@ -215,39 +213,36 @@ ACK_SIG <= ack_sig_i;
 process(req_sig,id_num)
 variable sh_0, sh_1, sh_2, sh_3 : std_logic_vector(15 downto 0);
 begin
-    --if poll_act = '1' then
-    sh_3 := req_sig;
-    sh_2 := sh_3;
-    sh_1 := sh_2;
-    sh_0 := sh_1;  
+  sh_3 := req_sig;
+  sh_2 := sh_3;
+  sh_1 := sh_2;
+  sh_0 := sh_1;  
 
-    if id_num(3) = '0' then
-        sh_3 := req_sig;
-    elsif id_num(3) = '1' then
-        sh_3 := req_sig(7 downto 0) & req_sig(15 downto 8);
-    end if;
+  if id_num(3) = '0' then
+      sh_3 := req_sig;
+  elsif id_num(3) = '1' then
+      sh_3 := req_sig(7 downto 0) & req_sig(15 downto 8);
+  end if;
 
-    if id_num(2) = '0' then
-        sh_2 := sh_3;
-    elsif id_num(2) = '1' then
-        sh_2 := sh_3(11 downto 0) & sh_3(15 downto 12);
-    end if;
+  if id_num(2) = '0' then
+      sh_2 := sh_3;
+  elsif id_num(2) = '1' then
+      sh_2 := sh_3(11 downto 0) & sh_3(15 downto 12);
+  end if;
 
-    if id_num(1) = '0' then
-        sh_1 := sh_2;
-    elsif id_num(1) = '1' then
-        sh_1 := sh_2(13 downto 0) & sh_2(15 downto 14);
-    end if;
+  if id_num(1) = '0' then
+      sh_1 := sh_2;
+  elsif id_num(1) = '1' then
+      sh_1 := sh_2(13 downto 0) & sh_2(15 downto 14);
+  end if;
 
-    if id_num(0) = '0' then
-        sh_0 := sh_1;
-    elsif id_num(0) = '1' then
-        sh_0 := sh_1(14 downto 0) & sh_1(15);
-    end if;
+  if id_num(0) = '0' then
+      sh_0 := sh_1;
+  elsif id_num(0) = '1' then
+      sh_0 := sh_1(14 downto 0) & sh_1(15);
+  end if;
 
-    bs_out <= sh_0;
-
-    --end if;
+  bs_out <= sh_0;
 end process;
 
 --Priority Encoder 
@@ -255,57 +250,51 @@ end process;
 process(poll_act,bs_out)
 variable cnt : integer := 0;
 begin
-    add_in_2 <= (others => '0');
-        if poll_act = '1' then
-            cnt := 0;
-            for i in 15 downto 0 loop
-                
-                if bs_out(i) = '0'then
-                    cnt := cnt+1;
-                elsif bs_out(i) = '1' then
-                    add_in_2 <= std_logic_vector(to_unsigned(cnt, 4)); --id"0000" is the first PE
-                    
-                    exit;
-                end if;
-            end loop;
-        --else 
-            --add_in_2 <= (others => '0');
+  add_in_2 <= (others => '0');
+    if poll_act = '1' then
+      cnt := 0;
+      for i in 15 downto 0 loop     
+        if bs_out(i) = '0'then
+          cnt := cnt+1;
+        elsif bs_out(i) = '1' then
+          add_in_2 <= std_logic_vector(to_unsigned(cnt, 4)); --id"0000" is the first PE  
+          exit;
         end if;
-    
+      end loop;
+    end if;
 end process;
 
 --Adder
 add_in_1 <= id_num;
 process(clk_p)--add_in_2,wr_req,chain,EVEN_P)
 begin
-    if rising_edge(clk_p) then
-        if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
-            if REQ_SIG = (REQ_SIG'range => '0') AND REQ_RD_IN = (REQ_RD_IN'range => '0') then
-                id_num <= x"0";
-            else
-                if REQ_RD_IN = (REQ_RD_IN'range => '0') then
-                    id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
-                end if;
-            end if;
+  if rising_edge(clk_p) then
+    if EVEN_P = '1' then --falling_edge of clk_e, latch id_num
+      if REQ_SIG = (REQ_SIG'range => '0') AND REQ_RD_IN = (REQ_RD_IN'range => '0') then
+        id_num <= x"0";
+      else
+        if REQ_RD_IN = (REQ_RD_IN'range => '0') then
+          id_num<= std_logic_vector(to_unsigned(to_integer(unsigned(add_in_1))+to_integer(unsigned(add_in_2)),4));
         end if;
+      end if;
     end if;
-    
+  end if;
 end process;
 
 ------synchronize id with request data-------
 process(clk_p)
 begin
-    if rising_edge(clk_p) then
-        if reset_i = '1' then 
-            id_syn <= "0000";
-            id_syn_d <= "0000";
-        else
-            if EVEN_P = '1' then
-                id_syn <= id_num;
-            end if;
-            id_syn_d <= id_syn;
-        end if;
+  if rising_edge(clk_p) then
+    if reset_i = '1' then 
+      id_syn <= "0000";
+      id_syn_d <= "0000";
+    else
+      if EVEN_P = '1' then
+        id_syn <= id_num;
+      end if;
+      id_syn_d <= id_syn;
     end if;
+  end if;
 end process;
 
 ----------------------------------------------------------------
@@ -314,39 +303,37 @@ end process;
 --PE Mux
 process(clk_p)
 begin
-    if rising_edge(clk_p) then 
-        if reset_i = '1' then
-            pe_mux_out <= (others => '0');
-            req_rd_reg <= (others => '0');
-        elsif EVEN_P = '0' then--rising_edge (clk_e)
-            pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_syn_d))); --PE req in comes the same clock cycle when req_sig is raised
-            req_rd_reg <= REQ_RD_IN;
-            --else
-        --    pe_mux_out <= (others => '0');
-        end if;
+  if rising_edge(clk_p) then 
+    if reset_i = '1' then
+      pe_mux_out <= (others => '0');
+      req_rd_reg <= (others => '0');
+    elsif EVEN_P = '0' then--rising_edge (clk_e)
+      pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_syn_d))); --PE req in comes the same clock cycle when req_sig is raised
+      req_rd_reg <= REQ_RD_IN;
     end if;
+  end if;
 end process;
 
 --Request FIFO
 process(clk_p) 
 begin
-    if rising_edge(clk_p)then
-        if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then--or (wr_req = '1' and EVEN_P = '0')then
-            wr <= '1';
-        else
-            wr <= '0';
-        end if;
+  if rising_edge(clk_p)then
+    if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then--or (wr_req = '1' and EVEN_P = '0')then
+      wr <= '1';
+    else
+      wr <= '0';
     end if;
+  end if;
 end process;
 --wr <= poll_act;
 --Output delay for synchronization with clk_e
 process(clk_p)
 begin
-    if rising_edge(clk_p) then
-        FIFO_VLD <= valid_d;
-        CMD_OUTPUT <= dout_d(159 downto 128);
-        DATA_OUTPUT <= dout_d(127 downto 0);
-    end if;
+  if rising_edge(clk_p) then
+    FIFO_VLD <= valid_d;
+    CMD_OUTPUT <= dout_d(159 downto 128);
+    DATA_OUTPUT <= dout_d(127 downto 0);
+  end if;
 end process;
 
 req_core <= pe_mux_out;
@@ -359,20 +346,20 @@ rd       <= RD_FIFO;
 --PE Demux
 process(clk_p)  --Should internal destination listed here?
 begin
-    if rising_edge(clk_p) then
-        if EVEN_P = '0' then
-            DATA_VLD_OUT<=( others => '0');
-            if B_CAST= '1' then
-                for i in 15 downto 0 loop
-                    pe_data_out (i)<= DATA_NOC;
-                    DATA_VLD_OUT (i) <= DATA_VLD;
-                end loop;
-            else
-                DATA_VLD_OUT(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
-                pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
-            end if;
-        end if;
+  if rising_edge(clk_p) then
+    if EVEN_P = '0' then
+      DATA_VLD_OUT<=( others => '0');
+      if B_CAST= '1' then
+        for i in 15 downto 0 loop
+          pe_data_out (i)<= DATA_NOC;
+          DATA_VLD_OUT (i) <= DATA_VLD;
+        end loop;
+      else
+        DATA_VLD_OUT(to_integer(unsigned(PE_UNIT)))<= DATA_VLD;
+        pe_data_out(to_integer(unsigned(PE_UNIT))) <= DATA_NOC;
+      end if;
     end if;
+  end if;
 end process;
 --DATA_VLD_OUT <= data_vld_out_i; 
 request_fifo : fifo

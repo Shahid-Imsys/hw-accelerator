@@ -265,7 +265,7 @@ begin
       signal wai_start    : std_logic;  -- Wait at start
       signal wai_coi      : std_logic;  -- Wait at coincidence
       signal wai_ff       : std_logic;  -- Disable downcount
-      signal dwnctr       : std_logic_vector(4 downto 0);  -- Downcounter
+      signal dwnctr       : std_logic_vector(5 downto 0);  -- Downcounter
       signal tiu_test_2   : std_logic_vector(4 downto 0);  -- Downcounter
       signal ld_dwnctr    : std_logic;  -- Load cond for ctr
       signal msa          : std_logic_vector(4 downto 0);  -- mantissa
@@ -301,7 +301,7 @@ begin
           wai    <= (others => '0');
         elsif rising_edge(clk_p) then
           if i < 2 and cpt = '1' and capt_pend = '1' then
-            msa <= dwnctr;
+            msa <= dwnctr(4 downto 0);
           elsif (clk_param(i) = '1') then 
             case reg_addr(5 downto 4) is
               when "00" => exp(i) <= wdata(7 downto 5);
@@ -376,17 +376,26 @@ begin
       process(clk_p_n, onff(i))
       begin
         if onff(i) = '0' then
-          dwnctr <= "00000";
+          dwnctr <= "000000";
         elsif rising_edge(clk_p_n) then
           if genclk(i) = '1' then
             if ld_dwnctr = '1' then
-              dwnctr <= msa;
+              if exp(i) = "000" then
+                dwnctr <= '0' & msa;
+              else
+                dwnctr <= '1' & msa;
+              end if;
             elsif wai_ff = '0' then
-              dwnctr <= dwnctr - 1;
+              if (i < 2 and cpt = '1' and dwnctr = "000000") then
+                dwnctr <= "011111";
+              else
+                dwnctr <= dwnctr - 1;
+              end if;
             end if;
           end if;
         end if;
       end process;
+
       -- When a timer counts to zero, it either reloads itself from msa or
       -- wraps around. A single timer is always reloaded, a driving timer
       -- is reloaded only if its ctrldrvg(1) line is held low by the driven
@@ -605,7 +614,11 @@ begin
     begin
       for i in 0 to TIM_CH_NBR-1 loop
         -- Default frequency selection, controlled by exp
-        tmp(i) := frd(conv_integer(exp(i)));
+        if (exp(i) = "000") then
+          tmp(i) := frd(conv_integer(exp(i)));
+        else
+          tmp(i) := frd(conv_integer(exp(i)-1));
+        end if;
 
         -- Timer may be used for external event counting, clocked by rising
         -- edge on its cpt_trig input. 
@@ -802,8 +815,6 @@ begin
 
     -- capt_pend is used to tell the msa input mux to load msa from the
     -- downctr rather than from wdata on the capt_event pulse.
-    --capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
-
     process (clk_p, trst_n)
     begin
       if (trst_n = '0') then

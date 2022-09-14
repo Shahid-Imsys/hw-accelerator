@@ -214,6 +214,7 @@ begin  -- architecture tb
 
   i_uart : entity work.uart_tb
     port map (
+      clk            => MX1_CK,
       tx             => pad(J)(1),
       rx             => pad(J)(0),
       reg_to_block   => reg_to_block,

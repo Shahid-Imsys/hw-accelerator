@@ -41,11 +41,7 @@ entity Noc_State_Machine is
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
-        Load_REQ_FF             : out std_logic;        
         Load_GPP_CMD            : out std_logic;
-        Reset_MDC               : out std_logic;
-        Load_MD_Reg             : out std_logic;
-        Step_MDC                : out std_logic;
         En_RM                   : out std_logic;                        
         Start_Tag_Shift         : out std_logic;                        
         Load_Tag_Shift_Counter  : out std_logic;                      
@@ -56,7 +52,6 @@ entity Noc_State_Machine is
         Load_Mux_Reg            : out std_logic; 
         Control_Data_Out        : out std_logic_vector(7 downto 0);
         PEC_TS_Reg              : out std_logic_vector(15 downto 0);              
-        Load_NOC_cmd_reg        : out std_logic;
         En_TP                   : out std_logic;
         Reset_TPC               : out std_logic;
         TP_Interchange          : out std_logic;
@@ -64,7 +59,6 @@ entity Noc_State_Machine is
         En_IO_Data              : out std_logic;
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
-        Load_TSDiv16_reg        : out std_logic;
         ERROR                   : out std_logic;
         Write_REQ               : out std_logic
     );
@@ -143,11 +137,8 @@ architecture Behavioral of Noc_State_Machine is
     signal  PEC_WE_extend           : std_logic;
     --internal signals
 	signal  Load_GPP_CMD_i          : std_logic;
-	signal  Reset_MDC_i             : std_logic;
 	signal  Reset_LC_i              : std_logic;
 	signal  Reset_BC_i              : std_logic;
-	signal  Step_MDC_i              : std_logic;
-	signal  Load_MD_Reg_i           : std_logic;
 	signal  Load_Tag_Shift_Counter_i: std_logic;
 	signal  Start_TAG_Shift_i       : std_logic;
 	signal  Load_NOC_reg_i          : std_logic;
@@ -164,11 +155,8 @@ architecture Behavioral of Noc_State_Machine is
 begin
 
     Load_GPP_CMD          <= Load_GPP_CMD_i;
-    Reset_MDC             <= Reset_MDC_i;
     Reset_LC              <= Reset_LC_i;
     Reset_BC              <= Reset_BC_i;
-    Step_MDC              <= Step_MDC_i;
-    Load_MD_Reg           <= Load_MD_Reg_i;
     Load_Tag_Shift_Counter<= Load_Tag_Shift_Counter_i;
     Start_TAG_Shift       <= Start_TAG_Shift_i;
     Load_NOC_reg          <= Load_NOC_reg_i;
@@ -202,7 +190,9 @@ begin
     program_mem_data_mux        <= IO_data(27 downto 0)    when boot_as_counter(1 downto 0) = "00" else
                                    IO_data(59 downto 32)   when boot_as_counter(1 downto 0) = "01" else
                                    IO_data(91 downto 64)   when boot_as_counter(1 downto 0) = "10" else
-                                   IO_data(123 downto 96)  when boot_as_counter(1 downto 0) = "11";
+                                   IO_data(123 downto 96)  when boot_as_counter(1 downto 0) = "11" else 
+                                   x"0000000";
+                                   
 
     TCx16                       <= std_logic_vector(Transfer_Counter) & "0000"; --TC_Mux & "0000";     --TS & "0000";
     Loop_Mux                    <= x"000" & Control_Data   when Loop_reg_mux_ctrl= '0' else (TCx16);
@@ -265,8 +255,6 @@ begin
     process(clk, reset)
     begin
         if reset = '1' then
-            Load_MD_Reg_i               <= '0';
-            Step_MDC_i                  <= '0';
             Reset_BC_i                  <= '0';
             Load_PCIe_CMD_Reg_i         <= '0';
             Control_Data_Out            <= (others => '0');
@@ -279,7 +267,6 @@ begin
             Load_Tag_Shift_Counter_i    <= '0';
             Load_Return_Reg1            <= '0';
             Load_Return_Reg2            <= '0';
-            Load_REQ_FF                 <= '0';
             Load_NOC_reg_i              <= '0';
             Sync_pulse                  <= '0';
             En_RM_i                     <= '0';
@@ -287,7 +274,6 @@ begin
             Start_TAG_Shift_i           <= '0';
             Load_TC                     <= '0';
             Load_GPP_CMD_i              <= '0';  
-            Reset_MDC_i                 <= '0';           
             Step_LC                     <= '0';
             Decr_TC                     <= '0';
             Reset_LC_i                  <= '0';
@@ -298,16 +284,13 @@ begin
             Return_Reg2                 <= (others => '0');
             Address_Counter             <= (others => '0');
             TP_Interchange              <= '0';
-            Load_NOC_cmd_reg            <= '0';
             En_TP                       <= '0';
             Reset_TPC                   <= '0';
             Load_RM_Address             <= '0';
             boot_FF                     <= '0';
             NOC_Ready                   <= '0';
             TC_mux_ctrl                 <= '0';
-            load_Mode_reg               <= '0';
-            Load_TSDiv16_reg            <= '0';
-            
+            load_Mode_reg               <= '0';            
         elsif rising_edge(clk) then
             FF                          <= not(boot_FF);
             LC_Equal_LR_latch           <= LC_Equal_LR;

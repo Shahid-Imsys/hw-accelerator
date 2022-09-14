@@ -78,11 +78,7 @@ architecture structural of Noc_Top is
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
-        Load_REQ_FF             : out std_logic;        
         Load_GPP_CMD            : out std_logic;
-        Reset_MDC               : out std_logic;
-        Load_MD_Reg             : out std_logic;
-        Step_MDC                : out std_logic;
         En_RM                   : out std_logic;                        
         Start_Tag_Shift         : out std_logic;                        
         Load_Tag_Shift_Counter  : out std_logic;                      
@@ -93,7 +89,6 @@ architecture structural of Noc_Top is
         Load_Mux_Reg            : out std_logic; 
         Control_Data_Out        : out std_logic_vector(7 downto 0);
         PEC_TS_Reg              : out std_logic_vector(15 downto 0);              
-        Load_NOC_cmd_reg        : out std_logic;
         En_TP                   : out std_logic;
         Reset_TPC               : out std_logic;
         TP_Interchange          : out std_logic;
@@ -101,7 +96,6 @@ architecture structural of Noc_Top is
         En_IO_Data              : out std_logic;
         Sync_pulse              : out std_logic;
         load_Mode_reg           : out std_logic;
-        Load_TSDiv16_reg        : out std_logic;
         ERROR                   : out std_logic;
         Write_REQ               : out std_logic                                  
     );
@@ -280,11 +274,7 @@ architecture structural of Noc_Top is
     signal Load_RM_Address      : std_logic;
     signal Load_NOC_Reg         : std_logic;
     signal Load_PEC_Reg         : std_logic;
-    signal Load_REQ_FF          : std_logic;
     signal Load_GPP_CMD         : std_logic;
-    signal Reset_MDC            : std_logic;
-    signal Load_MD_Reg          : std_logic;
-    signal Step_MDC             : std_logic;
     signal En_RM                : std_logic;
     signal Start_Tag_Shift      : std_logic;
     signal Load_Tag_Shift_Counter : std_logic;
@@ -293,7 +283,6 @@ architecture structural of Noc_Top is
     signal Load_Mux_Reg         : std_logic;
     signal Control_Data_Out     : std_logic_vector(7 downto 0);
     signal PEC_TS_Reg           : std_logic_vector(15 downto 0);
-    signal Load_NOC_cmd_reg     : std_logic;
     signal En_TP                : std_logic;
     signal Reset_TPC            : std_logic;
     signal TP_Interchange       : std_logic;
@@ -301,7 +290,6 @@ architecture structural of Noc_Top is
     signal Sync_pulse_i         : std_logic;
     signal Sync_pulse_i_p       : std_logic;
     signal load_Mode_reg        : std_logic;
-    signal Load_TSDiv16_reg     : std_logic;
     signal ERROR                : std_logic;
     signal Write_REQ            : std_logic;                  
 
@@ -341,7 +329,6 @@ architecture structural of Noc_Top is
     signal Tag_Line_i           : std_logic;
     signal RM_as_mux            : std_logic;
     --
-    signal REQ_FF               : std_logic; 
     signal Mode_reg             : std_logic_vector(4 downto 0);
     signal Enable_Root_memory   : std_logic;
     signal En_IO_Data_SM        : std_logic;
@@ -376,12 +363,8 @@ begin
 	process(clk, Reset)
 	begin
 		if Reset = '1' then
-            REQ_FF   <= '0';
             Mode_reg <= (others => '0');
 		elsif rising_edge (clk) then
-			if (Load_REQ_FF = '1') then 
-                REQ_FF   <= Control_Data_Out(0);
-			end if;
 			if (load_Mode_reg = '1') then
 		        Mode_reg <= Control_Data_Out(4 downto 0);
 		    end if;
@@ -443,11 +426,7 @@ begin
         Load_RM_Address         => Load_RM_Address,
         Load_NOC_Reg            => Load_NOC_Reg,
         Load_PEC_Reg            => Load_PEC_Reg,
-        Load_REQ_FF             => Load_REQ_FF,                
         Load_GPP_CMD            => Load_GPP_CMD,
-        Reset_MDC               => Reset_MDC,
-        Load_MD_Reg             => Load_MD_Reg,
-        Step_MDC                => Step_MDC,
         En_RM                   => En_RM,    
         Start_Tag_Shift         => Start_Tag_Shift,              
         Load_Tag_Shift_Counter  => Load_Tag_Shift_Counter,    
@@ -458,7 +437,6 @@ begin
         Load_Mux_Reg            => Load_Mux_Reg,  
         Control_Data_Out        => Control_Data_Out,
         PEC_TS_Reg              => PEC_TS_Reg,                     
-        Load_NOC_cmd_reg        => Load_NOC_cmd_reg,
         En_TP                   => En_TP,     
         Reset_TPC               => Reset_TPC,
         TP_Interchange          => TP_Interchange,        
@@ -466,7 +444,6 @@ begin
         En_IO_Data              => En_IO_Data_SM,
         Sync_pulse              => Sync_pulse_i,
         load_Mode_reg           => load_Mode_reg,
-        Load_TSDiv16_reg        => Load_TSDiv16_reg,
         ERROR                   => ERROR,
         Write_REQ               => Write_REQ                             
     );

@@ -59,20 +59,21 @@ begin
     NOC_CMD_flag            <= NOC_CMD_flag_i;
     NOC_CMD_Data            <= NOC_CMD_Reg;
 
-    Decoder <= "100000" when counter = 0 else   --
-               "100000" when counter = 1 else   --
-               "110000" when counter = 2 else   --
-               "001000" when counter = 3 else   --
-               "100100" when counter = 4 else   --
-               "100010" when counter = 5 else   --
-               "100001" when counter = 6 else   --
-               "100000" when counter = 7;       --
+    Decoder <= "100000" when counter = 0 else   
+               "100000" when counter = 1 else   
+               "110000" when counter = 2 else   
+               "001000" when counter = 3 else   
+               "100100" when counter = 4 else   
+               "100010" when counter = 5 else 
+               "100001" when counter = 6 else  
+               "100000" when counter = 7 else  
+               "100000";  
                                 
-    load_counter            <= Decoder(0);      --
-    Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      --
-    NOC_CMD_FF_value        <= Decoder(3);      --
-    load_NOC_CMD_REG        <= Decoder(4);      --
-    step_counter            <= Decoder(5);      --
+    load_counter            <= Decoder(0);      
+    Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      
+    NOC_CMD_FF_value        <= Decoder(3);      
+    load_NOC_CMD_REG        <= Decoder(4);      
+    step_counter            <= Decoder(5);      
     
     load    <= load_counter or not (NOC_Ready_FF or PEC_ready_FF or NOC_ERROR_FF); --
     enable  <= step_counter or (GPP_CMD_ACK and NOC_CMD_FF_value);  --
@@ -80,11 +81,11 @@ begin
     process(clk, Reset)
     begin
         if Reset = '1' then
-            counter                 <= (others => '0');  --
-            PEC_ready_FF            <= '0';     --
-            NOC_Ready_FF            <= '0';     --
-            NOC_ERROR_FF            <= '0';     --       
-            NOC_CMD_Reg             <= (others => '0'); --
+            counter                 <= (others => '0');  
+            PEC_ready_FF            <= '0';     
+            NOC_Ready_FF            <= '0';     
+            NOC_ERROR_FF            <= '0';            
+            NOC_CMD_Reg             <= (others => '0');
             
         elsif rising_edge(clk) then
             PEC_ready_P             <= PEC_ready;

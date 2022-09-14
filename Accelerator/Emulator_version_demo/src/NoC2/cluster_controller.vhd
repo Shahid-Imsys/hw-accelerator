@@ -179,7 +179,6 @@ end component;
   signal mem_out        : reg;                             --Output register of memory    
   signal noc_data_in    : reg;                             --NOC data input register
   signal noc_data_out   : reg;                             --NOC data output register
-  signal noc_data_out_p : reg;
   signal sync_collector : std_logic_vector(1 downto 0);
   signal pe_data_in     : reg;                             --Input register form pe side
   signal data_core_int  : reg;                             --Data register for PE --pe_data_out
@@ -543,7 +542,8 @@ EVEN_P <= even_p_2;
 	end process;
 	
 	continuous_mode <= '1' when dataout_vld = '1' and sync_collector= "11" else
-	                   '0' when dataout_vld = '0' and sync_collector= "11";
+	                   '0' when dataout_vld = '0' and sync_collector= "11" else 
+	                   '0';
 	
 	--one clock delay of noc_read to load data in noc_data_out register to output port
 	process(clk_e)
@@ -574,7 +574,7 @@ EVEN_P <= even_p_2;
     begin
 		if rising_edge(clk_e) then
 	    	if dataout_vld_o = '1' or (dataout_vld='1' and continuous_mode = '1') then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
-	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));--noc_data_out_p(to_integer(unsigned(byte_ctr)));
+	    	    DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
 	    	else
 	    	    DATA_OUT <= (others => '0');
         	end if;
@@ -902,7 +902,17 @@ EVEN_P <= even_p_2;
         end if;
     end process;
 --Output Latch
+--    noc_data_out <= data_core_int when noc_delay = '1'; -- else (x"00", x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00");
     noc_data_out <= data_core_int when noc_delay = '1';
+    
+--	data_rd_act : process(clk_e)
+--    begin
+--		if rising_edge(clk_e) then
+--		    if noc_delay = '1' then
+--                noc_data_out <= data_core_int;
+--            end if;    
+--		end if;
+--	end process; 
 
 TAG_FB <= sig_fin or delay;
 ---------------------------------------------
@@ -924,14 +934,6 @@ begin
 		rd_ena <= '0';
 		end if;
 	end if;
-end process;
-
-
-process(clk_e)
-begin
-if rising_edge(clk_e) then
-    noc_data_out_p  <= noc_data_out;
-end if;
 end process;
 
 				

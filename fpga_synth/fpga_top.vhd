@@ -154,7 +154,6 @@ architecture rtl of fpga_top is
       dac1_en    : out std_logic;       -- Enable for DAC1
       clk_a      : out std_logic;       -- Clock to the DAC's and ADC
 
-
       -- Port A
       pa_i  : in  std_logic_vector(7 downto 0);
       pa_en : out std_logic_vector(7 downto 0);
@@ -226,7 +225,9 @@ architecture rtl of fpga_top is
       spi_mosi      : in  std_logic;
       spi_miso      : out std_logic;
       spi_miso_oe_n : out std_logic;
-      pad_config    : out pad_config_record_t
+      pad_config    : out pad_config_record_t;
+      pll_config    : out pll_registers_record_t;
+      adpll_config  : in  adpll_registers_record_t
       );
   end component;
 
@@ -557,7 +558,10 @@ begin
       spi_mosi      => spi_mosi,
       spi_miso      => spi_miso,
       spi_miso_oe_n => spi_miso_oe_n,
-      pad_config    => pad_config
+      pad_config    => pad_config,
+      
+      pll_config    => open,
+      adpll_config  => (others => (others => '0'))
       );
 
 end rtl;

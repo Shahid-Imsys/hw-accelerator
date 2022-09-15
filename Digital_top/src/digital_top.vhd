@@ -166,9 +166,6 @@ end entity digital_top;
 
 architecture rtl of digital_top is
 
-  attribute keep_hierarchy : string;
-  attribute keep_hierarchy of rtl: architecture is "no";
-
   component test_spi_interface is
     port (
       rst_n        : in  std_ulogic;
@@ -381,7 +378,7 @@ begin  -- architecture rtl
 
         clock_in_off => clock_in_off,
         sel_pll      => clock_sel,
-        spi_sel_pll  => '1',
+        spi_sel_pll  => '0',
 
         spi_override_pll_locked => '0',
         pll_locked              => pll_locked,

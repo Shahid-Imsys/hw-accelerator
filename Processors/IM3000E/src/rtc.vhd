@@ -387,13 +387,13 @@ begin  -- rtl
   xout_selected <= '1';
 
   -- Disable latch for the power to BMEM
-  process (ld_bmem_iso_0, rtc_sel_iso_0)
-  begin
-    if ld_bmem_iso_0 = '1' then
-      dis_bmem <= rtc_sel_iso_0(0);
-    end if;
-  end process;
-
+--  process (ld_bmem_iso_0, rtc_sel_iso_0)
+--  begin
+--    if ld_bmem_iso_0 = '1' then
+--      dis_bmem <= rtc_sel_iso_0(0);
+--    end if;
+--  end process;
+  dis_bmem <= '0';
 
 
   arst_n <= lp_pwr_ok and not wakeup_lp;

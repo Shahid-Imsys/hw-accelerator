@@ -238,6 +238,7 @@ begin
       end loop;  -- i
 
       tx_int  <= '1';
+      wait for bit_length;
       tx_busy <= false;
     end loop;
 

@@ -601,7 +601,7 @@ begin  -- architecture rtl
         -- PAD
         pad => urx,
         --GPI
-        ie  => pj_en(1),
+        ie  => not pj_en(1),
         ste => pad_config.urx.ste,
         pd  => pad_config.urx.pd,
         pu  => pad_config.urx.pu,

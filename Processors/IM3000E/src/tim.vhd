@@ -73,7 +73,7 @@ entity tim is
     en_mckout1   : in std_logic;        -- Enable MCKOUT1 pin when high
     en_s         : in std_logic;        -- Enable SP clock when high
     speed_i      : in std_logic_vector(1 downto 0);  --I/O timing select
-    speed_u      : in std_logic_vector(6 downto 0);  --UART prescaler control
+    speed_u      : in std_logic_vector(9 downto 0);  --UART prescaler control
     speed_s      : in std_logic_vector(1 downto 0);  --SP clock control
     speed_ps1    : in std_logic_vector(3 downto 0);  --Prescaler 1 control
     speed_ps2    : in std_logic_vector(5 downto 0);  --Prescaler 2 control
@@ -146,7 +146,7 @@ architecture rtl of tim is
   signal split_i4                  : std_logic;
   signal split_i8                  : std_logic;
   signal fract_u                   : std_logic_vector(2 downto 0);
-  signal ctr_u                     : std_logic_vector(3 downto 0);
+  signal ctr_u                     : std_logic_vector(6 downto 0);
   signal sum_u                     : std_logic_vector(3 downto 0);
   signal split_s4                  : std_logic;
   signal split_s8                  : std_logic;
@@ -398,11 +398,11 @@ begin
     if rising_edge(clk_p) then
       if rst_cn_int = '0' then
         fract_u <= "000";
-        ctr_u   <= "0000";
+        ctr_u   <= (others => '0');
       elsif clk_c_en = '1' then
-        if ctr_u = "0000" then
+        if ctr_u = 0 then
           fract_u <= sum_u(2 downto 0);
-          ctr_u   <= speed_u(6 downto 3) + sum_u(3);
+          ctr_u   <= speed_u(9 downto 3) + sum_u(3);
         else
           ctr_u <= ctr_u - 1;
         end if;
@@ -410,7 +410,7 @@ begin
     end if;
   end process;
   sum_u <= "0000" + fract_u + speed_u(2 downto 0);
-  din_u <= '1' when ctr_u = "0000" else
+  din_u <= '1' when ctr_u = 0 else
            '0';
 
   -- These FFs split clk_c by four and eight for clk_s generation.

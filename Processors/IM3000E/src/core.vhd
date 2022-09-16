@@ -307,7 +307,7 @@ architecture struct of core is
   signal clk_sel   	: std_logic;
   signal en_s       	: std_logic;
   signal speed_s    	: std_logic_vector(1 downto 0);
-  signal speed_u    	: std_logic_vector(6 downto 0);
+  signal speed_u    	: std_logic_vector(9 downto 0);
   signal speed_ps1  	: std_logic_vector(3 downto 0);
   signal speed_ps2  	: std_logic_vector(5 downto 0);
   signal speed_ps3  	: std_logic_vector(4 downto 0);

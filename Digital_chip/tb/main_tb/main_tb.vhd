@@ -21,7 +21,7 @@ architecture tb of main_tb is
   signal port_oe          : ports_t;
 
 
-  constant HALF_CLK_C_CYCLE : time := 8000 ps;
+  constant HALF_CLK_C_CYCLE : time := 16000 ps;
 
   signal MX1_CK   : std_logic;
   signal MXOUT    : std_logic;

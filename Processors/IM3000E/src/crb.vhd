@@ -117,7 +117,7 @@ entity crb is
     en_iobus    : out std_logic_vector(1 downto 0);
     -- UACC register
     adc_ref2v   : out std_logic;  -- Select 2V internal ADC reference (1V)
-    speed_u     : out std_logic_vector(6 downto 0);
+    speed_u     : out std_logic_vector(9 downto 0);
     -- PSC1 register
     speed_ps1   : out std_logic_vector(3 downto 0);
     speed_ps2   : out std_logic_vector(5 downto 0);
@@ -229,7 +229,7 @@ architecture rtl of crb is
   signal en_eth_int     : std_logic_vector(1 downto 0);
   signal en_iobus_int   : std_logic_vector(1 downto 0);
   signal adc_ref2v_int  : std_logic;
-  signal speed_u_int    : std_logic_vector(6 downto 0);
+  signal speed_u_int    : std_logic_vector(9 downto 0);
   signal speed_ps1_int  : std_logic_vector(3 downto 0);
   signal speed_ps2_int  : std_logic_vector(5 downto 0);
   signal speed_ps3_int  : std_logic_vector(4 downto 0);
@@ -316,7 +316,7 @@ begin
       en_iobus_int  <= "00";
       -- UACC register
       adc_ref2v_int <= '1';
-      speed_u_int   <= "0000000";
+      speed_u_int   <= (others => '0');
       -- PSC1 register
       speed_ps1_int   <= "1111";
       speed_ps2_int   <= "111111";
@@ -409,8 +409,8 @@ begin
             en_eth_int    <= dbus(3 downto 2);
             en_iobus_int  <= dbus(1 downto 0);
           when "0111" => -- UACC register
-            adc_ref2v_int <= dbus(7);
-            speed_u_int   <= dbus(6 downto 0);
+            adc_ref2v_int           <= dbus(7);
+            speed_u_int(6 downto 0) <= dbus(6 downto 0);
           when "1000" => -- PSC1 register
             speed_ps1_int             <= dbus(7 downto 4);
             speed_ps2_int(5 downto 2) <= dbus(3 downto 0);
@@ -441,6 +441,7 @@ begin
 --      router_clk_en_int <= dbus(2);      --delete by HYX, 20141027
 
             core2_en_int <= dbus(7);
+            speed_u_int(9 downto 7) <= dbus(6 downto 4);
 --            ram_partition_int <= dbus(6 downto 3);
             halt_en_int <= dbus(3);           -- added bu HYX, 20150707
             short_cycle_int <= dbus(2);
@@ -633,7 +634,7 @@ process (clk_p, rst_cn, nap_rec)
         crb_out(1 downto 0) <= en_iobus_int;
       when "0111" => -- UACC register
         crb_out(7)          <= adc_ref2v_int;
-        crb_out(6 downto 0) <= speed_u_int;
+        crb_out(6 downto 0) <= speed_u_int(6 downto 0);
       when "1000" => -- PSC1 register
         crb_out(7 downto 4) <= speed_ps1_int;
         crb_out(3 downto 0) <= speed_ps2_int(5 downto 2);
@@ -738,7 +739,7 @@ process (clk_p, rst_cn, nap_rec)
         crb_out_c2(1 downto 0) <= en_iobus_int;
       when "0111" => -- UACC register
         crb_out_c2(7)          <= adc_ref2v_int;
-        crb_out_c2(6 downto 0) <= speed_u_int;
+        crb_out_c2(6 downto 0) <= speed_u_int(6 downto 0);
       when "1000" => -- PSC1 register
         crb_out_c2(7 downto 4) <= speed_ps1_int;
         crb_out_c2(3 downto 0) <= speed_ps2_int(5 downto 2);

@@ -378,7 +378,7 @@ begin  -- architecture rtl
 
         clock_in_off => clock_in_off,
         sel_pll      => clock_sel,
-        spi_sel_pll  => '0',
+        spi_sel_pll  => '1',
 
         spi_override_pll_locked => '0',
         pll_locked              => pll_locked,

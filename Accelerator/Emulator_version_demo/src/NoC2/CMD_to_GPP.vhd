@@ -48,7 +48,6 @@ architecture Behavioral of CMD_to_GPP is
     signal  Decoder                 : std_logic_vector(5 downto 0);
     signal  NOC_Ready_FF            : std_logic;
     signal  PEC_ready_FF            : std_logic;
-    signal  PEC_ready_P             : std_logic;
     signal  NOC_CMD_flag_i          : std_logic;
     signal  NOC_CMD_Reg             : std_logic_vector(7 downto 0);
     signal  NOC_ERROR_FF            : std_logic;
@@ -88,7 +87,6 @@ begin
             NOC_CMD_Reg             <= (others => '0');
             
         elsif rising_edge(clk) then
-            PEC_ready_P             <= PEC_ready;
             NOC_CMD_flag_i          <= not(GPP_CMD_ACK) and NOC_CMD_FF_value;
         
             if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '1')) then

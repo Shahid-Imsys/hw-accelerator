@@ -118,19 +118,36 @@ architecture rtl of ve is
       );
   end component;
 
-  component mem is
-    generic (
-      width       : integer := 8;
-      addressbits : integer := 2;
-      columns     : integer := 4
-      );
+  component mem256x32 is
     port (
       clk      : in  std_logic;
       read_en  : in  std_logic;
       write_en : in  std_logic;
-      d_in     : in  std_logic_vector(width-1 downto 0);
-      address  : in  std_logic_vector(addressbits-1 downto 0);
-      d_out    : out std_logic_vector(width-1 downto 0)
+      d_in     : in  std_logic_vector(31 downto 0);
+      address  : in  std_logic_vector(7 downto 0);
+      d_out    : out std_logic_vector(31 downto 0)
+      );
+  end component;
+
+  component mem256x64 is
+    port (
+      clk      : in  std_logic;
+      read_en  : in  std_logic;
+      write_en : in  std_logic;
+      d_in     : in  std_logic_vector(63 downto 0);
+      address  : in  std_logic_vector(7 downto 0);
+      d_out    : out std_logic_vector(63 downto 0)
+      );
+  end component;
+
+  component mem64x64 is
+    port (
+      clk      : in  std_logic;
+      read_en  : in  std_logic;
+      write_en : in  std_logic;
+      d_in     : in  std_logic_vector(63 downto 0);
+      address  : in  std_logic_vector(5 downto 0);
+      d_out    : out std_logic_vector(63 downto 0)
       );
   end component;
 
@@ -396,6 +413,7 @@ architecture rtl of ve is
   signal ppshiftinst_i : ppshift_shift_ctrl;
   signal addbiasinst_i : ppshift_addbias_ctrl;
   signal clipinst_i : ppshift_clip_ctrl;
+  signal lzod_i : lzod_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
   signal stall : unsigned(3 downto 0) := (others => '0');
   signal en_i : std_logic;
@@ -773,12 +791,7 @@ begin
 
   buf_sim_gen : if not USE_ASIC_MEMORIES generate
 --data mem(splited in high and low part)--
-    databuf_0 : mem
-      generic map(
-        width       => 32,
-        addressbits => 8,
-        columns     => 2
-        )
+    databuf_0 : mem256x32
       port map (
         clk      => clk_p,
         read_en  => read_en_o,
@@ -787,12 +800,7 @@ begin
         address  => data0addr_to_memory,
         d_out    => data0
         );
-    databuf_1 : mem
-      generic map(
-        width       => 32,
-        addressbits => 8,
-        columns     => 2
-        )
+    databuf_1 : mem256x32
       port map(
         clk      => clk_p,
         read_en  => read_en_o,
@@ -802,12 +810,7 @@ begin
         d_out    => data1
         );
 --weight mem--
-    buf_weight : mem
-      generic map (
-        width       => 64,
-        addressbits => 8,
-        columns     => 4
-        )
+    buf_weight : mem256x64
       port map (
         clk      => clk_p,
         read_en  => read_en_w_o,
@@ -818,12 +821,7 @@ begin
         );
 
 --bias mem--
-    buf_bias : mem
-      generic map(
-        width       => 64,
-        addressbits => 6,
-        columns     => 4
-        )
+    buf_bias : mem64X64
       port map(
         clk      => clk_p,
         read_en  => read_en_b_o,
@@ -932,7 +930,7 @@ begin
       ppshiftinst_i   => ppshiftinst_i,
       addbiasinst_i   => addbiasinst_i,
       clipinst_i      => clipinst_i,
-      lzod_i          => ("00", none),
+      lzod_i          => lzod_i,
       zpdata_i        => zp_data,
       zpweight_i      => zp_weight,
       bias_i          => bias_mux_out,

@@ -51,6 +51,7 @@ architecture rtl of ve_wctrl is
   signal ppshiftinst_i : ppshift_shift_ctrl;
   signal addbiasinst_i : ppshift_addbias_ctrl;
   signal clipinst_i : ppshift_clip_ctrl;
+  signal lzod_i : lzod_ctrl;
   signal zpdata_i : std_logic_vector(7 downto 0);
   signal zpweight_i : std_logic_vector(7 downto 0);
   signal bias_i : std_logic_vector(31 downto 0);
@@ -173,7 +174,7 @@ begin
     ppshiftinst_i => ppshiftinst_i,
     addbiasinst_i => addbiasinst_i,
     clipinst_i => clipinst_i,
-    lzod_i => ("00", none),
+    lzod_i => lzod_i,
     zpdata_i => zpdata_i,
     zpweight_i => zpweight_i,
     bias_i => bias_i,

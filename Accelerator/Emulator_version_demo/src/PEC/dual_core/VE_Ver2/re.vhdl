@@ -21,8 +21,6 @@ entity re is
     left_done        : in std_logic;
     right_done       : in std_logic;
     bias_done        : in std_logic;
-    au_cmp           : in au_param;
-    au_offset        : in au_param;
     bias_index_start : in std_logic_vector(7 downto 0);
     re_busy          : out std_logic;
     write_en_data    : out std_logic;
@@ -32,16 +30,10 @@ entity re is
     mode_b_l         : out std_logic;
     mode_c_l         : out std_logic;
     bias_en          : out std_logic;
+    au_start         : out std_logic;
     left_load        : out std_logic;
     right_load       : out std_logic;
-    bias_load        : out std_logic;
-    left_cmp         : out au_param;
-    left_offset      : out au_param;  
-    right_cmp        : out au_param;
-    right_offset     : out au_param;
-    bias_cmp         : out au_param;
-    bias_offset      : out au_param;
-    bias_index_wr    : out std_logic_vector(7 downto 0)
+    bias_load        : out std_logic
   );
 end entity re;
 
@@ -57,13 +49,17 @@ architecture receive_engine of re is
 begin
 
   --assign port
-  bias_index_wr <= bias_addr_reg; 
+
 
   latch_signals: process(clk)
   begin
     if rising_edge(clk) then --latches at the rising_edge of clk_p. 
       if rst = '0' then
         re_busy <= '0';
+        mode_a_l <= '0';
+        mode_b_l <= '0';
+        bias_en <= '0';
+        au_start <= '0';
       else
         if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
           re_busy <= '1';--left_done and right_done and bias_done;
@@ -72,19 +68,20 @@ begin
         end if;
         --mode a and b will be reflected by config registers when ve_starts
         if re_source = '0' then
+          au_start <= re_start;
           if re_start = '1' and mode_a = '1' and mode_b = '0' then
             mode_a_l <= '1';    --this should become enable signal for left au, data valid should become load signal for left au
           elsif left_done = '1' then
             mode_a_l <= '0';
           end if;
-          if re_start= '1' and mode_a = '0' and mode_b = '1' then
+          if re_start = '1' and mode_a = '0' and mode_b = '1' then
             mode_b_l <= '1';
           elsif right_done = '1' then
             mode_b_l <= '0';
           end if;
-          if re_start= '1' and mode_a = '1' and mode_b = '1' then
+          if re_start = '1' and mode_a = '1' and mode_b = '1' then
             bias_en <= '1';
-          elsif right_done = '1' then
+          elsif bias_done = '1' then
             bias_en <= '0';
           end if;
           --mode c latch signal --1210
@@ -94,26 +91,29 @@ begin
             mode_c_l <= '0';
           end if;
         else
-          mode_a_l <= re_source and mode_a;
-          mode_b_l <= re_source and mode_b;
+          if re_source = '1' and clk_e_pos = '0' then 
+            au_start <= re_start;
+            mode_a_l <= re_source and mode_a;
+            mode_b_l <= re_source and mode_b;
+          end if;
         end if;
       end if;
     end if;
   end process;
 
-  load_assign : process(clk)
+  load_assign : process(all)
   begin
-    if rising_edge(clk) then
+    --if rising_edge(clk) then
       if re_source = '0' then
         left_load <= mode_a_l and data_valid;
-      elsif re_source = '1' and clk_e_pos = '1' then
+      elsif re_source = '1' and clk_e_pos = '0' and mode_a_l = '1' then
         left_load <= re_start and mode_a;
       else
         left_load <= '0';
       end if;
       if re_source = '0' then
         right_load <= mode_b_l and data_valid;
-      elsif re_source = '1' and clk_e_pos = '1' then
+      elsif re_source = '1' and clk_e_pos = '0' and mode_b_l = '1' then
         right_load <= re_start and mode_b;
       else
         right_load <= '0';
@@ -123,7 +123,7 @@ begin
       else
         bias_load <= '0';
       end if;
-    end if;
+    --end if;
   end process;
 
   --Mode a and b for reloading receive engine, mode bits are not latched.
@@ -170,37 +170,7 @@ begin
   --    re_addr_weight <= (others => '0');
   --  end if;
   --end process;
-
-  RE_paramux : process(all)
-  begin
-    left_cmp     <= (others => (others => '0'));
-    left_offset  <= (others => (others => '0'));
-    right_cmp    <= (others => (others => '0'));
-    right_offset <= (others => (others => '0'));
-    bias_cmp     <= (others => (others => '0'));
-    bias_offset  <= (others => (others => '0'));
-    if re_source = '0' then
-      if mode_a_l = '1' and mode_b_l = '0' then
-        left_cmp    <= au_cmp;
-        left_offset <= au_offset;
-      elsif mode_a_l = '0' and mode_b_l = '1' then
-        right_cmp    <= au_cmp;
-        right_offset <= au_offset;
-      elsif bias_en = '1' then
-        bias_cmp    <= au_cmp;
-        bias_offset <= au_offset;
-      end if;
-    else
-      if mode_a = '1' and mode_b = '0' then
-        left_cmp    <= au_cmp;
-        left_offset <= au_offset;
-      elsif mode_a = '0' and mode_b = '1' then
-        right_cmp    <= au_cmp;
-        right_offset <= au_offset;
-      end if;
-    end if;
-  end process;
-
+  
   --Write enable signal to srams
   --
   write_enable_left: process(all)
@@ -231,17 +201,15 @@ begin
     end if;
   end process;
 
-  write_enable_bias: process(clk)
-  begin
-    if rising_edge(clk) then 
-      if re_busy = '1' and data_valid = '1' and mode_a_l = '1' and mode_b_l = '1' then
-        write_en_bias <= '1';
-        if bias_done = '1' then 
-          write_en_bias <= '0';
-        end if;
-      else
+  write_enable_bias: process(all)
+  begin 
+    if re_busy = '1' and data_valid = '1' and bias_en = '1' then
+      write_en_bias <= '1';
+      if bias_done = '1' then 
         write_en_bias <= '0';
       end if;
+    else
+      write_en_bias <= '0';
     end if;
   end process;
                   

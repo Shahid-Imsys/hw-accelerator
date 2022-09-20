@@ -169,6 +169,8 @@ begin
             stagecounter <= stagecounter + 1;
           end if;
         end if;
+      else
+        done_int <= '1';
       end if;
     end if;
   end process;

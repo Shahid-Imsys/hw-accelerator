@@ -73,9 +73,9 @@ begin
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
-  ppshiftinst   <= (enable, to_integer(unsigned(scale)), right);
-  addbiasinst   <= (addbias, trunc);
-  clipinst      <= (clip8, out0);
+  ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), shift_dir => right);
+  addbiasinst   <= (acc => addbias, quant => trunc);
+  clipinst      <= (clip => clip8, outreg => out0);
 
   latch_signals: process(clk)
   begin

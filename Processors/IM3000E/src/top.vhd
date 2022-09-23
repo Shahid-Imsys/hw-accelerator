@@ -233,7 +233,7 @@ architecture struct of top is
 
   component mprom_memory00 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(11 downto 0);
       rom_do  : out std_logic_vector(79 downto 0);
@@ -248,7 +248,7 @@ architecture struct of top is
 
   component mprom_memory11 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(11 downto 0);
       rom_do  : out std_logic_vector(79 downto 0);
@@ -264,7 +264,7 @@ architecture struct of top is
   component mpram_memory is
     generic (
       g_file_name   : string        := "mpram0.data";
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(10 downto 0);
       ram_di  : in  std_logic_vector(79 downto 0);
@@ -276,7 +276,7 @@ architecture struct of top is
 
   component trace_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(7 downto 0);
       ram_di  : in  std_logic_vector(31 downto 0);
@@ -288,7 +288,7 @@ architecture struct of top is
 
   component ram_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(13 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -300,7 +300,7 @@ architecture struct of top is
 
   component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(9 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);

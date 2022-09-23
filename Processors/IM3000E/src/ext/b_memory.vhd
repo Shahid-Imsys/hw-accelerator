@@ -8,7 +8,7 @@ use work.gp_pkg.all;
 entity b_memory is
 
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     clk     : in  std_logic;
@@ -103,9 +103,9 @@ begin  -- architecture rtl
         BC2      => '0'
         );
 
-  -- Use referens memory design for FPGA.
+  -- Use simulations memory design for FPGA
   else generate
-    iomem_referens : SY180_512X8X1CM8
+    b_mem_sim : SY180_512X8X1CM8
       port map (
         A0  => address(0),
         A1  => address(1),

@@ -43,7 +43,7 @@ begin
 
     process (clk,Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             Counter <= (others => '0');
         elsif rising_edge(clk) then
             if Reset_BC = '1' then

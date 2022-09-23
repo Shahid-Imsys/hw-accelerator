@@ -40,7 +40,7 @@ architecture Behavioral of Noc_Register is
 begin
 	process (Mux_select,Input_reg_data,Root_Memory_data,TP_data,Mux_Demux_data,Reset)
 	begin
-        if Reset = '1' then
+        if Reset = '0' then
 	        Dataout_mux     <= ( others => '0');
 	    elsif Mux_select = "00" then
             Dataout_mux     <= Input_reg_data;
@@ -57,7 +57,7 @@ begin
     
 	process(clk, Reset)
 	begin
-		if Reset = '1' then
+		if Reset = '0' then
             Noc_Reg_out   <= (others => '0');
 		elsif rising_edge (clk) then
 			if (Load_NOC_reg = '1') then 

@@ -47,7 +47,7 @@ use work.gp_pkg.all;
 
 entity rtc is
   generic (
-    g_memory_type : memory_type_t := referens;
+    g_memory_type : memory_type_t := asic;
     g_clock_frequency : integer -- Frequency in MHz
     );
   port (
@@ -242,7 +242,7 @@ architecture rtl of rtc is
 
   component ram_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       clk     : in  std_logic;
       address : in  std_logic_vector(13 downto 0);
@@ -256,7 +256,7 @@ architecture rtl of rtc is
 
   component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(9 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -268,7 +268,7 @@ architecture rtl of rtc is
 
   component b_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       clk     : in  std_logic;
       address : in  std_logic_vector(8 downto 0);

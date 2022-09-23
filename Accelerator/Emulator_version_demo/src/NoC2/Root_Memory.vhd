@@ -156,7 +156,7 @@ begin
     we(0)       <= Write_Read_Mode;
     process (clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             Address     <= (others => '0');
             Enable_p    <= '0';
             Enable_p2   <= '0';

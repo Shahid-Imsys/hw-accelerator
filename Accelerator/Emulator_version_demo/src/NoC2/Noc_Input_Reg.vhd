@@ -34,7 +34,7 @@ architecture Behavioral of Noc_Input_Reg is
 begin
     process (clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             NoC_Input_reg_Out <= (others => '0');
         elsif rising_edge(clk) then
             if write_enable = '1' then 

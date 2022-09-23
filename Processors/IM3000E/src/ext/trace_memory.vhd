@@ -7,7 +7,7 @@ use work.gp_pkg.all;
 entity trace_memory is
   
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     address : in std_logic_vector(7 downto 0);
@@ -146,10 +146,10 @@ begin  -- architecture rtl
         BC2      => '0'
         );
 
-    -- Use referens memory design for FPGA.
+    -- Use simulation memory design for FPGA
   else generate
 
-    trcmem_org : SY180_256X32X1CM4
+    trcmem_sim : SY180_256X32X1CM4
       port map (
         A0   => address(0),
         A1   => address(1),

@@ -254,7 +254,7 @@ begin
 
     process(clk, reset)
     begin
-        if reset = '1' then
+        if reset = '0' then
             Reset_BC_i                  <= '0';
             Load_PCIe_CMD_Reg_i         <= '0';
             Control_Data_Out            <= (others => '0');

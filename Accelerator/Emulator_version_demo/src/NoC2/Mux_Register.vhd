@@ -52,7 +52,7 @@ begin
 
     process(clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             Mux_reg        <= (others => '0');
         elsif rising_edge(clk) then
             if (Load_Mux_Reg = '1') then 

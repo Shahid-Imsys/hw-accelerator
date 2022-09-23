@@ -362,7 +362,7 @@ begin
     
 	process(clk, Reset)
 	begin
-		if Reset = '1' then
+		if Reset = '0' then
             Mode_reg <= (others => '0');
 		elsif rising_edge (clk) then
 			if (load_Mode_reg = '1') then
@@ -386,11 +386,11 @@ begin
 	EN_Noc_byte_data       <= Mode_reg(4);
 	
 	--REQ LOGIC
-	FF2_input              <= (FF1 nor reset) and (Write_REQ or FF2_output);
+	FF2_input              <= (FF1 nor not(reset)) and (Write_REQ or FF2_output);
 	NOC_WRITE_REQ          <= FF2_output;
 	process(clk, reset)
 	begin
-		if reset = '1' then
+		if reset = '0' then
             FF1         <= '0';
             FF2_output  <= '0';
 		elsif rising_edge (clk) then

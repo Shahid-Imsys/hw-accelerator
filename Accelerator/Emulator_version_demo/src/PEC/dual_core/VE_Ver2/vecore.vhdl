@@ -12,6 +12,7 @@ entity vecore is
     enable_add       : in  std_logic;
     enable_mul       : in  std_logic;
     enable_acc       : in  std_logic;
+    enable_lod       : in  std_logic;
     enable_sum       : in  std_logic;
     enable_shift     : in  std_logic;
     enable_add_bias  : in  std_logic;
@@ -28,10 +29,13 @@ entity vecore is
     shift_ctrl       : in  ppshift_shift_ctrl;
     bias_add_ctrl    : in  ppshift_addbias_ctrl;
     clip_ctrl        : in  ppshift_clip_ctrl;
-    lzo_ctrl         : in  lzod_ctrl;
+    lodctrl          : in  lzod_ctrl;
+    feedback_shift   : in  feedback_t;
+    feedback_clip    : in  feedback_t;
     zpdata           : in  std_logic_vector(7 downto 0);
     zpweight         : in  std_logic_vector(7 downto 0);
-    bias             : in  std_logic_vector(31 downto 0);
+    bias             : in  std_logic_vector(15 downto 0);
+    shift_result     : out std_logic_vector(15 downto 0);
     outreg           : out std_logic_vector(63 downto 0);
     writebuffer      : out std_logic_vector(63 downto 0)
     );
@@ -45,7 +49,15 @@ architecture first of vecore is
   signal weightreg      : std_logic_vector(63 downto 0);
   signal outreg_int     : std_logic_vector(63 downto 0);
   signal sum            : signed(32 downto 0);
-  signal lzo1, lzo2     : std_logic_vector(3 downto 0);
+  signal shift_from_lod : ppshift_shift_ctrl;
+  signal to_addbias     : std_logic;
+  signal feedback       : std_logic_vector(63 downto 0);
+  alias F3 is feedback(63 downto 48);
+  alias F2 is feedback(47 downto 32);
+  alias F1 is feedback(31 downto 16);
+  alias F0 is feedback(15 downto 0);
+  --signal shift_result   : std_logic_vector(15 downto 0);
+  signal clip_result   : std_logic_vector(15 downto 0);
 
   component memreg
     port (
@@ -61,22 +73,30 @@ architecture first of vecore is
   end component memreg;
 
   component vearith
-    port (
-      clk         : in  std_logic;
-      enable_add  : in  std_logic;
-      enable_mul  : in  std_logic;
-      enable_acc  : in  std_logic;
-      enable_sum  : in  std_logic;
-      data        : in  std_logic_vector(63 downto 0);
-      weight      : in  std_logic_vector(63 downto 0);
-      ctrl_addmul : in  all_addmul_ctrl;
-      ctrl_acc    : in  all_acc_ctrl;
-      ppctrl      : in  pp_ctrl;
-      zpdata      : in  std_logic_vector(7 downto 0);
-      zpweight    : in  std_logic_vector(7 downto 0);
-      result      : out signed(32 downto 0)
-      );
+  port (
+    clk         : in  std_logic;
+    enable_add  : in  std_logic;
+    enable_mul  : in  std_logic;
+    enable_acc  : in  std_logic;
+    enable_sum  : in  std_logic;
+    enable_lod  : in  std_logic;
+    data        : in  std_logic_vector(63 downto 0);
+    weight      : in  std_logic_vector(63 downto 0);
+    feedback    : in  std_logic_vector(63 downto 0);
+    ctrl_addmul : in  all_addmul_ctrl;
+    ctrl_acc    : in  all_acc_ctrl;
+    ppctrl      : in  pp_ctrl;
+    lodctrl     : in  lzod_ctrl;
+    zpdata      : in  std_logic_vector(7 downto 0);
+    zpweight    : in  std_logic_vector(7 downto 0);
+    result      : out signed(32 downto 0);
+    to_shift    : out ppshift_shift_ctrl;
+    to_addbias  : out std_logic
+  );
   end component vearith;
+
+  -- TODO: add abs sign
+
 
   component ctrlmap_alu
     port (
@@ -100,20 +120,25 @@ architecture first of vecore is
   end component ppmap1;
 
 
-  component ppshift is
-    port (
-      clk             : in  std_logic;
-      enable_shift    : in  std_logic;
-      enable_add_bias : in  std_logic;
-      enable_clip     : in  std_logic;
-      bias            : in  std_logic_vector(31 downto 0);
-      sum             : in  signed(32 downto 0);
-      shift_ctrl      : in  ppshift_shift_ctrl;
-      bias_add_ctrl   : in  ppshift_addbias_ctrl;
-      clip_ctrl       : in  ppshift_clip_ctrl;
-      outreg          : out std_logic_vector(63 downto 0)
-      );
-  end component;
+  component ppshift
+  port (
+    clk             : in  std_logic;
+    enable_shift    : in  std_logic;
+    enable_add_bias : in  std_logic;
+    enable_clip     : in  std_logic;
+    bias            : in  std_logic_vector(15 downto 0);
+    sum             : in  signed(32 downto 0);
+    shift_ctrl      : in  ppshift_shift_ctrl;
+    bias_add_ctrl   : in  ppshift_addbias_ctrl;
+    clip_ctrl       : in  ppshift_clip_ctrl;
+    lod_res         : in  ppshift_shift_ctrl;
+    lod_neg         : in  std_logic;
+    shift_result    : out std_logic_vector(15 downto 0);
+    clip_result     : out std_logic_vector(15 downto 0);
+    outreg          : out std_logic_vector(63 downto 0)
+  );
+  end component ppshift;
+
 
   component writebuff
     port (
@@ -125,16 +150,6 @@ architecture first of vecore is
       );
   end component writebuff;
 
-  component lzod
-  port (
-    clk    : in  std_logic;
-    enable : in  std_logic;
-    data   : in  std_logic_vector(63 downto 0);
-    ctrl   : in  lzod_ctrl;
-    lzo1   : out std_logic_vector(3 downto 0);
-    lzo2   : out std_logic_vector(3 downto 0)
-  );
-  end component lzod;
 
 begin
 
@@ -159,14 +174,19 @@ begin
       enable_mul  => enable_mul,
       enable_acc  => enable_acc,
       enable_sum  => enable_sum,
+      enable_lod  => enable_lod,
       data        => datareg,
       weight      => weightreg,
+      feedback    => feedback,
       ctrl_addmul => decoded_addmul,
       ctrl_acc    => decoded_acc,
       ppctrl      => decoded_pp,
+      lodctrl     => lodctrl,
       zpdata      => zpdata,
       zpweight    => zpweight,
-      result      => sum
+      result      => sum,
+      to_shift    => shift_from_lod,
+      to_addbias  => to_addbias
       );
 
   -- Instruction decoder for arithmetic unit muxes and adders
@@ -183,16 +203,6 @@ begin
       decoded => decoded_acc
       );
 
-  -- Leading zero-one detector
-  lzod_i : lzod
-    port map (
-      clk    => clk,
-      enable => enable_add,
-      data   => datareg,
-      ctrl   => lzo_ctrl,
-      lzo1   => lzo1,
-      lzo2   => lzo2
-    );
 
   -- Instruction decoder for arithmetic unit post-summation
   ppmap1_i : ppmap1
@@ -214,6 +224,10 @@ begin
       shift_ctrl      => shift_ctrl,
       bias_add_ctrl   => bias_add_ctrl,
       clip_ctrl       => clip_ctrl,
+      lod_res         => shift_from_lod,
+      lod_neg         => to_addbias,
+      shift_result    => shift_result,
+      clip_result     => clip_result,
       outreg          => outreg_int
       );
 
@@ -228,5 +242,28 @@ begin
       );
 
   outreg <= outreg_int;
+
+  feedback_update : process(bias, clk)
+  begin
+    F0 <= bias;
+    if rising_edge(clk) then
+      if enable_shift = '1' then
+        if feedback_shift = shift_to_3 then
+          F3 <= shift_result;
+        elsif feedback_shift = shift_to_2 then
+          F2 <= shift_result;
+        end if;
+      end if;
+      if enable_clip = '1' then
+        -- TODO
+        --if feedback_clip = clip_to_3 then
+        --  F3 <= clip_result;
+        --elsif feedback_clip = clip_to_1 then
+        if feedback_clip = clip_to_1 then
+          F1 <= clip_result;
+        end if;
+      end if;
+    end if;
+  end process;
 
 end architecture;

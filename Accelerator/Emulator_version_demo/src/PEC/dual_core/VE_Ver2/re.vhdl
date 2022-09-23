@@ -214,15 +214,15 @@ begin
       end if;
   end process;
 
-  write_enable_bias: process(clk)
+  write_enable_bias: process(all)
   begin
-      if rising_edge(clk) then 
+      --if rising_edge(clk) then 
           if re_busy = '1' and data_valid = '1' and mode_a_l = '1' and mode_b_l = '1' then
             write_en_bias <= '1';
           else
             write_en_bias <= '0';
           end if;
-      end if;
+      --end if;
   end process;
                   
 

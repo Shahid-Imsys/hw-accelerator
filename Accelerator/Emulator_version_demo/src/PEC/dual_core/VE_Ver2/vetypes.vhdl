@@ -4,37 +4,41 @@ use ieee.numeric_std.all;
 
 package vetypes is
   type sign_t is (s, u);
-  type swap_t is (noswap, swap, weighttodata);
+  type swap_t is (noswap, swap, switch);
   type addsub_t is (add, sub);
   type addsub2_t is (add, sub, subl);
   type enable_t is (enable, hold);
 
-  type mux7l0_t is (L7, zero);
-  type mux7l1_t is (zpd, zero, R7, L3, onefft);
-  type mux7r0_t is (R7, R3, R5, onefft, L1);
+  type mux7l0_t is (zero, L7, F5, F7);
+  -- TODO
+  --type mux7l1_t is (zpd, zero, R7, L3, onefft, L5);
+  type mux7l1_t is (zpd, zero, R7, L3, L5);
+  type mux7r0_t is (R7, R3, R5, onefft, L1, F1, F3, F5);
   type mux7r1_t is (zpw, zero);
 
-  type mux6l0_t is (L6, zero);
-  type mux6l1_t is (zpd, zero, R6, L2, L0);
-  type mux6r0_t is (R6, R3, R5, R7, onefft, L1);
+  type mux6l0_t is (zero, L6, F4, F6);
+  -- TODO
+  --type mux6l1_t is (zpd, zero, R6, L2, L0, L4);
+  type mux6l1_t is (zpd, zero, R6, L2, L4);
+  type mux6r0_t is (R6, R3, R5, R7, onefft, L1, F1, F3, F5);
   type mux6r1_t is (zpw, zero);
 
-  type mux5l0_t is (L5, L7, zero);
-  type mux5l1_t is (zpd, zero, R5, L3);
-  type mux5r0_t is (R5, R2, R4, R6, onefft, L0);
+  type mux5l0_t is (zero, L5, L7, F5, F7);
+  type mux5l1_t is (zpd, zero, R5, L3, L5);
+  type mux5r0_t is (R5, R2, R4, R6, onefft, L0, F0, F2, F4);
   type mux5r1_t is (zpw, zero);
 
-  type mux4l0_t is (L4, L6, zero);
-  type mux4l1_t is (zpd, zero, R4, L2);
-  type mux4r0_t is (R4, R2, R6, onefft, L0);
+  type mux4l0_t is (zero, L4, L6, F4, F6);
+  type mux4l1_t is (zpd, zero, R4, L2, L4);
+  type mux4r0_t is (R4, R2, R6, onefft, L0, F0, F2, F4);
   type mux4r1_t is (zpw, zero);
 
-  type mux3l0_t is (L3, L5, zero);
+  type mux3l0_t is (zero, L3, L5, F7);
   type mux3l1_t is (zpd, zero, R3, L1);
   type mux3r0_t is (R3, R1, R5, R7, one, onefft, L3);
   type mux3r1_t is (zpw, zero);
 
-  type mux2l0_t is (L2, L4, zero);
+  type mux2l0_t is (zero, L2, L4, F6);
   type mux2l1_t is (zpd, zero, R2, L0);
   type mux2r0_t is (R2, R1, R3, R5, R7, one, onefft, L3);
   type mux2r1_t is (zpw, zero);
@@ -44,15 +48,15 @@ package vetypes is
   type mux1r0_t is (R1, R0, R2, R4, R6, onefft, L2);
   type mux1r1_t is (zpw, zero);
 
-  type mux0l0_t is (L0, L4, zero);
+  type mux0l0_t is (zero, L0, L4);
   type mux0l1_t is (zpd, zero, R0, L0);
   type mux0r0_t is (R0, R2, R4, R6, onefft, L2);
   type mux0r1_t is (zpw, zero);
 
-  type acc_t is (keep, acc);
-  type addo_t is (zero, acc);
-  type adde_t is (zero, acc, odd, odd8, abs16);
-  type reg_t is (keep, add, acc);
+  type acc_t is (keep, acc, zero, max);
+  type addo_t is (zero, acc, max);
+  type adde_t is (zero, acc, odd, odd8, abs16, max);
+  type reg_t is (keep, add, acc, max);
 
   type ppodd_t is (zero, add, add8, left);
   type ppeven_t is (zero, add, left);
@@ -62,11 +66,15 @@ package vetypes is
   type clip_t is (none, clip8, clip16, clipone16, clipzero);
   type outreg_t is (none, out7, out6, out5, out4, out3, out2, out1, out0, out76, out54, out32, out10);
   type quant_t is (trunc, round, unbiased);
-  type lzod_t is (none, store1, store2);
+  type lzod_t is (none, store1, store2, store3);
+  --type lzod_out_t is (none, val, diff, nrit, nrit2, det1, det2);
+  type lzod_out_t is (none, val, nrit, nrit2, det1);
   type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sumall, sum,
                     select7, select6, select5, select4, select3, select2, select1,
-                    select0, unitri, sum16, sum16left);
+                    select0, unitri, sum16, sum16left, matmulleft, nrit);
   function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
+  type feedback_t is (keep, shift_to_3, shift_to_2, clip_to_3, clip_to_1);
+  type bias_addr_t is (ctrl,shift);
 
   -- alias matadd00 is add32 [return ppctrl_t];
   -- alias fftadd0 is add32 [return ppctrl_t];
@@ -174,6 +182,7 @@ package vetypes is
   type ppshift_shift_ctrl is record
     acce      : enable_t;
     shift     : natural range 0 to 31;
+    use_lod   : std_logic;
     shift_dir : shift_t;
   end record ppshift_shift_ctrl;
 
@@ -190,6 +199,7 @@ package vetypes is
   type lzod_ctrl is record
     word : std_logic_vector(1 downto 0);
     store : lzod_t;
+    output : lzod_out_t;
   end record lzod_ctrl;
 
   type memreg_ctrl is record

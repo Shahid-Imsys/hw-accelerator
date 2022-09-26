@@ -308,7 +308,7 @@ begin  -- architecture rtl
       NOC_DATA_EN   => NOC_DATA_EN
       );
 
-  noc_adaptger_inst : fpga_noc_adapter
+  noc_adapter_inst : fpga_noc_adapter
     generic map (
       ionoc_fifo_depth_bits => ionoc_fifo_depth_bits,  -- Each FIFO is 2^x = 16 words deep,
       ionoc_status_address  => x"45",

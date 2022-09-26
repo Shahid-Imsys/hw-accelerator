@@ -690,7 +690,7 @@ begin
       ------------------------------------------------------------
       -- Handle write index and wrdata pending flag
       --
-      if data_wr = '0' or ionoc_rxfifo_valid_f = '1' then
+      if ilioa = '0' or ionoc_rxfifo_valid_f = '1' then
         ionoc_datawrindex <= 0;         -- Reset write index on new data access
 
       elsif data_wr = '1' and clk_i_pos = '0' then

@@ -71,9 +71,9 @@ architecture rtl of ve_wctrlpipe is
   constant ppinst_delay : integer := 5;
   constant lzod_delay : integer := 5;
   constant ppshiftinst_delay : integer := 6;
-  constant bias_addr_delay : integer := 8;
-  constant bias_reg_delay : integer := 9;
-  constant bias_addr_ctrl_delay : integer := 9;
+  constant bias_addr_delay : integer := 5;
+  constant bias_reg_delay : integer := 6;
+  constant bias_addr_ctrl_delay : integer := 6;
   constant addbiasinst_delay : integer := 7;
   constant clipinst_delay : integer := 8;
   constant feedback_max_delay : integer := 8;

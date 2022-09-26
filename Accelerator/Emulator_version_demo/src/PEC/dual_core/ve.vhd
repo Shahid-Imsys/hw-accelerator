@@ -427,7 +427,7 @@ architecture rtl of ve is
   signal data1_addr_o : std_logic_vector(7 downto 0);
   signal weight_addr_o : std_logic_vector(7 downto 0);
   signal bias_addr_o : std_logic_vector(5 downto 0);
-  signal conv_done_pipe : std_logic_vector(8 downto 0);
+  signal conv_done_pipe : std_logic_vector(5 downto 0);
   --signal ve_push_dtm : std_logic; --0126
   --------------------------------
   --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
@@ -593,7 +593,7 @@ begin
   begin
     if rising_edge(clk_p) then
       conv_done_pipe(0) <= not conv_busy;
-      for i in 0 to 7 loop
+      for i in 0 to 4 loop
         conv_done_pipe(i+1) <= conv_done_pipe(i);
       end loop;
       if clk_e_pos = '0' then
@@ -639,9 +639,9 @@ begin
   address_pointer_mux: process(all)
   begin
     biasaddr_to_memory <= bias_index_wr;
-    if conv_done_pipe(8) = '0' or conv_busy = '1' then 
+    if conv_done_pipe(5) = '0' or conv_busy = '1' then 
       weightaddr_to_memory <= weight_addr_o;
-      if conv_done_pipe(8) = '0' then
+      if conv_done_pipe(5) = '0' then
         biasaddr_to_memory <= bias_addr_o;
       end if;
       if mode_c_l = '1' then
@@ -976,7 +976,7 @@ begin
       for i in 0 to 5 loop
         delay3(i+1) <= delay3(i);
       end loop;
-        output_ena <= delay3(5); 
+        output_ena <= delay3(4); 
     end if;
   end process;
 

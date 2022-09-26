@@ -623,7 +623,7 @@ begin
         RxFIFO_Valid_int <= '1';
         --
         for b in ionoc_wrdata'range loop
-          RxFIFO_Data(8*b + 7 downto 8*b) <= ionoc_wrdata(b);
+          RxFIFO_Data(8*b + 7 downto 8*b) <= ionoc_wrdata(15 - b);
         end loop;
       end if;
       --

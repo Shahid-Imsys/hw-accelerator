@@ -9,7 +9,7 @@ end entity;
 
 architecture generated of ctrlmap_acc is
 begin
-with inst select decoded <=
+with inst select decoded <= 
             (acc7 => (acc => keep, add => zero, reg => keep),
             acc6 => (acc => keep, add => odd8, reg => add),
             acc5 => (acc => keep, add => zero, reg => keep),
@@ -263,7 +263,47 @@ with inst select decoded <=
             acc5 => (acc => keep, add => zero, reg => keep),
             acc4 => (acc => keep, add => odd8, reg => add),
             acc3 => (acc => keep, add => zero, reg => keep),
-            acc2 => (acc => keep, add => odd8, reg => add), -- add => odd
+            acc2 => (acc => keep, add => odd8, reg => add),
             acc1 => (acc => keep, add => zero, reg => keep),
-            acc0 => (acc => keep, add => odd8, reg => keep)) when nrit;
+            acc0 => (acc => keep, add => odd8, reg => keep)) when nrit,
+            (acc7 => (acc => max, add => max, reg => keep),
+            acc6 => (acc => max, add => max, reg => keep),
+            acc5 => (acc => max, add => max, reg => keep),
+            acc4 => (acc => max, add => max, reg => keep),
+            acc3 => (acc => max, add => max, reg => keep),
+            acc2 => (acc => max, add => max, reg => keep),
+            acc1 => (acc => max, add => max, reg => keep),
+            acc0 => (acc => max, add => max, reg => keep)) when max,
+            (acc7 => (acc => max, add => zero, reg => keep),
+            acc6 => (acc => max, add => zero, reg => keep),
+            acc5 => (acc => max, add => zero, reg => keep),
+            acc4 => (acc => max, add => zero, reg => keep),
+            acc3 => (acc => max, add => zero, reg => keep),
+            acc2 => (acc => max, add => zero, reg => keep),
+            acc1 => (acc => max, add => zero, reg => keep),
+            acc0 => (acc => max, add => zero, reg => keep)) when firstmax,
+            (acc7 => (acc => max, add => zero, reg => max),
+            acc6 => (acc => max, add => zero, reg => max),
+            acc5 => (acc => max, add => zero, reg => max),
+            acc4 => (acc => max, add => zero, reg => max),
+            acc3 => (acc => max, add => zero, reg => max),
+            acc2 => (acc => max, add => zero, reg => max),
+            acc1 => (acc => max, add => zero, reg => max),
+            acc0 => (acc => max, add => zero, reg => max)) when lastmax,
+            (acc7 => (acc => zero, add => zero, reg => keep),
+            acc6 => (acc => zero, add => zero, reg => keep),
+            acc5 => (acc => zero, add => zero, reg => keep),
+            acc4 => (acc => zero, add => zero, reg => keep),
+            acc3 => (acc => zero, add => zero, reg => keep),
+            acc2 => (acc => zero, add => zero, reg => keep),
+            acc1 => (acc => zero, add => zero, reg => keep),
+            acc0 => (acc => zero, add => zero, reg => keep)) when zeroacc,
+            (acc7 => (acc => keep, add => zero, reg => add),
+            acc6 => (acc => keep, add => zero, reg => add),
+            acc5 => (acc => keep, add => zero, reg => add),
+            acc4 => (acc => keep, add => zero, reg => add),
+            acc3 => (acc => keep, add => zero, reg => add),
+            acc2 => (acc => keep, add => zero, reg => add),
+            acc1 => (acc => keep, add => zero, reg => add),
+            acc0 => (acc => keep, add => zero, reg => add)) when acctoout;
 end architecture;

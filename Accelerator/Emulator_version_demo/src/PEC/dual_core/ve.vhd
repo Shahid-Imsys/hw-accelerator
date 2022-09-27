@@ -259,6 +259,7 @@ architecture rtl of ve is
       mode_c           : in std_logic;
       left_done        : in std_logic;
       right_done       : in std_logic;
+      bias_done        : in std_logic;
       au_counters      : in au_param;
       au_cmp           : in au_param;
       au_offset        : in au_param;
@@ -271,8 +272,8 @@ architecture rtl of ve is
       bias_en          : out std_logic;
       load             : out std_logic;
       bias_load        : out std_logic;
-      data_rd_en       : out std_logic;
-      weight_rd_en     : out std_logic;
+      rd_en            : out std_logic;
+      bias_rd_en       : out std_logic;
       enable_shift     : out std_logic;
       enable_add_bias  : out std_logic;
       enable_clip      : out std_logic;
@@ -413,7 +414,7 @@ architecture rtl of ve is
   signal data_write_enable_i, weight_write_enable_i : std_logic;
   signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
-  signal read_en_to_mux, read_en_w_to_mux : std_logic;
+  signal read_en_to_mux, read_en_w_to_mux, read_en_b_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
   signal ve_clr_acc : std_logic; --clear accumulators
   signal pl_ve_byte : std_logic_vector(3 downto 0);
@@ -421,6 +422,7 @@ architecture rtl of ve is
   constant fft256_rand_data0  : string := "fft256_data0.dat";
   constant fft256_rand_data1  : string := "fft256_data1.dat";
   constant fft256_rand_weight : string := "fft256_weight.dat";
+  constant fftcopy            : string := "fftcopy.dat";
 
 
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
@@ -450,7 +452,7 @@ architecture rtl of ve is
   signal dmem_read_done, wmem_read_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
-  signal data_rd_en_conv, weight_rd_en_conv : std_logic;
+  signal rd_en_conv, b_rd_en_conv : std_logic;
   signal fft_read_en, fft_write_en : std_logic;
   signal memreg_c_i       : memreg_ctrl;
   signal conv_memreg_c    : memreg_ctrl;
@@ -815,22 +817,26 @@ begin
       when re_mode => data0_addr_i  <= x"00";
                       data1_addr_i  <= x"00";
                       weight_addr_i <= x"00";
+                      bias_addr_i   <= x"00"; 
       when conv    => data0_addr_i  <= left_finaladdress;
                       data1_addr_i  <= left_finaladdress;
                       weight_addr_i <= right_finaladdress;
+                      bias_addr_i   <= bias_finaladdress; 
       when fft     => data0_addr_i  <= ve_fftaddr_d0;
                       data1_addr_i  <= ve_fftaddr_d1;
                       weight_addr_i <= ve_fftaddr_tf;
+                      bias_addr_i   <= x"00";
       when others  => data0_addr_i  <= x"00";
                       data1_addr_i  <= x"00";
                       weight_addr_i <= x"00";
+                      bias_addr_i   <= x"00";
     end case;
   end process;
   
   addrtomem_pointer_mux: process(all)
   begin
     case mode_latch is 
-      when re_mode => biasaddr_to_memory <= bias_addr_i(5 downto 0);
+      when re_mode => biasaddr_to_memory <= bias_finaladdress(5 downto 0);
                       weightaddr_to_memory <= right_finaladdress;
                         if mode_c_l = '1' then
                           data0addr_to_memory <= curr_ring_addr;
@@ -864,20 +870,20 @@ begin
     end case;
   end process;
 
-  bias_address_mux: process(all)
-  begin
-    if rst = '0' then
-      bias_addr_i <= (others => '0');
-    else
-      if bwen_from_re = '1' then
-        bias_addr_i <= bias_finaladdress;
-      else
-        if ve_loop = x"01" then
-          bias_addr_i <= bias_index_rd;
-        end if;
-      end if;
-    end if;
-  end process;
+  --bias_address_mux: process(all)
+  --begin
+  --  if rst = '0' then
+  --    bias_addr_i <= (others => '0');
+  --  else
+  --    if bwen_from_re = '1' then
+  --      bias_addr_i <= bias_finaladdress;
+  --    else
+  --      if ve_loop = x"01" then
+  --        bias_addr_i <= bias_index_rd;
+  --      end if;
+  --    end if;
+  --  end if;
+  --end process;
 
   adder_set : process(clk_p)
   begin
@@ -910,7 +916,6 @@ begin
     case mode_latch is
       when conv   => conv_start     <= start;
                      au_start       <= start;
-                     ve_addr_reload <= addr_reload;
       when fft    => fft_start      <= start;
                      fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
       when others => re_start       <= start;
@@ -964,11 +969,11 @@ begin
   begin
     if re_ready = '0' then
       if mode_latch = conv then
-        data_read_enable_i <= data_rd_en_conv;
+        data_read_enable_i <= rd_en_conv;
         data_write_enable_i <= '0';
-        weight_read_enable_i <= weight_rd_en_conv;
+        weight_read_enable_i <= rd_en_conv;
         weight_write_enable_i <= '0';
-        read_en_b_i <= '1';
+        read_en_b_i <= b_rd_en_conv;
       elsif mode_latch = fft then
         data_read_enable_i <= fft_read_en;
         data_write_enable_i <= fft_write_en;
@@ -1004,7 +1009,7 @@ begin
       write_en_o   <= '0';
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= '0';
-      read_en_b_o  <= '1';
+      read_en_b_o  <= read_en_b_to_mux;
     elsif mode_latch = fft then
       read_en_o    <= read_en_to_mux;
       write_en_o   <= write_en_to_mux;
@@ -1159,7 +1164,7 @@ begin
 --bias mem--
     buf_bias : mem
       generic map(
-        load_filename => fft256_rand_weight,
+        load_filename => fftcopy,
         width         => 64,
         addressbits   => 6,
         columns       => 8
@@ -1171,7 +1176,7 @@ begin
         d_in     => bias_in,            --writebuffer,
         address  => biasaddr_to_memory,
         d_out    => bias_buf_out,
-        load_mem => '0'
+        load_mem => DDI_VLD
         );
   end generate;
 
@@ -1264,6 +1269,7 @@ begin
       mode_c           => mode_c,
       left_done        => left_done,
       right_done       => right_done,
+      bias_done        => bias_done,
       au_counters      => left_counters,
       au_cmp           => au_lcmp,
       au_offset        => au_loffset,
@@ -1276,8 +1282,8 @@ begin
       bias_en          => ben_conv,
       load             => load_from_conv,
       bias_load        => bload_from_conv,
-      data_rd_en       => data_rd_en_conv, -----------
-      weight_rd_en     => weight_rd_en_conv, --TBD
+      rd_en            => rd_en_conv, -----------
+      bias_rd_en       => b_rd_en_conv,
       enable_shift     => shifter_ena,
       enable_add_bias  => adder_ena,
       enable_clip      => clip_ena,
@@ -1343,14 +1349,14 @@ begin
       zpweight_i      => zp_weight,
       bias_i          => bias_buf_out,
       data0_addr_o    => data0_addr_o,
-      data1_addr_o    => data1_addr_o,  -- for now data0 and 1 use the same address.
+      data1_addr_o    => data1_addr_o,  
       weight_addr_o   => weight_addr_o,
       bias_addr_o     => bias_addr_o,  --biasaddr_to_memory, --out std_logic_vector(5 downto 0);
       data_ren_o      => read_en_to_mux,
       data_wen_o      => write_en_to_mux,          
       weight_ren_o    => read_en_w_to_mux,
       weight_wen_o    => write_en_w_to_mux,
-      bias_ren_o      => read_en_b_o, --out std_logic;          
+      bias_ren_o      => read_en_b_to_mux,           
       outreg_o        => outreg,
       writebuffer_o   => writebuffer,
       stall           => stall,

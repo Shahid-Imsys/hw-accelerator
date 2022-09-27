@@ -17,6 +17,7 @@ entity convcontroller is
     mode_c           : in std_logic;
     left_done        : in std_logic;
     right_done       : in std_logic;
+    bias_done        : in std_logic;
     au_counters      : in au_param;
     au_cmp           : in au_param;
     au_offset        : in au_param;
@@ -29,8 +30,8 @@ entity convcontroller is
     bias_en          : out std_logic;
     load             : out std_logic;
     bias_load        : out std_logic;
-    data_rd_en       : out std_logic;
-    weight_rd_en     : out std_logic;
+    rd_en            : out std_logic;
+    bias_rd_en       : out std_logic;
     enable_shift     : out std_logic;
     enable_add_bias  : out std_logic;
     enable_clip      : out std_logic;
@@ -104,7 +105,7 @@ begin
         end if;
         if start = '1' and mode_a = '1' and mode_b = '1' then
           bias_en <= '1';
-        elsif right_done = '1' then
+        elsif bias_done = '1' then
           bias_en <= '0';
         end if;
 
@@ -122,15 +123,14 @@ begin
     if rising_edge(clk) then
       if RST = '0' then
         load <= '0';
+        rd_en <= '0';
         inst <= firstconv;
       elsif busy = '1' and mode_a_l = '1' and mode_b_l = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
         load <= '1';
-        data_rd_en <= '1';
-        weight_rd_en <= '1';
+        rd_en <= '1';
         if left_done = '1' and right_done = '1' then
           load <= '0';
-          data_rd_en <= '0';
-          weight_rd_en <= '0';
+          rd_en <= '0';
         end if;
         if au_counters(0) = au_cmp(0) or start = '1' then
           inst <= firstconv;
@@ -217,21 +217,27 @@ begin
   end process;
 
 --bias buffer --also activates at the clock cycle when shifter is activated, so shares the o_mux_ena signal
-  --process(clk)
-  --begin 
-  --  if rising_edge(clk) then
-  --    if bias_addr_assign = '1' then
-  --      bias_addr_reg <= bias_index_start;         
-  --    elsif pp_stage_1 = '1' then
-  --      bias_mux <= bias_addr_reg (1 downto 0);
-  --      if bias_addr_reg = bias_index_end then
-  --        bias_addr_reg <= bias_index_start;
-  --      else
-  --        bias_addr_reg <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_addr_reg))+1,8));
-  --      end if;
-  --    end if;
-  --  end if;
-  --end process;
+  process(clk)
+  begin 
+    if rising_edge(clk) then        
+      if rst = '0' then
+        bias_load <= '0';
+        bias_rd_en <= '0';
+      else
+        if pp_stage_1 = '1' then
+          bias_load <= '1';
+          bias_rd_en <= '1';
+          if bias_done = '1' then
+            bias_load <= '0';
+            bias_rd_en <= '0';
+          end if;
+        else 
+          bias_load <= '0';
+          bias_rd_en <= '0';
+        end if;
+      end if;
+    end if;
+  end process;
 
 --Post Adder
   process(clk) --Enable control, one clock delay adter shifter control.

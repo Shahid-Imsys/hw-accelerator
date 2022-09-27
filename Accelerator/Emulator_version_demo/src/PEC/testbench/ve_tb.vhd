@@ -106,6 +106,7 @@ constant au_test_bcmp3 : std_logic_vector(127 downto 0)    := x"0000037000000000
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant ve_saddr_l : std_logic_vector(127 downto 0)       := x"00000060000000000000000000000000";
 constant ve_saddr_r : std_logic_vector(127 downto 0)       := x"00000070000000000000000000000000";
+constant bias_saddr : std_logic_vector(127 downto 0)       := x"00000190000000000000000000000000";
 constant pp_ctl     : std_logic_vector(127 downto 0)       := x"00000170000000000000000000000000";
 --write post processing relevant registers 54-59
 constant word_54 : std_logic_vector(127 downto 0) := "00000000000000000000001010000000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
@@ -156,6 +157,45 @@ pl(94) <= '0';
 pl(107) <= '1';
 wait for 30 ns;
 pl(107) <= '0';
+progress <= conv_mode_b;
+pl <= au_test_boffset0;
+ybus <= x"01";
+wait for 30.01 ns;
+pl <= au_test_boffset1;
+ybus <= x"03";
+wait for 30.01 ns;
+pl <= au_test_boffset2;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= au_test_boffset3;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= au_test_bcmp0;
+ybus <= x"03";
+wait for 30.01 ns;
+pl <= au_test_bcmp1;
+ybus <= x"0f";
+wait for 30.01 ns;
+pl <= au_test_bcmp2;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= au_test_bcmp3;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= bias_saddr;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= configure;
+ybus <= x"1c";
+wait for 30.1 ns;
+pl(95) <= '1';
+pl(98) <= '1'; --mode a 
+pl(97) <= '1'; --mode b 
+wait for 30 ns;
+pl(95) <= '0';
+pl(98) <= '0'; --mode a off
+pl(97) <= '0'; --mode b off
+wait for 30 ns;
 progress <= conv_mode_r;
 pl <= au_test_roffset0;
 ybus <= x"03";

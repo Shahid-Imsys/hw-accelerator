@@ -224,7 +224,7 @@ begin
         bias_load <= '0';
         bias_rd_en <= '0';
       else
-        if pp_stage_1 = '1' then
+        if inst = firstconv and load = '1' then
           bias_load <= '1';
           bias_rd_en <= '1';
           if bias_done = '1' then

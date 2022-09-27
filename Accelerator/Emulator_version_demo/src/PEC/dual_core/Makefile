@@ -14,7 +14,9 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhdl \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem.vhdl \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem64x64.vhdl \
+					$(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x32.vhdl \
+					$(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x64.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhdl \
 					$(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhdl \
  				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatoreven.vhdl \

@@ -83,9 +83,8 @@ begin  -- architecture tb
 
   dut : entity work.digital_chip
     generic map (
-      g_memory_type       => simulation,
-      g_simulation        => true,
-      g_clock_frequency   => 31)
+      g_simulation => true
+      )
     port map (
       pll_ref_clk => MX1_CK,
       mreset_n    => MRESET,
@@ -170,7 +169,7 @@ begin  -- architecture tb
   mtest <= '0';
 
   pad(A)(7 downto 5) <= "LLL";  --"000";          -- This is read by ROM bootloader
-  pad(A)(4 downto 3) <= "LH";  --"01";           -- Set SP communication at /2 speed
+  pad(A)(4 downto 3) <= "LL";  --"00";           -- Set SP communication at /4 speed
   pad(A)(2 downto 1) <= "LH";  --"01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
 

@@ -52,6 +52,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+--use ieee.numeric_std.all;
 
 entity tim is
   port(
@@ -148,8 +149,6 @@ architecture rtl of tim is
   signal fract_u                   : std_logic_vector(2 downto 0);
   signal ctr_u                     : std_logic_vector(6 downto 0);
   signal sum_u                     : std_logic_vector(3 downto 0);
-  signal split_s4                  : std_logic;
-  signal split_s8                  : std_logic;
   signal prescale1                 : std_logic_vector(3 downto 0);
   signal prescale2                 : std_logic_vector(5 downto 0);
   signal prescale3                 : std_logic_vector(4 downto 0);
@@ -187,6 +186,7 @@ architecture rtl of tim is
   signal pl_shin_pa_sig            : std_logic_vector(3 downto 0);  -- Used for CALL SP & ACK SPREQ
   signal pl_alud_sig               : std_logic;     -- Only bit 2 used here
   attribute syn_keep of held_e_int : signal is true;
+  signal counter_s                 : std_logic_vector(5 downto 0);
 begin
 ---------------------------------------------------------------------
 -- Reset generation &
@@ -413,45 +413,35 @@ begin
   din_u <= '1' when ctr_u = 0 else
            '0';
 
-  -- These FFs split clk_c by four and eight for clk_s generation.
-  -- They are not toggled if they are not needed, when clk_s is fast.
-  process (clk_p)
-  begin
-    if rising_edge(clk_p) then
-      if rst_cn_int = '0' or en_s = '0' then
-        split_s4 <= '0';
-        split_s8 <= '0';
-      elsif clk_c_en = '1' then
-        if speed_s = "10" or speed_s = "11" then
-          split_s4 <= not even_c xor split_s4;
-        end if;
-        if speed_s = "11" then
-          split_s8 <= (not even_c and not split_s4) xor split_s8;
-        end if;
-      end if;
-    end if;
-  end process;
-
   -- Generate din_s, this is the D input expression for the
   -- FF in the clock block that generates clk_s.
-  process (en_s, gate_s, even_c, split_s4, split_s8, speed_s)
+  
+  
+  process (clk_p, rst_cn_int, en_s)
   begin
-    case speed_s is
-      when "00" =>
-        din_s_int <= not even_c;
-      when "01" =>
-        din_s_int <= not even_c xor gate_s;
-      when "10" =>
-        din_s_int <= (not even_c and not split_s4) xor gate_s;
-      when "11" =>
-        din_s_int <= (not even_c and not split_s4 and not split_s8) xor gate_s;
-      when others => null;
-    end case;
+    if (rst_cn_int = '0') then
+      counter_s <= (others => '0');
+    elsif (rising_edge(clk_p)) then
+      case speed_s is
+        when "00" =>
+          din_s_int <= counter_s(1);
+        when "01" =>
+          din_s_int <= counter_s(3);
+        when "10" =>
+          din_s_int <= counter_s(4);
+        when "11" =>
+          din_s_int <= counter_s(5);
+        when others => null;
+      end case;
+      counter_s <= counter_s + 1;
+    end if;
     if en_s = '0' then
       din_s_int <= '0';
     end if;
   end process;
+  
   din_s <= din_s_int;
+  
   -- Generate gate_s, which is exactly the same as clk_i but is used for gating.
   process (clk_p)
   begin

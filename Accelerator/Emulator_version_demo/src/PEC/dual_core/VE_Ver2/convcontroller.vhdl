@@ -139,6 +139,28 @@ begin
       end if;
     end if;
   end process;
+
+  au_bias_control:process(clk)
+  begin 
+    if rising_edge(clk) then        
+      if rst = '0' then
+        bias_load <= '0';
+        bias_rd_en <= '0';
+      else
+        if inst = firstconv and load = '1' and pp_ctl(0) = '0' then
+          bias_load <= '1';
+          bias_rd_en <= '1';
+          if bias_done = '1' then
+            bias_load <= '0';
+            bias_rd_en <= '0';
+          end if;
+        else 
+          bias_load <= '0';
+          bias_rd_en <= '0';
+        end if;
+      end if;
+    end if;
+  end process;
   
 --Two modes
 --For output from overall accumulator latch, this selector activates one clock.
@@ -210,28 +232,6 @@ begin
     if rising_edge(clk) then
       pp_stage_1 <= o_mux_ena;
       enable_shift <= pp_stage_1;
-    end if;
-  end process;
-
-  au_bias_control:process(clk)
-  begin 
-    if rising_edge(clk) then        
-      if rst = '0' then
-        bias_load <= '0';
-        bias_rd_en <= '0';
-      else
-        if inst = firstconv and load = '1' then
-          bias_load <= '1';
-          bias_rd_en <= '1';
-          if bias_done = '1' then
-            bias_load <= '0';
-            bias_rd_en <= '0';
-          end if;
-        else 
-          bias_load <= '0';
-          bias_rd_en <= '0';
-        end if;
-      end if;
     end if;
   end process;
 

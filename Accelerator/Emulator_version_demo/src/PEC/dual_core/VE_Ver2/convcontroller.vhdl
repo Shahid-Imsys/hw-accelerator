@@ -59,9 +59,6 @@ architecture convctrl of convcontroller is
 
 begin
 
-  --data_addr     <= conv_addr_l;
-  --weight_addr   <= conv_addr_r;
-  --bias_addr     <= bias_addr_reg;
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
@@ -80,9 +77,9 @@ begin
     end if;
   end process;
 
-  latch_signals: process(clk)
+  AU_enable: process(clk) -- addressing unit enable
   begin
-    if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+    if rising_edge(clk) then 
       if rst = '0' then
         busy <= '0';
       else
@@ -94,7 +91,7 @@ begin
         end if;
 
         if start = '1' and mode_a = '1' and mode_b = '0' then
-          mode_a_l <= '1';    --this should become enable signal for left au, data valid should become load signal for left au
+          mode_a_l <= '1';    
         elsif left_done = '1' then
           mode_a_l <= '0';
         end if;
@@ -118,14 +115,14 @@ begin
     end if;
   end process;
 
-  conv_addr_gen: process(clk)
+  conv_addrcontrol_gen: process(clk) -- generate control singals for left and right addressing unit.
   begin
     if rising_edge(clk) then
       if RST = '0' then
         load <= '0';
         rd_en <= '0';
         inst <= firstconv;
-      elsif busy = '1' and mode_a_l = '1' and mode_b_l = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+      elsif busy = '1' and mode_a_l = '1' and mode_b_l = '1' then 
         load <= '1';
         rd_en <= '1';
         if left_done = '1' and right_done = '1' then
@@ -216,8 +213,7 @@ begin
     end if;
   end process;
 
---bias buffer --also activates at the clock cycle when shifter is activated, so shares the o_mux_ena signal
-  process(clk)
+  au_bias_control:process(clk)
   begin 
     if rising_edge(clk) then        
       if rst = '0' then

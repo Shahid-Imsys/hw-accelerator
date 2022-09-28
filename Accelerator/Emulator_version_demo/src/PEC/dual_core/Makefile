@@ -24,7 +24,7 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addmul.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_acc.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_alu.vhdl \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/lzod.vhdl \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/lod.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/memreg.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ppadd.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ppmap1.vhdl \

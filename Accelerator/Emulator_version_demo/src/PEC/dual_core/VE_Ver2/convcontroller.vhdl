@@ -222,13 +222,15 @@ begin
     if rising_edge(clk) then
       if bias_addr_assign = '1' then
         bias_addr_reg <= bias_index_start;         
-      elsif pp_stage_1 = '1' then
+      elsif pp_stage_1 = '1' and pp_ctl(1) = '0' then
         bias_mux <= bias_addr_reg (1 downto 0);
         if bias_addr_reg = bias_index_end then
           bias_addr_reg <= bias_index_start;
         else
           bias_addr_reg <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_addr_reg))+1,8));
         end if;
+      else
+        bias_addr_reg <= bias_addr_reg;
       end if;
     end if;
   end process;

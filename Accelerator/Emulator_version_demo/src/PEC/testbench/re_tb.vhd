@@ -103,6 +103,7 @@ constant au_test_bcmp0 : std_logic_vector(127 downto 0)    := x"0000034000000000
 constant au_test_bcmp1 : std_logic_vector(127 downto 0)    := x"00000350000000000000000000000000";
 constant au_test_bcmp2 : std_logic_vector(127 downto 0)    := x"00000360000000000000000000000000";
 constant au_test_bcmp3 : std_logic_vector(127 downto 0)    := x"00000370000000000000000000000000";
+constant ve_loop    : std_logic_vector(127 downto 0)       := x"00000080000000000000000000000000";
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant re_saddr_l : std_logic_vector(127 downto 0)       := x"00000010000000000000000000000000";
 constant re_saddr_r : std_logic_vector(127 downto 0)       := x"00000020000000000000000000000000";
@@ -154,7 +155,9 @@ wait for 60 ns;
 pl(94) <= '1';
 wait for 30 ns;
 pl(94) <= '0'; 
-wait for 30 ns;
+pl <= ve_loop;
+ybus <= x"36";
+wait for 30.01 ns;
 progress <= re_mode_r;
 pl <= au_test_roffset0;
 ybus <= x"03";

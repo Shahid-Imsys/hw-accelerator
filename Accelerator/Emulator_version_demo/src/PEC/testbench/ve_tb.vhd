@@ -104,6 +104,9 @@ constant au_test_bcmp1 : std_logic_vector(127 downto 0)    := x"0000035000000000
 constant au_test_bcmp2 : std_logic_vector(127 downto 0)    := x"00000360000000000000000000000000";
 constant au_test_bcmp3 : std_logic_vector(127 downto 0)    := x"00000370000000000000000000000000";
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
+constant ve_loop    : std_logic_vector(127 downto 0)       := x"00000080000000000000000000000000";
+constant ve_oloop   : std_logic_vector(127 downto 0)       := x"00000100000000000000000000000000";
+constant bias_end   : std_logic_vector(127 downto 0)       := x"00000180000000000000000000000000";
 constant ve_saddr_l : std_logic_vector(127 downto 0)       := x"00000060000000000000000000000000";
 constant ve_saddr_r : std_logic_vector(127 downto 0)       := x"00000070000000000000000000000000";
 constant bias_saddr : std_logic_vector(127 downto 0)       := x"00000190000000000000000000000000";
@@ -152,11 +155,21 @@ wait for 30 ns;
 DDI_VLD <= '0';
 rst <= '1';
 pl(95) <= '0';
+pl(96) <= '0';
 wait for 60 ns;
 pl(94) <= '0';
 pl(107) <= '1';
 wait for 30 ns;
 pl(107) <= '0';
+pl <= ve_loop;
+ybus <= x"03";
+wait for 30.01 ns;
+pl <= ve_oloop;
+ybus <= x"10";
+wait for 30.01 ns;
+pl <= bias_end;
+ybus <= x"03";
+wait for 30.01 ns;
 progress <= conv_mode_b;
 pl <= au_test_boffset0;
 ybus <= x"01";
@@ -183,18 +196,7 @@ pl <= au_test_bcmp3;
 ybus <= x"00";
 wait for 30.01 ns;
 pl <= bias_saddr;
-ybus <= x"00";
-wait for 30.01 ns;
-pl <= configure;
-ybus <= x"1c";
-wait for 30.1 ns;
-pl(95) <= '1';
-pl(98) <= '1'; --mode a 
-pl(97) <= '1'; --mode b 
-wait for 30 ns;
-pl(95) <= '0';
-pl(98) <= '0'; --mode a off
-pl(97) <= '0'; --mode b off
+ybus <= x"04";
 wait for 30 ns;
 progress <= conv_mode_r;
 pl <= au_test_roffset0;
@@ -204,10 +206,10 @@ pl <= au_test_roffset1;
 ybus <= x"0f";
 wait for 30.01 ns;
 pl <= au_test_roffset2;
-ybus <= x"01";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_roffset3;
-ybus <= x"03";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_rcmp0;
 ybus <= x"06";
@@ -216,24 +218,16 @@ pl <= au_test_rcmp1;
 ybus <= x"1e";
 wait for 30.01 ns;
 pl <= au_test_rcmp2;
-ybus <= x"02";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_rcmp3;
-ybus <= x"03";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= ve_saddr_r;
 ybus <= x"03";
 wait for 30.01 ns;
 pl <= configure;
-ybus <= x"1c";
-wait for 30.1 ns;
-pl(95) <= '1';
-pl(98) <= '0'; --mode a 
-pl(97) <= '1'; --mode b 
-wait for 30 ns;
-pl(95) <= '0';
-pl(98) <= '0'; --mode a off
-pl(97) <= '0'; --mode b off
+ybus <= x"14";
 wait for 30 ns;
 progress <= conv_mode_l;
 pl <= au_test_loffset0;
@@ -243,10 +237,10 @@ pl <= au_test_loffset1;
 ybus <= x"0f";
 wait for 30.01 ns;
 pl <= au_test_loffset2;
-ybus <= x"01";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_loffset3;
-ybus <= x"03";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_lcmp0;
 ybus <= x"06";
@@ -255,25 +249,23 @@ pl <= au_test_lcmp1;
 ybus <= x"1e";
 wait for 30.01 ns;
 pl <= au_test_lcmp2;
-ybus <= x"02";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_lcmp3;
-ybus <= x"03";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= ve_saddr_l;
 ybus <= x"05";
 wait for 30.01 ns;
-pl <= configure;
-ybus <= x"00";
-wait for 30.01 ns;
+pl(99) <= '1';
+wait for 30 ns;
+pl(99) <= '0';
+wait for 120 ns;
 pl(95) <= '1';
-pl(98) <= '1'; --mode a 
-pl(97) <= '0'; --mode b 
+pl(99) <= '1';
 wait for 30 ns;
-pl(98) <= '0'; --mode a off
-pl(97) <= '0'; --mode b off
 pl(95) <= '0';
-wait for 30 ns;
+pl(99) <= '0';
 
 
 --progress <= re_mode_a;

@@ -12,26 +12,25 @@ entity convcontroller is
     rst              : in std_logic;
     clk_e_pos        : in std_logic;
     start            : in std_logic;
+    cnt_rst          : in std_logic;
     mode_a           : in std_logic;
     mode_b           : in std_logic;
     mode_c           : in std_logic;
-    left_done        : in std_logic;
-    right_done       : in std_logic;
-    bias_done        : in std_logic;
-    au_counters      : in au_param;
-    au_cmp           : in au_param;
-    au_offset        : in au_param;
     config           : in std_logic_vector(7 downto 0);
     pp_ctl           : in std_logic_vector(7 downto 0);
+    dot_cnt          : in std_logic_vector(7 downto 0);
+    oc_cnt           : in std_logic_vector(7 downto 0);
+    bias_au_addr     : in std_logic_vector(7 downto 0);
+    bias_index_end   : in std_logic_vector(7 downto 0);
     scale            : in std_logic_vector(4 downto 0);
-    mode_a_l         : out std_logic;
-    mode_b_l         : out std_logic;
     mode_c_l         : out std_logic;
-    bias_en          : out std_logic;
     load             : out std_logic;
-    bias_load        : out std_logic;
     rd_en            : out std_logic;
+    left_rst         : out std_logic;
+    right_rst        : out std_logic;
+    bias_load        : out std_logic; 
     bias_rd_en       : out std_logic;
+    bias_rst         : out std_logic;
     enable_shift     : out std_logic;
     enable_add_bias  : out std_logic;
     enable_clip      : out std_logic;
@@ -55,6 +54,8 @@ architecture convctrl of convcontroller is
   signal a_delay        : std_logic;
   signal conv_out_sel   : std_logic_vector(2 downto 0);
   signal bias_addr_reg  : std_logic_vector(7 downto 0);
+  signal conv_loop      : std_logic_vector(7 downto 0);
+  signal conv_oloop     : std_logic_vector(7 downto 0);
   signal clockcycle     : integer := 0;
 
 begin
@@ -77,65 +78,93 @@ begin
     end if;
   end process;
 
-  AU_enable: process(clk) -- addressing unit enable
+  latch_signals: process(clk)
   begin
-    if rising_edge(clk) then 
-      if rst = '0' then
+    if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+      if start = '1' then
+        busy <= '1';
+      elsif conv_oloop = (conv_oloop'range => '0') then 
         busy <= '0';
-      else
-        
-        if start = '1' then
-          busy <= '1';
-        elsif left_done = '1' and right_done = '1' then 
-          busy <= '0';
-        end if;
-
-        if start = '1' and mode_a = '1' and mode_b = '0' then
-          mode_a_l <= '1';    
-        elsif left_done = '1' then
-          mode_a_l <= '0';
-        end if;
-        if start = '1' and mode_a = '0' and mode_b = '1' then
-          mode_b_l <= '1';
-        elsif right_done = '1' then
-          mode_b_l <= '0';
-        end if;
-        if start = '1' and mode_a = '1' and mode_b = '1' then
-          bias_en <= '1';
-        elsif bias_done = '1' then
-          bias_en <= '0';
-        end if;
-
-        --if start = '1' and mode_c = '1' then
-        --  mode_c_l <= '1';
-        --elsif conv_oloop = (conv_oloop'range => '0') then
-        --  mode_c_l <= '0';
-        --end if;
+      end if;
+      if start = '1' and mode_c = '1' then
+        mode_c_l <= '1';
+      elsif conv_oloop = (conv_oloop'range => '0') then
+        mode_c_l <= '0';
       end if;
     end if;
   end process;
 
-  conv_addrcontrol_gen: process(clk) -- generate control singals for left and right addressing unit.
+  conv_addr_gen: process(clk)
   begin
     if rising_edge(clk) then
       if RST = '0' then
-        load <= '0';
-        rd_en <= '0';
+        left_rst <= '0';
+        right_rst <= '0';
+        conv_loop <= (others => '0');
+        conv_oloop <= (others => '0');
+      elsif cnt_rst = '1' and clk_e_pos = '1' then
+        conv_loop <= dot_cnt;
+        conv_oloop <= oc_cnt;
+        if mode_a = '1' then
+          left_rst <= '1';
+        else
+          left_rst <= '0';
+        end if;
+        if mode_b = '1' then
+          right_rst <= '1';
+        else
+          right_rst <= '0';
+        end if;
+      elsif start = '1' and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
         inst <= firstconv;
-      elsif busy = '1' and mode_a_l = '1' and mode_b_l = '1' then 
         load <= '1';
         rd_en <= '1';
-        if left_done = '1' and right_done = '1' then
-          load <= '0';
-          rd_en <= '0';
+        conv_oloop <= oc_cnt;
+        conv_loop  <= dot_cnt;
+        if mode_a = '1' or mode_b = '1' then
+          if mode_a = '1' then
+            left_rst <= '1';
+          else
+            left_rst <= '0';
+          end if;
+          if mode_b = '1' then
+            right_rst <= '1';
+          else
+            right_rst <= '0';
+          end if;
         end if;
-        if au_counters(0) = au_cmp(0) or start = '1' then
+      elsif busy = '1' and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+        inst <= conv;
+        if conv_loop = x"01" then
+          if conv_oloop = x"01" then
+            load <= '0';
+            rd_en <= '0';
+          end if;
+          if config(4) = '1' then --reload by config register, bit 4 in configure register
+            conv_loop <= dot_cnt;
+          end if;
+          left_rst <= '0';
+          right_rst <= '0';
           inst <= firstconv;
-        elsif au_counters(0) = au_cmp(0)-au_offset(0) then
-          inst <= lastconv;
-        else
-          inst <= conv;
+          conv_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_oloop))-1,8));
+        elsif conv_loop /= x"01" then
+          conv_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_loop))-1,8));
+          load <= '1';
+          rd_en <= '1';
+          
+          if conv_loop = x"02" then
+            inst <= lastconv;
+            if config(2) = '1' then 
+              left_rst <= '1';
+            end if;
+            if config(3) = '1' then
+              right_rst <= '1';
+            end if;
+          end if;
         end if;
+      else
+        load <= '0';
+        rd_en <= '0';
       end if;
     end if;
   end process;
@@ -150,14 +179,15 @@ begin
         if inst = firstconv and load = '1' and pp_ctl(0) = '0' then
           bias_load <= '1';
           bias_rd_en <= '1';
-          if bias_done = '1' then
-            bias_load <= '0';
-            bias_rd_en <= '0';
-          end if;
         else 
           bias_load <= '0';
           bias_rd_en <= '0';
         end if;
+      end if;
+      if bias_au_addr = bias_index_end then
+        bias_rst <= '1';
+      else  
+        bias_rst <= '0';
       end if;
     end if;
   end process;
@@ -171,14 +201,12 @@ begin
       if rst = '0' then
         o_mux_ena <= '0';
       else
-        if mode_a_l = '1' and mode_b_l = '1' then
-          if au_counters(0) = au_cmp(0)- au_offset(0) then
-            o_mux_ena <= '1';
-          elsif conv_out_p = '0' then --11 clock delay of config(7)
-            o_mux_ena <= '0';
-          elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal
-            o_mux_ena <= '0';
-          end if;
+        if conv_loop = x"02" then
+          o_mux_ena <= '1';
+        elsif conv_out_p = '0' then --11 clock delay of config(7)
+          o_mux_ena <= '0';
+        elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal
+          o_mux_ena <= '0';
         end if;
       end if;
     end if;
@@ -190,37 +218,35 @@ begin
       if rst = '0' then
         conv_out_sel <= (others => '0');
       else
-        if mode_a_l = '1' and mode_b_l = '1' then
-          if au_counters(0) = au_cmp(0)- au_offset(0) then
-            if conv_out_p = '0' then
-              ppinst <= sumfirst;
-            elsif conv_out_p = '1' then
-              conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-              if conv_out_sel = "000" then
-                ppinst <= select0;
-              elsif conv_out_sel = "001" then
-                ppinst <= select1;
-              elsif conv_out_sel = "010" then
-                ppinst <= select2;
-              elsif conv_out_sel = "011" then
-                ppinst <= select3;
-              elsif conv_out_sel = "100" then
-                ppinst <= select4;
-              elsif conv_out_sel = "101" then
-                ppinst <= select5;
-              elsif conv_out_sel = "110" then
-                ppinst <= select6;
-              elsif conv_out_sel = "111" then
-                ppinst <= select7;
-              end if;
+        if conv_loop = x"02" then
+          if conv_out_p = '0' then
+            ppinst <= sumfirst;
+          elsif conv_out_p = '1' then
+            conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+            if conv_out_sel = "000" then
+              ppinst <= select0;
+            elsif conv_out_sel = "001" then
+              ppinst <= select1;
+            elsif conv_out_sel = "010" then
+              ppinst <= select2;
+            elsif conv_out_sel = "011" then
+              ppinst <= select3;
+            elsif conv_out_sel = "100" then
+              ppinst <= select4;
+            elsif conv_out_sel = "101" then
+              ppinst <= select5;
+            elsif conv_out_sel = "110" then
+              ppinst <= select6;
+            elsif conv_out_sel = "111" then
+              ppinst <= select7;
             end if;
-          elsif o_mux_ena = '1' then
-            if conv_out_p = '0' then
-              ppinst <= sumall;
-            end if;
-          elsif pp_stage_1 = '1' then
-            ppinst <= nop;
           end if;
+        elsif o_mux_ena = '1' then
+          if conv_out_p = '0' then
+            ppinst <= sumall;
+          end if;
+        elsif pp_stage_1 = '1' then
+          ppinst <= nop;
         end if;
       end if;
     end if;

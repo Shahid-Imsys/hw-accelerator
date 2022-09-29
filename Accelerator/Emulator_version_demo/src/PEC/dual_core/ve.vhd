@@ -204,15 +204,10 @@ architecture rtl of ve is
     port(
       clk          : in std_logic;
       rst          : in std_logic;
-      en           : in std_logic;
-      start        : in std_logic;
       load         : in std_logic;
       cmp          : in au_param;
       add_offset   : in au_param;
-      addon_off    : in std_logic_vector(2 downto 0);
       baseaddress  : in std_logic_vector(7 downto 0);
-      counters     : out au_param;
-      done         : out std_logic;
       finaladdress : out std_logic_vector(7 downto 0)
     );
   end component;
@@ -227,21 +222,17 @@ architecture rtl of ve is
       mode_c           : in std_logic;
       data_valid       : in std_logic;
       re_start         : in std_logic;
-      bias_addr_assign : in std_logic;
       re_source        : in std_logic;
-      left_done        : in std_logic;
-      right_done       : in std_logic;
-      bias_done        : in std_logic;
-      bias_index_start : in std_logic_vector(7 downto 0);
+      cnt_rst          : in std_logic;
+      wr_counter       : in std_logic_vector(7 downto 0);
       re_busy          : out std_logic;
       write_en_data    : out std_logic;
       write_en_weight  : out std_logic;
       write_en_bias    : out std_logic;
-      mode_a_l         : out std_logic;
-      mode_b_l         : out std_logic;
       mode_c_l         : out std_logic;
-      bias_en          : out std_logic;
-      au_start         : out std_logic;
+      left_rst         : out std_logic;
+      right_rst        : out std_logic;
+      bias_rst         : out std_logic;
       left_load        : out std_logic;
       right_load       : out std_logic;
       bias_load        : out std_logic
@@ -254,26 +245,25 @@ architecture rtl of ve is
       rst              : in std_logic;
       clk_e_pos        : in std_logic;
       start            : in std_logic;
+      cnt_rst          : in std_logic;
       mode_a           : in std_logic;
       mode_b           : in std_logic;
       mode_c           : in std_logic;
-      left_done        : in std_logic;
-      right_done       : in std_logic;
-      bias_done        : in std_logic;
-      au_counters      : in au_param;
-      au_cmp           : in au_param;
-      au_offset        : in au_param;
       config           : in std_logic_vector(7 downto 0);
       pp_ctl           : in std_logic_vector(7 downto 0);
+      dot_cnt          : in std_logic_vector(7 downto 0);
+      oc_cnt           : in std_logic_vector(7 downto 0);
+      bias_au_addr     : in std_logic_vector(7 downto 0);
+      bias_index_end   : in std_logic_vector(7 downto 0);
       scale            : in std_logic_vector(4 downto 0);
-      mode_a_l         : out std_logic;
-      mode_b_l         : out std_logic;
       mode_c_l         : out std_logic;
-      bias_en          : out std_logic;
       load             : out std_logic;
-      bias_load        : out std_logic;
       rd_en            : out std_logic;
+      left_rst         : out std_logic;
+      right_rst        : out std_logic;
+      bias_load        : out std_logic; 
       bias_rd_en       : out std_logic;
+      bias_rst         : out std_logic;
       enable_shift     : out std_logic;
       enable_add_bias  : out std_logic;
       enable_clip      : out std_logic;
@@ -322,7 +312,8 @@ architecture rtl of ve is
   signal re_rdy_int : std_logic;
   --Vector engine signals
   signal ve_rdy_int : std_logic;
-  signal start, conv_start, fft_start, au_start, start_from_re : std_logic;
+  signal start, conv_start, fft_start : std_logic;
+  signal lau_activate, rau_activate, bau_activate, activate_from_re : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
   signal laddon_off, raddon_off, baddon_off : std_logic_vector(2 downto 0);
   --signal mac_switch : std_logic;
@@ -347,28 +338,22 @@ architecture rtl of ve is
   signal au_lcmp, au_loffset : au_param;
   signal au_rcmp, au_roffset : au_param;
   signal au_bcmp, au_boffset : au_param;
-  signal left_counters, right_counters, bias_counters : au_param;
-  signal re_addr_data   : std_logic_vector(7 downto 0);
-  signal re_addr_weight : std_logic_vector(7 downto 0);
-  signal re_addr_l, re_addr_r   : std_logic_vector(7 downto 0); --Receive engine left address when DFM is used as the source
   signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
   signal re_loop_reg : std_logic_vector(7 downto 0); --receive engine's loop counter register
-  signal re_loop, re_ctr     : std_logic_vector(7 downto 0); --receive engine's loop counter
-  signal re_saddr_a, re_saddr_b   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source
-  signal re_addr_a, re_addr_b   : std_logic_vector(7 downto 0); 
-  signal ve_addr_l, ve_addr_r   : std_logic_vector(7 downto 0); --data to address pointer left
+  signal re_loop : std_logic_vector(7 downto 0); --receive engine's loop counter
+  signal re_saddr_a, re_saddr_b   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source 
   signal ve_saddr_l, ve_saddr_r  : std_logic_vector(7 downto 0); --Left starting address register
   signal left_baseaddress, right_baseaddress : std_logic_vector(7 downto 0);
   signal left_finaladdress, right_finaladdress, bias_finaladdress : std_logic_vector(7 downto 0);
-  signal ve_loop, ve_oloop, loop_ctr, oloop_ctr     : std_logic_vector(7 downto 0);
+  signal ve_loop, ve_oloop, dot_cnt, oc_cnt     : std_logic_vector(7 downto 0);
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
   signal fft_en, fft_done, finalstage : std_logic;
   signal left_loading, right_loading, bias_loading : std_logic;
-  signal left_done, right_done, bias_done : std_logic;
-  signal left_en, right_en, bias_en : std_logic;
-  signal len_re, len_conv, ren_re, ren_conv, ben_re, ben_conv : std_logic;
+  signal left_rst, right_rst, bias_rst : std_logic;
+  signal lrst_from_conv, rrst_from_conv, brst_from_conv : std_logic;
+  signal lrst_from_re, rrst_from_re, brst_from_re : std_logic;
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
@@ -394,8 +379,7 @@ architecture rtl of ve is
   signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
   signal re_ready : std_logic; --RE start latch
   signal conv_busy : std_logic; --VE start latch
-  signal bias_addr_assign : std_logic; --enable signal for enbale the assignment of bias start address.
-  signal re_addr_reload, ve_addr_reload, addr_reload  : std_logic;
+  signal re_cnt_rst, conv_cnt_rst, cnt_rst  : std_logic;
   signal conv_enable : std_logic;
   signal data0  : std_logic_vector(31 downto 0);
   signal data1  : std_logic_vector(31 downto 0);
@@ -559,7 +543,7 @@ begin
   mode_a         <= PL(98);
   mode_b         <= PL(97);
   mode_c         <= PL(92);
-  addr_reload    <= PL(99); 
+  cnt_rst        <= PL(99); 
   conv_enable    <= PL(107);
   ve_clr_acc     <= PL(93);
   pl_ve_byte     <= PL(112 downto 109);
@@ -589,7 +573,6 @@ begin
           pp_ctl            <= (others => '0');  --Make it 8 bits
           bias_index_end    <= (others => '0');
           bias_index_start  <= (others => '0');
-          bias_addr_assign  <= '0';
           mul_ctl           <= (others => '0'); 
           au_lcmp           <= (others => (others => '0'));
           au_loffset        <= (others => (others => '0'));
@@ -636,7 +619,6 @@ begin
           bias_index_end <= YBUS;
         elsif reg_in = CONS_BIAS_INDEX_START then
           bias_index_start <= YBUS;
-          bias_addr_assign <= '1';
         elsif reg_in = CONS_AU_LOFFSET0 then
           au_loffset(0) <= unsigned(YBUS);
         elsif reg_in = CONS_AU_LOFFSET1 then
@@ -685,8 +667,6 @@ begin
           au_bcmp(2) <= unsigned(YBUS);
         elsif reg_in = CONS_AU_BCMP3 then
           au_bcmp(3) <= unsigned(YBUS);
-        else
-          bias_addr_assign <= '0';
         end if;
       end if;
     end if;
@@ -748,7 +728,7 @@ begin
         curr_ring_addr <= (others => '0');
       elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
         curr_ring_addr <= YBUS;
-      elsif addr_reload = '1' then
+      elsif cnt_rst = '1' then
         curr_ring_addr <= curr_ring_addr;
       elsif (re_ready = '0' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
@@ -776,25 +756,16 @@ begin
                                                       else re_saddr_l;
                       right_baseaddress <= re_saddr_b when re_source = '1' 
                                                       else re_saddr_r;
-                      left_en <= len_re;
-                      right_en <= ren_re;
-                      bias_en <= ben_re;
                       left_loading <= lload_from_re;
                       right_loading <= rload_from_re;
                       bias_loading <= bload_from_re;
       when conv    => left_baseaddress  <= ve_saddr_l;
                       right_baseaddress <= ve_saddr_r;
-                      left_en <= len_conv;
-                      right_en <= ren_conv;
-                      bias_en <= ben_conv;
                       left_loading <= load_from_conv;
                       right_loading <= load_from_conv;
                       bias_loading <= bload_from_conv;
       when others  => left_baseaddress  <= x"00";
                       right_baseaddress <= x"00";
-                      left_en <= '0';
-                      right_en <= '0';
-                      bias_en <= '0';
                       left_loading <= '0';
                       right_loading <= '0';
                       bias_loading <= '0';
@@ -911,15 +882,28 @@ begin
     conv_start     <= '0';
     fft_start      <= '0';
     re_start       <= '0';
-    au_start       <= '0';
+    left_rst       <= '0';
+    right_rst      <= '0';
+    bias_rst       <= '0';
+    dot_cnt        <= x"00";
+    oc_cnt         <= x"00";
+    re_loop        <= x"00";
     fft_stages     <= "000";
     case mode_latch is
-      when conv   => conv_start     <= start;
-                     au_start       <= start;
-      when fft    => fft_start      <= start;
-                     fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
-      when others => re_start       <= start;
-                     au_start       <= start_from_re;
+      when conv    => conv_start     <= start;
+                      dot_cnt        <= ve_loop_reg;
+                      oc_cnt         <= ve_oloop_reg;
+                      left_rst       <= lrst_from_conv;
+                      right_rst      <= rrst_from_conv;
+                      bias_rst       <= brst_from_conv;
+      when fft     => fft_start      <= start;
+                      fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
+      when re_mode => re_start       <= start;
+                      re_loop        <= ve_loop_reg;
+                      left_rst       <= lrst_from_re;
+                      right_rst      <= rrst_from_re;
+                      bias_rst       <= brst_from_re;
+      when others  => null;
     end case;
   end process;
 
@@ -953,15 +937,14 @@ begin
 ---------------------------------------------------------------
 --Data Input MUX
 ---------------------------------------------------------------
-  --data_input: process(clk_p)
-  --begin
-  --  if rising_edge(clk_p) then
-  --    
-  --    bias_in <= mem_data_in; --Bias buffer --Always VE_IN
-  --  end if;
-  --end process;
-  mem_data_in <= ve_in;
-  bias_in <= ve_in;
+  data_input: process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      mem_data_in <= ve_in;
+      bias_in <= ve_in; --Bias buffer --Always VE_IN
+    end if;
+  end process;
+
 ---------------------------------------------------------------
 ----------read mux ------ TBD ------- temp solution -----------
 ---------------------------------------------------------------
@@ -1125,7 +1108,7 @@ begin
         d_in     => data_to_mem(63 downto 32),
         address  => data0addr_to_memory,
         d_out    => data0,
-        load_mem => DDI_VLD
+        load_mem => '0'--DDI_VLD
         );
     databuf_1 : mem
       generic map(
@@ -1141,7 +1124,7 @@ begin
         d_in     => data_to_mem(31 downto 0),
         address  => data1addr_to_memory,
         d_out    => data1,
-        load_mem => DDI_VLD
+        load_mem => '0'--DDI_VLD
         );
 --weight mem--
     buf_weight : mem
@@ -1158,7 +1141,7 @@ begin
         d_in     => data_to_mem,
         address  => weightaddr_to_memory,
         d_out    => weight,
-        load_mem => DDI_VLD
+        load_mem => '0'--DDI_VLD
         );
 
 --bias mem--
@@ -1176,55 +1159,40 @@ begin
         d_in     => bias_in,            --writebuffer,
         address  => biasaddr_to_memory,
         d_out    => bias_buf_out,
-        load_mem => DDI_VLD
+        load_mem => '0'--DDI_VLD
         );
   end generate;
 
   data_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst,
-      en           => left_en,
-      start        => au_start,
+      rst          => rst and not left_rst,
       load         => left_loading,
       cmp          => au_lcmp,
       add_offset   => au_loffset,
-      addon_off    => laddon_off,
       baseaddress  => left_baseaddress,
-      counters     => left_counters,
-      done         => left_done,
       finaladdress => left_finaladdress
     );
 
   weight_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst,
-      en           => right_en,
-      start        => au_start,
+      rst          => rst and not right_rst,
       load         => right_loading,
       cmp          => au_rcmp,
       add_offset   => au_roffset,
-      addon_off    => raddon_off,
       baseaddress  => right_baseaddress,
-      counters     => right_counters,
-      done         => right_done,
       finaladdress => right_finaladdress
     );
 
   bias_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst,
-      en           => bias_en,
-      start        => au_start,
+      rst          => rst and not bias_rst,
       load         => bias_loading,
       cmp          => au_bcmp,
       add_offset   => au_boffset,
-      addon_off    => baddon_off,
       baseaddress  => bias_index_start,
-      counters     => bias_counters,
-      done         => bias_done,
       finaladdress => bias_finaladdress
     );
 
@@ -1238,21 +1206,17 @@ begin
       mode_c           => mode_c,
       data_valid       => DDI_VLD,
       re_start         => re_start,
-      bias_addr_assign => bias_addr_assign,
       re_source        => re_source,
-      left_done        => left_done,
-      right_done       => right_done,
-      bias_done        => bias_done,
-      bias_index_start => bias_index_start,
+      cnt_rst          => re_cnt_rst,
+      wr_counter       => re_loop,
       re_busy          => re_ready,
       write_en_data    => dwen_from_re,
       write_en_weight  => wwen_from_re,
       write_en_bias    => bwen_from_re,
-      mode_a_l         => len_re,
-      mode_b_l         => ren_re,
       mode_c_l         => remode_c_l,
-      bias_en          => ben_re,
-      au_start         => start_from_re,
+      left_rst         => lrst_from_re,
+      right_rst        => rrst_from_re,
+      bias_rst         => brst_from_re,
       left_load        => lload_from_re,
       right_load       => rload_from_re,
       bias_load        => bload_from_re
@@ -1264,26 +1228,25 @@ begin
       rst              => rst,
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
+      cnt_rst          => conv_cnt_rst,
       mode_a           => mode_a,
       mode_b           => mode_b,
       mode_c           => mode_c,
-      left_done        => left_done,
-      right_done       => right_done,
-      bias_done        => bias_done,
-      au_counters      => left_counters,
-      au_cmp           => au_lcmp,
-      au_offset        => au_loffset,
       config           => config,
       pp_ctl           => pp_ctl,
+      dot_cnt          => dot_cnt,
+      oc_cnt           => oc_cnt,
+      bias_au_addr     => bias_finaladdress,
+      bias_index_end   => bias_index_end,
       scale            => scale,
-      mode_a_l         => len_conv,
-      mode_b_l         => ren_conv,
       mode_c_l         => vemode_c_l,
-      bias_en          => ben_conv,
       load             => load_from_conv,
+      rd_en            => rd_en_conv,
+      left_rst         => lrst_from_conv,
+      right_rst        => rrst_from_conv,
       bias_load        => bload_from_conv,
-      rd_en            => rd_en_conv, -----------
       bias_rd_en       => b_rd_en_conv,
+      bias_rst         => brst_from_conv,
       enable_shift     => shifter_ena,
       enable_add_bias  => adder_ena,
       enable_clip      => clip_ena,

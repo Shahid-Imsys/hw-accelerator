@@ -6,7 +6,7 @@ import argparse
 
 class mp2coe:
     def __init__(self):
-        self.bitPerWord = 128
+        self.bitPerWord = 28
 
         self.mpFileName = 'test.mp'
         self.mpData = []
@@ -25,12 +25,12 @@ class mp2coe:
                     data = []
                     byte = []
                     while bits < self.bitPerWord:
-                        byte = file.read(1)
+                        byte = file.read( 1 )
                         if byte:
                             data.append( byte )
                             bits += 8
                         else:
-                            break;
+                            break
 
                     if not data:
                         return
@@ -44,7 +44,7 @@ class mp2coe:
                                 str += '1'
                             else:
                                 str += '0'
-                            self.mpData.append( str )
+                        self.mpData.append( str )
 
         except IOError:
             print(" * Error reading " + self.mpFileName )
@@ -65,7 +65,7 @@ class mp2coe:
                             file.write('\n')
                         lines = lines + 1
                     file.write(b)
-                    n = n + 4
+                    n = n + 1
 
                 file.write(";\n")
 

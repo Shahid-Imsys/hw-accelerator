@@ -58,7 +58,7 @@ architecture rtl of spiflash_bfm is
     end if;
 
     -- loop through enough lines fo fill ram
-    for i in 0 to (integer(ceil(real(npages_c*32)/real(bytes_per_line_c)))) loop
+    for i in 0 to (integer(ceil(real(npages_c*256)/real(bytes_per_line_c)))) loop
       -- insert line i to row_v
       readline(ram_file, ram_file_line_v);
       for i in row_v'range loop

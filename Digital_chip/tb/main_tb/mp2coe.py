@@ -29,11 +29,14 @@ class mp2coe:
 
                 for _byte in data:
                     for i in range(8):
-                        bits = bits + 1
-                        if _byte & (0x80 >> i):
+                        if (bits % 32) < 4:
+                            pass
+                        elif _byte & (0x80 >> i):
                             self.mpData.append( '1' )
                         else:
                             self.mpData.append( '0' )
+
+                        bits = bits + 1
 
                 print("Read " + str( bits ) + " bits")
 

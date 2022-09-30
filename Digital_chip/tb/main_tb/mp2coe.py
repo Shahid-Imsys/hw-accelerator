@@ -6,13 +6,13 @@ import argparse
 
 class mp2coe:
     def __init__(self):
+        self.maxLines   = 256
         self.bitPerWord = 28
 
         self.mpFileName = 'test.mp'
         self.mpData = []
 
         self.coeFileName = 'boot_memory.coe'
-        self.coeData =  []
 
         self.read_mp()
         self.write_coe()
@@ -20,27 +20,22 @@ class mp2coe:
     def read_mp(self):
         try:
             with open(self.mpFileName, "rb") as file:
-                while True:
-                    bits = 0
-                    data = []
-                    byte = []
-                    while bits < self.bitPerWord:
-                        byte = file.read( 1 )
-                        if byte:
-                            data.append( byte )
-                            bits += 8
+                data = file.read( -1 )
+                bits = 0
+
+                if not data:
+                    print( " * Could not read " + self.mpFileName )
+                    return
+
+                for _byte in data:
+                    for i in range(8):
+                        bits = bits + 1
+                        if _byte & (0x80 >> i):
+                            self.mpData.append( '1' )
                         else:
-                            break
+                            self.mpData.append( '0' )
 
-                    if not data:
-                        return
-
-                    for _byte in data:
-                        for i in range(8):
-                            if int.from_bytes(_byte, 'big') & (0x80 >> i):
-                                self.mpData.append( '1' )
-                            else:
-                                self.mpData.append( '0' )
+                print("Read " + str( bits ) + " bits")
 
         except IOError:
             print(" * Error reading " + self.mpFileName )
@@ -53,6 +48,7 @@ class mp2coe:
                 file.write("memory_initialization_radix=2;\n")
                 file.write("memory_initialization_vector=")
 
+                done  = False
                 lines = 0
                 n     = 0
                 for b in self.mpData:
@@ -60,9 +56,16 @@ class mp2coe:
                         if lines > 0:
                             file.write('\n')
                         lines = lines + 1
-                    file.write(b)
-                    n = n + 1
+                        if lines > self.maxLines:
+                            done = True
+                    if not done:
+                        file.write(b)
+                        n = n + 1
+                    else:
+                        break
+
                 file.write(";\n")
+                print("Wrote " + str( lines - 1 ) + " lines" )
 
         except IOError:
             print(" * Error writing " + self.coeFileName )

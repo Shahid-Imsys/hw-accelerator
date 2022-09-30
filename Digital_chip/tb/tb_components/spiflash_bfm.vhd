@@ -7,7 +7,7 @@ use std.textio.all;
 entity spiflash_bfm is
   generic
   (
-    g_file_name : string := "mpramtest.data"
+    g_file_name : string := "mpram1.data"
   );
 
   port
@@ -23,12 +23,12 @@ end entity;
 
 architecture rtl of spiflash_bfm is
 
-  constant npages_c         : integer := 8; -- 1 page = 32 bytes
+  constant npages_c         : integer := 8; -- 1 page = 256 bytes
   constant bytes_per_line_c : integer := 10; -- in file to read
   constant pp_exec_time_c   : time    := 200 ns; -- Typ 0.4 ms, max 3 ms
   constant ec_exec_time_c   : time    := 200 ns; -- Typ 20 s, max 100 s
 
-  type page_type is array (0 to 31) of std_logic_vector(7 downto 0);
+  type page_type is array (0 to 255) of std_logic_vector(7 downto 0);
   type ram_type  is array (0 to npages_c-1) of page_type;
   type reg_type  is array (0 to 2) of std_logic_vector(7 downto 0);
 
@@ -72,7 +72,7 @@ architecture rtl of spiflash_bfm is
 
       -- fill page byte by byte
       for j in 0 to bytes_per_line_c-1 loop
-        if (byte_cnt_v > 31) then
+        if (byte_cnt_v > 255) then
           if (page_cnt_v > npages_c - 1) then
             exit;
           else
@@ -293,7 +293,7 @@ begin
           -- Read data
           when rd =>
             if (bitcnt_v < 0) then
-              if (bytecnt_v > 30) then
+              if (bytecnt_v > 254) then
                 if (pagecnt_v > npages_c - 2) then
                   pagecnt_v := 0;
                 else

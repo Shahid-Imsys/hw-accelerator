@@ -52,6 +52,9 @@ begin
           addl <= addlout(9 downto 1);
           addr <= addrout(9 downto 1);
         end if;
+
+        --  Delay control signals
+        mulen <= ctrl.en_addmul;
       end if;
     end if;
   end process;
@@ -65,8 +68,8 @@ begin
           mulres <= addl * addr;
         end if;
 
-        --  Delay control signals
-        mulen <= ctrl.en_addmul;
+        ----  Delay control signals
+        --mulen <= ctrl.en_addmul;
       end if;
     end if;
   end process;

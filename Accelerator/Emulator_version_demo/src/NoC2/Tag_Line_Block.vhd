@@ -56,7 +56,7 @@ begin
     -----Tag_Line_Controller
     process (clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
            Tag_Shift_Counter            <= (others => '0');
            Start_Tag_Shift_pre          <= '0';
            TAG_shift_i                  <= '0';
@@ -79,7 +79,7 @@ begin
     -----TAG INTERFACE
     process (clk, Reset)
     begin  
-        if Reset = '1' then
+        if Reset = '0' then
             PEC_Reg                     <= (others => '0');
             PEC_CMD_Ready               <= '0';
             PEC_Arg_Ready               <= '0';

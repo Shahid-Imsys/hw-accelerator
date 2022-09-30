@@ -46,7 +46,7 @@ package gp_pkg is
   -- Memory switch types
   -----------------------------------------------------------------------------
 
-  type memory_type_t is (asic, fpga, referens);
+  type memory_type_t is (asic, fpga, simulation);
   
 -----------------------------------------------------------------------------
 -- RTC controller commands

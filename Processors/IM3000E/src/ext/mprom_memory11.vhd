@@ -9,7 +9,7 @@ use work.gp_pkg.all;
 entity mprom_memory11 is
 
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     address : in  std_logic_vector(11 downto 0);

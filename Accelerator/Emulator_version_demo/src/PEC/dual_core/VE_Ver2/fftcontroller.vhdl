@@ -99,59 +99,36 @@ begin
 
   process(all)
   begin
+    -- Default values
+    inst_shift <=
+      (acce      => enable,
+       shift     => 8,
+       use_lod   => '0',
+       shift_dir => right);
+    inst_addbias <=
+      (acc   => pass,
+       quant => unbiased);
+    inst_clip <=
+      (clip   => clip16,
+       outreg => out76);
     case cyclecounter is
       when 0 =>
         inst_arith <= fftadd0;
         inst_add   <= add32;
-        inst_shift <=
-          (acce      => enable,
-           shift     => 8,
-           shift_dir => right);
-        inst_addbias <=
-          (acc   => pass,
-           quant => unbiased);
-        inst_clip <=
-          (clip   => clip16,
-           outreg => out76);
       when 1 =>
         inst_arith <= fftadd1;
         inst_add   <= add10;
-        inst_shift <=
-          (acce      => enable,
-           shift     => 8,
-           shift_dir => right);
-        inst_addbias <=
-          (acc   => pass,
-           quant => unbiased);
-        inst_clip <=
-          (clip   => clip16,
-           outreg => out54);
+        inst_clip.outreg <= out54;
       when 2 =>
         inst_arith <= fftsub0;
         inst_add   <= fftsub0;
-        inst_shift <=
-          (acce      => enable,
-           shift     => 16,
-           shift_dir => right);
-        inst_addbias <=
-          (acc   => pass,
-           quant => unbiased);
-        inst_clip <=
-          (clip   => clip16,
-           outreg => out32);
+        inst_shift.shift <= 16;
+        inst_clip.outreg <= out32;
       when 3 =>
         inst_arith <= fftsub1;
         inst_add   <= fftsub1;
-        inst_shift <=
-          (acce      => enable,
-           shift     => 16,
-           shift_dir => right);
-        inst_addbias <=
-          (acc   => pass,
-           quant => unbiased);
-        inst_clip <=
-          (clip   => clip16,
-           outreg => out10);
+        inst_shift.shift <= 16;
+        inst_clip.outreg <= out10;
     end case;
   end process;
 

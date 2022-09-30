@@ -75,31 +75,31 @@ begin
     Noc_reg_mux1     <= TP_Data1(15)(addr_cntr1) & TP_Data1(14)(addr_cntr1) & TP_Data1(13)(addr_cntr1) & TP_Data1(12)(addr_cntr1) & 
                         TP_Data1(11)(addr_cntr1) & TP_Data1(10)(addr_cntr1) & TP_Data1(9)(addr_cntr1)  & TP_Data1(8)(addr_cntr1)  & 
                         TP_Data1(7)(addr_cntr1)  & TP_Data1(6)(addr_cntr1)  & TP_Data1(5)(addr_cntr1)  & TP_Data1(4)(addr_cntr1)  & 
-                        TP_Data1(3)(addr_cntr1)  & TP_Data1(2)(addr_cntr1)  & TP_Data1(1)(addr_cntr1)  & TP_Data1(0)(addr_cntr1) when Enable_TP1_Down = '1' and TP1_RW = '0' and Reset = '0' else x"00000000000000000000000000000000" when Reset = '1' else x"00000000000000000000000000000000";
+                        TP_Data1(3)(addr_cntr1)  & TP_Data1(2)(addr_cntr1)  & TP_Data1(1)(addr_cntr1)  & TP_Data1(0)(addr_cntr1) when Enable_TP1_Down = '1' and TP1_RW = '0' and Reset = '1' else x"00000000000000000000000000000000" when Reset = '0' else x"00000000000000000000000000000000";
     
     --TP1 READ Upstream
     Noc_data_mux1    <= TP_Data1(addr_cntr1)(15) & TP_Data1(addr_cntr1)(14) & TP_Data1(addr_cntr1)(13) & TP_Data1(addr_cntr1)(12) &
                         TP_Data1(addr_cntr1)(11) & TP_Data1(addr_cntr1)(10) & TP_Data1(addr_cntr1)(9)  & TP_Data1(addr_cntr1)(8)  &
                         TP_Data1(addr_cntr1)(7)  & TP_Data1(addr_cntr1)(6)  & TP_Data1(addr_cntr1)(5)  & TP_Data1(addr_cntr1)(4)  &
-                        TP_Data1(addr_cntr1)(3)  & TP_Data1(addr_cntr1)(2)  & TP_Data1(addr_cntr1)(1)  & TP_Data1(addr_cntr1)(0) when Enable_TP1_UP = '1'   and TP1_RW = '0' and Reset = '0' else x"00000000000000000000000000000000" when Reset = '1' else x"00000000000000000000000000000000";
+                        TP_Data1(addr_cntr1)(3)  & TP_Data1(addr_cntr1)(2)  & TP_Data1(addr_cntr1)(1)  & TP_Data1(addr_cntr1)(0) when Enable_TP1_UP = '1'   and TP1_RW = '0' and Reset = '1' else x"00000000000000000000000000000000" when Reset = '0' else x"00000000000000000000000000000000";
     
     --TP0 READ Downstream                    
     Noc_reg_mux0     <= TP_Data0(15)(addr_cntr0) & TP_Data0(14)(addr_cntr0) & TP_Data0(13)(addr_cntr0) & TP_Data0(12)(addr_cntr0) & 
                         TP_Data0(11)(addr_cntr0) & TP_Data0(10)(addr_cntr0) & TP_Data0(9)(addr_cntr0)  & TP_Data0(8)(addr_cntr0)  & 
                         TP_Data0(7)(addr_cntr0)  & TP_Data0(6)(addr_cntr0)  & TP_Data0(5)(addr_cntr0)  & TP_Data0(4)(addr_cntr0)  & 
-                        TP_Data0(3)(addr_cntr0)  & TP_Data0(2)(addr_cntr0)  & TP_Data0(1)(addr_cntr0)  & TP_Data0(0)(addr_cntr0) when Enable_TP0_Down = '1' and TP0_RW = '0' and Reset = '0' else x"00000000000000000000000000000000" when Reset = '1' else x"00000000000000000000000000000000";
+                        TP_Data0(3)(addr_cntr0)  & TP_Data0(2)(addr_cntr0)  & TP_Data0(1)(addr_cntr0)  & TP_Data0(0)(addr_cntr0) when Enable_TP0_Down = '1' and TP0_RW = '0' and Reset = '1' else x"00000000000000000000000000000000" when Reset = '0' else x"00000000000000000000000000000000";
                         
     --TP0 READ Upstream
     Noc_data_mux0    <= TP_Data0(addr_cntr0)(15) & TP_Data0(addr_cntr0)(14) & TP_Data0(addr_cntr0)(13) & TP_Data0(addr_cntr0)(12) &
                         TP_Data0(addr_cntr0)(11) & TP_Data0(addr_cntr0)(10) & TP_Data0(addr_cntr0)(9)  & TP_Data0(addr_cntr0)(8)  &
                         TP_Data0(addr_cntr0)(7)  & TP_Data0(addr_cntr0)(6)  & TP_Data0(addr_cntr0)(5)  & TP_Data0(addr_cntr0)(4)  &
-                        TP_Data0(addr_cntr0)(3)  & TP_Data0(addr_cntr0)(2)  & TP_Data0(addr_cntr0)(1)  & TP_Data0(addr_cntr0)(0) when Enable_TP0_UP = '1'   and TP0_RW = '0' and Reset = '0' else x"00000000000000000000000000000000" when Reset = '1' else  x"00000000000000000000000000000000";                                            
-                        
+                        TP_Data0(addr_cntr0)(3)  & TP_Data0(addr_cntr0)(2)  & TP_Data0(addr_cntr0)(1)  & TP_Data0(addr_cntr0)(0) when Enable_TP0_UP = '1'   and TP0_RW = '0' and Reset = '1' else x"00000000000000000000000000000000" when Reset = '0' else  x"00000000000000000000000000000000";                                            
+     
              
     process(clk, reset)
     variable i : integer range 0 to 15 := 0;
     begin
-        if reset = '1' then
+        if reset = '0' then
             addr_cntr1              <= 0;
             addr_cntr0              <= 0;      
             TP_Interchange_FF       <= '0';
@@ -169,7 +169,7 @@ begin
                          addr_cntr0 <= 0;
                     end if;        
                 end if;                
-            end if;                           
+            end if;                    
         end if; --reset
     end process;
 

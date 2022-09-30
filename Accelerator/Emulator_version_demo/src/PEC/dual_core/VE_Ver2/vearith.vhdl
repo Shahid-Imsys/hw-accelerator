@@ -11,14 +11,19 @@ entity vearith is
     enable_mul     : in  std_logic;
     enable_acc     : in  std_logic;
     enable_sum     : in  std_logic;
+    enable_lod     : in  std_logic;
     data        : in  std_logic_vector(63 downto 0);
     weight      : in  std_logic_vector(63 downto 0);
+    feedback    : in  std_logic_vector(63 downto 0);
     ctrl_addmul : in  all_addmul_ctrl;
     ctrl_acc    : in  all_acc_ctrl;
     ppctrl      : in  pp_ctrl;
+    lodctrl        : in  lzod_ctrl;
     zpdata      : in  std_logic_vector(7 downto 0);
     zpweight    : in  std_logic_vector(7 downto 0);
-    result      : out signed(32 downto 0)
+    result      : out signed(32 downto 0);
+    to_shift    : out ppshift_shift_ctrl;
+    to_addbias  : out std_logic
     );
 end entity vearith;
 
@@ -42,6 +47,15 @@ architecture first of vearith is
   alias aR1 : std_logic_vector(7 downto 0) is weight(15 downto 8);
   alias aR0 : std_logic_vector(7 downto 0) is weight(7 downto 0);
 
+  alias aF7 : std_logic_vector(7 downto 0) is feedback(63 downto 56);
+  alias aF6 : std_logic_vector(7 downto 0) is feedback(55 downto 48);
+  alias aF5 : std_logic_vector(7 downto 0) is feedback(47 downto 40);
+  alias aF4 : std_logic_vector(7 downto 0) is feedback(39 downto 32);
+  alias aF3 : std_logic_vector(7 downto 0) is feedback(31 downto 24);
+  alias aF2 : std_logic_vector(7 downto 0) is feedback(23 downto 16);
+  alias aF1 : std_logic_vector(7 downto 0) is feedback(15 downto 8);
+  alias aF0 : std_logic_vector(7 downto 0) is feedback(7 downto 0);
+
 -- Constants
   constant czero   : std_logic_vector(7 downto 0) := "00000000";
   constant conefft : std_logic_vector(7 downto 0) := "10000000";
@@ -62,6 +76,9 @@ architecture first of vearith is
 
 -- accumulator result
   signal acc7, acc6, acc5, acc4, acc3, acc2, acc1, acc0 : signed(31 downto 0);
+  signal sign6, sign4, sign2, sign0 : std_logic;
+
+  -- TODO: add abs sign
 
   component addmul is
     port(
@@ -90,7 +107,8 @@ architecture first of vearith is
       en       : in  std_logic;
       mul, mul_odd : in  signed(17 downto 0);
       ctrl         : in  acce_ctrl;
-      result       : out signed(31 downto 0)
+      result       : out signed(31 downto 0);
+      sign_o       : out std_logic
       );
   end component;
 
@@ -111,6 +129,24 @@ architecture first of vearith is
       );
   end component;
 
+  component lod
+  port (
+    clk      : in  std_logic;
+    enable   : in  std_logic;
+    data3    : in  std_logic_vector(31 downto 0);
+    data2    : in  std_logic_vector(31 downto 0);
+    data1    : in  std_logic_vector(31 downto 0);
+    data0    : in  std_logic_vector(31 downto 0);
+    sign3    : in std_logic;
+    sign2    : in std_logic;
+    sign1    : in std_logic;
+    sign0    : in std_logic;
+    ctrl     : in  lzod_ctrl;
+    to_shift : out ppshift_shift_ctrl;
+    to_addbias : out std_logic
+  );
+  end component lod;
+
 begin
 
 
@@ -120,21 +156,28 @@ begin
 
   with ctrl_addmul.mux7l0 select val7l0 <=
     aL7   when L7,
-    czero when zero;
+    czero when zero,
+    aF7   when F7,
+    aF5   when F5;
 
   with ctrl_addmul.mux7l1 select val7l1 <=
     zpdata when zpd,
     czero  when zero,
     aR7    when R7,
     aL3    when L3,
-    conefft  when onefft;
+    aL5    when L5;
+    -- TODO
+    --conefft  when onefft;
 
   with ctrl_addmul.mux7r0 select val7r0 <=
     aR7     when R7,
     aR5     when R5,
     aR3     when R3,
     conefft when onefft,
-    aL1     when L1;
+    aL1     when L1,
+    aF1     when F1,
+    aF3     when F3,
+    aF5     when F5;
 
   with ctrl_addmul.mux7r1 select val7r1 <=
     zpweight when zpw,
@@ -172,14 +215,17 @@ begin
 
   with ctrl_addmul.mux6l0 select val6l0 <=
     aL6   when L6,
-    czero when zero;
+    czero when zero,
+    aF4   when F4,
+    aF6   when F6;
 
   with ctrl_addmul.mux6l1 select val6l1 <=
     zpdata when zpd,
     czero  when zero,
     aR6    when R6,
     aL2    when L2,
-    aL0    when L0;
+    --aL0    when L0,
+    aL4    when L4;
 
   with ctrl_addmul.mux6r0 select val6r0 <=
     aR7     when R7,
@@ -187,7 +233,10 @@ begin
     aR5     when R5,
     aR3     when R3,
     conefft when onefft,
-    aL1     when L1;
+    aL1     when L1,
+    aF1     when F1,
+    aF3     when F3,
+    aF5     when F5;
 
   with ctrl_addmul.mux6r1 select val6r1 <=
     zpweight when zpw,
@@ -217,7 +266,8 @@ begin
       mul     => mul6,
       mul_odd => mul7,
       ctrl    => ctrl_acc.acc6,
-      result  => acc6
+      result  => acc6,
+      sign_o  => sign6
       );
 
 -- Lane 5
@@ -227,13 +277,16 @@ begin
   with ctrl_addmul.mux5l0 select val5l0 <=
     aL7   when L7,
     aL5   when L5,
-    czero when zero;
+    czero when zero,
+    aF5   when F5,
+    aF7   when F7;
 
   with ctrl_addmul.mux5l1 select val5l1 <=
     zpdata when zpd,
     czero  when zero,
     aR5    when R5,
-    aL3    when L3;
+    aL3    when L3,
+    aL5    when L5;
 
   with ctrl_addmul.mux5r0 select val5r0 <=
     aR6     when R6,
@@ -241,7 +294,10 @@ begin
     aR4     when R4,
     aR2     when R2,
     conefft when onefft,
-    aL0     when L0;
+    aL0     when L0,
+    aF0     when F0,
+    aF2     when F2,
+    aF4     when F4;
 
   with ctrl_addmul.mux5r1 select val5r1 <=
     zpweight when zpw,
@@ -280,20 +336,26 @@ begin
   with ctrl_addmul.mux4l0 select val4l0 <=
     aL6   when L6,
     aL4   when L4,
-    czero when zero;
+    czero when zero,
+    aF4   when F4,
+    aF6   when F6;
 
   with ctrl_addmul.mux4l1 select val4l1 <=
     zpdata when zpd,
     czero  when zero,
     aR4    when R4,
-    aL2    when L2;
+    aL2    when L2,
+    aL4    when L4;
 
   with ctrl_addmul.mux4r0 select val4r0 <=
     aR6     when R6,
     aR4     when R4,
     aR2     when R2,
     conefft when onefft,
-    aL0     when L0;
+    aL0     when L0,
+    aF0     when F0,
+    aF2     when F2,
+    aF4     when F4;
 
   with ctrl_addmul.mux4r1 select val4r1 <=
     zpweight when zpw,
@@ -323,7 +385,8 @@ begin
       mul     => mul4,
       mul_odd => mul5,
       ctrl    => ctrl_acc.acc4,
-      result  => acc4
+      result  => acc4,
+      sign_o  => sign4
       );
 
 -- Lane 3
@@ -333,7 +396,8 @@ begin
   with ctrl_addmul.mux3l0 select val3l0 <=
     aL5   when L5,
     aL3   when L3,
-    czero when zero;
+    czero when zero,
+    AF7   when F7;
 
   with ctrl_addmul.mux3l1 select val3l1 <=
     zpdata when zpd,
@@ -387,7 +451,8 @@ begin
   with ctrl_addmul.mux2l0 select val2l0 <=
     aL2   when L2,
     aL4   when L4,
-    czero when zero;
+    czero when zero,
+    aF6   when F6;
 
   with ctrl_addmul.mux2l1 select val2l1 <=
     zpdata when zpd,
@@ -433,7 +498,8 @@ begin
       mul     => mul2,
       mul_odd => mul3,
       ctrl    => ctrl_acc.acc2,
-      result  => acc2
+      result  => acc2,
+      sign_o  => sign2
       );
 
 -- Lane 1
@@ -541,7 +607,8 @@ begin
       mul     => mul0,
       mul_odd => mul1,
       ctrl    => ctrl_acc.acc0,
-      result  => acc0
+      result  => acc0,
+      sign_o  => sign0
       );
 
 -- Post-processing
@@ -563,6 +630,24 @@ begin
       ctrl    => ppctrl,
       result  => result
       );
+
+  -- Leading one detection
+    lod_i : lod
+    port map (
+      clk      => clk,
+      enable   => enable_lod,
+      data3    => std_logic_vector(acc6),
+      data2    => std_logic_vector(result(31 downto 0)), --TODO
+      data1    => std_logic_vector(acc2),
+      data0    => std_logic_vector(acc0),
+      sign3    => sign6,
+      sign2    => sign4,
+      sign1    => sign2,
+      sign0    => sign0,
+      ctrl     => lodctrl,
+      to_shift => to_shift,
+      to_addbias => to_addbias
+    );
 
 
 end architecture;

@@ -76,7 +76,7 @@ begin
     
     process(clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             GPP_CMD_Reg         <= (others => '0');
             CMD_FF              <= '0';
             NOC_Length_plus     <= (others => '0');         

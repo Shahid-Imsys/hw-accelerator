@@ -9,7 +9,7 @@ entity mpram_memory is
 
   generic (
     g_file_name   : string        := "mpram0.data";
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     address : in  std_logic_vector(10 downto 0);

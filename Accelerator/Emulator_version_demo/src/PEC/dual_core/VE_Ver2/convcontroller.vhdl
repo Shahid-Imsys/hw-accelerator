@@ -73,7 +73,7 @@ begin
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
-  ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), shift_dir => right);
+  ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => right);
   addbiasinst   <= (acc => addbias, quant => trunc);
   clipinst      <= (clip => clip8, outreg => out0);
 
@@ -222,13 +222,15 @@ begin
     if rising_edge(clk) then
       if bias_addr_assign = '1' then
         bias_addr_reg <= bias_index_start;         
-      elsif pp_stage_1 = '1' then
+      elsif pp_stage_1 = '1' and pp_ctl(1) = '0' then
         bias_mux <= bias_addr_reg (1 downto 0);
         if bias_addr_reg = bias_index_end then
           bias_addr_reg <= bias_index_start;
         else
           bias_addr_reg <= std_logic_vector(to_unsigned(to_integer(unsigned(bias_addr_reg))+1,8));
         end if;
+      else
+        bias_addr_reg <= bias_addr_reg;
       end if;
     end if;
   end process;

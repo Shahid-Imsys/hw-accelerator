@@ -79,7 +79,7 @@ begin
     
     process(clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             counter                 <= (others => '0');  
             PEC_ready_FF            <= '0';     
             NOC_Ready_FF            <= '0';     
@@ -89,19 +89,19 @@ begin
         elsif rising_edge(clk) then
             NOC_CMD_flag_i          <= not(GPP_CMD_ACK) and NOC_CMD_FF_value;
         
-            if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '1')) then
+            if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '0')) then
                 NOC_Ready_FF        <= '1';
             else     
                 NOC_Ready_FF        <= '0';
             end if;
             
-            if ((PEC_ready = '1' or PEC_ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(1) = '1') or Reset = '1')) then
+            if ((PEC_ready = '1' or PEC_ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(1) = '1') or Reset = '0')) then
                 PEC_ready_FF        <= '1';
             else     
                 PEC_ready_FF        <= '0';
             end if;
                        
-            if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '1')) then
+            if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
                 NOC_ERROR_FF        <= '1';
             else     
                 NOC_ERROR_FF        <= '0';

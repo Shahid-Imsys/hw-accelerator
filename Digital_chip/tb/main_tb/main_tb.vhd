@@ -169,7 +169,7 @@ begin  -- architecture tb
   mtest <= '0';
 
   pad(A)(7 downto 5) <= "LLL";  --"000";          -- This is read by ROM bootloader
-  pad(A)(4 downto 3) <= "LH";  --"01";           -- Set SP communication at /2 speed
+  pad(A)(4 downto 3) <= "LL";  --"00";           -- Set SP communication at /4 speed
   pad(A)(2 downto 1) <= "LH";  --"01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
 

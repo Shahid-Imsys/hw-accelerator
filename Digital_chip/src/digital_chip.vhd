@@ -368,7 +368,7 @@ begin  -- architecture rtl
         )
       port map (
         hclk          => dco_clk(0),
-        clk_noc       => '0',
+        clk_noc       => dco_clk(0),
         pll_ref_clk   => pll_ref_clk_in,
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
@@ -1208,7 +1208,7 @@ begin  -- architecture rtl
         di  => mrstout
         );
 
-  pa_i(4 downto 1) <= "0101";
+  pa_i(4 downto 1) <= "0001";
   
     i_pa0_sin_pad : entity work.inoutput_pad
       generic map (

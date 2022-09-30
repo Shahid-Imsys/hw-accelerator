@@ -33,7 +33,6 @@ entity digital_core is
 
   generic (
     g_memory_type         : memory_type_t := asic;
-    USE_ASIC_MEMORIES     : boolean       := false;
     ionoc_fifo_depth_bits : integer       := 4;  -- Each FIFO is 2^x = 16 words deep
     g_clock_frequency     : integer);
 
@@ -270,12 +269,22 @@ architecture rtl of digital_core is
   signal NOC_IO_DIR    : std_logic;
   signal NOC_WRITE_REQ : std_logic;
   signal IO_WRITE_ACK  : std_logic;
+  
+  signal USE_ASIC_MEMORIES : boolean;
 
 begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
+  
+  FPGA_MEM: if g_memory_type = fpga generate
+     USE_ASIC_MEMORIES <= false;
+  end generate;
+  
+  ASIC_MEM: if g_memory_type /= fpga generate
+     USE_ASIC_MEMORIES <= true;
+  end generate;
 
-  noc_top_inst : Accelerator_Top
+  Accelerator_Top_inst : Accelerator_Top
     generic map(
       USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
     port map (
@@ -299,7 +308,7 @@ begin  -- architecture rtl
       NOC_DATA_EN   => NOC_DATA_EN
       );
 
-  noc_adaptger_inst : fpga_noc_adapter
+  noc_adapter_inst : fpga_noc_adapter
     generic map (
       ionoc_fifo_depth_bits => ionoc_fifo_depth_bits,  -- Each FIFO is 2^x = 16 words deep,
       ionoc_status_address  => x"45",

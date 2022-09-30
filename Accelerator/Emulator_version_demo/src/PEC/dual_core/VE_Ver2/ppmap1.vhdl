@@ -52,5 +52,9 @@ begin
     (mux3 => add8, mux2 => add, mux1 => add8, mux0 => add,
      acc  => acc, addsub => add, reg => enable) when sum16,
     (mux3 => add8, mux2 => add, mux1 => zero, mux0 => zero,
-     acc  => acc, addsub => add, reg => enable) when sum16left;
+     acc  => acc, addsub => add, reg => enable) when sum16left,
+    (mux3 => add8, mux2 => add, mux1 => zero, mux0 => zero,
+     acc  => zero, addsub => add, reg => enable) when matmulleft,
+     (mux3 => add, mux2 => zero, mux1 => add8, mux0 => zero,
+     acc  => zero, addsub => subl, reg => enable) when nrit;
 end architecture;

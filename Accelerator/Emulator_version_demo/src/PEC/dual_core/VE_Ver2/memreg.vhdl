@@ -30,7 +30,7 @@ begin
         if ctrl.datareg = enable then
           if ctrl.swap = noswap then
             dataout <= data0 & data1;
-          elsif ctrl.swap = weighttodata then
+          elsif ctrl.swap = switch then
             dataout <= weight;
           else
             dataout <= data1 & data0;
@@ -45,7 +45,11 @@ begin
     if rising_edge(clk) then
       if en = '1' then
         if ctrl.weightreg = enable then
-          weightout <= weight;
+          if ctrl.swap = switch then
+            weightout <= data0 & data1;
+          else
+            weightout <= weight;
+          end if;
         end if;
       end if;
     end if;

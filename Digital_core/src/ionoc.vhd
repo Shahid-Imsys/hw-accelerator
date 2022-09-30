@@ -623,7 +623,7 @@ begin
         RxFIFO_Valid_int <= '1';
         --
         for b in ionoc_wrdata'range loop
-          RxFIFO_Data(8*b + 7 downto 8*b) <= ionoc_wrdata(b);
+          RxFIFO_Data(8*b + 7 downto 8*b) <= ionoc_wrdata(15 - b);
         end loop;
       end if;
       --
@@ -690,7 +690,7 @@ begin
       ------------------------------------------------------------
       -- Handle write index and wrdata pending flag
       --
-      if data_wr = '0' or ionoc_rxfifo_valid_f = '1' then
+      if ilioa = '0' or ionoc_rxfifo_valid_f = '1' then
         ionoc_datawrindex <= 0;         -- Reset write index on new data access
 
       elsif data_wr = '1' and clk_i_pos = '0' then

@@ -36,15 +36,11 @@ class mp2coe:
                         return
 
                     for _byte in data:
-                        # self.mpData.append( _byte.hex() )
-
-                        str = ''
                         for i in range(8):
                             if int.from_bytes(_byte, 'big') & (0x80 >> i):
-                                str += '1'
+                                self.mpData.append( '1' )
                             else:
-                                str += '0'
-                        self.mpData.append( str )
+                                self.mpData.append( '0' )
 
         except IOError:
             print(" * Error reading " + self.mpFileName )
@@ -66,7 +62,6 @@ class mp2coe:
                         lines = lines + 1
                     file.write(b)
                     n = n + 1
-
                 file.write(";\n")
 
         except IOError:

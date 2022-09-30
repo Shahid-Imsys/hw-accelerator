@@ -269,24 +269,15 @@ architecture rtl of digital_core is
   signal NOC_IO_DIR    : std_logic;
   signal NOC_WRITE_REQ : std_logic;
   signal IO_WRITE_ACK  : std_logic;
-  
-  signal USE_ASIC_MEMORIES : boolean;
 
 begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
   
   FPGA_MEM: if g_memory_type = fpga generate
-     USE_ASIC_MEMORIES <= false;
-  end generate;
-  
-  ASIC_MEM: if g_memory_type /= fpga generate
-     USE_ASIC_MEMORIES <= true;
-  end generate;
-
   Accelerator_Top_inst : Accelerator_Top
     generic map(
-      USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
+      USE_ASIC_MEMORIES => false )
     port map (
       clk           => clk_noc,
       Reset         => cpu_rst_n,
@@ -307,6 +298,33 @@ begin  -- architecture rtl
       NOC_DATA_DIR  => NOC_DATA_DIR,
       NOC_DATA_EN   => NOC_DATA_EN
       );
+  end generate;
+  
+  ASIC_MEM: if g_memory_type /= fpga generate -- also sim
+  Accelerator_Top_inst : Accelerator_Top
+    generic map(
+      USE_ASIC_MEMORIES => true )
+    port map (
+      clk           => clk_noc,
+      Reset         => cpu_rst_n,
+      PEC_Ready     => '0',
+      GPP_CMD_ACK   => GPP_CMD_ACK,
+      GPP_CMD_Flag  => GPP_CMD_Flag,
+      GPP_CMD_Data  => GPP_CMD,
+      NOC_CMD_flag  => NOC_CMD_flag,
+      NOC_CMD_ACK   => NOC_CMD_ACK,
+      NOC_CMD_Data  => NOC_CMD,
+      IO_data       => IO_data,
+      NOC_data      => NOC_data,
+      NOC_Address   => NOC_Address,
+      NOC_Length    => NOC_Length,
+      NOC_WRITE_REQ => NOC_WRITE_REQ,
+      IO_WRITE_ACK  => IO_WRITE_ACK,
+      FIFO_Ready    => FIFO_Ready,
+      NOC_DATA_DIR  => NOC_DATA_DIR,
+      NOC_DATA_EN   => NOC_DATA_EN
+      );
+  end generate;
 
   noc_adapter_inst : fpga_noc_adapter
     generic map (

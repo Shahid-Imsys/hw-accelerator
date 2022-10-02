@@ -30,10 +30,13 @@ use ieee.std_logic_1164.all;
 use work.pad_instance_package.all;
 use work.data_types_pack.all;
 
+use work.gp_pkg.all;
+
 entity digital_chip is
 
   generic (
-    g_simulation      : boolean := false
+    g_memory_type     : memory_type_t := asic;
+    g_simulation      : boolean       := false
     );
   port (
     -- PLL reference clock
@@ -363,8 +366,9 @@ begin  -- architecture rtl
   i_digital_top : entity work.digital_top 
     generic map
       (
-        g_clock_frequency => 31,  -- system clock frequency in MHz
-        g_simulation => g_simulation
+        g_memory_type     => g_memory_type,
+        g_simulation      => g_simulation,
+        g_clock_frequency => 31  -- system clock frequency in MHz
         )
       port map (
         hclk          => dco_clk(0),

@@ -83,7 +83,8 @@ begin  -- architecture tb
 
   dut : entity work.digital_chip
     generic map (
-      g_simulation => true
+      g_memory_type => simulation,
+      g_simulation  => true
       )
     port map (
       pll_ref_clk => MX1_CK,

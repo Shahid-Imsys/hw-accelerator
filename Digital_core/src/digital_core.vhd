@@ -274,7 +274,7 @@ begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
   
-  FPGA_MEM: if g_memory_type = fpga generate
+  FPGA_MEM: if g_memory_type /= asic generate
   Accelerator_Top_inst : Accelerator_Top
     generic map(
       USE_ASIC_MEMORIES => false )
@@ -300,7 +300,7 @@ begin  -- architecture rtl
       );
   end generate;
   
-  ASIC_MEM: if g_memory_type /= fpga generate -- also sim
+  ASIC_MEM: if g_memory_type = asic generate
   Accelerator_Top_inst : Accelerator_Top
     generic map(
       USE_ASIC_MEMORIES => true )

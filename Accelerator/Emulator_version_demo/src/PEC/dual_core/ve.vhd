@@ -37,6 +37,7 @@ use ieee.numeric_std.all;
 
 use work.instructiontypes.all;
 use work.vetypes.all;
+use work.mpgmfield_lib.all;
 --use work.cluster_pkg.all;
 
 entity ve is
@@ -214,28 +215,32 @@ architecture rtl of ve is
 
   component re
     port(
-      clk              : in std_logic;
-      rst              : in std_logic;
-      clk_e_pos        : in std_logic;
-      mode_a           : in std_logic;
-      mode_b           : in std_logic;
-      mode_c           : in std_logic;
-      data_valid       : in std_logic;
-      re_start         : in std_logic;
-      re_source        : in std_logic;
-      cnt_rst          : in std_logic;
-      wr_counter       : in std_logic_vector(7 downto 0);
-      re_busy          : out std_logic;
-      write_en_data    : out std_logic;
-      write_en_weight  : out std_logic;
-      write_en_bias    : out std_logic;
-      mode_c_l         : out std_logic;
-      left_rst         : out std_logic;
-      right_rst        : out std_logic;
-      bias_rst         : out std_logic;
-      left_load        : out std_logic;
-      right_load       : out std_logic;
-      bias_load        : out std_logic
+      clk             : in std_logic;
+      rst             : in std_logic;
+      clk_e_pos       : in std_logic;
+      mode_a          : in std_logic;
+      mode_b          : in std_logic;
+      mode_c          : in std_logic;
+      data_valid      : in std_logic;
+      re_start        : in std_logic;
+      re_source       : in std_logic;
+      cnt_rst         : in std_logic;
+      wr_counter      : in std_logic_vector(7 downto 0);
+      re_busy         : out std_logic;
+      write_en_data   : out std_logic;
+      write_en_weight : out std_logic;
+      write_en_bias   : out std_logic;
+      mode_c_l        : out std_logic;
+      left_rst        : out std_logic;
+      right_rst       : out std_logic;
+      bias_rst        : out std_logic;
+      left_load       : out std_logic;
+      right_load      : out std_logic;
+      bias_load       : out std_logic;
+      apushback_rst   : out std_logic;
+      bpushback_rst   : out std_logic;
+      apushback_load  : out std_logic;
+      bpushback_load  : out std_logic
     );
   end component;
 
@@ -315,7 +320,6 @@ architecture rtl of ve is
   signal start, conv_start, fft_start : std_logic;
   signal lau_activate, rau_activate, bau_activate, activate_from_re : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
-  signal laddon_off, raddon_off, baddon_off : std_logic_vector(2 downto 0);
   --signal mac_switch : std_logic;
   --Shared signals
   signal mode_a : std_logic; --mode A activate
@@ -335,9 +339,8 @@ architecture rtl of ve is
   signal dtm_data_reg : dtm_word;
   signal mode_latch : mode;
   signal fft_read_state : read_state;
-  signal au_lcmp, au_loffset : au_param;
-  signal au_rcmp, au_roffset : au_param;
-  signal au_bcmp, au_boffset : au_param;
+  signal au_lcmp, au_loffset, au_rcmp, au_roffset, au_bcmp, au_boffset : au_param;
+  signal pa_cmp, pa_offset, pb_offset, pb_cmp : au_param;
   signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
   signal re_loop_reg : std_logic_vector(7 downto 0); --receive engine's loop counter register
   signal re_loop : std_logic_vector(7 downto 0); --receive engine's loop counter
@@ -345,6 +348,7 @@ architecture rtl of ve is
   signal ve_saddr_l, ve_saddr_r  : std_logic_vector(7 downto 0); --Left starting address register
   signal left_baseaddress, right_baseaddress : std_logic_vector(7 downto 0);
   signal left_finaladdress, right_finaladdress, bias_finaladdress : std_logic_vector(7 downto 0);
+  signal apushback_finaladdress, bpushback_finaladdress : std_logic_vector(7 downto 0);
   signal ve_loop, ve_oloop, dot_cnt, oc_cnt     : std_logic_vector(7 downto 0);
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
@@ -356,6 +360,7 @@ architecture rtl of ve is
   signal lrst_from_re, rrst_from_re, brst_from_re : std_logic;
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
+  signal apushback_load, bpushback_load, apushback_rst, bpushback_rst : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -385,8 +390,6 @@ architecture rtl of ve is
   signal data1  : std_logic_vector(31 downto 0);
   signal weight  : std_logic_vector(63 downto 0);
   signal bias_buf_out : std_logic_vector(63 downto 0);
-  signal bias_mux_out : std_logic_vector(31 downto 0);
-  signal bias_mux     : std_logic_vector(1 downto 0);
   signal bypass     : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
@@ -467,61 +470,7 @@ architecture rtl of ve is
   signal weight_addr_o : std_logic_vector(7 downto 0);
   signal fft_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
-  --------------------------------
-  --Register set selection fields (can be moved to mpgmfield_lib.vhd?)
-  --------------------------------
-  constant CONS_NON_ACT          : std_logic_vector(5 downto 0) := "00"&x"0";
-  constant CONS_RE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"1"; --write left starting address of receive engine
-  constant CONS_RE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"2"; --write right starting address of recieve engine
-  constant CONS_RE_LC            : std_logic_vector(5 downto 0) := "00"&x"3"; --write receive engine's loop counter
-  constant CONS_DFY_ADDR_A       : std_logic_vector(5 downto 0) := "00"&x"4"; --push back address from DFY
-  constant CONS_DFY_ADDR_B       : std_logic_vector(5 downto 0) := "00"&x"5"; --push back address from DFY, B mode
-  constant CONS_VE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"6"; --vector engine's left starting address
-  constant CONS_VE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"7"; --vector engine's right starting address
-  constant CONS_VE_LC            : std_logic_vector(5 downto 0) := "00"&x"8"; --vector engine's INNER loop counter
-  constant CONS_VE_OFFSET_L      : std_logic_vector(5 downto 0) := "00"&x"9"; --left offset
-  constant CONS_VE_OFFSET_R      : std_logic_vector(5 downto 0) := "00"&x"a"; --right offset
-  constant CONS_VE_DEPTH_L       : std_logic_vector(5 downto 0) := "00"&x"b"; --left depth
-  constant CONS_VE_JUMP_L        : std_logic_vector(5 downto 0) := "00"&x"c"; --left jump
-  constant CONS_DFY_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"d"; --write DFY
-  constant CONS_DFY_REG_PARALLEL : std_logic_vector(5 downto 0) := "00"&x"e"; --write DFY in parallel from mac registers
-  constant CONS_DTM_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"f"; --Write DTM --?
-  constant CONS_VE_OLC           : std_logic_vector(5 downto 0) := "01"&x"0"; --write vector engine's OUTER loop counter
-  constant CONS_CONFIG           : std_logic_vector(5 downto 0) := "01"&x"1"; --write config register for both ring mode and inner-outer loop mode
-  constant CONS_RING_END         : std_logic_vector(5 downto 0) := "01"&x"2"; --Ring mode end address
-  constant CONS_RING_START       : std_logic_vector(5 downto 0) := "01"&x"3"; --Ring mode start address. 
-  --constant CONS_CURR_RING        : std_logic_vector(4 downto 0) := "1"&x"3"; --Current ring address register. Always written when ring_start writes. 
-  constant CONS_ZP_DATA          : std_logic_vector(5 downto 0) := "01"&x"4"; --Zero point value for data register, signed
-  constant CONS_ZP_WEIGHT        : std_logic_vector(5 downto 0) := "01"&x"5"; --Zero point value for weight register, signed
-  constant CONS_SCALE            : std_logic_vector(5 downto 0) := "01"&x"6"; --Scale factor for shifter
-  constant CONS_PP_CTL           : std_logic_vector(5 downto 0) := "01"&x"7"; --Controls the bypass of different logics inside post processors
-  constant CONS_BIAS_INDEX_END   : std_logic_vector(5 downto 0) := "01"&x"8"; --End indexing of the bias 
-  constant CONS_BIAS_INDEX_START : std_logic_vector(5 downto 0) := "01"&x"9"; --Start indexing of the bias
---AU parameters
-  constant CONS_AU_LOFFSET0       : std_logic_vector(5 downto 0) := "10"&x"0"; --add left offset0 of addressing unit
-  constant CONS_AU_LOFFSET1       : std_logic_vector(5 downto 0) := "10"&x"1"; --add left offset1 of addressing unit
-  constant CONS_AU_LOFFSET2       : std_logic_vector(5 downto 0) := "10"&x"2"; --add left offset2 of addressing unit
-  constant CONS_AU_LOFFSET3       : std_logic_vector(5 downto 0) := "10"&x"3"; --add left offset4 of addressing unit
-  constant CONS_AU_LCMP0          : std_logic_vector(5 downto 0) := "10"&x"4"; --left compare value0 of addressing unit
-  constant CONS_AU_LCMP1          : std_logic_vector(5 downto 0) := "10"&x"5"; --left compare value1 of addressing unit
-  constant CONS_AU_LCMP2          : std_logic_vector(5 downto 0) := "10"&x"6"; --left compare value2 of addressing unit
-  constant CONS_AU_LCMP3          : std_logic_vector(5 downto 0) := "10"&x"7"; --left compare value3 of addressing unit
-  constant CONS_AU_ROFFSET0       : std_logic_vector(5 downto 0) := "10"&x"8"; --add right offset0 of addressing unit
-  constant CONS_AU_ROFFSET1       : std_logic_vector(5 downto 0) := "10"&x"9"; --add right offset1 of addressing unit
-  constant CONS_AU_ROFFSET2       : std_logic_vector(5 downto 0) := "10"&x"A"; --add right offset2 of addressing unit
-  constant CONS_AU_ROFFSET3       : std_logic_vector(5 downto 0) := "10"&x"B"; --add right offset4 of addressing unit
-  constant CONS_AU_RCMP0          : std_logic_vector(5 downto 0) := "10"&x"C"; --right compare value0 of addressing unit
-  constant CONS_AU_RCMP1          : std_logic_vector(5 downto 0) := "10"&x"D"; --right compare value1 of addressing unit
-  constant CONS_AU_RCMP2          : std_logic_vector(5 downto 0) := "10"&x"E"; --right compare value2 of addressing unit
-  constant CONS_AU_RCMP3          : std_logic_vector(5 downto 0) := "10"&x"F"; --right compare value3 of addressing unit
-  constant CONS_AU_BOFFSET0       : std_logic_vector(5 downto 0) := "11"&x"0"; --add bias offset0 of addressing unit
-  constant CONS_AU_BOFFSET1       : std_logic_vector(5 downto 0) := "11"&x"1"; --add bias offset1 of addressing unit
-  constant CONS_AU_BOFFSET2       : std_logic_vector(5 downto 0) := "11"&x"2"; --add bias offset2 of addressing unit
-  constant CONS_AU_BOFFSET3       : std_logic_vector(5 downto 0) := "11"&x"3"; --add bias offset4 of addressing unit
-  constant CONS_AU_BCMP0          : std_logic_vector(5 downto 0) := "11"&x"4"; --bias compare value0 of addressing unit
-  constant CONS_AU_BCMP1          : std_logic_vector(5 downto 0) := "11"&x"5"; --bias compare value1 of addressing unit
-  constant CONS_AU_BCMP2          : std_logic_vector(5 downto 0) := "11"&x"6"; --bias compare value2 of addressing unit
-  constant CONS_AU_BCMP3          : std_logic_vector(5 downto 0) := "11"&x"7"; --bias compare value3 of addressing unit
+
   --constant CONS_MAC_SWITCH       : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
   --------------------------------------------------------
   --Delay FFs
@@ -580,6 +529,10 @@ begin
           au_roffset        <= (others => (others => '0'));
           au_bcmp           <= (others => (others => '0'));
           au_boffset        <= (others => (others => '0'));
+          pa_cmp            <= (others => (others => '0'));
+          pa_offset         <= (others => (others => '0'));
+          pb_cmp            <= (others => (others => '0'));
+          pb_offset         <= (others => (others => '0'));
         elsif reg_in = CONS_RE_START_ADDR_L then
           re_saddr_l <= YBUS;
         elsif reg_in = CONS_RE_START_ADDR_R then
@@ -606,7 +559,6 @@ begin
           ring_end_addr <= YBUS;
         elsif reg_in = CONS_RING_START then
           ring_start_addr <= YBUS;
-          --curr_ring_addr <= YBUS;
         elsif reg_in = CONS_ZP_DATA then
           zp_data <= YBUS;
         elsif reg_in = CONS_ZP_WEIGHT then
@@ -667,6 +619,38 @@ begin
           au_bcmp(2) <= unsigned(YBUS);
         elsif reg_in = CONS_AU_BCMP3 then
           au_bcmp(3) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PACMP0 then
+          pa_cmp(0) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PACMP1 then
+          pa_cmp(1) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PACMP2 then
+          pa_cmp(2) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PACMP3 then
+          pa_cmp(3) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PAOFFSET0 then
+          pa_offset(0) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PAOFFSET1 then
+          pa_offset(1) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PAOFFSET2 then
+          pa_offset(2) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PAOFFSET3 then
+          pa_offset(3) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBCMP0 then
+          pb_cmp(0) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBCMP1 then
+          pb_cmp(1) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBCMP2 then
+          pb_cmp(2) <= unsigned(YBUS);
+        --elsif reg_in = CONS_AU_PBCMP3 then   -- parameter field fulled 
+        --  pb_cmp(3) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBOFFSET0 then
+          pb_offset(0) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBOFFSET1 then
+          pb_offset(1) <= unsigned(YBUS);
+        elsif reg_in = CONS_AU_PBOFFSET2 then
+          pb_offset(2) <= unsigned(YBUS);
+        --elsif reg_in = CONS_AU_PBOFFSET3 then   -- parameter field fulled 
+        --  pb_offset(3) <= unsigned(YBUS);
         end if;
       end if;
     end if;
@@ -715,6 +699,8 @@ begin
     end if;
   end process;
 
+  fft_en <= '1' when mode_latch = fft else '0'; -- more enable signals should be added to controllers later to reduce power consumption.
+
   --********************************
   --Mode c. Shared by RE and VE
   --********************************
@@ -752,10 +738,8 @@ begin
   AUparam_mux : process(all)
   begin
     case mode_latch is 
-      when re_mode => left_baseaddress  <= re_saddr_a when re_source = '1' 
-                                                      else re_saddr_l;
-                      right_baseaddress <= re_saddr_b when re_source = '1' 
-                                                      else re_saddr_r;
+      when re_mode => left_baseaddress  <= re_saddr_l;                                                    
+                      right_baseaddress <= re_saddr_r; 
                       left_loading <= lload_from_re;
                       right_loading <= rload_from_re;
                       bias_loading <= bload_from_re;
@@ -815,6 +799,13 @@ begin
                         else
                           data0addr_to_memory <= left_finaladdress;
                           data1addr_to_memory <= left_finaladdress;
+                          if re_source = '1' and mode_a = '1' then
+                            data0addr_to_memory <= apushback_finaladdress;
+                            data1addr_to_memory <= apushback_finaladdress;
+                          elsif re_source = '1' and mode_b = '1' then
+                            data0addr_to_memory <= bpushback_finaladdress;
+                            data1addr_to_memory <= bpushback_finaladdress;
+                          end if;
                         end if;
       when conv    => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
@@ -856,27 +847,6 @@ begin
   --  end if;
   --end process;
 
-  adder_set : process(clk_p)
-  begin
-    if rising_edge(clk_p) then
-      if rst = '0' then
-        laddon_off <= "111";
-        raddon_off <= "111";
-        baddon_off <= "111";
-      else
-        if mode_a = '1' and mode_b = '0' then
-          laddon_off <= config(4 downto 2);
-        end if;
-        if mode_a = '0' and mode_b = '1' then
-          raddon_off <= config(4 downto 2);
-        end if;
-        if mode_a = '1' and mode_b = '1' then
-          baddon_off <= config(4 downto 2);
-        end if;
-      end if;
-    end if;
-  end process;
-
   start_demux : process(all)
   begin
     conv_start     <= '0';
@@ -889,8 +859,11 @@ begin
     oc_cnt         <= x"00";
     re_loop        <= x"00";
     fft_stages     <= "000";
+    re_cnt_rst     <= '0';
+    conv_cnt_rst   <= '0';
     case mode_latch is
       when conv    => conv_start     <= start;
+                      conv_cnt_rst   <= cnt_rst;
                       dot_cnt        <= ve_loop_reg;
                       oc_cnt         <= ve_oloop_reg;
                       left_rst       <= lrst_from_conv;
@@ -899,6 +872,7 @@ begin
       when fft     => fft_start      <= start;
                       fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
       when re_mode => re_start       <= start;
+                      re_cnt_rst     <= cnt_rst;
                       re_loop        <= ve_loop_reg;
                       left_rst       <= lrst_from_re;
                       right_rst      <= rrst_from_re;
@@ -1006,8 +980,6 @@ begin
   end process;
   bypass <= '0';
 
---bias data selector
-  bias_mux_out <= (x"0000" & bias_buf_out(16*(to_integer(unsigned(bias_mux)))+15 downto 16*(to_integer(unsigned(bias_mux)))));
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
 ---------------------------------------------------------------
@@ -1196,30 +1168,56 @@ begin
       finaladdress => bias_finaladdress
     );
 
+    pushback_a : addressing_unit
+    port map(
+      clk          => clk_p,
+      rst          => rst and not apushback_rst,
+      load         => apushback_load,
+      cmp          => pa_cmp,
+      add_offset   => pa_offset,
+      baseaddress  => re_saddr_a,
+      finaladdress => apushback_finaladdress
+    );
+
+    pushback_b : addressing_unit
+    port map(
+      clk          => clk_p,
+      rst          => rst and not bpushback_rst,
+      load         => bpushback_load,
+      cmp          => pb_cmp,
+      add_offset   => pb_offset,
+      baseaddress  => re_saddr_b,
+      finaladdress => bpushback_finaladdress
+    );
+
   re_i : re
     port map(
-      clk              => clk_p,
-      rst              => rst,
-      clk_e_pos        => clk_e_pos,
-      mode_a           => mode_a,
-      mode_b           => mode_b,
-      mode_c           => mode_c,
-      data_valid       => DDI_VLD,
-      re_start         => re_start,
-      re_source        => re_source,
-      cnt_rst          => re_cnt_rst,
-      wr_counter       => re_loop,
-      re_busy          => re_ready,
-      write_en_data    => dwen_from_re,
-      write_en_weight  => wwen_from_re,
-      write_en_bias    => bwen_from_re,
-      mode_c_l         => remode_c_l,
-      left_rst         => lrst_from_re,
-      right_rst        => rrst_from_re,
-      bias_rst         => brst_from_re,
-      left_load        => lload_from_re,
-      right_load       => rload_from_re,
-      bias_load        => bload_from_re
+      clk             => clk_p,
+      rst             => rst,
+      clk_e_pos       => clk_e_pos,
+      mode_a          => mode_a,
+      mode_b          => mode_b,
+      mode_c          => mode_c,
+      data_valid      => DDI_VLD,
+      re_start        => re_start,
+      re_source       => re_source,
+      cnt_rst         => re_cnt_rst,
+      wr_counter      => re_loop,
+      re_busy         => re_ready,
+      write_en_data   => dwen_from_re,
+      write_en_weight => wwen_from_re,
+      write_en_bias   => bwen_from_re,
+      mode_c_l        => remode_c_l,
+      left_rst        => lrst_from_re,
+      right_rst       => rrst_from_re,
+      bias_rst        => brst_from_re,
+      left_load       => lload_from_re,
+      right_load      => rload_from_re,
+      bias_load       => bload_from_re,
+      apushback_rst   => apushback_rst,
+      bpushback_rst   => bpushback_rst,
+      apushback_load  => apushback_load,
+      bpushback_load  => bpushback_load
     );
 
   convcontroller_i : convcontroller
@@ -1263,7 +1261,7 @@ begin
   fftcontroller_i : fftcontroller
     port map(
       clk          => clk_p,
-      en           => '0',--fft_en,
+      en           => fft_en,
       start        => fft_start,
       stages       => fft_stages,  -- N = 2^(stages + 2), at most 7
       data0addr    => ve_fftaddr_d0, --data address comes out from fft controller

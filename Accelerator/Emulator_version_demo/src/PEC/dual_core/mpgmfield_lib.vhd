@@ -361,4 +361,75 @@ package mpgmfield_lib is
   constant DS_CSTACKH	: std_logic_vector(1 downto 0) :=  "10";
   constant DS_CTRH		: std_logic_vector(1 downto 0) :=  "11";
 
+  --------------------------------
+  --Register set selection fields
+  --------------------------------
+  constant CONS_NON_ACT          : std_logic_vector(5 downto 0) := "00"&x"0";
+  constant CONS_RE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"1"; --write left starting address of receive engine
+  constant CONS_RE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"2"; --write right starting address of recieve engine
+  constant CONS_RE_LC            : std_logic_vector(5 downto 0) := "00"&x"3"; --write receive engine's loop counter
+  constant CONS_DFY_ADDR_A       : std_logic_vector(5 downto 0) := "00"&x"4"; --push back address from DFY
+  constant CONS_DFY_ADDR_B       : std_logic_vector(5 downto 0) := "00"&x"5"; --push back address from DFY, B mode
+  constant CONS_VE_START_ADDR_L  : std_logic_vector(5 downto 0) := "00"&x"6"; --vector engine's left starting address
+  constant CONS_VE_START_ADDR_R  : std_logic_vector(5 downto 0) := "00"&x"7"; --vector engine's right starting address
+  constant CONS_VE_LC            : std_logic_vector(5 downto 0) := "00"&x"8"; --vector engine's INNER loop counter
+  constant CONS_VE_OFFSET_L      : std_logic_vector(5 downto 0) := "00"&x"9"; --left offset
+  constant CONS_VE_OFFSET_R      : std_logic_vector(5 downto 0) := "00"&x"a"; --right offset
+  constant CONS_VE_DEPTH_L       : std_logic_vector(5 downto 0) := "00"&x"b"; --left depth
+  constant CONS_VE_JUMP_L        : std_logic_vector(5 downto 0) := "00"&x"c"; --left jump
+  constant CONS_DFY_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"d"; --write DFY
+  constant CONS_DFY_REG_PARALLEL : std_logic_vector(5 downto 0) := "00"&x"e"; --write DFY in parallel from mac registers
+  constant CONS_DTM_REG_SHIFT_IN : std_logic_vector(5 downto 0) := "00"&x"f"; --Write DTM --?
+  constant CONS_VE_OLC           : std_logic_vector(5 downto 0) := "01"&x"0"; --write vector engine's OUTER loop counter
+  constant CONS_CONFIG           : std_logic_vector(5 downto 0) := "01"&x"1"; --write config register for both ring mode and inner-outer loop mode
+  constant CONS_RING_END         : std_logic_vector(5 downto 0) := "01"&x"2"; --Ring mode end address
+  constant CONS_RING_START       : std_logic_vector(5 downto 0) := "01"&x"3"; --Ring mode start address.  
+  constant CONS_ZP_DATA          : std_logic_vector(5 downto 0) := "01"&x"4"; --Zero point value for data register, signed
+  constant CONS_ZP_WEIGHT        : std_logic_vector(5 downto 0) := "01"&x"5"; --Zero point value for weight register, signed
+  constant CONS_SCALE            : std_logic_vector(5 downto 0) := "01"&x"6"; --Scale factor for shifter
+  constant CONS_PP_CTL           : std_logic_vector(5 downto 0) := "01"&x"7"; --Controls the bypass of different logics inside post processors
+  constant CONS_BIAS_INDEX_END   : std_logic_vector(5 downto 0) := "01"&x"8"; --End indexing of the bias 
+  constant CONS_BIAS_INDEX_START : std_logic_vector(5 downto 0) := "01"&x"9"; --Start indexing of the bias
+--AU parameters
+  constant CONS_AU_PBOFFSET0 : std_logic_vector(5 downto 0) := "01"&x"A"; --add pushback mode_b offset0 of addressing unit
+  constant CONS_AU_PBOFFSET1 : std_logic_vector(5 downto 0) := "01"&x"B"; --add pushback mode_b of addressing unit
+  constant CONS_AU_PBOFFSET2 : std_logic_vector(5 downto 0) := "01"&x"C"; --add pushback mode_b of addressing unit
+  --constant CONS_AU_PBOFFSET3 : std_logic_vector(5 downto 0) := "01"&x"D"; --add pushback mode_b of addressing unit
+  constant CONS_AU_PBCMP0    : std_logic_vector(5 downto 0) := "01"&x"D"; --pushback mode_b comparator0 of addressing unit
+  constant CONS_AU_PBCMP1    : std_logic_vector(5 downto 0) := "01"&x"E"; --pushback mode_b comparator1 of addressing unit
+  constant CONS_AU_PBCMP2    : std_logic_vector(5 downto 0) := "01"&x"F"; --pushback mode_b comparator2 of addressing unit
+  --constant CONS_AU_PBCMP3    : std_logic_vector(5 downto 0) := "01"&x"F"; --pushback mode_b comparator3 of addressing unit
+  constant CONS_AU_LOFFSET0  : std_logic_vector(5 downto 0) := "10"&x"0"; --add left offset0 of addressing unit
+  constant CONS_AU_LOFFSET1  : std_logic_vector(5 downto 0) := "10"&x"1"; --add left offset1 of addressing unit
+  constant CONS_AU_LOFFSET2  : std_logic_vector(5 downto 0) := "10"&x"2"; --add left offset2 of addressing unit
+  constant CONS_AU_LOFFSET3  : std_logic_vector(5 downto 0) := "10"&x"3"; --add left offset4 of addressing unit
+  constant CONS_AU_LCMP0     : std_logic_vector(5 downto 0) := "10"&x"4"; --left comparator0 of addressing unit
+  constant CONS_AU_LCMP1     : std_logic_vector(5 downto 0) := "10"&x"5"; --left comparator1 of addressing unit
+  constant CONS_AU_LCMP2     : std_logic_vector(5 downto 0) := "10"&x"6"; --left comparator2 of addressing unit
+  constant CONS_AU_LCMP3     : std_logic_vector(5 downto 0) := "10"&x"7"; --left comparator3 of addressing unit
+  constant CONS_AU_ROFFSET0  : std_logic_vector(5 downto 0) := "10"&x"8"; --add right offset0 of addressing unit
+  constant CONS_AU_ROFFSET1  : std_logic_vector(5 downto 0) := "10"&x"9"; --add right offset1 of addressing unit
+  constant CONS_AU_ROFFSET2  : std_logic_vector(5 downto 0) := "10"&x"A"; --add right offset2 of addressing unit
+  constant CONS_AU_ROFFSET3  : std_logic_vector(5 downto 0) := "10"&x"B"; --add right offset4 of addressing unit
+  constant CONS_AU_RCMP0     : std_logic_vector(5 downto 0) := "10"&x"C"; --right comparator0 of addressing unit
+  constant CONS_AU_RCMP1     : std_logic_vector(5 downto 0) := "10"&x"D"; --right comparator1 of addressing unit
+  constant CONS_AU_RCMP2     : std_logic_vector(5 downto 0) := "10"&x"E"; --right comparator2 of addressing unit
+  constant CONS_AU_RCMP3     : std_logic_vector(5 downto 0) := "10"&x"F"; --right comparator3 of addressing unit
+  constant CONS_AU_BOFFSET0  : std_logic_vector(5 downto 0) := "11"&x"0"; --add bias offset0 of addressing unit
+  constant CONS_AU_BOFFSET1  : std_logic_vector(5 downto 0) := "11"&x"1"; --add bias offset1 of addressing unit
+  constant CONS_AU_BOFFSET2  : std_logic_vector(5 downto 0) := "11"&x"2"; --add bias offset2 of addressing unit
+  constant CONS_AU_BOFFSET3  : std_logic_vector(5 downto 0) := "11"&x"3"; --add bias offset4 of addressing unit
+  constant CONS_AU_BCMP0     : std_logic_vector(5 downto 0) := "11"&x"4"; --bias comparator0 of addressing unit
+  constant CONS_AU_BCMP1     : std_logic_vector(5 downto 0) := "11"&x"5"; --bias comparator1 of addressing unit
+  constant CONS_AU_BCMP2     : std_logic_vector(5 downto 0) := "11"&x"6"; --bias comparator2 of addressing unit
+  constant CONS_AU_BCMP3     : std_logic_vector(5 downto 0) := "11"&x"7"; --bias comparator3 of addressing unit
+  constant CONS_AU_PAOFFSET0 : std_logic_vector(5 downto 0) := "11"&x"8"; --add pushback mode_a offset0 of addressing unit
+  constant CONS_AU_PAOFFSET1 : std_logic_vector(5 downto 0) := "11"&x"9"; --add pushback mode_a of addressing unit
+  constant CONS_AU_PAOFFSET2 : std_logic_vector(5 downto 0) := "11"&x"A"; --add pushback mode_a of addressing unit
+  constant CONS_AU_PAOFFSET3 : std_logic_vector(5 downto 0) := "11"&x"B"; --add pushback mode_a of addressing unit
+  constant CONS_AU_PACMP0    : std_logic_vector(5 downto 0) := "11"&x"C"; --pushback mode_a comparator0 of addressing unit
+  constant CONS_AU_PACMP1    : std_logic_vector(5 downto 0) := "11"&x"D"; --pushback mode_a comparator1 of addressing unit
+  constant CONS_AU_PACMP2    : std_logic_vector(5 downto 0) := "11"&x"E"; --pushback mode_a comparator2 of addressing unit
+  constant CONS_AU_PACMP3    : std_logic_vector(5 downto 0) := "11"&x"F"; --pushback mode_a comparator3 of addressing unit
+
 end mpgmfield_lib;

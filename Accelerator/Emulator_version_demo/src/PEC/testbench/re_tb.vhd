@@ -83,26 +83,57 @@ constant au_test_loffset0 : std_logic_vector(127 downto 0) := x"0000020000000000
 constant au_test_loffset1 : std_logic_vector(127 downto 0) := x"00000210000000000000000000000000";
 constant au_test_loffset2 : std_logic_vector(127 downto 0) := x"00000220000000000000000000000000";
 constant au_test_loffset3 : std_logic_vector(127 downto 0) := x"00000230000000000000000000000000";
+--------------------------------------------------------------------------------------------------
 constant au_test_lcmp0 : std_logic_vector(127 downto 0)    := x"00000240000000000000000000000000";
 constant au_test_lcmp1 : std_logic_vector(127 downto 0)    := x"00000250000000000000000000000000";
 constant au_test_lcmp2 : std_logic_vector(127 downto 0)    := x"00000260000000000000000000000000";
 constant au_test_lcmp3 : std_logic_vector(127 downto 0)    := x"00000270000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 constant au_test_roffset0 : std_logic_vector(127 downto 0) := x"00000280000000000000000000000000";
 constant au_test_roffset1 : std_logic_vector(127 downto 0) := x"00000290000000000000000000000000";
 constant au_test_roffset2 : std_logic_vector(127 downto 0) := x"000002A0000000000000000000000000";
 constant au_test_roffset3 : std_logic_vector(127 downto 0) := x"000002B0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
 constant au_test_rcmp0 : std_logic_vector(127 downto 0)    := x"000002C0000000000000000000000000";
 constant au_test_rcmp1 : std_logic_vector(127 downto 0)    := x"000002D0000000000000000000000000";
 constant au_test_rcmp2 : std_logic_vector(127 downto 0)    := x"000002E0000000000000000000000000";
 constant au_test_rcmp3 : std_logic_vector(127 downto 0)    := x"000002F0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 constant au_test_boffset0 : std_logic_vector(127 downto 0) := x"00000300000000000000000000000000";
 constant au_test_boffset1 : std_logic_vector(127 downto 0) := x"00000310000000000000000000000000";
 constant au_test_boffset2 : std_logic_vector(127 downto 0) := x"00000320000000000000000000000000";
 constant au_test_boffset3 : std_logic_vector(127 downto 0) := x"00000330000000000000000000000000";
+--------------------------------------------------------------------------------------------------
 constant au_test_bcmp0 : std_logic_vector(127 downto 0)    := x"00000340000000000000000000000000";
 constant au_test_bcmp1 : std_logic_vector(127 downto 0)    := x"00000350000000000000000000000000";
 constant au_test_bcmp2 : std_logic_vector(127 downto 0)    := x"00000360000000000000000000000000";
 constant au_test_bcmp3 : std_logic_vector(127 downto 0)    := x"00000370000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+constant pa_tset_offset0 : std_logic_vector(127 downto 0)  := X"00000380000000000000000000000000";
+constant pa_tset_offset1 : std_logic_vector(127 downto 0)  := X"00000390000000000000000000000000";
+constant pa_tset_offset2 : std_logic_vector(127 downto 0)  := X"000003A0000000000000000000000000";
+constant pa_tset_offset3 : std_logic_vector(127 downto 0)  := X"000003B0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+constant pa_test_cmp0 : std_logic_vector(127 downto 0)     := X"000003C0000000000000000000000000";
+constant pa_test_cmp1 : std_logic_vector(127 downto 0)     := X"000003D0000000000000000000000000";
+constant pa_test_cmp2 : std_logic_vector(127 downto 0)     := X"000003E0000000000000000000000000";
+constant pa_test_cmp3 : std_logic_vector(127 downto 0)     := X"000003F0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+constant pb_tset_offset0 : std_logic_vector(127 downto 0)  := X"000001A0000000000000000000000000";
+constant pb_tset_offset1 : std_logic_vector(127 downto 0)  := X"000001B0000000000000000000000000";
+constant pb_tset_offset2 : std_logic_vector(127 downto 0)  := X"000001C0000000000000000000000000";
+--constant pb_tset_offset3 : std_logic_vector(127 downto 0)  := X"000001B0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+constant pb_test_cmp0 : std_logic_vector(127 downto 0)     := X"000001D0000000000000000000000000";
+constant pb_test_cmp1 : std_logic_vector(127 downto 0)     := X"000001E0000000000000000000000000";
+constant pb_test_cmp2 : std_logic_vector(127 downto 0)     := X"000001F0000000000000000000000000";
+--constant pb_test_cmp3 : std_logic_vector(127 downto 0)     := X"000001F0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 constant ve_loop    : std_logic_vector(127 downto 0)       := x"00000080000000000000000000000000";
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant re_saddr_l : std_logic_vector(127 downto 0)       := x"00000010000000000000000000000000";
@@ -199,7 +230,7 @@ pl(98) <= '0'; --mode a off
 pl(97) <= '0'; --mode b off
 wait for 30 ns;
 DDI_VLD <= '1';
-for i in 0 to 54 loop
+for i in 0 to 53 loop
   ve_in <= std_logic_vector(to_unsigned(i, 64));
   wait for 15 ns;
 end loop;
@@ -246,7 +277,7 @@ pl(98) <= '0'; --mode a off
 pl(97) <= '0'; --mode b off
 wait for 30 ns;
 DDI_VLD <= '1'; 
-for i in 0 to 54 loop
+for i in 0 to 53 loop
   ve_in <= std_logic_vector(to_unsigned(i, 64));
   wait for 15 ns;
 end loop;
@@ -294,7 +325,7 @@ pl(98) <= '0'; --mode a off
 pl(97) <= '0'; --mode b off
 wait for 30 ns;
 DDI_VLD <= '1'; 
-for i in 0 to 54 loop
+for i in 0 to 53 loop
   ve_in <= std_logic_vector(to_unsigned(i, 64));
   wait for 15 ns;
 end loop;
@@ -318,13 +349,42 @@ pl(94) <= '1';
 wait for 30 ns;
 pl(94) <= '0'; 
 wait for 30 ns;
-ybus <= x"08";
-pl <= pp_ctl;
+pl <= pa_test_cmp0;
+ybus <= x"05";
+wait for 30.01 ns;
+pl <= pa_tset_offset0;
+ybus <= x"01";
+wait for 30.01 ns;
+pl <= pb_test_cmp0;
+ybus <= x"06";
+wait for 30.01 ns;
+pl <= pb_tset_offset0;
+ybus <= x"02";
+wait for 30.01 ns;
 wait for 30 ns;
 pl(95) <= '1'; --start
 pl(96) <= '1'; --resource 1
+pl(99) <= '0'; --cnt_rst = '0'
 pl(98) <= '1'; --mode a 
 pl(97) <= '0'; --mode b 
+wait for 90 ns;
+pl(95) <= '0'; --start
+wait for 30 ns;
+pl(95) <= '1'; --start
+pl(96) <= '1'; --resource 1
+pl(99) <= '0'; --cnt_rst = '0'
+pl(98) <= '0'; --mode a 
+pl(97) <= '1'; --mode b 
+wait for 90 ns;
+pl(95) <= '0'; --start
+wait for 30 ns;
+pl(95) <= '1'; --start
+pl(96) <= '1'; --resource 1
+pl(99) <= '0'; --cnt_rst = '0'
+pl(98) <= '1'; --mode a 
+pl(97) <= '0'; --mode b 
+wait for 90 ns;
+pl(95) <= '0'; --start
 wait for 3000 ns;
 --pl(94)<= '0';
 --pl(93) <= '1';

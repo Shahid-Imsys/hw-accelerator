@@ -89,6 +89,7 @@ architecture first of vecore is
     lodctrl     : in  lzod_ctrl;
     zpdata      : in  std_logic_vector(7 downto 0);
     zpweight    : in  std_logic_vector(7 downto 0);
+    bias        : in  signed(31 downto 0);
     result      : out signed(32 downto 0);
     to_shift    : out ppshift_shift_ctrl;
     to_addbias  : out std_logic
@@ -184,6 +185,7 @@ begin
       lodctrl     => lodctrl,
       zpdata      => zpdata,
       zpweight    => zpweight,
+      bias        => resize(signed(bias), 32),   --- Fix me: should be 32 bits
       result      => sum,
       to_shift    => shift_from_lod,
       to_addbias  => to_addbias

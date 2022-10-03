@@ -59,7 +59,7 @@ package vetypes is
   type mux0r0_t is (R0, R2, R4, R6, onefft, L2);
   type mux0r1_t is (zpw, zero);
 
-  type acc_t is (keep, acc, zero, max);
+  type acc_t is (keep, acc, zero, max, loadbias);
   type addo_t is (zero, acc, max);
   type adde_t is (zero, acc, odd, odd8, abs16, max);
   type reg_t is (keep, add, acc, max);

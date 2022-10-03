@@ -10,6 +10,7 @@ entity accumulatorodd is
     en     : in  std_logic;
     mul    : in  signed(17 downto 0);
     ctrl   : in  acco_ctrl;
+    bias   : in  signed(31 downto 0);
     result : out signed(31 downto 0)
     );
 end entity;
@@ -41,6 +42,8 @@ begin
           accumulator <= (others => '0');
         elsif ctrl.acc = max then
           accumulator <= max_value;
+        elsif ctrl.acc = loadbias then
+          accumulator <= bias;
         end if;
       end if;
     end if;

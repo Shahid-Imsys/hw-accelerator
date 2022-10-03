@@ -8,28 +8,32 @@ use work.vetypes.all;
 
 entity re is 
   port(
-    clk              : in std_logic;
-    rst              : in std_logic;
-    clk_e_pos        : in std_logic;
-    mode_a           : in std_logic;
-    mode_b           : in std_logic;
-    mode_c           : in std_logic;
-    data_valid       : in std_logic;
-    re_start         : in std_logic;
-    re_source        : in std_logic;
-    cnt_rst          : in std_logic;
-    wr_counter       : in std_logic_vector(7 downto 0);
-    re_busy          : out std_logic;
-    write_en_data    : out std_logic;
-    write_en_weight  : out std_logic;
-    write_en_bias    : out std_logic;
-    mode_c_l         : out std_logic;
-    left_rst         : out std_logic;
-    right_rst        : out std_logic;
-    bias_rst         : out std_logic;
-    left_load        : out std_logic;
-    right_load       : out std_logic;
-    bias_load        : out std_logic
+    clk             : in std_logic;
+    rst             : in std_logic;
+    clk_e_pos       : in std_logic;
+    mode_a          : in std_logic;
+    mode_b          : in std_logic;
+    mode_c          : in std_logic;
+    data_valid      : in std_logic;
+    re_start        : in std_logic;
+    re_source       : in std_logic;
+    cnt_rst         : in std_logic;
+    wr_counter      : in std_logic_vector(7 downto 0);
+    re_busy         : out std_logic;
+    write_en_data   : out std_logic;
+    write_en_weight : out std_logic;
+    write_en_bias   : out std_logic;
+    mode_c_l        : out std_logic;
+    left_rst        : out std_logic;
+    right_rst       : out std_logic;
+    bias_rst        : out std_logic;
+    left_load       : out std_logic;
+    right_load      : out std_logic;
+    bias_load       : out std_logic;
+    apushback_rst   : out std_logic;
+    bpushback_rst   : out std_logic;
+    apushback_load  : out std_logic;
+    bpushback_load  : out std_logic
   );
 end entity re;
 
@@ -135,47 +139,35 @@ begin
   --Mode a and b for reloading receive engine, mode bits are not latched.
   --re_start, re_source and modes are written in one microinstruction.
   --addr_reload, modes are written in one microinstruction.
-  --pushback_addr_write : process(clk) --generate address counter a abd b
-  --begin
-  --  if rising_edge(clk) then
-  --    if RST = '0' then
-  --      re_addr_a <= (others => '0');
-  --      re_addr_b <= (others => '0');
-  --    elsif clk_e_pos = '1'then --falling_edge of clock_e
-  --      if re_source = '1' and re_addr_reload = '1' then
-  --        if mode_a = '1' then
-  --          re_addr_a <= re_saddr_a;
-  --        elsif mode_b = '1' then
-  --          re_addr_b <= re_saddr_b;
-  --        end if;
-  --      elsif re_addr_reload = '0' and re_source = '1' and re_start = '1' then
-  --        if mode_a = '1'  then 
-  --          re_addr_a <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_a))+1,8));
-  --        elsif mode_b = '1' then
-  --          re_addr_b <= std_logic_vector(to_unsigned(to_integer(unsigned(re_addr_b))+1,8));
-  --        end if;
-  --      end if;
-  --    end if;
-  --  end if;
-  --end process;
+  pushback_addr_write : process(clk) --generate address counter a abd b
+  begin
+    if rising_edge(clk) then
+      if RST = '0' then
+        apushback_load <= '0';
+        bpushback_load <= '0';
+        apushback_rst <= '0';
+        bpushback_rst <= '0';
+      elsif clk_e_pos = '1'then --falling_edge of clock_e
+        if re_source = '1' and cnt_rst = '1' then
+          if mode_a = '1' then
+            apushback_rst <= '1';
+          elsif mode_b = '1' then
+            bpushback_rst <= '1';
+          end if;
+        elsif cnt_rst = '0' and re_source = '1' and re_start = '1' then
+          if mode_a = '1'  then 
+            apushback_load <= '1';
+          elsif mode_b = '1' then
+            bpushback_load <= '1';
+          end if;
+        end if;
+      else
+        apushback_load <= '0';
+        bpushback_load <= '0';
+      end if;
+    end if;
+  end process;
 
-  --====== Addresses MUX ======--
-  --address_pointer_mux: process(all)
-  --begin
-  --  if re_busy = '0' and re_source = '1' then --Use receive engine's address counter a and b --mode c added --2.0
-  --    re_addr_weight <= (others => '0');
-  --    if mode_a_l = '1' then
-  --      re_addr_data <= re_addr_a;
-  --    elsif mode_b_l = '1' then
-  --      re_addr_data <= re_addr_b;
-  --    else
-  --      re_addr_data <= (others => '0');
-  --    end if;
-  --  else
-  --    re_addr_data <= (others => '0');
-  --    re_addr_weight <= (others => '0');
-  --  end if;
-  --end process;
   
   --Write enable signal to srams
   --
@@ -183,8 +175,8 @@ begin
   begin
     if re_busy = '1' and ((mode_a_l = '1' and mode_b_l = '0' ) or mode_c_l = '1')then
       write_en_data <= left_load;
-    elsif re_start = '1' and re_source = '1' and mode_a = '1' then
-      write_en_data <= left_load;
+    elsif re_start = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b = '1') then
+      write_en_data <= apushback_load or bpushback_load;
     else
       write_en_data <= '0';
     end if;
@@ -193,8 +185,6 @@ begin
   write_enable_right: process(all)
   begin
     if re_busy = '1' and mode_a_l = '0' and mode_b_l = '1' then
-      write_en_weight <= right_load;
-    elsif re_start = '1' and re_source = '1' and mode_b ='1' then
       write_en_weight <= right_load;
     else
       write_en_weight <= '0';

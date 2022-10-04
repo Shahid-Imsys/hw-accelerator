@@ -116,7 +116,7 @@ begin  -- architecture rtl
   
   i_clock_gate : entity work.clock_gate  
     generic map (
-      fpga_g =>  fpga_g)
+      fpga_g => fpga_g)
     port map (
       clk => clk_mux_out_int,
       en  => clock_p_puls,
@@ -126,7 +126,7 @@ begin  -- architecture rtl
   
   i_clock_gate_n : entity work.clock_gate  
     generic map (
-      fpga_g =>  fpga_g)
+      fpga_g => fpga_g)
     port map (
       clk => clk_mux_out_int,
       en  => clock_p_n_puls,
@@ -134,12 +134,10 @@ begin  -- architecture rtl
       clk_out => clk_p_n
       );
 
-
   -- Ethernet clocks
   i_eth_rx_clock_gate : entity work.clock_gate
-    
     generic map (
-      fpga_g =>  fpga_g)
+      fpga_g => fpga_g)
     port map (
       clk => pg_1_i,
       en  => '1',
@@ -148,7 +146,6 @@ begin  -- architecture rtl
       );
 
   i_eth_tx_clock_gate : entity work.clock_gate
-    
     generic map (
       fpga_g =>  fpga_g)
     port map (

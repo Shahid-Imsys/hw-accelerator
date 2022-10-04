@@ -43,9 +43,9 @@ end entity fpga_clock_reset;
 architecture rtl of fpga_clock_reset is
 
   signal common_rst_n : std_logic;
-  signal main_rst_n : std_logic;
+  signal main_rst_n   : std_logic;
   
-begin  -- architecture rtl
+begin
 
   -----------------------------------
   -- reset section
@@ -75,27 +75,7 @@ begin  -- architecture rtl
   clk_p   <= clk_in;
   clk_p_n <= not clk_in;
   
-  -- Ethernet clocks
-  i_eth_rx_clock_gate : entity work.clock_gate
-    
-    generic map (
-      fpga_g => fpga_g)
-    port map (
-      clk => pg_1_i,
-      en  => '1',
-      scan_mode => scan_mode,
-      clk_out => clk_rx
-      );
-
-  i_eth_tx_clock_gate : entity work.clock_gate
-    
-    generic map (
-      fpga_g => fpga_g)
-    port map (
-      clk => pf_1_i,
-      en  => '1',
-      scan_mode => scan_mode,
-      clk_out => clk_tx
-      );
+  clk_rx <= pg_1_i;
+  clk_tx <= pf_1_i;
 
 end architecture rtl;

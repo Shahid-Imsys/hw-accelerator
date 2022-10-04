@@ -38,9 +38,7 @@ entity digital_top is
     g_clock_frequency : integer       := 31);
   port (
     hclk          : in  std_logic;      -- clk input
-    
-    clk_noc       : in  std_logic;
-    
+    clk_noc       : in  std_logic;    
     pll_ref_clk   : in  std_logic;
     pll_locked    : in  std_logic;
     pre_spi_rst_n : in  std_logic;
@@ -328,8 +326,8 @@ architecture rtl of digital_top is
   signal clk_rx      : std_logic;
   signal clk_tx      : std_logic;
 
-  signal sclk   : std_logic;
-  signal sclk_n : std_logic;
+  signal sclk        : std_logic;
+  signal sclk_n      : std_logic;
 
   signal spi_rst_n    : std_logic;
   signal cpu_rst_n    : std_logic;
@@ -350,7 +348,7 @@ begin  -- architecture rtl
     i_clock_reset : entity work.clock_reset
 
       generic map (
-        fpga_g => (asic_c = fpga))
+        fpga_g => false )
 
       port map (
         pll_clk     => hclk,

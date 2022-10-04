@@ -331,19 +331,7 @@ for i in 0 to 53 loop
 end loop;
 DDI_VLD <= '0';
 wait for 90 ns;
---progress <= re_mode_a;
---ybus <= x"01";
---pl <= au_test_offset0;
---wait for 30.01 ns;
---ybus <= x"03";
---pl <= au_test_offset1;
---wait for 30.01 ns;
---ybus <= x"02";
---pl <= au_test_offset2;
---wait for 30.01 ns;
---ybus <= x"01";
---pl <= au_test_offset3;
---wait for 30 ns;
+
 
 pl(94) <= '1';
 wait for 30 ns;
@@ -361,7 +349,9 @@ wait for 30.01 ns;
 pl <= pb_tset_offset0;
 ybus <= x"02";
 wait for 30.01 ns;
-wait for 30 ns;
+pl <= pp_ctl;
+ybus <= x"08";
+wait for 30.01 ns;
 pl(95) <= '1'; --start
 pl(96) <= '1'; --resource 1
 pl(99) <= '0'; --cnt_rst = '0'

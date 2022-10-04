@@ -832,20 +832,6 @@ begin
     end case;
   end process;
 
-  --bias_address_mux: process(all)
-  --begin
-  --  if rst = '0' then
-  --    bias_addr_i <= (others => '0');
-  --  else
-  --    if bwen_from_re = '1' then
-  --      bias_addr_i <= bias_finaladdress;
-  --    else
-  --      if ve_loop = x"01" then
-  --        bias_addr_i <= bias_index_rd;
-  --      end if;
-  --    end if;
-  --  end if;
-  --end process;
 
   start_demux : process(all)
   begin
@@ -1345,7 +1331,9 @@ begin
   --    if rst = '0' then 
   --      outreg <= (others => '0');
   --    else
-  --      outreg <= std_logic_vector(unsigned(outreg)+1);
+  --      if output_ena = '1' then
+  --        outreg <= std_logic_vector(unsigned(outreg)+1);
+  --      end if;
   --    end if;
   --  end if;
   --end process;

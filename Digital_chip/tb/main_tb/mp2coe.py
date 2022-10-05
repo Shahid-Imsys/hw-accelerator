@@ -9,7 +9,7 @@ class mp2coe:
         self.maxLines   = 256
         self.bitPerWord = 28
 
-        self.mpFileName = 'test.mp'
+        self.mpFileName = 'nocbootcode.mp'
         self.mpData = []
 
         self.coeFileName = 'boot_memory.coe'

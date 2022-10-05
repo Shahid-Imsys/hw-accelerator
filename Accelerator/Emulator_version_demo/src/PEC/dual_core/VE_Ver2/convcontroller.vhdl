@@ -201,7 +201,11 @@ begin
   begin
     if rising_edge(clk) then
       if conv_loop = x"02" then
-        o_mux_ena <= '1';
+        if pp_ctl(1) = '0' then 
+          o_mux_ena <= '1';
+        else
+          o_mux_ena <= '0';
+        end if;
       elsif conv_out_p = '0' then --11 clock delay of config(7)
         o_mux_ena <= '0';
       elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal

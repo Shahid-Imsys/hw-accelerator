@@ -11,7 +11,7 @@ class mp2coe:
         self.mpFileName = 'boot_rom.mp'
         self.mpData = []
 
-        self.coeFileName = 'boot_memoy.coe'
+        self.coeFileName = 'boot_memory.coe'
 
         self.read_mp()
         self.write_coe()

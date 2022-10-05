@@ -112,7 +112,13 @@ begin
           conv_addr_r <= conv_saddr_r;
         end if;
       elsif start = '1' and addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
-        inst <= firstconv;
+        if conv_out_p = '1' then
+          inst <= firstconv;
+          ppinst <= nop;
+        else
+          inst <= sum;
+          ppinst <= sumfirst;
+        end if;
         conv_oloop <= oloop_counter;
         conv_loop  <= loop_counter;
         if mode_a = '1' or mode_b = '1' then
@@ -124,7 +130,13 @@ begin
           end if;
         end if;
       elsif busy = '1' and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
-        inst <= conv;
+        if conv_out_p = '1' then
+          inst <= conv;
+          ppinst <= nop;
+        else
+          inst <= sum;
+          ppinst <= sum;
+        end if;
         if conv_loop = x"01" then
           if config(4) = '1' then --reload by config register, bit 4 in configure register
             conv_loop <= loop_counter;
@@ -139,14 +151,43 @@ begin
           else  ----need to be modified later
             conv_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_r)+1),8));
           end if;
-          inst <= firstconv;
+          if conv_out_p = '1' then
+            inst <= firstconv;
+            ppinst <= nop;
+          else
+            inst <= sum;
+            ppinst <= sumfirst;
+          end if;
           conv_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_oloop))-1,8));
         elsif conv_loop /= x"01" then
           conv_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_loop))-1,8));
           conv_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_l)+1),8));
           conv_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_r)+1),8)); --calculate right address;
           if conv_loop = x"02" then
-            inst <= lastconv;
+            if conv_out_p = '1' then
+              inst <= lastconv;
+              conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+              if conv_out_sel = "000" then
+                ppinst <= select0;
+              elsif conv_out_sel = "001" then
+                ppinst <= select1;
+              elsif conv_out_sel = "010" then
+                ppinst <= select2;
+              elsif conv_out_sel = "011" then
+                ppinst <= select3;
+              elsif conv_out_sel = "100" then
+                ppinst <= select4;
+              elsif conv_out_sel = "101" then
+                ppinst <= select5;
+              elsif conv_out_sel = "110" then
+                ppinst <= select6;
+              elsif conv_out_sel = "111" then
+                ppinst <= select7;
+              end if;
+            else
+              inst <= sum;
+              ppinst <= sum;
+            end if; 
           end if;
         end if;
       end if;
@@ -169,43 +210,43 @@ begin
     end if;
   end process;
 
-  process(clk)
-  begin 
-    if rising_edge(clk) then
-      if rst = '0' then
-        conv_out_sel <= (others => '0');
-      elsif conv_loop = x"02" then
-        if conv_out_p = '0' then
-          ppinst <= sumfirst;
-        elsif conv_out_p = '1' then
-          conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-          if conv_out_sel = "000" then
-            ppinst <= select0;
-          elsif conv_out_sel = "001" then
-            ppinst <= select1;
-          elsif conv_out_sel = "010" then
-            ppinst <= select2;
-          elsif conv_out_sel = "011" then
-            ppinst <= select3;
-          elsif conv_out_sel = "100" then
-            ppinst <= select4;
-          elsif conv_out_sel = "101" then
-            ppinst <= select5;
-          elsif conv_out_sel = "110" then
-            ppinst <= select6;
-          elsif conv_out_sel = "111" then
-            ppinst <= select7;
-          end if;
-        end if;
-      elsif o_mux_ena = '1' then
-        if conv_out_p = '0' then
-          ppinst <= sumall;
-        end if;
-      elsif pp_stage_1 = '1' then
-        ppinst <= nop;
-      end if;
-    end if;
-  end process;
+  --process(clk)
+  --begin 
+  --  if rising_edge(clk) then
+  --    if rst = '0' then
+  --      conv_out_sel <= (others => '0');
+  --    elsif conv_loop = x"02" then
+  --      if conv_out_p = '0' then
+  --        ppinst <= sumfirst;
+  --      elsif conv_out_p = '1' then
+  --        conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+  --        if conv_out_sel = "000" then
+  --          ppinst <= select0;
+  --        elsif conv_out_sel = "001" then
+  --          ppinst <= select1;
+  --        elsif conv_out_sel = "010" then
+  --          ppinst <= select2;
+  --        elsif conv_out_sel = "011" then
+  --          ppinst <= select3;
+  --        elsif conv_out_sel = "100" then
+  --          ppinst <= select4;
+  --        elsif conv_out_sel = "101" then
+  --          ppinst <= select5;
+  --        elsif conv_out_sel = "110" then
+  --          ppinst <= select6;
+  --        elsif conv_out_sel = "111" then
+  --          ppinst <= select7;
+  --        end if;
+  --      end if;
+  --    elsif o_mux_ena = '1' then
+  --      if conv_out_p = '0' then
+  --        ppinst <= sumall;
+  --      end if;
+  --    elsif pp_stage_1 = '1' then
+  --      ppinst <= nop;
+  --    end if;
+  --  end if;
+  --end process;
                 
   --Post Shifter --maximum 16 bits, scale <= "10000"
   process(clk) --Enable control, one clock delay of ourput selector

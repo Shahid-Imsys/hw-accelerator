@@ -976,7 +976,7 @@ begin
       for i in 0 to 5 loop
         delay3(i+1) <= delay3(i);
       end loop;
-        output_ena <= delay3(4); 
+        output_ena <= delay3(3); 
     end if;
   end process;
 

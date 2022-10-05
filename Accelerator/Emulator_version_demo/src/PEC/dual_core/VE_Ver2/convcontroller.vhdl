@@ -213,44 +213,6 @@ begin
       end if;
     end if;
   end process;
-
-  --process(clk)
-  --begin 
-  --  if rising_edge(clk) then
-  --    if rst = '0' then
-  --      conv_out_sel <= (others => '0');
-  --    elsif conv_loop = x"02" then
-  --      if conv_out_p = '0' then
-  --        ppinst <= sumfirst;
-  --      elsif conv_out_p = '1' then
-  --        conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-  --        if conv_out_sel = "000" then
-  --          ppinst <= select0;
-  --        elsif conv_out_sel = "001" then
-  --          ppinst <= select1;
-  --        elsif conv_out_sel = "010" then
-  --          ppinst <= select2;
-  --        elsif conv_out_sel = "011" then
-  --          ppinst <= select3;
-  --        elsif conv_out_sel = "100" then
-  --          ppinst <= select4;
-  --        elsif conv_out_sel = "101" then
-  --          ppinst <= select5;
-  --        elsif conv_out_sel = "110" then
-  --          ppinst <= select6;
-  --        elsif conv_out_sel = "111" then
-  --          ppinst <= select7;
-  --        end if;
-  --      end if;
-  --    elsif o_mux_ena = '1' then
-  --      if conv_out_p = '0' then
-  --        ppinst <= sumall;
-  --      end if;
-  --    elsif pp_stage_1 = '1' then
-  --      ppinst <= nop;
-  --    end if;
-  --  end if;
-  --end process;
                 
   --Post Shifter --maximum 16 bits, scale <= "10000"
   process(clk) --Enable control, one clock delay of ourput selector

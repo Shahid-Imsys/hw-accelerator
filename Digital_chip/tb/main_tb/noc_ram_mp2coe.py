@@ -35,7 +35,7 @@ class mp2coe:
 
                         bits = bits + 1
 
-                print("Read " + str( bits ) + " bits")
+                print("Read " + str( bits ) + " bits from " + self.mpFileName )
 
         except IOError:
             print(" * Error reading " + self.mpFileName )
@@ -51,21 +51,33 @@ class mp2coe:
                 done  = False
                 lines = 0
                 n     = 0
+                word  = [0 for i in range(16)] # 16 byte word as array of bytes
+                
                 for b in self.mpData:
                     if (n % self.bitPerWord) == 0:
-                        if lines > 0:
-                            file.write('\n')
-                        lines = lines + 1
-                        if lines > self.maxLines:
-                            done = True
-                    if not done:
-                        file.write(b)
-                        n = n + 1
+                        # Start new byte
+                        byte = ''
+
+                    if b == '0':
+                        byte += '0'
                     else:
-                        break
+                        byte += '1'
+                    
+                    if (n % self.bitPerWord) == (self.bitPerWord - 1):
+                        index = (n >> 3) % 16
+                        word[ index ] = byte
+                        if index == 15:
+                            for i in reversed( range(16) ):
+                                if lines < self.maxLines:
+                                    file.write( word[i] )
+                                    file.write( ' ' )
+                                    lines += 1
+                                else:
+                                    print("Max memory length reached!")
+                    n += 1
 
                 file.write(";\n")
-                print("Wrote " + str( lines - 1 ) + " lines" )
+                print("Wrote " + str( lines - 1 ) + " lines to " + self.coeFileName )
 
         except IOError:
             print(" * Error writing " + self.coeFileName )

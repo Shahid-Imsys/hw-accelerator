@@ -67,13 +67,15 @@ class mp2coe:
                         index = (n >> 3) % 16
                         word[ index ] = byte
                         if index == 15:
-                            for i in reversed( range(16) ):
-                                if lines < self.maxLines:
-                                    file.write( word[i] )
-                                    file.write( ' ' )
-                                    lines += 1
-                                else:
-                                    print("Max memory length reached!")
+                            for i32 in range(4):
+                                for i8 in reversed( range(4) ):
+                                    i = i32 * 4 + i8
+                                    if lines < self.maxLines:
+                                        file.write( word[i] )
+                                        file.write( ' ' )
+                                        lines += 1
+                                    else:
+                                        print("Max memory length reached!")
                     n += 1
 
                 file.write(";\n")

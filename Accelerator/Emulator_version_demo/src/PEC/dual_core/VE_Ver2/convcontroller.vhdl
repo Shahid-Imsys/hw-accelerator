@@ -60,8 +60,8 @@ architecture convctrl of convcontroller is
   signal conv_out_sel   : std_logic_vector(2 downto 0);
   signal conv_addr_l    : std_logic_vector(7 downto 0);
   signal conv_addr_r    : std_logic_vector(7 downto 0);
-  signal conv_loop      : std_logic_vector(7 downto 0);
-  signal conv_oloop     : std_logic_vector(7 downto 0);
+  signal conv_loop      : unsigned(7 downto 0);
+  signal conv_oloop     : unsigned(7 downto 0);
   signal bias_addr_reg  : std_logic_vector(7 downto 0);
 
 begin
@@ -69,7 +69,7 @@ begin
   data_addr     <= conv_addr_l;
   weight_addr   <= conv_addr_r;
   bias_addr     <= bias_addr_reg;
-  conv_loop_ctr <= conv_loop;
+  conv_loop_ctr <= std_logic_vector(conv_loop);
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
@@ -82,12 +82,12 @@ begin
       if rising_edge(clk) then --latches at the rising_edge of clk_p. 
           if start = '1' then
             busy <= '1';
-          elsif conv_oloop = (conv_oloop'range => '0') then 
+          elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = x"00" then 
             busy <= '0';
           end if;
           if start = '1' and mode_c = '1' then
             mode_c_l <= '1';
-          elsif conv_oloop = (conv_oloop'range => '0') then
+          elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = x"00" then
             mode_c_l <= '0';
           end if;
       end if;
@@ -103,8 +103,8 @@ begin
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
       elsif addr_reload = '1' and clk_e_pos = '1' then
-        conv_loop <= loop_counter;
-        conv_oloop <= oloop_counter;
+        conv_loop <= unsigned(loop_counter) - 1;
+        conv_oloop <= unsigned(oloop_counter) - 1;
         if mode_a = '1' then
           conv_addr_l <= conv_saddr_l;
         end if;
@@ -119,8 +119,8 @@ begin
           inst <= sum;
           ppinst <= sumfirst;
         end if;
-        conv_oloop <= oloop_counter;
-        conv_loop  <= loop_counter;
+        conv_oloop <= unsigned(oloop_counter) - 1;
+        conv_loop  <= unsigned(loop_counter) - 1;
         if mode_a = '1' or mode_b = '1' then
           if mode_a = '1' then                --- reload depending on mode.
             conv_addr_l <= conv_saddr_l;
@@ -129,7 +129,7 @@ begin
             conv_addr_r <= conv_saddr_r;
           end if;
         end if;
-      elsif busy = '1' and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+      elsif busy = '1' then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
         if conv_out_p = '1' then
           inst <= conv;
           ppinst <= nop;
@@ -137,9 +137,9 @@ begin
           inst <= sum;
           ppinst <= sum;
         end if;
-        if conv_loop = x"01" then
+        if conv_loop = x"00" then
           if config(4) = '1' then --reload by config register, bit 4 in configure register
-            conv_loop <= loop_counter;
+            conv_loop <= unsigned(loop_counter) - 1;
           end if;
           if config(2) = '1' then 
             conv_addr_l <= conv_saddr_l;
@@ -158,12 +158,12 @@ begin
             inst <= sum;
             ppinst <= sumfirst;
           end if;
-          conv_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_oloop))-1,8));
-        elsif conv_loop /= x"01" then
-          conv_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_loop))-1,8));
+          conv_oloop <= conv_oloop - 1;
+        elsif conv_loop /= x"00" then
+          conv_loop <= conv_loop - 1;
           conv_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_l)+1),8));
           conv_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_r)+1),8)); --calculate right address;
-          if conv_loop = x"02" then
+          if conv_loop = x"01" then
             if conv_out_p = '1' then
               inst <= lastconv;
               conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
@@ -200,7 +200,7 @@ begin
   process(clk)
   begin
     if rising_edge(clk) then
-      if conv_loop = x"02" then
+      if conv_loop = x"01" then
         if pp_ctl(1) = '0' then 
           o_mux_ena <= '1';
         else
@@ -213,44 +213,6 @@ begin
       end if;
     end if;
   end process;
-
-  --process(clk)
-  --begin 
-  --  if rising_edge(clk) then
-  --    if rst = '0' then
-  --      conv_out_sel <= (others => '0');
-  --    elsif conv_loop = x"02" then
-  --      if conv_out_p = '0' then
-  --        ppinst <= sumfirst;
-  --      elsif conv_out_p = '1' then
-  --        conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-  --        if conv_out_sel = "000" then
-  --          ppinst <= select0;
-  --        elsif conv_out_sel = "001" then
-  --          ppinst <= select1;
-  --        elsif conv_out_sel = "010" then
-  --          ppinst <= select2;
-  --        elsif conv_out_sel = "011" then
-  --          ppinst <= select3;
-  --        elsif conv_out_sel = "100" then
-  --          ppinst <= select4;
-  --        elsif conv_out_sel = "101" then
-  --          ppinst <= select5;
-  --        elsif conv_out_sel = "110" then
-  --          ppinst <= select6;
-  --        elsif conv_out_sel = "111" then
-  --          ppinst <= select7;
-  --        end if;
-  --      end if;
-  --    elsif o_mux_ena = '1' then
-  --      if conv_out_p = '0' then
-  --        ppinst <= sumall;
-  --      end if;
-  --    elsif pp_stage_1 = '1' then
-  --      ppinst <= nop;
-  --    end if;
-  --  end if;
-  --end process;
                 
   --Post Shifter --maximum 16 bits, scale <= "10000"
   process(clk) --Enable control, one clock delay of ourput selector

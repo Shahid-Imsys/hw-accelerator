@@ -41,7 +41,7 @@ use work.vetypes.all;
 
 entity ve is
   generic(
-    USE_ASIC_MEMORIES : boolean := true
+    USE_ASIC_MEMORIES : boolean := false
     );
   port(
     --Control inputs
@@ -411,6 +411,7 @@ architecture rtl of ve is
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
+  signal read_en_b_i : std_logic;
   signal memreg_c_i : memreg_ctrl;
   signal writebuff_c_i : memreg_ctrl;
   signal inst_i : instruction;
@@ -710,11 +711,11 @@ begin
     if re_busy = '0' then
       data_read_enable_i <= '1';
       weight_read_enable_i <= '1';
-      --read_en_b_o <= '1';
+      read_en_b_i <= '1';
     else
       data_read_enable_i <= '0';
       weight_read_enable_i <= '0';
-      --read_en_b_o <= '0';
+      read_en_b_i <= '0';
     end if;
   end process;
 
@@ -935,7 +936,7 @@ begin
       data_wen_i       => write_en_o,    --data_write_enable_i,
       weight_ren_i     => weight_read_enable_i,
       weight_wen_i     => write_en_w_o,  --weight_write_enable_i, 
-      bias_ren_i       => '1',
+      bias_ren_i       => read_en_b_i,
       data0_i          => data0,
       data1_i          => data1,
       weight_i         => weight,

@@ -422,6 +422,11 @@ EVEN_P <= even_p_2;
     begin
 		if rising_edge(clk_e) then
             noc_delay <= noc_reg_rdy;
+            
+            -- noc_data_out <= data_core_int when noc_delay = '1';
+            if noc_reg_rdy = '1' then
+                noc_data_out <= data_core_int;
+            end if;
 		end if;
 	end process; 
 	
@@ -905,7 +910,7 @@ EVEN_P <= even_p_2;
     end process;
 --Output Latch
 --    noc_data_out <= data_core_int when noc_delay = '1'; -- else (x"00", x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00");
-    noc_data_out <= data_core_int when noc_delay = '1';
+    -- noc_data_out <= data_core_int when noc_delay = '1';
     
 --	data_rd_act : process(clk_e)
 --    begin

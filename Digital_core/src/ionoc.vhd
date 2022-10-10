@@ -184,6 +184,8 @@ architecture rtl of ionoc is
   signal ionoc_rxfifo_valid_f : std_logic;
 
   -- TxFIFO Data to GPP
+  signal TxFIFO_Ready_int     : std_logic;
+  --
   signal ionoc_txfifo_valid_f : std_logic;
   signal ionoc_rddata_noc     : ionoc_cache_t;  -- Local fifo data cache
   --
@@ -267,7 +269,8 @@ begin
 ------------------------------------------------------
 -- clk_noc concurrent statements
 ------------------------------------------------------
-  GPP_CMD_ACK <= GPP_CMD_ACK_int;
+  GPP_CMD_ACK  <= GPP_CMD_ACK_int;
+  TxFIFO_Ready <= TxFIFO_Ready_int;
 ------------------------------------------------------
 
 
@@ -535,9 +538,9 @@ begin
       GPP_CMD      <= (others => '0');
       GPP_CMD_Flag <= '0';
       --
-      RxFIFO_Data  <= (others => '0');
-      RxFIFO_Valid <= '0';
-      TxFIFO_Ready <= '0';
+      RxFIFO_Data      <= (others => '0');
+      RxFIFO_Valid     <= '0';
+      TxFIFO_Ready_int <= '0';
 
       -- Process signals
       GPP_CMD_Flag_int        <= '0';
@@ -644,28 +647,28 @@ begin
       -- TxFIFO Interface
       --
 
-      -- TxFIFO is offering data, make copy
-      if TxFIFO_Valid = '1' and
-        ionoc_txfifo_valid_f = '0' then
-        ionoc_txfifo_valid_f <= '1';
-        TxFIFO_Ready         <= '0';    -- Do not allow more data from TxFIFO
-        --
-        for b in ionoc_rddata_noc'range loop
-          ionoc_rddata_noc(b) <= TxFIFO_Data(8*b + 7 downto 8*b);
-        end loop;
-      end if;
-      --
+      -- IO-bus has read data
       if ionoc_txfifo_valid_f = '1' and
         ionoc_rddata_pending then
         -- Data presented to IO-bus interface
         ionoc_txfifo_valid_f <= '0';
       end if;
-      --
-      if TxFIFO_Valid = '0' and
-        ionoc_txfifo_valid_f = '0' and
+
+      -- TxFIFO is offering data, make copy
+      if TxFIFO_Valid     = '1' and
+        TxFIFO_Ready_int     = '1' and
         not ionoc_rddata_pending then
-        -- Data is cumsumed, prepare for next word
-        TxFIFO_Ready <= '1';
+        ionoc_txfifo_valid_f <= '1';
+        TxFIFO_Ready_int     <= '0';    -- Do not allow more data from TxFIFO
+        --
+        for b in ionoc_rddata_noc'range loop
+          ionoc_rddata_noc(b) <= TxFIFO_Data(8*b + 7 downto 8*b);
+        end loop;
+
+      elsif ionoc_txfifo_valid_f = '0' and
+        not ionoc_rddata_pending then
+        -- Data is consumed, prepare for next word
+        TxFIFO_Ready_int <= '1';
       end if;
 
     end if;  -- clk_noc

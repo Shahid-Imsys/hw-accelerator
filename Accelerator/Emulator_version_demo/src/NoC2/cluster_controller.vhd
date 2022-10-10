@@ -46,7 +46,7 @@ use work.all;
 
 entity cluster_controller is
 	generic(
-		TAG_CMD_DECODE_TIME : integer := 52 --53     --azzzz38 "to add addr2 in tag line"  --Number of clock cycles for peci_busy to deassert
+		TAG_CMD_DECODE_TIME : integer := 38     --azzz52 back to 38 to remove addr2 --azzzz38 "to add addr2 in tag line"  --Number of clock cycles for peci_busy to deassert
 												--To be moved to defines
 		);
   	port(
@@ -213,7 +213,7 @@ end component;
  
   signal standby        : std_logic;
   signal delay2         : std_logic;
-  signal tag_ctr_2      : unsigned(5 downto 0) := "101101"; --azzzz 45 "to add addr2 in tag line" --"011110"; --30
+  signal tag_ctr_2      : unsigned(5 downto 0) := "011110"; --30  --"101101"; --azzz back to 30 to remove addr2, azzzz 45 "to add addr2 in tag line" --"011110"; --30
   signal tag_ctr_3      : unsigned(5 downto 0) := "100110"; --38
   signal tag_ctr_1      : unsigned(5 downto 0);
  
@@ -377,7 +377,7 @@ EVEN_P <= even_p_2;
 			        delay_pipe(i+1) <= delay_pipe(i);
 			    end loop;
 			    
-			    delay2 <= delay_pipe(4); 			
+			    delay2 <= delay_pipe(3); --delay_pipe(4); 	reduced for broadcast, in this case sync can come earlier and can not miss it	
 				
 			elsif noc_cmd = "00101" then     --WriteBlockB
 				if noc_reg_rdy= '1' and len_ctr = "000000000000000" then 
@@ -590,7 +590,7 @@ EVEN_P <= even_p_2;
     begin
 	if rising_edge(clk_e) then
 		if noc_cmd = "01111" then
-			tag_ctr_2 <= "101101"; --azzzz 45 "to add addr2 in tag line" --"011110"; --30
+			tag_ctr_2 <=  "011110"; --30  --"101101"; --azzz back to 30 to remove addr2 --azzzz 45 "to add addr2 in tag line" --"011110"; --30
 			tag_ctr_3 <= "100110"; --38;
 			len_ctr <= (others => '0');
 			addr_n  <= (others => '0');
@@ -600,21 +600,21 @@ EVEN_P <= even_p_2;
 		elsif sig_fin = '1' and delay = '0' then
 		    if noc_cmd = "00011" or noc_cmd = "00100" then
                 tag_ctr_2 <= tag_ctr_2 - 1;
-                if tag_ctr_2 >= 30 then --azzzz 15 then  to add addr2 in tag line
+                if tag_ctr_2 >= 15 then --30 then --azzz back to 15 to remove addr2 --azzzz 15 then  to add addr2 in tag line
                     len_ctr(0) <= tag; 
                     for i in 0 to 13 loop
                         len_ctr(i+1)<= len_ctr(i);
                     end loop;
-                elsif tag_ctr_2 < 30 and tag_ctr_2 >= 15 then    --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
+                elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then --azzzz to remove addr2 --tag_ctr_2 < 30 and tag_ctr_2 >= 15 then    --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
                     addr_n(0) <= tag;
                     for i in 0 to 13 loop
                         addr_n(i+1)<= addr_n(i);
                     end loop;
-                elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then     --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
-                    addr2_n(0) <= tag;
-                    for i in 0 to 13 loop
-                        addr2_n(i+1)<= addr2_n(i);
-                    end loop;		    		
+--                elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then     --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
+--                    addr2_n(0) <= tag;
+--                    for i in 0 to 13 loop
+--                        addr2_n(i+1)<= addr2_n(i);
+--                    end loop;		    		
                 end if;
 		    elsif noc_cmd = "00101" then
 		    	tag_ctr_3<= tag_ctr_3-1;
@@ -641,7 +641,7 @@ EVEN_P <= even_p_2;
 		    	end if;
 		    end if;
 	    elsif delay2 = '1' then   -- azzz delay = '1' then changed to delay2 because of the delay before receiving data
-			tag_ctr_2 <= "101101"; --azzzz 45 to add addr2 in tag line --"011110"; --30
+			tag_ctr_2 <= "011110"; --30 --azzzz to remove addr2 --"101101"; --azzzz 45 to add addr2 in tag line --"011110"; --30
 			tag_ctr_3 <= "100110"; --38;
 		    if noc_reg_rdy = '1' then
                 if noc_cmd = "00011" then

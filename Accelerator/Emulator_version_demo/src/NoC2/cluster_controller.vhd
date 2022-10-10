@@ -396,10 +396,12 @@ EVEN_P <= even_p_2;
 					delay2 <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
 						delay_c(0) <= '1';
-						for i in 0 to TAG_CMD_DECODE_TIME-10 loop
+						--for i in 0 to TAG_CMD_DECODE_TIME-10 loop
+						for i in 0 to TAG_CMD_DECODE_TIME-11 loop
 							delay_c(i+1) <= delay_c(i);
 						end loop;
-						delay <= delay_c(TAG_CMD_DECODE_TIME-9);
+						--delay <= delay_c(TAG_CMD_DECODE_TIME-9);
+						delay <= delay_c(TAG_CMD_DECODE_TIME-10);
 				end if;
 				delay_pipe(0) <= delay;
 		        for i in 0 to 3 loop

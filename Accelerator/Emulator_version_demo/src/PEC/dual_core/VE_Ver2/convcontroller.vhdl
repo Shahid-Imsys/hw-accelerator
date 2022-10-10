@@ -10,6 +10,7 @@ entity convcontroller is
   port(
     clk              : in std_logic;
     rst              : in std_logic;
+    en               : in std_logic;
     clk_e_pos        : in std_logic;
     start            : in std_logic;
     cnt_rst          : in std_logic;
@@ -41,6 +42,7 @@ entity convcontroller is
     ppshiftinst      : out ppshift_shift_ctrl;
     addbiasinst      : out ppshift_addbias_ctrl;
     clipinst         : out ppshift_clip_ctrl;
+    stall            : out unsigned(3 downto 0);
     busy             : out std_logic
   );
 end entity;
@@ -54,8 +56,8 @@ architecture convctrl of convcontroller is
   signal a_delay        : std_logic;
   signal conv_out_sel   : std_logic_vector(2 downto 0);
   signal bias_addr_reg  : std_logic_vector(7 downto 0);
-  signal conv_loop      : std_logic_vector(7 downto 0);
-  signal conv_oloop     : std_logic_vector(7 downto 0);
+  signal conv_loop      : unsigned(7 downto 0);
+  signal conv_oloop     : unsigned(7 downto 0);
   signal clockcycle     : integer := 0;
 
 begin
@@ -81,15 +83,17 @@ begin
   latch_signals: process(clk)
   begin
     if rising_edge(clk) then --latches at the rising_edge of clk_p. 
-      if start = '1' then
-        busy <= '1';
-      elsif conv_oloop = (conv_oloop'range => '0') then 
-        busy <= '0';
-      end if;
-      if start = '1' and mode_c = '1' then
-        mode_c_l <= '1';
-      elsif conv_oloop = (conv_oloop'range => '0') then
-        mode_c_l <= '0';
+      if en = '1' then
+        if start = '1' then
+          busy <= '1';
+        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0')then 
+          busy <= '0';
+        end if;
+        if start = '1' and mode_c = '1' then
+          mode_c_l <= '1';
+        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0')then
+          mode_c_l <= '0';
+        end if;
       end if;
     end if;
   end process;
@@ -102,26 +106,10 @@ begin
         right_rst <= '0';
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
-      elsif cnt_rst = '1' and clk_e_pos = '1' then
-        conv_loop <= dot_cnt;
-        conv_oloop <= oc_cnt;
-        if mode_a = '1' then
-          left_rst <= '1';
-        else
-          left_rst <= '0';
-        end if;
-        if mode_b = '1' then
-          right_rst <= '1';
-        else
-          right_rst <= '0';
-        end if;
-      elsif start = '1' and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
-        inst <= firstconv;
-        load <= '1';
-        rd_en <= '1';
-        conv_oloop <= oc_cnt;
-        conv_loop  <= dot_cnt;
-        if mode_a = '1' or mode_b = '1' then
+      elsif en = '1' then
+        if cnt_rst = '1' and clk_e_pos = '1' then
+          conv_loop <= unsigned(dot_cnt);
+          conv_oloop <= unsigned(oc_cnt);
           if mode_a = '1' then
             left_rst <= '1';
           else
@@ -132,39 +120,61 @@ begin
           else
             right_rst <= '0';
           end if;
-        end if;
-      elsif busy = '1' and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
-        inst <= conv;
-        if conv_loop = x"01" then
-          if conv_oloop = x"01" then
-            load <= '0';
-            rd_en <= '0';
-          end if;
-          if config(4) = '1' then --reload by config register, bit 4 in configure register
-            conv_loop <= dot_cnt;
-          end if;
-          left_rst <= '0';
-          right_rst <= '0';
+        elsif start = '1' and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
           inst <= firstconv;
-          conv_oloop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_oloop))-1,8));
-        elsif conv_loop /= x"01" then
-          conv_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_loop))-1,8));
           load <= '1';
           rd_en <= '1';
-          
-          if conv_loop = x"02" then
-            inst <= lastconv;
-            if config(2) = '1' then 
+          conv_loop <= unsigned(dot_cnt);
+          conv_oloop <= unsigned(oc_cnt);
+          if mode_a = '1' or mode_b = '1' then
+            if mode_a = '1' then
               left_rst <= '1';
+            else
+              left_rst <= '0';
             end if;
-            if config(3) = '1' then
+            if mode_b = '1' then
               right_rst <= '1';
+            else
+              right_rst <= '0';
             end if;
           end if;
+        elsif busy = '1' then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+          inst <= conv;
+          if conv_loop = x"00" then
+            left_rst <= '0';
+            right_rst <= '0';
+            inst <= firstconv;
+            --if pushback_en = '1' then
+            --  conv_oloop <= conv_oloop;
+            --end if;
+            conv_oloop <= conv_oloop - 1;
+            if config(4) = '1' then --reload by config register, bit 4 in configure register
+              conv_loop <= unsigned(dot_cnt);
+            end if;
+            if conv_oloop = x"00" then
+              load <= '0';
+              rd_en <= '0';
+              inst <= nop;
+              conv_oloop <= conv_oloop;
+            end if;
+          elsif conv_loop /= x"00" then
+            conv_loop <= conv_loop - 1;
+            load <= '1';
+            rd_en <= '1';     
+            if conv_loop = x"01" then
+              inst <= lastconv;
+              if config(2) = '1' then 
+                left_rst <= '1';
+              end if;
+              if config(3) = '1' then
+                right_rst <= '1';
+              end if;
+            end if;
+          end if;
+        else
+          load <= '0';
+          rd_en <= '0';
         end if;
-      else
-        load <= '0';
-        rd_en <= '0';
       end if;
     end if;
   end process;
@@ -175,7 +185,7 @@ begin
       if rst = '0' then
         bias_load <= '0';
         bias_rd_en <= '0';
-      else
+      elsif en = '1' then
         if inst = firstconv and load = '1' and pp_ctl(0) = '0' then
           bias_load <= '1';
           bias_rd_en <= '1';
@@ -200,8 +210,8 @@ begin
     if rising_edge(clk) then
       if rst = '0' then
         o_mux_ena <= '0';
-      else
-        if conv_loop = x"02" then
+      elsif en = '1' then
+        if conv_loop = x"01" then
           o_mux_ena <= '1';
         elsif conv_out_p = '0' then --11 clock delay of config(7)
           o_mux_ena <= '0';
@@ -217,8 +227,8 @@ begin
     if rising_edge(clk) then
       if rst = '0' then
         conv_out_sel <= (others => '0');
-      else
-        if conv_loop = x"02" then
+      elsif en = '1' then
+        if conv_loop = x"01" then
           if conv_out_p = '0' then
             ppinst <= sumfirst;
           elsif conv_out_p = '1' then
@@ -279,5 +289,19 @@ begin
     end if;
   end process; 
 
+  pushback_stall : process(clk) --stall the computation to push back the result to buffer.
+  begin
+    if rising_edge(clk) then
+      if rst = '0' then
+        stall <= x"0";
+      else
+        --if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = x"01" then
+        --  stall <= unsigned(dot_cnt(3 downto 0)) + 1;--stall the ve core for one clock cycle to push the result back to mem buffer.
+        --else
+        --  stall <= x"0";
+        --end if;
+      end if;
+    end if;
+  end process;
 
 end architecture; 

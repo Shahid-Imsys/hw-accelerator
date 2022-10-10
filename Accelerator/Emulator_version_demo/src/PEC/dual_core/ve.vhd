@@ -225,6 +225,7 @@ architecture rtl of ve is
       re_start        : in std_logic;
       re_source       : in std_logic;
       cnt_rst         : in std_logic;
+      pushback_en     : in std_logic;
       wr_counter      : in std_logic_vector(7 downto 0);
       re_busy         : out std_logic;
       write_en_data   : out std_logic;
@@ -248,6 +249,7 @@ architecture rtl of ve is
     port(
       clk              : in std_logic;
       rst              : in std_logic;
+      en               : in std_logic;
       clk_e_pos        : in std_logic;
       start            : in std_logic;
       cnt_rst          : in std_logic;
@@ -279,6 +281,7 @@ architecture rtl of ve is
       ppshiftinst      : out ppshift_shift_ctrl;
       addbiasinst      : out ppshift_addbias_ctrl;
       clipinst         : out ppshift_clip_ctrl;
+      stall            : out unsigned(3 downto 0);
       busy             : out std_logic
     );
   end component;
@@ -448,10 +451,10 @@ architecture rtl of ve is
   signal conv_writebuff_c : memreg_ctrl;
   signal fft_writebuff_c  : memreg_ctrl;
   signal inst_i           : instruction;
-  signal conv_inst        : instruction;
+  signal conv_ins        : instruction;
   signal fft_inst         : instruction;
   signal ppinst_i         : ppctrl_t;
-  signal conv_ppinst      : ppctrl_t;
+  signal conv_ppins      : ppctrl_t;
   signal fft_ppinst       : ppctrl_t;
   signal ppshiftinst_i    : ppshift_shift_ctrl;
   signal conv_ppshiftinst : ppshift_shift_ctrl;
@@ -463,8 +466,9 @@ architecture rtl of ve is
   signal conv_clipinst    : ppshift_clip_ctrl;
   signal fft_clipinst     : ppshift_clip_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
-  signal stall : unsigned(3 downto 0) := (others => '0');
-  signal en_i : std_logic;
+  signal fft_stall, conv_stall, stall : unsigned(3 downto 0) := (others => '0');
+  signal en_o : std_logic;
+  signal pushback_en : std_logic;
   signal data0_addr_o : std_logic_vector(7 downto 0);
   signal data1_addr_o : std_logic_vector(7 downto 0);
   signal weight_addr_o : std_logic_vector(7 downto 0);
@@ -680,26 +684,99 @@ begin
     end if;
   end process;
   
-  RE_VE_switch : process(clk_p)
+  --RE_VE_switch : process(clk_p)
+  --begin
+  --  if rising_edge(clk_p) then
+  --    if rv_switch = '1' and ve_rdy = '1' then
+  --      mode_latch <= re_mode;
+  --    else
+  --      if re_rdy = '1' and ve_rdy = '1' then
+  --        if ve_clr_acc = '1' and rv_switch = '0' then  
+  --          mode_latch <= fft;
+  --        elsif conv_enable = '1' and rv_switch = '0' then
+  --          mode_latch <= conv;
+  --        elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+  --          mode_latch <= matrix;
+  --        end if;
+  --      end if;
+  --    end if;
+  --  end if;
+  --end process;
+
+  mode_state_machine : process(clk_p)
   begin
     if rising_edge(clk_p) then
-      if rv_switch = '1' and ve_rdy = '1' then
-        mode_latch <= re_mode;
-      else
-        if re_rdy = '1' and ve_rdy = '1' then
-          if ve_clr_acc = '1' and rv_switch = '0' then  
-            mode_latch <= fft;
-          elsif conv_enable = '1' and rv_switch = '0' then
-            mode_latch <= conv;
-          elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
-            mode_latch <= matrix;
-          end if;
-        end if;
+      if rst = '0' then
+        mode_latch <= idle;
+      elsif clk_e_pos = '0' then
+        case mode_latch is 
+          when idle => 
+            if rv_switch = '1' then
+              mode_latch <= re_mode;
+            elsif conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= conv;
+            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+              mode_latch <= fft;
+            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= matrix;
+            else
+              mode_latch <= idle;
+            end if;
+          when re_mode =>
+            if (conv_enable = '1' and rv_switch = '0') or (re_source = '1' and pushback_en = '0') then
+              mode_latch <= conv;
+            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+              mode_latch <= fft;
+            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= matrix;
+            --elsif re_rdy = '1' then --back to initial state TBD
+            --  mode_latch <= idle;
+            else
+              mode_latch <= re_mode;
+            end if;
+          when conv =>
+            if rv_switch = '1' or (re_source = '1' and pushback_en = '1') then --pushback
+              mode_latch <= re_mode;
+            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+              mode_latch <= fft;
+            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= matrix;
+            --elsif ve_rdy = '1' then
+            --  mode_latch <= idle;  
+            else
+              mode_latch <= conv;
+            end if;
+          when fft =>
+            if rv_switch = '1' then
+              mode_latch <= re_mode;
+            elsif conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= conv;
+            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= matrix;
+            --elsif ve_rdy = '1' then
+            --  mode_latch <= idle;  
+            else
+              mode_latch <= fft;
+            end if;
+          when matrix => 
+            if rv_switch = '1' then
+              mode_latch <= re_mode;
+            elsif conv_enable = '1' and rv_switch = '0' then
+              mode_latch <= conv;
+            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+              mode_latch <= fft;
+            --elsif ve_rdy = '1' then
+            --  mode_latch <= idle;
+            else
+              mode_latch <= matrix;
+            end if;
+          when others => mode_latch <= idle;
+        end case;
       end if;
     end if;
   end process;
 
-  fft_en <= '1' when mode_latch = fft else '0'; -- more enable signals should be added to controllers later to reduce power consumption.
+  fft_en <= '1' when mode_latch = fft else '0'; -- more enable signals should be added to controllers later
 
   --********************************
   --Mode c. Shared by RE and VE
@@ -835,36 +912,39 @@ begin
 
   start_demux : process(all)
   begin
-    conv_start     <= '0';
-    fft_start      <= '0';
-    re_start       <= '0';
-    left_rst       <= '0';
-    right_rst      <= '0';
-    bias_rst       <= '0';
-    dot_cnt        <= x"00";
-    oc_cnt         <= x"00";
-    re_loop        <= x"00";
-    fft_stages     <= "000";
-    re_cnt_rst     <= '0';
-    conv_cnt_rst   <= '0';
+    --if rising_edge(clk_p) then
+    conv_start   <= '0';
+    fft_start    <= '0';
+    re_start     <= '0';
+    left_rst     <= '0';
+    right_rst    <= '0';
+    bias_rst     <= '0';
+    --dot_cnt      <= x"00";
+    --oc_cnt       <= x"00";
+    fft_stages   <= "000";
+    stall        <= x"0";
+    re_cnt_rst   <= '0';
+    conv_cnt_rst <= '0';
     case mode_latch is
-      when conv    => conv_start     <= start;
-                      conv_cnt_rst   <= cnt_rst;
-                      dot_cnt        <= ve_loop_reg;
-                      oc_cnt         <= ve_oloop_reg;
-                      left_rst       <= lrst_from_conv;
-                      right_rst      <= rrst_from_conv;
-                      bias_rst       <= brst_from_conv;
-      when fft     => fft_start      <= start;
-                      fft_stages     <= unsigned(ve_loop_reg(2 downto 0));
-      when re_mode => re_start       <= start;
-                      re_cnt_rst     <= cnt_rst;
-                      re_loop        <= ve_loop_reg;
-                      left_rst       <= lrst_from_re;
-                      right_rst      <= rrst_from_re;
-                      bias_rst       <= brst_from_re;
+      when conv    => conv_start   <= start;
+                      conv_cnt_rst <= cnt_rst;
+                      --dot_cnt      <= ve_loop_reg;
+                      --oc_cnt       <= ve_oloop_reg;
+                      stall        <= conv_stall;
+                      left_rst     <= lrst_from_conv;
+                      right_rst    <= rrst_from_conv;
+                      bias_rst     <= brst_from_conv;
+      when fft     => fft_start    <= start;
+                      fft_stages   <= unsigned(ve_loop_reg(2 downto 0));
+                      stall        <= fft_stall;
+      when re_mode => re_start     <= start;
+                      re_cnt_rst   <= cnt_rst;
+                      left_rst     <= lrst_from_re;
+                      right_rst    <= rrst_from_re;
+                      bias_rst     <= brst_from_re;
       when others  => null;
     end case;
+    --end if;
   end process;
 
   instruction_mux : process(all)
@@ -872,8 +952,8 @@ begin
     case mode_latch is
       when conv   => memreg_c_i    <= conv_memreg_c;
                      writebuff_c_i <= conv_writebuff_c;
-                     inst_i        <= conv_inst;
-                     ppinst_i      <= conv_ppinst;
+                     inst_i        <= conv_ins;
+                     ppinst_i      <= conv_ppins;
                      ppshiftinst_i <= conv_ppshiftinst;
                      addbiasinst_i <= conv_addbiasinst;
                      clipinst_i    <= conv_clipinst;
@@ -884,13 +964,13 @@ begin
                      ppshiftinst_i <= fft_ppshiftinst;
                      addbiasinst_i <= fft_addbiasinst;
                      clipinst_i    <= fft_clipinst;
-      when others => memreg_c_i    <= (noswap, hold, hold);
-                     writebuff_c_i <= (noswap, hold, hold);
+      when others => memreg_c_i    <= (swap => noswap, datareg => hold, weightreg => hold);
+                     writebuff_c_i <= (swap => noswap, datareg => hold, weightreg => hold);
                      inst_i        <= nop;
                      ppinst_i      <= nop;
-                     ppshiftinst_i <= (hold, 0, '0', left);
-                     addbiasinst_i <= (pass, unbiased);
-                     clipinst_i    <= (none, none);
+                     ppshiftinst_i <= (acce => hold, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => left);
+                     addbiasinst_i <= (acc  => pass, quant => unbiased);
+                     clipinst_i    <= (clip => none, outreg => none);
     end case;
   end process;
 
@@ -942,9 +1022,9 @@ begin
     read_en_b_o  <= '0';
     write_en_b_o <= '0';
     if mode_latch = re_mode then
-      read_en_o    <= read_en_to_mux;
+      read_en_o    <= '0';--read_en_to_mux;
       write_en_o   <= dwen_from_re;
-      read_en_w_o  <= read_en_w_to_mux;
+      read_en_w_o  <= '0';--read_en_w_to_mux;
       write_en_w_o <= wwen_from_re;
       write_en_b_o <= bwen_from_re;
     elsif mode_latch = conv then
@@ -1188,7 +1268,8 @@ begin
       re_start        => re_start,
       re_source       => re_source,
       cnt_rst         => re_cnt_rst,
-      wr_counter      => re_loop,
+      pushback_en     => pushback_en,
+      wr_counter      => re_loop_reg,
       re_busy         => re_ready,
       write_en_data   => dwen_from_re,
       write_en_weight => wwen_from_re,
@@ -1210,6 +1291,7 @@ begin
     port map(
       clk              => clk_p,
       rst              => rst,
+      en               => en_o and not pushback_en,
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,
@@ -1218,8 +1300,8 @@ begin
       mode_c           => mode_c,
       config           => config,
       pp_ctl           => pp_ctl,
-      dot_cnt          => dot_cnt,
-      oc_cnt           => oc_cnt,
+      dot_cnt          => ve_loop_reg,--dot_cnt,
+      oc_cnt           => ve_oloop_reg,--oc_cnt,
       bias_au_addr     => bias_finaladdress,
       bias_index_end   => bias_index_end,
       scale            => scale,
@@ -1236,11 +1318,12 @@ begin
       enable_clip      => clip_ena,
       memreg_c         => conv_memreg_c,
       writebuff_c      => conv_writebuff_c,
-      inst             => conv_inst,
-      ppinst           => conv_ppinst,
+      inst             => conv_ins,
+      ppinst           => conv_ppins,
       ppshiftinst      => conv_ppshiftinst,
       addbiasinst      => conv_addbiasinst,
       clipinst         => conv_clipinst,
+      stall            => conv_stall,
       busy             => conv_busy
     );
 
@@ -1264,7 +1347,7 @@ begin
       inst_shift   => fft_ppshiftinst,
       inst_addbias => fft_addbiasinst,
       inst_clip    => fft_clipinst,
-      stall        => stall
+      stall        => fft_stall
     );
 
   ve_wctrlpipe_inst : ve_wctrlpipe
@@ -1290,7 +1373,7 @@ begin
       ppshiftinst_i   => ppshiftinst_i,
       addbiasinst_i   => addbiasinst_i,
       clipinst_i      => clipinst_i,
-      lzod_i          => ("00", none, none),
+      lzod_i          => (word => "00", store => none, output => none),
       feedback_ctrl_i => clip_to_1, --in feedback_t;
       zpdata_i        => zp_data,
       zpweight_i      => zp_weight,
@@ -1307,7 +1390,7 @@ begin
       outreg_o        => outreg,
       writebuffer_o   => writebuffer,
       stall           => stall,
-      en_o            => en_i
+      en_o            => en_o
       );
 
 ------------------------------------------------------------------------------
@@ -1320,7 +1403,7 @@ begin
       for i in 0 to 5 loop
         delay3(i+1) <= delay3(i);
       end loop;
-      output_ena <= delay3(6); 
+      output_ena <= delay3(3); 
       --output_ena <= re_source;--DNN PUSH BACK TEST
     end if;
   end process;
@@ -1437,6 +1520,7 @@ begin
         dfy_reg <= (others => (others => '0'));
         dtm_data_reg <= (others => (others => '0'));
         output_c <= (others => '0');
+        pushback_en <= '0';
       elsif reg_in = CONS_DFY_REG_SHIFT_IN then --write feedback(dfy) register through y bus
         if clk_e_neg = '1' then
         dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
@@ -1446,8 +1530,10 @@ begin
           dfy_reg(to_integer(unsigned(output_c))) <= outreg(7 downto 0);
           if output_c = x"7" then
             output_c <=(others => '0');
+            pushback_en <= '1';
           else
             output_c <= std_logic_vector(to_unsigned(to_integer(unsigned(output_c))+1,4));
+            pushback_en <= '0';
           end if;
         elsif pp_ctl(4 downto 3) = "10" then --to DTM data register
           dtm_data_reg(to_integer(unsigned(output_c))) <= outreg(7 downto 0);

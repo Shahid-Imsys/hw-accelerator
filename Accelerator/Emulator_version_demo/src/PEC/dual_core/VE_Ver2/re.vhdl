@@ -18,6 +18,7 @@ entity re is
     re_start        : in std_logic;
     re_source       : in std_logic;
     cnt_rst         : in std_logic;
+    pushback_en     : in std_logic;
     wr_counter      : in std_logic_vector(7 downto 0);
     re_busy         : out std_logic;
     write_en_data   : out std_logic;
@@ -154,7 +155,7 @@ begin
           elsif mode_b = '1' then
             bpushback_rst <= '1';
           end if;
-        elsif cnt_rst = '0' and re_source = '1' and re_start = '1' then
+        elsif cnt_rst = '0' and re_source = '1' and pushback_en = '1' then
           if mode_a = '1'  then 
             apushback_load <= '1';
           elsif mode_b = '1' then
@@ -175,7 +176,7 @@ begin
   begin
     if re_busy = '1' and ((mode_a_l = '1' and mode_b_l = '0' ) or mode_c_l = '1')then
       write_en_data <= left_load;
-    elsif re_start = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b = '1') then
+    elsif pushback_en = '1' and clk_e_pos = '0' and re_source = '1' and (mode_a = '1' or mode_b = '1') then
       write_en_data <= apushback_load or bpushback_load;
     else
       write_en_data <= '0';

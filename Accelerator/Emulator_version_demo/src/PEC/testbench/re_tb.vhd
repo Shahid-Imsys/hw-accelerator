@@ -441,6 +441,9 @@ wait for 30.01 ns;
 pl <= re_saddr_b;
 ybus <= x"03";
 wait for 30.01 ns;
+pl <= re_saddr_a;
+ybus <= x"01";
+wait for 30.01 ns;
 pl <= pa_test_cmp0;
 ybus <= x"05";
 wait for 30.01 ns;
@@ -472,16 +475,15 @@ progress <= p_mode_a;
 --pl(94) <= '1';
 --wait for 30 ns;
 --pl(94) <= '0'; 
-wait for 30 ns;
-pl(95) <= '1'; --start
+wait for 60 ns;
 pl(99) <= '0'; --cnt_rst = '0'
 pl(98) <= '1'; --mode a 
 pl(97) <= '0'; --mode b 
-wait for 90 ns;
+wait for 30 ns;
 pl(95) <= '0'; --start
+pl(98) <= '0'; --mode a 
 progress <= p_mode_b;
 wait for 30 ns;
-pl(95) <= '1'; --start
 pl(99) <= '0'; --cnt_rst = '0'
 pl(98) <= '0'; --mode a 
 pl(97) <= '1'; --mode b 
@@ -489,7 +491,6 @@ wait for 90 ns;
 pl(95) <= '0'; --start
 progress <= p_mode_a;
 wait for 30 ns;
-pl(95) <= '1'; --start
 pl(99) <= '0'; --cnt_rst = '0'
 pl(98) <= '1'; --mode a 
 pl(97) <= '0'; --mode b 

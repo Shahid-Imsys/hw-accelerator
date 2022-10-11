@@ -13,6 +13,7 @@ entity addressing_unit is
   port(
     clk : in std_logic;
     rst : in std_logic;
+    en  : in std_logic;
     load : in std_logic;
     cmp        : in au_param;
     add_offset : in au_param;
@@ -45,8 +46,8 @@ begin
   --third <= third_int when addon_off(1) = '0' else x"00";
   --fourth <= fourth_int when addon_off(2) = '0' else x"00";
 
-  finaladdress <= std_logic_vector(unsigned(baseaddress) + first + second + third + fourth) when load = '1'
-                                                                                            else (others => '0');
+  finaladdress <= std_logic_vector(unsigned(baseaddress) + first + second + third + fourth); --when load = '1'
+                                                                                            --else (others => '0');
 
   --done <= rst_first and rst_second and rst_third and rst_fourth;
 
@@ -84,10 +85,12 @@ begin
       if rst = '0' then
         first <= (others => '0');
       else
-        if rst_first = '1' then
-          first <= (others => '0');
-        elsif load = '1' then
-          first <= add_offset(0) + first;
+        if en = '1' then
+          if rst_first = '1' then
+            first <= (others => '0');
+          elsif load = '1' then
+            first <= add_offset(0) + first;
+          end if;
         end if;
       end if;
     end if;
@@ -99,10 +102,12 @@ begin
       if rst = '0' then
         second <= (others => '0');
       else
-        if rst_second = '1' and rst_first = '1' then
-          second <= (others => '0');
-        elsif load_second = '1' then
-          second <= add_offset(1) + second;
+        if en = '1' then
+          if rst_second = '1' and rst_first = '1' then
+            second <= (others => '0');
+          elsif load_second = '1' then
+            second <= add_offset(1) + second;
+          end if;
         end if;
       end if;
     end if;
@@ -114,10 +119,12 @@ begin
       if rst = '0' then
         third <= (others => '0');
       else
-        if rst_third = '1' and rst_second = '1' and rst_first = '1' then
-          third <= (others => '0');
-        elsif load_third = '1' and load_second = '1' then
-          third <= add_offset(2) + third;
+        if en = '1' then
+          if rst_third = '1' and rst_second = '1' and rst_first = '1' then
+            third <= (others => '0');
+          elsif load_third = '1' and load_second = '1' then
+            third <= add_offset(2) + third;
+          end if;
         end if;
       end if;
     end if;
@@ -129,10 +136,12 @@ begin
       if rst = '0' then
         fourth <= (others => '0');
       else
-        if rst_fourth = '1' and rst_third = '1' and rst_second = '1' and rst_first = '1' then
-          fourth <= (others => '0');
-        elsif load_fourth = '1' and load_third = '1' and load_second = '1' then
-          fourth <= add_offset(3) + fourth;
+        if en = '1' then
+          if rst_fourth = '1' and rst_third = '1' and rst_second = '1' and rst_first = '1' then
+            fourth <= (others => '0');
+          elsif load_fourth = '1' and load_third = '1' and load_second = '1' then
+            fourth <= add_offset(3) + fourth;
+          end if;
         end if;
       end if;
     end if;

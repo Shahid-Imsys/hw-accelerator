@@ -205,6 +205,7 @@ architecture rtl of ve is
     port(
       clk          : in std_logic;
       rst          : in std_logic;
+      en           : in std_logic;
       load         : in std_logic;
       cmp          : in au_param;
       add_offset   : in au_param;
@@ -708,7 +709,7 @@ begin
     if rising_edge(clk_p) then
       if rst = '0' then
         mode_latch <= idle;
-      elsif clk_e_pos = '0' then
+      elsif clk_e_pos = '1' then
         case mode_latch is 
           when idle => 
             if rv_switch = '1' then
@@ -846,10 +847,10 @@ begin
   addrfromctrl_pointer_mux : process(all)
   begin
     case mode_latch is
-      when re_mode => data0_addr_i  <= x"00";
-                      data1_addr_i  <= x"00";
-                      weight_addr_i <= x"00";
-                      bias_addr_i   <= x"00"; 
+      when re_mode => data0_addr_i  <= left_finaladdress;
+                      data1_addr_i  <= left_finaladdress;
+                      weight_addr_i <= right_finaladdress;
+                      bias_addr_i   <= bias_finaladdress; 
       when conv    => data0_addr_i  <= left_finaladdress;
                       data1_addr_i  <= left_finaladdress;
                       weight_addr_i <= right_finaladdress;
@@ -1206,6 +1207,7 @@ begin
       clk          => clk_p,
       rst          => rst and not left_rst,
       load         => left_loading,
+      en           => not pushback_en,
       cmp          => au_lcmp,
       add_offset   => au_loffset,
       baseaddress  => left_baseaddress,
@@ -1217,6 +1219,7 @@ begin
       clk          => clk_p,
       rst          => rst and not right_rst,
       load         => right_loading,
+      en           => not pushback_en,
       cmp          => au_rcmp,
       add_offset   => au_roffset,
       baseaddress  => right_baseaddress,
@@ -1228,6 +1231,7 @@ begin
       clk          => clk_p,
       rst          => rst and not bias_rst,
       load         => bias_loading,
+      en           => not pushback_en,
       cmp          => au_bcmp,
       add_offset   => au_boffset,
       baseaddress  => bias_index_start,
@@ -1239,6 +1243,7 @@ begin
       clk          => clk_p,
       rst          => rst and not apushback_rst,
       load         => apushback_load,
+      en           => pushback_en,
       cmp          => pa_cmp,
       add_offset   => pa_offset,
       baseaddress  => re_saddr_a,
@@ -1250,6 +1255,7 @@ begin
       clk          => clk_p,
       rst          => rst and not bpushback_rst,
       load         => bpushback_load,
+      en           => pushback_en,
       cmp          => pb_cmp,
       add_offset   => pb_offset,
       baseaddress  => re_saddr_b,

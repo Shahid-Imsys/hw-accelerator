@@ -121,7 +121,13 @@ begin
             right_rst <= '0';
           end if;
         elsif start = '1' and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
-          inst <= firstconv;
+          if conv_out_p = '1' then
+            inst <= firstconv;
+            ppinst <= nop;
+          else
+            inst <= sum;
+            ppinst <= sumfirst;
+          end if;
           load <= '1';
           rd_en <= '1';
           conv_loop <= unsigned(dot_cnt);
@@ -139,14 +145,23 @@ begin
             end if;
           end if;
         elsif busy = '1' then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
-          inst <= conv;
+          if conv_out_p = '1' then
+            inst <= conv;
+            ppinst <= nop;
+          else
+            inst <= sum;
+            ppinst <= sum;
+          end if;
           if conv_loop = x"00" then
             left_rst <= '0';
             right_rst <= '0';
-            inst <= firstconv;
-            --if pushback_en = '1' then
-            --  conv_oloop <= conv_oloop;
-            --end if;
+            if conv_out_p = '1' then
+              inst <= firstconv;
+              ppinst <= nop;
+            else
+              inst <= sum;
+              ppinst <= sumfirst;
+            end if;
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
               conv_loop <= unsigned(dot_cnt);
@@ -162,18 +177,43 @@ begin
             load <= '1';
             rd_en <= '1';     
             if conv_loop = x"01" then
-              inst <= lastconv;
               if config(2) = '1' then 
                 left_rst <= '1';
               end if;
               if config(3) = '1' then
                 right_rst <= '1';
               end if;
+              if conv_out_p = '1' then
+                inst <= lastconv;
+                conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+                if conv_out_sel = "000" then
+                  ppinst <= select0;
+                elsif conv_out_sel = "001" then
+                  ppinst <= select1;
+                elsif conv_out_sel = "010" then
+                  ppinst <= select2;
+                elsif conv_out_sel = "011" then
+                  ppinst <= select3;
+                elsif conv_out_sel = "100" then
+                  ppinst <= select4;
+                elsif conv_out_sel = "101" then
+                  ppinst <= select5;
+                elsif conv_out_sel = "110" then
+                  ppinst <= select6;
+                elsif conv_out_sel = "111" then
+                  ppinst <= select7;
+                end if;
+              else
+                inst <= sum;
+                ppinst <= sumfirst;
+              end if;
             end if;
           end if;
         else
           load <= '0';
           rd_en <= '0';
+          inst <= nop;
+          ppinst <= nop;
         end if;
       end if;
     end if;
@@ -186,7 +226,7 @@ begin
         bias_load <= '0';
         bias_rd_en <= '0';
       elsif en = '1' then
-        if inst = firstconv and load = '1' and pp_ctl(0) = '0' then
+        if pp_stage_1 = '1' and load = '1' and pp_ctl(0) = '0' then
           bias_load <= '1';
           bias_rd_en <= '1';
         else 
@@ -212,7 +252,11 @@ begin
         o_mux_ena <= '0';
       elsif en = '1' then
         if conv_loop = x"01" then
-          o_mux_ena <= '1';
+          if pp_ctl(1) = '0' then
+            o_mux_ena <= '1';
+          else
+            o_mux_ena <= '0';
+          end if;
         elsif conv_out_p = '0' then --11 clock delay of config(7)
           o_mux_ena <= '0';
         elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal
@@ -222,45 +266,6 @@ begin
     end if;
   end process;
 
-  process(clk)
-  begin 
-    if rising_edge(clk) then
-      if rst = '0' then
-        conv_out_sel <= (others => '0');
-      elsif en = '1' then
-        if conv_loop = x"01" then
-          if conv_out_p = '0' then
-            ppinst <= sumfirst;
-          elsif conv_out_p = '1' then
-            conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-            if conv_out_sel = "000" then
-              ppinst <= select0;
-            elsif conv_out_sel = "001" then
-              ppinst <= select1;
-            elsif conv_out_sel = "010" then
-              ppinst <= select2;
-            elsif conv_out_sel = "011" then
-              ppinst <= select3;
-            elsif conv_out_sel = "100" then
-              ppinst <= select4;
-            elsif conv_out_sel = "101" then
-              ppinst <= select5;
-            elsif conv_out_sel = "110" then
-              ppinst <= select6;
-            elsif conv_out_sel = "111" then
-              ppinst <= select7;
-            end if;
-          end if;
-        elsif o_mux_ena = '1' then
-          if conv_out_p = '0' then
-            ppinst <= sumall;
-          end if;
-        elsif pp_stage_1 = '1' then
-          ppinst <= nop;
-        end if;
-      end if;
-    end if;
-  end process;
                 
   --Post Shifter --maximum 16 bits, scale <= "10000"
   process(clk) --Enable control, one clock delay of ourput selector
@@ -295,11 +300,13 @@ begin
       if rst = '0' then
         stall <= x"0";
       else
-        --if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = x"01" then
-        --  stall <= unsigned(dot_cnt(3 downto 0)) + 1;--stall the ve core for one clock cycle to push the result back to mem buffer.
-        --else
-        --  stall <= x"0";
-        --end if;
+        if pp_ctl(4 downto 3) = "01" then 
+          if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = x"01" then
+            stall <= x"1";--stall the ve core for one clock cycle to push the result back to mem buffer.
+          else
+            stall <= x"0";
+          end if;
+        end if;
       end if;
     end if;
   end process;

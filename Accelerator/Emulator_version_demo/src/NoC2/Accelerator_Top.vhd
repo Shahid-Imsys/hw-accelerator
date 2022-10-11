@@ -177,7 +177,7 @@ begin
         IO_WRITE_ACK            => IO_WRITE_ACK        
     );
         
-  cc_gen : for i in 0 to 1 generate
+  cc_gen : for i in 0 to 15 generate
     cluster_controller_Inst : cluster_controller
     port map
     (

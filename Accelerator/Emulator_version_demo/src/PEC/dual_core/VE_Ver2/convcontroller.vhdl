@@ -102,6 +102,7 @@ begin
         conv_addr_r <= (others => '0');
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
+        conv_out_sel <= (others => '0');
       elsif addr_reload = '1' and clk_e_pos = '1' then
         conv_loop <= unsigned(loop_counter) - 1;
         if oloop_counter /= x"00" then    -- make sure ve compute at least one oloop

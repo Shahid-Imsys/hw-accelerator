@@ -1212,7 +1212,8 @@ begin  -- architecture rtl
         di  => mrstout
         );
 
-  pa_i(4 downto 1) <= "0001";
+  pa_i(4 downto 3) <= "00"; -- 00 = fcore / 2 (DataBook STO-DEV7026 R1.2 p.23)
+  pa_i(2 downto 1) <= "01"; -- 01 =           (DataBook STO-DEV7026 R1.2 section 3.3.1)
   
     i_pa0_sin_pad : entity work.inoutput_pad
       generic map (

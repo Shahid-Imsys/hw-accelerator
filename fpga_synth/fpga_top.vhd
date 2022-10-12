@@ -370,8 +370,11 @@ begin
   PA5_CS_N <= pa_p(5);
   pa_i(5)  <= '0';                      -- PA5_CS_N;
 
-  pa_i(4) <= '1';
+  -- 4 downto 3 is MCKOUT rate selection
+  pa_i(4) <= '0';
   pa_i(3) <= '0';
+  
+  -- 1 downto 0 is MPLL config (databook 3.3.1)
   pa_i(2) <= '0';
   pa_i(1) <= '1';
 

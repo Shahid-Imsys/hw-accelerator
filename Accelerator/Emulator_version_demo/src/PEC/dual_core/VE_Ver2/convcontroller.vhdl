@@ -104,7 +104,11 @@ begin
         conv_oloop <= (others => '0');
       elsif addr_reload = '1' and clk_e_pos = '1' then
         conv_loop <= unsigned(loop_counter) - 1;
-        conv_oloop <= unsigned(oloop_counter) - 1;
+        if oloop_counter /= x"00" then    -- make sure ve compute at least one oloop
+          conv_oloop <= unsigned(oloop_counter) - 1;
+        else
+          conv_oloop <= x"01";
+        end if;
         if mode_a = '1' then
           conv_addr_l <= conv_saddr_l;
         end if;
@@ -119,7 +123,11 @@ begin
           inst <= sum;
           ppinst <= sumfirst;
         end if;
-        conv_oloop <= unsigned(oloop_counter) - 1;
+        if oloop_counter /= x"00" then    -- make sure ve compute at least one oloop
+          conv_oloop <= unsigned(oloop_counter) - 1;
+        else
+          conv_oloop <= x"01";
+        end if;
         conv_loop  <= unsigned(loop_counter) - 1;
         if mode_a = '1' or mode_b = '1' then
           if mode_a = '1' then                --- reload depending on mode.

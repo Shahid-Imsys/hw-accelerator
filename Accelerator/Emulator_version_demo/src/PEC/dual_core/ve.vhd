@@ -278,6 +278,7 @@ architecture rtl of ve is
       data_wr_en       : out std_logic;
       weight_rd_en     : out std_logic;
       weight_wr_en     : out std_logic;
+      bias_rd_ena      : out std_logic;
       enable_shift     : out std_logic;
       enable_add_bias  : out std_logic;
       enable_clip      : out std_logic;
@@ -387,6 +388,9 @@ architecture rtl of ve is
   signal pl_ve_byte : std_logic_vector(3 downto 0);
 
 
+  signal data0_addr_i  : std_logic_vector(7 downto 0);
+  signal data1_addr_i  : std_logic_vector(7 downto 0);
+  signal weight_addr_i : std_logic_vector(7 downto 0);  
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
   signal data1addr_to_memory : std_logic_vector(7 downto 0);
   signal weightaddr_to_memory : std_logic_vector(7 downto 0);
@@ -637,24 +641,32 @@ begin
   --**********************
   --Address_MUX
   --**********************
+  address_mux_to_pipeline : process(all)
+  begin
+    if re_busy = '0' then
+      data0_addr_i <= ve_addr_l;
+      data1_addr_i <= ve_addr_l;
+      weight_addr_i <= ve_addr_r; 
+      if mode_c_l = '1' then
+        data0_addr_i <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+        data1_addr_i <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+      end if;
+    else
+      data0_addr_i <= x"00";
+      data1_addr_i <= x"00";
+      weight_addr_i <= x"00";
+    end if;
+  end process;
   address_pointer_mux: process(all)
   begin
-    biasaddr_to_memory <= bias_index_wr;
-    if conv_done_pipe(5) = '0' or conv_busy = '1' then 
+    if re_busy = '0' then--conv_done_pipe(5) = '0' or conv_busy = '1' then 
       weightaddr_to_memory <= weight_addr_o;
-      if conv_done_pipe(5) = '0' then
-        biasaddr_to_memory <= bias_addr_o;
-      end if;
-      if mode_c_l = '1' then
-        data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-        data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-      else
-        data0addr_to_memory <= data0_addr_o;
-        data1addr_to_memory <= data1_addr_o;
-      end if; 
+      biasaddr_to_memory <= bias_addr_o;
+      data0addr_to_memory <= data0_addr_o;
+      data1addr_to_memory <= data1_addr_o; 
     else
       weightaddr_to_memory <= re_addr_weight;
-      
+      biasaddr_to_memory <= bias_index_wr;
       if mode_c_l = '1' then
         data0addr_to_memory <= curr_ring_addr;
         data1addr_to_memory <= curr_ring_addr;
@@ -711,7 +723,7 @@ begin
     if re_busy = '0' then
       data_read_enable_i <= '1';
       weight_read_enable_i <= '1';
-      read_en_b_i <= '1';
+      read_en_b_i <= bias_rd_ena;
     else
       data_read_enable_i <= '0';
       weight_read_enable_i <= '0';
@@ -911,6 +923,7 @@ begin
     data_wr_en       => open, -- TBD
     weight_rd_en     => open, --
     weight_wr_en     => open, -----------
+    bias_rd_ena      => bias_rd_ena,
     enable_shift     => shifter_ena,
     enable_add_bias  => adder_ena,
     enable_clip      => clip_ena,
@@ -927,9 +940,9 @@ begin
   ve_wctrlpipe_inst : ve_wctrlpipe
     port map(
       clk              => clk_p,
-      data0_addr_i     => ve_addr_l,     --data0_addr_i,
-      data1_addr_i     => ve_addr_l,     --data1_addr_i,
-      weight_addr_i    => ve_addr_r,     --weight_addr_i,
+      data0_addr_i     => data0_addr_i,
+      data1_addr_i     => data1_addr_i,
+      weight_addr_i    => weight_addr_i,
       bias_addr_i      => bias_index_rd, 
       bias_addr_ctrl_i => ctrl,
       data_ren_i       => data_read_enable_i,

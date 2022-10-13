@@ -36,6 +36,7 @@ entity convcontroller is
     data_wr_en       : out std_logic;
     weight_rd_en     : out std_logic;
     weight_wr_en     : out std_logic;
+    bias_rd_ena      : out std_logic;
     enable_shift     : out std_logic;
     enable_add_bias  : out std_logic;
     enable_clip      : out std_logic;
@@ -79,7 +80,7 @@ begin
 
   latch_signals: process(clk)
   begin
-      if rising_edge(clk) then --latches at the rising_edge of clk_p. 
+      if rising_edge(clk) then  
           if start = '1' then
             busy <= '1';
           elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = x"00" then 
@@ -240,6 +241,11 @@ begin
         bias_addr_reg <= bias_index_start;         
       elsif pp_stage_1 = '1' and pp_ctl(1) = '0' then
         bias_mux <= bias_addr_reg (1 downto 0);
+        if bias_addr_reg (1 downto 0) = "00" then
+          bias_rd_ena <= '1';
+        else
+          bias_rd_ena <= '0';
+        end if;
         if bias_addr_reg = bias_index_end then
           bias_addr_reg <= bias_index_start;
         else

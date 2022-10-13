@@ -87,11 +87,15 @@ begin
       if rising_edge(clk) then  
           if start = '1' then
             busy <= '1';
+          elsif oloop_counter = (oloop_counter'range => '0') and conv_loop = x"00" then
+            busy <= '0';
           elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = x"00" then 
             busy <= '0';
           end if;
           if start = '1' and mode_c = '1' then
             mode_c_l <= '1';
+          elsif oloop_counter = (oloop_counter'range => '0') and conv_loop = x"00" then
+            mode_c_l <= '0';
           elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = x"00" then
             mode_c_l <= '0';
           end if;

@@ -54,6 +54,7 @@ end entity;
 architecture convctrl of convcontroller is
   --signals
   signal o_mux_ena      : std_logic;
+  signal pselector_en   : std_logic;
   signal pp_stage_1     : std_logic;
   signal pp_stage_2     : std_logic;
   signal conv_out_p     : std_logic;
@@ -64,6 +65,8 @@ architecture convctrl of convcontroller is
   signal conv_loop      : unsigned(7 downto 0);
   signal conv_oloop     : unsigned(7 downto 0);
   signal bias_addr_reg  : std_logic_vector(7 downto 0);
+  signal ppinst_p       : ppctrl_t;
+  signal ppinst_s       : ppctrl_t;
 
 begin
 
@@ -74,6 +77,7 @@ begin
   conv_out_p    <= pp_ctl(0);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
+  ppinst        <= ppinst_p when conv_out_p = '1' else ppinst_s;
   ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => right);
   addbiasinst   <= (acc => addbias, quant => trunc);
   clipinst      <= (clip => clip8, outreg => out0);
@@ -103,7 +107,6 @@ begin
         conv_addr_r <= (others => '0');
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
-        conv_out_sel <= (others => '0');
       elsif addr_reload = '1' and clk_e_pos = '1' then
         conv_loop <= unsigned(loop_counter) - 1;
         if oloop_counter /= x"00" then    -- make sure ve compute at least one oloop
@@ -118,12 +121,13 @@ begin
           conv_addr_r <= conv_saddr_r;
         end if;
       elsif start = '1' and addr_reload = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+        ppinst_s <= sumfirst;
         if conv_out_p = '1' then
           inst <= firstconv;
-          ppinst <= nop;
+        --  ppinst <= nop;
         else
           inst <= sum;
-          ppinst <= sumfirst;
+        --  ppinst <= sumfirst;
         end if;
         if oloop_counter /= x"00" then    -- make sure ve compute at least one oloop
           conv_oloop <= unsigned(oloop_counter) - 1;
@@ -140,12 +144,13 @@ begin
           end if;
         end if;
       elsif busy = '1' then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+        ppinst_s <= sum;
         if conv_out_p = '1' then
           inst <= conv;
-          ppinst <= nop;
+        --  ppinst <= nop;
         else
           inst <= sum;
-          ppinst <= sum;
+        --  ppinst <= sum;
         end if;
         if conv_loop = x"00" then
           if config(4) = '1' then --reload by config register, bit 4 in configure register
@@ -163,40 +168,24 @@ begin
           end if;
           if conv_out_p = '1' then
             inst <= firstconv;
-            ppinst <= nop;
+          --  ppinst <= nop;
           else
             inst <= sum;
-            ppinst <= sumfirst;
+          --  ppinst <= sumfirst;
           end if;
+          ppinst_s <= sumfirst;
           conv_oloop <= conv_oloop - 1;
         elsif conv_loop /= x"00" then
           conv_loop <= conv_loop - 1;
           conv_addr_l <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_l)+1),8));
           conv_addr_r <= std_logic_vector(to_unsigned(to_integer(unsigned(conv_addr_r)+1),8)); --calculate right address;
           if conv_loop = x"01" then
+            ppinst_s <= sum;
             if conv_out_p = '1' then
               inst <= lastconv;
-              conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
-              if conv_out_sel = "000" then
-                ppinst <= select0;
-              elsif conv_out_sel = "001" then
-                ppinst <= select1;
-              elsif conv_out_sel = "010" then
-                ppinst <= select2;
-              elsif conv_out_sel = "011" then
-                ppinst <= select3;
-              elsif conv_out_sel = "100" then
-                ppinst <= select4;
-              elsif conv_out_sel = "101" then
-                ppinst <= select5;
-              elsif conv_out_sel = "110" then
-                ppinst <= select6;
-              elsif conv_out_sel = "111" then
-                ppinst <= select7;
-              end if;
             else
               inst <= sum;
-              ppinst <= sum;
+            --  ppinst <= sum;
             end if; 
           end if;
         end if;
@@ -204,22 +193,73 @@ begin
     end if;
   end process;
   
+  process(clk)
+  begin 
+    if rising_edge(clk) then
+      if rst = '0' then
+        conv_out_sel <= (others => '0');
+      elsif pselector_en = '1' then
+        conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+        if conv_out_sel = "000" then
+          ppinst_p <= select0;
+        elsif conv_out_sel = "001" then
+          ppinst_p <= select1;
+        elsif conv_out_sel = "010" then
+          ppinst_p <= select2;
+        elsif conv_out_sel = "011" then
+          ppinst_p <= select3;
+        elsif conv_out_sel = "100" then
+          ppinst_p <= select4;
+        elsif conv_out_sel = "101" then
+          ppinst_p <= select5;
+        elsif conv_out_sel = "110" then
+          ppinst_p <= select6;
+        elsif conv_out_sel = "111" then
+          ppinst_p <= select7;
+        end if;
+      else
+        ppinst_p <= nop;
+      end if;
+    end if;
+  end process;
+
 --Two modes
 --For output from overall accumulator latch, this selector activates one clock.
 --For output from unique accumulator latches, this mux activates eight clocks and select one accumulator latch in each clock cycle.
   process(clk)
   begin
     if rising_edge(clk) then
-      if conv_loop = x"01" then
-        if pp_ctl(1) = '0' then 
-          o_mux_ena <= '1';
+      if conv_loop = x"02" then
+        if conv_out_p = '1' then
+          pselector_en <= '1';
+        else
+          pselector_en <= '0';
+        end if;
+      elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal
+        pselector_en <= '0';
+      end if;
+    end if;
+  end process;
+
+  process(clk)
+  begin
+    if rising_edge(clk) then
+      if conv_out_p = '0' then
+        if conv_loop = x"01" then
+          if pp_ctl(1) = '0' then 
+            o_mux_ena <= '1';
+          else
+            o_mux_ena <= '0';
+          end if;
         else
           o_mux_ena <= '0';
         end if;
-      elsif conv_out_p = '0' then --11 clock delay of config(7)
-        o_mux_ena <= '0';
-      elsif conv_out_sel = (conv_out_sel'range => '1') then --reset the output enable signal
-        o_mux_ena <= '0';
+      else--reset the output enable signal
+        if pp_ctl(1) = '0' then 
+          o_mux_ena <= pselector_en;
+        else
+          o_mux_ena <= '0';
+        end if;
       end if;
     end if;
   end process;

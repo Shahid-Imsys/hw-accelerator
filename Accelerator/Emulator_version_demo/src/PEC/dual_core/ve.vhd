@@ -391,6 +391,7 @@ architecture rtl of ve is
   signal data0_addr_i  : std_logic_vector(7 downto 0);
   signal data1_addr_i  : std_logic_vector(7 downto 0);
   signal weight_addr_i : std_logic_vector(7 downto 0);  
+  signal bias_addr_i   : std_logic_vector(7 downto 0);
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
   signal data1addr_to_memory : std_logic_vector(7 downto 0);
   signal weightaddr_to_memory : std_logic_vector(7 downto 0);
@@ -647,6 +648,7 @@ begin
       data0_addr_i <= ve_addr_l;
       data1_addr_i <= ve_addr_l;
       weight_addr_i <= ve_addr_r; 
+      bias_addr_i <= bias_index_rd;
       if mode_c_l = '1' then
         data0_addr_i <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
         data1_addr_i <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
@@ -655,6 +657,7 @@ begin
       data0_addr_i <= x"00";
       data1_addr_i <= x"00";
       weight_addr_i <= x"00";
+      bias_addr_i <= x"00";
     end if;
   end process;
   address_pointer_mux: process(all)
@@ -943,7 +946,7 @@ begin
       data0_addr_i     => data0_addr_i,
       data1_addr_i     => data1_addr_i,
       weight_addr_i    => weight_addr_i,
-      bias_addr_i      => bias_index_rd, 
+      bias_addr_i      => bias_addr_i, 
       bias_addr_ctrl_i => ctrl,
       data_ren_i       => data_read_enable_i,
       data_wen_i       => write_en_o,    --data_write_enable_i,

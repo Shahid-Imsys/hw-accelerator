@@ -233,19 +233,15 @@ begin
     end if;
   end process;
 
+  bias_rd_ena <= o_mux_ena; 
 --bias buffer --also activates at the clock cycle when shifter is activated, so shares the o_mux_ena signal
   process(clk)
   begin 
     if rising_edge(clk) then
       if bias_addr_assign = '1' then
-        bias_addr_reg <= bias_index_start;         
-      elsif pp_stage_1 = '1' and pp_ctl(1) = '0' then
+        bias_addr_reg <= bias_index_start;  
+      elsif o_mux_ena = '1' and pp_ctl(1) = '0' then
         bias_mux <= bias_addr_reg (1 downto 0);
-        if bias_addr_reg (1 downto 0) = "00" then
-          bias_rd_ena <= '1';
-        else
-          bias_rd_ena <= '0';
-        end if;
         if bias_addr_reg = bias_index_end then
           bias_addr_reg <= bias_index_start;
         else

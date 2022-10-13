@@ -120,22 +120,37 @@ architecture rtl of ve is
     );
   end component;
 
-  component mem is
-    generic (
-      load_filename : string;
-      width         : integer := 32;
-      addressbits   : integer := 2;
-      columns       : integer := 4
-      );
+  component mem256x32 is
     port (
       clk      : in  std_logic;
       read_en  : in  std_logic;
       write_en : in  std_logic;
-      d_in     : in  std_logic_vector(width-1 downto 0);
-      address  : in  std_logic_vector(addressbits-1 downto 0);
-      d_out    : out std_logic_vector(width-1 downto 0);
-      load_mem : in std_logic
-    );
+      d_in     : in  std_logic_vector(31 downto 0);
+      address  : in  std_logic_vector(7 downto 0);
+      d_out    : out std_logic_vector(31 downto 0)
+      );
+  end component;
+
+  component mem256x64 is
+    port (
+      clk      : in  std_logic;
+      read_en  : in  std_logic;
+      write_en : in  std_logic;
+      d_in     : in  std_logic_vector(63 downto 0);
+      address  : in  std_logic_vector(7 downto 0);
+      d_out    : out std_logic_vector(63 downto 0)
+      );
+  end component;
+
+  component mem64x64 is
+    port (
+      clk      : in  std_logic;
+      read_en  : in  std_logic;
+      write_en : in  std_logic;
+      d_in     : in  std_logic_vector(63 downto 0);
+      address  : in  std_logic_vector(5 downto 0);
+      d_out    : out std_logic_vector(63 downto 0)
+      );
   end component;
 
   component SNPS_RF_SP_UHS_256x64 is
@@ -1133,72 +1148,44 @@ begin
 
   buf_sim_gen : if not USE_ASIC_MEMORIES generate
 --data mem(splited in high and low part)--
-    databuf_0 : mem
-      generic map(
-        load_filename => fft256_rand_data0,
-        width         => 32,
-        addressbits   => 8,
-        columns       => 4
-        )
+    databuf_0 : mem256x32
       port map (
         clk      => clk_p,
         read_en  => read_en_o,
         write_en => write_en_o,
         d_in     => data_to_mem(63 downto 32),
         address  => data0addr_to_memory,
-        d_out    => data0,
-        load_mem => '0'--DDI_VLD
+        d_out    => data0
         );
-    databuf_1 : mem
-      generic map(
-        load_filename => fft256_rand_data1,
-        width         => 32,
-        addressbits   => 8,
-        columns       => 4
-        )
+    databuf_1 : mem256x32
       port map(
         clk      => clk_p,
         read_en  => read_en_o,
         write_en => write_en_o,
         d_in     => data_to_mem(31 downto 0),
         address  => data1addr_to_memory,
-        d_out    => data1,
-        load_mem => '0'--DDI_VLD
+        d_out    => data1
         );
---weight mem--
-    buf_weight : mem
-      generic map (
-        load_filename => fft256_rand_weight,
-        width         => 64,
-        addressbits   => 8,
-        columns       => 8
-        )
+    --weight mem--
+    buf_weight : mem256x64
       port map (
         clk      => clk_p,
         read_en  => read_en_w_o,
         write_en => write_en_w_o,
         d_in     => data_to_mem,
         address  => weightaddr_to_memory,
-        d_out    => weight,
-        load_mem => '0'--DDI_VLD
+        d_out    => weight
         );
-
---bias mem--
-    buf_bias : mem
-      generic map(
-        load_filename => fftcopy,
-        width         => 64,
-        addressbits   => 6,
-        columns       => 8
-        )
+    
+    --bias mem--
+    buf_bias : mem64X64
       port map(
         clk      => clk_p,
         read_en  => read_en_b_o,
         write_en => write_en_b_o,
         d_in     => bias_in,            --writebuffer,
         address  => biasaddr_to_memory,
-        d_out    => bias_buf_out,
-        load_mem => '0'--DDI_VLD
+        d_out    => bias_buf_out
         );
   end generate;
 

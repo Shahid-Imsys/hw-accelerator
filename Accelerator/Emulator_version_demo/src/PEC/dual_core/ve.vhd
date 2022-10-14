@@ -626,13 +626,13 @@ begin
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
           curr_ring_addr <= ring_start_addr;
-        elsif (re_source = '0' and re_loop /= x"00" and ddi_vld = '1') or re_source = '1' then --/= (re_loop'range => '0') and ddi_vld = '1') or re_source = '1' then
+        elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then --/= (re_loop'range => '0') and ddi_vld = '1') or re_source = '1' then
           curr_ring_addr <= next_ring_addr;
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
         if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
           curr_ring_addr <= ring_start_addr;
-        elsif ve_loop /= x"00" then--/=(ve_loop'range => '0') then
+        else--if ve_loop /= x"00" then--/=(ve_loop'range => '0') then
           curr_ring_addr <= next_ring_addr;
         end if;
       end if;

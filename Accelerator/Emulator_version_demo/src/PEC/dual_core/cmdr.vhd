@@ -115,41 +115,41 @@ begin
     pl_dbus_s    <= pl(108)&pl(50)&pl(22)&pl(14)&pl(44);
     process(pl_dbus_s, DATA_VLD)
     begin 
-        if pl_dbus_s = "10001" then
-            ddfm_trig <= '1';
-        elsif DATA_VLD = '1' then
-            ddfm_trig <= '0';
-        else
-            ddfm_trig <= '0';
-        end if;
+      if pl_dbus_s = "10001" then
+        ddfm_trig <= '1';
+      elsif DATA_VLD = '1' then
+        ddfm_trig <= '0';
+      else
+        ddfm_trig <= '0';
+      end if;
     end process;
 
     process(CLK_E_NEG, DIN, DATA_VLD)
     begin
-        if DATA_VLD = '1' then
-            if CLK_E_NEG = '1' then
-                ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
-            else
-                ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
-            end if;
+      if DATA_VLD = '1' then
+        if CLK_E_NEG = '1' then
+          ve_data_int <= DIN(127 downto 64); --input lower half to vector engine at falling edge of clk_e
         else
-            ve_data_int <= (others => '0');
+          ve_data_int <= DIN(63 downto 0); --input upper half to vector engine at rising edge of clk_e
         end if;
+      else
+        ve_data_int <= (others => '0');
+      end if;
     end process;
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if RST_EN = '0' then
-                VE_DIN <= (others => '0');
-                mp_data_int <= (others => '0');
-                dbus_reg <= (others => '0');
-            elsif DATA_VLD = '1' then 
-                mp_data_int <= DIN; 
-                dbus_reg <= DIN;          --input to microprogram data
-            end if;
-            VE_DIN <= ve_data_int;
+      if rising_edge(clk_p) then
+        if RST_EN = '0' then
+          VE_DIN <= (others => '0');
+          mp_data_int <= (others => '0');
+          dbus_reg <= (others => '0');
+        elsif DATA_VLD = '1' then 
+          mp_data_int <= DIN; 
+          dbus_reg <= DIN;          --input to microprogram data
         end if;
+        VE_DIN <= ve_data_int;
+      end if;
     end process;
 
     dbus_int <= dbus_reg(8*(to_integer(unsigned(pl_dfm_byte)))+7 downto 8*(to_integer(unsigned(pl_dfm_byte)))) when ddfm_trig = '1'
@@ -177,183 +177,183 @@ begin
     init_mpgm_rq_single <= "01000000111111110000000000000000"; --Broadcast request for 1 PE.
     process(clk_p)
     begin
-    if rising_edge(clk_p) then --
+      if rising_edge(clk_p) then --
         if rst_en = '0' then
-            dtm_reg <= (others => '0');
-            ve_in_cnt <= (others => '0');
+          dtm_reg <= (others => '0');
+          ve_in_cnt <= (others => '0');
         elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
-            dtm_reg <= init_mpgm_rq;
-            ve_in_cnt <= (others => '0');
+          dtm_reg <= init_mpgm_rq;
+          ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
-            dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
-            ve_in_cnt <= (others => '0');
+          dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
+          ve_in_cnt <= (others => '0');
         elsif ve_dtm_rdy = '1' then
-            dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
-            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+          dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
+          ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         elsif ld_dtm_v = '1' and CLK_E_NEG = '1' then --rising_edge
-            dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
-            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+          dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
+          ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
         end if;
-    end if;
+      end if;
     end process;
     --Fifo control signals
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
-                if CLK_E_NEG = '0' then
-                    fifo_wr_en <= '1';
-                else
-                    fifo_wr_en <= '0';
-                end if;
-            elsif ve_push_dtm = '1' then
-                fifo_wr_en <= '1';
-            else
-                fifo_wr_en <= '0';
-            end if;
+      if rising_edge(clk_p) then
+        if EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
+          if CLK_E_NEG = '0' then
+            fifo_wr_en <= '1';
+          else
+            fifo_wr_en <= '0';
+          end if;
+        elsif ve_push_dtm = '1' then
+          fifo_wr_en <= '1';
+        else
+          fifo_wr_en <= '0';
         end if;
+      end if;
     end process;
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                push_cnt <= 0;
-            else
-                if clk_e_neg = '0' then
-                    if VE_AUTO_SEND = '0' then
-                        if fifo_push = '1' then
-                            push_cnt <= push_cnt + 1;
-                            if push_cnt = 5 then
-                                push_cnt <= 0;
-                            end if; 
-                        end if;
-                    else 
-                        push_cnt <= 0;
-                    end if;
-                end if;
-            end if;
-        end if;
-    end process;
-
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then 
-                transfer_cnt <= (others => '0');
-                cnt_reg <= (others => '0');
-                transfer_type <= "00";
-            else
-                if push_cnt = 0 then
-                    if fifo_push = '1' or EXE = '1' then
-                        transfer_type <= dtm_reg(31 downto 30);
-                        if dtm_reg (31 downto 30) = "11" then
-                            cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
-                            if fifo_rd_en = '1' then
-                                if transfer_cnt /= (transfer_cnt'range => '0') then
-                                    transfer_cnt <= transfer_cnt -1;
-                                else 
-                                    transfer_cnt <= cnt_reg;
-                                end if;
-                            end if;
-                        end if;
-                    elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
-                        transfer_cnt <= cnt_reg;
-                    else
-                        if fifo_rd_en = '1' and transfer_type = "11" then
-                            transfer_cnt <= transfer_cnt -1;
-                        end if;
-                    end if;
-                end if;
-            end if;
-        end if;
-    end process;
-
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then 
-            if rst_en = '0' then
-                requesting <= '0';
-            else
-                requesting <= (ve_auto_send and fifo_full) or pl_send_req;
-                if rd_trig = '1' or fb = '1' then
-                    requesting  <= '0';
+      if rising_edge(clk_p) then
+        if rst_en = '0' then
+          push_cnt <= 0;
+        else
+          if clk_e_neg = '0' then
+            if VE_AUTO_SEND = '0' then
+              if fifo_push = '1' then
+                push_cnt <= push_cnt + 1;
+                if push_cnt = 5 then
+                  push_cnt <= 0;
                 end if; 
+              end if;
+            else 
+              push_cnt <= 0;
             end if;
+          end if;
         end if;
+      end if;
     end process;
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                send_req_d <= '0';
-                send_req <= '0';
-                rd_trig <= '0';
-            else
-                if clk_e_neg = '1' then --rising_edge
-                    if fb = '1' then            -- if got feedback from cluster net, start to read the fifo and stop send request.
-                        rd_trig <= '1';
-                        send_req <= '0';
-                        send_req_d <= '0';
-                    else
-                        rd_trig <= '0';
-                        if EXE ='1'then
-                            send_req_d <= '1';
-                        elsif requesting = '1' then
-                            send_req_d <= '1';--requesting;
-                        else
-                            --case transfer_type is
-                            --    when "11" =>
-                            --        if transfer_cnt = x"00" then
-                            --            rd_trig <= '0';
-                            --        end if;
-                            --    when others => rd_trig <= '0';
-                            --end case;
-                        end if;
-                        send_req <= send_req_d;
-                    end if;
+      if rising_edge(clk_p) then
+        if rst_en = '0' then 
+          transfer_cnt <= (others => '0');
+          cnt_reg <= (others => '0');
+          transfer_type <= "00";
+        else
+          if push_cnt = 0 then
+            if fifo_push = '1' or EXE = '1' then
+              transfer_type <= dtm_reg(31 downto 30);
+              if dtm_reg (31 downto 30) = "11" then
+                cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);   
+                if fifo_rd_en = '1' then
+                  if transfer_cnt /= (transfer_cnt'range => '0') then
+                    transfer_cnt <= transfer_cnt -1;
+                  else 
+                    transfer_cnt <= cnt_reg;
+                  end if;
                 end if;
+              end if;
+            elsif clk_e_neg = '1' and transfer_cnt = (transfer_cnt'range => '0') then
+              transfer_cnt <= cnt_reg;
+            else
+              if fifo_rd_en = '1' and transfer_type = "11" then
+                transfer_cnt <= transfer_cnt -1;
+              end if;
             end if;
+          end if;
         end if;
+      end if;
     end process;
 
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
-                fifo_rd_en <= '1';
-            else
-                fifo_rd_en <= '0';
-            end if;
+      if rising_edge(clk_p) then 
+        if rst_en = '0' then
+          requesting <= '0';
+        else
+          requesting <= (ve_auto_send and fifo_full) or pl_send_req;
+          if rd_trig = '1' or fb = '1' then
+            requesting  <= '0';
+          end if; 
         end if;
+      end if;
+    end process;
+
+    process(clk_p)
+    begin
+      if rising_edge(clk_p) then
+        if rst_en = '0' then
+          send_req_d <= '0';
+          send_req <= '0';
+          rd_trig <= '0';
+        else
+          if clk_e_neg = '1' then --rising_edge
+            if fb = '1' then            -- if got feedback from cluster net, start to read the fifo and stop send request.
+              rd_trig <= '1';
+              send_req <= '0';
+              send_req_d <= '0';
+            else
+              rd_trig <= '0';
+              if EXE ='1'then
+                send_req_d <= '1';
+              elsif requesting = '1' then
+                send_req_d <= '1';--requesting;
+              else
+                --case transfer_type is
+                --    when "11" =>
+                --        if transfer_cnt = x"00" then
+                --            rd_trig <= '0';
+                --        end if;
+                --    when others => rd_trig <= '0';
+                --end case;
+              end if;
+              send_req <= send_req_d;
+            end if;
+          end if;
+        end if;
+      end if;
+    end process;
+
+    process(clk_p)
+    begin
+      if rising_edge(clk_p) then
+        if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
+          fifo_rd_en <= '1';
+        else
+          fifo_rd_en <= '0';
+        end if;
+      end if;
     end process;
 
     process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
     begin
-        if rising_edge(clk_p) then
-            if clk_e_neg = '1' then
-                if rst_en = '0' then
-                    req <= '0';
-                elsif fb = '0' then
-                    if send_req = '1' then
-                        req <= '1';
-                    end if; 
-                    --case transfer_type is 
-                    --    when "11" =>
-                    --        if send_req = '1' and transfer_cnt = x"04" then
-                    --            req <= '1';
-                    --         end if;
-                    --    when others => 
-                    --        if send_req = '1' then
-                    --            req <= '1';
-                    --        end if;
-                    --end case;
-                elsif fb = '1' then
-                    req <= '0';
-                end if;
-            end if;
+      if rising_edge(clk_p) then
+        if clk_e_neg = '1' then
+          if rst_en = '0' then
+            req <= '0';
+          elsif fb = '0' then
+            if send_req = '1' then
+              req <= '1';
+            end if; 
+            --case transfer_type is 
+            --    when "11" =>
+            --        if send_req = '1' and transfer_cnt = x"04" then
+            --            req <= '1';
+            --         end if;
+            --    when others => 
+            --        if send_req = '1' then
+            --            req <= '1';
+            --        end if;
+            --end case;
+          elsif fb = '1' then
+            req <= '0';
+          end if;
         end if;
+      end if;
     end process;
     
     REQ_OUT <= req;
@@ -366,20 +366,20 @@ begin
     --output register used as a data collector, col_ctr used as a data counter that triggers empty and prog_full signals
     process(clk_p)
     begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                output_register <=(others => '0');
-                col_ctr <= 5;
-            else
-                if fifo_wr_en = '1' and col_ctr /= 0 then
-                    output_register(32*col_ctr-1 downto 32*col_ctr - 32) <= dtm_reg;
-                    col_ctr <= col_ctr-1;
-                elsif fifo_rd_en = '1' then
-                    dout <= output_register;
-                    col_ctr <=5;
-                end if;
-            end if;
+      if rising_edge(clk_p) then
+        if rst_en = '0' then
+          output_register <=(others => '0');
+          col_ctr <= 5;
+        else
+          if fifo_wr_en = '1' and col_ctr /= 0 then
+            output_register(32*col_ctr-1 downto 32*col_ctr - 32) <= dtm_reg;
+            col_ctr <= col_ctr-1;
+          elsif fifo_rd_en = '1' then
+            dout <= output_register;
+            col_ctr <=5;
+          end if;
         end if;
+      end if;
     end process;
 
     empty <= '1' when col_ctr = 5 else '0';

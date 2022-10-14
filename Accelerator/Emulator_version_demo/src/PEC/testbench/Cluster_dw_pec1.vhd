@@ -161,7 +161,7 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_pw  : ram_type := init_ram_from_file("Depthwise_v1.ascii");
+signal ucode_pw  : ram_type := init_ram_from_file("Depthwise_v1.2.ascii");
 signal data_pw   : data_in := init_input_from_file("dw_data_5x8x144.ascii");
 signal kernel_pw : kernels_in := init_kernel_from_file("CM_kernels_T_dw_u8_ref.ascii");
 signal bias_pw   : bias_in := init_bias_from_file("CM_bias_dw_s16.ascii");

@@ -56,6 +56,7 @@ entity cmdr is
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
         DTM_FIFO_RDY : out std_logic;
+        dtm_buf_empty : out std_logic;
         VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
         VE_DTM_RDY : in std_logic;
         VE_PUSH_DTM : in std_logic;
@@ -361,6 +362,7 @@ begin
     fb  <= ACK_IN;
     srst <= not rst_en;
     DTM_FIFO_RDY <= not empty;
+    dtm_buf_empty <= empty;
 
     --Widen the bandwith to 20B. Use a collecting logic instead of fifo here.
     --output register used as a data collector, col_ctr used as a data counter that triggers empty and prog_full signals

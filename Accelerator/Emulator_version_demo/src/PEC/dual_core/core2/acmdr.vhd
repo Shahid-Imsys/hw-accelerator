@@ -56,6 +56,7 @@ entity acmdr is
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
         DTM_FIFO_RDY : out std_logic;
+        dtm_buf_empty : out std_logic;   
         VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
         VE_DTM_RDY : in std_logic;
         VE_PUSH_DTM : in std_logic;
@@ -359,6 +360,7 @@ begin
     begin
         if rising_edge(clk_p) then
             DTM_FIFO_RDY <= not empty;
+            dtm_buf_empty <= empty;
         end if;
     end process;
 

@@ -281,7 +281,8 @@ architecture struct of acore is
   signal adl_cy     : std_logic;               
   signal mmr_hold_e : std_logic; 
   signal dfm_rdy    : std_logic; --CJ 
-  signal dtm_fifo_rdy : std_logic; --CJ              
+  signal dtm_fifo_rdy : std_logic; --CJ     
+  signal dtm_buf_empty : std_logic;         
   
   -- CPC signals
 --  signal plsel_n      : std_logic;
@@ -525,6 +526,7 @@ begin
       ve_rdy        => ve_rdy_int, --Added by CJ
       dfm_rdy       => dfm_rdy,--Added by CJ
       fifo_rdy      => dtm_fifo_rdy, --Added by CJ
+      buf_empty     => dtm_buf_empty,
       continue      => resume,   --Added by CJ               
       --Data Inputs
       dbus          => dbus_int,                
@@ -799,6 +801,7 @@ begin
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,
         DTM_FIFO_RDY => dtm_fifo_rdy,
+        dtm_buf_empty => dtm_buf_empty,
         VE_DTMO  =>ve_out_dtm_int,
         VE_DTM_RDY => ve_dtm_rdy_int,
         VE_PUSH_DTM => ve_push_dtm_int,

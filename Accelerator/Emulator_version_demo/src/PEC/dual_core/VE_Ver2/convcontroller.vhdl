@@ -86,12 +86,16 @@ begin
       if en = '1' then
         if start = '1' then
           busy <= '1';
-        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0')then 
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+          busy <= '0';
+        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then 
           busy <= '0';
         end if;
         if start = '1' and mode_c = '1' then
           mode_c_l <= '1';
-        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0')then
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+          mode_c_l <= '0';
+        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
           mode_c_l <= '0';
         end if;
       end if;
@@ -108,8 +112,12 @@ begin
         conv_oloop <= (others => '0');
       elsif en = '1' then
         if cnt_rst = '1' and clk_e_pos = '1' then
-          conv_loop <= unsigned(dot_cnt);
-          conv_oloop <= unsigned(oc_cnt);
+          conv_loop <= unsigned(dot_cnt) - 1;
+          if oc_cnt = x"00" then
+            conv_oloop <= x"01";
+          else
+            conv_oloop <= unsigned(oc_cnt) - 1;
+          end if;
           if mode_a = '1' then
             left_rst <= '1';
           else
@@ -130,8 +138,12 @@ begin
           end if;
           load <= '1';
           rd_en <= '1';
-          conv_loop <= unsigned(dot_cnt);
-          conv_oloop <= unsigned(oc_cnt);
+          conv_loop <= unsigned(dot_cnt) - 1;
+          if oc_cnt = x"00" then
+            conv_oloop <= x"01";
+          else
+            conv_oloop <= unsigned(oc_cnt) - 1;
+          end if;
           if mode_a = '1' or mode_b = '1' then
             if mode_a = '1' then
               left_rst <= '1';
@@ -164,7 +176,7 @@ begin
             end if;
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
-              conv_loop <= unsigned(dot_cnt);
+              conv_loop <= unsigned(dot_cnt) - 1;
             end if;
             if conv_oloop = x"00" then
               load <= '0';

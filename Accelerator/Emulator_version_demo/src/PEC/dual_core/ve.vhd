@@ -380,6 +380,7 @@ architecture rtl of ve is
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
   signal apushback_load, bpushback_load, apushback_rst, bpushback_rst : std_logic;
+  signal ring_load, ring_rst : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -798,28 +799,28 @@ begin
   --Mode c. Shared by RE and VE
   --********************************
   --How to control the right address?
-  next_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+ to_integer(unsigned(offset_l)),8));
+  --next_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+ to_integer(unsigned(offset_l)),8));
 
   mode_c_addr: process(clk_p)
   begin
     if rising_edge(clk_p) then
       if RST = '0' then
-        curr_ring_addr <= (others => '0');
-      elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
-        curr_ring_addr <= YBUS;
+        ring_load <= '0';
+      --elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
+      --  curr_ring_addr <= YBUS;
       elsif cnt_rst = '1' then
-        curr_ring_addr <= curr_ring_addr;
+        ring_rst <= '1';
       elsif (re_ready = '0' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
-        if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
-          curr_ring_addr <= ring_start_addr;
-        elsif (re_source = '0' and re_loop = x"01" and ddi_vld = '1') or re_source = '1' then --/= (re_loop'range => '0') and ddi_vld = '1') or re_source = '1' then
-          curr_ring_addr <= next_ring_addr;
+        if next_ring_addr = ring_end_addr then
+          ring_rst <= '1';
+        elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then
+          ring_load <= '1';
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
-        if next_ring_addr = ring_end_addr then --if ( ( (uint32_t)curr_ring_addr + (uint32_t)offset_l ) == (uint32_t)ring_end_addr  ) { // then
-          curr_ring_addr <= ring_start_addr;
-        elsif ve_loop = x"01" then--/=(ve_loop'range => '0') then
-          curr_ring_addr <= next_ring_addr;
+        if next_ring_addr = ring_end_addr then
+          ring_rst <= '1';
+        else
+          ring_load <= '1';
         end if;
       end if;
     end if;
@@ -831,14 +832,14 @@ begin
   AUparam_mux : process(all)
   begin
     case mode_latch is 
-      when re_mode => left_baseaddress  <= re_saddr_l;                                                    
+      when re_mode => left_baseaddress  <= re_saddr_l when mode_c_l = '0' else ring_start_addr;                                                    
                       right_baseaddress <= re_saddr_r; 
-                      left_loading <= lload_from_re;
+                      left_loading <= lload_from_re when mode_c_l = '0' else ring_load;
                       right_loading <= rload_from_re;
                       bias_loading <= bload_from_re;
-      when conv    => left_baseaddress  <= ve_saddr_l;
+      when conv    => left_baseaddress  <= ve_saddr_l when mode_c_l = '0' else ring_start_addr;
                       right_baseaddress <= ve_saddr_r;
-                      left_loading <= load_from_conv;
+                      left_loading <= load_from_conv when mode_c_l = '0' else ring_load;
                       right_loading <= load_from_conv;
                       bias_loading <= bload_from_conv;
       when others  => left_baseaddress  <= x"00";
@@ -947,7 +948,7 @@ begin
                       --dot_cnt      <= ve_loop_reg;
                       --oc_cnt       <= ve_oloop_reg;
                       stall        <= conv_stall;
-                      left_rst     <= lrst_from_conv;
+                      left_rst     <= lrst_from_conv when mode_c_l = '0' else ring_rst;
                       right_rst    <= rrst_from_conv;
                       bias_rst     <= brst_from_conv;
       when fft     => fft_start    <= start;
@@ -955,7 +956,7 @@ begin
                       stall        <= fft_stall;
       when re_mode => re_start     <= start;
                       re_cnt_rst   <= cnt_rst;
-                      left_rst     <= lrst_from_re;
+                      left_rst     <= lrst_from_re when mode_c_l = '0' else ring_rst;
                       right_rst    <= rrst_from_re;
                       bias_rst     <= brst_from_re;
       when others  => null;

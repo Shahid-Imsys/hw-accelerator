@@ -178,7 +178,8 @@ end component;
   signal mem_in         : reg;                             --Input register to memory
   signal mem_out        : reg;                             --Output register of memory    
   signal noc_data_in    : reg;                             --NOC data input register
-  signal noc_data_out   : reg;                             --NOC data output register
+  signal noc_data_out   : reg;                             --NOC data output
+  signal noc_data_reg   : reg;                             --NOC data output register
   signal sync_collector : std_logic_vector(1 downto 0);
   signal pe_data_in     : reg;                             --Input register form pe side
   signal data_core_int  : reg;                             --Data register for PE --pe_data_out
@@ -419,14 +420,15 @@ EVEN_P <= even_p_2;
 	--This process generates a the latched delay signals to control the behaviour 
 	--of some triggers.
 	rd_act : process(clk_e)
+	   variable noc_delay_d : std_logic := '0';
     begin
 		if rising_edge(clk_e) then
             noc_delay <= noc_reg_rdy;
             
-            -- noc_data_out <= data_core_int when noc_delay = '1';
-            if noc_reg_rdy = '1' then
-                noc_data_out <= data_core_int;
+            if noc_delay_d = '1' then
+                noc_data_reg <= data_core_int;
             end if;
+            noc_delay_d := noc_reg_rdy;
 		end if;
 	end process; 
 	
@@ -910,7 +912,7 @@ EVEN_P <= even_p_2;
     end process;
 --Output Latch
 --    noc_data_out <= data_core_int when noc_delay = '1'; -- else (x"00", x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00" , x"00");
-    -- noc_data_out <= data_core_int when noc_delay = '1';
+noc_data_out <= data_core_int when noc_delay = '1' else noc_data_reg;
     
 --	data_rd_act : process(clk_e)
 --    begin

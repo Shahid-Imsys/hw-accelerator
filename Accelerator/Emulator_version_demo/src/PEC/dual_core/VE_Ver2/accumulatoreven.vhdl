@@ -11,7 +11,10 @@ entity accumulatoreven is
     mul     : in  signed(17 downto 0);
     mul_odd : in  signed(17 downto 0);
     ctrl    : in  acce_ctrl;
+<<<<<<< HEAD
     bias    : in  signed(31 downto 0);
+=======
+>>>>>>> master
     result  : out signed(31 downto 0);
     sign_o  : out std_logic
     );

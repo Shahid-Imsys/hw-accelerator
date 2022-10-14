@@ -56,6 +56,7 @@ entity core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
+    clk_p_n     : in  std_logic;  -- PLL clock
     clk_c_en    : in  std_logic;  -- CP clock
     even_c      : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2 
@@ -65,7 +66,7 @@ entity core is
     clk_d_pos       : in  std_logic;  -- DRAM clock
     clk_s_pos       : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
-    rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
+    --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     en_d        : out std_logic;  -- Enable clk_d
     fast_d      : out std_logic;  -- clk_d speed select 
@@ -82,7 +83,8 @@ entity core is
     hold_flash_d: in std_logic;
     flash_en    : out std_logic;
     flash_mode  : out std_logic_vector (3 downto 0);
-	  ld_dqi_flash: in std_logic;
+    clock_sel   : out std_logic;
+    ld_dqi_flash: in std_logic;
     -- Control signals to/from the oscillator and PLL
     pll_frange  : out std_logic;  -- Frequency range select
     pll_n       : out std_logic_vector(5 downto 0);   -- Multiplier
@@ -93,7 +95,8 @@ entity core is
 		test_pll    : out std_logic;  -- PLL in test mode
     xout        : in  std_logic;  -- XOSC ref. clock output
     -- Power on signal
-    pwr_ok      : in  std_logic;  -- Power is on 
+    pwr_ok      : in  std_logic;  -- Power is on
+    core_wdog_n   : out std_logic;  -- Watchdog_reset.
     --signals to core2
     c2_core2_en    : out  std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
@@ -304,7 +307,7 @@ architecture struct of core is
   signal clk_sel   	: std_logic;
   signal en_s       	: std_logic;
   signal speed_s    	: std_logic_vector(1 downto 0);
-  signal speed_u    	: std_logic_vector(6 downto 0);
+  signal speed_u    	: std_logic_vector(9 downto 0);
   signal speed_ps1  	: std_logic_vector(3 downto 0);
   signal speed_ps2  	: std_logic_vector(5 downto 0);
   signal speed_ps3  	: std_logic_vector(4 downto 0);
@@ -424,6 +427,12 @@ architecture struct of core is
   attribute syn_keep of dbus_int  : signal is true;
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
+
+  attribute mark_debug : string;
+  attribute mark_debug of dbus_int: signal is "true";  
+  attribute mark_debug of ybus: signal is "true";  
+  attribute mark_debug of pl: signal is "true";  
+
   
 begin
 ---------------------------------------------------------------------
@@ -668,7 +677,8 @@ begin
     c2_t_rp       <= t_rp     ;  
 --    c2_en_mexec   <= en_mexec ;  
     short_cycle <= short_cycle_int;
-    
+
+  clock_sel <= clk_sel;
     
 ---------------------------------------------------------------------
 -- TIM - timing logic
@@ -679,6 +689,7 @@ begin
     port map (
       -- Clock
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n, 
       even_c      => even_c,
       clk_c_en       => clk_c_en,            
       --clk_c2_pos      => clk_c2_pos,            
@@ -750,9 +761,10 @@ begin
 	  );
         
   rst_cn <= rst_cn_int;
-  rst_n <= rst_n_int;
+  --rst_n <= rst_n_int;
   clk_e_pos <= clk_e_pos_int;
   clk_e_neg <= clk_e_neg_int;
+
 ---------------------------------------------------------------------
 -- CLC
 ---------------------------------------------------------------------
@@ -820,6 +832,7 @@ begin
       curr_mpga     => curr_mpga,
       mar           => mar);
 
+  core_wdog_n <= wdog_n;
 ---------------------------------------------------------------------
 -- ALU
 ---------------------------------------------------------------------

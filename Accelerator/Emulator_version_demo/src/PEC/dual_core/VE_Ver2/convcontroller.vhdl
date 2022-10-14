@@ -50,6 +50,7 @@ end entity;
 architecture convctrl of convcontroller is
   --signals
   signal o_mux_ena      : std_logic;
+  signal pselector_en   : std_logic;
   signal pp_stage_1     : std_logic;
   signal pp_stage_2     : std_logic;
   signal conv_out_p     : std_logic;
@@ -254,6 +255,36 @@ begin
     end if;
   end process;
   
+  process(clk)
+  begin 
+    if rising_edge(clk) then
+      if rst = '0' then
+        conv_out_sel <= (others => '0');
+      elsif pselector_en = '1' then
+        conv_out_sel <= std_logic_vector(to_signed(to_integer(signed(conv_out_sel))+1,3));
+        if conv_out_sel = "000" then
+          ppinst_p <= select0;
+        elsif conv_out_sel = "001" then
+          ppinst_p <= select1;
+        elsif conv_out_sel = "010" then
+          ppinst_p <= select2;
+        elsif conv_out_sel = "011" then
+          ppinst_p <= select3;
+        elsif conv_out_sel = "100" then
+          ppinst_p <= select4;
+        elsif conv_out_sel = "101" then
+          ppinst_p <= select5;
+        elsif conv_out_sel = "110" then
+          ppinst_p <= select6;
+        elsif conv_out_sel = "111" then
+          ppinst_p <= select7;
+        end if;
+      else
+        ppinst_p <= nop;
+      end if;
+    end if;
+  end process;
+
 --Two modes
 --For output from overall accumulator latch, this selector activates one clock.
 --For output from unique accumulator latches, this mux activates eight clocks and select one accumulator latch in each clock cycle.

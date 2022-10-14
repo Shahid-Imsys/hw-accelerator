@@ -1,0 +1,2 @@
+eth_tx_fifo.v,verilog,xil_defaultlib,../../../../gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v,
+glbl.v,Verilog,xil_defaultlib,glbl.v

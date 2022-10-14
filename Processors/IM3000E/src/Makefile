@@ -1,7 +1,7 @@
 GPP_DIR=$(PROJECT_PATH)/Processors/IM3000E/src
 GPP_DIR_WIN=$(PROJECT_PATH_WIN)/Processors/IM3000E/src
 
-IP_DIR=$(PROJECT_PATH)/Processors/IM3000E/fpga_synth/gpp
+IP_DIR_WIN=$(PROJECT_PATH_WIN)/fpga_synth/gpp
 
 gpp_rtl: mem_load_comp fpga_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(GPP_DIR_WIN)/mpgmfield_lib.vhd \
@@ -17,8 +17,6 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/clc.vhd \
 			 	  $(GPP_DIR_WIN)/clk_mux.vhd \
 			 	  $(GPP_DIR_WIN)/clk_gen.vhd \
-			 	  $(GPP_DIR_WIN)/pads/XMD.vhd \
-			 	  $(GPP_DIR_WIN)/pads/ZMA2GSD.vhd \
 			 	  $(GPP_DIR_WIN)/pads/YA2GSD.vhd \
 			 	  $(GPP_DIR_WIN)/iopads.vhd \
 			 	  $(GPP_DIR_WIN)/rtc.vhd \
@@ -58,12 +56,13 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/peri/OctoSPI.vhd \
 			 	  $(GPP_DIR_WIN)/peri/peri.vhd \
 			 	  $(GPP_DIR_WIN)/top.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory00.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mprom_memory11.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/ram_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/trace_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
-			 	  $(GPP_DIR_WIN)/ext/FXPLL031HA0A_APGD.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SU180_16384X8X1BM8.vhd \
@@ -77,7 +76,10 @@ mem_load_comp:
 	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v
 
 fpga_ip:
-	$(V_COMP) $(IP_DIR)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \
-		  $(IP_DIR)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \
+	          $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
+#		  $(IP_DIR_WIN)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
+	#$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
 
 #include $(GPP_DIR)/pads/Makefile

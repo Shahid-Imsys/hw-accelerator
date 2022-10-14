@@ -83,6 +83,9 @@ architecture rtl of mbm is
   signal pl_mbmop_sig  :      std_logic_vector(3 downto 0);
   signal pl_mapr_sig   :      std_logic_vector(3 downto 0);
   signal pl_data0_sig  :      std_logic_vector(7 downto 0);
+
+  signal mbmd_int :   std_logic_vector(7 downto 0);
+  signal mbmd_d   :   std_logic_vector(7 downto 0);
   
 begin
   ---------------------------------------------------------------------
@@ -241,31 +244,43 @@ begin
   -- all output from multiplication must be taken out using the MUL2
   -- operation.
   pl_data0_sig <= (pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)  xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
-  mbmd_p : process (pl_mbmop_sig, y_reg, rot, pl_data0_sig, mask, ar)
+  mbmd_p : process (pl_mbmop_sig, y_reg, rot, pl_data0_sig, mask, ar, mbmd_d)
   begin
     if pl_mbmop_sig(3) = '0' then           -- LANDD0, ROTL1ANDD0..ROTL7ANDD0
-      mbmd <= rot and pl_data0_sig;         -- Rotated LATCH and DATA0 field
+      mbmd_int <= rot and pl_data0_sig;         -- Rotated LATCH and DATA0 field
     else
       case pl_mbmop_sig is
         when MBMOP_YORD0 =>             -- Y register and DATA0 field
-          mbmd <= y_reg or pl_data0_sig;                
+          mbmd_int <= y_reg or pl_data0_sig;                
         when MBMOP_ROTLATCH =>          -- Rotated LATCH
-          mbmd <= rot;
+          mbmd_int <= rot;
         when MBMOP_MASKANDY =>          -- Mask and Y register
-          mbmd <= mask and y_reg;
+          mbmd_int <= mask and y_reg;
         when MBMOP_FIRSTSHIFT =>        -- Mask and rotated LATCH
-          mbmd <= mask and rot;
+          mbmd_int <= mask and rot;
         when MBMOP_NEXTSHIFT =>         -- Mask and rotated LATCH or ARL
-          mbmd <= (mask and rot) or (ar(7 downto 0));
+          mbmd_int <= (mask and rot) or (ar(7 downto 0));
         when MBMOP_MUL2 =>              -- ARL
-          mbmd <= ar(7 downto 0);
+          mbmd_int <= ar(7 downto 0);
         when MBMOP_MUL1|MBMOP_MUL3 =>
-          mbmd <= x"00";
-        when others => null;
+          mbmd_int <= x"00";
+        when others => mbmd_int <= mbmd_d;
       end case;      
     end if;      
-  end process;  
+  end process;
 
+  mbmd <= mbmd_int;
+  
+  -- This process is inserted to force the process ido_mem_latch not to
+  -- generate a latch.
+  latch_removal_mbmd_p:process (clk_p, rst_en) is
+  begin
+    if rst_en = '0' then
+      mbmd_d <= (others => '0');
+    elsif rising_edge(clk_p) then
+      mbmd_d <= mbmd_int;
+    end if;
+  end process;
   ---------------------------------------------------------------------
   -- Testbits from D bus and Y register
   ---------------------------------------------------------------------

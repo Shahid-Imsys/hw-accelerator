@@ -108,6 +108,8 @@ entity ports is
     rx1_irq    : in  std_logic;
     rx2_irq    : in  std_logic;
     tx_irq     : in  std_logic;
+    wdog2_n    : in  std_logic;
+    noc_irq    : in  std_logic;
     -- signals to/from TIU(timer)
     tiu_out    : in  std_logic_vector(7 downto 0);
     pulseout   : in  std_logic_vector(7 downto 0);
@@ -146,6 +148,9 @@ architecture rtl of ports is
 
   constant IRQ_ADC : integer := 2;
 
+  signal adc_run_d : std_logic;
+  signal adc_run_int : std_logic;
+  
   signal dtp      : std_logic_vector(7 downto 0);      -- data to ports
   signal we_ctrl  : std_logic;          -- write enable control
   signal we_data  : std_logic;          -- write enable data
@@ -181,12 +186,15 @@ architecture rtl of ports is
   signal adc_edge     : std_logic;
   signal adc_irq      : std_logic;
 
-  signal port_irq_in    : std_logic_vector(5 downto 0);
-  signal port_irq_rst   : std_logic_vector(5 downto 0);
-  signal port_irq_latch : std_logic_vector(5 downto 0);
-  signal port_irq_ff    : std_logic_vector(5 downto 0);
-  signal port_irq       : std_logic_vector(5 downto 0);
-  signal port_irq_en    : std_logic_vector(5 downto 0);  --add by maning
+  signal port_irq_in    : std_logic_vector(4 downto 0);
+  signal port_irq_rst   : std_logic_vector(4 downto 0);
+  signal port_irq_latch : std_logic_vector(4 downto 0);
+  signal port_irq_ff    : std_logic_vector(4 downto 0);
+  signal port_irq       : std_logic_vector(4 downto 0);
+  signal port_irq_en    : std_logic_vector(4 downto 0);  --add by maning
+
+  signal dac_data_d : dac_data_type;
+  signal dac_data_int : dac_data_type;
 begin
   -- The dtp latch opens in the middle of a cycle that writes to
   -- a port register and closes at the end, holding data for the
@@ -427,17 +435,17 @@ begin
   -- 4. Processor set the mask bit again to enable further interrupt.
 
   -- Re-assign interrupt control registers.
-  pi_int(PORT_IRQ0) <= irq0_src;        -- Read source vector using DPORT
-  irq0_en           <= pen_int(PORT_IRQ0);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ0) <= irq0_src;           -- Read source vector using DPORT
+  irq0_en           <= pen_int(PORT_IRQ0); -- Write and read enable register using CPORT
 
-  pi_int(PORT_IRQ1) <= irq1_src;        -- Read source vector using DPORT
-  irq1_en           <= pen_int(PORT_IRQ1);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ1) <= irq1_src;           -- Read source vector using DPORT
+  irq1_en           <= pen_int(PORT_IRQ1); -- Write and read enable register using CPORT
 
   -- Put together interrupt source vectors.
   irq0_src(7 downto 3) <= rx1_irq & rx2_irq & tx_irq & port_irq(1 downto 0);
   irq0_src(IRQ_ADC)    <= adc_irq;
   irq0_src(1 downto 0) <= tiu_irq & (not mirq0_i);
-  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & port_irq(5 downto 2) & (not mirq1_i);
+  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & (not wdog2_n) & noc_irq & port_irq(3 downto 2) & (not mirq1_i);
 
   -- Mask interrupt sources with interrupt enable registers
   -- and gate them together to form two interrupt request lines
@@ -456,7 +464,7 @@ begin
     end loop;
   end process;
 
-  port_irq_in     <= pbi(5 downto 0);
+  port_irq_in     <= pbi(4 downto 0);
 --      port_irq_rst(1) <= pen_ld(PORT_IRQ0) and dtp(4);
 --      port_irq_rst(0) <= pen_ld(PORT_IRQ0) and dtp(3);
 --      port_irq_rst(5) <= pen_ld(PORT_IRQ1) and dtp(4);
@@ -465,7 +473,7 @@ begin
 --      port_irq_rst(2) <= pen_ld(PORT_IRQ1) and dtp(1);
   port_irq_rst(1) <= po_ld(PORT_IRQ0) and dtp(4);
   port_irq_rst(0) <= po_ld(PORT_IRQ0) and dtp(3);
-  port_irq_rst(5) <= po_ld(PORT_IRQ1) and dtp(4);
+--  port_irq_rst(5) <= po_ld(PORT_IRQ1) and dtp(4);
   port_irq_rst(4) <= po_ld(PORT_IRQ1) and dtp(3);
   port_irq_rst(3) <= po_ld(PORT_IRQ1) and dtp(2);
   port_irq_rst(2) <= po_ld(PORT_IRQ1) and dtp(1);
@@ -502,7 +510,7 @@ begin
 --      end process;
 --------------------maning commented the above codes in 2012-06-15 09:41:32---------------------
 ----------------------------------the modified code start---------------------------------------
-  port_irq_en <= irq1_en(4 downto 1) & irq0_en(4 downto 3);
+  port_irq_en <= irq1_en(3 downto 1) & irq0_en(4 downto 3);
 
   process (clk_p)
   begin
@@ -530,11 +538,11 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst_en = '0' then
-        for i in 0 to 5 loop
+        for i in 0 to 4 loop
           port_irq(i) <= '0';
         end loop;
       else
-        for i in 0 to 5 loop
+        for i in 0 to 4 loop
           if port_irq_rst(i) = '1' or port_irq_en(i) = '0' then  --clear the interrupt when clearing it or not enable
             port_irq(i) <= '0';
           elsif port_irq_latch(i) = '1' and port_irq_ff(i) = '0' then
@@ -633,6 +641,8 @@ begin
         sft_reg    <= (others => '0');
 
       elsif rising_edge(clk_p) then
+      
+        --sft_reg <= (others => '0');
 
         if sft_reg_ld = '1' then
           sft_reg(8 downto 1) <= dtp;
@@ -644,9 +654,12 @@ begin
             sft_out <= '0';
           end if;
 
-        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then
-          -- Rising edge of sft_clk (after double regs)
+        -- Falling edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then  
           sft_out <= sft_reg(8);
+
+        -- Rising edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '1' and sft_clk_d(0) = '0' then  
 
           if pulseout(7) = '0' then
             case sft_in_sel is
@@ -704,21 +717,37 @@ begin
   -- When dac_timer is set, data is only loaded when there is a pulse from
   -- timer 2, otherwise it is loaded continously. dac_sel determines which
   -- channel that is loaded: none, ch0, ch1 or both (ch1 inverted).
-  process (dac_timer, dac_sel, pulseout(2), po_int(PORT_DA_H), po_int(PORT_AD_L))
+  process (dac_timer, dac_sel, pulseout(2), po_int(PORT_DA_H), po_int(PORT_AD_L), dac_data_d)
   begin
+    dac_data_int(1) <= dac_data_d(1);
+    dac_data_int(0) <= dac_data_d(0);
     if dac_timer = '0' or pulseout(2) = '1' then
       if dac_sel(0) = '1' then
-        dac_data(0) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
+        dac_data_int(0) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
       end if;
       if dac_sel(1) = '1' then
         if dac_sel(0) = '0' then
-          dac_data(1) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
+          dac_data_int(1) <= po_int(PORT_DA_H) & po_int(PORT_AD_L);
         else
-          dac_data(1) <= not (po_int(PORT_DA_H) & po_int(PORT_AD_L));
+          dac_data_int(1) <= not (po_int(PORT_DA_H) & po_int(PORT_AD_L));
         end if;
       end if;
     end if;
   end process;
+
+  dac_data <= dac_data_int;
+  
+  -- This process is inserted to force the process ido_mem_latch not to
+  -- generate a latch in synthesis.
+  latch_removal_p: process (clk_p, rst_en) is
+  begin  -- process latch_removal
+    if rst_en = '0' then                -- asynchronous reset (active low)
+      dac_data_d <= (others => (others => '0'));
+    elsif clk_p'event and clk_p = '1' then  -- rising clock edge
+      dac_data_d(1) <= dac_data_int(1);
+      dac_data_d(0) <= dac_data_int(0);
+    end if;
+  end process latch_removal_p;
 
   -- Detect rising edges of adc_done.
 --      process (clk_e)
@@ -743,21 +772,31 @@ begin
 
   -- Let the ADC run free in modes 11,10. In mode 01, initiate a new
   -- sample using a pulse from timer 4. Mode 00 is reset.
-  process (adc_mode_int, pulseout(4), adc_edge)
+  process (adc_mode_int, pulseout(4), adc_edge, adc_run_d)
   begin
+    adc_run_int <= adc_run_d;
     if adc_mode_int(1) = '1' then
-      adc_run <= '1';
+      adc_run_int <= '1';
     elsif adc_mode_int(0) = '1' then
       if pulseout(4) = '1' then
-        adc_run <= '1';
+        adc_run_int <= '1';
       elsif adc_edge = '1' then
-        adc_run <= '0';
+        adc_run_int <= '0';
       end if;
     else
-      adc_run <= '0';
+      adc_run_int <= '0';
     end if;
   end process;
 
+  adc_run <= adc_run_int;
+  
+  process (clk_p)
+  begin
+    if rising_edge(clk_p) then
+      adc_run_d <= adc_run_int;
+    end if;
+  end process;
+  
   adc_en <= '1' when adc_mode_int /= "00" else
             '0';
 

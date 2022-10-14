@@ -7,7 +7,7 @@ use work.gp_pkg.all;
 
 entity ram_memory is
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
   port (
     clk     : in  std_logic;
     address : in  std_logic_vector(13 downto 0);
@@ -82,72 +82,97 @@ architecture str of ram_memory is
       );
   end component;
 
+  component main_mem
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+  
+  signal wea_v : std_ulogic_vector(0 to 0);
+
 begin  -- architecture str
 
+  wea_v(0) <= not we_n;
 
   -- Use memories for ASIC implementation
-  g_asic_memory : if g_memory_type = asic generate
- ram0_asic : SNPS_SP_HD_16Kx8
-    port map (
-      Q        => ram_do,
-      ADR      => address,
-      D        => ram_di,
-      WE       => not we_n,
-      ME       => cs,
-      CLK      => clk,
-      TEST1    => '0',
-      TEST_RNM => '0',
-      RME      => '0',
-      RM       => (others => '0'),
-      WA       => (others => '0'),
-      WPULSE   => (others => '0'),
-      LS       => '0',
-      BC0      => '0',
-      BC1      => '0',
-      BC2      => '0'
-      );
-
-
-  -- Use referens memory design for FPGA.
-  else generate
-
-    ram0_org : SU180_16384X8X1BM8
+  g_memory : if g_memory_type = asic generate
+    ram0_asic : SNPS_SP_HD_16Kx8
       port map (
-        A0  => address(0),
-        A1  => address(1),
-        A2  => address(2),
-        A3  => address(3),
-        A4  => address(4),
-        A5  => address(5),
-        A6  => address(6),
-        A7  => address(7),
-        A8  => address(8),
-        A9  => address(9),
-        A10 => address(10),
-        A11 => address(11),
-        A12 => address(12),
-        A13 => address(13),
-        DO0 => ram_do(0),
-        DO1 => ram_do(1),
-        DO2 => ram_do(2),
-        DO3 => ram_do(3),
-        DO4 => ram_do(4),
-        DO5 => ram_do(5),
-        DO6 => ram_do(6),
-        DO7 => ram_do(7),
-        DI0 => ram_di(0),
-        DI1 => ram_di(1),
-        DI2 => ram_di(2),
-        DI3 => ram_di(3),
-        DI4 => ram_di(4),
-        DI5 => ram_di(5),
-        DI6 => ram_di(6),
-        DI7 => ram_di(7),
-        WEB => we_n,
-        CK  => clk,
-        CS  => cs,
-        OE  => '1'
+        Q        => ram_do,
+        ADR      => address,
+        D        => ram_di,
+        WE       => not we_n,
+        ME       => cs,
+        CLK      => clk,
+        TEST1    => '0',
+        TEST_RNM => '0',
+        RME      => '0',
+        RM       => (others => '0'),
+        WA       => (others => '0'),
+        WPULSE   => (others => '0'),
+        LS       => '0',
+        BC0      => '0',
+        BC1      => '0',
+        BC2      => '0'
         );
-  end generate;
+
+  else generate -- if g_memory_type = simulation generate
+
+    ram0 : main_mem
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+/*   -- Use simulation memory design for FPGA
+   else generate
+     ram0_ref : SU180_16384X8X1BM8
+       port map (
+         A0  => address(0),
+         A1  => address(1),
+         A2  => address(2),
+         A3  => address(3),
+         A4  => address(4),
+         A5  => address(5),
+         A6  => address(6),
+         A7  => address(7),
+         A8  => address(8),
+         A9  => address(9),
+         A10 => address(10),
+         A11 => address(11),
+         A12 => address(12),
+         A13 => address(13),
+         DO0 => ram_do(0),
+         DO1 => ram_do(1),
+         DO2 => ram_do(2),
+         DO3 => ram_do(3),
+         DO4 => ram_do(4),
+         DO5 => ram_do(5),
+         DO6 => ram_do(6),
+         DO7 => ram_do(7),
+         DI0 => ram_di(0),
+         DI1 => ram_di(1),
+         DI2 => ram_di(2),
+         DI3 => ram_di(3),
+         DI4 => ram_di(4),
+         DI5 => ram_di(5),
+         DI6 => ram_di(6),
+         DI7 => ram_di(7),
+         WEB => we_n,
+         CK  => clk,
+         CS  => cs,
+         OE  => '1'
+         );
+*/  
+    end generate;
 
 end architecture str;

@@ -50,6 +50,7 @@ entity peri is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;
+    clk_p_n     : in  std_logic;
     clk_c_en    : in  std_logic;
     clk_e_pos   : in  std_logic;        -- Execution clock
     clk_e_neg   : in  std_logic;        -- Execution clock
@@ -66,6 +67,7 @@ entity peri is
     dbus        : in  std_logic_vector(7 downto 0);
     dfp         : out std_logic_vector(7 downto 0);
     rst_en      : in  std_logic;
+    wdog2_n     : in  std_logic;
     --rst_en2     : in  std_logic;
     pl_pd       : in  std_logic_vector(2 downto 0);
     pl_aaddr    : in  std_logic_vector(4 downto 0);
@@ -77,6 +79,7 @@ entity peri is
     ext_iden    : in  std_logic;
     ext_idreq   : in  std_logic;
     ext_idack   : out std_logic;
+    ext_irq     : in  std_logic;
     --
     ilioa       : in  std_logic;
     ildout      : in  std_logic;
@@ -325,6 +328,7 @@ begin  -- struct
   timer : entity work.tiu
     port map(
       clk_p      => clk_p,
+      clk_p_n    => clk_p_n,
       clk_c_en   => clk_c_en,
       rst_en     => rst_en,
       reg_wr     => reg_wr,
@@ -408,6 +412,8 @@ begin  -- struct
       rx1_irq    => rx1_irq,
       rx2_irq    => rx2_irq,
       tx_irq     => tx_irq,
+      wdog2_n    => wdog2_n,
+      noc_irq    => ext_irq,
       -- timer signals
       tiu_out    => tiu_out,
       pulseout   => pulseout,

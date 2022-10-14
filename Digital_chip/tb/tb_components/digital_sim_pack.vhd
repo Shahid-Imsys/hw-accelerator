@@ -179,13 +179,13 @@ package body digital_top_sim_pack is
       when 16#CC# => write_code(core, "GMEM increment test begin");   
       when 16#CD# => write_code(core, "BMEM zero-one test begin");  
       when 16#CE# => write_code(core, "BMEM checkerboard test begin");  
-      when 16#CF# => write_code(core, "BMEM increment test begin"); 
+      when 16#CF# => write_code(core, "BMEM increment test begin");
+      
+      when 16#E0# => write_code(core, "NOC boot code upload request");
+ 
       when 16#F0# => write_code(core, "RAM0 test begin");  
       when 16#F1# => write_code(core, "RAM test begin");   
   
-
-      
-
       when 16#D0# => write_code(core, "Core test done");
       when 16#D1# => write_code(core, "Memory Test done");
       when 16#D2# => write_code(core, "Test 2 done");

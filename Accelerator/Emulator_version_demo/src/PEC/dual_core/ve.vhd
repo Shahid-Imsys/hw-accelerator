@@ -432,6 +432,10 @@ architecture rtl of ve is
   constant fftcopy            : string := "fftcopy.dat";
 
 
+  signal data0_addr_i  : std_logic_vector(7 downto 0);
+  signal data1_addr_i  : std_logic_vector(7 downto 0);
+  signal weight_addr_i : std_logic_vector(7 downto 0);  
+  signal bias_addr_i   : std_logic_vector(7 downto 0);
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
   signal data1addr_to_memory : std_logic_vector(7 downto 0);
   signal weightaddr_to_memory : std_logic_vector(7 downto 0);

@@ -9,7 +9,7 @@ entity mpram_memory is
 
   generic (
     g_file_name   : string        := "mpram0.data";
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     address : in  std_logic_vector(10 downto 0);
@@ -251,10 +251,12 @@ begin  -- architecture str
   -- Use memories from ASIC implementation
   g_asic_memory : if g_memory_type = asic generate
 
+    -- pragma synthesis_off
     i_load_mpram : load_mpram
       generic map (
         initFile => g_file_name);
-
+    -- pragma synthesis_on
+    
     mpram_asic : SNPS_SP_HD_2Kx80
       port map (
         Q        => ram_do,

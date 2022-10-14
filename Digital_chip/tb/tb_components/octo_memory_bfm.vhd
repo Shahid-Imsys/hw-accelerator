@@ -79,16 +79,19 @@ begin  -- architecture bfm
     4 when "1111",
     0 when others; -- Reserved!
 
-  check_double_drive_dq : process (dq) is
+  check_double_drive_dq : process (ck) is
     variable no_dd : boolean := true;
   begin  -- process check_double_drive_dq
-    for i in dq'range loop
-      if dq(i) = 'X' then
-        no_dd := false;
-      end if;
-    end loop;  -- i
+    if falling_edge(ck) then
+      for i in dq'range loop
+        if dq(i) = 'X' then
+          no_dd := false;
+        end if;
+      end loop;  -- i
 
-    assert no_dd report "[Octo_BFM] Double driving on signal dq" severity warning;
+      assert no_dd report "[Octo_BFM] Double driving on signal dq" severity warning;
+    end if;
+    
   end process check_double_drive_dq;
 
   p_deep_power_down : process (all) is
@@ -159,7 +162,9 @@ begin  -- architecture bfm
     elsif cs = '1' then                 -- wait_on_cs state
       command <= x"00";
       state   <= command_state_1;
-      if state /= command_state_1 and state /= wait_on_cs and state /= write_ddr then
+      if state = read_ddr then
+        state <= command_state_1;
+      elsif state /= command_state_1 and state /= wait_on_cs and state /= write_ddr then
         write(l, string'("[Octo_BFM] Warning, BFM in state "));
         write(l, state_t'image(state));
         write(l, string'(" when cs is high"));
@@ -250,12 +255,12 @@ begin  -- architecture bfm
 
         -- State write register
         when write_register =>
-          rwds <= 'Z';
+          rwds <= '1';
 
-          check_for_z;
-          assert rwds /= 'Z'
-            report "[Octo_BFM] No driving on RWDS in state write_register"
-            severity warning;
+          -- check_for_z;
+          -- assert rwds /= 'Z'
+          --   report "[Octo_BFM] No driving on RWDS in state write_register"
+          --   severity warning;
 
           if address = 0 then           -- ID0 register
             if counter = 1 then

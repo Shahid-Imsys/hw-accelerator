@@ -72,7 +72,7 @@ end entity eth_tx;
 
 architecture structure of eth_tx is
 
-  component blk_mem_gen_0
+  component eth_tx_fifo
     port (
       clka  : in  std_logic;
       wea   : in  std_logic_vector(0 downto 0);
@@ -388,7 +388,7 @@ begin
       end if;
     end process;
 
-    tx_fifo_mem : blk_mem_gen_0
+    tx_fifo_mem : eth_tx_fifo
       port map (
         clka  => clk_p,
         wea   => wea,

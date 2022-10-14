@@ -7,7 +7,7 @@ use work.gp_pkg.all;
 
 entity memory_1024x8 is
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
   port (
     clk     : in  std_logic;
     address : in  std_logic_vector(9 downto 0);
@@ -102,9 +102,9 @@ begin  -- architecture rtl
       );
 
 
-  -- Use referens memory design for FPGA.
+  -- Use simulation memory design for FPGA
   else generate
-  iomem_referens: SY180_1024X8X1CM8
+  io_mem_sim: SY180_1024X8X1CM8
     port map (
         A0  => address(0),
         A1  => address(1),

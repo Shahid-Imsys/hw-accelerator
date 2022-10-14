@@ -46,7 +46,8 @@ use work.all;
 
 entity cluster_controller is
   generic(
-    USE_ASIC_MEMORIES   : boolean := true;
+    USE_ASIC_MEMORIES   : boolean := false;
+    single_pe_sim       : boolean := true;
     TAG_CMD_DECODE_TIME : integer := 38  --Number of clock cycles for peci_busy to deassert
                                          --To be moved to defines
     );
@@ -985,7 +986,7 @@ begin
   c_rdy_i <= PE_RDY_0  and PE_RDY_1  and PE_RDY_2  and PE_RDY_3  and
              PE_RDY_4  and PE_RDY_5  and PE_RDY_6  and PE_RDY_7  and
              PE_RDY_8  and PE_RDY_9  and PE_RDY_10 and PE_RDY_11 and
-             PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+             PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15 when not single_pe_sim else PE_RDY_15;
 
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------      

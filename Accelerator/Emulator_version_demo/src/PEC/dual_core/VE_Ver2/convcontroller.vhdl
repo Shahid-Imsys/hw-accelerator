@@ -54,6 +54,7 @@ architecture convctrl of convcontroller is
   signal pp_stage_1     : std_logic;
   signal pp_stage_2     : std_logic;
   signal conv_out_p     : std_logic;
+  signal max_sel        : std_logic;
   signal a_delay        : std_logic;
   signal ppinst_s       : ppctrl_t;
   signal ppinst_p       : ppctrl_t;
@@ -136,6 +137,9 @@ begin
           ppinst_s <= sumfirst;
           if conv_out_p = '1' then
             inst <= firstconv;
+            if max_sel = '1' then
+              inst <= firstmax;
+            end if;
           else
             inst <= sum;
           end if;
@@ -163,12 +167,18 @@ begin
           ppinst_s <= sum;
           if conv_out_p = '1' then
             inst <= conv;
+            if max_sel = '1' then
+              inst <= max;
+            end if;
           else
             inst <= sum;
           end if;
           if conv_loop = x"00" then
             if conv_out_p = '1' then
               inst <= firstconv;
+              if max_sel = '1' then
+                inst <= firstmax;
+              end if;
             else
               inst <= sum;
             end if;
@@ -199,6 +209,9 @@ begin
               end if;
               if conv_out_p = '1' then
                 inst <= lastconv;
+                if max_sel = '1' then
+                  inst <= lastmax;
+                end if;
               else
                 inst <= sum;
               end if;

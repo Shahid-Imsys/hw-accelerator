@@ -811,14 +811,14 @@ begin
       elsif cnt_rst = '1' then
         ring_rst <= '1';
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
-        if next_ring_addr = ring_end_addr then
+        if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then --clear counter takes one clock cycle, here do a look ahead clear.
           ring_rst <= '1';
         elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then
           ring_load <= '1';
           ring_rst <= '0';
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
-        if next_ring_addr = ring_end_addr then
+        if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then
           ring_rst <= '1';
         else
           ring_load <= '1';

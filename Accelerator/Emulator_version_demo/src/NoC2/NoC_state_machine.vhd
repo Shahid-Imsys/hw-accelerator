@@ -150,7 +150,20 @@ architecture Behavioral of Noc_State_Machine is
 	signal  TC_mux_ctrl             : std_logic;
 	signal  MSB_as                  : std_logic;
 	signal  FF_data                 : std_logic;
-	signal  FF                      : std_logic;	
+	signal  FF                      : std_logic;
+	
+	
+    attribute mark_debug : string; 
+    attribute mark_debug of Address_Counter: signal is "true";
+    attribute mark_debug of program_mem_out: signal is "true";
+    attribute mark_debug of boot_as_counter: signal is "true";
+    attribute mark_debug of boot_mem_out: signal is "true";
+    attribute mark_debug of CMD_FF: signal is "true";
+    attribute mark_debug of FIFO_Ready1: signal is "true";
+    attribute mark_debug of FIFO_Ready2: signal is "true";
+    attribute mark_debug of FIFO_Ready3: signal is "true";
+    attribute mark_debug of Transfer_Counter: signal is "true";
+        		
 	
 begin
 
@@ -290,7 +303,8 @@ begin
             boot_FF                     <= '0';
             NOC_Ready                   <= '0';
             TC_mux_ctrl                 <= '0';
-            load_Mode_reg               <= '0';            
+            load_Mode_reg               <= '0';
+            Reset_IR                    <= '0';            
         elsif rising_edge(clk) then
             FF                          <= not(boot_FF);
             LC_Equal_LR_latch           <= LC_Equal_LR;

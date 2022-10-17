@@ -32,7 +32,7 @@ entity CMD_from_GPP is
         Opcode                  : out std_logic_vector(7  downto 0);
         Switch_ctrl             : out std_logic_vector(7 downto 0);
         Transfer_size           : out std_logic_vector(15 downto 0);
-        RM_address              : out std_logic_vector(15 downto 0);
+        RM_address              : out std_logic_vector(14 downto 0);
         CM_Address0             : out std_logic_vector(14 downto 0);
         CM_Address1             : out std_logic_vector(14 downto 0);
         Padding_Data            : out std_logic_vector(7 downto 0);
@@ -41,16 +41,16 @@ entity CMD_from_GPP is
         TSDiv16_Reg             : out std_logic_vector(11 downto 0);
         CMD_FF                  : out std_logic;        
         NOC_CMD_ACK             : out std_logic;
-        Address_steps           : out std_logic_vector(113 downto 0);
-        End_values              : out std_logic_vector(113 downto 0)
+        Address_steps           : out std_logic_vector(118 downto 0);
+        End_values              : out std_logic_vector(118 downto 0)
     );
 end CMD_from_GPP;
 
 architecture Behavioral of CMD_from_GPP is
 
     signal  GPP_CMD_Reg         : std_logic_vector(127 downto 0);
-    signal  GPP_CMD_Reg2        : std_logic_vector(113 downto 0);
-    signal  GPP_CMD_Reg3        : std_logic_vector(113 downto 0);
+    signal  GPP_CMD_Reg2        : std_logic_vector(118 downto 0);
+    signal  GPP_CMD_Reg3        : std_logic_vector(118 downto 0);
     signal  NOC_Length_i        : std_logic_vector(15 downto 0);
     signal  NOC_Length_plus     : std_logic_vector(15 downto 0);
     signal  FF_Ack              : std_logic;
@@ -63,7 +63,7 @@ begin
     Transfer_size   <= GPP_CMD_Reg(31 downto 16);
     NOC_Length      <= GPP_CMD_Reg(31 downto 16);
     NOC_Length_i    <= GPP_CMD_Reg(31 downto 16);   
-    RM_address      <= GPP_CMD_Reg(47 downto 32);
+    RM_address      <= GPP_CMD_Reg(46 downto 32);
     CM_Address0     <= GPP_CMD_Reg(62 downto 48);
     CM_Address1     <= GPP_CMD_Reg(78 downto 64);
     NOC_Address     <= GPP_CMD_Reg(111 downto 80);
@@ -86,10 +86,10 @@ begin
                 FF              <= '1';
             end if;
             if Load_GPP_CMD = '1' and Control_data(1) = '1' then
-                GPP_CMD_Reg2    <= GPP_CMD_Data(113 downto 0);
+                GPP_CMD_Reg2    <= GPP_CMD_Data(118 downto 0);
             end if;
             if Load_GPP_CMD = '1' and Control_data(2) = '1' then
-                GPP_CMD_Reg3    <= GPP_CMD_Data(113 downto 0);
+                GPP_CMD_Reg3    <= GPP_CMD_Data(118 downto 0);
             end if;                       
             CMD_FF              <= GPP_CMD_Flag;
             NOC_Length_plus     <= std_logic_vector(unsigned(NOC_Length_i) + x"000F");

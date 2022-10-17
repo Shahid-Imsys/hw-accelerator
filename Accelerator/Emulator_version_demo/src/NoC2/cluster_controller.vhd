@@ -465,7 +465,8 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				sync_collector <= (others => '0');
 			elsif noc_cmd = "00011" or noc_cmd = "00101" or noc_cmd = "00100" then
-				if delay2 = '1' then
+				-- if delay2 = '1' then
+				if delay = '1' then
 					sync_collector(0) <= tag;
 					sync_collector(1) <= sync_collector(0);
 				else
@@ -521,7 +522,8 @@ EVEN_P <= even_p_2;
 				noc_reg_rdy <= '0';
         	    noc_write <= '0';
         	    noc_read <= '0';
-        	elsif delay2 = '1' then     
+        	-- elsif delay2 = '1' then     
+			elsif delay = '1' then						   
 			    if noc_cmd = "00011" or noc_cmd = "00101" then
 			        if byte_ctr = "0000" then 
 			        	noc_reg_rdy <= '1';

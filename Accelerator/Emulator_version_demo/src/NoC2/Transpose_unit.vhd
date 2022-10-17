@@ -127,13 +127,13 @@ begin
             
             ----TP0
             --Downstream--------------------------------------------------------------------------------------------------------------------
-            if Enable_TP0_Down = '1' then
+            if Enable_TP0_Down = '1' and TP0_RW = '1' then
                 --TP WRITE
-                if TP0_RW = '1' then                                  
+                -- if TP0_RW = '1' then                                  
                     for i in 0 to 15 loop
                         TP_Data0(addr_cntr0)(i)  <= IO_data(i*8 +7 downto i*8);
                     end loop;
-                end if;
+                -- end if;
             end if;
             --Upstream----------------------------------------------------------------------------------------------------------------------
             if Enable_TP0_UP = '1' then

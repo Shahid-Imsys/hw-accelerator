@@ -102,10 +102,9 @@ entity Root_Memory is
   Port(
         clk                 : in  std_logic;
         Reset               : in  std_logic;
-        Write_Read_Mode     : in  std_logic;
+        Write_Read_Mode     : in  std_logic;    -- '0' = read 
         Enable              : in  std_logic;
-        Load_RM_Address     : in  std_logic;
-        RM_Address          : in  std_logic_vector(12 downto 0);
+        RM_Address          : in  std_logic_vector(14 downto 0);
         DataIn              : in  std_logic_vector(127 downto 0);
         DataOut             : out std_logic_vector(127 downto 0)
    );
@@ -114,7 +113,7 @@ end Root_Memory;
 architecture Behavioral of Root_Memory is
 
     signal we           : std_logic_vector(0 downto 0);
-    signal Address      : unsigned(12 downto 0);
+    signal Address      : unsigned(14 downto 0);
     signal RM_FF        : std_logic;
     signal Enable_p     : std_logic;
     signal Enable_p2    : std_logic;
@@ -145,7 +144,7 @@ architecture Behavioral of Root_Memory is
       clka    : in std_logic;
       ena     : in std_logic;
       wea     : in std_logic_vector(0 downto 0);
-      addra   : in std_logic_vector(12 downto 0);
+      addra   : in std_logic_vector(14 downto 0);
       dina    : in std_logic_vector(127 downto 0);
       douta   : out std_logic_vector(127 downto 0)
     );
@@ -157,15 +156,9 @@ begin
     process (clk, Reset)
     begin
         if Reset = '0' then
-            Address     <= (others => '0');
             Enable_p    <= '0';
             Enable_p2   <= '0';
         elsif rising_edge(clk) then
-            if Load_RM_Address = '1' then
-                Address   <= unsigned(RM_Address);
-            elsif Enable = '1' then  --(Enable = '1' and Write_Read_Mode = '1') then --or ((Enable = '1' or Enable_p ='1')and Write_Read_Mode = '0') then
-                Address   <= Address + 1;
-            end if;
             Enable_p      <= Enable;
             Enable_p2     <= Enable_p;
         end if;
@@ -196,16 +189,16 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
     end generate;
 
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
-
+    
     Root_Memory_Inst : blk_mem_gen_0
     port map (
-        clka    => clk,
-        ena     => mem_enable,
-        wea     => we,
-        addra   => std_logic_vector(Address),
-        dina    => DataIn,
-        douta   => DataOut
-    );
+        clka      => clk,
+        ena       => mem_enable,
+        wea       => we,
+        addra     => std_logic_vector(RM_Address),
+        dina      => DataIn,
+        douta     => DataOut
+    );    
     end generate;
-
+    
 end Behavioral;

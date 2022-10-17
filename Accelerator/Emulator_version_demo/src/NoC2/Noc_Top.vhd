@@ -112,7 +112,7 @@ architecture structural of Noc_Top is
         Opcode                  : out std_logic_vector(7  downto 0);
         Switch_ctrl             : out std_logic_vector(7 downto 0);
         Transfer_size           : out std_logic_vector(15 downto 0);
-        RM_address              : out std_logic_vector(15 downto 0);
+        RM_address              : out std_logic_vector(14 downto 0);
         CM_Address0             : out std_logic_vector(14 downto 0);
         CM_Address1             : out std_logic_vector(14 downto 0);
         Padding_Data            : out std_logic_vector(7 downto 0);
@@ -121,8 +121,8 @@ architecture structural of Noc_Top is
         TSDiv16_Reg             : out std_logic_vector(11 downto 0);
         CMD_FF                  : out std_logic;        
         NOC_CMD_ACK             : out std_logic;
-        Address_steps           : out std_logic_vector(113 downto 0);
-        End_values              : out std_logic_vector(113 downto 0)        
+        Address_steps           : out std_logic_vector(118 downto 0);
+        End_values              : out std_logic_vector(118 downto 0)        
     );
     end component;
   
@@ -173,8 +173,7 @@ architecture structural of Noc_Top is
         Reset                   : in  std_logic;
         Write_Read_Mode         : in  std_logic;
         Enable                  : in  std_logic;
-        Load_RM_Address         : in  std_logic;
-        RM_Address              : in  std_logic_vector(12 downto 0);
+        RM_Address              : in  std_logic_vector(14 downto 0);
         DataIn                  : in  std_logic_vector(127 downto 0);
         DataOut                 : out std_logic_vector(127 downto 0)  
     );
@@ -265,6 +264,24 @@ architecture structural of Noc_Top is
     );
     end component;
     
+    component RM_as_generator is
+    port(
+	    clk                  : in  std_logic;
+	    Reset                : in  std_logic;
+	    Load_IR              : in  std_logic;
+	    Reset_IR             : in  std_logic;
+	    Load_RM_as           : in  std_logic;
+	    En_RM1               : in  std_logic;
+	    RM_as_Mux            : in  std_logic;
+	    RM_as                : in  std_logic_vector(14 downto 0);
+	    Address_steps        : in  unsigned(118 downto 0);
+	    End_values           : in  unsigned(118 downto 0);
+	    RM_byte_as           : out unsigned(3 downto 0); 
+	    RM_word_as           : out unsigned(14 downto 0);
+	    RM_as_err            : out std_logic
+    );	    
+    end component;    
+    
     --NOC_State Machine
     signal TAG_shift            : std_logic;
     signal Transfer_size        : std_logic_vector(15 downto 0);
@@ -295,13 +312,13 @@ architecture structural of Noc_Top is
 
     --CMD_From_GPP
     signal Switch_ctrl          : std_logic_vector(7 downto 0); 
-    signal RM_address           : std_logic_vector(15 downto 0);
+    signal RM_address           : std_logic_vector(14 downto 0);
     signal CM_Address0          : std_logic_vector(14 downto 0);
     signal CM_Address1          : std_logic_vector(14 downto 0);
     signal Padding_Data         : std_logic_vector(7 downto 0);
     signal TSDiv16_Reg          : std_logic_vector(11 downto 0);
-    signal Address_steps        : std_logic_vector(113 downto 0);
-    signal End_values           : std_logic_vector(113 downto 0);    
+    signal Address_steps        : std_logic_vector(118 downto 0);
+    signal End_values           : std_logic_vector(118 downto 0);    
     --MUX_DEMUX
     signal Switch_Data          : std_logic_vector(127 downto 0);
     signal Mux_Demux_out0       : std_logic_vector(127 downto 0);
@@ -328,6 +345,9 @@ architecture structural of Noc_Top is
     signal NOC_data_mux_ctrl    : std_logic;
     signal Tag_Line_i           : std_logic;
     signal RM_as_mux            : std_logic;
+    
+    --RM_as_generator
+    signal RM_word_as           : unsigned(14 downto 0);
     --
     signal Mode_reg             : std_logic_vector(4 downto 0);
     signal Enable_Root_memory   : std_logic;
@@ -350,8 +370,31 @@ architecture structural of Noc_Top is
     --RM ADDRESS GEN
     signal Load_IR              : std_logic;
     signal Reset_IR             : std_logic;
-
-	signal RM_byte_as           : std_logic_vector(3 downto 0);    
+	signal RM_byte_as           : unsigned(3 downto 0);
+	signal RM_as_err            : std_logic;
+	
+	
+    attribute mark_debug : string; 
+    attribute mark_debug of PEC_Ready: signal is "true";
+    attribute mark_debug of PEC_WE: signal is "true";
+    attribute mark_debug of PEC_byte_data: signal is "true";
+    attribute mark_debug of Noc_byte_data: signal is "true";
+    attribute mark_debug of GPP_CMD_Data: signal is "true";
+    attribute mark_debug of NOC_CMD_Data: signal is "true";
+    attribute mark_debug of GPP_CMD_Flag: signal is "true";
+    attribute mark_debug of NOC_CMD_ACK: signal is "true";
+    attribute mark_debug of NOC_CMD_flag: signal is "true";
+    attribute mark_debug of GPP_CMD_ACK: signal is "true";
+    attribute mark_debug of IO_data: signal is "true";
+    attribute mark_debug of NOC_data: signal is "true";
+    attribute mark_debug of NOC_Address: signal is "true";
+    attribute mark_debug of NOC_Length: signal is "true";
+    
+    attribute mark_debug of FIFO_Ready: signal is "true";
+    attribute mark_debug of NOC_DATA_DIR: signal is "true";
+    attribute mark_debug of NOC_DATA_EN: signal is "true";
+    attribute mark_debug of NOC_WRITE_REQ: signal is "true";
+    attribute mark_debug of IO_WRITE_ACK: signal is "true"; 	    
 
 begin
 
@@ -521,8 +564,7 @@ begin
         Reset                   => Reset,
         Write_Read_Mode         => R_W_RM,  -- from Mux_register
         Enable                  => Enable_Root_memory,
-        Load_RM_Address         => Load_RM_Address,
-        RM_Address              => RM_Address(12 downto 0),
+        RM_Address              => std_logic_vector(RM_word_as),
         DataIn                  => switch_data,
         DataOut                 => RM_Data_Out
      );
@@ -573,7 +615,7 @@ begin
 	    Reset_BC                => Reset_BC,
 	    Step_BC                 => Step_BC,
 	    RM_as_mux               => RM_as_mux,
-	    RM_byte_as              => RM_byte_as,    
+	    RM_byte_as              => std_logic_vector(RM_byte_as),    
 	    Decoder                 => Decoder,
 	    byte_counter            => byte_counter    
     );
@@ -611,5 +653,23 @@ begin
         Tag_Line                => Tag_Line_i,
         TAG_shift               => TAG_shift
     );
+    
+    RM_as_generator_Inst: RM_as_generator
+    port map
+    (
+        clk                     => clk,
+        Reset                   => Reset,
+        Load_IR                 => Load_IR,
+        Reset_IR                => Reset_IR,
+        Load_RM_as              => Load_RM_Address,
+        En_RM1                  => Enable_Root_memory,
+        RM_as_Mux               => RM_as_Mux,
+        RM_as                   => RM_Address,
+        Address_steps           => unsigned(Address_steps),
+        End_values              => unsigned(End_values),
+        RM_byte_as              => RM_byte_as,
+        RM_word_as              => RM_word_as,
+        RM_as_err               => RM_as_err
+	);       
                    
 end structural;

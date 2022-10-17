@@ -7,10 +7,10 @@
 -- of such information is prohibited except by express written
 -- agreement with Shortlink AB.
 -- ----------------------------------------------------------------------------
--- ASIC:     
--- Module:   
+-- ASIC:
+-- Module:
 -- ----------------------------------------------------------------------------
--- Authors:  
+-- Authors:
 -- Company:  Shortlink
 -- ----------------------------------------------------------------------------
 -- Description:
@@ -76,7 +76,9 @@ architecture tb of uart_tb is
   signal tx_enable     : boolean := false;
   signal tx_busy       : boolean;
 
-  type state_t is (wait_on_address, short_message_1, short_message_2, write_message, write_data, read_data);
+  type state_t is (wait_on_address, short_message_1, short_message_2, write_message, write_data, read_data,
+    ts_noctest  -- Test Specific: NOC Test
+    );
   signal state : state_t := wait_on_address;
 
   signal uploading   : boolean := false;
@@ -131,7 +133,7 @@ begin
     variable byte_cnt : integer := 0;
     variable octet    : std_ulogic_vector(7 downto 0);
   begin
-     
+
     while true loop
       if uploading and not done then
         if(not endfile(fHandle)) then
@@ -209,7 +211,7 @@ begin
         upload_done <= true;
         bit_cnt     := 0;
         octet       := x"00";
-        
+
         wait until uploading;
         done := false;
       end if;
@@ -247,6 +249,9 @@ begin
   register_update : process (received_byte)
     variable l                : line;
     variable reg_to_block_tmp : reg_to_block_t;
+    variable byte_cnt         : integer;
+    variable byte_offset      : integer;
+    variable expected_byte    : integer range 0 to 255;
   begin  -- process register
 
     if now > 30 ns then
@@ -257,6 +262,7 @@ begin
             when tb_short_message_1 => state <= short_message_1;
             when tb_short_message_2 => state <= short_message_2;
             when tb_write           => state <= write_message;
+            when tb_noctest         => state <= ts_noctest; byte_cnt := 0;
             when others =>
               reg_to_block_tmp.address := received_byte mod 128;
               reg_to_block_tmp.byte    := 1;
@@ -291,6 +297,24 @@ begin
           end if;
 
           --when read_address =>
+
+        when ts_noctest =>
+          byte_offset := byte_cnt / 64;
+          expected_byte := (byte_cnt + byte_offset) mod 256;
+
+          write(l, string'(" Got 0x"));
+          hwrite(l, std_logic_vector(to_unsigned(received_byte, 8)));
+          write(l, string'(", expected 0x"));
+          hwrite(l, std_logic_vector(to_unsigned(expected_byte, 8)));
+          writeline(output, l);
+
+          assert received_byte = expected_byte report "[NOCTEST] Bad readback data" severity failure;
+
+          byte_cnt := byte_cnt + 1;
+          if byte_cnt = 1024 then
+            report "[NOCTEST] Done comparing UART readback data" severity note;
+            state <= wait_on_address;
+          end if;
 
         when others =>
           report "Unknown state in uart_tb" severity note;

@@ -420,15 +420,13 @@ EVEN_P <= even_p_2;
 	--This process generates a the latched delay signals to control the behaviour 
 	--of some triggers.
 	rd_act : process(clk_e)
-	   variable noc_delay_d : std_logic := '0';
     begin
 		if rising_edge(clk_e) then
             noc_delay <= noc_reg_rdy;
             
-            if noc_delay_d = '1' then
+            if noc_delay = '1' then
                 noc_data_reg <= data_core_int;
             end if;
-            noc_delay_d := noc_reg_rdy;
 		end if;
 	end process; 
 	

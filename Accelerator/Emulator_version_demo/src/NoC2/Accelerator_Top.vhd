@@ -20,9 +20,12 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
+use work.gp_pkg.all;
+
+
 entity Accelerator_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
+        g_memory_type        : memory_type_t := asic
     );
     Port (
 	    clk                  : in  std_logic;
@@ -52,8 +55,7 @@ architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
-    );
+        USE_ASIC_MEMORIES    : boolean := false );
     Port(
 	    clk                  : in  std_logic;
 	    Reset                : in  std_logic;
@@ -143,10 +145,10 @@ architecture Behavioral of Accelerator_Top is
      
 begin
 
+
     Noc_Top_Inst: Noc_Top
     Generic map(
-      USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES
-    )
+        USE_ASIC_MEMORIES       => g_memory_type = asic )
     port map
     (
         clk                     => clk,
@@ -176,58 +178,115 @@ begin
         NOC_WRITE_REQ           => NOC_WRITE_REQ,
         IO_WRITE_ACK            => IO_WRITE_ACK        
     );
-        
-  cc_gen : for i in 0 to 15 generate
-    cluster_controller_Inst : cluster_controller
-    port map
-    (
---Clock inputs    
-        CLK_P                   => clk,
-        CLK_E                   => clk,
---Power reset input:        
-        RST_E                   => Reset,
---Clock outputs
-        DDO_VLD                 => PEC_WE(i),        
-        EVEN_P                  => open,
---Tag line        
-        TAG                     => Tag_Line,    
-        TAG_FB                  => open,
---Data line        
-        DATA                    => Noc_byte_data(8*i+7 downto 8*i),
-        DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i),
---PE Control        
-        EXE                     => open,
-        RESUME                  => open,
---Feedback signals        
-        C_RDY                   => open,
-        PE_RDY_0                => '0',
-        PE_RDY_1                => '0',
-        PE_RDY_2                => '0',
-        PE_RDY_3                => '0',
-        PE_RDY_4                => '0',
-        PE_RDY_5                => '0',
-        PE_RDY_6                => '0',
-        PE_RDY_7                => '0',
-        PE_RDY_8                => '0',
-        PE_RDY_9                => '0',
-        PE_RDY_10               => '0',
-        PE_RDY_11               => '0',
-        PE_RDY_12               => '0',
-        PE_RDY_13               => '0',
-        PE_RDY_14               => '0',
-        PE_RDY_15               => '0',
---Request and distribution logic signals        
-        RST_R                   => open,
-        REQ_IN                  => '0',
-        REQ_FIFO                => (others => '0'),
-        DATA_FROM_PE            => (others => '0'),
-        DATA_TO_PE              => open,
-        DATA_VLD                => open,
-        PE_UNIT                 => open,
-        BC                      => open,
-        RD_FIFO                 => open,
-        FIFO_VLD                => '0'                                  
-    );
+
+  fpga_gen: if g_memory_type = fpga generate        
+      cc_gen : for i in 0 to 1 generate
+        cluster_controller_Inst : cluster_controller
+        port map
+        (
+    --Clock inputs    
+            CLK_P                   => clk,
+            CLK_E                   => clk,
+    --Power reset input:        
+            RST_E                   => Reset,
+    --Clock outputs
+            DDO_VLD                 => PEC_WE(i),        
+            EVEN_P                  => open,
+    --Tag line        
+            TAG                     => Tag_Line,    
+            TAG_FB                  => open,
+    --Data line        
+            DATA                    => Noc_byte_data(8*i+7 downto 8*i),
+            DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i),
+    --PE Control        
+            EXE                     => open,
+            RESUME                  => open,
+    --Feedback signals        
+            C_RDY                   => open,
+            PE_RDY_0                => '0',
+            PE_RDY_1                => '0',
+            PE_RDY_2                => '0',
+            PE_RDY_3                => '0',
+            PE_RDY_4                => '0',
+            PE_RDY_5                => '0',
+            PE_RDY_6                => '0',
+            PE_RDY_7                => '0',
+            PE_RDY_8                => '0',
+            PE_RDY_9                => '0',
+            PE_RDY_10               => '0',
+            PE_RDY_11               => '0',
+            PE_RDY_12               => '0',
+            PE_RDY_13               => '0',
+            PE_RDY_14               => '0',
+            PE_RDY_15               => '0',
+    --Request and distribution logic signals        
+            RST_R                   => open,
+            REQ_IN                  => '0',
+            REQ_FIFO                => (others => '0'),
+            DATA_FROM_PE            => (others => '0'),
+            DATA_TO_PE              => open,
+            DATA_VLD                => open,
+            PE_UNIT                 => open,
+            BC                      => open,
+            RD_FIFO                 => open,
+            FIFO_VLD                => '0'                                  
+        );
+      end generate;
+    end generate;
+
+    asic_gen: if g_memory_type /= fpga generate        
+      cc_gen : for i in 0 to 15 generate
+        cluster_controller_Inst : cluster_controller
+        port map
+        (
+    --Clock inputs    
+            CLK_P                   => clk,
+            CLK_E                   => clk,
+    --Power reset input:        
+            RST_E                   => Reset,
+    --Clock outputs
+            DDO_VLD                 => PEC_WE(i),        
+            EVEN_P                  => open,
+    --Tag line        
+            TAG                     => Tag_Line,    
+            TAG_FB                  => open,
+    --Data line        
+            DATA                    => Noc_byte_data(8*i+7 downto 8*i),
+            DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i),
+    --PE Control        
+            EXE                     => open,
+            RESUME                  => open,
+    --Feedback signals        
+            C_RDY                   => open,
+            PE_RDY_0                => '0',
+            PE_RDY_1                => '0',
+            PE_RDY_2                => '0',
+            PE_RDY_3                => '0',
+            PE_RDY_4                => '0',
+            PE_RDY_5                => '0',
+            PE_RDY_6                => '0',
+            PE_RDY_7                => '0',
+            PE_RDY_8                => '0',
+            PE_RDY_9                => '0',
+            PE_RDY_10               => '0',
+            PE_RDY_11               => '0',
+            PE_RDY_12               => '0',
+            PE_RDY_13               => '0',
+            PE_RDY_14               => '0',
+            PE_RDY_15               => '0',
+    --Request and distribution logic signals        
+            RST_R                   => open,
+            REQ_IN                  => '0',
+            REQ_FIFO                => (others => '0'),
+            DATA_FROM_PE            => (others => '0'),
+            DATA_TO_PE              => open,
+            DATA_VLD                => open,
+            PE_UNIT                 => open,
+            BC                      => open,
+            RD_FIFO                 => open,
+            FIFO_VLD                => '0'                                  
+        );
+      end generate;
   end generate;
            
 end Behavioral;

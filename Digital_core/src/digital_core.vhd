@@ -270,6 +270,14 @@ architecture rtl of digital_core is
   signal NOC_WRITE_REQ : std_logic;
   signal IO_WRITE_ACK  : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of GPP_CMD: signal is "true"; 
+  attribute mark_debug of GPP_CMD_Flag: signal is "true";   
+  attribute mark_debug of IO_DATA: signal is "true"; 
+  attribute mark_debug of NOC_DATA: signal is "true"; 
+  attribute mark_debug of NOC_IRQ: signal is "true"; 
+
+
 begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction

@@ -402,7 +402,7 @@ architecture rtl of ve is
   signal bias_addr_o : std_logic_vector(5 downto 0);
   signal fw_layer   : std_logic_vector(23 downto 0); --feed forward layer, 24 bits.
   signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
-  signal re_ready : std_logic; --RE start latch
+  signal re_busy : std_logic; --RE start latch
   signal conv_busy : std_logic; --VE start latch
   signal re_cnt_rst, conv_cnt_rst, cnt_rst  : std_logic;
   signal conv_enable : std_logic;
@@ -685,7 +685,7 @@ begin
       if rst = '0' then
         re_rdy <= '1';
       elsif clk_e_pos = '0' then
-        re_rdy <= not re_ready;
+        re_rdy <= not re_busy;
       end if;
     end if;
   end process;
@@ -799,7 +799,7 @@ begin
   --Mode c. Shared by RE and VE
   --********************************
   --How to control the right address?
-  --next_ring_addr <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+ to_integer(unsigned(offset_l)),8));
+  next_ring_addr <= std_logic_vector(unsigned(left_finaladdress) + au_loffset(0));
 
   mode_c_addr: process(clk_p)
   begin
@@ -810,17 +810,19 @@ begin
       --  curr_ring_addr <= YBUS;
       elsif cnt_rst = '1' then
         ring_rst <= '1';
-      elsif (re_ready = '0' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
+      elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if next_ring_addr = ring_end_addr then
           ring_rst <= '1';
         elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then
           ring_load <= '1';
+          ring_rst <= '0';
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
         if next_ring_addr = ring_end_addr then
           ring_rst <= '1';
         else
           ring_load <= '1';
+          ring_rst <= '0';
         end if;
       end if;
     end if;
@@ -1007,7 +1009,7 @@ begin
 ---------------------------------------------------------------
   rw_from_control_mux : process(all)
   begin
-    if re_ready = '0' then
+    if re_busy = '0' then
       if mode_latch = conv then
         data_read_enable_i <= rd_en_conv;
         data_write_enable_i <= '0';
@@ -1264,7 +1266,7 @@ begin
       cnt_rst         => re_cnt_rst,
       pushback_en     => pushback_en,
       wr_counter      => re_loop_reg,
-      re_busy         => re_ready,
+      re_busy         => re_busy,
       write_en_data   => dwen_from_re,
       write_en_weight => wwen_from_re,
       write_en_bias   => bwen_from_re,

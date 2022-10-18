@@ -653,9 +653,9 @@ architecture struct of top is
   attribute mark_debug : string;
   attribute mark_debug of c1_mprom_a: signal is "true";  
   attribute mark_debug of c1_mprom_ce: signal is "true";
-  attribute mark_debug of c1_mpram_a: signal is "true";  
+  --attribute mark_debug of c1_mpram_a: signal is "true";  
   attribute mark_debug of c1_mpram_ce: signal is "true";
-  attribute mark_debug of c1_mpram_d: signal is "true";
+  --attribute mark_debug of c1_mpram_d: signal is "true";
   --attribute mark_debug of c2_mprom_a: signal is "true";  
   --attribute mark_debug of c2_mprom_ce: signal is "true";
   --attribute mark_debug of c2_mpram_a: signal is "true";  

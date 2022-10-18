@@ -423,7 +423,8 @@ architecture rtl of ve is
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
   signal read_en_to_mux, read_en_w_to_mux, read_en_b_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
-  signal ve_clr_acc : std_logic; --clear accumulators
+  signal clr_acc : std_logic; --clear accumulators
+  signal fft_mode : std_logic;
   signal pl_ve_byte : std_logic_vector(3 downto 0);
   --fft test data
   constant fft256_rand_data0  : string := "fft256_data0.dat";
@@ -515,7 +516,8 @@ begin
   mode_c         <= PL(92);
   cnt_rst        <= PL(99); 
   conv_enable    <= PL(107);
-  ve_clr_acc     <= PL(93);
+  fft_mode       <= PL(106);
+  clr_acc        <= PL(93);
   pl_ve_byte     <= PL(112 downto 109);
   --
   reg_write: process(clk_p)
@@ -700,25 +702,6 @@ begin
       end if;
     end if;
   end process;
-  
-  --RE_VE_switch : process(clk_p)
-  --begin
-  --  if rising_edge(clk_p) then
-  --    if rv_switch = '1' and ve_rdy = '1' then
-  --      mode_latch <= re_mode;
-  --    else
-  --      if re_rdy = '1' and ve_rdy = '1' then
-  --        if ve_clr_acc = '1' and rv_switch = '0' then  
-  --          mode_latch <= fft;
-  --        elsif conv_enable = '1' and rv_switch = '0' then
-  --          mode_latch <= conv;
-  --        elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
-  --          mode_latch <= matrix;
-  --        end if;
-  --      end if;
-  --    end if;
-  --  end if;
-  --end process;
 
   mode_state_machine : process(clk_p)
   begin
@@ -732,9 +715,9 @@ begin
               mode_latch <= re_mode;
             elsif conv_enable = '1' and rv_switch = '0' then
               mode_latch <= conv;
-            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and rv_switch = '0' then  
               mode_latch <= fft;
-            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
               mode_latch <= matrix;
             else
               mode_latch <= idle;
@@ -742,9 +725,9 @@ begin
           when re_mode =>
             if (conv_enable = '1' and rv_switch = '0') or (re_source = '1' and pushback_en = '0') then
               mode_latch <= conv;
-            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and rv_switch = '0' then  
               mode_latch <= fft;
-            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
               mode_latch <= matrix;
             --elsif re_rdy = '1' then --back to initial state TBD
             --  mode_latch <= idle;
@@ -754,9 +737,9 @@ begin
           when conv =>
             if rv_switch = '1' or (re_source = '1' and pushback_en = '1') then --pushback
               mode_latch <= re_mode;
-            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and rv_switch = '0' then  
               mode_latch <= fft;
-            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -768,7 +751,7 @@ begin
               mode_latch <= re_mode;
             elsif conv_enable = '1' and rv_switch = '0' then
               mode_latch <= conv;
-            elsif ve_clr_acc = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -780,7 +763,7 @@ begin
               mode_latch <= re_mode;
             elsif conv_enable = '1' and rv_switch = '0' then
               mode_latch <= conv;
-            elsif ve_clr_acc = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and rv_switch = '0' then  
               mode_latch <= fft;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;
@@ -894,29 +877,19 @@ begin
     case mode_latch is 
       when re_mode => biasaddr_to_memory <= bias_finaladdress(5 downto 0);
                       weightaddr_to_memory <= right_finaladdress;
-                        --if mode_c_l = '1' then
-                        --  data0addr_to_memory <= curr_ring_addr;
-                        --  data1addr_to_memory <= curr_ring_addr;
-                        --else
-                          data0addr_to_memory <= left_finaladdress;
-                          data1addr_to_memory <= left_finaladdress;
-                          if re_source = '1' and mode_a = '1' then
-                            data0addr_to_memory <= apushback_finaladdress;
-                            data1addr_to_memory <= apushback_finaladdress;
-                          elsif re_source = '1' and mode_b = '1' then
-                            data0addr_to_memory <= bpushback_finaladdress;
-                            data1addr_to_memory <= bpushback_finaladdress;
-                          end if;
-                        --end if;
+                      data0addr_to_memory <= left_finaladdress;
+                      data1addr_to_memory <= left_finaladdress;
+                      if re_source = '1' and mode_a = '1' then
+                        data0addr_to_memory <= apushback_finaladdress;
+                        data1addr_to_memory <= apushback_finaladdress;
+                      elsif re_source = '1' and mode_b = '1' then
+                        data0addr_to_memory <= bpushback_finaladdress;
+                        data1addr_to_memory <= bpushback_finaladdress;
+                      end if;
       when conv    => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
-                        --if mode_c_l = '1' then
-                        --  data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                        --  data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                        --else
-                          data0addr_to_memory <= data0_addr_o;
-                          data1addr_to_memory <= data1_addr_o;
-                        --end if; 
+                      data0addr_to_memory <= data0_addr_o;
+                      data1addr_to_memory <= data1_addr_o;
       when fft     => if fft_done_pipe(10) = '1' then
                         weightaddr_to_memory <= rdout_addr_weight;
                         data0addr_to_memory  <= rdout_addr_data;
@@ -976,7 +949,7 @@ begin
     case mode_latch is
       when conv   => memreg_c_i    <= conv_memreg_c;
                      writebuff_c_i <= conv_writebuff_c;
-                     inst_i        <= conv_ins;
+                     inst_i        <= conv_ins when clr_acc = '0' else zeroacc;
                      ppinst_i      <= conv_ppins;
                      ppshiftinst_i <= conv_ppshiftinst;
                      addbiasinst_i <= conv_addbiasinst;

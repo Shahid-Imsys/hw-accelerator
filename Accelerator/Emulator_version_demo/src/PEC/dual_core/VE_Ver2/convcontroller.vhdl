@@ -67,6 +67,7 @@ architecture convctrl of convcontroller is
 begin
 
   conv_out_p    <= pp_ctl(0);
+  max_sel       <= pp_ctl(2);
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
   ppinst        <= ppinst_p when conv_out_p = '1' else ppinst_s;

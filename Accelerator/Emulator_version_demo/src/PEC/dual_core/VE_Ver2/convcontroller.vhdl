@@ -187,7 +187,9 @@ begin
             ppinst_s <= sumfirst;
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
-              conv_loop <= unsigned(dot_cnt) - 1;
+              if conv_oloop /= x"00" then --do not reload dot products counter if out put channel counter is 0
+                conv_loop <= unsigned(dot_cnt) - 1;
+              end if;
             end if;
             if conv_oloop = x"00" then
               load <= '0';

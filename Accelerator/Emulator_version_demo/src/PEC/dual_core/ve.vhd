@@ -380,7 +380,7 @@ architecture rtl of ve is
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
   signal apushback_load, bpushback_load, apushback_rst, bpushback_rst : std_logic;
-  signal ring_load, ring_rst : std_logic;
+  signal ring_load, ring_rst, ring_rd, ring_wr : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -806,23 +806,28 @@ begin
     if rising_edge(clk_p) then
       if RST = '0' then
         ring_load <= '0';
-      --elsif reg_in = CONS_RING_START and CLK_E_NEG = '1' then --initial curr_ring
-      --  curr_ring_addr <= YBUS;
-      elsif cnt_rst = '1' then
+        ring_rst <= '1';
+        ring_rd <= '0';
+        ring_wr <= '0';
+      elsif cnt_rst = '1' and start = '0' then
         ring_rst <= '1';
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then --clear counter takes one clock cycle, here do a look ahead clear.
           ring_rst <= '1';
+          ring_load <= '0';
         elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then
           ring_load <= '1';
           ring_rst <= '0';
+          ring_wr <= '1';
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
         if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then
           ring_rst <= '1';
+          ring_load <= '0';
         else
           ring_load <= '1';
           ring_rst <= '0';
+          ring_rd <= '1';
         end if;
       end if;
     end if;
@@ -889,10 +894,10 @@ begin
     case mode_latch is 
       when re_mode => biasaddr_to_memory <= bias_finaladdress(5 downto 0);
                       weightaddr_to_memory <= right_finaladdress;
-                        if mode_c_l = '1' then
-                          data0addr_to_memory <= curr_ring_addr;
-                          data1addr_to_memory <= curr_ring_addr;
-                        else
+                        --if mode_c_l = '1' then
+                        --  data0addr_to_memory <= curr_ring_addr;
+                        --  data1addr_to_memory <= curr_ring_addr;
+                        --else
                           data0addr_to_memory <= left_finaladdress;
                           data1addr_to_memory <= left_finaladdress;
                           if re_source = '1' and mode_a = '1' then
@@ -902,16 +907,16 @@ begin
                             data0addr_to_memory <= bpushback_finaladdress;
                             data1addr_to_memory <= bpushback_finaladdress;
                           end if;
-                        end if;
+                        --end if;
       when conv    => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
-                        if mode_c_l = '1' then
-                          data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                          data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
-                        else
+                        --if mode_c_l = '1' then
+                        --  data0addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                        --  data1addr_to_memory <= std_logic_vector(to_unsigned(to_integer(unsigned(curr_ring_addr))+to_integer(unsigned(depth_l)),8));
+                        --else
                           data0addr_to_memory <= data0_addr_o;
                           data1addr_to_memory <= data1_addr_o;
-                        end if; 
+                        --end if; 
       when fft     => if fft_done_pipe(10) = '1' then
                         weightaddr_to_memory <= rdout_addr_weight;
                         data0addr_to_memory  <= rdout_addr_data;
@@ -1011,7 +1016,7 @@ begin
   begin
     if re_busy = '0' then
       if mode_latch = conv then
-        data_read_enable_i <= rd_en_conv;
+        data_read_enable_i <= rd_en_conv when mode_c_l = '0' else ring_rd;
         data_write_enable_i <= '0';
         weight_read_enable_i <= rd_en_conv;
         weight_write_enable_i <= '0';
@@ -1025,7 +1030,7 @@ begin
       end if;
     else
       data_read_enable_i <= '0';
-      data_write_enable_i <= dwen_from_re;
+      data_write_enable_i <= dwen_from_re when mode_c_l = '0' else ring_wr;
       weight_read_enable_i <= '0';
       weight_write_enable_i <= wwen_from_re;
       read_en_b_i <= '0';

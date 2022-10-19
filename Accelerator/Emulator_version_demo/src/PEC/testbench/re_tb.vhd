@@ -533,6 +533,12 @@ pl(99) <= '1';
 wait for 30 ns;
 pl(99) <= '0';
 pl(121) <= '1';
+wait for 30 ns;
+pl(99) <= '1'; --cnt_rst = '1'
+pl(95) <= '1'; --start
+wait for 30 ns;
+pl(99) <= '0'; --cnt_rst = '1'
+pl(95) <= '0'; --start
 wait for 2000 ns;
 
 

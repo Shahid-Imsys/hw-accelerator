@@ -495,7 +495,13 @@ architecture rtl of ve is
   signal weight_addr_o : std_logic_vector(7 downto 0);
   signal fft_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
-
+  signal not_pushback : std_logic; -- remove later
+  signal lrst         : std_logic;
+  signal rrst         : std_logic;
+  signal brst         : std_logic;
+  signal parst        : std_logic;
+  signal pbrst        : std_logic;
+  signal en_conv      : std_logic;
   --constant CONS_MAC_SWITCH       : std_logic_vector(4 downto 0) := "1"&x"f"; --write the multiplier control register
   --------------------------------------------------------
   --Delay FFs
@@ -804,6 +810,11 @@ begin
         ring_load <= '1';
         ring_rst <= '0';
         ring_rd <= '1';
+      else
+        ring_load <= '0';
+        ring_rst <= '1';
+        ring_rd <= '0';
+        ring_wr <= '0';
       end if;
     end if;
   end process;
@@ -1039,6 +1050,14 @@ begin
     weight <= weight_out when bypass_reg = '0' else ve_in;
   end process;
 
+  not_pushback <= not pushback_en; -- remove later
+  lrst <= rst and not left_rst;
+  rrst <= rst and not right_rst;
+  brst <= rst and not bias_rst;
+  parst <= rst and not apushback_rst;
+  pbrst <= rst and not bpushback_rst;
+  en_conv <= en_o and not pushback_en;
+
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
 ---------------------------------------------------------------
@@ -1169,9 +1188,9 @@ begin
   data_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst and not left_rst,
+      rst          => lrst,
       load         => left_loading,
-      en           => not pushback_en,
+      en           => not_pushback,
       cmp          => au_lcmp,
       add_offset   => au_loffset,
       baseaddress  => left_baseaddress,
@@ -1181,9 +1200,9 @@ begin
   weight_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst and not right_rst,
+      rst          => rrst,
       load         => right_loading,
-      en           => not pushback_en,
+      en           => not_pushback,
       cmp          => au_rcmp,
       add_offset   => au_roffset,
       baseaddress  => right_baseaddress,
@@ -1193,9 +1212,9 @@ begin
   bias_addressing : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst and not bias_rst,
+      rst          => brst,
       load         => bias_loading,
-      en           => not pushback_en,
+      en           => not_pushback,
       cmp          => au_bcmp,
       add_offset   => au_boffset,
       baseaddress  => bias_index_start,
@@ -1205,7 +1224,7 @@ begin
     pushback_a : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst and not apushback_rst,
+      rst          => parst,
       load         => apushback_load,
       en           => pushback_en,
       cmp          => pa_cmp,
@@ -1217,7 +1236,7 @@ begin
     pushback_b : addressing_unit
     port map(
       clk          => clk_p,
-      rst          => rst and not bpushback_rst,
+      rst          => pbrst,
       load         => bpushback_load,
       en           => pushback_en,
       cmp          => pb_cmp,
@@ -1261,7 +1280,7 @@ begin
     port map(
       clk              => clk_p,
       rst              => rst,
-      en               => en_o and not pushback_en,
+      en               => en_conv,
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,

@@ -78,7 +78,7 @@ package vetypes is
   type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum, sumall,
                     select7, select6, select5, select4, select3, select2, select1,
                     select0, unitri, sum16, sum16left, matmulleft, nrit);
-  function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
+  --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
   type feedback_t is (keep, shift_to_3, shift_to_2, clip_to_3, clip_to_1);
   type bias_addr_t is (ctrl,shift);
 
@@ -216,8 +216,8 @@ package vetypes is
 end package;
 
 package body vetypes is
-  function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t is
-  begin
-    return ppctrl_t'val(to_integer(unsigned(v)));
-  end function;
+  --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t is
+  --begin
+  --  return ppctrl_t'val(to_integer(unsigned(v)));
+  --end function;
 end package body;

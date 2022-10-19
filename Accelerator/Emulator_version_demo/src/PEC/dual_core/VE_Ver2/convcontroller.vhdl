@@ -14,9 +14,11 @@ entity convcontroller is
     clk_e_pos        : in std_logic;
     start            : in std_logic;
     cnt_rst          : in std_logic;
+    data_valid       : in std_logic;
     mode_a           : in std_logic;
     mode_b           : in std_logic;
     mode_c           : in std_logic;
+    bypass           : in std_logic;
     config           : in std_logic_vector(7 downto 0);
     pp_ctl           : in std_logic_vector(7 downto 0);
     dot_cnt          : in std_logic_vector(7 downto 0);
@@ -25,6 +27,7 @@ entity convcontroller is
     bias_index_end   : in std_logic_vector(7 downto 0);
     scale            : in std_logic_vector(4 downto 0);
     mode_c_l         : out std_logic;
+    bypass_reg       : out std_logic;
     load             : out std_logic;
     rd_en            : out std_logic;
     left_rst         : out std_logic;
@@ -42,7 +45,7 @@ entity convcontroller is
     ppshiftinst      : out ppshift_shift_ctrl;
     addbiasinst      : out ppshift_addbias_ctrl;
     clipinst         : out ppshift_clip_ctrl;
-    stall            : out unsigned(3 downto 0);
+    stall            : out unsigned(7 downto 0);
     busy             : out std_logic
   );
 end entity;
@@ -104,6 +107,13 @@ begin
         elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
           mode_c_l <= '0';
         end if;
+        if bypass = '1' then
+          bypass_reg <= '1';
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+          bypass_reg <= '0';
+        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
+          bypass_reg <= '0';
+        end if;
       end if;
     end if;
   end process;
@@ -164,7 +174,7 @@ begin
               right_rst <= '0';
             end if;
           end if;
-        elsif busy = '1' then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+        elsif busy = '1' and (bypass_reg = '0' or (bypass_reg = '1' and data_valid = '1')) then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
           ppinst_s <= sum;
           if conv_out_p = '1' then
             inst <= conv;
@@ -198,7 +208,7 @@ begin
               inst <= nop;
               conv_oloop <= conv_oloop;
             end if;
-          elsif conv_loop /= x"00" then
+          elsif conv_loop /= x"00" and (bypass_reg = '0' or (bypass_reg = '1' and data_valid = '1')) then
             conv_loop <= conv_loop - 1;
             load <= '1';
             rd_en <= '1';     
@@ -356,13 +366,19 @@ end process;
   begin
     if rising_edge(clk) then
       if rst = '0' then
-        stall <= x"0";
+        stall <= x"00";
       else
         if pp_ctl(4 downto 3) = "01" then 
           if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = x"01" then
-            stall <= x"1";--stall the ve core for one clock cycle to push the result back to mem buffer.
+            stall <= x"01";--stall the ve core for one clock cycle to push the result back to mem buffer.
           else
-            stall <= x"0";
+            stall <= x"00";
+          end if;
+        elsif bypass_reg = '1' then
+          if (conv_oloop /= x"00" or conv_loop /= x"00") and data_valid = '0' then --pause the ve 
+            stall <= x"ff";
+          elsif data_valid = '1' then
+            stall <= x"00";
           end if;
         end if;
       end if;

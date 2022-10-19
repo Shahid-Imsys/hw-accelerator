@@ -115,7 +115,7 @@ architecture rtl of ve is
       outreg_o         : out std_logic_vector(63 downto 0);
       writebuffer_o    : out std_logic_vector(63 downto 0);
       -- en
-      stall            : in unsigned(3 downto 0) := (others => '0');
+      stall            : in unsigned(7 downto 0) := (others => '0');
       en_o             : out std_logic
     );
   end component;
@@ -269,9 +269,11 @@ architecture rtl of ve is
       clk_e_pos        : in std_logic;
       start            : in std_logic;
       cnt_rst          : in std_logic;
+      data_valid       : in std_logic;
       mode_a           : in std_logic;
       mode_b           : in std_logic;
       mode_c           : in std_logic;
+      bypass           : in std_logic;
       config           : in std_logic_vector(7 downto 0);
       pp_ctl           : in std_logic_vector(7 downto 0);
       dot_cnt          : in std_logic_vector(7 downto 0);
@@ -280,6 +282,7 @@ architecture rtl of ve is
       bias_index_end   : in std_logic_vector(7 downto 0);
       scale            : in std_logic_vector(4 downto 0);
       mode_c_l         : out std_logic;
+      bypass_reg       : out std_logic;
       load             : out std_logic;
       rd_en            : out std_logic;
       left_rst         : out std_logic;
@@ -297,7 +300,7 @@ architecture rtl of ve is
       ppshiftinst      : out ppshift_shift_ctrl;
       addbiasinst      : out ppshift_addbias_ctrl;
       clipinst         : out ppshift_clip_ctrl;
-      stall            : out unsigned(3 downto 0);
+      stall            : out unsigned(7 downto 0);
       busy             : out std_logic
     );
   end component;
@@ -322,7 +325,7 @@ architecture rtl of ve is
       inst_shift   : out ppshift_shift_ctrl;
       inst_addbias : out ppshift_addbias_ctrl;
       inst_clip    : out ppshift_clip_ctrl;
-      stall        : out unsigned(3 downto 0)
+      stall        : out unsigned(7 downto 0)
     );
   end component;
 
@@ -349,7 +352,7 @@ architecture rtl of ve is
   signal vemode_c_l : std_logic; --vector engine's mode c latch signal
   signal reload : std_logic; --reload address counters 
   signal reg_in : std_logic_vector(5 downto 0); --parameter register set field, including loop counter.
-  signal rv_switch : std_logic; --Used to control VE's work mode, RE mode or VE mode.
+  signal re_switch : std_logic; --Used to control VE's work mode, RE mode or VE mode.
     
   --------------------------------
   --Registers
@@ -408,9 +411,9 @@ architecture rtl of ve is
   signal conv_enable : std_logic;
   signal data0  : std_logic_vector(31 downto 0);
   signal data1  : std_logic_vector(31 downto 0);
-  signal weight  : std_logic_vector(63 downto 0);
+  signal weight, weight_out  : std_logic_vector(63 downto 0);
   signal bias_buf_out : std_logic_vector(63 downto 0);
-  signal bypass     : std_logic;
+  signal bypass, bypass_reg    : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
   signal bias_in    : std_logic_vector(63 downto 0);
@@ -484,7 +487,7 @@ architecture rtl of ve is
   signal conv_clipinst    : ppshift_clip_ctrl;
   signal fft_clipinst     : ppshift_clip_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
-  signal fft_stall, conv_stall, stall : unsigned(3 downto 0) := (others => '0');
+  signal fft_stall, conv_stall, stall : unsigned(7 downto 0) := (others => '0');
   signal en_o : std_logic;
   signal pushback_en : std_logic;
   signal data0_addr_o : std_logic_vector(7 downto 0);
@@ -506,19 +509,21 @@ begin
   --Some microinstructions are latched to registers and operates at clk_p frequency. 
   --Not latched signals are used only in one microinstruction time (clk_e) together with 
   --re_start and ve_start signals and mode abcd or relaod signal. 
-  dfy_dest_sel   <= PL(119 downto 116); --DEST_BYTE
-  start          <= PL(95); 
-  rv_switch      <= PL(94); -- RE mode or VE mode
-  re_source      <= PL(96); --RE_DFY_SRC --
-  reg_in         <= PL(105 downto 100);
-  mode_a         <= PL(98);
-  mode_b         <= PL(97);
-  mode_c         <= PL(92);
-  cnt_rst        <= PL(99); 
-  conv_enable    <= PL(107);
-  fft_mode       <= PL(106);
-  clr_acc        <= PL(93);
-  pl_ve_byte     <= PL(112 downto 109);
+  bypass       <= PL(121);-- buffer bypass
+  dfy_dest_sel <= PL(119 downto 116); --DEST_BYTE
+  pl_ve_byte   <= PL(112 downto 109);
+  conv_enable  <= PL(107);
+  fft_mode     <= PL(106);
+  reg_in       <= PL(105 downto 100);
+  cnt_rst      <= PL(99);
+  mode_a       <= PL(98);
+  mode_b       <= PL(97);
+  re_source    <= PL(96); --RE_DFY_SRC --
+  start        <= PL(95); 
+  re_switch    <= PL(94); -- RE mode or VE mode
+  clr_acc      <= PL(93);
+  mode_c       <= PL(92);
+
   --
   reg_write: process(clk_p)
   begin
@@ -538,7 +543,6 @@ begin
           config            <= (others => '0'); 
           ring_end_addr     <= (others => '0'); 
           ring_start_addr   <= (others => '0'); 
-          --curr_ring_addr    <= (others => '0');
           zp_data           <= (others => '0');
           zp_weight         <= (others => '0');
           scale             <= (others => '0'); 
@@ -711,23 +715,23 @@ begin
       elsif clk_e_pos = '1' then
         case mode_latch is 
           when idle => 
-            if rv_switch = '1' then
+            if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and rv_switch = '0' then
+            elsif conv_enable = '1' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
               mode_latch <= matrix;
             else
               mode_latch <= idle;
             end if;
           when re_mode =>
-            if (conv_enable = '1' and rv_switch = '0') or (re_source = '1' and pushback_en = '0') then
+            if (conv_enable = '1' and re_switch = '0') or (re_source = '1' and pushback_en = '0') then
               mode_latch <= conv;
-            elsif fft_mode = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif re_rdy = '1' then --back to initial state TBD
             --  mode_latch <= idle;
@@ -735,11 +739,11 @@ begin
               mode_latch <= re_mode;
             end if;
           when conv =>
-            if rv_switch = '1' or (re_source = '1' and pushback_en = '1') then --pushback
+            if re_switch = '1' or (re_source = '1' and pushback_en = '1') then --pushback
               mode_latch <= re_mode;
-            elsif fft_mode = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -747,11 +751,11 @@ begin
               mode_latch <= conv;
             end if;
           when fft =>
-            if rv_switch = '1' then
+            if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and rv_switch = '0' then
+            elsif conv_enable = '1' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and conv_enable = '1' and rv_switch = '0' then
+            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -759,11 +763,11 @@ begin
               mode_latch <= fft;
             end if;
           when matrix => 
-            if rv_switch = '1' then
+            if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and rv_switch = '0' then
+            elsif conv_enable = '1' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and rv_switch = '0' then  
+            elsif fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;
@@ -781,8 +785,6 @@ begin
   --********************************
   --Mode c. Shared by RE and VE
   --********************************
-  --How to control the right address?
-  next_ring_addr <= std_logic_vector(unsigned(left_finaladdress) + au_loffset(0));
 
   mode_c_addr: process(clk_p)
   begin
@@ -795,23 +797,13 @@ begin
       elsif cnt_rst = '1' and start = '0' then
         ring_rst <= '1';
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
-        if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then --clear counter takes one clock cycle, here do a look ahead clear.
-          ring_rst <= '1';
-          ring_load <= '0';
-        elsif (re_source = '0' and ddi_vld = '1') or re_source = '1' then
-          ring_load <= '1';
-          ring_rst <= '0';
-          ring_wr <= '1';
-        end if;
+        ring_load <= '1';
+        ring_rst <= '0';
+        ring_wr <= '1';
       elsif conv_busy = '1' and mode_c_l = '1' then
-        if next_ring_addr = std_logic_vector(unsigned(ring_end_addr) - au_loffset(0)) then
-          ring_rst <= '1';
-          ring_load <= '0';
-        else
-          ring_load <= '1';
-          ring_rst <= '0';
-          ring_rd <= '1';
-        end if;
+        ring_load <= '1';
+        ring_rst <= '0';
+        ring_rd <= '1';
       end if;
     end if;
   end process;
@@ -855,11 +847,11 @@ begin
     case mode_latch is
       when re_mode => data0_addr_i  <= left_finaladdress;
                       data1_addr_i  <= left_finaladdress;
-                      weight_addr_i <= right_finaladdress;
+                      weight_addr_i <= right_finaladdress when bypass_reg = '0' else x"00";
                       bias_addr_i   <= bias_finaladdress; 
       when conv    => data0_addr_i  <= left_finaladdress;
                       data1_addr_i  <= left_finaladdress;
-                      weight_addr_i <= right_finaladdress;
+                      weight_addr_i <= right_finaladdress when bypass_reg = '0' else x"00";
                       bias_addr_i   <= bias_finaladdress; 
       when fft     => data0_addr_i  <= ve_fftaddr_d0;
                       data1_addr_i  <= ve_fftaddr_d1;
@@ -876,7 +868,7 @@ begin
   begin
     case mode_latch is 
       when re_mode => biasaddr_to_memory <= bias_finaladdress(5 downto 0);
-                      weightaddr_to_memory <= right_finaladdress;
+                      weightaddr_to_memory <= right_finaladdress when bypass_reg = '0' else x"00";
                       data0addr_to_memory <= left_finaladdress;
                       data1addr_to_memory <= left_finaladdress;
                       if re_source = '1' and mode_a = '1' then
@@ -887,7 +879,7 @@ begin
                         data1addr_to_memory <= bpushback_finaladdress;
                       end if;
       when conv    => biasaddr_to_memory <= bias_addr_o;
-                      weightaddr_to_memory <= weight_addr_o;
+                      weightaddr_to_memory <= weight_addr_o when bypass_reg = '0' else x"00";
                       data0addr_to_memory <= data0_addr_o;
                       data1addr_to_memory <= data1_addr_o;
       when fft     => if fft_done_pipe(10) = '1' then
@@ -919,7 +911,7 @@ begin
     --dot_cnt      <= x"00";
     --oc_cnt       <= x"00";
     fft_stages   <= "000";
-    stall        <= x"0";
+    stall        <= x"00";
     re_cnt_rst   <= '0';
     conv_cnt_rst <= '0';
     case mode_latch is
@@ -989,9 +981,9 @@ begin
   begin
     if re_busy = '0' then
       if mode_latch = conv then
-        data_read_enable_i <= rd_en_conv when mode_c_l = '0' else ring_rd;
+        data_read_enable_i <= ring_rd when mode_c_l = '1' else ddi_vld when bypass_reg = '1' else rd_en_conv;
         data_write_enable_i <= '0';
-        weight_read_enable_i <= rd_en_conv;
+        weight_read_enable_i <= rd_en_conv when bypass_reg = '0' else '0';
         weight_write_enable_i <= '0';
         read_en_b_i <= b_rd_en_conv;
       elsif mode_latch = fft then
@@ -1005,7 +997,7 @@ begin
       data_read_enable_i <= '0';
       data_write_enable_i <= dwen_from_re when mode_c_l = '0' else ring_wr;
       weight_read_enable_i <= '0';
-      weight_write_enable_i <= wwen_from_re;
+      weight_write_enable_i <= wwen_from_re when bypass_reg = '0' else '0';
       read_en_b_i <= '0';
     end if;
   end process;
@@ -1041,7 +1033,11 @@ begin
       end if;
     end if;
   end process;
-  bypass <= '0';
+
+  bypass_mux : process(all)
+  begin
+    weight <= weight_out when bypass_reg = '0' else ve_in;
+  end process;
 
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
@@ -1089,7 +1085,7 @@ begin
 --weight mem--
     buf_weight : SNPS_RF_SP_UHS_256x64
       port map (
-        Q        => weight,
+        Q        => weight_out,
         ADR      => weightaddr_to_memory,
         D        => mem_data_in,
         WE       => write_en_w_o,
@@ -1155,7 +1151,7 @@ begin
         write_en => write_en_w_o,
         d_in     => data_to_mem,
         address  => weightaddr_to_memory,
-        d_out    => weight
+        d_out    => weight_out
         );
     
     --bias mem--
@@ -1269,9 +1265,11 @@ begin
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,
+      data_valid       => ddi_vld,
       mode_a           => mode_a,
       mode_b           => mode_b,
       mode_c           => mode_c,
+      bypass           => bypass,
       config           => config,
       pp_ctl           => pp_ctl,
       dot_cnt          => ve_loop_reg,--dot_cnt,
@@ -1280,6 +1278,7 @@ begin
       bias_index_end   => bias_index_end,
       scale            => scale,
       mode_c_l         => vemode_c_l,
+      bypass_reg       => bypass_reg,
       load             => load_from_conv,
       rd_en            => rd_en_conv,
       left_rst         => lrst_from_conv,
@@ -1472,13 +1471,13 @@ begin
           if doutrd_en = '1' then
             fft_result(127 downto 64) <= data0 & data1; 
           elsif woutrd_en = '1' then
-            fft_result(127 downto 64) <= weight;
+            fft_result(127 downto 64) <= weight_out;
           end if;
         else
           if doutrd_en = '1' then
             fft_result(63 downto 0) <= data0 & data1; 
           elsif woutrd_en = '1' then
-            fft_result(63 downto 0) <= weight;
+            fft_result(63 downto 0) <= weight_out;
           end if;
         end if;
       else

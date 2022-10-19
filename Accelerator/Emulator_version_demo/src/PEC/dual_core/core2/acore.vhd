@@ -322,7 +322,7 @@ begin
   req_c2 <= req;
   req_rd_c2 <= req_rd;
   ack    <= ack_c2;
-  ready_1  <= pl(121) and not dtm_fifo_rdy;
+  ready_1  <= pl(127) and not dtm_fifo_rdy;
   dfm_rdy <= ddi_vld;
 ---------------------------------------------------------------------
 -- External test clock gating 

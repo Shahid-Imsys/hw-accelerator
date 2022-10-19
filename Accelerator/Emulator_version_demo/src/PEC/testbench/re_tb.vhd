@@ -58,7 +58,7 @@ component ve
 end component;
 
 type mem is array(511 downto 0) of std_logic_vector(127 downto 0);
-type processes is (load_para, exe, re_mode_l, re_mode_r, re_mode_b, p_mode_a, p_mode_b, conv_mode_l, conv_mode_r, conv_mode_b, mode_c, FFT);
+type processes is (load_para, exe, re_mode_l, re_mode_r, re_mode_b, p_mode_a, p_mode_b, conv_mode_l, conv_mode_r, conv_mode_b, mode_c, bypass, FFT);
 signal virtual_mem : mem;
 signal data_counter : unsigned(8 downto 0) := '0' & x"00";
 signal clk_p : std_logic;
@@ -148,9 +148,6 @@ constant ve_saddr_l : std_logic_vector(127 downto 0)       := x"0000006000000000
 constant ve_saddr_r : std_logic_vector(127 downto 0)       := x"00000070000000000000000000000000";
 constant bias_saddr : std_logic_vector(127 downto 0)       := x"00000190000000000000000000000000";
 --------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------
-constant ring_end   : std_logic_vector(127 downto 0)       := x"00000120000000000000000000000000";
-constant ring_start : std_logic_vector(127 downto 0)       := x"00000130000000000000000000000000";
 --------------------------------------------------------------------------------------------------
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant pp_ctl     : std_logic_vector(127 downto 0)       := x"00000170000000000000000000000000";
@@ -505,14 +502,14 @@ wait for 30.01 ns;
 pl <= ve_oloop;
 ybus <= x"02";
 wait for 30.01 ns;
-pl <= ring_end;
-ybus <= x"a2";
-wait for 30.01 ns;
 pl <= au_test_loffset0;
 ybus <= x"12";
 wait for 30.01 ns;
+pl <= au_test_lcmp0;
+ybus <= x"90";
+wait for 30.01 ns;
 pl <= au_test_loffset1;
-ybus <= x"01";
+ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_loffset2;
 ybus <= x"00";
@@ -521,7 +518,7 @@ pl <= au_test_loffset3;
 ybus <= x"00";
 wait for 30.01 ns;
 pl <= pp_ctl;
-ybus <= x"F9";
+ybus <= x"FD";
 pl(99) <= '1'; --cnt_rst = '1'
 wait for 30.01 ns;
 pl(95) <= '1';
@@ -530,7 +527,13 @@ wait for 30 ns;
 pl(92) <= '0';
 pl(99) <= '0'; --cnt_rst = '1'
 pl(95) <= '0'; --start
-wait for 3000 ns;
+wait for 525 ns;
+progress <= bypass;
+pl(99) <= '1';
+wait for 30 ns;
+pl(99) <= '0';
+pl(121) <= '1';
+wait for 2000 ns;
 
 
 --pl(94)<= '0';

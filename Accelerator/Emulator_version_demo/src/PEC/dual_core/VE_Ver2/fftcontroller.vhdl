@@ -31,7 +31,7 @@ entity fftcontroller is
     inst_shift   : out ppshift_shift_ctrl;
     inst_addbias : out ppshift_addbias_ctrl;
     inst_clip    : out ppshift_clip_ctrl;
-    stall        : out unsigned(3 downto 0)
+    stall        : out unsigned(7 downto 0)
     );
 end entity;
 

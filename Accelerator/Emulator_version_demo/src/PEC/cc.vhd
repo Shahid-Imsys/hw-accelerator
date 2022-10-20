@@ -46,9 +46,9 @@ use work.all;
 
 entity cluster_controller is
   generic(
-    USE_ASIC_MEMORIES   : boolean := false;
-    single_pe_sim       : boolean := true;
-    TAG_CMD_DECODE_TIME : integer := 38  --Number of clock cycles for peci_busy to deassert
+    USE_ASIC_MEMORIES   : in boolean := false;
+    single_pe_sim       : in boolean := true;
+    TAG_CMD_DECODE_TIME : in integer := 38  --Number of clock cycles for peci_busy to deassert
                                          --To be moved to defines
     );
 

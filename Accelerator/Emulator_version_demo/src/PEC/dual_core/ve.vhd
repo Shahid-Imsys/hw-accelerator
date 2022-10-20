@@ -495,7 +495,7 @@ architecture rtl of ve is
   signal weight_addr_o : std_logic_vector(7 downto 0);
   signal fft_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
-  signal not_pushback : std_logic; -- remove later
+  signal no_pushback : std_logic; -- remove later
   signal lrst         : std_logic;
   signal rrst         : std_logic;
   signal brst         : std_logic;
@@ -1050,7 +1050,7 @@ begin
     weight <= weight_out when bypass_reg = '0' else ve_in;
   end process;
 
-  not_pushback <= not pushback_en; -- remove later
+  no_pushback <= not pushback_en; -- remove later
   lrst <= rst and not left_rst;
   rrst <= rst and not right_rst;
   brst <= rst and not bias_rst;
@@ -1190,7 +1190,7 @@ begin
       clk          => clk_p,
       rst          => lrst,
       load         => left_loading,
-      en           => not_pushback,
+      en           => no_pushback,
       cmp          => au_lcmp,
       add_offset   => au_loffset,
       baseaddress  => left_baseaddress,
@@ -1202,7 +1202,7 @@ begin
       clk          => clk_p,
       rst          => rrst,
       load         => right_loading,
-      en           => not_pushback,
+      en           => no_pushback,
       cmp          => au_rcmp,
       add_offset   => au_roffset,
       baseaddress  => right_baseaddress,
@@ -1214,7 +1214,7 @@ begin
       clk          => clk_p,
       rst          => brst,
       load         => bias_loading,
-      en           => not_pushback,
+      en           => no_pushback,
       cmp          => au_bcmp,
       add_offset   => au_boffset,
       baseaddress  => bias_index_start,

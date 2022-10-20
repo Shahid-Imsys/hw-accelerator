@@ -215,9 +215,9 @@ package vetypes is
   end record;
 end package;
 
-package body vetypes is
+--package body vetypes is
   --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t is
   --begin
   --  return ppctrl_t'val(to_integer(unsigned(v)));
   --end function;
-end package body;
+--end package body;

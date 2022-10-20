@@ -424,7 +424,7 @@ begin
     elsif (rising_edge(clk_p)) then
       case speed_s is
         when "00" =>
-          din_s_int <= counter_s(1);
+          din_s_int <= counter_s(2);
         when "01" =>
           din_s_int <= counter_s(3);
         when "10" =>

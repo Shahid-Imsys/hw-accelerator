@@ -144,7 +144,7 @@ begin
           else
             right_rst <= '0';
           end if;
-        elsif start = '1' and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+        elsif start = '1' and cnt_rst = '1' and (bypass_reg = '0' or (bypass_reg = '1' and data_valid = '1')) then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
           ppinst_s <= sumfirst;
           if conv_out_p = '1' then
             inst <= firstconv;
@@ -174,7 +174,7 @@ begin
               right_rst <= '0';
             end if;
           end if;
-        elsif busy = '1' and (bypass_reg = '0' or (bypass_reg = '1' and data_valid = '1')) then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
+        elsif (busy = '1' and bypass_reg = '0') or (bypass_reg = '1' and data_valid = '1') then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
           ppinst_s <= sum;
           if conv_out_p = '1' then
             inst <= conv;
@@ -208,7 +208,7 @@ begin
               inst <= nop;
               conv_oloop <= conv_oloop;
             end if;
-          elsif conv_loop /= x"00" and (bypass_reg = '0' or (bypass_reg = '1' and data_valid = '1')) then
+          elsif (conv_loop /= x"00" and bypass_reg = '0') or (bypass_reg = '1' and data_valid = '1') then
             conv_loop <= conv_loop - 1;
             load <= '1';
             rd_en <= '1';     

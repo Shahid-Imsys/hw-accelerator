@@ -981,7 +981,7 @@ begin
   begin
     if rising_edge(clk_p) then
       mem_data_in <= ve_in;
-      bias_in <= ve_in; --Bias buffer --Always VE_IN
+      bias_in <= mem_data_in; --Bias buffer --Always VE_IN
     end if;
   end process;
 

@@ -539,6 +539,8 @@ pl(95) <= '1'; --start
 wait for 30 ns;
 pl(99) <= '0'; --cnt_rst = '1'
 pl(95) <= '0'; --start
+wait for 120 ns;
+ddi_vld <= '1';
 wait for 2000 ns;
 
 

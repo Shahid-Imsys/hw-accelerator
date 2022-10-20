@@ -416,7 +416,7 @@ architecture rtl of ve is
   signal bypass, bypass_reg    : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
-  signal bias_in    : std_logic_vector(63 downto 0);
+  signal mem_data_reg    : std_logic_vector(63 downto 0);
   signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
   signal mode_a_l  : std_logic;
   signal mode_b_l  : std_logic;
@@ -980,8 +980,8 @@ begin
   data_input: process(clk_p)
   begin
     if rising_edge(clk_p) then
-      mem_data_in <= ve_in;
-      bias_in <= mem_data_in; --Bias buffer --Always VE_IN
+      mem_data_reg <= ve_in;
+      mem_data_in <= mem_data_reg; --Bias buffer --Always VE_IN
     end if;
   end process;
 
@@ -1126,7 +1126,7 @@ begin
       port map (
         Q        => bias_buf_out,
         ADR      => biasaddr_to_memory,
-        D        => bias_in,            --writebuffer
+        D        => mem_data_in,            --writebuffer
         WE       => write_en_b_o,
         ME       => '1',
         CLK      => clk_p,
@@ -1179,7 +1179,7 @@ begin
         clk      => clk_p,
         read_en  => read_en_b_o,
         write_en => write_en_b_o,
-        d_in     => bias_in,            --writebuffer,
+        d_in     => mem_data_in,            --writebuffer,
         address  => biasaddr_to_memory,
         d_out    => bias_buf_out
         );

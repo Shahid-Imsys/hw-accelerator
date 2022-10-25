@@ -766,7 +766,7 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => vldl_2,
+      DDI_VLD     => vldl_2,--replace it with vldl in later version
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,

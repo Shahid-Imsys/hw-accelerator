@@ -276,6 +276,7 @@ architecture rtl of ve is
       bypass           : in std_logic;
       config           : in std_logic_vector(7 downto 0);
       pp_ctl           : in std_logic_vector(7 downto 0);
+      re_loop          : in std_logic_vector(7 downto 0);
       dot_cnt          : in std_logic_vector(7 downto 0);
       oc_cnt           : in std_logic_vector(7 downto 0);
       bias_au_addr     : in std_logic_vector(7 downto 0);
@@ -567,9 +568,9 @@ begin
           pb_cmp            <= (others => (others => '0'));
           pb_offset         <= (others => (others => '0'));
         elsif reg_in = CONS_RE_START_ADDR_L then
-          re_saddr_l <= YBUS;
+          re_saddr_l <= YBUS;--counter clear should be added
         elsif reg_in = CONS_RE_START_ADDR_R then
-          re_saddr_r <= YBUS;
+          re_saddr_r <= YBUS;--counter clear should be added
         elsif reg_in = CONS_RE_LC then
           re_loop_reg <= YBUS;
         elsif reg_in = CONS_DFY_ADDR_A then
@@ -577,9 +578,9 @@ begin
         elsif reg_in = CONS_DFY_ADDR_B then
           re_saddr_b <= YBUS;
         elsif reg_in = CONS_VE_START_ADDR_L then
-          ve_saddr_l <= YBUS;
+          ve_saddr_l <= YBUS;--counter clear should be added
         elsif reg_in = CONS_VE_START_ADDR_R then
-          ve_saddr_r <= YBUS;
+          ve_saddr_r <= YBUS;--counter clear should be added
         elsif reg_in = CONS_VE_LC then
           ve_loop_reg <= YBUS;
         --elsif reg_in = CONS_DFY_REG_SHIFT_IN then
@@ -591,7 +592,7 @@ begin
         elsif reg_in = CONS_RING_END then
           ring_end_addr <= YBUS;
         elsif reg_in = CONS_RING_START then
-          ring_start_addr <= YBUS;
+          ring_start_addr <= YBUS;--counter clear should be added
         elsif reg_in = CONS_ZP_DATA then
           zp_data <= YBUS;
         elsif reg_in = CONS_ZP_WEIGHT then
@@ -603,7 +604,7 @@ begin
         elsif reg_in = CONS_BIAS_INDEX_END then
           bias_index_end <= YBUS;
         elsif reg_in = CONS_BIAS_INDEX_START then
-          bias_index_start <= YBUS;
+          bias_index_start <= YBUS;--counter clear should be added
         elsif reg_in = CONS_AU_LOFFSET0 then
           au_loffset(0) <= unsigned(YBUS);
         elsif reg_in = CONS_AU_LOFFSET1 then
@@ -992,7 +993,7 @@ begin
   begin
     if re_busy = '0' then
       if mode_latch = conv then
-        data_read_enable_i <= ring_rd when mode_c_l = '1' else ddi_vld when bypass_reg = '1' else rd_en_conv;
+        data_read_enable_i <= ring_rd when mode_c_l = '1' else rd_en_conv;
         data_write_enable_i <= '0';
         weight_read_enable_i <= rd_en_conv when bypass_reg = '0' else '0';
         weight_write_enable_i <= '0';
@@ -1047,7 +1048,7 @@ begin
 
   bypass_mux : process(all)
   begin
-    weight <= weight_out when bypass_reg = '0' else ve_in;
+    weight <= weight_out when bypass_reg = '0' else mem_data_in;
   end process;
 
   no_pushback <= not pushback_en; -- remove later
@@ -1291,6 +1292,7 @@ begin
       bypass           => bypass,
       config           => config,
       pp_ctl           => pp_ctl,
+      re_loop          => re_loop_reg,
       dot_cnt          => ve_loop_reg,--dot_cnt,
       oc_cnt           => ve_oloop_reg,--oc_cnt,
       bias_au_addr     => bias_finaladdress,

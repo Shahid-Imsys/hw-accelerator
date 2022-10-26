@@ -8,7 +8,6 @@ noc2_rtl: xilinx_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Acc_data_types.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Accelerator_Top.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Byte_counter_decoder.vhd
-	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/cluster_controller.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_from_GPP.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_to_GPP.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMEM_32KX16.vhd

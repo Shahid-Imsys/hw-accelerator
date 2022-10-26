@@ -19,6 +19,7 @@ dual_core_rtl:
 					$(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x64.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhdl \
 					$(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhdl \
+					$(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhdl \
  				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatoreven.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatorodd.vhdl \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addmul.vhdl \

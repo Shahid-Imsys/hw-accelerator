@@ -164,8 +164,13 @@ begin
           else
             inst <= sum;
           end if;
-          bias_load <= '1';
-          bias_rd_en <= '1';
+          if pp_ctl(0) = '0' then
+            bias_load <= '1';
+            bias_rd_en <= '1';
+          else
+            bias_load <= '0';
+            bias_rd_en <= '0';
+          end if;
           load <= '1';
           rd_en <= '1';
           if cnt_rst = '1' then
@@ -218,8 +223,13 @@ begin
               inst <= sum;
             end if;
             ppinst_s <= sumfirst;
-            bias_load <= '1';
-            bias_rd_en <= '1';
+            if pp_ctl(0) = '0' then
+              bias_load <= '1';
+              bias_rd_en <= '1';
+            else
+              bias_load <= '0';
+              bias_rd_en <= '0';
+            end if;
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
               if conv_oloop /= x"00" then --do not reload dot products counter if out put channel counter is 0

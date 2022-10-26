@@ -51,7 +51,9 @@ entity Noc_Top is
         NOC_DATA_DIR         : out std_logic;
         NOC_DATA_EN          : out std_logic;
         NOC_WRITE_REQ        : out std_logic;        
-        IO_WRITE_ACK         : in  std_logic         	
+        IO_WRITE_ACK         : in  std_logic;
+        Enable_Root_memory_t : out std_logic;
+        RM_Data_Out_t        : out std_logic_vector(127 downto 0)
   );
 end Noc_Top;
 
@@ -398,6 +400,8 @@ architecture structural of Noc_Top is
 
 begin
 
+    RM_Data_Out_t           <= RM_Data_Out;
+
     Tag_Line        <= Tag_Line_i or Sync_pulse_i or Sync_pulse_i_p;
     
     NOC_data        <= Mux_Demux_out1 when NOC_data_mux_ctrl = '1' else Noc_data_mux;  --????????need to check code
@@ -418,6 +422,7 @@ begin
 		    
 		    PEC_WE_p2     <= PEC_WE_p1;
 		    PEC_WE_p1     <= PEC_WE;
+            Enable_Root_memory_t    <= Enable_Root_memory;		    
 		end if;	
 	end process;
 	

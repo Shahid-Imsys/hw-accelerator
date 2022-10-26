@@ -105,7 +105,8 @@ begin
             Reg_L2(2) <= (others => '0');
             Reg_L3(0) <= (others => '0');
             Reg_L3(1) <= (others => '0');
-            Reg_L4    <= (others => '0');           
+            Reg_L4    <= (others => '0');
+            RM_as_counter   <= (others => '0');             
         elsif rising_edge(clk) then
             ---LOAD L1 REGs
             if Load_IR = '1' then
@@ -158,8 +159,6 @@ begin
                 RM_as_counter   <= unsigned(RM_as);
             elsif EN_RM1 = '1' then
                 RM_as_counter   <= RM_as_counter + 1;
-            else
-                RM_as_counter   <= (others => '0'); 
             end if;
             
             --ERROR 

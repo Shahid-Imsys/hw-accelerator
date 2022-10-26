@@ -139,7 +139,7 @@ architecture Behavioral of Root_Memory is
       BC2      : in  std_logic);
   end component;
 
-  component blk_mem_gen_0
+  component root_mem
     port (
       clka    : in std_logic;
       ena     : in std_logic;
@@ -149,11 +149,6 @@ architecture Behavioral of Root_Memory is
       douta   : out std_logic_vector(127 downto 0)
     );
   end component;
-  
-  type DataOut_RM_type is array(natural range <>) of std_logic_vector(127 downto 0);
-  signal Active_RM  : integer range 0 to 3;
-  signal DataOut_RM : DataOut_RM_type(3 downto 0);
-  signal WE_RM      : std_logic_vector(3 downto 0);
 
 begin
 
@@ -169,39 +164,33 @@ begin
         end if;
     end process;
 
-    mem_enable <= (Enable or Enable_p or Enable_p2) when Write_Read_Mode = '0' else Enable;
+    mem_enable <= Enable; --(Enable or Enable_p or Enable_p2) when Write_Read_Mode = '0' else Enable;
 
 rm_asic_gen : if USE_ASIC_MEMORIES generate
-    
-    DataOut   <= DataOut_RM(Active_RM);
-    Active_RM <= to_integer(Address(14 downto 13));
-    
-    rm_gen : for i in 0 to 3 generate
-        WE_RM(i) <= we(0) when Active_RM = i else '0';
-    
-        Root_Memory_Inst : SNPS_SP_HD_8Kx128
-            port map (
-              Q        => DataOut_RM(i),
-              ADR      => std_logic_vector(Address(12 downto 0)),
-              D        => DataIn,
-              WE       => WE_RM(i),
-              ME       => '1',
-              CLK      => clk,
-              TEST1    => '0',
-              TEST_RNM => '0',
-              RME      => '0',
-              RM       => (others => '0'),
-              WA       => (others => '0'),
-              WPULSE   => (others => '0'),
-              LS       => '0',
-              BC0      => '0',
-              BC1      => '0',
-              BC2      => '0');
-        end generate;
+
+    Root_Memory_Inst : SNPS_SP_HD_8Kx128
+        port map (
+          Q        => DataOut,
+          ADR      => std_logic_vector(Address),
+          D        => DataIn,
+          WE       => we(0),
+          ME       => '1',
+          CLK      => clk,
+          TEST1    => '0',
+          TEST_RNM => '0',
+          RME      => '0',
+          RM       => (others => '0'),
+          WA       => (others => '0'),
+          WPULSE   => (others => '0'),
+          LS       => '0',
+          BC0      => '0',
+          BC1      => '0',
+          BC2      => '0');
     end generate;
+
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
     
-    Root_Memory_Inst : blk_mem_gen_0
+    Root_Memory_Inst : root_mem
     port map (
         clka      => clk,
         ena       => mem_enable,

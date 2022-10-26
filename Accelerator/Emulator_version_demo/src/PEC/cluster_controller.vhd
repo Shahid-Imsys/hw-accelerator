@@ -884,14 +884,16 @@ EVEN_P <= even_p_2;
 		end if;
 	end process;
 	--Data buffer
-	process(DATA_FROM_PE)
-	begin
-		for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
-			pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
-			pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
-			pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
-			pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
-		end loop;
+    process(clk_p)                        --DATA_FROM_PE)
+    begin
+        if rising_edge(clk_p) then
+            for i in 0 to 3 loop                                     --incoming data in formatt(a1,b1,c1,d1,a2,b2,c2,d2,a3,b3,c3,d3,a4,b4,c4,d4)
+                pe_data_in(i) <= DATA_FROM_PE(8*i+103 downto 8*i+96);--pe_data_in in format(a4,b4,c4,d4,a3,b3,c3,d3,a2,b2,c2,d2,a1,b1,c1,d1)
+                pe_data_in(i+4) <= DATA_FROM_PE(8*i+71 downto 8*i+64);
+                pe_data_in(i+8) <= DATA_FROM_PE(8*i+39 downto 8*i+32);
+                pe_data_in(i+12) <= DATA_FROM_PE(8*i+7 downto 8*i);
+            end loop;
+        end if;
 	end process;
 
 
@@ -949,7 +951,7 @@ TAG_FB <= sig_fin or delay;
 c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
            PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
 		   PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
-		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15;
+		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15 when not single_pe_sim else PE_RDY_15;
 		   
 C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	

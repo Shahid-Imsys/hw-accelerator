@@ -130,6 +130,8 @@ begin
       if RST = '0' then
         left_rst <= '0';
         right_rst <= '0';
+        bias_load <= '0';
+        bias_rd_en <= '0';
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
       elsif en = '1' then
@@ -150,8 +152,10 @@ begin
           else
             right_rst <= '0';
           end if;
-        elsif start = '1' or (data_valid = '1' and busy = '0') then--and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+        elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then--and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
           ppinst_s <= sumfirst;
+          left_rst <= '0';
+          right_rst <= '0';
           if conv_out_p = '1' then
             inst <= firstconv;
             if max_sel = '1' then
@@ -160,6 +164,8 @@ begin
           else
             inst <= sum;
           end if;
+          bias_load <= '1';
+          bias_rd_en <= '1';
           load <= '1';
           rd_en <= '1';
           if cnt_rst = '1' then
@@ -185,6 +191,8 @@ begin
         elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt) - 1)then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
           left_rst <= '0';
           right_rst <= '0';
+          bias_load <= '0';
+          bias_rd_en <= '0';
           if bypass_reg = '1' then
             if data_valid = '0' then
               load <= '0';
@@ -210,6 +218,8 @@ begin
               inst <= sum;
             end if;
             ppinst_s <= sumfirst;
+            bias_load <= '1';
+            bias_rd_en <= '1';
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
               if conv_oloop /= x"00" then --do not reload dot products counter if out put channel counter is 0
@@ -219,6 +229,8 @@ begin
             if conv_oloop = x"00" then
               load <= '0';
               rd_en <= '0';
+              bias_load <= '0';
+              bias_rd_en <= '0';
               inst <= nop;
               ppinst_s <= nop;
               conv_oloop <= conv_oloop;
@@ -255,28 +267,30 @@ begin
     end if;
   end process;
 
-  au_bias_control:process(clk)
-  begin 
-    if rising_edge(clk) then        
-      if rst = '0' then
-        bias_load <= '0';
-        bias_rd_en <= '0';
-      elsif en = '1' then
-        if o_mux_ena = '1' and load = '1' and pp_ctl(0) = '0' then
-          bias_load <= '1';
-          bias_rd_en <= '1';
-        else 
-          bias_load <= '0';
-          bias_rd_en <= '0';
-        end if;
-      end if;
-      if bias_au_addr = bias_index_end then
-        bias_rst <= '1';
-      else  
-        bias_rst <= '0';
-      end if;
-    end if;
-  end process;
+  --au_bias_control:process(clk)
+  --begin 
+  --  if rising_edge(clk) then        
+  --    if rst = '0' then
+  --      bias_load <= '0';
+  --      bias_rd_en <= '0';
+  --      bias_rst <= '1';
+  --    elsif en = '1' then
+  --      bias_rst <= '0';
+  --      if conv and pp_ctl(0) = '0' then
+  --        bias_load <= '1';
+  --        bias_rd_en <= '1';
+  --      else 
+  --        bias_load <= '0';
+  --        bias_rd_en <= '0';
+  --      end if;
+  --    end if;
+  --    --if bias_au_addr = bias_index_end then
+  --    --  bias_rst <= '1';
+  --    --else  
+  --    --  bias_rst <= '0';
+  --    --end if;
+  --  end if;
+  --end process;
   
   process(clk)
   begin
@@ -390,7 +404,7 @@ end process;
             stall <= x"00";
           end if;
         elsif bypass_reg = '1' then
-          if (conv_oloop /= x"00" or conv_loop /= x"00") and data_valid = '0' then --pause the ve 
+          if (conv_oloop /= x"00" or conv_loop /= x"00") and data_valid = '0' and busy = '1' then --pause the ve 
             stall <= unsigned(re_loop);
           elsif data_valid = '1' then
             stall <= x"00";

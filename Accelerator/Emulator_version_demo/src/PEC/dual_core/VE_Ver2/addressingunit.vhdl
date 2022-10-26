@@ -29,6 +29,9 @@ architecture addressing of addressing_unit is
   signal rst_second  : std_logic;
   signal rst_fourth  : std_logic;
   signal rst_third   : std_logic;
+  ------ attributes for synthesis -------
+  attribute ram_style : string;
+  attribute ram_style of counters : signal is "registers";
   --signal done_int    : std_logic;
   --signal clockcycle  : integer         := 0;
 

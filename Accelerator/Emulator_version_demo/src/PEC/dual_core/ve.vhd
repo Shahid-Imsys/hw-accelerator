@@ -414,7 +414,7 @@ architecture rtl of ve is
   signal data1  : std_logic_vector(31 downto 0);
   signal weight, weight_out  : std_logic_vector(63 downto 0);
   signal bias_buf_out : std_logic_vector(63 downto 0);
-  signal bypass, bypass_reg    : std_logic;
+  signal bypass, bypass_reg, rcving_data, bypass_valid : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
   signal mem_data_reg    : std_logic_vector(63 downto 0);
@@ -709,7 +709,7 @@ begin
       if rst = '0' then
         ve_rdy <= '1';
       elsif clk_e_pos = '0' then
-        ve_rdy <= not conv_busy and fft_done;--fft_done_pipe(10);
+        ve_rdy <= not conv_busy;-- and fft_done;--fft_done_pipe(10);
       end if;
     end if;
   end process;
@@ -926,11 +926,14 @@ begin
     stall        <= x"00";
     re_cnt_rst   <= '0';
     conv_cnt_rst <= '0';
+    bypass_valid    <= '0';
+    rcving_data  <= '0';
     case mode_latch is
       when conv    => conv_start   <= start;
                       conv_cnt_rst <= cnt_rst;
                       --dot_cnt      <= ve_loop_reg;
                       --oc_cnt       <= ve_oloop_reg;
+                      bypass_valid    <= DDI_VLD;
                       stall        <= conv_stall;
                       left_rst     <= lrst_from_conv when mode_c_l = '0' else ring_rst;
                       right_rst    <= rrst_from_conv;
@@ -940,6 +943,7 @@ begin
                       stall        <= fft_stall;
       when re_mode => re_start     <= start;
                       re_cnt_rst   <= cnt_rst;
+                      rcving_data  <= DDI_VLD;
                       left_rst     <= lrst_from_re when mode_c_l = '0' else ring_rst;
                       right_rst    <= rrst_from_re;
                       bias_rst     <= brst_from_re;
@@ -1254,7 +1258,7 @@ begin
       mode_a          => mode_a,
       mode_b          => mode_b,
       mode_c          => mode_c,
-      data_valid      => DDI_VLD,
+      data_valid      => rcving_data,
       re_start        => re_start,
       re_source       => re_source,
       cnt_rst         => re_cnt_rst,
@@ -1285,7 +1289,7 @@ begin
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,
-      data_valid       => ddi_vld,
+      data_valid       => bypass_valid,
       mode_a           => mode_a,
       mode_b           => mode_b,
       mode_c           => mode_c,

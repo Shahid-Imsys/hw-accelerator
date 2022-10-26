@@ -545,7 +545,7 @@ wait for 120 ns;
 ddi_vld <= '1';
 wait for 135 ns;
 ddi_vld <= '0';
-wait for 2000 ns;
+wait for 20000 ns;
 
 
 --pl(94)<= '0';

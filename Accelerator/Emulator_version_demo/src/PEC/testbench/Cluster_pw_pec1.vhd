@@ -102,7 +102,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM_B : data_in_b;
         variable RAM :data_in;
         begin
-          for i in 0 to 4095 loop
+          for i in 0 to 4031 loop--4095 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -144,7 +144,7 @@ architecture Behavioral of Cluster_sim is
         variable RAM_B : res_out_b;
         variable RAM :result_out;
         begin
-          for i in 0 to 18431 loop
+          for i in 0 to 143 loop--18431 loop
             readline(ram_file, ram_file_line);
             read(ram_file_line, RAM_B(i));
             RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -161,12 +161,12 @@ architecture Behavioral of Cluster_sim is
 	    return mem;
 	    end function;
 
-signal ucode_pw  : ram_type := init_ram_from_file("test_mp_pec.ascii");--("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
-signal data_pw   : data_in := init_input_from_file("test_in_pec_1.ascii");
-signal kernel_pw : kernels_in := init_kernel_from_file("test_k_pec.ascii");
-signal bias_pw   : bias_in := init_bias_from_file("test_bias_pec.ascii");
-signal param_pw  : param_in := init_param_from_file("test_params_pec.ascii");
-signal ref_out   : result_out := init_out_from_file("test_out_pec_1.ascii");
+signal ucode_pw  : ram_type := init_ram_from_file("Pointwise_expand_v20.ascii");--("test_mp_pec.ascii");--("mpmem_dual_core.data");--("mpmem.data");--("test_mp.ascii");
+signal data_pw   : data_in := init_input_from_file("pw_data_pec_1_64x32x32.ascii");--("test_in_pec_1.ascii");
+signal kernel_pw : kernels_in := init_kernel_from_file("CM_kernels_pwe_u8.ascii");--("test_k_pec.ascii");
+signal bias_pw   : bias_in := init_bias_from_file("CM_bias_pwe_s16.ascii");--("test_bias_pec.ascii");
+signal param_pw  : param_in := init_param_from_file("CM_params.ascii");--("test_params_pec.ascii");
+signal ref_out   : result_out := init_out_from_file("pw_ref_4x4x144.ascii");--("test_out_pec_1.ascii");
 signal clk_e_neg_i : std_logic;
 signal tag_in  : std_logic;
 signal tag_out : std_logic;
@@ -201,8 +201,8 @@ constant ucode_len  : std_logic_vector(14 downto 0) := "000000011111111";--255, 
 constant param_len  : std_logic_vector(14 downto 0) := "000000000111111";--63, 64 words
 constant kernels_len: std_logic_vector(14 DOWNTO 0) := "000000011010111";--215, 216 words
 constant bias_len   : std_logic_vector(14 DOWNTO 0) := "000000000010001";--17, 18 words
-constant data_len   : std_logic_vector(14 DOWNTO 0) := "000111111111111";--4095, 4096 WORDS
-constant pw_out_len : std_logic_vector(14 downto 0) := "100011111111111";--18431, 18432 WORDS.
+constant data_len   : std_logic_vector(14 DOWNTO 0) := "000111110111111";--"000111111111111";--4095, 4096 WORDS
+constant pw_out_len : std_logic_vector(14 downto 0) := "000000101000011";--"100011111111111";--18431, 18432 WORDS.
 constant CLK_P_CYCLE : time := 15 ns;
 constant CLK_E_CYCLE : time := 30 ns;
 
@@ -504,10 +504,10 @@ tag_in <= '0';
 wait until rising_edge(clk_e);
 wait for 5 ns;
 progress <=4095;
-for i in 0 to 4094 loop
+for i in 0 to 4030 loop--4094 loop
   sendmemword(conv_to_memword(data_pw(i)));
 end loop;
-  sendlastmemword(conv_to_memword(data_pw(4095)));
+  sendlastmemword(conv_to_memword(data_pw(4031)));--4095)));
 progress <=7;
 wait until tag_fb = '0';
 wait until rising_edge(clk_e);
@@ -672,7 +672,7 @@ wait for 5 ns;
 wait until rising_edge(clk_e);
 wait for 5 ns;
 
-for i in 0 to 18431 loop
+for i in 0 to 143 loop--18431 loop
   sendreadpulse;
 end loop;
 
@@ -716,7 +716,7 @@ process
   procedure readmemword (signal outword : out out_word) is
   begin
     wait until ddo_vld = '1';
-    for i in 0 to 294911 loop
+    for i in 0 to 2303 loop--294911 loop
     outword(i) <= data_out;
     wait until rising_edge(clk_e);
   wait for 5ns;
@@ -726,7 +726,7 @@ begin
   readmemword(outword);
 
               
-  for i in 0 to 18431 loop
+  for i in 0 to 143 loop--18431 loop
     out_ram(i) <= outword(16*i) & outword(16*i+1) & outword(16*i+2) & outword(16*i+3) & 
                   outword(16*i+4) & outword(16*i+5) & outword(16*i+6) & outword(16*i+7) &
                   outword(16*i+8) & outword(16*i+9) & outword(16*i+10) & outword(16*i+11) &

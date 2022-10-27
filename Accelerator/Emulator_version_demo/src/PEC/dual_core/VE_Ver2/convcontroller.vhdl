@@ -138,7 +138,7 @@ begin
         if cnt_rst = '1' and clk_e_pos = '1' then
           conv_loop <= unsigned(dot_cnt) - 1;
           if oc_cnt = x"00" then
-            conv_oloop <= x"01";
+            conv_oloop <= x"00";
           else
             conv_oloop <= unsigned(oc_cnt) - 1;
           end if;
@@ -176,7 +176,7 @@ begin
           if cnt_rst = '1' then
             conv_loop <= unsigned(dot_cnt) - 1;
             if oc_cnt = x"00" then
-              conv_oloop <= x"01";
+              conv_oloop <= x"00";
             else
               conv_oloop <= unsigned(oc_cnt) - 1;
             end if;
@@ -270,6 +270,8 @@ begin
         else
           load <= '0';
           rd_en <= '0';
+          bias_load <= '0';
+          bias_rd_en <= '0';
           inst <= nop;
           ppinst_s <= nop;
         end if;

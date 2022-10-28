@@ -22,7 +22,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity Accelerator_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
+      USE_ASIC_MEMORIES      : boolean := true
     );
     Port (
 	    clk                  : in  std_logic;
@@ -54,7 +54,7 @@ architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
+      USE_ASIC_MEMORIES      : boolean := true
     );
     Port(
 	    clk                  : in  std_logic;

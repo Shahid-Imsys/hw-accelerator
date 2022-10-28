@@ -69,7 +69,7 @@ architecture Behavioral of Root_Memory is
     );
   end component;
 
-  signal we           : std_logic;
+  signal we           : std_logic_vector(0 downto 0);
   signal Address      : unsigned(14 downto 0);
   signal RM_FF        : std_logic;
   signal Enable_p     : std_logic;
@@ -83,7 +83,7 @@ architecture Behavioral of Root_Memory is
 
 begin
 
-we <= Write_Read_Mode;
+we(0) <= Write_Read_Mode;
 
 process (clk, Reset)
 begin

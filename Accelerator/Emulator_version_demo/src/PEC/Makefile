@@ -9,8 +9,7 @@ pec_rtl: dual_core_rtl ip mem_comp
 			 	  $(PEC_DIR_WIN)/req_dis_logic.vhd
 
 ip:
-	$(COMP) $(COMP_RTL_FLAGS) $(PEC_DIR_WIN)/xilinx\ IP/PEC\ IPs/c_accum_0/c_accum_0_sim_netlist.vhdl \
-				  $(PEC_DIR_WIN)/arithmetic\ IP/fifo.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(PEC_DIR_WIN)/arithmetic\ IP/fifo.vhd
 
 include $(PEC_DIR)/dual_core/Makefile
 include $(PROJECT_PATH)/IP/Synopsys/Makefile

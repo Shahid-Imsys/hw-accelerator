@@ -215,7 +215,7 @@ architecture rtl of digital_core is
 
   component Accelerator_Top is
     Generic(
-        g_memory_type        : memory_type_t := asic
+        USE_ASIC_MEMORIES    : boolean := false
     );
     port (
 	    clk                  : in  std_logic;
@@ -284,7 +284,7 @@ begin  -- architecture rtl
   
   Accelerator_Top_inst : Accelerator_Top
     generic map(
-      g_memory_type => g_memory_type )
+      USE_ASIC_MEMORIES => g_memory_type /= fpga )
     port map (
       clk           => clk_noc,
       Reset         => cpu_rst_n,

@@ -33,6 +33,7 @@ use work.cluster_pkg.all;
 --use UNISIM.VComponents.all;
 
 entity PEC_top is
+  generic ( USE_ASIC_MEMORIES : boolean := true );
   Port ( 
 	  CLK_P    : in std_logic;
 	  CLK_E    : in std_logic;
@@ -129,6 +130,7 @@ component req_dst_logic
 	end component;
 
 component PE_pair_top
+    generic ( USE_ASIC_MEMORIES : boolean := true );
 	port(
 	HCLK       : in    std_logic;                  -- clk input, use this or an internally generated clock for CPU core
     EVEN_C     : in    std_logic;
@@ -265,6 +267,8 @@ port map(
     PE_DATA_OUT   => pe_data_out_i
 );
 pe_pair_1: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(15),
     C1_REQ_RD  => req_rd_i(15),
@@ -301,6 +305,8 @@ port map(
     MWAKEUP_LP => '0' 
 );
 pe_pair_2: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(13),
     C1_REQ_RD  => req_rd_i(13),
@@ -337,6 +343,8 @@ port map(
     MWAKEUP_LP => '0'
 );
 pe_pair_3: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(11),
     C1_REQ_RD  => req_rd_i(11),
@@ -373,6 +381,8 @@ port map(
     MWAKEUP_LP => '0' 
 );
 pe_pair_4: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(9),
     C1_REQ_RD  => req_rd_i(9),
@@ -409,6 +419,8 @@ port map(
     MWAKEUP_LP => '0'
 );
 pe_pair_5: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(7),
     C1_REQ_RD  => req_rd_i(7),
@@ -445,6 +457,8 @@ port map(
     MWAKEUP_LP => '0' 
 );
 pe_pair_6: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(5),
     C1_REQ_RD  => req_rd_i(5),
@@ -481,6 +495,8 @@ port map(
     MWAKEUP_LP => '0' 
 );
 pe_pair_7: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(3),
     C1_REQ_RD  => req_rd_i(3),
@@ -517,6 +533,8 @@ port map(
     MWAKEUP_LP => '0'  
 );
 pe_pair_8: PE_pair_top
+generic map(
+    USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
 port map(
 	C1_REQ     => req_sig_i(1),
     C1_REQ_RD  => req_rd_i(1),

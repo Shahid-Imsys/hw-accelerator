@@ -1341,6 +1341,7 @@ end generate;
     p3_sr         => p3_sr                --: out std_logic; -- Slew rate limit on port group 3 pins
     );
   core2 : entity work.pe1_acore
+  generic map ( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
   port map(
 ---------------------------------------------------------------------
     -- Signals to/from other blocks

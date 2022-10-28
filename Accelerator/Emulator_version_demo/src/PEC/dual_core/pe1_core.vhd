@@ -50,6 +50,7 @@ use ieee.std_logic_1164.all;
 use work.all;
 
 entity pe1_core is
+  generic ( USE_ASIC_MEMORIES : boolean := true );
   port (
 ---------------------------------------------------------------------
     -- Signals to/from other blocks
@@ -1291,8 +1292,9 @@ begin
 ---------------------------------------------------------------------
 -- VE
 ---------------------------------------------------------------------
-      vector_engine : entity work.ve
-      port map(
+  vector_engine : entity work.ve
+    generic map( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES ) 
+    port map(
       CLK_P       => clk_p,
       CLK_E_POS   => clk_e_pos_int,
       CLK_E_NEG   => clk_e_neg_int,

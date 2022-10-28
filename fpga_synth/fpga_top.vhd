@@ -455,7 +455,7 @@ begin
     generic map (
       g_memory_type     => fpga,
       g_simulation      => false,
-      g_clock_frequency => 100          -- Frequency in MHz
+      g_clock_frequency => 100 -- Frequency in MHz
       )
     port map (
       hclk        => HCLK,

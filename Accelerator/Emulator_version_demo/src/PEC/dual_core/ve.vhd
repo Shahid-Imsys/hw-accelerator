@@ -41,7 +41,7 @@ use work.vetypes.all;
 
 entity ve is
   generic(
-    USE_ASIC_MEMORIES : boolean := false
+    USE_ASIC_MEMORIES : boolean := true
     );
   port(
     --Control inputs

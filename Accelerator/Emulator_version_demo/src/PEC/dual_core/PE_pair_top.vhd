@@ -1105,6 +1105,8 @@ end generate;
 --  -- Real time clock  !!! SEPARATELY POWERED !!!
 --  -----------------------------------------------------------------------------
     rtc0: entity work.pe1_rtc
+     generic map (
+      USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
      port map(
       pllout    => HCLK                     ,
       lp_pwr_ok => lp_pwr_ok                ,
@@ -1145,6 +1147,7 @@ end generate;
   -- pe1_core
   -----------------------------------------------------------------------------
   core1: entity work.pe1_core
+    generic map ( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
     port map(
     -- Clocks to/from clock block
     clk_p         => HCLK             , --: in  std_logic;  -- PLL clock

@@ -240,20 +240,6 @@ architecture rtl of rtc is
       );
   end component;
 
-  component ram_memory is
-    generic (
-      g_memory_type : memory_type_t := asic);
-    port (
-      clk     : in  std_logic;
-      address : in  std_logic_vector(13 downto 0);
-      ram_di  : in  std_logic_vector(7 downto 0);
-      ram_do  : out std_logic_vector(7 downto 0);
-      we_n    : in  std_logic;
-      cs      : in  std_logic
-      );
-
-  end component;
-
   component memory_1024x8 is
     generic (
       g_memory_type : memory_type_t := asic);

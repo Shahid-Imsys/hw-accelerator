@@ -329,18 +329,10 @@ architecture rtl of fpga_top is
   signal clk_200m : std_logic;
   signal clk_100m : std_logic;
   signal clk_50m  : std_logic;
-
   signal clk_noc  : std_logic;
-
-  signal led_clk : std_logic;
+  signal led_clk  : std_logic;
 
   signal counter34 : unsigned(33 downto 0) := (others => '0');
-
-  attribute mark_debug                : string;
-  attribute mark_debug of OSPI_DQ_i   : signal is "true";
-  attribute mark_debug of OSPI_RWDS_i : signal is "true";
-  attribute mark_debug of OSPI_DQ_e   : signal is "true";
-  attribute mark_debug of OSPI_RWDS_e : signal is "true";
 
 begin
 

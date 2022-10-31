@@ -833,14 +833,20 @@ begin
       when re_mode => left_baseaddress  <= re_saddr_l when mode_c_l = '0' else ring_start_addr;                                                    
                       right_baseaddress <= re_saddr_r; 
                       left_loading(0) <= lload_from_re when mode_c_l = '0' else ring_load;
+                      left_loading(3 downto 1) <= "000"; -- not use currently
                       right_loading(0) <= rload_from_re;
+                      right_loading(3 downto 1) <= "000"; -- not use currently
                       bias_loading(0) <= bload_from_re;
+                      bias_loading(3 downto 1) <= "000"; -- not use currently
       when conv    => left_baseaddress  <= ve_saddr_l when mode_c_l = '0' else ring_start_addr;
                       right_baseaddress <= ve_saddr_r;
                       left_loading(0) <= load_from_conv when mode_c_l = '0' else ring_load;
                       left_loading(1) <= ext_load;
+                      left_loading(3 downto 2) <= "00"; -- not use currently
                       right_loading(0) <= load_from_conv;
+                      right_loading(3 downto 1) <= "000"; -- not use currently
                       bias_loading(0) <= bload_from_conv;
+                      bias_loading(3 downto 1) <= "000"; -- not use currently
       when others  => left_baseaddress  <= x"00";
                       right_baseaddress <= x"00";
                       left_loading <= x"0";
@@ -899,7 +905,8 @@ begin
                       weightaddr_to_memory <= weight_addr_o when bypass_reg = '0' else x"00";
                       data0addr_to_memory <= data0_addr_o;
                       data1addr_to_memory <= data1_addr_o;
-      when fft     => if fft_done_pipe(10) = '1' then
+      when fft     => biasaddr_to_memory <= bias_addr_o;
+                      if fft_done_pipe(10) = '1' then
                         weightaddr_to_memory <= rdout_addr_weight;
                         data0addr_to_memory  <= rdout_addr_data;
                         data1addr_to_memory  <= rdout_addr_data;
@@ -1012,6 +1019,12 @@ begin
         data_write_enable_i <= fft_write_en;
         weight_read_enable_i <= fft_read_en;
         weight_write_enable_i <= fft_write_en;
+        read_en_b_i <= '0';
+      else
+        data_read_enable_i <= '0';
+        data_write_enable_i <= '0';
+        weight_read_enable_i <= '0';
+        weight_write_enable_i <= '0';
         read_en_b_i <= '0';
       end if;
     else

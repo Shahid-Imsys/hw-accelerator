@@ -299,8 +299,8 @@ begin
           --when read_address =>
 
         when ts_noctest =>
-          byte_offset := byte_cnt / 64;
-          expected_byte := (byte_cnt + byte_offset) mod 256;
+          byte_offset := byte_cnt / 256;
+          expected_byte := (byte_cnt + 4 * byte_offset) mod 256;
 
           write(l, string'(" Got 0x"));
           hwrite(l, std_logic_vector(to_unsigned(received_byte, 8)));

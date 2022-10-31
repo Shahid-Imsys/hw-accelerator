@@ -147,7 +147,7 @@ begin
         RM_Data_Out_t           => RM_Data_Out_t 
     );     
 
-  pec_gen : for i in 0 to 1 generate
+  pec_gen : for i in 0 to 0 generate
     PEC_top_Inst : PEC_top
     Generic map(
       USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES

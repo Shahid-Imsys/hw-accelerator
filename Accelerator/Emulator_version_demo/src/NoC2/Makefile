@@ -22,6 +22,7 @@ noc2_rtl: xilinx_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Switch.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Tag_Line_Block.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Transpose_unit.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/RM_as_generator.vhd
 
 xilinx_ip:
 	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v

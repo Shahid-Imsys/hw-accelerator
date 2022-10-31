@@ -50,6 +50,12 @@ end PEC_top;
 architecture struct of PEC_top is
 
 component cluster_controller
+generic(
+    USE_ASIC_MEMORIES   : boolean := false;
+    single_pe_sim       : boolean := true;
+    TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
+                                            --To be moved to defines
+);
 port(
 --Clock inputs
 	  CLK_P        : in std_logic;     --PE clocks
@@ -201,6 +207,11 @@ begin
     ------------------END----------------------------
 
 cc: cluster_controller
+generic map (
+    USE_ASIC_MEMORIES   => USE_ASIC_MEMORIES
+--    single_pe_sim       => -- no flow of generics, use defaults
+--    TAG_CMD_DECODE_TIME => -- no flow of generics, use defaults
+)
 port map(
 	CLK_P => clk_p,
 	CLK_E => clk_e,

@@ -218,14 +218,15 @@ architecture rtl of ve is
       simulation : boolean := true
       );
     port(
-      clk          : in std_logic;
-      rst          : in std_logic;
-      en           : in std_logic;
-      load         : in std_logic;
-      cmp          : in au_param;
-      add_offset   : in au_param;
-      baseaddress  : in std_logic_vector(7 downto 0);
-      finaladdress : out std_logic_vector(7 downto 0)
+      clk           : in std_logic;
+      rst           : in std_logic;
+      en            : in std_logic;
+      ext_tigger_en : in std_logic;
+      load          : in std_logic_vector(3 downto 0);
+      cmp           : in au_param;
+      add_offset    : in au_param;
+      baseaddress   : in std_logic_vector(7 downto 0);
+      finaladdress  : out std_logic_vector(7 downto 0)
     );
   end component;
 
@@ -291,6 +292,7 @@ architecture rtl of ve is
       bias_load        : out std_logic; 
       bias_rd_en       : out std_logic;
       bias_rst         : out std_logic;
+      ext_load         : out std_logic;
       enable_shift     : out std_logic;
       enable_add_bias  : out std_logic;
       enable_clip      : out std_logic;
@@ -377,14 +379,16 @@ architecture rtl of ve is
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
   signal fft_en, fft_done, finalstage : std_logic;
-  signal left_loading, right_loading, bias_loading : std_logic;
+  signal left_loading, right_loading, bias_loading : std_logic_vector(3 downto 0);
   signal left_rst, right_rst, bias_rst : std_logic;
   signal lrst_from_conv, rrst_from_conv, brst_from_conv : std_logic;
   signal lrst_from_re, rrst_from_re, brst_from_re : std_logic;
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
-  signal apushback_load, bpushback_load, apushback_rst, bpushback_rst : std_logic;
-  signal ring_load, ring_rst, ring_rd, ring_wr : std_logic;
+  signal apushback_load, bpushback_load : std_logic_vector(3 downto 0); 
+  signal apushback_rst, bpushback_rst : std_logic;
+  signal ring_load, ring_rst, ring_rd, ring_wr, ext_load : std_logic;
+  signal ext_tigger_en : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
@@ -828,19 +832,20 @@ begin
     case mode_latch is 
       when re_mode => left_baseaddress  <= re_saddr_l when mode_c_l = '0' else ring_start_addr;                                                    
                       right_baseaddress <= re_saddr_r; 
-                      left_loading <= lload_from_re when mode_c_l = '0' else ring_load;
-                      right_loading <= rload_from_re;
-                      bias_loading <= bload_from_re;
+                      left_loading(0) <= lload_from_re when mode_c_l = '0' else ring_load;
+                      right_loading(0) <= rload_from_re;
+                      bias_loading(0) <= bload_from_re;
       when conv    => left_baseaddress  <= ve_saddr_l when mode_c_l = '0' else ring_start_addr;
                       right_baseaddress <= ve_saddr_r;
-                      left_loading <= load_from_conv when mode_c_l = '0' else ring_load;
-                      right_loading <= load_from_conv;
-                      bias_loading <= bload_from_conv;
+                      left_loading(0) <= load_from_conv when mode_c_l = '0' else ring_load;
+                      left_loading(1) <= ext_load;
+                      right_loading(0) <= load_from_conv;
+                      bias_loading(0) <= bload_from_conv;
       when others  => left_baseaddress  <= x"00";
                       right_baseaddress <= x"00";
-                      left_loading <= '0';
-                      right_loading <= '0';
-                      bias_loading <= '0';
+                      left_loading <= x"0";
+                      right_loading <= x"0";
+                      bias_loading <= x"0";
     end case;
   end process;
 
@@ -1062,6 +1067,7 @@ begin
   parst <= rst and not apushback_rst;
   pbrst <= rst and not bpushback_rst;
   en_conv <= en_o and not pushback_en;
+  ext_tigger_en <= mode_c_l;-- or other function enable
 
 ---------------------------------------------------------------
 --MEM, Multiplier and accumulator IPs
@@ -1194,8 +1200,9 @@ begin
     port map(
       clk          => clk_p,
       rst          => lrst,
-      load         => left_loading,
       en           => no_pushback,
+      ext_tigger_en => ext_tigger_en,
+      load         => left_loading,  
       cmp          => au_lcmp,
       add_offset   => au_loffset,
       baseaddress  => left_baseaddress,
@@ -1204,50 +1211,54 @@ begin
 
   weight_addressing : addressing_unit
     port map(
-      clk          => clk_p,
-      rst          => rrst,
-      load         => right_loading,
-      en           => no_pushback,
-      cmp          => au_rcmp,
-      add_offset   => au_roffset,
-      baseaddress  => right_baseaddress,
-      finaladdress => right_finaladdress
+      clk           => clk_p,
+      rst           => rrst,
+      en            => no_pushback,
+      ext_tigger_en => ext_tigger_en,
+      load          => right_loading,
+      cmp           => au_rcmp,
+      add_offset    => au_roffset,
+      baseaddress   => right_baseaddress,
+      finaladdress  => right_finaladdress
     );
 
   bias_addressing : addressing_unit
     port map(
-      clk          => clk_p,
-      rst          => brst,
-      load         => bias_loading,
-      en           => no_pushback,
-      cmp          => au_bcmp,
-      add_offset   => au_boffset,
-      baseaddress  => bias_index_start,
-      finaladdress => bias_finaladdress
+      clk           => clk_p,
+      rst           => brst,
+      en            => no_pushback,
+      ext_tigger_en => ext_tigger_en,
+      load          => bias_loading,
+      cmp           => au_bcmp,
+      add_offset    => au_boffset,
+      baseaddress   => bias_index_start,
+      finaladdress  => bias_finaladdress
     );
 
     pushback_a : addressing_unit
     port map(
-      clk          => clk_p,
-      rst          => parst,
-      load         => apushback_load,
-      en           => pushback_en,
-      cmp          => pa_cmp,
-      add_offset   => pa_offset,
-      baseaddress  => re_saddr_a,
-      finaladdress => apushback_finaladdress
+      clk           => clk_p,
+      rst           => parst,
+      en            => pushback_en,
+      ext_tigger_en => ext_tigger_en,
+      load          => apushback_load,
+      cmp           => pa_cmp,
+      add_offset    => pa_offset,
+      baseaddress   => re_saddr_a,
+      finaladdress  => apushback_finaladdress
     );
 
     pushback_b : addressing_unit
     port map(
-      clk          => clk_p,
-      rst          => pbrst,
-      load         => bpushback_load,
-      en           => pushback_en,
-      cmp          => pb_cmp,
-      add_offset   => pb_offset,
-      baseaddress  => re_saddr_b,
-      finaladdress => bpushback_finaladdress
+      clk           => clk_p,
+      rst           => pbrst,
+      en            => pushback_en,
+      ext_tigger_en => ext_tigger_en,
+      load          => bpushback_load,
+      cmp           => pb_cmp,
+      add_offset    => pb_offset,
+      baseaddress   => re_saddr_b,
+      finaladdress  => bpushback_finaladdress
     );
 
   re_i : re
@@ -1277,8 +1288,8 @@ begin
       bias_load       => bload_from_re,
       apushback_rst   => apushback_rst,
       bpushback_rst   => bpushback_rst,
-      apushback_load  => apushback_load,
-      bpushback_load  => bpushback_load
+      apushback_load  => apushback_load(0),
+      bpushback_load  => bpushback_load(0)
     );
 
   convcontroller_i : convcontroller
@@ -1311,6 +1322,7 @@ begin
       bias_load        => bload_from_conv,
       bias_rd_en       => b_rd_en_conv,
       bias_rst         => brst_from_conv,
+      ext_load         => ext_load,
       enable_shift     => shifter_ena,
       enable_add_bias  => adder_ena,
       enable_clip      => clip_ena,

@@ -36,6 +36,7 @@ entity convcontroller is
     bias_load        : out std_logic; 
     bias_rd_en       : out std_logic;
     bias_rst         : out std_logic;
+    ext_load         : out std_logic;
     enable_shift     : out std_logic;
     enable_add_bias  : out std_logic;
     enable_clip      : out std_logic;
@@ -223,6 +224,7 @@ begin
               inst <= sum;
             end if;
             ppinst_s <= sumfirst;
+            ext_load <= '0';
             if pp_ctl(0) = '0' then
               bias_load <= '1';
               bias_rd_en <= '1';
@@ -248,9 +250,13 @@ begin
           elsif conv_loop /= x"00" then
             conv_loop <= conv_loop - 1;
             load <= '1';
-            rd_en <= '1';     
+            rd_en <= '1';    
+            ext_load <= '0'; 
             if conv_loop = x"01" then
               ppinst_s <= sum;
+              if mode_c_l = '1' then
+                ext_load <= '1';
+              end if;
               if config(2) = '1' then 
                 left_rst <= '1';
               end if;
@@ -279,30 +285,6 @@ begin
     end if;
   end process;
 
-  --au_bias_control:process(clk)
-  --begin 
-  --  if rising_edge(clk) then        
-  --    if rst = '0' then
-  --      bias_load <= '0';
-  --      bias_rd_en <= '0';
-  --      bias_rst <= '1';
-  --    elsif en = '1' then
-  --      bias_rst <= '0';
-  --      if conv and pp_ctl(0) = '0' then
-  --        bias_load <= '1';
-  --        bias_rd_en <= '1';
-  --      else 
-  --        bias_load <= '0';
-  --        bias_rd_en <= '0';
-  --      end if;
-  --    end if;
-  --    --if bias_au_addr = bias_index_end then
-  --    --  bias_rst <= '1';
-  --    --else  
-  --    --  bias_rst <= '0';
-  --    --end if;
-  --  end if;
-  --end process;
   
   process(clk)
   begin

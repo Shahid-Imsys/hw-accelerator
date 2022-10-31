@@ -11,14 +11,15 @@ entity addressing_unit is
     simulation : boolean := true
   );
   port(
-    clk : in std_logic;
-    rst : in std_logic;
-    en  : in std_logic;
-    load : in std_logic;
-    cmp        : in au_param;
-    add_offset : in au_param;
-    baseaddress : in std_logic_vector(7 downto 0);
-    finaladdress : out std_logic_vector(7 downto 0)
+    clk           : in std_logic;
+    rst           : in std_logic;
+    en            : in std_logic;
+    ext_tigger_en : in std_logic;
+    load          : in std_logic_vector(3 downto 0);
+    cmp           : in au_param;
+    add_offset    : in au_param;
+    baseaddress   : in std_logic_vector(7 downto 0);
+    finaladdress  : out std_logic_vector(7 downto 0)
   );
 end entity;
 
@@ -29,15 +30,18 @@ architecture addressing of addressing_unit is
   signal rst_second  : std_logic;
   signal rst_fourth  : std_logic;
   signal rst_third   : std_logic;
+  signal load_second : std_logic; 
+  signal load_third  : std_logic; 
+  signal load_fourth : std_logic; 
   ------ attributes for synthesis -------
   attribute ram_style : string;
   attribute ram_style of counters : signal is "registers";
   --signal done_int    : std_logic;
   --signal clockcycle  : integer         := 0;
 
-  alias load_second : std_logic is rst_first;
-  alias load_third  : std_logic is rst_second;
-  alias load_fourth : std_logic is rst_third;
+  --alias load_second : std_logic is rst_first;
+  --alias load_third  : std_logic is rst_second;
+  --alias load_fourth : std_logic is rst_third;
   alias first       : unsigned is counters(0);
   alias second      : unsigned is counters(1);
   alias third       : unsigned is counters(2);
@@ -45,9 +49,9 @@ architecture addressing of addressing_unit is
 
 begin
 
-  --second <= second_int when addon_off(0) = '0' else x"00";
-  --third <= third_int when addon_off(1) = '0' else x"00";
-  --fourth <= fourth_int when addon_off(2) = '0' else x"00";
+  load_second <= load(1) when ext_tigger_en = '1' else rst_first;
+  load_third  <= load(2) when ext_tigger_en = '1' else rst_second;
+  load_fourth <= load(3) when ext_tigger_en = '1' else rst_third;
 
   finaladdress <= std_logic_vector(unsigned(baseaddress) + first + second + third + fourth); --when load = '1'
                                                                                             --else (others => '0');
@@ -91,7 +95,7 @@ begin
         if en = '1' then
           if rst_first = '1' then
             first <= (others => '0');
-          elsif load = '1' then
+          elsif load(0) = '1' then
             first <= add_offset(0) + first;
           end if;
         end if;

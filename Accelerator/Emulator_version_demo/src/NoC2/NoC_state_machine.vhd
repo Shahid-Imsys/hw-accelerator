@@ -38,6 +38,7 @@ entity Noc_State_Machine is
         Opcode                  : in  std_logic_vector(11 downto 0);
         Loop_reg_mux_ctrl       : in  std_logic;
         PEC_WE                  : in  std_logic;
+        RM_as_err               : in  std_logic;
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
@@ -75,11 +76,22 @@ architecture Behavioral of Noc_State_Machine is
       );
     end component;
     
-    component program_memory
+--    component program_memory
+--      port (
+--        clka  : in  std_logic;
+--        ena   : in  std_logic;
+--        wea   : in  std_logic_vector(0 downto 0);
+--        addra : in  std_logic_vector(8 downto 0);
+--        dina  : in  std_logic_vector(27 downto 0);
+--        douta : out std_logic_vector(27 downto 0)
+--      );
+--    end component;
+
+    component PMEM_512X28
       port (
-        clka  : in  std_logic;
+        clk   : in  std_logic;
         ena   : in  std_logic;
-        wea   : in  std_logic_vector(0 downto 0);
+        wea   : in  std_logic;
         addra : in  std_logic_vector(8 downto 0);
         dina  : in  std_logic_vector(27 downto 0);
         douta : out std_logic_vector(27 downto 0)
@@ -90,7 +102,8 @@ architecture Behavioral of Noc_State_Machine is
     signal  ena_boot_mem            : std_logic;
     signal  load_program_mem        : std_logic;
     signal  Address_Counter         : unsigned(8 downto 0);
-    signal  program_mem_we          : std_logic_vector(0 downto 0);
+--    signal  program_mem_we          : std_logic_vector(0 downto 0);
+    signal  program_mem_we          : std_logic;    
     signal  program_mem_addr_mux    : std_logic_vector(8 downto 0);
     signal  program_mem_data_mux    : std_logic_vector(27 downto 0);
     signal  program_mem_out         : std_logic_vector(27 downto 0);  
@@ -186,19 +199,30 @@ begin
       douta => boot_mem_out
     );
   
-    program_memory_Inst : program_memory
+--    program_memory_Inst : program_memory
+--    port map (
+--      clka  => clk,
+--      ena   => '1',  --need to change
+--      wea   => program_mem_we,
+--      addra => program_mem_addr_mux,
+--      dina  => program_mem_data_mux,
+--      douta => program_mem_out
+--    );
+    program_memory_Inst : PMEM_512X28
     port map (
-      clka  => clk,
+      clk   => clk,
       ena   => '1',  --need to change
       wea   => program_mem_we,
       addra => program_mem_addr_mux,
       dina  => program_mem_data_mux,
       douta => program_mem_out
-    );
+    );   
+    
     
     mem_out                     <= program_mem_out when FF = '0' else boot_mem_out;
     ena_boot_mem                <= not(boot_FF) or FF;
-    program_mem_we(0)           <= '0' when load_program_mem= '0' else '1';
+--    program_mem_we(0)           <= '0' when load_program_mem= '0' else '1';
+    program_mem_we              <= '0' when load_program_mem= '0' else '1';
     program_mem_addr_mux        <= std_logic_vector(Address_Counter) when boot_FF = '1' else std_logic_vector(boot_as_counter);
     program_mem_data_mux        <= IO_data(27 downto 0)    when boot_as_counter(1 downto 0) = "00" else
                                    IO_data(59 downto 32)   when boot_as_counter(1 downto 0) = "01" else
@@ -215,7 +239,8 @@ begin
                                    not(IO_WRITE_ACK)       when Mem_Out(26 downto 24) = "011" else 
                                    not(FIFO_Ready3)        when Mem_Out(26 downto 24) = "100" else 
                                    TC_equal_Zero           when Mem_Out(26 downto 24) = "101" else
-                                   LC_Equal_LR_extend      when Mem_Out(26 downto 24) = "110" else '0';
+                                   LC_Equal_LR_extend      when Mem_Out(26 downto 24) = "110" else 
+                                   RM_as_err               when Mem_Out(26 downto 24) = "111" else  '0';
 
     Wait_condition_Mux          <= PEC_WE_extend           when (Mem_Out(21 downto 20) = "00" and Mem_Out(23)= '1') else 
                                    LC_Equal_LR_extend      when (Mem_Out(21 downto 20) = "01" and Mem_Out(23)= '1') else 

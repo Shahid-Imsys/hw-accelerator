@@ -221,7 +221,7 @@ port map(
     --RST_P  => rst_p,
 	TAG  => tag,
 	TAG_FB => tag_out_i,
-    DATA => data,
+    DATA => DATA,
 	DATA_OUT => data_out_i,
 	exe      => exe,
 	resume   => resume,

@@ -79,8 +79,8 @@ architecture rtl of memory_1024x8 is
 
 begin  -- architecture rtl
 
-  -- Use memories for ASIC implementation
-  g_asic_memory : if g_memory_type = asic generate
+  -- Use memories for ASIC implementation (and simulation)
+  g_asic_memory : if g_memory_type /= fpga generate
  io_mem_asic : SNPS_SP_HD_1024x8
     port map (
       Q        => ram_do,

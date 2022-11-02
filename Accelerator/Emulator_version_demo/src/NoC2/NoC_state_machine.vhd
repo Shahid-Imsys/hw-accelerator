@@ -76,17 +76,6 @@ architecture Behavioral of Noc_State_Machine is
       );
     end component;
     
---    component program_memory
---      port (
---        clka  : in  std_logic;
---        ena   : in  std_logic;
---        wea   : in  std_logic_vector(0 downto 0);
---        addra : in  std_logic_vector(8 downto 0);
---        dina  : in  std_logic_vector(27 downto 0);
---        douta : out std_logic_vector(27 downto 0)
---      );
---    end component;
-
     component PMEM_512X28
       port (
         clk   : in  std_logic;
@@ -149,21 +138,21 @@ architecture Behavioral of Noc_State_Machine is
     signal  PEC_WE_latch            : std_logic;
     signal  PEC_WE_extend           : std_logic;
     --internal signals
-	signal  Load_GPP_CMD_i          : std_logic;
-	signal  Reset_LC_i              : std_logic;
-	signal  Reset_BC_i              : std_logic;
-	signal  Load_Tag_Shift_Counter_i: std_logic;
-	signal  Start_TAG_Shift_i       : std_logic;
-	signal  Load_NOC_reg_i          : std_logic;
-	signal  Load_PEC_Reg_i          : std_logic;
-	signal  Load_PCIe_CMD_Reg_i     : std_logic;
-	signal  En_RM_i                 : std_logic;
-	signal  R_W_PCIe_i              : std_logic;
-	signal  Load_Mux_Reg_i          : std_logic;
-	signal  TC_mux_ctrl             : std_logic;
-	signal  MSB_as                  : std_logic;
-	signal  FF_data                 : std_logic;
-	signal  FF                      : std_logic;
+    signal  Load_GPP_CMD_i          : std_logic;
+    signal  Reset_LC_i              : std_logic;
+    signal  Reset_BC_i              : std_logic;
+    signal  Load_Tag_Shift_Counter_i: std_logic;
+    signal  Start_TAG_Shift_i       : std_logic;
+    signal  Load_NOC_reg_i          : std_logic;
+    signal  Load_PEC_Reg_i          : std_logic;
+    signal  Load_PCIe_CMD_Reg_i     : std_logic;
+    signal  En_RM_i                 : std_logic;
+    signal  R_W_PCIe_i              : std_logic;
+    signal  Load_Mux_Reg_i          : std_logic;
+    signal  TC_mux_ctrl             : std_logic;
+    signal  MSB_as                  : std_logic;
+    signal  FF_data                 : std_logic;
+    signal  FF                      : std_logic;
 	
 	
     attribute mark_debug : string; 
@@ -199,15 +188,6 @@ begin
       douta => boot_mem_out
     );
   
---    program_memory_Inst : program_memory
---    port map (
---      clka  => clk,
---      ena   => '1',  --need to change
---      wea   => program_mem_we,
---      addra => program_mem_addr_mux,
---      dina  => program_mem_data_mux,
---      douta => program_mem_out
---    );
     program_memory_Inst : PMEM_512X28
     port map (
       clk   => clk,

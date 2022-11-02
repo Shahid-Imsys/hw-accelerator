@@ -7,9 +7,11 @@ tb_comp_rtl : packet
 				 $(TB_COMP_DIR_WIN)/octo_memory_bfm.vhd \
 				 $(TB_COMP_DIR_WIN)/spiflash_bfm.vhd
 
-packet:
+packet: test_spi_interface
 	$(COMP) $(COMP_TB_FLAGS) $(TB_COMP_DIR_WIN)/digital_sim_pack.vhd \
 				 $(TB_COMP_DIR_WIN)/tb_components_pkg.vhd \
 				 $(TB_COMP_DIR_WIN)/register_tb_definitions.vhd \
 				 $(TB_COMP_DIR_WIN)/register_tb_package.vhd \
 				 $(TB_COMP_DIR_WIN)/spi_tb_pack.vhd
+
+include $(PROJECT_PATH)/Digital_top/src/Makefile

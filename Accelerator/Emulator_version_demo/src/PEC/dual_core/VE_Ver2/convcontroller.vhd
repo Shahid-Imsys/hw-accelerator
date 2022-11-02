@@ -133,6 +133,7 @@ begin
         right_rst <= '0';
         bias_load <= '0';
         bias_rd_en <= '0';
+        ext_load <= '0';
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
       elsif en = '1' then

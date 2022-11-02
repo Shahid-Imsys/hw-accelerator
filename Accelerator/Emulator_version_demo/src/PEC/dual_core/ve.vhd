@@ -387,7 +387,7 @@ architecture rtl of ve is
   signal load_from_conv, bload_from_conv : std_logic;
   signal apushback_load, bpushback_load : std_logic_vector(3 downto 0); 
   signal apushback_rst, bpushback_rst : std_logic;
-  signal ring_load, ring_rst, ring_rd, ring_wr, ext_load : std_logic;
+  signal ring_load, ring_rd, ring_wr, ext_load : std_logic;
   signal ext_tigger_en : std_logic;
   signal offset_l    : std_logic_vector(7 downto 0); --offset register
   signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
@@ -802,13 +802,11 @@ begin
     if rising_edge(clk_p) then
       if RST = '0' then
         ring_load <= '0';
-        ring_rst <= '1';
         ring_rd <= '0';
         ring_wr <= '0';
-      elsif cnt_rst = '1' and start = '0' then
-        ring_rst <= '1';
+      --elsif cnt_rst = '1' and start = '0' then
+      --  ring_rst <= '1';
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
-        ring_rst <= '0';
         if (re_source = '0' and DDI_VLD = '1') or re_source = '1' then
           ring_load <= '1';
           ring_wr <= '1';
@@ -818,7 +816,6 @@ begin
         end if;
       elsif conv_busy = '1' and mode_c_l = '1' then
         ring_load <= '1';
-        ring_rst <= '0';
         ring_rd <= '1';
       else
         ring_load <= '0';
@@ -951,7 +948,7 @@ begin
                       --oc_cnt       <= ve_oloop_reg;
                       bypass_valid    <= DDI_VLD;
                       stall        <= conv_stall;
-                      left_rst     <= lrst_from_conv when mode_c_l = '0' else ring_rst;
+                      left_rst     <= lrst_from_conv when mode_c_l = '0' else '0';
                       right_rst    <= rrst_from_conv;
                       bias_rst     <= brst_from_conv;
       when fft     => fft_start    <= start;
@@ -960,7 +957,7 @@ begin
       when re_mode => re_start     <= start;
                       re_cnt_rst   <= cnt_rst;
                       rcving_data  <= DDI_VLD;
-                      left_rst     <= lrst_from_re when mode_c_l = '0' else ring_rst;
+                      left_rst     <= lrst_from_re when mode_c_l = '0' else '0';
                       right_rst    <= rrst_from_re;
                       bias_rst     <= brst_from_re;
       when others  => null;

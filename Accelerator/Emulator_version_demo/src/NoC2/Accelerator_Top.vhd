@@ -108,7 +108,7 @@ architecture Behavioral of Accelerator_Top is
     signal PEC_byte_data : std_logic_vector(127 downto 0):= (others => '0');
     signal Noc_byte_data : std_logic_vector(127 downto 0):= (others => '0');
     signal Tag_Line      : std_logic;
-    signal PEC_WE        : std_logic_vector(1 downto 0);
+    signal PEC_WE        : std_logic_vector(PEC_NUMBER -1 downto 0);
      
 begin
 
@@ -146,7 +146,7 @@ begin
         IO_WRITE_ACK            => IO_WRITE_ACK,
         Enable_Root_memory_t    => Enable_Root_memory_t,
         RM_Data_Out_t           => RM_Data_Out_t 
-    );     
+    );
 
   pec_gen : for i in 0 to PEC_NUMBER -1 generate
     PEC_top_Inst : PEC_top
@@ -165,6 +165,6 @@ begin
         DATA                    => Noc_byte_data(8*i+7 downto 8*i),
         DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i)
      );
-  end generate;               
+  end generate;
            
 end Behavioral;

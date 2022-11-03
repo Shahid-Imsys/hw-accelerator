@@ -37,13 +37,11 @@ begin
 
   -- state combinatorials
 
-  full <= '1' when (wptr(BITS-1 downto 0) = (rptr(BITS-1 downto 0) - 1)) and (wptr(BITS) /= rptr(BITS)) else
+  full <= '1' when (wptr(BITS-1 downto 0) = rptr(BITS-1 downto 0)) and (wptr(BITS) /= rptr(BITS)) else
           '0';
   empty <= '1' when wptr = rptr else
            '0';
-  level <= to_slv(2**BITS, level'length) when full else
-           (others => '0') when empty else
-           std_logic_vector(wptr - rptr);
+  level <= std_logic_vector(wptr - rptr);
 
   -- write machine
 

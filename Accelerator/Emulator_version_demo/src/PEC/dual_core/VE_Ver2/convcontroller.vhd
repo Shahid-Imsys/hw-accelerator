@@ -144,14 +144,15 @@ begin
           else
             conv_oloop <= unsigned(oc_cnt) - 1;
           end if;
-          if mode_a = '1' then
-            left_rst <= '1';
+          if mode_c_l = '0' then
+            if mode_a = '1' then
+              left_rst <= '1';
+            end if;
+            if mode_b = '1' then
+              right_rst <= '1';
+            end if;
           else
             left_rst <= '0';
-          end if;
-          if mode_b = '1' then
-            right_rst <= '1';
-          else
             right_rst <= '0';
           end if;
         elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then--and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
@@ -182,16 +183,14 @@ begin
             else
               conv_oloop <= unsigned(oc_cnt) - 1;
             end if;
-            if mode_a = '1' or mode_b = '1' then
-              if mode_a = '1' and clk_e_pos = '1' then
-                left_rst <= '1';
-              else
-                left_rst <= '0';
-              end if;
-              if mode_b = '1' and clk_e_pos = '1' then
-                right_rst <= '1';
-              else
-                right_rst <= '0';
+            if mode_c_l = '0' then
+              if mode_a = '1' or mode_b = '1' then
+                if mode_a = '1' and clk_e_pos = '1' then
+                  left_rst <= '1';
+                end if;
+                if mode_b = '1' and clk_e_pos = '1' then
+                  right_rst <= '1';
+                end if;
               end if;
             end if;
           end if;

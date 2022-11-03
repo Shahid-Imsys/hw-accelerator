@@ -26,9 +26,9 @@ entity Accelerator_Top is
       PEC_NUMBER             : integer := 2
     );
     Port (
-	    clk                  : in  std_logic;
-      clk_e                : in  std_logic;
-	    Reset                : in  std_logic;
+	      clk_p                : in  std_logic;
+        clk_e                : in  std_logic;
+	      Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
@@ -119,7 +119,7 @@ begin
     )
     port map
     (
-        clk                     => clk,
+        clk                     => clk_e,
         Reset                   => Reset,
         PEC_Ready               => PEC_Ready,
         --NOC PEC INTERFACE 
@@ -156,7 +156,7 @@ begin
     )    
     port map
     ( 
-        CLK_P                   => clk,
+        CLK_P                   => clk_p,
         CLK_E                   => clk_e,
         RST_E                   => Reset,
         DDO_VLD                 => PEC_WE(i),

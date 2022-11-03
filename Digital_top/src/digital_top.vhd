@@ -38,7 +38,7 @@ entity digital_top is
     g_clock_frequency : integer       := 31);
   port (
     hclk          : in  std_logic;      -- clk input
-    clk_noc       : in  std_logic;    
+    clk_p_acc     : in  std_logic;    
     pll_ref_clk   : in  std_logic;
     pll_locked    : in  std_logic;
     pre_spi_rst_n : in  std_logic;
@@ -180,7 +180,7 @@ architecture rtl of digital_top is
 
   signal clk_p_cpu   : std_logic;
   signal clk_p_cpu_n : std_logic;
-  signal clk_p_acc   : std_logic;
+  signal clk_p_acc_int   : std_logic;
   signal clk_e       : std_logic;
   signal clk_rx      : std_logic;
   signal clk_tx      : std_logic;
@@ -224,7 +224,7 @@ begin  -- architecture rtl
 
         clk_p_cpu   => clk_p_cpu,
         clk_p_cpu_n => clk_p_cpu_n,
-        clk_p_acc   => clk_p_acc,
+        clk_p_acc   => clk_p_acc_int,
         clk_e       => clk_e,
         clk_rx      => clk_rx,
         clk_tx      => clk_tx,
@@ -250,13 +250,13 @@ begin  -- architecture rtl
     i_clock_reset : entity work.fpga_clock_reset
 
       port map (
-        clk_in                  => hclk,
-        clk_noc                 => clk_noc,
+        clk_cpu_in              => hclk,
+        clk_acc_in              => clk_p_acc,
         spi_sclk                => spi_sclk,
         --
         clk_p_cpu               => clk_p_cpu,
         clk_p_cpu_n             => clk_p_cpu_n,
-        clk_p_acc               => clk_p_acc,
+        clk_p_acc               => clk_p_acc_int,
         clk_e                   => clk_e,
         clk_rx                  => clk_rx,
         clk_tx                  => clk_tx,
@@ -294,7 +294,7 @@ begin  -- architecture rtl
     port map (
       clk_p_cpu   => clk_p_cpu,
       clk_p_cpu_n => clk_p_cpu_n,
-      clk_noc     => clk_p_acc,
+      clk_p_acc   => clk_p_acc_int,
       clk_e       => clk_e,
       clk_rx      => clk_rx,
       clk_tx      => clk_tx,

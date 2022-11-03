@@ -39,7 +39,7 @@ entity digital_core is
   port (
     clk_p_cpu   : in std_logic;         -- clk input
     clk_p_cpu_n : in std_logic;         -- clk input
-    clk_noc     : in std_logic;         -- 
+    clk_p_acc     : in std_logic;         -- 
     clk_e       : in std_logic;
     clk_rx      : in std_logic;
     clk_tx      : in std_logic;
@@ -219,9 +219,9 @@ architecture rtl of digital_core is
         USE_ASIC_MEMORIES    : boolean := false
     );
     port (
-	    clk                    : in  std_logic;
-      clk_e                  : in  std_logic;
-	    Reset                  : in  std_logic;
+	      clk_p                : in  std_logic;
+        clk_e                : in  std_logic;
+	      Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
@@ -288,7 +288,7 @@ begin  -- architecture rtl
     generic map(
       USE_ASIC_MEMORIES => g_memory_type /= fpga )
     port map (
-      clk           => clk_noc,
+      clk_p         => clk_p_acc,
       clk_e         => clk_e,
       Reset         => cpu_rst_n,
       PEC_Ready     => '0',
@@ -330,7 +330,7 @@ begin  -- architecture rtl
       inext         => ext_inext,
       idack         => ext_idack,
       idreq         => ext_idreq,
-      clk_noc       => clk_noc,
+      clk_noc       => clk_p_acc,
       --
       NOC_IRQ       => NOC_IRQ,
       GPP_CMD       => GPP_CMD,

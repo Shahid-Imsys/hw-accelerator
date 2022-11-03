@@ -180,6 +180,8 @@ architecture rtl of digital_top is
 
   signal clk_p_cpu   : std_logic;
   signal clk_p_cpu_n : std_logic;
+  signal clk_p_acc   : std_logic;
+  signal clk_e       : std_logic;
   signal clk_rx      : std_logic;
   signal clk_tx      : std_logic;
 
@@ -220,12 +222,14 @@ begin  -- architecture rtl
         rst_n     => cpu_rst_n,
         spi_rst_n => spi_rst_n,
 
-        clk_p   => clk_p_cpu,
-        clk_p_n => clk_p_cpu_n,
-        clk_rx  => clk_rx,
-        clk_tx  => clk_tx,
-        sclk    => sclk,
-        sclk_n  => sclk_n,
+        clk_p_cpu   => clk_p_cpu,
+        clk_p_cpu_n => clk_p_cpu_n,
+        clk_p_acc   => clk_p_acc,
+        clk_e       => clk_e,
+        clk_rx      => clk_rx,
+        clk_tx      => clk_tx,
+        sclk        => sclk,
+        sclk_n      => sclk_n,
 
         pg_1_i => pg_i(1),
         pf_1_i => pf_i(1),
@@ -247,10 +251,13 @@ begin  -- architecture rtl
 
       port map (
         clk_in                  => hclk,
+        clk_noc                 => clk_noc,
         spi_sclk                => spi_sclk,
         --
-        clk_p                   => clk_p_cpu,
-        clk_p_n                 => clk_p_cpu_n,
+        clk_p_cpu               => clk_p_cpu,
+        clk_p_cpu_n             => clk_p_cpu_n,
+        clk_p_acc               => clk_p_acc,
+        clk_e                   => clk_e,
         clk_rx                  => clk_rx,
         clk_tx                  => clk_tx,
         sclk                    => sclk,
@@ -287,7 +294,8 @@ begin  -- architecture rtl
     port map (
       clk_p_cpu   => clk_p_cpu,
       clk_p_cpu_n => clk_p_cpu_n,
-      clk_noc     => clk_noc,
+      clk_noc     => clk_p_acc,
+      clk_e       => clk_e,
       clk_rx      => clk_rx,
       clk_tx      => clk_tx,
 

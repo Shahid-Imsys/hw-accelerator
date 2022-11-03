@@ -8,13 +8,16 @@ entity fpga_clock_reset is
   port (
     clk_in   : in std_logic;
     spi_sclk : in std_logic;
+    clk_noc  : in std_logic;
     --
-    clk_p   : out std_logic;
-    clk_p_n : out std_logic;
-    clk_rx  : out std_logic;
-    clk_tx  : out std_logic;
-    sclk    : out std_logic;
-    sclk_n  : out std_logic;
+    clk_p_cpu   : out std_logic;
+    clk_p_cpu_n : out std_logic;
+    clk_p_acc   : out std_logic;
+    clk_e       : out std_logic;
+    clk_rx      : out std_logic;
+    clk_tx      : out std_logic;
+    sclk        : out std_logic;
+    sclk_n      : out std_logic;
     
     pre_spi_rst_n : in std_logic;
     mreset_n      : in std_logic;   -- system reset, active low
@@ -72,9 +75,13 @@ begin
   -- Clock section
   --------------------------------------
     
-  clk_p   <= clk_in;
-  clk_p_n <= not clk_in;
+  clk_p_cpu   <= clk_in;
+  clk_p_cpu_n <= not clk_in;
+
+  clk_p_acc   <= clk_noc;
   
+  clk_e <= clk_in;
+
   clk_rx <= pg_1_i;
   clk_tx <= pf_1_i;
 

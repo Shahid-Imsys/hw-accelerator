@@ -27,6 +27,7 @@ entity Accelerator_Top is
     );
     Port (
 	    clk                  : in  std_logic;
+      clk_e                : in  std_logic;
 	    Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
         --Command interface signals 
@@ -156,7 +157,7 @@ begin
     port map
     ( 
         CLK_P                   => clk,
-        CLK_E                   => clk,
+        CLK_E                   => clk_e,
         RST_E                   => Reset,
         DDO_VLD                 => PEC_WE(i),
         TAG                     => Tag_Line,

@@ -9,8 +9,10 @@ entity clock_reset is
     pll_clk     : in std_ulogic;
     pll_ref_clk : in std_ulogic;
     spi_sclk    : in std_logic;
-    clk_p       : out std_logic;
-    clk_p_n     : out std_logic;
+    clk_p_cpu   : out std_logic;
+    clk_p_cpu_n : out std_logic;
+    clk_p_acc   : out std_logic;
+    clk_e       : out std_logic;
     clk_rx      : out std_logic;
     clk_tx      : out std_logic;
     sclk        : out std_logic;
@@ -52,8 +54,10 @@ architecture rtl of clock_reset is
 
   signal sel_pll_all : std_logic;
 
-  signal clock_p_puls   : std_logic;
-  signal clock_p_n_puls : std_logic;
+  signal cpu_clock_p_puls   : std_logic;
+  signal cpu_clock_p_n_puls : std_logic;
+  signal acc_clock_p_puls   : std_logic;
+  signal clock_e_puls       : std_logic;
 
 begin -- architecture rtl
 
@@ -108,24 +112,45 @@ begin -- architecture rtl
       clk_mux_out   => clk_mux_out_int);
 
   clk_mux_out_int_d <= clk_mux_out_int;
-  i_clock_gate : entity work.clock_gate
+
+  i_clock_gate_cpu : entity work.clock_gate
     generic map(
       fpga_g => fpga_g)
     port map(
       clk       => clk_mux_out_int,
-      en        => clock_p_puls,
+      en        => cpu_clock_p_puls,
       scan_mode => scan_mode,
-      clk_out   => clk_p
+      clk_out   => clk_p_cpu
     );
 
-  i_clock_gate_n : entity work.clock_gate
+  i_clock_gate_cpu_n : entity work.clock_gate
     generic map(
       fpga_g => fpga_g)
     port map(
       clk       => clk_mux_out_int,
-      en        => clock_p_n_puls,
+      en        => cpu_clock_p_n_puls,
       scan_mode => scan_mode,
-      clk_out   => clk_p_n
+      clk_out   => clk_p_cpu_n
+    );
+
+  i_clock_gate_acc : entity work.clock_gate
+    generic map(
+      fpga_g => fpga_g)
+    port map(
+      clk       => clk_mux_out_int,
+      en        => acc_clock_p_puls,
+      scan_mode => scan_mode,
+      clk_out   => clk_p_acc
+    );
+
+  i_clock_gate_e : entity work.clock_gate
+    generic map(
+      fpga_g => fpga_g)
+    port map(
+      clk       => clk_mux_out_int,
+      en        => clock_e_puls,
+      scan_mode => scan_mode,
+      clk_out   => clk_e
     );
 
   -- Ethernet clocks
@@ -151,29 +176,67 @@ begin -- architecture rtl
 
   sclk   <= spi_sclk;
   sclk_n <= not spi_sclk;
-  clock_divide_p : process (clk_mux_out_int, rst_n) is
+
+  clock_divide_acc_p : process (clk_mux_out_int, rst_n) is
     variable counter : integer range 0 to 1;
-  begin               -- process clock_divide_p
-    if rst_n = '0' then -- asynchronous reset (active low)
-      clock_p_puls   <= '0';
-      clock_p_n_puls <= '0';
-      counter := 0;
+  begin
+    if rst_n = '0' then
+      acc_clock_p_puls <= '0';
     elsif rising_edge(clk_mux_out_int) then
-      clock_p_puls   <= '0';
-      clock_p_n_puls <= '0';
+      acc_clock_p_puls <= '0';
 
       if clock_in_off then
-        clock_p_puls   <= '0';
-        clock_p_n_puls <= '0';
+        acc_clock_p_puls <= '0';
+      else
+        acc_clock_p_puls <= '1';
+      end if;
+    end if;
+  end process clock_divide_acc_p;
+
+  clock_divide_cpu_p : process (clk_mux_out_int, rst_n) is
+    variable counter : integer range 0 to 1;
+  begin               -- process clock_divide_e
+    if rst_n = '0' then -- asynchronous reset (active low)
+      cpu_clock_p_puls   <= '0';
+      cpu_clock_p_n_puls <= '0';
+      counter := 0;
+    elsif rising_edge(clk_mux_out_int) then
+      cpu_clock_p_puls   <= '0';
+      cpu_clock_p_n_puls <= '0';
+
+      if clock_in_off then
+        cpu_clock_p_puls   <= '0';
+        cpu_clock_p_n_puls <= '0';
         counter := 0;
       elsif counter = 0 then
-        clock_p_puls <= '1';
+        cpu_clock_p_puls <= '1';
         counter := counter + 1;
       elsif counter = 1 then
-        clock_p_n_puls <= '1';
+        cpu_clock_p_n_puls <= '1';
         counter := 0;
       end if;
     end if;
-  end process clock_divide_p;
+  end process clock_divide_cpu_p;
+
+  clock_divide_e : process (clk_mux_out_int, rst_n) is
+    variable counter : integer range 0 to 1;
+  begin               -- process clock_divide_e
+    if rst_n = '0' then -- asynchronous reset (active low)
+      clock_e_puls <= '0';
+      counter := 0;
+    elsif rising_edge(clk_mux_out_int) then
+      clock_e_puls <= '0';
+
+      if clock_in_off then
+        clock_e_puls <= '0';
+        counter := 0;
+      elsif counter = 0 then
+        clock_e_puls <= '1';
+        counter := counter + 1;
+      elsif counter = 1 then
+        counter := 0;
+      end if;
+    end if;
+  end process clock_divide_e;
 
 end architecture rtl;

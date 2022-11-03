@@ -23,9 +23,10 @@ noc2_rtl: xilinx_ip
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Tag_Line_Block.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Transpose_unit.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/RM_as_generator.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/PMEM_512X28.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/RMEM_32KX16.vhd
 
 xilinx_ip:
 	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
 	$(V_COMP) $(NOC2_DIR_WIN)/IP/boot_memory/sim/boot_memory.v
-	$(V_COMP) $(NOC2_DIR_WIN)/IP/program_memory/sim/program_memory.v
         

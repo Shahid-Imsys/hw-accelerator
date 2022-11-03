@@ -17,11 +17,9 @@
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 use work.cluster_pkg.all;
 
 -- Uncomment the following library declaration if using
@@ -223,7 +221,7 @@ port map(
     --RST_P  => rst_p,
 	TAG  => tag,
 	TAG_FB => tag_out_i,
-    DATA => data,
+    DATA => DATA,
 	DATA_OUT => data_out_i,
 	exe      => exe,
 	resume   => resume,

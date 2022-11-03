@@ -58,18 +58,19 @@ architecture Behavioral of Root_Memory is
       BC2      : in  std_logic);
   end component;
 
-  component root_mem
-    port (
-      clka    : in std_logic;
-      ena     : in std_logic;
-      wea     : in std_logic_vector(0 downto 0);
-      addra   : in std_logic_vector(14 downto 0);
-      dina    : in std_logic_vector(127 downto 0);
-      douta   : out std_logic_vector(127 downto 0)
-    );
-  end component;
 
-  signal we           : std_logic_vector(0 downto 0);
+  component RMEM_32KX16 is
+    port(
+		  clk     : in std_logic;
+          ena     : in std_logic;
+          wea     : in std_logic;
+          addra   : in std_logic_vector(14 downto 0);
+          dina    : in std_logic_vector(127 downto 0);
+          douta   : out std_logic_vector(127 downto 0)
+	    );	
+	end component;
+
+--  signal we           : std_logic_vector(0 downto 0);
   signal Address      : unsigned(14 downto 0);
   signal RM_FF        : std_logic;
   signal Enable_p     : std_logic;
@@ -83,20 +84,7 @@ architecture Behavioral of Root_Memory is
 
 begin
 
-we(0) <= Write_Read_Mode;
-
-process (clk, Reset)
-begin
-    if Reset = '0' then
-        Enable_p    <= '0';
-        Enable_p2   <= '0';
-    elsif rising_edge(clk) then
-        Enable_p    <= Enable;
-        Enable_p2   <= Enable_p;
-    end if;
-end process;
-
-mem_enable <= Enable; --(Enable or Enable_p or Enable_p2) when Write_Read_Mode = '0' else Enable;
+mem_enable <= Enable;
 
 rm_asic_gen : if USE_ASIC_MEMORIES generate
 
@@ -104,7 +92,7 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
   Active_RM <= to_integer(Address(14 downto 13));
 
   rm_gen : for i in 0 to 3 generate
-      WE_RM(i) <= we(0) when Active_RM = i else '0';
+      WE_RM(i) <= Write_Read_Mode when Active_RM = i else '0';
 
       Root_Memory_Inst : SNPS_SP_HD_8Kx128
           port map (
@@ -127,13 +115,14 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
     end generate;
 end generate;
 
+
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
 
-  Root_Memory_Inst : root_mem
+  Root_Memory_Inst : RMEM_32KX16
   port map (
-      clka      => clk,
+      clk       => clk,
       ena       => mem_enable,
-      wea       => we,
+      wea       => Write_Read_Mode,
       addra     => std_logic_vector(RM_Address),
       dina      => DataIn,
       douta     => DataOut

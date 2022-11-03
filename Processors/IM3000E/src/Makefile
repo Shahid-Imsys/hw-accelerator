@@ -74,6 +74,7 @@ gpp_rtl: mem_load_comp fpga_ip
 
 mem_load_comp:
 	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v
+	$(V_COMP) $(GPP_DIR_WIN)/ext/load_ram.v
 
 fpga_ip:
 #	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \

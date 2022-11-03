@@ -77,6 +77,7 @@ architecture structural of Noc_Top is
         Opcode                  : in  std_logic_vector(11 downto 0);
         Loop_reg_mux_ctrl       : in  std_logic;
         PEC_WE                  : in  std_logic;
+        RM_as_err               : in  std_logic;        
         Load_RM_Address         : out std_logic;  
         Load_NOC_Reg            : out std_logic;  
         Load_PEC_Reg            : out std_logic;  
@@ -470,6 +471,7 @@ begin
         Opcode                  => Opcode,
         Loop_reg_mux_ctrl       => Loop_reg_mux_ctrl,
         PEC_WE                  => PEC_WE,
+        RM_as_err               => RM_as_err,
         --OUTPIUT
         Load_RM_Address         => Load_RM_Address,
         Load_NOC_Reg            => Load_NOC_Reg,

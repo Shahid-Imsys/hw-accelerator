@@ -55,6 +55,8 @@ end entity;
 architecture convctrl of convcontroller is
   --signals
   signal by_start       : std_logic;
+  signal bias_load_int  : std_logic;
+  signal bias_rd_en_int : std_logic;
   signal o_mux_ena      : std_logic;
   signal pselector_en   : std_logic;
   signal pp_stage_1     : std_logic;
@@ -74,6 +76,8 @@ begin
 
   conv_out_p    <= pp_ctl(0);
   max_sel       <= pp_ctl(2);
+  bias_load     <= bias_load_int when conv_out_p = '0' else o_mux_ena;
+  bias_rd_en    <= bias_rd_en_int when conv_out_p = '0' else o_mux_ena;
   memreg_c      <= (swap => noswap, datareg => enable, weightreg => enable);
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
   ppinst        <= ppinst_p when conv_out_p = '1' else ppinst_s;
@@ -131,8 +135,8 @@ begin
       if RST = '0' then
         left_rst <= '0';
         right_rst <= '0';
-        bias_load <= '0';
-        bias_rd_en <= '0';
+        bias_load_int <= '0';
+        bias_rd_en_int <= '0';
         ext_load <= '0';
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
@@ -168,11 +172,11 @@ begin
             inst <= sum;
           end if;
           if pp_ctl(0) = '0' then
-            bias_load <= '1';
-            bias_rd_en <= '1';
+            bias_load_int <= '1';
+            bias_rd_en_int <= '1';
           else
-            bias_load <= '0';
-            bias_rd_en <= '0';
+            bias_load_int <= '0';
+            bias_rd_en_int <= '0';
           end if;
           load <= '1';
           rd_en <= '1';
@@ -197,8 +201,8 @@ begin
         elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt) - 1)then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
           left_rst <= '0';
           right_rst <= '0';
-          bias_load <= '0';
-          bias_rd_en <= '0';
+          bias_load_int <= '0';
+          bias_rd_en_int <= '0';
           if bypass_reg = '1' then
             if data_valid = '0' then
               load <= '0';
@@ -226,11 +230,11 @@ begin
             ppinst_s <= sumfirst;
             ext_load <= '0';
             if pp_ctl(0) = '0' then
-              bias_load <= '1';
-              bias_rd_en <= '1';
+              bias_load_int <= '1';
+              bias_rd_en_int <= '1';
             else
-              bias_load <= '0';
-              bias_rd_en <= '0';
+              bias_load_int <= '0';
+              bias_rd_en_int <= '0';
             end if;
             conv_oloop <= conv_oloop - 1;
             if config(4) = '1' then --reload by config register, bit 4 in configure register
@@ -241,8 +245,8 @@ begin
             if conv_oloop = x"00" then
               load <= '0';
               rd_en <= '0';
-              bias_load <= '0';
-              bias_rd_en <= '0';
+              bias_load_int <= '0';
+              bias_rd_en_int <= '0';
               inst <= nop;
               ppinst_s <= nop;
               conv_oloop <= conv_oloop;
@@ -276,8 +280,8 @@ begin
         else
           load <= '0';
           rd_en <= '0';
-          bias_load <= '0';
-          bias_rd_en <= '0';
+          bias_load_int <= '0';
+          bias_rd_en_int <= '0';
           inst <= nop;
           ppinst_s <= nop;
         end if;

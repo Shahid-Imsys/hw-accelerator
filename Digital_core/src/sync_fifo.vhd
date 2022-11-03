@@ -30,23 +30,18 @@ architecture fpga of sync_fifo is
   signal wptr : unsigned(BITS downto 0) := (others => '0');
   signal rptr : unsigned(BITS downto 0) := (others => '0');
 
-  signal full : std_logic;
+  signal full  : std_logic;
   signal empty : std_logic;
-
-  signal fwft_ready : std_logic;
 
 begin
 
   -- state combinatorials
 
-  full <= '1' when (wptr(BITS-1 downto 0) = (rptr(BITS-1 downto 0) - 1)) and (wptr(BITS) /= rptr(BITS)) else
+  full <= '1' when (wptr(BITS-1 downto 0) = rptr(BITS-1 downto 0)) and (wptr(BITS) /= rptr(BITS)) else
           '0';
   empty <= '1' when wptr = rptr else
            '0';
-  level <= to_slv(2**BITS, level'length) when full else
-           to_slv(1, level'length) when (out_valid and empty) or fwft_ready else
-           (others => '0') when empty else
-           std_logic_vector(wptr - rptr + 1);
+  level <= std_logic_vector(wptr - rptr);
 
   -- write machine
 
@@ -69,28 +64,13 @@ begin
     if not areset_n then
       rptr <= (others => '0');
     elsif rising_edge(clk) then
-      if not empty and fwft_ready then
+      if not empty and out_ready and out_valid then
         rptr <= rptr + 1;
-        out_data <= mem(to_integer(rptr(BITS-1 downto 0)));
       end if;
     end if;
   end process;
 
-  --  fwft logic
-
-  fwft_ready <= (not empty) and (out_ready or not out_valid);
-
-  process (clk, areset_n) begin
-    if not areset_n then
-      out_valid <= '0';
-    elsif rising_edge(clk) then
-      if fwft_ready then
-        out_valid <= '1';
-      elsif out_ready then
-        out_valid <= '0';
-      end if;
-    end if;
-  end process;
+  out_data  <= mem(to_integer(rptr(BITS-1 downto 0)));
+  out_valid <= not empty;
 
 end fpga;
-

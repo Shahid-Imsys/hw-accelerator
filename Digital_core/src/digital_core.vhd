@@ -330,7 +330,7 @@ begin  -- architecture rtl
       inext         => ext_inext,
       idack         => ext_idack,
       idreq         => ext_idreq,
-      clk_noc       => clk_p_acc,
+      clk_noc       => clk_e,
       --
       NOC_IRQ       => NOC_IRQ,
       GPP_CMD       => GPP_CMD,

@@ -45,9 +45,6 @@ architecture str of mpram_memory is
   end component;
 
   component mpram_mem is
-    generic (
-        C_MEM_INIT_FILE : string;
-        C_READ_MIF      : integer);
     port (
       a       : in  std_logic_vector(10 downto 0);
       d       : in  std_logic_vector(79 downto 0);
@@ -98,9 +95,6 @@ begin  -- architecture str
   else generate -- fpga
 
     mpram_fpga : mpram_mem
-      generic map (
-        C_MEM_INIT_FILE => g_file_name,
-        C_READ_MIF     => 1)
       port map (
         a    => address,
         d    => ram_di,

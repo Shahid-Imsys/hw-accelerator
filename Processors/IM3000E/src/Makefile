@@ -77,7 +77,7 @@ mem_load_comp:
 	$(V_COMP) $(GPP_DIR_WIN)/ext/load_ram.v
 
 fpga_ip:
-#	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v \
+	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v
 #	          $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
 #		  $(IP_DIR_WIN)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v

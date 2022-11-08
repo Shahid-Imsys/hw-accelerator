@@ -433,12 +433,12 @@ architecture rtl of ve is
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
   signal clr_acc : std_logic; --clear accumulators
   signal fft_mode : std_logic;
+  signal N_point : integer;
+  signal bits    : integer;
+  signal n       : integer; 
+  signal mem_no, swap  : std_logic;
+  signal bit_rev : std_logic_vector(7 downto 0);
   signal pl_ve_byte : std_logic_vector(3 downto 0);
-  --fft test data
-  constant fft256_rand_data0  : string := "fft256_data0.dat";
-  constant fft256_rand_data1  : string := "fft256_data1.dat";
-  constant fft256_rand_weight : string := "fft256_weight.dat";
-  constant fftcopy            : string := "fftcopy.dat";
 
 
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
@@ -463,9 +463,8 @@ architecture rtl of ve is
   signal send_req_d : std_logic;
   signal set_fifo_push : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
-  signal rdout_addr_data, rdout_addr_weight : std_logic_vector(7 downto 0);
-  signal doutrd_en, woutrd_en : std_logic;
-  signal dmem_read_done, wmem_read_done : std_logic;
+  signal outrd_en, woutrd_en : std_logic;
+  signal mem_read_done, wmem_read_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
   signal rd_en_conv, b_rd_en_conv : std_logic;
@@ -907,10 +906,10 @@ begin
                       data0addr_to_memory <= data0_addr_o;
                       data1addr_to_memory <= data1_addr_o;
       when fft     => biasaddr_to_memory <= bias_addr_o;
-                      if fft_done_pipe(10) = '1' then
-                        weightaddr_to_memory <= rdout_addr_weight;
-                        data0addr_to_memory  <= rdout_addr_data;
-                        data1addr_to_memory  <= rdout_addr_data;
+                      if fft_done_pipe(10) = '1' and fft_done = '1' then
+                        weightaddr_to_memory <= x"00";
+                        data0addr_to_memory  <= bit_rev;
+                        data1addr_to_memory  <= bit_rev;
                       else
                         weightaddr_to_memory <= weight_addr_o;
                         data0addr_to_memory  <= data0_addr_o;
@@ -1032,7 +1031,7 @@ begin
       data_read_enable_i <= '0';
       data_write_enable_i <= dwen_from_re when mode_c_l = '0' else ring_wr;
       weight_read_enable_i <= '0';
-      weight_write_enable_i <= wwen_from_re when bypass_reg = '0' else '0';
+      weight_write_enable_i <= '0';--wwen_from_re when bypass_reg = '0' else '0';
       read_en_b_i <= '0';
     end if;
   end process;
@@ -1062,8 +1061,8 @@ begin
       write_en_o   <= write_en_to_mux;
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= write_en_w_to_mux;
-      if fft_done_pipe(10) = '1' then
-        read_en_o   <= doutrd_en;
+      if fft_done_pipe(10) = '1' and fft_done = '1' then
+        read_en_o   <= outrd_en;
         read_en_w_o <= woutrd_en;
       end if;
     end if;
@@ -1212,15 +1211,15 @@ begin
 
   data_addressing : addressing_unit
     port map(
-      clk          => clk_p,
-      rst          => lrst,
-      en           => no_pushback,
+      clk           => clk_p,
+      rst           => lrst,
+      en            => no_pushback,
       ext_tigger_en => ext_tigger_en,
-      load         => left_loading,  
-      cmp          => au_lcmp,
-      add_offset   => au_loffset,
-      baseaddress  => left_baseaddress,
-      finaladdress => left_finaladdress
+      load          => left_loading,  
+      cmp           => au_lcmp,
+      add_offset    => au_loffset,
+      baseaddress   => left_baseaddress,
+      finaladdress  => left_finaladdress
     );
 
   weight_addressing : addressing_unit
@@ -1445,29 +1444,56 @@ begin
   --  end if;
   --end process;
 
+  stage_to_points : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        N_point <= 0;
+        bits    <= 0;
+      elsif fft_start = '1' then
+        case fft_stages is 
+          when "000"  => N_point <= 4;
+                         bits    <= 2;
+          when "001"  => N_point <= 8;
+                         bits    <= 3;
+          when "010"  => N_point <= 16;
+                         bits    <= 4;
+          when "011"  => N_point <= 32;
+                         bits    <= 5;
+          when "100"  => N_point <= 64;
+                         bits    <= 6;
+          when "101"  => N_point <= 128;
+                         bits    <= 7;
+          when "110"  => N_point <= 256;
+                         bits    <= 8;
+          when others => N_point <= 512;
+                         bits    <= 9;
+        end case;
+      end if;
+    end if;
+  end process;
+
   fft_read_states : process(clk_p)
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
         fft_read_state <= waiting;
-        doutrd_en <= '0';
+        outrd_en <= '0';
         woutrd_en <= '0';
       else
         case fft_read_state is 
           when waiting =>
-            if fft_done_pipe(10) = '1' and dmem_read_done = '0' then
-              doutrd_en <= '1';
-              fft_read_state <= reading_dmem;
+            if fft_start = '1' then
+              fft_read_state <= computing;
             end if;
-          when reading_dmem =>
-            if rdout_addr_data = x"ff" and wmem_read_done = '0' then
-              doutrd_en <= '0';
-              woutrd_en <= '1';
-              fft_read_state <= reading_wmem;
-            end if;
-          when reading_wmem =>
-            if rdout_addr_weight = x"ff" then
-              woutrd_en <= '0';
+          when computing =>
+          if fft_done = '1' and fft_done_pipe(8) = '1' and mem_read_done = '0' then
+            outrd_en <= '1';
+            fft_read_state <= reading_mem;
+          end if;
+          when reading_mem =>
+            if n = (N_point/2) then
+              outrd_en <= '0';
               fft_read_state <= waiting;
             end if;
           when others => fft_read_state <= waiting;
@@ -1477,6 +1503,7 @@ begin
   end process;
 
   fft_readout : process(clk_p)
+    variable n_vector : std_logic_vector(7 downto 0);
   begin
     if rising_edge(clk_p) then
       fft_done_pipe(0) <= fft_done;
@@ -1484,30 +1511,68 @@ begin
         fft_done_pipe(i+1) <= fft_done_pipe(i);
       end loop;
       if rst = '0' then
-        dmem_read_done <= '0';
-        wmem_read_done <= '0';
-        rdout_addr_data <= x"00";
-        rdout_addr_weight <= x"00";
+        mem_read_done <= '0';
+        n <= 0;
+        bit_rev <= x"00";
         fft_done_pipe <= (others => '0');
       else
         if fft_read_state = waiting then
           if fft_start = '1' then
-            dmem_read_done <= '0';
-            wmem_read_done <= '0';
+            mem_read_done <= '0';
           end if;
-        elsif fft_read_state = reading_dmem then        
-          if rdout_addr_data = x"ff" then
-            dmem_read_done <= '1';
-            rdout_addr_data <= x"00";
+        elsif mode_latch = fft and fft_read_state = reading_mem then 
+          n_vector := std_logic_vector(to_unsigned(n, 8));       
+          if n = (N_point/2) then
+            mem_read_done <= '1';
+            n <= 0;
           else 
-            rdout_addr_data <= std_logic_vector(unsigned(rdout_addr_data)+1);
-          end if;
-        elsif fft_read_state = reading_wmem then
-          if rdout_addr_weight = x"ff" then
-            wmem_read_done <= '1';
-            rdout_addr_weight <= x"00";
-          else 
-            rdout_addr_weight <= std_logic_vector(unsigned(rdout_addr_weight)+1);
+            case bits is 
+              when 2      => mem_no     <= n_vector(0);
+                             bit_rev(0) <= n_vector(0);
+              when 3      => mem_no     <= n_vector(0) xor n_vector(1);
+                             bit_rev(0) <= n_vector(1);
+                             bit_rev(1) <= n_vector(0);
+              when 4      => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2);
+                             bit_rev(0) <= n_vector(2);
+                             bit_rev(1) <= n_vector(1);  
+                             bit_rev(2) <= n_vector(0);
+              when 5      => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2) xor n_vector(3);
+                             bit_rev(0) <= n_vector(3);
+                             bit_rev(1) <= n_vector(2);
+                             bit_rev(2) <= n_vector(1);
+                             bit_rev(3) <= n_vector(0);
+              when 6      => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2) xor n_vector(3) xor n_vector(4);
+                             bit_rev(0) <= n_vector(4);
+                             bit_rev(1) <= n_vector(3);
+                             bit_rev(2) <= n_vector(2);
+                             bit_rev(3) <= n_vector(1);
+                             bit_rev(4) <= n_vector(0);
+              when 7      => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2) xor n_vector(3) xor n_vector(4) xor n_vector(5);
+                             bit_rev(0) <= n_vector(5);
+                             bit_rev(1) <= n_vector(4);
+                             bit_rev(2) <= n_vector(3);
+                             bit_rev(3) <= n_vector(2);
+                             bit_rev(4) <= n_vector(1);
+                             bit_rev(5) <= n_vector(0);
+              when 8      => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2) xor n_vector(3) xor n_vector(4) xor n_vector(5) xor n_vector(6);
+                             bit_rev(0) <= n_vector(6);
+                             bit_rev(1) <= n_vector(5);
+                             bit_rev(2) <= n_vector(4);
+                             bit_rev(3) <= n_vector(3);
+                             bit_rev(4) <= n_vector(2);
+                             bit_rev(5) <= n_vector(1);
+                             bit_rev(6) <= n_vector(0);
+              when others => mem_no     <= n_vector(0) xor n_vector(1) xor n_vector(2) xor n_vector(3) xor n_vector(4) xor n_vector(5) xor n_vector(6) xor n_vector(7);
+                             bit_rev(0) <= n_vector(7);
+                             bit_rev(1) <= n_vector(6);
+                             bit_rev(2) <= n_vector(5);
+                             bit_rev(3) <= n_vector(4);
+                             bit_rev(4) <= n_vector(3);
+                             bit_rev(5) <= n_vector(2);
+                             bit_rev(6) <= n_vector(1);
+                             bit_rev(7) <= n_vector(0);
+            end case;
+            n <= n + 1;
           end if;
         end if;
       end if;
@@ -1517,18 +1582,19 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
+      swap <= mem_no;
       if fft_done_pipe(10) = '1' then
         if CLK_E_NEG = '0' then
-          if doutrd_en = '1' then
-            fft_result(127 downto 64) <= data0 & data1; 
-          elsif woutrd_en = '1' then
-            fft_result(127 downto 64) <= weight_out;
+          if swap = '1' then
+            fft_result(127 downto 64) <= data0 & data1;
+          else
+            fft_result(127 downto 64) <= data1 & data0; 
           end if;
         else
-          if doutrd_en = '1' then
-            fft_result(63 downto 0) <= data0 & data1; 
-          elsif woutrd_en = '1' then
-            fft_result(63 downto 0) <= weight_out;
+          if swap = '1' then
+            fft_result(63 downto 0) <= data0 & data1;
+          else
+            fft_result(63 downto 0) <= data1 & data0;
           end if;
         end if;
       else

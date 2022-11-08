@@ -7,7 +7,7 @@ package vetypes is
   type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
   type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
   type mode is (idle, re_mode, conv, fft, matrix);
-  type read_state is (waiting, reading_dmem, reading_wmem);
+  type read_state is (waiting, computing, reading_mem);
 
   type sign_t is (s, u);
   type swap_t is (noswap, swap, switch);

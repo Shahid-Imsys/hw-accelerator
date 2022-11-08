@@ -92,7 +92,7 @@ begin
         re_loop <= (others => '0');
       elsif re_start = '1' and clk_e_pos = '1' and re_source = '0' then
         re_loop <= wr_counter;
-      elsif re_source = '0' and re_busy = '1' and re_loop /=(re_loop'range => '0') and data_valid = '1' then
+      elsif re_source = '0' and re_busy = '1' and re_loop /=(re_loop'range => '0') and (left_load = '1' or right_load = '1' or bias_load = '1') then
         re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
       end if;
     end if;
@@ -111,12 +111,12 @@ begin
       elsif re_source = '0' and cnt_rst = '1' then
         if mode_a_l = '1' and mode_b_l = '0'then
           left_rst <= '1';
-        elsif mode_a_l = '1' and mode_b_l = '0'then
+        elsif mode_a_l = '0' and mode_b_l = '1'then
           right_rst <= '1';
         elsif mode_a_l = '1' and mode_b_l = '1' then
           bias_rst <= '1';
         end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and re_loop /= (re_loop'range => '0') then
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' then
         left_rst <= '0';
         right_rst <= '0';
         bias_rst <= '0';

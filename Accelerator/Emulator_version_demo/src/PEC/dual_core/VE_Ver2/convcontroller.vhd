@@ -54,7 +54,8 @@ end entity;
 
 architecture convctrl of convcontroller is
   --signals
-  signal by_start       : std_logic;
+  signal bypass_int     : std_logic;
+  signal bypass_int_reg : std_logic;
   signal bias_load_int  : std_logic;
   signal bias_rd_en_int : std_logic;
   signal o_mux_ena      : std_logic;
@@ -102,6 +103,8 @@ begin
       if rst = '0' then
         busy <= '0';
         mode_c_l <= '0';
+        bypass_int <= '0';
+        bypass_int_reg <= '0';
         bypass_reg <= '0';
       elsif en = '1' then
         if start = '1' then
@@ -123,12 +126,14 @@ begin
           mode_c_l <= '0';
         end if;
         if bypass = '1' then
-          bypass_reg <= '1';
+          bypass_int <= '1';
         elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
-          bypass_reg <= '0';
+          bypass_int <= '0';
         elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
-          bypass_reg <= '0';
+          bypass_int <= '0';
         end if;
+        bypass_int_reg <= bypass_int;----dum solution for sync data in bypass mode
+        bypass_reg <= bypass_int_reg;
       end if;
     end if;
   end process;

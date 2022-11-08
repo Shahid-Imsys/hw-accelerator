@@ -420,7 +420,7 @@ architecture rtl of ve is
   signal bias_buf_out : std_logic_vector(63 downto 0);
   signal bypass, bypass_reg, rcving_data, bypass_valid : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
-  signal mem_data_in, data_to_mem : std_logic_vector(63 downto 0);
+  signal mem_data_in, data_to_mem, bypassed_reg, bypassed_weight : std_logic_vector(63 downto 0);
   signal mem_data_reg    : std_logic_vector(63 downto 0);
   signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
   signal mode_a_l  : std_logic;
@@ -999,6 +999,8 @@ begin
     if rising_edge(clk_p) then
       mem_data_reg <= ve_in;
       mem_data_in <= mem_data_reg; --Bias buffer --Always VE_IN
+      bypassed_reg <= mem_data_in;
+      bypassed_weight <= bypassed_reg;
     end if;
   end process;
 
@@ -1070,7 +1072,7 @@ begin
 
   bypass_mux : process(all)
   begin
-    weight <= weight_out when bypass_reg = '0' else mem_data_in;
+    weight <= weight_out when bypass_reg = '0' else bypassed_weight;
   end process;
 
   no_pushback <= not pushback_en; -- remove later

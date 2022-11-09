@@ -7,20 +7,21 @@ use work.vetypes.all;
 entity vearith is
   port(
     clk         : in  std_logic;
-    enable_add     : in  std_logic;
-    enable_mul     : in  std_logic;
-    enable_acc     : in  std_logic;
-    enable_sum     : in  std_logic;
-    enable_lod     : in  std_logic;
+    enable_add  : in  std_logic;
+    enable_mul  : in  std_logic;
+    enable_acc  : in  std_logic;
+    enable_sum  : in  std_logic;
+    enable_lod  : in  std_logic;
     data        : in  std_logic_vector(63 downto 0);
     weight      : in  std_logic_vector(63 downto 0);
     feedback    : in  std_logic_vector(63 downto 0);
     ctrl_addmul : in  all_addmul_ctrl;
     ctrl_acc    : in  all_acc_ctrl;
     ppctrl      : in  pp_ctrl;
-    lodctrl        : in  lzod_ctrl;
+    lodctrl     : in  lzod_ctrl;
     zpdata      : in  std_logic_vector(7 downto 0);
     zpweight    : in  std_logic_vector(7 downto 0);
+    bias        : in signed(31 downto 0);
     result      : out signed(32 downto 0);
     to_shift    : out ppshift_shift_ctrl;
     to_addbias  : out std_logic
@@ -97,6 +98,7 @@ architecture first of vearith is
       en : in  std_logic;
       mul    : in  signed(17 downto 0);
       ctrl   : in  acco_ctrl;
+      bias   : in  signed(31 downto 0);
       result : out signed(31 downto 0)
       );
   end component;
@@ -107,6 +109,7 @@ architecture first of vearith is
       en       : in  std_logic;
       mul, mul_odd : in  signed(17 downto 0);
       ctrl         : in  acce_ctrl;
+      bias   : in  signed(31 downto 0);
       result       : out signed(31 downto 0);
       sign_o       : out std_logic
       );
@@ -206,6 +209,7 @@ begin
       en => enable_acc,
       mul    => mul7,
       ctrl   => ctrl_acc.acc7,
+      bias => bias,
       result => acc7
       );
 
@@ -266,6 +270,7 @@ begin
       mul     => mul6,
       mul_odd => mul7,
       ctrl    => ctrl_acc.acc6,
+      bias => bias,
       result  => acc6,
       sign_o  => sign6
       );
@@ -326,6 +331,7 @@ begin
       en => enable_acc,
       mul    => mul5,
       ctrl   => ctrl_acc.acc5,
+      bias   => bias,
       result => acc5
       );
 
@@ -385,6 +391,7 @@ begin
       mul     => mul4,
       mul_odd => mul5,
       ctrl    => ctrl_acc.acc4,
+      bias => bias,
       result  => acc4,
       sign_o  => sign4
       );
@@ -440,6 +447,7 @@ begin
       clk    => clk,
       en => enable_acc,
       mul    => mul3,
+      bias => bias,
       ctrl   => ctrl_acc.acc3,
       result => acc3
       );
@@ -498,6 +506,7 @@ begin
       mul     => mul2,
       mul_odd => mul3,
       ctrl    => ctrl_acc.acc2,
+      bias => bias,
       result  => acc2,
       sign_o  => sign2
       );
@@ -552,6 +561,7 @@ begin
       en => enable_acc,
       mul    => mul1,
       ctrl   => ctrl_acc.acc1,
+      bias => bias,
       result => acc1
       );
 
@@ -607,6 +617,7 @@ begin
       mul     => mul0,
       mul_odd => mul1,
       ctrl    => ctrl_acc.acc0,
+      bias => bias,
       result  => acc0,
       sign_o  => sign0
       );

@@ -3,6 +3,12 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package vetypes is
+  type au_param is array(3 downto 0) of unsigned(7 downto 0);
+  type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
+  type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
+  type mode is (idle, re_mode, conv, fft, matrix);
+  type read_state is (waiting, computing, reading_mem);
+
   type sign_t is (s, u);
   type swap_t is (noswap, swap, switch);
   type addsub_t is (add, sub);
@@ -53,7 +59,7 @@ package vetypes is
   type mux0r0_t is (R0, R2, R4, R6, onefft, L2);
   type mux0r1_t is (zpw, zero);
 
-  type acc_t is (keep, acc, zero, max);
+  type acc_t is (keep, acc, zero, max, loadbias);
   type addo_t is (zero, acc, max);
   type adde_t is (zero, acc, odd, odd8, abs16, max);
   type reg_t is (keep, add, acc, max);
@@ -69,10 +75,10 @@ package vetypes is
   type lzod_t is (none, store1, store2, store3);
   --type lzod_out_t is (none, val, diff, nrit, nrit2, det1, det2);
   type lzod_out_t is (none, val, nrit, nrit2, det1);
-  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sumall, sum,
+  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum, sumall,
                     select7, select6, select5, select4, select3, select2, select1,
                     select0, unitri, sum16, sum16left, matmulleft, nrit);
-  function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
+  --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
   type feedback_t is (keep, shift_to_3, shift_to_2, clip_to_3, clip_to_1);
   type bias_addr_t is (ctrl,shift);
 
@@ -209,9 +215,9 @@ package vetypes is
   end record;
 end package;
 
-package body vetypes is
-  function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t is
-  begin
-    return ppctrl_t'val(to_integer(unsigned(v)));
-  end function;
-end package body;
+--package body vetypes is
+  --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t is
+  --begin
+  --  return ppctrl_t'val(to_integer(unsigned(v)));
+  --end function;
+--end package body;

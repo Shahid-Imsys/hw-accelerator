@@ -46,7 +46,7 @@ use ieee.std_logic_unsigned.all;
 
 entity pe1_rtc is
   generic(
-    USE_ASIC_MEMORIES   : boolean := true );
+    USE_ASIC_MEMORIES   : boolean := false );
   port (
     --gmem1
     c1_gmem_a         : in    std_logic_vector(9 downto 0);

@@ -4,7 +4,7 @@ use work.all;
 use work.pe1_gp_pkg.all;
 
 entity PE_pair_top is
-  generic ( USE_ASIC_MEMORIES : boolean := true );
+  generic ( USE_ASIC_MEMORIES : boolean := false );
   port (
     --Data interface --Added by CJ
     C1_REQ    : out std_logic;

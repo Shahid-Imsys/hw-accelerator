@@ -490,7 +490,7 @@ begin
   dbus <= dbus_int;
   pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
   aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
-  ready <= pl(121) and not dtm_fifo_rdy;
+  ready <= pl(127) and not dtm_fifo_rdy;
 ---------------------------------------------------------------------
 -- Microinstruction loading
 ---------------------------------------------------------------------
@@ -1301,7 +1301,7 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => vldl_2,
+      DDI_VLD     => vldl_2,--replace it with vldl in later version
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,

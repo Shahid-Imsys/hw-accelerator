@@ -324,7 +324,7 @@ begin
   req_c2 <= req;
   req_rd_c2 <= req_rd;
   ack    <= ack_c2;
-  ready_1  <= pl(121) and not dtm_fifo_rdy;
+  ready_1  <= pl(127) and not dtm_fifo_rdy;
   dfm_rdy <= ddi_vld;
 ---------------------------------------------------------------------
 -- External test clock gating
@@ -770,7 +770,7 @@ begin
       RST         => rst_en_int,
       PL          => pl,
       YBUS        => ybus,
-      DDI_VLD     => vldl_2,
+      DDI_VLD     => vldl_2,--replace it with vldl in later version
       RE_RDY      => re_rdy_int,
       VE_RDY      => ve_rdy_int,
       VE_IN       => ve_in_int,

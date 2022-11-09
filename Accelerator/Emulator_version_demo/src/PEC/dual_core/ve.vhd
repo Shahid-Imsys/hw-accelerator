@@ -1454,20 +1454,28 @@ begin
         bits    <= 0;
       elsif fft_start = '1' then
         case fft_stages is 
+          --1 stage
           when "000"  => N_point <= 4;
                          bits    <= 2;
+          --2 stage
           when "001"  => N_point <= 8;
                          bits    <= 3;
+          --3 stage
           when "010"  => N_point <= 16;
                          bits    <= 4;
+          --4 stage
           when "011"  => N_point <= 32;
                          bits    <= 5;
+          --5 stage
           when "100"  => N_point <= 64;
                          bits    <= 6;
+          --6 stage
           when "101"  => N_point <= 128;
                          bits    <= 7;
+          --7 stage
           when "110"  => N_point <= 256;
                          bits    <= 8;
+          --8 satege
           when others => N_point <= 512;
                          bits    <= 9;
         end case;
@@ -1494,7 +1502,7 @@ begin
             fft_read_state <= reading_mem;
           end if;
           when reading_mem =>
-            if n = (N_point/2) then
+            if n = to_integer(shift_right(to_unsigned(N_point, 10), 1)) then -- n = N/2
               outrd_en <= '0';
               fft_read_state <= waiting;
             end if;
@@ -1524,7 +1532,7 @@ begin
           end if;
         elsif mode_latch = fft and fft_read_state = reading_mem then 
           n_vector := std_logic_vector(to_unsigned(n, 8));       
-          if n = (N_point/2) then
+          if n = to_integer(shift_right(to_unsigned(N_point, 10), 1)) then -- n = N/2
             mem_read_done <= '1';
             n <= 0;
           else 

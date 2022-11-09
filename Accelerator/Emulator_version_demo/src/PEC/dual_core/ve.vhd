@@ -436,7 +436,7 @@ architecture rtl of ve is
   signal N_point : integer;
   signal bits    : integer;
   signal n       : integer; 
-  signal mem_no, swap  : std_logic;
+  signal mem_no, swap_int, swap : std_logic;
   signal bit_rev : std_logic_vector(7 downto 0);
   signal pl_ve_byte : std_logic_vector(3 downto 0);
 
@@ -463,7 +463,7 @@ architecture rtl of ve is
   signal send_req_d : std_logic;
   signal set_fifo_push : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
-  signal outrd_en, woutrd_en : std_logic;
+  signal outrd_en, woutrd_en, res_assign : std_logic;
   signal mem_read_done, wmem_read_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
@@ -998,7 +998,7 @@ begin
   begin
     if rising_edge(clk_p) then
       mem_data_reg <= ve_in;
-      mem_data_in <= mem_data_reg; --Bias buffer --Always VE_IN
+      mem_data_in <= mem_data_reg; 
       bypassed_reg <= mem_data_in;
       bypassed_weight <= bypassed_reg;
     end if;
@@ -1381,13 +1381,13 @@ begin
       data0_addr_i    => data0_addr_i,
       data1_addr_i    => data1_addr_i,
       weight_addr_i   => weight_addr_i,
-      bias_addr_i     => bias_addr_i, --in std_logic_vector(7 downto 0);
-      bias_addr_ctrl_i=> ctrl, --in bias_addr_t;
+      bias_addr_i     => bias_addr_i, 
+      bias_addr_ctrl_i=> ctrl, 
       data_ren_i      => data_read_enable_i,
       data_wen_i      => data_write_enable_i,
       weight_ren_i    => weight_read_enable_i,
       weight_wen_i    => weight_write_enable_i,
-      bias_ren_i      => read_en_b_i, --in std_logic;
+      bias_ren_i      => read_en_b_i, 
       data0_i         => data0,
       data1_i         => data1,
       weight_i        => weight,
@@ -1406,7 +1406,7 @@ begin
       data0_addr_o    => data0_addr_o,
       data1_addr_o    => data1_addr_o,  
       weight_addr_o   => weight_addr_o,
-      bias_addr_o     => bias_addr_o,  --biasaddr_to_memory, --out std_logic_vector(5 downto 0);
+      bias_addr_o     => bias_addr_o,  
       data_ren_o      => read_en_to_mux,
       data_wen_o      => write_en_to_mux,          
       weight_ren_o    => read_en_w_to_mux,
@@ -1429,22 +1429,8 @@ begin
         delay3(i+1) <= delay3(i);
       end loop;
       output_ena <= delay3(3); 
-      --output_ena <= re_source;--DNN PUSH BACK TEST
     end if;
   end process;
-
-  --sim_out : process(clk_p) --DNN PUSH BACK TEST
-  --begin
-  --  if rising_edge(clk_p) then
-  --    if rst = '0' then 
-  --      outreg <= (others => '0');
-  --    else
-  --      if output_ena = '1' then
-  --        outreg <= std_logic_vector(unsigned(outreg)+1);
-  --      end if;
-  --    end if;
-  --  end if;
-  --end process;
 
   stage_to_points : process(clk_p)
   begin
@@ -1516,6 +1502,7 @@ begin
     variable n_vector : std_logic_vector(7 downto 0);
   begin
     if rising_edge(clk_p) then
+      swap_int <= mem_no;
       fft_done_pipe(0) <= fft_done;
       for i in 0 to 9 loop
         fft_done_pipe(i+1) <= fft_done_pipe(i);
@@ -1592,8 +1579,9 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
-      swap <= mem_no;
-      if fft_done_pipe(10) = '1' then
+      swap <= swap_int;
+      res_assign <= read_en_o;
+      if fft_done_pipe(10) = '1' and res_assign = '1' then
         if CLK_E_NEG = '0' then
           if swap = '1' then
             fft_result(127 downto 64) <= data0 & data1;
@@ -1658,7 +1646,7 @@ begin
   out_mux : process(all)
   begin
     case mode_latch is 
-      when fft => VE_OUT_DTM <= fft_result when clk_e_neg = '1' else (others => '0');
+      when fft => VE_OUT_DTM <= fft_result;
       when others => VE_OUT_DTM <= ve_out_reg;
     end case;
   end process;

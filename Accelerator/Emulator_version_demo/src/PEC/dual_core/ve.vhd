@@ -1020,7 +1020,7 @@ begin
         data_read_enable_i <= fft_read_en;
         data_write_enable_i <= fft_write_en;
         weight_read_enable_i <= fft_read_en;
-        weight_write_enable_i <= fft_write_en;
+        weight_write_enable_i <= '0';
         read_en_b_i <= '0';
       else
         data_read_enable_i <= '0';

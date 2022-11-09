@@ -270,6 +270,7 @@ architecture rtl of ve is
       clk_e_pos        : in std_logic;
       start            : in std_logic;
       cnt_rst          : in std_logic;
+      keep_acc         : in std_logic;
       data_valid       : in std_logic;
       mode_a           : in std_logic;
       mode_b           : in std_logic;
@@ -431,7 +432,7 @@ architecture rtl of ve is
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
   signal read_en_to_mux, read_en_w_to_mux, read_en_b_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
-  signal clr_acc : std_logic; --clear accumulators
+  signal kep_acc : std_logic; --keep accumulators vaule for long pointwise convolution
   signal fft_mode : std_logic;
   signal N_point : integer;
   signal bits    : integer;
@@ -531,7 +532,7 @@ begin
   re_source    <= PL(96); --RE_DFY_SRC --
   start        <= PL(95); 
   re_switch    <= PL(94); -- RE mode or VE mode
-  clr_acc      <= PL(93);
+  kep_acc      <= PL(93);
   mode_c       <= PL(92);
 
   --
@@ -969,7 +970,7 @@ begin
     case mode_latch is
       when conv   => memreg_c_i    <= conv_memreg_c;
                      writebuff_c_i <= conv_writebuff_c;
-                     inst_i        <= conv_ins when clr_acc = '0' else zeroacc;
+                     inst_i        <= conv_ins;
                      ppinst_i      <= conv_ppins;
                      ppshiftinst_i <= conv_ppshiftinst;
                      addbiasinst_i <= conv_addbiasinst;
@@ -1315,6 +1316,7 @@ begin
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,
+      keep_acc         => kep_acc,
       data_valid       => bypass_valid,
       mode_a           => mode_a,
       mode_b           => mode_b,

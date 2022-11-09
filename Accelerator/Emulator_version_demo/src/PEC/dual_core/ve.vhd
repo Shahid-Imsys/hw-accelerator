@@ -37,7 +37,7 @@ use ieee.numeric_std.all;
 
 use work.instructiontypes.all;
 use work.vetypes.all;
-use work.mpgmfield_lib.all;
+use work.pe1_mpgmfield_lib.all;
 --use work.cluster_pkg.all;
 
 entity ve is

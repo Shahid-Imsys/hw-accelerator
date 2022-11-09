@@ -662,11 +662,11 @@ architecture struct of top is
   --attribute mark_debug of c2_mpram_ce: signal is "true";
   --attribute mark_debug of c2_mpram_d: signal is "true";
   --attribute mark_debug of c2_core2_en: signal is "true";
-  attribute mark_debug of c1_d_addr: signal is "true";
-  attribute mark_debug of c1_d_cs: signal is "true";  
-  attribute mark_debug of c1_d_we: signal is "true";  
-  attribute mark_debug of c1_d_dqo: signal is "true";
-  attribute mark_debug of c1_d_dqi: signal is "true";  
+  --attribute mark_debug of c1_d_addr: signal is "true";
+  --attribute mark_debug of c1_d_cs: signal is "true";  
+  --attribute mark_debug of c1_d_we: signal is "true";  
+  --attribute mark_debug of c1_d_dqo: signal is "true";
+  --attribute mark_debug of c1_d_dqi: signal is "true";  
   
   
 

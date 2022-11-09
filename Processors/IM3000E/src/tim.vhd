@@ -187,6 +187,16 @@ architecture rtl of tim is
   signal pl_alud_sig               : std_logic;     -- Only bit 2 used here
   attribute syn_keep of held_e_int : signal is true;
   signal counter_s                 : std_logic_vector(5 downto 0);
+
+
+  attribute mark_debug : string; 
+  attribute mark_debug of ack_spreq: signal is "true";
+  attribute mark_debug of call_sp: signal is "true";    
+  attribute mark_debug of stop_step_c2: signal is "true";
+  attribute mark_debug of single_step: signal is "true"; 
+  attribute mark_debug of pl_shin_pa_sig: signal is "true";   
+
+
 begin
 ---------------------------------------------------------------------
 -- Reset generation &

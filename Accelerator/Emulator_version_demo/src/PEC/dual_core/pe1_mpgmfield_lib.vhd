@@ -433,4 +433,4 @@ package pe1_mpgmfield_lib is
   constant CONS_AU_PACMP2    : std_logic_vector(5 downto 0) := "11"&x"E"; --pushback mode_a comparator2 of addressing unit
   constant CONS_AU_PACMP3    : std_logic_vector(5 downto 0) := "11"&x"F"; --pushback mode_a comparator3 of addressing unit
 
-end mpgmfield_lib;
+end pe1_mpgmfield_lib;

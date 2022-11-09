@@ -19,8 +19,10 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x64.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhd \
+					$(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
  				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatoreven.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatorodd.vhd \
+					$(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addmul.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_acc.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_alu.vhd \

@@ -270,7 +270,6 @@ architecture rtl of ve is
       clk_e_pos        : in std_logic;
       start            : in std_logic;
       cnt_rst          : in std_logic;
-      keep_acc         : in std_logic;
       data_valid       : in std_logic;
       mode_a           : in std_logic;
       mode_b           : in std_logic;
@@ -432,7 +431,7 @@ architecture rtl of ve is
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
   signal read_en_to_mux, read_en_w_to_mux, read_en_b_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
-  signal kep_acc : std_logic; --keep accumulators vaule for long pointwise convolution
+  signal keep_acc : std_logic; --keep accumulators vaule for long pointwise convolution
   signal fft_mode : std_logic;
   signal N_point : integer;
   signal bits    : integer;
@@ -532,7 +531,7 @@ begin
   re_source    <= PL(96); --RE_DFY_SRC --
   start        <= PL(95); 
   re_switch    <= PL(94); -- RE mode or VE mode
-  kep_acc      <= PL(93);
+  keep_acc     <= PL(93);
   mode_c       <= PL(92);
 
   --
@@ -1316,7 +1315,6 @@ begin
       clk_e_pos        => clk_e_pos,
       start            => conv_start,
       cnt_rst          => conv_cnt_rst,
-      keep_acc         => kep_acc,
       data_valid       => bypass_valid,
       mode_a           => mode_a,
       mode_b           => mode_b,

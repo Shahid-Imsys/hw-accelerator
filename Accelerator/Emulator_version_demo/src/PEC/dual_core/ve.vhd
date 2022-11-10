@@ -1094,7 +1094,7 @@ begin
       port map (
         Q        => data0,
         ADR      => data0addr_to_memory,
-        D        => mem_data_in(63 downto 32),
+        D        => data_to_mem(63 downto 32),
         WE       => write_en_o,
         ME       => '1',
         CLK      => clk_p,
@@ -1113,7 +1113,7 @@ begin
       port map (
         Q        => data1,
         ADR      => data1addr_to_memory,
-        D        => mem_data_in(31 downto 0),
+        D        => data_to_mem(31 downto 0),
         WE       => write_en_o,
         ME       => '1',
         CLK      => clk_p,
@@ -1133,7 +1133,7 @@ begin
       port map (
         Q        => weight_out,
         ADR      => weightaddr_to_memory,
-        D        => mem_data_in,
+        D        => data_to_mem,
         WE       => write_en_w_o,
         ME       => '1',
         CLK      => clk_p,

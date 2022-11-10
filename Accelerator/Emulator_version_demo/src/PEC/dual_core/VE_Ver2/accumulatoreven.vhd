@@ -1,3 +1,6 @@
+--even index number accumulator
+--this block can be use either as accumulator or adder, for more details check the block diagram
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

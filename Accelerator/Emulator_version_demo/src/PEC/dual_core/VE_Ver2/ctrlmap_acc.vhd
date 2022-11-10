@@ -1,3 +1,7 @@
+--control map for accumulator
+--this block maps the control instructions from controller
+--to accumulators.
+
 use work.vetypes.all;
 use work.instructiontypes.all;
 

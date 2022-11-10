@@ -1,3 +1,6 @@
+--adder and multiplier
+--this block does add/sub and multiplication.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

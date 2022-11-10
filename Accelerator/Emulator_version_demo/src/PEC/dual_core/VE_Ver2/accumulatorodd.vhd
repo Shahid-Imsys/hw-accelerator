@@ -1,3 +1,6 @@
+--odd index number accumulator
+--this block is just an accumulator
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

@@ -1,4 +1,6 @@
-
+--convolution controller
+--this block generates the control signals for addressing unit, mem 
+--and convolution instructions to the ve core.
 
 library ieee;
 use ieee.std_logic_1164.all;

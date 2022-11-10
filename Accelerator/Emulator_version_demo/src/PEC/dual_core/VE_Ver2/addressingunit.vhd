@@ -1,4 +1,5 @@
-
+-- address generate unit
+-- this unit generates the addresses for read/write from/to local sram.
 
 library ieee;
 use ieee.std_logic_1164.all;

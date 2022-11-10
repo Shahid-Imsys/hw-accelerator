@@ -1,3 +1,7 @@
+--control map for alu
+--this block maps the control instructions from controller
+--to alu.
+
 use work.vetypes.all;
 use work.instructiontypes.all;
 

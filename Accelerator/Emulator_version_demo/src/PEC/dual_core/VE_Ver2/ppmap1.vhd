@@ -1,3 +1,7 @@
+--postprocess instruction map
+--this block maps the postprocess instructions to
+--postprocess blocks.
+
 library ieee;
 use ieee.std_logic_1164.all;
 

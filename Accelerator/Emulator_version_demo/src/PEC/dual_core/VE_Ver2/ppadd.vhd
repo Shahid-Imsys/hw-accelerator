@@ -1,3 +1,7 @@
+--postprocess adder
+--this block can be use as adder or accumulator or MUX. For details check
+--the block diagram
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

@@ -31,7 +31,7 @@ entity ldlinvcontroller is
     clipinst_o : out ppshift_clip_ctrl;
     zpdata_o : out std_logic_vector(7 downto 0);
     zpweight_o : out std_logic_vector(7 downto 0);
-    bias_o : out std_logic_vector(31 downto 0);
+    bias_o : out std_logic_vector(63 downto 0);
 
     en_max_o : out unsigned(3 downto 0)
   );
@@ -62,11 +62,14 @@ architecture rtl of ldlinvcontroller is
 
   signal dest_index : unsigned(7 downto 0) := (others => '0');
   signal dest_index_tmp : unsigned(9 downto 0) := (others => '0');
+  signal dest_index_tmp2 : unsigned(9 downto 0) := (others => '0');
   signal l_index : unsigned(7 downto 0) := (others => '0');
   signal l_inv_index : unsigned(7 downto 0) := (others => '0');
   signal l_inv_index_tmp : unsigned(9 downto 0) := (others => '0');
+  signal l_inv_index_tmp2 : unsigned(9 downto 0) := (others => '0');
   signal sum_index : unsigned(7 downto 0) := (others => '0');
   signal sum_index_tmp : unsigned(9 downto 0) := (others => '0');
+  signal csq : unsigned(9 downto 0) := (others => '0');
 
   type state_type is (idle, working, matmulhalf, rzero, writing);
   signal state : state_type := idle;
@@ -98,7 +101,7 @@ architecture rtl of ldlinvcontroller is
   signal clipinst : ppshift_clip_ctrl;
   signal zpdata : std_logic_vector(7 downto 0);
   signal zpweight : std_logic_vector(7 downto 0);
-  signal bias : std_logic_vector(31 downto 0);
+  signal bias : std_logic_vector(63 downto 0);
 
 begin
   --counters-----------------------------------------------------------------
@@ -221,7 +224,7 @@ begin
   ---------------------------------------------------------------------------
   --counter control----------------------------------------------------------
   --process (all)
-  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
+  process (start, state, next_state, i_is_max, j_is_max, c_is_max, r_is_max)
   begin
     r_ce <= '0';
     r_reset <= '0';
@@ -251,7 +254,7 @@ begin
   end process;
 
   --process (all)
-  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
+  process (start, state, next_state, i_is_max, j_is_max, c_is_max)
   begin
     c_ce <= '0';
     c_reset <= '0';
@@ -281,7 +284,7 @@ begin
   end process;
 
   --process (all)
-  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
+  process (start, state, next_state, i_is_max, j_is_max)
   begin
     i_ce <= '0';
     i_reset <= '0';
@@ -315,7 +318,7 @@ begin
   end process;
 
   --process (all)
-  process (start, state, next_state, prev_state, i_is_max, j_is_max, c_is_max, r_is_max, i)
+  process (start, state, next_state, j_is_max)
   begin
     j_ce <= '0';
     j_reset <= '0';
@@ -358,42 +361,49 @@ begin
 
   ---------------------------------------------------------------------------
   --address control----------------------------------------------------------
-  dest_index_tmp <= (r + c) * (r + c + 1)/2 + c;
-  dest_index <= dest_index_tmp(7 downto 0);
+
+  csq <= c*c + c;
+
+  dest_index_tmp <= r*r + r + csq;
+  dest_index_tmp2 <= dest_index_tmp(9 downto 1) + r*c + c;
+  dest_index <= dest_index_tmp2(7 downto 0);
+
   l_index <= dest_index + j;
-  l_inv_index_tmp <= (j + c) * (j + c + 1)/2 + c;
-  l_inv_index <= l_inv_index_tmp(7 downto 0);
-  sum_index_tmp <= (r + c) * (3 + r + c)/2;
+
+  l_inv_index_tmp <= j*j + j + csq;
+  l_inv_index_tmp2 <= l_inv_index_tmp(9 downto 1) + j*c + c;
+  l_inv_index <= l_inv_index_tmp2(7 downto 0);
+
+  sum_index_tmp <= dest_index_tmp2 + r; --sum_index_tmp <= (r + c) * (3 + r + c)/2; --TODO: (r + c) * (r + c - 1)/2
   sum_index <= sum_index_tmp(7 downto 0);
 
   --process (all)
   process(r, state)
   begin
     if r = 0 then
-      data_read_addr_sel <= d;
-    elsif state = matmulhalf then
-      data_read_addr_sel <= s;
       weight_read_addr_sel <= d;
+    elsif state = matmulhalf then
+      weight_read_addr_sel <= s;
+      data_read_addr_sel <= d;
     else
-      data_read_addr_sel <= l;
-      weight_read_addr_sel <= li;
+      weight_read_addr_sel <= l;
+      data_read_addr_sel <= li;
     end if;
   end process;
-
-  with data_read_addr_sel select
-    data_read_addr <=
-    dest_index when d,
-    l_index when l,
-    sum_index when s,
-    (others => '0') when others;
 
   with weight_read_addr_sel select
     weight_read_addr <=
     dest_index when d,
-    l_inv_index when li,
-    (others => '0') when others;
+    l_index when l,
+    sum_index when others;
 
-  weight_write_addr <= dest_index;
+  with data_read_addr_sel select
+    data_read_addr <=
+    dest_index when d,
+    l_inv_index when others;
+
+  data_write_addr <= dest_index;
+
   ---------------------------------------------------------------------------
   --instructions-------------------------------------------------------------
   --process (all)
@@ -404,7 +414,7 @@ begin
     weight_read_enable <= '0';
     weight_write_enable <= '0';
 
-    memreg_c <= (swap => noswap,
+    memreg_c <= (swap => switch,
       datareg => hold,
       weightreg => hold);
     writebuff_c <= (swap => noswap,
@@ -415,6 +425,7 @@ begin
     ppshiftinst <=
       (acce => enable,
       shift => 8,
+      use_lod => '0',
       shift_dir => right);
     addbiasinst <= (acc => pass,
                     quant => trunc);
@@ -497,7 +508,8 @@ begin
         clipinst.outreg <= none;
         data_read_enable <= '0';
         weight_read_enable <= '0';
-        weight_write_enable <= '1';
+        data_write_enable <= '1';
+        weight_write_enable <= '0';
         writebuff_c.datareg <= enable;
         writebuff_c.weightreg <= enable;
       when others =>
@@ -544,8 +556,9 @@ begin
   data0_addr_o <= std_logic_vector(data_read_addr) when (data_write_enable /= '1')
                   else std_logic_vector(data_write_addr);
   data1_addr_o <= data0_addr_o;
-  weight_addr_o <= std_logic_vector(weight_read_addr) when (weight_write_enable /= '1')
-                  else std_logic_vector(weight_write_addr);
+  --weight_addr_o <= std_logic_vector(weight_read_addr) when (weight_write_enable /= '1')
+  --                else std_logic_vector(weight_write_addr);
+  weight_addr_o <= std_logic_vector(weight_read_addr);
   data_read_enable_o <= data_read_enable;
   data_write_enable_o <= data_write_enable;
   weight_read_enable_o <= weight_read_enable;

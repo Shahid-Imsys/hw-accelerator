@@ -11,16 +11,19 @@ entity ldlcontroller is
         clk : in std_logic;
         start : in std_logic;
         en_i : in std_logic;
-        nt : in std_logic_vector(4 downto 0) := "00011";--integer range 0 to 20 := 3;
+        nt : in std_logic_vector(4 downto 0) := "00010";--integer range 0 to 20 := 3;
         done : out std_logic;
 
         data0_addr_o : out std_logic_vector(7 downto 0);
         data1_addr_o : out std_logic_vector(7 downto 0);
         weight_addr_o : out std_logic_vector(7 downto 0);
+        bias_addr_o : out std_logic_vector(7 downto 0);
+        bias_addr_ctrl_o : out bias_addr_t;
         data_read_enable_o : out std_logic;
         data_write_enable_o : out std_logic;
         weight_read_enable_o : out std_logic;
         weight_write_enable_o : out std_logic;
+        bias_ren_o : out std_logic;
 
         memreg_c_o : out memreg_ctrl;
         writebuff_c_o : out memreg_ctrl;
@@ -29,16 +32,16 @@ entity ldlcontroller is
         ppshiftinst_shift_o : out ppshift_shift_ctrl;
         ppshiftinst_addbias_o : out ppshift_addbias_ctrl;
         ppshiftinst_clip_o : out ppshift_clip_ctrl;
+        lzod_o : out lzod_ctrl;
+        feedback_ctrl_o : out feedback_t;
         zpdata_o : out std_logic_vector(7 downto 0);
         zpweight_o : out std_logic_vector(7 downto 0);
-        bias_o : out std_logic_vector(31 downto 0);
 
         en_max_o : out unsigned(3 downto 0)
     );
 end entity;
 
 -------------------------------------------------------------------------------
--- TODO: data/weight_read/write_enable, memreg_c/writebuff_c, en_max
 -------------------------------------------------------------------------------
 
 architecture rtl of ldlcontroller is
@@ -48,7 +51,7 @@ architecture rtl of ldlcontroller is
     signal k : unsigned(4 downto 0) := (others => '0');--integer range 0 to nt := 0;
     signal i : unsigned(4 downto 0) := "00001";--integer range 0 to nt := 1;
     signal j : unsigned(4 downto 0) := "00001";--integer range 0 to nt := 1;
-    signal r : unsigned(4 downto 0) := (others => '0');
+    signal r : unsigned(2 downto 0) := (others => '0');
     signal c : unsigned(1 downto 0) := (others => '0');
     signal k_ce : std_logic;
     signal i_ce : std_logic;
@@ -60,7 +63,7 @@ architecture rtl of ldlcontroller is
     signal j_reset : std_logic;
     signal r_reset : std_logic;
     signal c_reset : std_logic;
-    signal r_max : unsigned(4 downto 0) := (others => '0');
+    signal r_max : unsigned(2 downto 0) := (others => '0');
 
     type a_addr_type is (kk,ik,ii,ij);
     signal a_addr : unsigned(7 downto 0);--integer  range 0 to 255;
@@ -90,6 +93,8 @@ architecture rtl of ldlcontroller is
     signal weight_read_addr : unsigned(7 downto 0);--integer;
     signal data_write_addr : unsigned(7 downto 0);--integer;
     signal weight_write_addr : unsigned(7 downto 0);--integer;
+    signal bias_addr : std_logic_vector(7 downto 0);
+    signal bias_addr_ctrl : bias_addr_t;
     signal data_read_addr_sel : addr_type;
     signal weight_read_addr_sel : addr_type;
     signal data_write_addr_sel : addr_type;
@@ -98,6 +103,7 @@ architecture rtl of ldlcontroller is
     signal data_write_enable : std_logic;
     signal weight_read_enable : std_logic;
     signal weight_write_enable : std_logic;
+    signal bias_ren : std_logic;
 
     signal memreg_c : memreg_ctrl;
     signal writebuff_c : memreg_ctrl;
@@ -106,10 +112,36 @@ architecture rtl of ldlcontroller is
     signal ppshiftinst_shift : ppshift_shift_ctrl;
     signal ppshiftinst_addbias : ppshift_addbias_ctrl;
     signal ppshiftinst_clip : ppshift_clip_ctrl;
+    signal lzod : lzod_ctrl;
+    signal feedback_ctrl : feedback_t;
     signal zpdata : std_logic_vector(7 downto 0);
     signal zpweight : std_logic_vector(7 downto 0);
-    signal bias : std_logic_vector(31 downto 0);
+
+    signal kp1 : unsigned(4 downto 0);
+    signal ip1 : unsigned(4 downto 0);
+    signal jp1 : unsigned(4 downto 0);
+    signal rp1 : unsigned(2 downto 0);
+    signal cp1 : unsigned(1 downto 0);
+    signal ntm1 : unsigned(4 downto 0);
+    signal im1 : unsigned(4 downto 0);
+
+    signal ris0 : std_logic;
+    signal ris1 : std_logic;
+    signal ris2 : std_logic;
+
 begin
+
+    kp1 <= k + 1;
+    ip1 <= i + 1;
+    jp1 <= j + 1;
+    rp1 <= r + 1;
+    cp1 <= c + 1;
+    ntm1 <= unsigned(nt) - 1;
+    im1 <= i - 1;
+
+    ris0 <= '1' when r = "000" else '0';
+    ris1 <= '1' when r = "001" else '0';
+    ris2 <= '1' when r = "010" else '0';
 
     process (clk)
     begin
@@ -118,7 +150,7 @@ begin
                 if k_reset = '1' then
                     k <= (others => '0'); -- 0 due to zero indexing
                 elsif k_ce = '1' then
-                    k <= k + 1;
+                    k <= kp1;
                 end if;
             end if;
         end if;
@@ -129,9 +161,9 @@ begin
         if rising_edge(clk) then
             if en_i = '1' then
                 if i_reset = '1' then
-                    i <= k + 1;
+                    i <= kp1;
                 elsif i_ce = '1' then
-                    i <= i + 1;
+                    i <= ip1;
                 end if;
             end if;
         end if;
@@ -142,9 +174,9 @@ begin
         if rising_edge(clk) then
             if en_i = '1' then
                 if j_reset = '1' then
-                    j <= k + 1;
+                    j <= kp1;
                 elsif j_ce = '1' then
-                    j <= j + 1;
+                    j <= jp1;
                 end if;
             end if;
         end if;
@@ -157,7 +189,7 @@ begin
                 if r_reset = '1' then
                     r <= (others => '0');
                 elsif r_ce = '1' then
-                    r <= r + 1;
+                    r <= rp1;
                 end if;
             end if;
         end if;
@@ -169,30 +201,21 @@ begin
             if en_i = '1' then
                 if c_reset = '1' then
                     c <= (others => '0');
-                elsif c_ce = '1' then
-                    c <= c + 1;
+                else
+                    c <= cp1;
                 end if;
             end if;
         end if;
     end process;
 
     -- next state process
-    process (all)
+    --process (all)
+    process (state, prev_state, k, i, j, r, c, start, ris1, ris2, ntm1, kp1, im1)
     begin
         next_state <= state;
         if state = xSYTRF then -- xSYTRF
-            if r = "00000" and c = "00" then
+            if (c = "11" and (ris1 = '1' or ris2 = '1')) or r = "110" then
                 next_state <= writing;
-            elsif r = "00101" and c = "01" then
-                next_state <= writing;
-            elsif c = "11" then
-                if r = "00110" and k = unsigned(nt)-1 then
-                    done <= '1';
-                    -- go to wait state
-                    next_state <= idle;
-                else
-                    next_state <= writing;
-                end if;
             end if;
         elsif state = xTRSM then -- xTRSM
             if c = "11" then
@@ -208,22 +231,27 @@ begin
             end if;
         elsif state = writing then
             if prev_state = xSYTRF then
-                if r = "00110" then
-                    next_state <= xTRSM;
+                if r = "110" then
+                    if k = ntm1 then
+                        done <= '1';
+                        next_state <= idle;
+                    else
+                        next_state <= xTRSM;
+                    end if;
                 else
                     next_state <= xSYTRF;
                 end if;
             elsif prev_state = xTRSM then
-                if r = "00001" and i = unsigned(nt)-1 then
+                if ris1 = '1' and i = ntm1 then
                     next_state <= xSYDRK;
                 else
                     next_state <= xTRSM;
                 end if;
             elsif prev_state = xSYDRK then
-                if r = "00011" then
-                    if i > k+1 then
+                if ris2 = '1' then
+                    if i > kp1 then
                         next_state <= xGEMDM;
-                    elsif i = unsigned(nt)-1 then
+                    elsif i = ntm1 then
                         next_state <= xSYTRF;
                     else
                         next_state <= xSYDRK;
@@ -231,10 +259,10 @@ begin
                 else
                     next_state <= xSYDRK;
                 end if;
-            elsif prev_state = xGEMDM then
-                if r = "00011" then
-                    if j = i-1 then
-                        if i = unsigned(nt)-1 then
+            else
+                if ris2 = '1' then
+                    if j = im1 then
+                        if i = ntm1 then
                             next_state <= xSYTRF;
                         else
                             next_state <= xSYDRK;
@@ -265,15 +293,16 @@ begin
     end process;
 
     with prev_state select
-        r_max <= "00110" when xSYTRF,
-            "00001" when xTRSM,
-            "00011" when xSYDRK,
-            "00011" when xGEMDM,
-            "11111" when others;
+        r_max <= "110" when xSYTRF,
+            "001" when xTRSM,
+            "010" when xSYDRK,
+            "010" when xGEMDM,
+            "111" when others;
 
 
     -- counter control
-    process (all)
+    --process (all)
+    process (state, next_state, prev_state, r, c, r_max, start, ris0, ris1, ris2)
     begin
         k_ce <= '0';
         i_ce <= '0';
@@ -287,36 +316,24 @@ begin
         c_reset <= '0';
 
         if state = xSYTRF then -- xSYTRF
-            if r = "00011" and c = "00" then
+            if
+            (ris0 = '1' and c = "11") or (r = "011" and c = "11") or
+            (r = "100" and c = "11") or r = "101" then
                 r_ce <= '1';
                 c_reset <= '1';
             end if;
-        elsif state = xTRSM then -- xTRSM
-
-        elsif state = xSYDRK then -- xSYDRK
-            if r = "00000" and c = "00" then
-                r_ce <= '1';
-                c_reset <= '1';
-            end if;
-
-        elsif state = xGEMDM then -- xGEMDM
-            if r = "00000" and c = "00" then
-                r_ce <= '1';
-                c_reset <= '1';
-            end if;
-
         elsif state = writing then
             if prev_state = xSYTRF then
                 if next_state = xTRSM then
                     i_reset <= '1';
                 end if;
-            elsif prev_state = xTRSM and r = "00001" then
+            elsif prev_state = xTRSM and ris1 = '1' then
                 if next_state = xTRSM then
                     i_ce <= '1';
                 else -- next_state = xSYDRK
                     i_reset <= '1';
                 end if;
-            elsif prev_state = xSYDRK and r = "00011" then
+            elsif prev_state = xSYDRK and ris2 = '1' then
                 if next_state = xSYTRF then
                     k_ce <= '1';
                 elsif next_state = xSYDRK then
@@ -324,7 +341,7 @@ begin
                 else -- next_state = xGEMDM
                     j_reset <= '1';
                 end if;
-            elsif prev_state = xGEMDM and r = "00011" then
+            elsif prev_state = xGEMDM and ris2 = '1' then
                 if next_state = xSYTRF then
                     k_ce <= '1';
                 elsif next_state = xSYDRK then
@@ -351,120 +368,89 @@ begin
     end process;
 
     -- address select control
-    process (all)
+    --process (all)
+    process (state, prev_state, r, ris0, ris1)
     begin
+        data_read_addr_sel <= a;
+        weight_read_addr_sel <= last;
+        data_write_addr_sel <= last;
+        weight_write_addr_sel <= last;
+        a_addr_sel <= kk;
+        l_addr_sel <= kk;
         if state = xSYTRF then -- xSYTRF
-            if r = "00000" then
-                data_read_addr_sel <= a;
-                weight_write_addr_sel <= last;
-                a_addr_sel <= kk;
-            elsif r = "00001" then        -- 4 cycles, set Lkk
-                weight_read_addr_sel <= last;
-                weight_write_addr_sel <= l;
-                l_addr_sel <= kk;
-            elsif r = "00010" then                               -- 4 cycles, set Dkk
-                data_read_addr_sel <= a;
-                weight_read_addr_sel <= last;
-                weight_write_addr_sel <= d;
-                a_addr_sel <= kk;
-            elsif r = "00011" then
-                weight_read_addr_sel <= a;
-                data_write_addr_sel <= last;
-                a_addr_sel <= kk;
-            elsif r = "00100" then
-                data_read_addr_sel <= last;
-                data_write_addr_sel <= last;
-            else
-                data_read_addr_sel <= last;
-                weight_read_addr_sel <= d;
-                weight_write_addr_sel <= di;
-            end if;
+            data_read_addr_sel <= a;
+            a_addr_sel <= kk;
         elsif state = xTRSM then -- xTRSM
-            if r = "00000" then        -- 4 cycles, Aik*Lkk
+            if ris0 = '1' then        -- 4 cycles, Aik*Lkk
                 data_read_addr_sel <= a;
                 weight_read_addr_sel <= l;
-                data_write_addr_sel <= last;
                 a_addr_sel <= ik;
                 l_addr_sel <= kk;
             else                                -- 4 cycles, tmp*d_inv
                 data_read_addr_sel <= last;
                 weight_read_addr_sel <= di;
-                weight_write_addr_sel <= l;
-                l_addr_sel <= ik;
             end if;
         elsif state = xSYDRK then -- xSYDRK
-            if r = "00000" then           -- probably 1 cycle, from W to D
+            if ris0 = '1' then           -- 4 cycles, Aik*Lkk
+                data_read_addr_sel <= a;
+                weight_read_addr_sel <= l;
+                a_addr_sel <= ik;
+                l_addr_sel <= kk;
+            elsif ris1 = '1' then -- 4 cycles, tmp*Lik, W*D
+                data_read_addr_sel <= last;
                 weight_read_addr_sel <= l;
                 l_addr_sel <= ik;
-            elsif r = "00001" then        -- 4 cycles, Lik*Dkk
-                weight_read_addr_sel <= d;
-                weight_write_addr_sel <= last;
-            elsif r = "00010" then        -- 4 cycles, tmp*Lik, W*D
-                data_read_addr_sel <= last;
-                weight_read_addr_sel <= last;
-                weight_write_addr_sel <= last;
             else                                -- matsub
                 data_read_addr_sel <= a;
                 weight_read_addr_sel <= last;
-                data_write_addr_sel <= a;
                 a_addr_sel <= ii;
             end if;
         elsif state  = xGEMDM then -- xGEMDM
-            if r = "00000" then           -- probably 1 cycle, from W to D
+            if ris0 = '1' then           -- 4 cycles, Aik*Lkk
+                data_read_addr_sel <= a;
                 weight_read_addr_sel <= l;
-                l_addr_sel <= ik;
-            elsif r = "00001" then        -- 4 cycles, Lik*Dkk
-                weight_read_addr_sel <= d;
-                data_write_addr_sel <= last;
-            elsif r = "00010" then        -- 4 cycles, tmp*Ljk, D*W
+                a_addr_sel <= ik;
+                l_addr_sel <= kk;
+            elsif ris1 = '1' then        -- 4 cycles, tmp*Ljk, D*W
                 data_read_addr_sel <= last;
                 weight_read_addr_sel <= l;
-                weight_write_addr_sel <= last;
                 l_addr_sel <= jk;
             else                                -- matsub
                 data_read_addr_sel <= a;
                 weight_read_addr_sel <= last;
-                data_write_addr_sel <= a;
                 a_addr_sel <= ij;
             end if;
         elsif state = writing then
             if prev_state = xSYTRF then
-                if r = "00000" then
-                    weight_write_addr_sel <= last;
-                elsif r = "00001" then        -- 4 cycles, set Lkk
-                    weight_write_addr_sel <= l;
-                    l_addr_sel <= kk;
-                elsif r = "00010" then                               -- 4 cycles, set Dkk
-                    weight_write_addr_sel <= d;
-                elsif r = "00011" then
-                    data_write_addr_sel <= last;
-                elsif r = "00100" then
-                    data_write_addr_sel <= last;
-                else
-                    weight_write_addr_sel <= di;
-                end if;
+                case r is
+                    when "001" =>
+                        weight_write_addr_sel <= l;
+                        l_addr_sel <= kk;
+                    when "010" =>
+                        weight_write_addr_sel <= d;
+                    when others =>
+                        weight_write_addr_sel <= di;
+                end case;
             elsif prev_state = xTRSM then
-                if r = "00000" then        -- 4 cycles, Aik*Lkk
+                if ris0 = '1' then        -- 4 cycles, Aik*Lkk
                     data_write_addr_sel <= last;
                 else                                -- 4 cycles, tmp*d_inv
                     weight_write_addr_sel <= l;
                     l_addr_sel <= ik;
                 end if;
             elsif prev_state = xSYDRK then
-                if r = "00000" then           -- probably 1 cycle, from W to D
-                elsif r = "00001" then        -- 4 cycles, Lik*Dkk
-                    weight_write_addr_sel <= last;
-                elsif r = "00010" then        -- 4 cycles, tmp*Lik, W*D
+                if ris0 = '1' then           -- 4 cycles, Aik*Lkk
+                    data_write_addr_sel <= last;
+                elsif ris1 = '1' then -- 4 cycles, tmp*Lik, W*D
                     weight_write_addr_sel <= last;
                 else                                -- matsub
-                    weight_write_addr_sel <= a;
+                    data_write_addr_sel <= a;
                     a_addr_sel <= ii;
                 end if;
             else -- prev_state = xGEMDM
-                if r = "00000" then           -- probably 1 cycle, from W to D
-                elsif r = "00001" then        -- 4 cycles, Lik*Dkk
+                if ris0 = '1' then           -- 4 cycles, Aik*Lkk
                     data_write_addr_sel <= last;
-                elsif r = "00010" then        -- 4 cycles, tmp*Ljk, D*W
+                elsif ris1 = '1' then        -- 4 cycles, tmp*Ljk, D*W
                     weight_write_addr_sel <= last;
                 else                                -- matsub
                     data_write_addr_sel <= a;
@@ -482,84 +468,75 @@ begin
     end process;
 
     -- addresses
-    l_rows_tmp <= unsigned(nt)*(1+unsigned(nt))/2;
-    l_rows <= l_rows_tmp(7 downto 0);
-    a_addr_tmp <= a_row*(a_row+1)/2 + a_col;
-    a_addr <= a_addr_tmp(7 downto 0);
-    l_addr_tmp <= l_row*(l_row+1)/2 + l_col;
-    l_addr <= l_addr_tmp(7 downto 0);
+    --l_rows_tmp <= unsigned(nt)*(1+unsigned(nt));
+    l_rows_tmp <= unsigned(nt)*unsigned(nt)+unsigned(nt);
+    l_rows <= l_rows_tmp(8 downto 1);
+
+    --a_addr_tmp <= a_row*(a_row+1);
+    a_addr_tmp <= a_row*a_row+a_row;
+    a_addr <= a_addr_tmp(8 downto 1) + a_col;
+
+    --l_addr_tmp <= l_row*(l_row+1);
+    l_addr_tmp <= l_row*l_row+l_row;
+    l_addr <= l_addr_tmp(8 downto 1) + l_col;
+
     d_addr <= k + l_rows;
     d_inv_addr <= d_addr + unsigned(nt);
     last_addr <= x"FF";
 
     with a_addr_sel select
         a_row <= k when kk,
-                 i when ik,
-                 i when ii,
-                 i when ij,
-                 (others => '0') when others;
+                 i when others;
 
     with a_addr_sel select
         a_col <= k when kk,
                  k when ik,
                  i when ii,
-                 j when ij,
-                 (others => '0') when others;
+                 j when others;
 
 
     with l_addr_sel select
         l_row <= k when kk,
                  i when ik,
-                 j when jk,
-                 (others => '0') when others;
+                 j when others;
 
-    with l_addr_sel select
-        l_col <= k when kk,
-                 k when ik,
-                 k when jk,
-                 (others => '0') when others;
+    l_col <= k;
 
     -- remove unneccesary addresses
     with data_read_addr_sel select
         data_read_addr <=   a_addr when a,
-                            l_addr when l,
-                            d_addr when d,
-                            d_inv_addr when di,
-                            last_addr when last,
-                            (others => '0') when others;
+                            last_addr when others;
 
     with weight_read_addr_sel select
         weight_read_addr <= a_addr when a,
                             l_addr when l,
-                            d_addr when d,
                             d_inv_addr when di,
-                            last_addr when last,
-                            (others => '0') when others;
+                            last_addr when others;
 
     with data_write_addr_sel select
         data_write_addr <=  a_addr when a,
-                            l_addr when l,
-                            d_addr when d,
-                            d_inv_addr when di,
-                            last_addr when last,
-                            (others => '0') when others;
+                            last_addr when others;
 
     with weight_write_addr_sel select
         weight_write_addr <= a_addr when a,
                              l_addr when l,
                              d_addr when d,
                              d_inv_addr when di,
-                             last_addr when last,
-                             (others => '0') when others;
+                             last_addr when others;
+
+    bias_addr <= (others => '0');
 
 
     -- instructions
-    process (all)
+    --process (all)
+    process (state, prev_state, r, c, ris0, ris1)
     begin
         data_read_enable <= '0';
         weight_read_enable <= '0';
         data_write_enable <= '0';
         weight_write_enable <= '0';
+        bias_ren <= '0';
+        bias_addr_ctrl <= ctrl;
 
         memreg_c <= (swap => noswap,
             datareg => hold,
@@ -573,132 +550,182 @@ begin
         ppshiftinst_shift <=
             (acce      => enable,
              shift     => 8,
+             use_lod    => '0',
              shift_dir => right);
 
         ppshiftinst_addbias <=
             (acc       => pass,
-             quant     => trunc);
+             quant     => trunc); -- TODO: trunc eller round, trunc verkar bättre, kanske ska vara round på fler ställen?
 
         ppshiftinst_clip <=
             (clip      => clip16,
-             outreg    => out76);
+             outreg    => none);
+
+        lzod <= (word => "00", store => none, output => none);
+        feedback_ctrl <= keep;
 
         zpdata <= (others => '0');
         zpweight <= (others => '0');
-        bias <= (others => '0');
 
-        if state = xSYTRF then -- xSYTRF -- TODO all instructions with new state control
-            if r = "00000" then
-                data_read_enable <= '1';
-                memreg_c.datareg <= enable;
-                -- inst <= division; -- TODO
-                ppinst <= select6;
-            elsif r = "00001" then        -- 4 cycles, set Lkk
-                case c is
-                    when "00" =>
-                        weight_read_enable <= '1';
-                        memreg_c.weightreg <= enable;
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipone16;
-                    when "01" =>
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipzero;
-                        ppshiftinst_clip.outreg <= out54;
-                    when "10" =>
-                        inst <= unitri1;
-                        ppinst <= select6;
-                        ppshiftinst_shift.shift <= 7;
-                        ppshiftinst_clip.outreg <= out32;
-                    when others => -- "11"
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipone16;
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            elsif r = "00010" then                                -- 4 cycles, set Dkk
-                case c is
-                    when "00" =>
-                        data_read_enable <= '1';
-                        weight_read_enable <= '1';
-                        memreg_c.datareg <= enable;
-                        memreg_c.weightreg <= enable;
-                        inst <= unitri1;
-                        ppinst <= select6;
-                        ppshiftinst_shift.shift <= 7;
-                    when "01" =>
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipzero;
-                        ppshiftinst_clip.outreg <= out54;
-                    when "10" =>
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipzero;
-                        ppshiftinst_clip.outreg <= out32;
-                    when others => -- "11"
-                        inst <= unispec;
-                        ppinst <= select6;
-                        ppshiftinst_shift.shift <= 7;
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            elsif r = "00011" then
-                weight_read_enable <= '1';
-                memreg_c.swap <= weighttodata;
-                memreg_c.datareg <= enable;
-                ppinst <= nop;
-            elsif r = "00100" then
-                inst <= matdet;
-                ppinst <= fftsub0;
-                ppshiftinst_shift.shift <= 0;
-                case c is
-                    when "00" =>
-                    ppshiftinst_clip.outreg <= out76;
-                    when "01" =>
-                        ppshiftinst_clip.outreg <= out54;
-                    when "10" =>
-                        ppshiftinst_clip.outreg <= out32;
-                    when others =>
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            elsif r = "00101" then
-                --inst <= division; -- TODO
-                ppinst <= select0;
-                case c is
-                    when "00" =>
-                        data_read_enable <= '1';
-                        memreg_c.datareg <= enable; -- TODO possibly need zeros in the middle
-                    when others =>
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            else
-                case c is
-                    when "00" =>
-                        data_read_enable <= '1';
-                        weight_read_enable <= '1';
-                        memreg_c.datareg <= enable;
-                        memreg_c.weightreg <= enable;
-                        inst <= matmul11; --d(4)*(1/det(a))
-                    when "01" =>
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipzero;
-                        ppshiftinst_clip.outreg <= out54;
-                    when "10" =>
-                        ppinst <= nop;
-                        ppshiftinst_clip.clip <= clipzero;
-                        ppshiftinst_clip.outreg <= out32;
-                    when others =>
-                        inst <= matmul00; --d(1)*(1/det(a))
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            end if;
+        if state = xSYTRF then -- xSYTRF
+            case r is
+                when "000" =>
+                    case c is
+                        when "00" =>
+                            data_read_enable <= '1';
+                            bias_addr_ctrl <= shift;
+                            memreg_c.datareg <= enable;
+                            inst <= abs16;
+                            ppinst <= select6;
+                            ppshiftinst_shift.use_lod <= '1';
+                            lzod <= (word => "11", store => store2, output => val);
+                            feedback_ctrl <= shift_to_3;
+                        when "01" =>
+                            inst <= abs16;
+                            ppinst <= select2;
+                            ppshiftinst_shift.use_lod <= '1';
+                            lzod <= (word => "01", store => store1, output => val);
+                            feedback_ctrl <= shift_to_2;
+                        when "10" =>
+                            inst <= mulden;
+                            ppinst <= matmulleft;
+                            ppshiftinst_shift <= (acce => enable, shift => 9, use_lod => '0', shift_dir => left);
+                            feedback_ctrl <= shift_to_2;
+                        when others =>
+                            inst <= mulnum;
+                            ppinst <= matmulleft;
+                            ppshiftinst_shift <= (acce => enable, shift => 1, use_lod => '0', shift_dir => left);
+                            feedback_ctrl <= shift_to_3;
+                    end case;
+                when "001" =>
+                    case c is
+                        when "00" =>
+                            ppinst <= nop;
+                            ppshiftinst_clip.clip <= clipone16;
+                            ppshiftinst_clip.outreg <= out76;
+                        when "01" =>
+                            ppinst <= nop;
+                            ppshiftinst_clip.clip <= clipzero;
+                            ppshiftinst_clip.outreg <= out54;
+                        when "10" =>
+                            ppinst <= nop;
+                            ppshiftinst_clip.clip <= clipone16;
+                            ppshiftinst_clip.outreg <= out10;
+                        when others =>
+                            inst <= nrit;
+                            ppinst <= nrit;
+                            ppshiftinst_shift <= (acce => enable, shift => 8, use_lod => '1', shift_dir => right);
+                            ppshiftinst_addbias <= (acc => pass, quant => round); -- TODO: trunc eller round vid division?
+                            ppshiftinst_clip <= (clip => clip16, outreg => out32);
+                            lzod <= (word => "11", store => none, output => nrit);
+                            feedback_ctrl <= clip_to_1;
+                    end case;
+                when "010" =>
+                    case c is
+                        when "00" =>
+                            inst <= unitri1;
+                            ppinst <= select6;
+                            ppshiftinst_shift.shift <= 7;
+                            ppshiftinst_clip.outreg <= out76;
+                        when "01" =>
+                            ppinst <= nop;
+                            ppshiftinst_clip.clip <= clipzero;
+                            ppshiftinst_clip.outreg <= out54;
+                        when "10" =>
+                            ppinst <= nop;
+                            ppshiftinst_clip.clip <= clipzero;
+                            ppshiftinst_clip.outreg <= out32;
+                        when others => -- "11"
+                            inst <= unispec;
+                            ppinst <= unitri;
+                            ppshiftinst_clip.outreg <= out10;
+                    end case;
+                when "011" =>
+                    case c is
+                        when "00" =>
+                            inst <= matdet;
+                            ppinst <= fftsub0;
+                            ppshiftinst_shift <= (acce => hold, shift => 0, use_lod => '0', shift_dir => left);
+                            lzod <= (word => "10", store => none, output => none);
+                        when "01" =>
+                            --normalize det(a)
+                            bias_addr_ctrl <= shift;
+                            ppinst <= nop;
+                            ppshiftinst_shift.use_lod <= '1';
+                            lzod <= (word => "10", store => store2, output => val);
+                            feedback_ctrl <= shift_to_3;
+                        when "10" =>
+                            --normalize a(1)
+                            inst <= abs16;
+                            ppinst <= select6;
+                            ppshiftinst_shift.use_lod <= '1';
+                            lzod <= (word => "11", store => store1, output => val);
+                            feedback_ctrl <= shift_to_2;
+                        when others =>
+                            -- calc d(4)
+                            inst <= unispec;
+                            ppinst <= unitri;
+                            ppshiftinst_shift <= (acce => hold, shift => 0, use_lod => '0', shift_dir => left);
+                            lzod <= (word => "10", store => none, output => none);
+                    end case;
+                when "100" =>
+                    case c is
+                        when "00" =>
+                            --normalize d(4)
+                            bias_addr_ctrl <= shift;
+                            ppinst <= nop;
+                            ppshiftinst_shift.use_lod <= '1';
+                            lzod <= (word => "10", store => store3, output => val);
+                            feedback_ctrl <= shift_to_2;
+                        when "01" =>
+                            -- calc delta
+                            inst <= mulden;
+                            ppinst <= matmulleft;
+                            ppshiftinst_shift <= (acce => enable, shift => 9, use_lod => '0', shift_dir => left);
+                            feedback_ctrl <= shift_to_2;
+                        when "10" =>
+                            -- calc t1
+                            inst <= mulnum;
+                            ppinst <= matmulleft;
+                            ppshiftinst_shift <= (acce => enable, shift => 1, use_lod => '0', shift_dir => left);
+                            feedback_ctrl <= shift_to_3;
+                        when others =>
+                            -- calc t2
+                            inst <= mulnum;
+                            ppinst <= matmulleft;
+                            ppshiftinst_shift <= (acce => enable, shift => 1, use_lod => '0', shift_dir => left);
+                            feedback_ctrl <= shift_to_3;
+                    end case;
+                when "101" =>
+                    -- calc it1
+                    inst <= nrit;
+                    ppinst <= nrit;
+                    ppshiftinst_shift.use_lod <= '1';
+                    lzod <= (word => "11", store => none, output => det1);
+                    ppshiftinst_addbias <= (acc => pass, quant => round); -- TODO: trunc eller round vid division?
+                    ppshiftinst_clip <= (clip => clip16, outreg => out10);
+                --when "01111" =>
+                when others =>
+                    -- calc it2
+                    inst <= nrit;
+                    ppinst <= nrit;
+                    ppshiftinst_shift.use_lod <= '1';
+                    lzod <= (word => "11", store => none, output => nrit2);
+                    ppshiftinst_addbias <= (acc => pass, quant => round); -- TODO: trunc eller round vid division?
+                    ppshiftinst_clip <= (clip => clip16, outreg => out76);
+            end case;
         elsif state = xTRSM then -- xTRSM
-            if r = "00000" then        -- 4 cycles, Aik*Lkk
+            if ris0 = '1' then        -- 4 cycles, Aik*Lkk
                 inst <= unitri1;
                 ppinst <= select6;
-                ppshiftinst_shift.shift <= 7;
                 case c is
                     when "00" =>
                         data_read_enable <= '1';
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
+                        ppshiftinst_shift.shift <= 7;
                     when "01" =>
                         inst <= unitri2;
                         ppinst <= unitri;
@@ -706,6 +733,7 @@ begin
                     when "10" =>
                         inst <= unitri3;
                         ppshiftinst_clip.outreg <= out32;
+                        ppshiftinst_shift.shift <= 7;
                     when others =>
                         inst <= unitri4;
                         ppinst <= unitri;
@@ -719,6 +747,7 @@ begin
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
                     when "01" =>
                         inst <= matmul01;
                         ppshiftinst_clip.outreg <= out54;
@@ -731,35 +760,40 @@ begin
                 end case;
             end if;
         elsif state = xSYDRK then -- xSYDRK
-            if r = "00000" then           -- probably 1 cycle, from W to D
-                weight_read_enable <= '1';
-                memreg_c.swap <= weighttodata;
-                memreg_c.datareg <= enable;
-                ppinst <= nop;
-            elsif r = "00001" then        -- 4 cycles, Lik*Dkk
-                inst <= matmul00;
-                case c is
-                    when "00" =>
-                        weight_read_enable <= '1';
-                        memreg_c.weightreg <= enable;
-                    when "01" =>
-                        inst <= matmul01;
-                        ppshiftinst_clip.outreg <= out54;
-                    when "10" =>
-                        inst <= matmul10;
-                        ppshiftinst_clip.outreg <= out32;
-                    when others =>
-                        inst <= matmul11;
-                        ppshiftinst_clip.outreg <= out10;
-                end case;
-            elsif r = "00010" then        -- 4 cycles, tmp*Lik, W*D
-                inst <= matmul00t; -- matmul_t
+            if ris0 = '1' then        -- 4 cycles, Aik*Lkk
+                inst <= unitri1;
+                ppinst <= select6;
                 case c is
                     when "00" =>
                         data_read_enable <= '1';
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
+                        ppshiftinst_shift.shift <= 7;
+                    when "01" =>
+                        inst <= unitri2;
+                        ppinst <= unitri;
+                        ppshiftinst_clip.outreg <= out54;
+                    when "10" =>
+                        inst <= unitri3;
+                        ppshiftinst_clip.outreg <= out32;
+                        ppshiftinst_shift.shift <= 7;
+                    when others =>
+                        inst <= unitri4;
+                        ppinst <= unitri;
+                        ppshiftinst_clip.outreg <= out10;
+                end case;
+            elsif ris1 = '1' then        -- 4 cycles, tmp*Lik, W*D
+                inst <= matmul00t; -- matmul_t
+                -- TODO: result from this is often too big
+                case c is
+                    when "00" =>
+                        data_read_enable <= '1';
+                        weight_read_enable <= '1';
+                        memreg_c.datareg <= enable;
+                        memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
                     when "01" =>
                         inst <= matmul01t;
                         ppshiftinst_clip.outreg <= out54;
@@ -771,15 +805,18 @@ begin
                         ppshiftinst_clip.outreg <= out10;
                 end case;
             else                                -- matsub
+                -- TODO: result from this is often too small, due to previous result
                 inst <= matsub;
                 ppinst <= select6;
                 ppshiftinst_shift.shift <= 7;
+                ppshiftinst_addbias <= (acc => pass, quant => round); -- TODO: to slightly increase result
                 case c is
                     when "00" =>
                         data_read_enable <= '1';
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
                     when "01" =>
                         ppinst <= select4;
                         ppshiftinst_clip.outreg <= out54;
@@ -792,28 +829,31 @@ begin
                 end case;
             end if;
         elsif state  = xGEMDM then -- xGEMDM
-            if r = "00000" then           -- probably 1 cycle, from W to D
-                weight_read_enable <= '1';
-                memreg_c.swap <= weighttodata;
-                memreg_c.datareg <= enable;
-                ppinst <= nop;
-            elsif r = "00001" then        -- 4 cycles, Lik*Dkk
-                inst <= matmul00;
+            if ris0 = '1' then        -- 4 cycles, Aik*Lkk
+                inst <= unitri1;
+                ppinst <= select6;
                 case c is
                     when "00" =>
+                        data_read_enable <= '1';
                         weight_read_enable <= '1';
+                        memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
+                        ppshiftinst_shift.shift <= 7;
                     when "01" =>
-                        inst <= matmul01;
+                        inst <= unitri2;
+                        ppinst <= unitri;
                         ppshiftinst_clip.outreg <= out54;
                     when "10" =>
-                        inst <= matmul10;
+                        inst <= unitri3;
                         ppshiftinst_clip.outreg <= out32;
+                        ppshiftinst_shift.shift <= 7;
                     when others =>
-                        inst <= matmul11;
+                        inst <= unitri4;
+                        ppinst <= unitri;
                         ppshiftinst_clip.outreg <= out10;
                 end case;
-            elsif r = "00010" then        -- 4 cycles, tmp*Lik, W*D
+            elsif ris1 = '1' then        -- 4 cycles, tmp*Lik, W*D
                 inst <= matmul00t; -- matmul_t
                 case c is
                     when "00" =>
@@ -821,6 +861,7 @@ begin
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
                     when "01" =>
                         inst <= matmul01t;
                         ppshiftinst_clip.outreg <= out54;
@@ -841,6 +882,7 @@ begin
                         weight_read_enable <= '1';
                         memreg_c.datareg <= enable;
                         memreg_c.weightreg <= enable;
+                        ppshiftinst_clip.outreg <= out76;
                     when "01" =>
                         ppinst <= select4;
                         ppshiftinst_clip.outreg <= out54;
@@ -856,44 +898,38 @@ begin
             writebuff_c.datareg <= enable;
             ppinst <= nop;
             ppshiftinst_shift.acce <= hold;
-            ppshiftinst_clip.outreg <= none;
             case prev_state is
                 when xSYTRF =>
                     case r is
-                        when "00000" =>
+                        when "001" =>
                             weight_write_enable <= '1';
-                        when "00001" =>
+                        when "010" =>
                             weight_write_enable <= '1';
-                        when "00010" =>
-                            weight_write_enable <= '1';
-                        when "00100" =>
-                            data_write_enable <= '1';
-                        when "00101" =>
-                            data_write_enable <= '1';
+                        --when "01111" =>
                         when others =>
                             weight_write_enable <= '1';
                     end case;
                 when xTRSM =>
                     case r is
-                        when "00000" =>
+                        when "000" =>
                             data_write_enable <= '1';
                         when others =>
                             weight_write_enable <= '1';
                     end case;
                 when xSYDRK =>
                     case r is
-                        when "00001" =>
-                            weight_write_enable <= '1';
-                        when "00010" =>
+                        when "000" =>
+                            data_write_enable <= '1';
+                        when "001" =>
                             weight_write_enable <= '1';
                         when others =>
                             data_write_enable <= '1';
                     end case;
                 when others => -- xGEMDM
                     case r is
-                        when "00001" =>
+                        when "000" =>
                             data_write_enable <= '1';
-                        when "00010" =>
+                        when "001" =>
                             weight_write_enable <= '1';
                         when others =>
                             data_write_enable <= '1';
@@ -908,11 +944,37 @@ begin
     ---------------------------------------------------------------------------
     -- TODO add delay depending on data dependecies when testing for functionality
 
-  process (all)
+  --process (all)
+  process (state, next_state, prev_state, r, c, ris0, ris1, ris2)
   begin
     en_max <= x"0";
-    if state = writing and prev_state = xSYTRF and r = "00010" then
-        en_max <= X"A";
+    if state = xSYTRF then
+        if ris0 = '1' and c = "01" then
+            en_max <= x"4";
+        elsif (ris0 = '1' and c = "11") or (r = "011" and c = "10") or (r = "100" and (c = "00" or c = "10")) or r = "101" then
+            en_max <= x"1";
+        elsif (r = "100" and c = "11") then
+            en_max <= x"2";
+        end if;
+    elsif state = writing then
+        if prev_state = xSYTRF then
+            if ris1 = '1' then
+                en_max <= x"2";
+            end if;
+        elsif prev_state = xTRSM then
+            if ris0 = '1' then
+                en_max <= x"A";
+            end if;
+        elsif prev_state = xSYDRK then
+            if ris0 = '1' or ris1 = '1' or (ris2 = '1' and next_state = xSYTRF) then
+                en_max <= x"A";
+            end if;
+        --elsif prev_state = xGEMDM then
+        else
+            if ris0 = '1' or ris1 = '1' or (ris2 = '1' and next_state = xSYTRF) then
+                en_max <= x"A";
+            end if;
+        end if;
     end if;
   end process;
 
@@ -924,10 +986,13 @@ begin
     data1_addr_o <= data0_addr_o;
     weight_addr_o <= std_logic_vector(weight_read_addr) when (weight_write_enable /= '1')
                         else std_logic_vector(weight_write_addr);
+    bias_addr_o <= bias_addr;
+    bias_addr_ctrl_o <= bias_addr_ctrl;
     data_read_enable_o <= data_read_enable;
     data_write_enable_o <= data_write_enable;
     weight_read_enable_o <= weight_read_enable;
     weight_write_enable_o <= weight_write_enable;
+    bias_ren_o <= bias_ren;
 
     memreg_c_o <= memreg_c;
     writebuff_c_o <= writebuff_c;
@@ -936,10 +1001,11 @@ begin
     ppshiftinst_shift_o <= ppshiftinst_shift;
     ppshiftinst_addbias_o <= ppshiftinst_addbias;
     ppshiftinst_clip_o <= ppshiftinst_clip;
+    lzod_o <= lzod;
+    feedback_ctrl_o <= feedback_ctrl;
     zpdata_o <= zpdata;
     zpweight_o <= zpweight;
-    bias_o <= bias;
 
-    en_max_o <= en_max;
+    en_max_o <= en_max when (en_i = '1') else (others => '0');
 
 end architecture;

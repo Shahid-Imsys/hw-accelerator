@@ -16,7 +16,6 @@ entity convcontroller is
     clk_e_pos        : in std_logic;
     start            : in std_logic;
     cnt_rst          : in std_logic;
-    keep_acc         : in std_logic;
     data_valid       : in std_logic;
     mode_a           : in std_logic;
     mode_b           : in std_logic;
@@ -168,7 +167,7 @@ begin
             right_rst <= '0';
           end if;
         elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then--and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
-          if keep_acc = '0' then 
+          if config(1) = '0' then -- when this bit is not set clear the accumulator for each new computation.
             ppinst_s <= sumfirst;
           else 
             ppinst_s <= sum;

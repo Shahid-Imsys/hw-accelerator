@@ -24,8 +24,6 @@ entity convcontroller is
     re_loop          : in std_logic_vector(7 downto 0);
     dot_cnt          : in std_logic_vector(7 downto 0);
     oc_cnt           : in std_logic_vector(7 downto 0);
-    bias_au_addr     : in std_logic_vector(7 downto 0);
-    bias_index_end   : in std_logic_vector(7 downto 0);
     scale            : in std_logic_vector(4 downto 0);
     mode_c_l         : out std_logic;
     bypass_reg       : out std_logic;
@@ -35,7 +33,6 @@ entity convcontroller is
     right_rst        : out std_logic;
     bias_load        : out std_logic; 
     bias_rd_en       : out std_logic;
-    bias_rst         : out std_logic;
     ext_load         : out std_logic;
     enable_shift     : out std_logic;
     enable_add_bias  : out std_logic;
@@ -132,7 +129,7 @@ begin
         elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
           bypass_int <= '0';
         end if;
-        bypass_int_reg <= bypass_int;----dum solution for sync data in bypass mode
+        bypass_int_reg <= bypass_int;----dumb solution for sync data in bypass mode
         bypass_reg <= bypass_int_reg;
       end if;
     end if;

@@ -280,8 +280,6 @@ architecture rtl of ve is
       re_loop          : in std_logic_vector(7 downto 0);
       dot_cnt          : in std_logic_vector(7 downto 0);
       oc_cnt           : in std_logic_vector(7 downto 0);
-      bias_au_addr     : in std_logic_vector(7 downto 0);
-      bias_index_end   : in std_logic_vector(7 downto 0);
       scale            : in std_logic_vector(4 downto 0);
       mode_c_l         : out std_logic;
       bypass_reg       : out std_logic;
@@ -291,7 +289,6 @@ architecture rtl of ve is
       right_rst        : out std_logic;
       bias_load        : out std_logic; 
       bias_rd_en       : out std_logic;
-      bias_rst         : out std_logic;
       ext_load         : out std_logic;
       enable_shift     : out std_logic;
       enable_add_bias  : out std_logic;
@@ -712,7 +709,7 @@ begin
       if rst = '0' then
         ve_rdy <= '1';
       elsif clk_e_pos = '0' then
-        ve_rdy <= not conv_busy;-- and fft_done;--fft_done_pipe(10);
+        ve_rdy <= not conv_busy and not bypass_reg;-- and fft_done;--fft_done_pipe(10);
       end if;
     end if;
   end process;
@@ -949,7 +946,7 @@ begin
                       stall        <= conv_stall;
                       left_rst     <= lrst_from_conv when mode_c_l = '0' else '0';
                       right_rst    <= rrst_from_conv;
-                      bias_rst     <= brst_from_conv;
+                      bias_rst     <= '0';
       when fft     => fft_start    <= start;
                       fft_stages   <= unsigned(ve_loop_reg(2 downto 0));
                       stall        <= fft_stall;
@@ -1325,8 +1322,6 @@ begin
       re_loop          => re_loop_reg,
       dot_cnt          => ve_loop_reg,--dot_cnt,
       oc_cnt           => ve_oloop_reg,--oc_cnt,
-      bias_au_addr     => bias_finaladdress,
-      bias_index_end   => bias_index_end,
       scale            => scale,
       mode_c_l         => vemode_c_l,
       bypass_reg       => bypass_reg,
@@ -1336,7 +1331,6 @@ begin
       right_rst        => rrst_from_conv,
       bias_load        => bload_from_conv,
       bias_rd_en       => b_rd_en_conv,
-      bias_rst         => brst_from_conv,
       ext_load         => ext_load,
       enable_shift     => shifter_ena,
       enable_add_bias  => adder_ena,

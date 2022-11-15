@@ -448,8 +448,9 @@ begin
       clk_100M  => clk_100M,
       clk_50M   => clk_50M );
 
-  HCLK      <= clk_100m;
-  clk_p_acc <= clk_200m;
+  -- These two need to have a 1/2 relationship
+  HCLK      <= clk_50m;
+  clk_p_acc <= clk_100m;
 
   digital_top_inst : digital_top
     generic map (

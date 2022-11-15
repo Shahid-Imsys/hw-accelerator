@@ -73,7 +73,7 @@ use work.gp_pkg.all;
 
 entity top is
   generic (
-    g_memory_type     : memory_type_t := fpga;
+    g_memory_type     : memory_type_t := asic;
     g_clock_frequency : integer       := 300  -- Frequency in MHz
     );
   port (

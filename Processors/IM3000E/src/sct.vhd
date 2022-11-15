@@ -120,11 +120,9 @@ architecture rtl of sct is
   	attribute mark_debug of seq_pop_des: signal is "true";
   	attribute mark_debug of st_pop: signal is "true"; 
   	attribute mark_debug of st_push: signal is "true";
-  	attribute mark_debug of pc_pc_pc: signal is "true"; 
-  	attribute mark_debug of pc_pc_ri: signal is "true";
   	attribute mark_debug of pl_seqc: signal is "true"; 
-  	attribute mark_debug of st_st_st: signal is "true";
-	
+
+
 begin
 	-- Create named signals for overlapping microprogram fields.
 	pl_map		<= pl_ad(3 downto 0);

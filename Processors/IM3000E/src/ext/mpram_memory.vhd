@@ -59,8 +59,6 @@ architecture str of mpram_memory is
       initFile : string);
   end component load_mpram;
 
-  signal ram_do_fpga : std_logic_vector(79 downto 0);
-
 begin  -- architecture str
 
   -- Use memories from ASIC implementation

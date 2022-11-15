@@ -23,7 +23,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity Noc_Top is
     Generic(
-        USE_ASIC_MEMORIES    : boolean := false
+        USE_ASIC_MEMORIES    : boolean := true
   );    
   Port (
 	    clk                  : in  std_logic;
@@ -61,6 +61,7 @@ end Noc_Top;
 architecture structural of Noc_Top is
 
     component Noc_State_Machine is
+    generic( USE_ASIC_MEMORIES  : boolean := true );
     port(
         clk                     : in  std_logic;
         Reset                   : in  std_logic;
@@ -454,6 +455,7 @@ begin
 	FIFO_Ready3 <= '1' when FIFO_Ready >= "111000" else '0';
         
     Noc_State_Machine_Inst: Noc_State_Machine
+    generic map ( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
     port map
     (
         clk                     => clk,

@@ -105,7 +105,6 @@ architecture rtl of fpga_top is
   component digital_top is
     generic (
       g_memory_type     : memory_type_t := asic;
-      g_simulation      : boolean       := false;
       g_clock_frequency : integer       := 31);
 
     port (
@@ -455,7 +454,6 @@ begin
   digital_top_inst : digital_top
     generic map (
       g_memory_type     => fpga,
-      g_simulation      => false,
       g_clock_frequency => 100 -- Frequency in MHz
       )
     port map (

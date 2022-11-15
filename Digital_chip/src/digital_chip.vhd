@@ -367,7 +367,6 @@ begin  -- architecture rtl
     generic map
       (
         g_memory_type     => g_memory_type,
-        g_simulation      => g_simulation,
         g_clock_frequency => 31  -- system clock frequency in MHz
         )
       port map (

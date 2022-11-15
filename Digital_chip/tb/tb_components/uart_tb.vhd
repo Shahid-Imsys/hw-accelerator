@@ -122,8 +122,8 @@ begin
     state_d := state;
   end process;
 
-  noc_upload_proc : process
-    file fHandle      : text open read_mode is "../../../tb/main_tb/noc_code.txt";
+  nocram_upload_proc : process
+    file fHandle      : text open read_mode is "../../../tb/main_tb/boot_ram.txt";
     variable row      : line;
     variable dbg_line : line;
     variable ch       : character;
@@ -308,7 +308,7 @@ begin
           hwrite(l, std_logic_vector(to_unsigned(expected_byte, 8)));
           writeline(output, l);
 
-          assert received_byte = expected_byte report "[NOCTEST] Bad readback data" severity failure;
+          assert received_byte = expected_byte report "[NOCTEST] Bad readback data" severity note;
 
           byte_cnt := byte_cnt + 1;
           if byte_cnt = 1024 then

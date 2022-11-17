@@ -46,9 +46,7 @@ entity Accelerator_Top is
         NOC_DATA_DIR         : out std_logic;
         NOC_DATA_EN          : out std_logic;        
         NOC_WRITE_REQ        : out std_logic;
-        IO_WRITE_ACK         : in  std_logic;
-        Enable_Root_memory_t : out std_logic;
-        RM_Data_Out_t        : out std_logic_vector(127 downto 0)        
+        IO_WRITE_ACK         : in  std_logic
   );
 end Accelerator_Top;
 
@@ -84,9 +82,7 @@ architecture Behavioral of Accelerator_Top is
         NOC_DATA_DIR         : out std_logic;
         NOC_DATA_EN          : out std_logic;
         NOC_WRITE_REQ        : out std_logic;        
-        IO_WRITE_ACK         : in  std_logic;
-        Enable_Root_memory_t : out std_logic;
-        RM_Data_Out_t        : out std_logic_vector(127 downto 0)                        
+        IO_WRITE_ACK         : in  std_logic
     );
     end component;
 
@@ -144,9 +140,7 @@ begin
         NOC_DATA_DIR            => NOC_DATA_DIR,
         NOC_DATA_EN             => NOC_DATA_EN,
         NOC_WRITE_REQ           => NOC_WRITE_REQ,
-        IO_WRITE_ACK            => IO_WRITE_ACK,
-        Enable_Root_memory_t    => Enable_Root_memory_t,
-        RM_Data_Out_t           => RM_Data_Out_t 
+        IO_WRITE_ACK            => IO_WRITE_ACK
     );
 
   pec_gen : for i in 0 to PEC_NUMBER -1 generate

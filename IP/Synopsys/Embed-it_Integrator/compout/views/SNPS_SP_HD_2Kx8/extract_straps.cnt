@@ -1,4 +1,0 @@
-gds_files = /home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_SP_HD_2Kx8
-MPT_PARAMETERS
-bitcell_name = mm16a04_u_22FDSOI_P124_bitcell
-memory_boundary_layer = 62:21

@@ -2641,3 +2641,23 @@ INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_512x8
 INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_8Kx128
 INFO  [Integrator, IAPI-001]: Running "GENERATE" on component "SNPS_SP_HD_2Kx8".
 INFO  [Integrator, IAPI-010]: Finished "GENERATE" on "SNPS_SP_HD_2Kx8". Status: Successful
+ERROR [Integrator, CFG-062]: Out of range parameter(s) BK=1 CM=16 center_decode=false 
+       The value of the following parameters should be changed:
+       NB=2 NW=2048   
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_1024x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_1024x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_256x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_256x64
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_512x28
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_64x64
+INFO  [Integrator, IAPI-011]: Checking SNPS_ROM_4Kx80_mprom00
+INFO  [Integrator, IAPI-011]: Checking SNPS_ROM_4Kx80_mprom11
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_1024x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_16Kx8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_1Kx160
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_256x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_2Kx80
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_512x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_8Kx128
+INFO  [Integrator, IAPI-001]: Running "GENERATE" on component "SNPS_SP_HD_1Kx160".
+INFO  [Integrator, IAPI-010]: Finished "GENERATE" on "SNPS_SP_HD_1Kx160". Status: Successful

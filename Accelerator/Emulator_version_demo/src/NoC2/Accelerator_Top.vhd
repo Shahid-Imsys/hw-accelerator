@@ -164,7 +164,7 @@ begin
   end generate;
 
 
-  process(c_rdy())
+  process(C_RDY())
   begin
     case pec_number is
       when 1 => PEC_Ready   <= C_RDY(0);

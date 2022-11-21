@@ -22,11 +22,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity Accelerator_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
+      USE_ASIC_MEMORIES      : boolean := true;
+      PEC_NUMBER             : integer := 2
     );
     Port (
-	    clk                  : in  std_logic;
-	    Reset                : in  std_logic;
+	      clk_p                : in  std_logic;
+        clk_e                : in  std_logic;
+	      Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
@@ -52,7 +54,7 @@ architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false
+      USE_ASIC_MEMORIES      : boolean := true
     );
     Port(
 	    clk                  : in  std_logic;
@@ -80,66 +82,30 @@ architecture Behavioral of Accelerator_Top is
         NOC_DATA_DIR         : out std_logic;
         NOC_DATA_EN          : out std_logic;
         NOC_WRITE_REQ        : out std_logic;        
-        IO_WRITE_ACK         : in  std_logic                
+        IO_WRITE_ACK         : in  std_logic
     );
     end component;
 
- 
-    component cluster_controller is
-    port(
---Clock inputs
-        CLK_P                : in std_logic;     --PE clock, clock from the oscillator --0628
-	    CLK_E                : in std_logic;     --NOC clock
---Power reset input:
-	    RST_E                : in std_logic; --active low --For reset clk_e generator
---Clock outputs
-        DDO_VLD              : out std_logic;    --Output data valid port
-	    EVEN_P               : out std_logic;    --To PE and network
---Tag line
-	    TAG                  : in std_logic;
-	    TAG_FB               : out std_logic;
---Data line   
-	    DATA                 : in std_logic_vector(7 downto 0);
-	    DATA_OUT             : out std_logic_vector(7 downto 0);
---PE Control
-        EXE                  : out std_logic;   --Start execution
-	    RESUME               : out std_logic;   --Resume paused execution
---Feedback signals
-        C_RDY                : out std_logic;
-	    PE_RDY_0             : in std_logic;
-	    PE_RDY_1             : in std_logic;
-	    PE_RDY_2             : in std_logic;
-	    PE_RDY_3             : in std_logic;
-	    PE_RDY_4             : in std_logic;
-	    PE_RDY_5             : in std_logic;
-	    PE_RDY_6             : in std_logic;
-	    PE_RDY_7             : in std_logic;
-	    PE_RDY_8             : in std_logic;
-	    PE_RDY_9             : in std_logic;
-	    PE_RDY_10            : in std_logic;
-	    PE_RDY_11            : in std_logic;
-	    PE_RDY_12            : in std_logic;
-	    PE_RDY_13            : in std_logic;
-	    PE_RDY_14            : in std_logic;
-	    PE_RDY_15            : in std_logic;
---Request and distribution logic signals
-        RST_R                : out std_logic;  --Active low
-	    REQ_IN               : in std_logic;  --req to noc in reg logic
-	    REQ_FIFO             : in std_logic_vector(31 downto 0);
-	    DATA_FROM_PE         : in std_logic_vector(127 downto 0);
-	    DATA_TO_PE           : out std_logic_vector(127 downto 0);
-	    DATA_VLD             : out std_logic;
-	    PE_UNIT              : out std_logic_vector(5 downto 0);
-	    BC                   : out std_logic; --Broadcast handshake
-	    RD_FIFO              : out std_logic;
-	    FIFO_VLD             : in std_logic
+    component PEC_top is
+    generic ( USE_ASIC_MEMORIES : boolean := true );
+    Port( 
+        CLK_P    : in std_logic;
+        CLK_E    : in std_logic;
+        RST_E    : in std_logic;
+        DDO_VLD  : out std_logic;
+        TAG      : in std_logic;
+        TAG_FB   : out std_logic;
+        C_RDY    : out std_logic;
+        DATA     : in std_logic_vector(7 downto 0);
+        DATA_OUT : out std_logic_vector(7 downto 0)
     );
     end component;
+    
     
     signal PEC_byte_data : std_logic_vector(127 downto 0):= (others => '0');
     signal Noc_byte_data : std_logic_vector(127 downto 0):= (others => '0');
     signal Tag_Line      : std_logic;
-    signal PEC_WE        : std_logic_vector(0 to 15);
+    signal PEC_WE        : std_logic_vector(PEC_NUMBER -1 downto 0);
      
 begin
 
@@ -149,7 +115,7 @@ begin
     )
     port map
     (
-        clk                     => clk,
+        clk                     => clk_e,
         Reset                   => Reset,
         PEC_Ready               => PEC_Ready,
         --NOC PEC INTERFACE 
@@ -174,60 +140,26 @@ begin
         NOC_DATA_DIR            => NOC_DATA_DIR,
         NOC_DATA_EN             => NOC_DATA_EN,
         NOC_WRITE_REQ           => NOC_WRITE_REQ,
-        IO_WRITE_ACK            => IO_WRITE_ACK        
+        IO_WRITE_ACK            => IO_WRITE_ACK
     );
-        
-  cc_gen : for i in 0 to 15 generate
-    cluster_controller_Inst : cluster_controller
+
+  pec_gen : for i in 0 to PEC_NUMBER -1 generate
+    PEC_top_Inst : PEC_top
+    Generic map(
+      USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES
+    )    
     port map
-    (
---Clock inputs    
-        CLK_P                   => clk,
-        CLK_E                   => clk,
---Power reset input:        
+    ( 
+        CLK_P                   => clk_p,
+        CLK_E                   => clk_e,
         RST_E                   => Reset,
---Clock outputs
-        DDO_VLD                 => PEC_WE(i),        
-        EVEN_P                  => open,
---Tag line        
-        TAG                     => Tag_Line,    
+        DDO_VLD                 => PEC_WE(i),
+        TAG                     => Tag_Line,
         TAG_FB                  => open,
---Data line        
-        DATA                    => Noc_byte_data(8*i+7 downto 8*i),
-        DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i),
---PE Control        
-        EXE                     => open,
-        RESUME                  => open,
---Feedback signals        
         C_RDY                   => open,
-        PE_RDY_0                => '0',
-        PE_RDY_1                => '0',
-        PE_RDY_2                => '0',
-        PE_RDY_3                => '0',
-        PE_RDY_4                => '0',
-        PE_RDY_5                => '0',
-        PE_RDY_6                => '0',
-        PE_RDY_7                => '0',
-        PE_RDY_8                => '0',
-        PE_RDY_9                => '0',
-        PE_RDY_10               => '0',
-        PE_RDY_11               => '0',
-        PE_RDY_12               => '0',
-        PE_RDY_13               => '0',
-        PE_RDY_14               => '0',
-        PE_RDY_15               => '0',
---Request and distribution logic signals        
-        RST_R                   => open,
-        REQ_IN                  => '0',
-        REQ_FIFO                => (others => '0'),
-        DATA_FROM_PE            => (others => '0'),
-        DATA_TO_PE              => open,
-        DATA_VLD                => open,
-        PE_UNIT                 => open,
-        BC                      => open,
-        RD_FIFO                 => open,
-        FIFO_VLD                => '0'                                  
-    );
+        DATA                    => Noc_byte_data(8*i+7 downto 8*i),
+        DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i)
+     );
   end generate;
            
 end Behavioral;

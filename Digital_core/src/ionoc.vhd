@@ -200,6 +200,11 @@ architecture rtl of ionoc is
   signal ionoc_wrdata_pending : boolean;
   signal ionoc_rddata_pending : boolean;
 
+  attribute mark_debug : string;
+  attribute mark_debug of ionoc_rdstatus: signal is "true"; 
+  attribute mark_debug of RxFIFO_Valid_int: signal is "true"; 
+  attribute mark_debug of TxFIFO_Ready_int: signal is "true"; 
+
 begin
 
 ------------------------------------------------------
@@ -693,14 +698,12 @@ begin
       ------------------------------------------------------------
       -- Handle write index and wrdata pending flag
       --
-      if ilioa = '0' or ionoc_rxfifo_valid_f = '1' then
+      if ilioa = '0' then
         ionoc_datawrindex <= 0;         -- Reset write index on new data access
 
       elsif data_wr = '1' and clk_i_pos = '0' then
         -- IO bus writes to word cache
         ionoc_wrdata(ionoc_datawrindex) <= idi;
-        -- Reset pending flag when word is updated
-        ionoc_wrdata_pending            <= false;
         --
         if ionoc_datawrindex /= (ionoc_wrdata'length - 1) then
           ionoc_datawrindex <= ionoc_datawrindex + 1;

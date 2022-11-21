@@ -201,6 +201,8 @@ architecture rtl of fpga_noc_adapter is
   -- signal IO_DATA_Valid : std_logic;
   signal IO_DATA_Ready : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of TxFIFO_Data: signal is "true"; 
 
 begin
 

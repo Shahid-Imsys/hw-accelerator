@@ -83,7 +83,7 @@ begin  -- architecture tb
 
   dut : entity work.digital_chip
     generic map (
-      g_memory_type => simulation,
+      g_memory_type => simulation, -- TODO Should be "simulation", change if committed to something else (can be temporary set to "fpga" to speed up sim)
       g_simulation  => true
       )
     port map (

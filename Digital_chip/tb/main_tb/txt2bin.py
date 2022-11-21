@@ -7,6 +7,7 @@ import os
 
 bitArray  = []
 byteArray = []
+wordArray = []
 
 for line in sys.stdin:
     for ch in line:
@@ -18,13 +19,26 @@ for line in sys.stdin:
 
 i = 0
 byte = 0
+word = 0
 
 for bit in bitArray:
     byte |= bit << (7 - i)
     i = (i + 1) % 8
     if i == 0:
-        byteArray.append( byte )
+        wordArray.append( byte )
         byte = 0
+        word = (word + 1) % 16
+        if word == 0:
+            for w in wordArray[12:16]:
+                byteArray.append( w )
+            for w in wordArray[8:12]:
+                byteArray.append( w )
+            for w in wordArray[4:8]:
+                byteArray.append( w )
+            for w in wordArray[0:4]:
+                byteArray.append( w )
+            # Clear array
+            wordArray.clear()
 
 # print("Collected {} byte from bit stream".format(len(byteArray)))
 

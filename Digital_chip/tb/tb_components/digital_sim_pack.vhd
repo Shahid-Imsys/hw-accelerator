@@ -13,8 +13,10 @@ package digital_top_sim_pack is
   -- TB controller (UART)
   constant tb_short_message_1 : integer := 0;
   constant tb_short_message_2 : integer := 1;
-  constant tb_write         : integer := 2;
-  constant tb_read          : integer := 0;
+  constant tb_write           : integer := 2;
+  constant tb_noctest         : integer := 3;
+
+  -- constant tb_read            : integer := 0;
 
   constant tb_debug_command : integer := 8;
 
@@ -60,7 +62,7 @@ package body digital_top_sim_pack is
 
       --Dsource error in unit: dsl.vhd
       when 16#11# => write_code(core, "DATA0FZ_ERR");  --DATA0 and Flag_zero error
-      when 16#12# => write_code(core, "DCONST_ERR");  --Dsource constant error           
+      when 16#12# => write_code(core, "DCONST_ERR");  --Dsource constant error
       when 16#13# => write_code(core, "LDORET_ERR");  --Do and Return error
 
       --Clk request errors, not using in current testprogram version
@@ -72,7 +74,7 @@ package body digital_top_sim_pack is
       --Sequencer error in unit: clc.vhd
       when 16#20# => write_code(core, "ENDDEC_ERR");
       when 16#21# => write_code(core, "SEQ_DORET_ERR");  --CLC Do and Return error
-      when 16#22# => write_code(core, "SEQ_CTR_ERR");    --CLC counter error      
+      when 16#22# => write_code(core, "SEQ_CTR_ERR");    --CLC counter error
       when 16#23# => write_code(core, "SEQ_COND_ERR");   --CLC condition error
       when 16#24# => write_code(core, "SEQ_SKIP_ERR");   --CLC skip error
       when 16#25# => write_code(core, "SEQ_YDEC_ERR");
@@ -87,13 +89,13 @@ package body digital_top_sim_pack is
       when 16#40# => write_code(core, "GMEM_RW_ERR");  --G memory read/write error
 
       --MBM errors in unit: mbm.vhd
-      when 16#50# => write_code(core, "MBM_MISC_ERR");   --MBM 
+      when 16#50# => write_code(core, "MBM_MISC_ERR");   --MBM
       when 16#51# => write_code(core, "MBM_MUL_ERR");    --MBM multiplier error
       --when 16#52# => write_code(core, "MBM_SHIFT_ERR");  --MBM shift function error
 
-      --I/O interface and peripherals error: Not using for now 
-      when 16#60# => write_code(core, "GPORT_ERR");  --General I/O error            
-      when 16#64# => write_code(core, "IOS_ERR");  --I/O interface controller error     
+      --I/O interface and peripherals error: Not using for now
+      when 16#60# => write_code(core, "GPORT_ERR");  --General I/O error
+      when 16#64# => write_code(core, "IOS_ERR");  --I/O interface controller error
       when 16#65# => write_code(core, "RTC_ERR");  --RTC error
       when 16#66# => write_code(core, "DMA_ERR");  --DMA error
       when 16#67# => write_code(core, "UART_ERR");   --UART error
@@ -108,7 +110,7 @@ package body digital_top_sim_pack is
       when 16#83# => write_code(core, "DRAM_TST3");
       when 16#84# => write_code(core, "DRAM_TST4");
 
-      --RAM aaddress steping error: mmr.vhd  
+      --RAM aaddress steping error: mmr.vhd
       when 16#90# => write_code(core, "ADHP_ERR");
       when 16#94# => write_code(core, "ADLSTEP_ERR");
 
@@ -139,53 +141,53 @@ package body digital_top_sim_pack is
                      --when 16#20# => write_code(core, "ADL+2STEP");
                      --when 16#60# => write_code(core, "ADL-2STEP");
       --OSPI Memory test error label:
-      when 16#A5# => write_code(core, "SET_LATENCY_ERR");  
-      when 16#A6# => write_code(core, "OSPI_RW_ERR"); 
-      when 16#A7# => write_code(core, "OSPI_AUTO_INC_ERR");  
-      when 16#A8# => write_code(core, "OSPI_BURST_RW_ERR"); 
+      when 16#A5# => write_code(core, "SET_LATENCY_ERR");
+      when 16#A6# => write_code(core, "OSPI_RW_ERR");
+      when 16#A7# => write_code(core, "OSPI_AUTO_INC_ERR");
+      when 16#A8# => write_code(core, "OSPI_BURST_RW_ERR");
 
       --Memory test error label:
       when 16#B0# => write_code(core, "GR_ERR");  --G memory GR part read/write error
-      when 16#B1# => write_code(core, "SB_ERR "); --G memory SB part read/write error 
+      when 16#B1# => write_code(core, "SB_ERR "); --G memory SB part read/write error
       when 16#B2# => write_code(core, "MS_ERR");  --G memory MSTACK part read/write error
-      when 16#B3# => write_code(core, "PS_ERR");  --G memory PSTACK part read/write error 
-      when 16#B4# => write_code(core, "GR_ERR_CB "); 
-      when 16#B5# => write_code(core, "SB_ERR_CB");  
-      when 16#B6# => write_code(core, "MS_ERR_CB");  
-      when 16#B7# => write_code(core, "PS_ERR_CB");  
-      when 16#B8# => write_code(core, "GR_ERR_INC "); 
-      when 16#B9# => write_code(core, "SB_ERR_INC");  
-      when 16#BA# => write_code(core, "MS_ERR_INC");  
-      when 16#BB# => write_code(core, "PS_ERR_INC"); 
+      when 16#B3# => write_code(core, "PS_ERR");  --G memory PSTACK part read/write error
+      when 16#B4# => write_code(core, "GR_ERR_CB ");
+      when 16#B5# => write_code(core, "SB_ERR_CB");
+      when 16#B6# => write_code(core, "MS_ERR_CB");
+      when 16#B7# => write_code(core, "PS_ERR_CB");
+      when 16#B8# => write_code(core, "GR_ERR_INC ");
+      when 16#B9# => write_code(core, "SB_ERR_INC");
+      when 16#BA# => write_code(core, "MS_ERR_INC");
+      when 16#BB# => write_code(core, "PS_ERR_INC");
 
-      when 16#BC# => write_code(core, "BMEM_ERR");  --Bettery memory read/write error 
-      when 16#BD# => write_code(core, "BMEM_ERR_CB");  
-      when 16#BE# => write_code(core, "BMEM_ERR_INC"); 
+      when 16#BC# => write_code(core, "BMEM_ERR");  --Bettery memory read/write error
+      when 16#BD# => write_code(core, "BMEM_ERR_CB");
+      when 16#BE# => write_code(core, "BMEM_ERR_INC");
 
-      when 16#BF# => write_code(core, "RAM0_ERR");  --RAM0 read/write error 
-      when 16#C0# => write_code(core, "RAM_ERR");   --RAM1-4 read/write error 
-      when 16#C1# => write_code(core, "IOMEM_ERR");  --IO memory read/write error 
-    
+      when 16#BF# => write_code(core, "RAM0_ERR");  --RAM0 read/write error
+      when 16#C0# => write_code(core, "RAM_ERR");   --RAM1-4 read/write error
+      when 16#C1# => write_code(core, "IOMEM_ERR");  --IO memory read/write error
+
 
       --Memory test status code
-      when 16#C2# => write_code(core, "GMEM: all test task end");  
-      when 16#C3# => write_code(core, "BMEM: all test task end");   
-      when 16#C4# => write_code(core, "RAM0: all test task end");  
-      when 16#C5# => write_code(core, "RAM: all test task end");  
-      --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error 
+      when 16#C2# => write_code(core, "GMEM: all test task end");
+      when 16#C3# => write_code(core, "BMEM: all test task end");
+      when 16#C4# => write_code(core, "RAM0: all test task end");
+      when 16#C5# => write_code(core, "RAM: all test task end");
+      --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error
 
-      when 16#CA# => write_code(core, "GMEM zero-one test begin");  
-      when 16#CB# => write_code(core, "GMEM checkerboard test begin");   
-      when 16#CC# => write_code(core, "GMEM increment test begin");   
-      when 16#CD# => write_code(core, "BMEM zero-one test begin");  
-      when 16#CE# => write_code(core, "BMEM checkerboard test begin");  
+      when 16#CA# => write_code(core, "GMEM zero-one test begin");
+      when 16#CB# => write_code(core, "GMEM checkerboard test begin");
+      when 16#CC# => write_code(core, "GMEM increment test begin");
+      when 16#CD# => write_code(core, "BMEM zero-one test begin");
+      when 16#CE# => write_code(core, "BMEM checkerboard test begin");
       when 16#CF# => write_code(core, "BMEM increment test begin");
-      
+
       when 16#E0# => write_code(core, "NOC boot code upload request");
- 
-      when 16#F0# => write_code(core, "RAM0 test begin");  
-      when 16#F1# => write_code(core, "RAM test begin");   
-  
+
+      when 16#F0# => write_code(core, "RAM0 test begin");
+      when 16#F1# => write_code(core, "RAM test begin");
+
       when 16#D0# => write_code(core, "Core test done");
       when 16#D1# => write_code(core, "Memory Test done");
       when 16#D2# => write_code(core, "Test 2 done");
@@ -196,12 +198,12 @@ package body digital_top_sim_pack is
       when 16#D7# => write_code(core, "Test 7 done");
       when 16#D8# => write_code(core, "Test 8 done");
       when 16#D9# => write_code(core, "Test 9 done");
-        
+
       when 16#DE# =>
         write_code(core, "Simulation finshed OK");
         std.env.stop(0);
       when 16#DF# => report "Simulation FAILED" severity failure;
-                     
+
       when others => write_code(core, "Unknown message!" & integer'image(error_code));
     end case;
   end procedure decode_error_code;

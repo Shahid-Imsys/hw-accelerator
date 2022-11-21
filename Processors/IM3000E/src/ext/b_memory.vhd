@@ -82,7 +82,7 @@ architecture rtl of b_memory is
 begin  -- architecture rtl
 
   -- Use memories for ASIC implementation
-  g_asic_memory : if g_memory_type = asic generate
+  g_asic_memory : if g_memory_type /= fpga generate
     b_mem_asic : SNPS_SP_HD_512x8
       port map (
         Q        => ram_do,

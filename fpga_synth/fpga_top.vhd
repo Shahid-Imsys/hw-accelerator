@@ -105,12 +105,11 @@ architecture rtl of fpga_top is
   component digital_top is
     generic (
       g_memory_type     : memory_type_t := asic;
-      g_simulation      : boolean       := false;
       g_clock_frequency : integer       := 31);
 
     port (
       hclk        : in  std_logic;      -- clk input
-      clk_noc     : in  std_logic;
+      clk_p_acc   : in  std_logic;
       pll_ref_clk : in  std_logic;
       pll_locked  : in  std_logic;
       pre_spi_rst_n : in std_logic;
@@ -324,23 +323,15 @@ architecture rtl of fpga_top is
   signal spi_miso_oe_n : std_logic;
   signal pad_config    : pad_config_record_t;
 
-  signal HCLK     : std_logic;
-  signal HCLK_n   : std_logic;
-  signal clk_200m : std_logic;
-  signal clk_100m : std_logic;
-  signal clk_50m  : std_logic;
-
-  signal clk_noc  : std_logic;
-
-  signal led_clk : std_logic;
+  signal HCLK      : std_logic;
+  signal HCLK_n    : std_logic;
+  signal clk_200m  : std_logic;
+  signal clk_100m  : std_logic;
+  signal clk_50m   : std_logic;
+  signal clk_p_acc : std_logic;
+  signal led_clk   : std_logic;
 
   signal counter34 : unsigned(33 downto 0) := (others => '0');
-
-  attribute mark_debug                : string;
-  attribute mark_debug of OSPI_DQ_i   : signal is "true";
-  attribute mark_debug of OSPI_RWDS_i : signal is "true";
-  attribute mark_debug of OSPI_DQ_e   : signal is "true";
-  attribute mark_debug of OSPI_RWDS_e : signal is "true";
 
 begin
 
@@ -456,18 +447,18 @@ begin
       clk_100M  => clk_100M,
       clk_50M   => clk_50M );
 
-  HCLK    <= clk_100m;
-  clk_noc <= clk_200m;
+  -- These two need to have a 1/2 relationship
+  HCLK      <= clk_50m;
+  clk_p_acc <= clk_100m;
 
   digital_top_inst : digital_top
     generic map (
       g_memory_type     => fpga,
-      g_simulation      => false,
-      g_clock_frequency => 100          -- Frequency in MHz
+      g_clock_frequency => 100 -- Frequency in MHz
       )
     port map (
       hclk        => HCLK,
-      clk_noc     => clk_noc,
+      clk_p_acc   => clk_p_acc,
       pll_ref_clk => HCLK,
       pll_locked  => '1',
       pre_spi_rst_n => '1',

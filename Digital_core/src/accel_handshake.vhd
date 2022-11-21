@@ -100,6 +100,9 @@ architecture fpga of accel_handshake is
 	signal tx_remain : integer;
 	constant full_trunc : std_logic_vector(5 downto 0) := std_logic_vector(to_unsigned(2**5 - 1, 6));
 	
+  	attribute mark_debug : string;
+  	attribute mark_debug of tx_remain_trunc: signal is "true"; 
+
 begin
 
 	rx_level_trunc <= rx_level(5 downto 0) when unsigned(rx_level) < 2**5 else 

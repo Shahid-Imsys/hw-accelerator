@@ -6,15 +6,18 @@ entity fpga_clock_reset is
   generic (
     fpga_g : boolean := true);
   port (
-    clk_in   : in std_logic;
-    spi_sclk : in std_logic;
+    clk_cpu_in : in std_logic;
+    clk_acc_in : in std_logic;
+    spi_sclk   : in std_logic;
     --
-    clk_p   : out std_logic;
-    clk_p_n : out std_logic;
-    clk_rx  : out std_logic;
-    clk_tx  : out std_logic;
-    sclk    : out std_logic;
-    sclk_n  : out std_logic;
+    clk_p_cpu   : out std_logic;
+    clk_p_cpu_n : out std_logic;
+    clk_p_acc   : out std_logic;
+    clk_e       : out std_logic;
+    clk_rx      : out std_logic;
+    clk_tx      : out std_logic;
+    sclk        : out std_logic;
+    sclk_n      : out std_logic;
     
     pre_spi_rst_n : in std_logic;
     mreset_n      : in std_logic;   -- system reset, active low
@@ -56,7 +59,7 @@ begin
   
   i_main_rst_n : entity work.reset_sync
   port map (
-    clk => clk_in,
+    clk => clk_cpu_in,
  
     scan_mode   => scan_mode,
     a_rst_n     => main_rst_n,
@@ -72,9 +75,13 @@ begin
   -- Clock section
   --------------------------------------
     
-  clk_p   <= clk_in;
-  clk_p_n <= not clk_in;
+  clk_p_cpu   <= clk_cpu_in;
+  clk_p_cpu_n <= not clk_cpu_in;
+
+  clk_p_acc   <= clk_acc_in;
   
+  clk_e <= clk_cpu_in;
+
   clk_rx <= pg_1_i;
   clk_tx <= pf_1_i;
 

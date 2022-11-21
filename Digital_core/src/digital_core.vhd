@@ -39,7 +39,8 @@ entity digital_core is
   port (
     clk_p_cpu   : in std_logic;         -- clk input
     clk_p_cpu_n : in std_logic;         -- clk input
-    clk_noc     : in std_logic;         -- 
+    clk_p_acc     : in std_logic;         -- 
+    clk_e       : in std_logic;
     clk_rx      : in std_logic;
     clk_tx      : in std_logic;
 
@@ -215,11 +216,12 @@ architecture rtl of digital_core is
 
   component Accelerator_Top is
     Generic(
-      USE_ASIC_MEMORIES   : boolean := false
+        USE_ASIC_MEMORIES    : boolean := false
     );
     port (
-	    clk                  : in  std_logic;
-	    Reset                : in  std_logic;
+	      clk_p                : in  std_logic;
+        clk_e                : in  std_logic;
+	      Reset                : in  std_logic;
         PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
@@ -270,16 +272,24 @@ architecture rtl of digital_core is
   signal NOC_WRITE_REQ : std_logic;
   signal IO_WRITE_ACK  : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of GPP_CMD: signal is "true"; 
+  attribute mark_debug of GPP_CMD_Flag: signal is "true";   
+  attribute mark_debug of IO_DATA: signal is "true"; 
+  attribute mark_debug of NOC_DATA: signal is "true"; 
+  attribute mark_debug of NOC_IRQ: signal is "true"; 
+
+
 begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
   
-  FPGA_MEM: if g_memory_type /= asic generate
   Accelerator_Top_inst : Accelerator_Top
     generic map(
-      USE_ASIC_MEMORIES => false )
+      USE_ASIC_MEMORIES => g_memory_type /= fpga )
     port map (
-      clk           => clk_noc,
+      clk_p         => clk_p_acc,
+      clk_e         => clk_e,
       Reset         => cpu_rst_n,
       PEC_Ready     => '0',
       GPP_CMD_ACK   => GPP_CMD_ACK,
@@ -298,33 +308,6 @@ begin  -- architecture rtl
       NOC_DATA_DIR  => NOC_DATA_DIR,
       NOC_DATA_EN   => NOC_DATA_EN
       );
-  end generate;
-  
-  ASIC_MEM: if g_memory_type = asic generate
-  Accelerator_Top_inst : Accelerator_Top
-    generic map(
-      USE_ASIC_MEMORIES => true )
-    port map (
-      clk           => clk_noc,
-      Reset         => cpu_rst_n,
-      PEC_Ready     => '0',
-      GPP_CMD_ACK   => GPP_CMD_ACK,
-      GPP_CMD_Flag  => GPP_CMD_Flag,
-      GPP_CMD_Data  => GPP_CMD,
-      NOC_CMD_flag  => NOC_CMD_flag,
-      NOC_CMD_ACK   => NOC_CMD_ACK,
-      NOC_CMD_Data  => NOC_CMD,
-      IO_data       => IO_data,
-      NOC_data      => NOC_data,
-      NOC_Address   => NOC_Address,
-      NOC_Length    => NOC_Length,
-      NOC_WRITE_REQ => NOC_WRITE_REQ,
-      IO_WRITE_ACK  => IO_WRITE_ACK,
-      FIFO_Ready    => FIFO_Ready,
-      NOC_DATA_DIR  => NOC_DATA_DIR,
-      NOC_DATA_EN   => NOC_DATA_EN
-      );
-  end generate;
 
   noc_adapter_inst : fpga_noc_adapter
     generic map (
@@ -347,7 +330,7 @@ begin  -- architecture rtl
       inext         => ext_inext,
       idack         => ext_idack,
       idreq         => ext_idreq,
-      clk_noc       => clk_noc,
+      clk_noc       => clk_e,
       --
       NOC_IRQ       => NOC_IRQ,
       GPP_CMD       => GPP_CMD,

@@ -34,34 +34,35 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity cmdr is
-  port(
-    --Clock and reset functions
-    CLK_P     : in std_logic;
-    RST_EN    : in std_logic;
-    CLK_E_NEG : in std_logic;   
-    --Microprogram control
-    PL        : in std_logic_vector(127 downto 0);
-    --Cluster data interface
-    EXE       : in std_logic;
-    DATA_VLD  : in std_logic;
-    REQ_OUT   : out std_logic;
-    REQ_RD_OUT: out std_logic;
-    ACK_IN    : in std_logic;
-    DIN       : in std_logic_vector(127 downto 0);
-    DOUT      : out std_logic_vector(159 downto 0); --20B
-    --Core interface
-    YBUS      : in std_logic_vector(7 downto 0);
-    LD_MPGM   : in std_logic;
-    VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
-    DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
-    MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
-    DTM_FIFO_RDY : out std_logic;
-    VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
-    VE_DTM_RDY : in std_logic;
-    VE_PUSH_DTM : in std_logic;
-    VE_AUTO_SEND : in std_logic
-      
-  );
+    port(
+        --Clock and reset functions
+        CLK_P     : in std_logic;
+        RST_EN    : in std_logic;
+        CLK_E_NEG : in std_logic;   
+        --Microprogram control
+        PL        : in std_logic_vector(127 downto 0);
+        --Cluster data interface
+        EXE       : in std_logic;
+        DATA_VLD  : in std_logic;
+        REQ_OUT   : out std_logic;
+        REQ_RD_OUT: out std_logic;
+        ACK_IN    : in std_logic;
+        DIN       : in std_logic_vector(127 downto 0);
+        DOUT      : out std_logic_vector(159 downto 0); --20B
+        --Core interface
+        YBUS      : in std_logic_vector(7 downto 0);
+        LD_MPGM   : in std_logic;
+        VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
+        DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
+        MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
+        DTM_FIFO_RDY : out std_logic;
+        dtm_buf_empty : out std_logic;
+        VE_DTMO   : in std_logic_vector(127 downto 0);  --output DTM data from VE;
+        VE_DTM_RDY : in std_logic;
+        VE_PUSH_DTM : in std_logic;
+        VE_AUTO_SEND : in std_logic
+        
+    );
 end; 
 
 architecture rtl of cmdr is
@@ -354,11 +355,12 @@ begin
     end if;
   end process;
     
-  REQ_OUT <= req;
-  REQ_RD_OUT <= rd_trig;
-  fb  <= ACK_IN;
-  srst <= not rst_en;
-  DTM_FIFO_RDY <= not empty;
+    REQ_OUT <= req;
+    REQ_RD_OUT <= rd_trig;
+    fb  <= ACK_IN;
+    srst <= not rst_en;
+    DTM_FIFO_RDY <= not empty;
+    dtm_buf_empty <= empty;
 
     --Widen the bandwith to 20B. Use a collecting logic instead of fifo here.
     --output register used as a data collector, col_ctr used as a data counter that triggers empty and prog_full signals

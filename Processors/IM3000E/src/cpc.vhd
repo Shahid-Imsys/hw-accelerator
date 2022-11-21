@@ -104,9 +104,13 @@ architecture rtl of cpc is
   signal mpram_we_nint  : std_logic;
 
   attribute mark_debug : string; 
-  attribute mark_debug of dfsr_int: signal is "true";  
+  attribute mark_debug of dfsr: signal is "true";  
   attribute mark_debug of tx_sel: signal is "true"; 
-  attribute mark_debug of byte_cnt: signal is "true"; 
+  attribute mark_debug of wtimc: signal is "true"; 
+  attribute mark_debug of wdclc: signal is "true"; 
+  attribute mark_debug of wdalc: signal is "true"; 
+
+
 
 begin
   dfsr <= dfsr_int;

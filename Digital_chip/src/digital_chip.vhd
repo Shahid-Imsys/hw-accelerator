@@ -367,12 +367,11 @@ begin  -- architecture rtl
     generic map
       (
         g_memory_type     => g_memory_type,
-        g_simulation      => g_simulation,
         g_clock_frequency => 31  -- system clock frequency in MHz
         )
       port map (
         hclk          => dco_clk(0),
-        clk_noc       => dco_clk(0),
+        clk_p_acc     => dco_clk(0),
         pll_ref_clk   => pll_ref_clk_in,
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,

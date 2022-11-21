@@ -33,7 +33,6 @@ entity Noc_State_Machine is
     TAG_shift              : in  std_logic;
     TS                     : in  std_logic_vector(15 downto 0);
     TSDiv16_Reg            : in  std_logic_vector(11 downto 0);
-    PEC_Ready              : in  std_logic;
     IO_WRITE_ACK           : in  std_logic;
     CMD_FF                 : in  std_logic;
     Opcode                 : in  std_logic_vector(11 downto 0);
@@ -61,7 +60,7 @@ entity Noc_State_Machine is
     En_IO_Data             : out std_logic;
     Sync_pulse             : out std_logic;
     load_Mode_reg          : out std_logic;
-    error                  : out std_logic;
+    ERROR                  : out std_logic;
     Write_REQ              : out std_logic
     );
 end Noc_State_Machine;
@@ -439,9 +438,9 @@ begin
   Load_Mux_Reg           <= Load_Mux_Reg_i;
   PEC_TS_Reg             <= std_logic_vector(Transfer_Counter);
 
-  boot_rom_proc : process(clk, reset)
+  boot_rom_proc : process(clk, Reset)
   begin
-    if reset = '0' then
+    if Reset = '0' then
         boot_mem_out <= (others => '0');
 
     elsif rising_edge(clk) then
@@ -563,9 +562,9 @@ begin
   PEC_WE_extend      <= PEC_WE or PEC_WE_latch;
 
 
-  process(clk, reset)
+  process(clk, Reset)
   begin
-    if reset = '0' then
+    if Reset = '0' then
       Reset_BC_i               <= '0';
       Load_PCIe_CMD_Reg_i      <= '0';
       Control_Data_Out         <= (others => '0');
@@ -642,7 +641,7 @@ begin
       Load_Boot_FF          <= Decoder2(1) and Mem_Out(3);
       FF_data               <= Decoder2(1) and Mem_Out(4);
       Reset_Boot_as_counter <= Decoder2(1) and Mem_Out(5);
-      error                 <= Decoder2(1) and Mem_Out(6);
+      ERROR                 <= Decoder2(1) and Mem_Out(6);
 
       Step_LC    <= Decoder2(2) and Mem_Out(2);
       Reset_IR   <= Decoder2(2) and Mem_Out(3);
@@ -692,7 +691,7 @@ begin
       if Load_Return_Reg2 = '1' then
         Return_Reg2 <= MSB_as & Control_Data;
       end if;
-    end if;  --reset
+    end if;  --Reset
   end process;
 
 end Behavioral;

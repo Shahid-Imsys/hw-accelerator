@@ -42,7 +42,6 @@ architecture Behavioral of Accelerator_tb is
 	    clk_p                : in  std_logic;
       clk_e                : in  std_logic;
 	    Reset                : in  std_logic;
-      PEC_Ready            : in  std_logic; 
       --Command interface signals 
       GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
       NOC_CMD_Data         : out std_logic_vector(7 downto 0);
@@ -59,9 +58,7 @@ architecture Behavioral of Accelerator_tb is
       NOC_DATA_DIR         : out std_logic;
       NOC_DATA_EN          : out std_logic;        
       NOC_WRITE_REQ        : out std_logic;
-      IO_WRITE_ACK         : in  std_logic;
-      Enable_Root_memory_t : out std_logic;
-      RM_Data_Out_t        : out std_logic_vector(127 downto 0)                           
+      IO_WRITE_ACK         : in  std_logic                          
       );
     end component;
    
@@ -246,7 +243,7 @@ architecture Behavioral of Accelerator_tb is
     signal ref_out   : result_out := init_out_from_file("pwc_ref_4x8x32.ascii");
 
     signal    clk_p         : std_logic;
-    signal    clk_e           : std_logic;
+    signal    clk_e         : std_logic;
     signal    Reset         : std_logic;
     signal    PEC_Ready     : std_logic;
     --Command interface signals 
@@ -266,8 +263,6 @@ architecture Behavioral of Accelerator_tb is
     signal    NOC_DATA_EN   : std_logic;
     signal    NOC_WRITE_REQ : std_logic;
     signal    IO_WRITE_ACK  : std_logic;
-    signal    Enable_Root_memory_t : std_logic;
-    signal    RM_Data_Out_t        : std_logic_vector(127 downto 0);  
     signal    i             : integer := 0;
     signal    j             : integer := 0;
     signal    k             : integer := 0;
@@ -287,9 +282,9 @@ architecture Behavioral of Accelerator_tb is
                   
 begin
     
-    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => false, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, PEC_Ready => PEC_Ready, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
+    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => false, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
     NOC_CMD_ACK => NOC_CMD_ACK, NOC_CMD_flag => NOC_CMD_flag, GPP_CMD_ACK => GPP_CMD_ACK, IO_data => IO_data, NOC_data => NOC_data, NOC_Address => NOC_Address, NOC_Length => NOC_Length, 
-    FIFO_Ready => FIFO_Ready, NOC_DATA_DIR => NOC_DATA_DIR, NOC_DATA_EN => NOC_DATA_EN, NOC_WRITE_REQ => NOC_WRITE_REQ, IO_WRITE_ACK => IO_WRITE_ACK,Enable_Root_memory_t => Enable_Root_memory_t,RM_Data_Out_t =>RM_Data_Out_t); 
+    FIFO_Ready => FIFO_Ready, NOC_DATA_DIR => NOC_DATA_DIR, NOC_DATA_EN => NOC_DATA_EN, NOC_WRITE_REQ => NOC_WRITE_REQ, IO_WRITE_ACK => IO_WRITE_ACK); 
 
     process
     begin  
@@ -958,12 +953,7 @@ begin
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"26" then
                 outword(m) <= NOC_data;
                 m  <= m +1;
-                progress2 <= 5;
-            elsif Enable_Root_memory_t = '1' and GPP_CMD_Data(7 downto 0)= x"28" then
-                outword2(m) <= RM_Data_Out_t;
-                outword(m) <= RM_Data_Out_t;
-                m  <= m +1;
-                progress2 <= 5;                
+                progress2 <= 5;              
             elsif m > Data_Transfer_Size -1 then
                 progress2 <= 0;
                 m  <= 0;                    

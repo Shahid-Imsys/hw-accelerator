@@ -72,7 +72,7 @@ begin
 		end loop;
 	end process;
 	
-	process (Decoder,switch_mux_In,switch_input_muxes)
+	process (switch_mux_In,switch_input_muxes)
     begin
 		for i in 0 to 15 loop
 			if switch_input_muxes(0) ='0' then

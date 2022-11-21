@@ -105,10 +105,6 @@ architecture rtl of cpc is
 
   attribute mark_debug : string; 
   attribute mark_debug of dfsr: signal is "true";  
-  attribute mark_debug of tx_sel: signal is "true"; 
-  attribute mark_debug of wtimc: signal is "true"; 
-  attribute mark_debug of wdclc: signal is "true"; 
-  attribute mark_debug of wdalc: signal is "true"; 
 
 
 
@@ -134,7 +130,7 @@ begin
     attribute mark_debug of sipo_reg: signal is "true";    
     attribute mark_debug of rx_en: signal is "true"; 
     attribute mark_debug of rx_stop: signal is "true"; 
-
+    
   begin
     -- The rx_en signal is set by an incoming start bit
     -- (msdin low) and cleared when the bit counter reaches

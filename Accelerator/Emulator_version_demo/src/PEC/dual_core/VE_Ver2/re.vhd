@@ -45,10 +45,6 @@ architecture receive_engine of re is
   signal mode_a_l        : std_logic;
   signal mode_b_l        : std_logic;
   signal re_loop         : std_logic_vector(7 downto 0);
-  signal ring_end_addr   : std_logic_vector(7 downto 0);
-  signal ring_start_addr : std_logic_vector(7 downto 0);
-  signal curr_ring_addr  : std_logic_vector(7 downto 0);
-  signal next_ring_addr  : std_logic_vector(7 downto 0);
   signal offset_l        : std_logic_vector(7 downto 0); --offset register
 
 begin

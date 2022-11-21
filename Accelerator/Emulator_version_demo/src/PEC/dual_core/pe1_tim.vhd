@@ -334,7 +334,7 @@ begin
 	-- FF in the clock block that generates clk_e. Also generate
 	-- gate_e, a copy of clk_e used for gating, not for clocking.
 	clk_e_neg <= not even_c or held_e_int or hold_flash;
-    clk_e_pos <= even_c or held_e_int or hold_flash;
+  clk_e_pos <= even_c or held_e_int or hold_flash;
     --gate_e <= even_c or held_e_int;
 
 	-- These FFs split clk_c by four and eight for clk_i generation.

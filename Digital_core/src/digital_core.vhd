@@ -222,7 +222,6 @@ architecture rtl of digital_core is
 	      clk_p                : in  std_logic;
         clk_e                : in  std_logic;
 	      Reset                : in  std_logic;
-        PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
@@ -291,7 +290,6 @@ begin  -- architecture rtl
       clk_p         => clk_p_acc,
       clk_e         => clk_e,
       Reset         => cpu_rst_n,
-      PEC_Ready     => '0',
       GPP_CMD_ACK   => GPP_CMD_ACK,
       GPP_CMD_Flag  => GPP_CMD_Flag,
       GPP_CMD_Data  => GPP_CMD,

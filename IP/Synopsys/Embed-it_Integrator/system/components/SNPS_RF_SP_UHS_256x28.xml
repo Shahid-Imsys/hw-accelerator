@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<Manifest>
- <ComponentType>memory</ComponentType>
- <Compiler>gf22nsd41p11s1srl256sa04p1</Compiler>
- <TopLevel>true</TopLevel>
- <DbModificationTime>05/25/2021 16:42:09</DbModificationTime>
- <Frozen>false</Frozen>
-</Manifest>

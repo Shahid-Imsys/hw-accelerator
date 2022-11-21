@@ -42,7 +42,6 @@ architecture Behavioral of Accelerator_tb is
 	    clk_p                : in  std_logic;
       clk_e                : in  std_logic;
 	    Reset                : in  std_logic;
-      PEC_Ready            : in  std_logic; 
       --Command interface signals 
       GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
       NOC_CMD_Data         : out std_logic_vector(7 downto 0);
@@ -244,7 +243,7 @@ architecture Behavioral of Accelerator_tb is
     signal ref_out   : result_out := init_out_from_file("pwc_ref_4x8x32.ascii");
 
     signal    clk_p         : std_logic;
-    signal    clk_e           : std_logic;
+    signal    clk_e         : std_logic;
     signal    Reset         : std_logic;
     signal    PEC_Ready     : std_logic;
     --Command interface signals 
@@ -283,7 +282,7 @@ architecture Behavioral of Accelerator_tb is
                   
 begin
     
-    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => false, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, PEC_Ready => PEC_Ready, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
+    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => false, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
     NOC_CMD_ACK => NOC_CMD_ACK, NOC_CMD_flag => NOC_CMD_flag, GPP_CMD_ACK => GPP_CMD_ACK, IO_data => IO_data, NOC_data => NOC_data, NOC_Address => NOC_Address, NOC_Length => NOC_Length, 
     FIFO_Ready => FIFO_Ready, NOC_DATA_DIR => NOC_DATA_DIR, NOC_DATA_EN => NOC_DATA_EN, NOC_WRITE_REQ => NOC_WRITE_REQ, IO_WRITE_ACK => IO_WRITE_ACK); 
 

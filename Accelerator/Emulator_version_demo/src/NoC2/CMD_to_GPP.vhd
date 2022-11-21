@@ -101,7 +101,7 @@ begin
                 PEC_ready_FF        <= '0';
             end if;
                        
-            if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
+            if ((ERROR = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
                 NOC_ERROR_FF        <= '1';
             else     
                 NOC_ERROR_FF        <= '0';

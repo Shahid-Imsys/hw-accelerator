@@ -163,6 +163,27 @@ begin
      );
   end generate;
 
-  PEC_Ready   <= C_RDY(0) and C_RDY(1);
-           
+
+  process(C_RDY())
+  begin
+    case pec_number is
+      when 1 => PEC_Ready   <= C_RDY(0);
+      when 2 => PEC_Ready   <= C_RDY(0) and C_RDY(1);
+      when 3 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2);
+      when 4 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3);
+      when 5 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4);
+      when 6 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5);
+      when 7 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6);
+      when 8 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7);
+      when 9 => PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8);
+      when 10=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9);
+      when 11=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10);
+      when 12=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10) and C_RDY(11);
+      when 13=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10) and C_RDY(11) and C_RDY(12);
+      when 14=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10) and C_RDY(11) and C_RDY(12) and C_RDY(13);
+      when 15=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10) and C_RDY(11) and C_RDY(12) and C_RDY(13) and C_RDY(14);
+      when 16=> PEC_Ready   <= C_RDY(0) and C_RDY(1) and C_RDY(2) and C_RDY(3) and C_RDY(4) and C_RDY(5) and C_RDY(6) and C_RDY(7) and C_RDY(8) and C_RDY(9) and C_RDY(10) and C_RDY(11) and C_RDY(12) and C_RDY(13) and C_RDY(14) and C_RDY(15);
+    end case;
+end process;
+
 end Behavioral;

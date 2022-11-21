@@ -40,7 +40,7 @@ entity pe1_mpll is
     clk_p       : in std_logic;
     clk_c2_pos  : in  std_logic;   -- 'clk_c / 2' clock
     clk_e_pos   : in std_logic;
-    clk_e_neg      : in  std_logic;   -- execution clock
+    clk_e_neg   : in  std_logic;   -- execution clock
     --gate_e     : in  std_logic;   -- Copy of execution clock used for gating, also the positive edge
     -- From CPC (SP load)
     wmlat			 : in  std_logic;   -- load pe1_mpll pulse (1 'clk_s', active high)

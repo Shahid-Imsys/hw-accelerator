@@ -101,6 +101,9 @@ architecture rtl of clk_gen is
   signal clk_s_pos_int  : std_logic;
   signal clk_a_int      : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of clk_s_pos_int: signal is "true";   
+
 begin
 
   -- PLL output is the source of clk_c except when the PLL

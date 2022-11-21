@@ -70,7 +70,6 @@ architecture structural of Noc_Top is
         TAG_shift               : in  std_logic;                    
         TS                      : in  std_logic_vector(15 downto 0);
         TSDiv16_Reg             : in  std_logic_vector(11 downto 0);
-        PEC_Ready               : in  std_logic;
         IO_WRITE_ACK            : in  std_logic;
         CMD_FF                  : in  std_logic;
         Opcode                  : in  std_logic_vector(11 downto 0);
@@ -462,7 +461,6 @@ begin
         TAG_shift               => TAG_shift,                   
         TS                      => Transfer_size,
         TSDiv16_Reg             => TSDiv16_Reg,
-        PEC_Ready               => PEC_Ready,
         IO_WRITE_ACK            => IO_WRITE_ACK,
         CMD_FF                  => CMD_FF,
         Opcode                  => Opcode,

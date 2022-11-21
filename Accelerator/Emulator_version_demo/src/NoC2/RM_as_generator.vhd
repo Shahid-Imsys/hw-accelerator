@@ -91,9 +91,9 @@ begin
     Address_steps_0 <= Address_steps(18 downto 0);
     End_values_0    <= End_values(18 downto 0);
     
-    process(clk, reset)
+    process(clk, Reset)
     begin
-        if reset = '0' then
+        if Reset = '0' then
             Reg_L1(0) <= (others => '0');
             Reg_L1(1) <= (others => '0');
             Reg_L1(2) <= (others => '0');

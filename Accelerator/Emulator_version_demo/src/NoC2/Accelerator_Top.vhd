@@ -29,7 +29,6 @@ entity Accelerator_Top is
 	      clk_p                : in  std_logic;
         clk_e                : in  std_logic;
 	      Reset                : in  std_logic;
-        PEC_Ready            : in  std_logic;
         --Command interface signals 
         GPP_CMD_Data         : in  std_logic_vector(127 downto 0);
         NOC_CMD_Data         : out std_logic_vector(7 downto 0);
@@ -57,8 +56,8 @@ architecture Behavioral of Accelerator_Top is
       USE_ASIC_MEMORIES      : boolean := true
     );
     Port(
-	    clk                  : in  std_logic;
-	    Reset                : in  std_logic;
+	      clk                  : in  std_logic;
+	      Reset                : in  std_logic;
         PEC_Ready            : in  std_logic; 
         --NOC PEC INTERFACE
         PEC_WE               : in  std_logic;
@@ -106,6 +105,8 @@ architecture Behavioral of Accelerator_Top is
     signal Noc_byte_data : std_logic_vector(127 downto 0):= (others => '0');
     signal Tag_Line      : std_logic;
     signal PEC_WE        : std_logic_vector(PEC_NUMBER -1 downto 0);
+    signal C_RDY         : std_logic_vector(PEC_NUMBER -1 downto 0); 
+    signal PEC_Ready     : std_logic;
      
 begin
 
@@ -156,10 +157,12 @@ begin
         DDO_VLD                 => PEC_WE(i),
         TAG                     => Tag_Line,
         TAG_FB                  => open,
-        C_RDY                   => open,
+        C_RDY                   => C_RDY(i),
         DATA                    => Noc_byte_data(8*i+7 downto 8*i),
         DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i)
      );
   end generate;
+
+  PEC_Ready   <= C_RDY(0) and C_RDY(1);
            
 end Behavioral;

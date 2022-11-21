@@ -172,7 +172,9 @@ architecture rtl of clc is
   signal pl_sig12      : std_logic;        
   signal pl_sig18   : std_logic_vector(3 downto 0);
   signal pl_sig15     : std_logic_vector(4 downto 0);
-  
+
+  attribute mark_debug : string;
+  attribute mark_debug of st_ctr: signal is "true";   
 
 begin
   -- Create named signals for overlapping microprogram fields.

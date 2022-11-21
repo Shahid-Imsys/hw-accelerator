@@ -431,10 +431,11 @@ architecture struct of core is
   attribute mark_debug : string;
   attribute mark_debug of dbus_int: signal is "true";  
   attribute mark_debug of ybus: signal is "true";  
-  attribute mark_debug of pl: signal is "true";  
-  attribute mark_debug of spack_n: signal is "true";  
-  attribute mark_debug of runmode: signal is "true";  
-  
+  attribute mark_debug of pl: signal is "true";     
+  attribute mark_debug of plsel_n: signal is "true";
+  attribute mark_debug of clk_p: signal is "true"; 
+  attribute mark_debug of even_c: signal is "true"; 
+
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 

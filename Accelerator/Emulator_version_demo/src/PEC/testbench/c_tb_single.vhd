@@ -39,6 +39,7 @@ end c_tb;
 
 architecture Behavioral of c_tb is
 component PEC_top
+  generic ( USE_ASIC_MEMORIES : boolean := false );
   Port ( 
 	  CLK_P : in std_logic;
 	  CLK_E  : in std_logic;
@@ -104,6 +105,8 @@ begin
   end process;
 
 cluster_1: PEC_top
+generic map(
+  USE_ASIC_MEMORIES => false )
 port map(
 clk_p => clk_p,
 clk_e => clk_e,

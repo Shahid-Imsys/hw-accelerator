@@ -340,7 +340,6 @@ architecture rtl of ve is
   --Vector engine signals
   signal ve_rdy_int : std_logic;
   signal start, conv_start, fft_start : std_logic;
-  signal lau_activate, rau_activate, bau_activate, activate_from_re : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
   --signal mac_switch : std_logic;
   --Shared signals
@@ -405,8 +404,6 @@ architecture rtl of ve is
   signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
   signal bias_index_rd, bias_index_wr : std_logic_vector(7 downto 0);
   signal bias_addr_o : std_logic_vector(5 downto 0);
-  signal fw_layer   : std_logic_vector(23 downto 0); --feed forward layer, 24 bits.
-  signal mul_ctl   : std_logic_vector(7 downto 0); --turn off the multipliers.
   signal re_busy : std_logic; --RE start latch
   signal conv_busy : std_logic; --VE start latch
   signal re_cnt_rst, conv_cnt_rst, cnt_rst  : std_logic;
@@ -556,7 +553,6 @@ begin
           pp_ctl            <= (others => '0');  --Make it 8 bits
           bias_index_end    <= (others => '0');
           bias_index_start  <= (others => '0');
-          mul_ctl           <= (others => '0'); 
           au_lcmp           <= (others => (others => '0'));
           au_loffset        <= (others => (others => '0'));
           au_rcmp           <= (others => (others => '0'));

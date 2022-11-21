@@ -45,7 +45,6 @@ architecture Behavioral of Transpose_unit is
     signal  addr_cntr1              : integer range 0 to 15;
     signal  addr_cntr0              : integer range 0 to 15;
     signal  TP_Interchange_FF       : std_logic;
-    signal  TP_Interchange_FF_d     : std_logic;
     signal  Noc_reg_mux0            : std_logic_vector(127 downto 0);
     signal  Noc_data_mux0           : std_logic_vector(127 downto 0);
     signal  Noc_reg_mux1            : std_logic_vector(127 downto 0);
@@ -149,7 +148,6 @@ begin
             if TP_Interchange = '1' then
                 TP_Interchange_FF    <= not TP_Interchange_FF;
             end if;
-            TP_Interchange_FF_d  <= TP_Interchange_FF;           
 
             if Reset_TPC = '1' then
                 addr_cntr1   <= 0;

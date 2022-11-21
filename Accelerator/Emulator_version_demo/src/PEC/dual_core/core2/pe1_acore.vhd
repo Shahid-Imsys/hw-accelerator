@@ -166,7 +166,6 @@ architecture struct of pe1_acore is
   signal core2_en_buf : std_logic;
   signal vldl       : std_logic;
   signal vldl_2     : std_logic;
-  signal temp       : std_logic;
   signal ready_1    : std_logic;
   -- Named fields of the pipeline register input
   signal mp_miform  : std_logic;
@@ -367,13 +366,8 @@ begin
       if rising_edge(clk_p) then
         if rst_en_int = '0' then
           vldl <= '0';
-          temp <= '0';
         else
           vldl <= ddi_vld;
-          if clk_e_neg_int = '1' then --make sure vldl is generated later than clk_e_neg
-          temp <= ddi_vld;
-          --vldl <= mid;
-          end if;
         end if;
       end if;
   end process;

@@ -79,7 +79,6 @@ architecture rtl of pe1_acmdr is
     signal send_req_d    : std_logic;
     signal send_req      : std_logic;
     signal requesting    : std_logic;
-    signal transfer_cnt  : unsigned(7 downto 0);
     signal cnt_reg       : unsigned(7 downto 0);
     signal transfer_type : std_logic_vector(1 downto 0);
 
@@ -238,7 +237,6 @@ begin
     begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
-                transfer_cnt <= (others => '0');
                 cnt_reg <= (others => '0');
                 transfer_type <= "00";
             else
@@ -247,19 +245,6 @@ begin
                         transfer_type <= dtm_reg(31 downto 30);
                         if dtm_reg (31 downto 30) = "11" then
                             cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);
-                            if fifo_rd_en = '1' then
-                                if transfer_cnt /= (transfer_cnt'range => '0') then
-                                    transfer_cnt <= transfer_cnt -1;
-                                else
-                                    transfer_cnt <= cnt_reg;
-                                end if;
-                            end if;
-                        end if;
-                    elsif clk_e_pos = '1' and transfer_cnt = (transfer_cnt'range => '0') then
-                        transfer_cnt <= cnt_reg;
-                    else
-                        if fifo_rd_en = '1' and transfer_type = "11" then
-                            transfer_cnt <= transfer_cnt -1;
                         end if;
                     end if;
                 end if;
@@ -298,14 +283,6 @@ begin
                         rd_trig <= '0';
                         if requesting = '1' then
                             send_req_d <= '1';--requesting;
-                        else
-                            --case transfer_type is
-                            --    when "11" =>
-                            --        if transfer_cnt = x"00" then
-                            --            rd_trig <= '0';
-                            --        end if;
-                            --    when others => rd_trig <= '0';
-                            --end case;
                         end if;
                         send_req <= send_req_d;
                     end if;
@@ -335,16 +312,6 @@ begin
                     if send_req = '1' then
                         req <= '1';
                     end if;
-                    --case transfer_type is
-                    --    when "11" =>
-                    --        if send_req = '1' and transfer_cnt = x"04" then
-                    --            req <= '1';
-                    --         end if;
-                    --    when others =>
-                    --        if send_req = '1' then
-                    --            req <= '1';
-                    --        end if;
-                    --end case;
                 elsif fb = '1' then
                     req <= '0';
                 end if;

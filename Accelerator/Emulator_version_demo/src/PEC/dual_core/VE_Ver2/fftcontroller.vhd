@@ -55,25 +55,9 @@ architecture first of fftcontroller is
   signal data1addrmasked   : std_logic_vector(7 downto 0) := (others => '0');
   signal swap_int          : std_logic                    := '0';
   signal swap_swap         : swap_t;
-  signal clockcycle        : integer                      := 0;
   signal finalcycle        : std_logic                    := '0';
   signal maxstagereached   : std_logic                    := '0';
 begin
-
-
--- Clock cycle counter for debug
-  process(clk)
-  begin
-    if rising_edge(clk) then
-      if simulation then
-        if start = '1' then
-          clockcycle <= 0;
-        else
-          clockcycle <= clockcycle + 1;
-        end if;
-      end if;
-    end if;
-  end process;
 
 -- Cycle counter
   process(clk)

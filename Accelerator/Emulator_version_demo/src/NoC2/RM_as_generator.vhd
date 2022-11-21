@@ -51,7 +51,6 @@ architecture Behavioral of RM_as_generator is
     signal Reg_L4       : unsigned(19 downto 0);
     signal Reg_L4_p1    : unsigned(3 downto 0);
     signal Reg_L4_p2    : unsigned(3 downto 0);
-    signal Reg_L4_p3    : unsigned(3 downto 0);
     signal i            : integer;
     signal RM_as_counter: unsigned(14 downto 0);
     signal Load_IR1     : unsigned(5 downto 1);
@@ -152,7 +151,6 @@ begin
             
             Reg_L4_p1   <= Reg_L4(3 downto 0);
             Reg_L4_p2   <= Reg_L4_p1;
-            Reg_L4_p3   <= Reg_L4_p2;
                                     
             --RM AS Counter
             if Load_RM_as = '1' then

@@ -210,7 +210,6 @@ end component;
   signal addr_n         : std_logic_vector(14 downto 0);   --NOC address pointer
 --  signal addr2_n        : std_logic_vector(14 downto 0);   --azzzz addr2 for NOC2
   signal addr_p         : std_logic_vector(14 downto 0);   --PE  side address pointer
-  signal req_addr_p     : std_logic_vector(14 downto 0);
   signal noc_cmd_buf    : std_logic_vector(4 downto 0);    --NOC command buffer
   signal noc_cmd        : std_logic_vector(4 downto 0);    --NOC command control register
   signal id_num         : std_logic_vector(5 downto 0);
@@ -225,12 +224,10 @@ end component;
   signal dist_reg       : std_logic_vector(3 downto 0);    --Data pack distance register, length TBD
   signal dist_ctr       : std_logic_vector(3 downto 0);
   signal b_cast_ctr     : std_logic_vector(5 downto 0);
-  signal write_count    : std_logic_vector(1 downto 0);    --Wr req data counter
   --Delay signal
   signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
   signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
-  signal rd_ena         : std_logic;
   signal dataout_vld_o  : std_logic;
   signal continuous_mode: std_logic;
  
@@ -769,18 +766,15 @@ EVEN_P <= even_p_2;
  		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
 			if noc_cmd = "01111" then
 				pe_req_type <= (others => '0');
-				req_addr_p <= (others => '0');
 				req_last <= (others => '0');
                 bc_i <= (others => '0');
 
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
- 				req_addr_p <= REQ_FIFO(14 downto 0);
  				req_last <= REQ_FIFO(29 downto 24);
                 bc_i(0) <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
             elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
                 pe_req_type <= (others => '0');
-				req_addr_p <= (others => '0');
 				req_last <= (others => '0');
 
                 bc_i(0) <= '0';
@@ -842,9 +836,7 @@ EVEN_P <= even_p_2;
                         req_exe <= '0';
 			    	end if;
     
-			    	--if write_count = "11" then
-			    		write_req<= '0';
-			    	--end if;
+    	    		write_req<= '0';
                 end if;
 			end if;
 		end if;
@@ -857,7 +849,6 @@ EVEN_P <= even_p_2;
 			if noc_cmd = "01111" then
 				addr_p <= (others => '0');
 				len_ctr_p <= (others => '0');
-				write_count <= "00";
 				pe_write <= '0';
 				pe_read <= '0';
 			elsif even_p_int = '0' then	
@@ -875,18 +866,9 @@ EVEN_P <= even_p_2;
 							if pe_write = '0' then
 								pe_read <= '1';
 							end if; 
-						elsif write_req = '1' then--and fifo_vld = '1' then
-							--pe_data_in(4*to_integer(unsigned(write_count))) <= REQ_FIFO(7 downto 0);
-            	            --pe_data_in(4*to_integer(unsigned(write_count))+1) <=REQ_FIFO(15 downto 8);
-            	            --pe_data_in(4*to_integer(unsigned(write_count))+2) <=REQ_FIFO(23 downto 16);
-            	            --pe_data_in(4*to_integer(unsigned(write_count))+3) <=REQ_FIFO(31 downto 24);
-							--write_count <= std_logic_vector(to_unsigned(to_integer(unsigned(write_count))+1,2));
+						elsif write_req = '1' then
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
-							--if write_count = "11" then
-								pe_write <= '1';
-							--else
-								--pe_write <= '0';
-							--end if;
+							pe_write <= '1';
 						end if;
 					elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
 						addr_p <= REQ_FIFO(14 downto 0);
@@ -971,18 +953,6 @@ c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
 		   PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15 when not single_pe_sim else PE_RDY_15;
 		   
 C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
-----------------------------------------------------------------------------------	
-process(clk_e)
-begin
-	if rising_edge(clk_e) then
-		if noc_cmd = "00100" then
-		rd_ena <= '1';
-		else
-		rd_ena <= '0';
-		end if;
-	end if;
-end process;
-
 				
   --Memory blocks
   cmem_asic_gen : if USE_ASIC_MEMORIES generate

@@ -650,6 +650,11 @@ architecture struct of top is
   signal ram_cs  : main_ram_cs_t;
   signal ram_web : main_ram_web_t;
 
+  attribute mark_debug : string;
+  attribute mark_debug of c1_mprom_a: signal is "true";  
+  attribute mark_debug of c1_mprom_ce: signal is "true";
+  attribute mark_debug of c1_mpram_ce: signal is "true";
+
 begin
 
   -- IO-bus signals to NOC adapter

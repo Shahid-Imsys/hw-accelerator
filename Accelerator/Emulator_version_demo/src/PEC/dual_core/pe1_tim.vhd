@@ -57,83 +57,82 @@ use ieee.std_logic_unsigned.all;
 entity pe1_tim is
 	port(
 		-- Clock
-		clk_p      : in  std_logic; -- clock buffer to PLL
-		even_c     : in std_logic;
-		clk_c_en   : in  std_logic; -- PLL clock input
+		clk_p           : in  std_logic; -- clock buffer to PLL
+		even_c          : in std_logic;
+		clk_c_en        : in  std_logic; -- PLL clock input
 		--clk_c2_pos  : out  std_logic; -- clk_c / 2
-		clk_e_pos   : out  std_logic; -- Execution clock input
-		clk_e_neg   : out std_logic;
+		clk_e_pos       : out  std_logic; -- Execution clock input
+		clk_e_neg       : out std_logic;
 --  clk_i      : in std_logic;  -- I/O clock input
-
 		-- Microinstruction fields
-		pl         : in  std_logic_vector(127 downto 0); -- Used for CALL SP & ACK SPREQ
+		pl              : in  std_logic_vector(127 downto 0); -- Used for CALL SP & ACK SPREQ
 
 		--pl_shin_pa : in  std_logic_vector(3 downto 0); -- Used for CALL SP & ACK SPREQ
 		--pl_alud    : in  std_logic_vector(2 downto 2); -- Only bit 2 used here
 		-- Static control inputs
-		en_i       : in  std_logic; -- Enable I/O clock when high
-		en_mckout1 : in  std_logic; -- Enable MCKOUT1 pin when high
-		en_s       : in  std_logic; -- Enable SP clock when high
-		speed_i    : in  std_logic_vector(1 downto 0);   --I/O timing select
-		speed_u    : in  std_logic_vector(6 downto 0);   --UART prescaler control
-		speed_s    : in  std_logic_vector(1 downto 0);   --SP clock control
-		speed_ps1  : in  std_logic_vector(3 downto 0);   --Prescaler 1 control
-		speed_ps2  : in  std_logic_vector(5 downto 0);   --Prescaler 2 control
-		speed_ps3  : in  std_logic_vector(4 downto 0);   --Prescaler 3 control
-		dis_xosc   : in  std_logic; -- disable xosc from CRB
-		dis_pll    : in  std_logic; -- disable pll  from CRB
-		clk_sel    : in  std_logic;-- clock select from CRB
+		en_i            : in  std_logic; -- Enable I/O clock when high
+		en_mckout1      : in  std_logic; -- Enable MCKOUT1 pin when high
+		en_s            : in  std_logic; -- Enable SP clock when high
+		speed_i         : in  std_logic_vector(1 downto 0);   --I/O timing select
+		speed_u         : in  std_logic_vector(6 downto 0);   --UART prescaler control
+		speed_s         : in  std_logic_vector(1 downto 0);   --SP clock control
+		speed_ps1       : in  std_logic_vector(3 downto 0);   --Prescaler 1 control
+		speed_ps2       : in  std_logic_vector(5 downto 0);   --Prescaler 2 control
+		speed_ps3       : in  std_logic_vector(4 downto 0);   --Prescaler 3 control
+		dis_xosc        : in  std_logic; -- disable xosc from CRB
+		dis_pll         : in  std_logic; -- disable pll  from CRB
+		clk_sel         : in  std_logic;-- clock select from CRB
 		-- Inputs from outside pe1_core
-		mreset     : in  std_logic; -- Asynchronous reset (active low)
-		pwr_ok     : in  std_logic; -- Power-on from PWRON
-		--mpordis_i  : in  std_logic; -- MPORDIS pad input
-		mtest_i    : in  std_logic; -- MTEST pad input
-		mbypass_i  : in  std_logic; -- MBYPASS pad input
+		mreset          : in  std_logic; -- Asynchronous reset (active low)
+		pwr_ok          : in  std_logic; -- Power-on from PWRON
+		--mpordis_i       : in  std_logic; -- MPORDIS pad input
+		mtest_i         : in  std_logic; -- MTEST pad input
+		mbypass_i       : in  std_logic; -- MBYPASS pad input
 		-- Inputs from other pe1_core blocks
-		hold_e     : in  std_logic; -- Hold input for clk_e, stops high when set
-		hold_flash : in  std_logic;
-		hold_flash_d: in std_logic;
-		gen_spreq  : in  std_logic; -- Generate SPREQ (act H)
-		rsc_n      : in  std_logic; -- DCRS command from CPC (active low)
-		stop_step  : in  std_logic; -- SSCU command from CPC (active high)
-		run        : in  std_logic; -- RUCU command from CPC (active high)
-		spack_cmd  : in  std_logic; -- ACKC command from CPC (active high)
-		reqrun     : in  std_logic; -- Wakeup after sleep mode (active high)
-		sleep      : in  std_logic; -- Sleep signal (active high)
-		wdog_n     : in  std_logic; -- Watch dog reset (active low)
+		hold_e          : in  std_logic; -- Hold input for clk_e, stops high when set
+		hold_flash      : in  std_logic;
+		hold_flash_d    : in std_logic;
+		gen_spreq       : in  std_logic; -- Generate SPREQ (act H)
+		rsc_n           : in  std_logic; -- DCRS command from CPC (active low)
+		stop_step       : in  std_logic; -- SSCU command from CPC (active high)
+		run             : in  std_logic; -- RUCU command from CPC (active high)
+		spack_cmd       : in  std_logic; -- ACKC command from CPC (active high)
+		reqrun          : in  std_logic; -- Wakeup after sleep mode (active high)
+		sleep           : in  std_logic; -- Sleep signal (active high)
+		wdog_n          : in  std_logic; -- Watch dog reset (active low)
 
 		-- power down wake up reset , added by HYX, 20150706
-		reset_core_n  : in std_logic;
-		reset_iso  : in std_logic;  -- isolate the reset by power_ok
+		reset_core_n    : in std_logic;
+		reset_iso       : in std_logic;  -- isolate the reset by power_ok
 		reset_iso_clear : out std_logic;
 
 		-- Outputs to outside pe1_core
-		mrstout    : out std_logic; -- MRSTOUT pad output
-		en_xosc    : out std_logic; -- enable XOSC
-		en_pll     : out std_logic; -- enable PLL
-		sel_pll    : out std_logic; -- select PLL as clock source
-		test_pll   : out std_logic; -- PLL in test mode
-		mirqout    : out std_logic; -- MIRQOUT pin, for irq to SP (act low)
-		mckout1    : out std_logic; -- Programmable division of clk_c, to external pin
+		mrstout         : out std_logic; -- MRSTOUT pad output
+		en_xosc         : out std_logic; -- enable XOSC
+		en_pll          : out std_logic; -- enable PLL
+		sel_pll         : out std_logic; -- select PLL as clock source
+		test_pll        : out std_logic; -- PLL in test mode
+		mirqout         : out std_logic; -- MIRQOUT pin, for irq to SP (act low)
+		mckout1         : out std_logic; -- Programmable division of clk_c, to external pin
 		--din_e      : out std_logic; -- To clock block for clk_e generation
-		din_i      : out std_logic; -- To clock block for clk_i generation
-		din_u      : out std_logic; -- To clock block for clk_u generation
-		din_s      : out std_logic; -- To clock block for clk_s generation
+		din_i           : out std_logic; -- To clock block for clk_i generation
+		din_u           : out std_logic; -- To clock block for clk_u generation
+		din_s           : out std_logic; -- To clock block for clk_s generation
 		-- Outputs to other pe1_core blocks
 		--even_c     : out std_logic; -- High during even clk_c cycles
 		--gate_e     : out std_logic; -- A copy of clk_e, used for gating
-		held_e     : out std_logic; -- High when clk_e is held
-		pend_i     : out std_logic; -- High during clk_c cycle before rising clk_i edge
+		held_e          : out std_logic; -- High when clk_e is held
+		pend_i          : out std_logic; -- High during clk_c cycle before rising clk_i edge
 --    gate_i     : out std_logic; -- A copy of clk_i, used for gating
-		state_ps3  : out std_logic_vector(4 downto 0); -- Transfer prescaler 3 to CRB for access
-		clkreq_gen : out std_logic; -- Programmable division of clk_c, for clkreq generation
-		ld_mar     : out std_logic; -- Load the MAR register at CALL SP (act high)
-		runmode    : out std_logic; -- For status information to SP
-		spack_n    : out std_logic; -- SP acknowledge,(act low)
-		spreq_n    : out std_logic; -- SP request, (act low)
-        rst_n      : out std_logic; -- Asynchronous reset to clk_gen
-		rst_cn     : out std_logic; -- Reset signal generated, clk_c sync
-		rst_en     : out std_logic); --Reset signal generated, falling clk_e sync
+		state_ps3       : out std_logic_vector(4 downto 0); -- Transfer prescaler 3 to CRB for access
+		clkreq_gen      : out std_logic; -- Programmable division of clk_c, for clkreq generation
+		ld_mar          : out std_logic; -- Load the MAR register at CALL SP (act high)
+		runmode         : out std_logic; -- For status information to SP
+		spack_n         : out std_logic; -- SP acknowledge,(act low)
+		spreq_n         : out std_logic; -- SP request, (act low)
+    rst_n           : out std_logic; -- Asynchronous reset to clk_gen
+		rst_cn          : out std_logic; -- Reset signal generated, clk_c sync
+		rst_en          : out std_logic); --Reset signal generated, falling clk_e sync
 end;
 architecture rtl of pe1_tim is
 	signal reqrun_s      : std_logic;
@@ -159,12 +158,12 @@ architecture rtl of pe1_tim is
 	signal ps2_out       : std_logic;
 	signal ps3_out       : std_logic;
 	signal rst_nint      : std_logic;
-	signal rst_nint_int0  : std_logic;--added by maning
-	signal rst_nint_int1  : std_logic;--added by maning
+	signal rst_nint_int0 : std_logic;--added by maning
+	signal rst_nint_int1 : std_logic;--added by maning
 	signal mtest_i_int0  : std_logic;--added by maning
 	signal mtest_i_int1  : std_logic;--added by maning
 	signal rst_cn_cnt    : std_logic_vector(2 downto 0);
-	signal rst_cn_cnt1    : std_logic_vector(4 downto 0); -- for use in wake up mode added by maning
+	signal rst_cn_cnt1   : std_logic_vector(4 downto 0); -- for use in wake up mode added by maning
 	signal rst_cn_off    : std_logic;
 --	signal pll_stable_cnt : std_logic_vector(14 downto 0);
 --	signal pll_stable_cnt_off : std_logic;

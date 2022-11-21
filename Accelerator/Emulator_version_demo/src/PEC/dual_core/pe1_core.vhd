@@ -56,34 +56,34 @@ entity pe1_core is
     -- Signals to/from other blocks
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
-    clk_p       : in  std_logic;  -- PLL clock
-    clk_c_en    : in  std_logic;  -- CP clock
-    even_c      : in  std_logic;
+    clk_p        : in  std_logic;  -- PLL clock
+    clk_c_en     : in  std_logic;  -- CP clock
+    even_c       : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2
-    clk_e_pos    : out  std_logic;  -- Execution clock
-    clk_e_neg    : out  std_logic;  -- Execution clock
-    clk_i_pos       : in  std_logic;  -- I/O clock
-    clk_d_pos       : in  std_logic;  -- DRAM clock
-    clk_s_pos       : in  std_logic;  -- SP clock
+    clk_e_pos    : out std_logic;  -- Execution clock
+    clk_e_neg    : out std_logic;  -- Execution clock
+    clk_i_pos    : in  std_logic;  -- I/O clock
+    clk_d_pos    : in  std_logic;  -- DRAM clock
+    clk_s_pos    : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
-    rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
-    rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-    en_d        : out std_logic;  -- Enable clk_d
-    fast_d      : out std_logic;  -- clk_d speed select
+    rst_n        : out std_logic;  -- Asynchronous reset to clk_gen
+    rst_cn       : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
+    en_d         : out std_logic;  -- Enable clk_d
+    fast_d       : out std_logic;  -- clk_d speed select
     --din_e       : out std_logic;  -- D input to FF generating clk_e
-    din_i       : out std_logic;  -- D input to FF generating clk_i
-    din_u       : out std_logic;  -- D input to FF generating clk_u
-    din_s       : out std_logic;  -- D input to FF generating clk_s
-    clk_in_off  : out std_logic;  -- close all input clock
+    din_i        : out std_logic;  -- D input to FF generating clk_i
+    din_u        : out std_logic;  -- D input to FF generating clk_u
+    din_s        : out std_logic;  -- D input to FF generating clk_s
+    clk_in_off   : out std_logic;  -- close all input clock
     clk_main_off : out std_logic; -- close main clock except clk_p
-    sdram_en : out std_logic; --off chip sdram enable
+    sdram_en     : out std_logic; --off chip sdram enable
     --flash Control
-    out_line    :   out std_logic;  -- one line is 8x4 = 32 bytes
-    hold_flash  : in std_logic;
-    hold_flash_d: in std_logic;
-    flash_en    : out std_logic;
-    flash_mode  : out std_logic_vector (3 downto 0);
-	  ld_dqi_flash: in std_logic;
+    out_line     : out std_logic;  -- one line is 8x4 = 32 bytes
+    hold_flash   : in std_logic;
+    hold_flash_d : in std_logic;
+    flash_en     : out std_logic;
+    flash_mode   : out std_logic_vector (3 downto 0);
+	  ld_dqi_flash : in std_logic;
     -- Control signals to/from the oscillator and PLL
     pll_frange  : out std_logic;  -- Frequency range select
     pll_n       : out std_logic_vector(5 downto 0);   -- Multiplier
@@ -102,7 +102,7 @@ entity pe1_core is
     -- ID
     id_number   : in std_logic_vector(5 downto 0);   --Added by CJ
     --signals to core2
-    c2_core2_en    : out  std_logic;  -- core2 enable
+    c2_core2_en    : out std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
     c2_clkreq_gen  : out std_logic;
     --c2_even_c      : out std_logic;
@@ -112,12 +112,12 @@ entity pe1_core is
     c2_en_pmem     : out  std_logic;
     c2_en_wdog     : out std_logic;
     c2_pup_clk     : out std_logic;
-    c2_pup_irq    	: out std_logic_vector(1 downto 0);
-    c2_r_size     	: out std_logic_vector(1 downto 0);
-    c2_c_size     	: out std_logic_vector(1 downto 0);
-    c2_t_ras      	: out std_logic_vector(2 downto 0);
-    c2_t_rcd      	: out std_logic_vector(1 downto 0);
-    c2_t_rp       	: out std_logic_vector(1 downto 0);
+    c2_pup_irq     : out std_logic_vector(1 downto 0);
+    c2_r_size      : out std_logic_vector(1 downto 0);
+    c2_c_size      : out std_logic_vector(1 downto 0);
+    c2_t_ras       : out std_logic_vector(2 downto 0);
+    c2_t_rcd       : out std_logic_vector(1 downto 0);
+    c2_t_rp        : out std_logic_vector(1 downto 0);
 --    c2_en_mexec   	: out std_logic;
     -- BMEM block signals
     bmem_a8     : out  std_logic;
@@ -142,7 +142,7 @@ entity pe1_core is
     reset_core_n    : in std_logic;
     reset_iso       : in std_logic; -- reset isolate signal, can differ start from begginning or halt mode
     reset_iso_clear : out std_logic;
-	poweron_finish  : in std_logic;
+	  poweron_finish  : in std_logic;
     nap_rec         : in std_logic;  -- will recover from nap mode
     halt_en         : out std_logic;
     nap_en          : out std_logic;
@@ -239,7 +239,7 @@ entity pe1_core is
     mbypass_i   : in  std_logic;  -- bypass PLL
     mwake_i     : in  std_logic;  -- wake up
     -- DRAM signals
-	en_pmem2	: out std_logic; --patch memory enable for program ROM
+	  en_pmem2	: out std_logic; --patch memory enable for program ROM
     d_addr      : out std_logic_vector(31 downto 0);--2012-02-09 14:00:40 maning
     dcs_o       : out std_logic;  -- Chip select
     dras_o      : out std_logic;  -- Row address strobe
@@ -268,20 +268,6 @@ entity pe1_core is
     p2_sr       : out std_logic; -- Slew rate limit on port group 2 pins
     p3_hi       : out std_logic; -- High drive on port group 3 pins
     p3_sr       : out std_logic -- Slew rate limit on port group 3 pins
-
-    -- pc_hi       : out std_logic;  -- High drive on port C pins
-    -- pc_lo_n     : out std_logic;  -- Not low drive port C pins
-    -- ph_hi       : out std_logic;  -- High drive on port H pins
-    -- ph_lo_n     : out std_logic;  -- Not low drive port H pins
-    -- pi_hi       : out std_logic;  -- High drive on port I pins
-    -- pi_lo_n     : out std_logic;  -- Not low drive port I pins
-    -- pel_hi      : out std_logic;  -- High drive on low half of port E pins
-    -- peh_hi      : out std_logic;  -- High drive on high half of port E pins
-    -- pdll_hi     : out std_logic;  -- High drive low dibit, low half of port D
-    -- pdlh_hi     : out std_logic;  -- High drive high dibit, low half of port D
-    -- pdh_hi      : out std_logic;  -- High drive on high half of port D pins
-    -- pf_hi       : out std_logic;  -- High drive on port F pins
-    -- pg_hi       : out std_logic); -- High drive on port G pins
     );
 
 end pe1_core;
@@ -320,7 +306,7 @@ architecture struct of pe1_core is
   signal dis_pll    	: std_logic;
   signal dis_xosc   	: std_logic;
   signal en_mxout   	: std_logic;
-  signal clk_sel   	: std_logic;
+  signal clk_sel   	  : std_logic;
   signal en_s       	: std_logic;
   signal speed_s    	: std_logic_vector(1 downto 0);
   signal speed_u    	: std_logic_vector(6 downto 0);
@@ -455,12 +441,12 @@ architecture struct of pe1_core is
   signal ack    : std_logic;
   signal ld_mpgm:  std_logic;
   signal vldl   : std_logic;
-  signal vldl_2  : std_logic;
+  signal vldl_2 : std_logic;
   signal mpgmin : std_logic_vector(127 downto 0);
-  signal temp         : std_logic;
-  signal temp1        : std_logic; --Added by CJ. Used to latch temp
+  signal temp   : std_logic;
+  signal temp1  : std_logic; --Added by CJ. Used to latch temp
   --signal n_temp        : std_logic;
-  signal ltwo        : std_logic; --Added by CJ. Two clk_e delay of vldl.
+  signal ltwo      : std_logic; --Added by CJ. Two clk_e delay of vldl.
   signal init_ld   : std_logic;
   --Vector engine signal
   signal ve_in_int  : std_logic_vector(63 downto 0);
@@ -684,7 +670,7 @@ begin
       pup_irq     => pup_irq,
       en_i        => en_i,
       -- MORG register
-	  en_pmem2	  => en_pmem2,
+	    en_pmem2	  => en_pmem2,
       en_d        => en_d,
       r_size      => r_size,
       c_size      => c_size,
@@ -732,36 +718,16 @@ begin
       --flash control
       flash_en    => flash_en,
       flash_mode => flash_mode,
-	  --router control register
---	  router_ir_en => router_ir_en,      --delete by HYX, 20141027
---	  north_en	   => north_en	  ,        --delete by HYX, 20141027
---	  south_en	   => south_en	  ,        --delete by HYX, 20141027
---	  west_en	   => west_en	  ,          --delete by HYX, 20141027
---	  east_en	   => east_en	  ,          --delete by HYX, 20141027
---	  router_clk_en => router_clk_en,    --delete by HYX, 20141027
 	    -- IOCTRL register & pad control   --delete by HYX, 20141027
-    d_hi           => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
-    d_sr           => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
-    d_lo           => d_lo           ,   --: out std_logic; -- Low drive on DRAM interface
-    p1_hi          => p1_hi          ,   --: out std_logic; -- High drive on port group 1 pins
-    p1_sr          => p1_sr          ,   --: out std_logic; -- Slew rate limit on port group 1 pins
-    p2_hi          => p2_hi          ,   --: out std_logic; -- High drive on port group 2 pins
-    p2_sr          => p2_sr          ,   --: out std_logic; -- Slew rate limit on port group 2 pins
-    p3_hi          => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
-    p3_sr          => p3_sr          ,   --: out std_logic; -- Slew rate limit on port group 3 pins
-    -- pc_hi          => pc_hi          ,   --: out std_logic;  -- High drive on port C pins
-    -- pc_lo_n        => pc_lo_n        ,   --: out std_logic;  -- Not low drive port C pins
-    -- ph_hi          => ph_hi          ,   --: out std_logic;  -- High drive on port H pins
-    -- ph_lo_n        => ph_lo_n        ,   --: out std_logic;  -- Not low drive port H pins
-    -- pi_hi          => pi_hi          ,   --: out std_logic;  -- High drive on port I pins
-    -- pi_lo_n        => pi_lo_n        ,   --: out std_logic;  -- Not low drive port I pins
-    -- pel_hi         => pel_hi         ,   --: out std_logic;  -- High drive on low half of port E pins
-    -- peh_hi         => peh_hi         ,   --: out std_logic;  -- High drive on high half of port E pins
-    -- pdll_hi        => pdll_hi        ,   --: out std_logic;  -- High drive low dibit, low half of port D
-    -- pdlh_hi        => pdlh_hi        ,   --: out std_logic;  -- High drive high dibit, low half of port D
-    -- pdh_hi         => pdh_hi         ,   --: out std_logic;  -- High drive on high half of port D pins
-    -- pf_hi          => pf_hi          ,   --: out std_logic;  -- High drive on port F pins
-    -- pg_hi          => pg_hi             --: out std_logic  -- High drive on port G pins
+      d_hi           => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
+      d_sr           => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
+      d_lo           => d_lo           ,   --: out std_logic; -- Low drive on DRAM interface
+      p1_hi          => p1_hi          ,   --: out std_logic; -- High drive on port group 1 pins
+      p1_sr          => p1_sr          ,   --: out std_logic; -- Slew rate limit on port group 1 pins
+      p2_hi          => p2_hi          ,   --: out std_logic; -- High drive on port group 2 pins
+      p2_sr          => p2_sr          ,   --: out std_logic; -- Slew rate limit on port group 2 pins
+      p3_hi          => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
+      p3_sr          => p3_sr          ,   --: out std_logic; -- Slew rate limit on port group 3 pins
     	-- BMEM block interface
       bmem_a8     => bmem_a8,
       core2_en    => c2_core2_en,
@@ -778,18 +744,12 @@ begin
       nap_rec     => nap_rec     , -- will recover from nap mode
       halt_en     => halt_en     ,
       nap_en      => nap_en      ,
-    --  rst_rtc     => rst_rtc,
-    --  en_fclk     => en_fclk,
-    --  fclk        => fclk,
       ld_bmem     => ld_bmem);
-    --  rtc_sel     => rtc_sel,
-    --  rtc_data    => rtc_data);
 
-  fast_d		<= fast_d_int;
-	dqm_size	<= dqm_size_int;
-    c2_rsc_n    <= rsc_n;
+    fast_d		    <= fast_d_int;
+	  dqm_size	    <= dqm_size_int;
+    c2_rsc_n      <= rsc_n;
     c2_clkreq_gen <= clkreq_gen;
-    --c2_even_c   <= even_c;
     c2_en_pmem    <= en_pmem  ;
     c2_en_wdog    <= en_wdog  ;
     c2_pup_clk    <= pup_clk  ;
@@ -799,8 +759,7 @@ begin
     c2_t_ras      <= t_ras    ;
     c2_t_rcd      <= t_rcd    ;
     c2_t_rp       <= t_rp     ;
---    c2_en_mexec   <= en_mexec ;
-    short_cycle <= short_cycle_int;
+    short_cycle   <= short_cycle_int;
 
 
 ---------------------------------------------------------------------
@@ -813,12 +772,12 @@ begin
       -- Clock
       clk_p       => clk_p,
       even_c      => even_c,
-      clk_c_en       => clk_c_en,
+      clk_c_en    => clk_c_en,
       --clk_c2_pos      => clk_c2_pos,
-      clk_e_pos       => clk_e_pos_int,
-	  clk_e_neg	   	=> clk_e_neg_int,
+      clk_e_pos   => clk_e_pos_int,
+	    clk_e_neg	  => clk_e_neg_int,
       -- Microinstruction fields
-      pl  		  => pl,
+      pl  		    => pl,
       -- Static control inputs
       en_i        => en_i,
       en_mckout1  => en_mckout1,
@@ -877,9 +836,8 @@ begin
       rst_cn      => rst_cn_int,
       rst_en      => rst_en_int,
       reset_core_n => reset_core_n,
-	  reset_iso_clear => reset_iso_clear,
+	    reset_iso_clear => reset_iso_clear,
       reset_iso => reset_iso
-      --rst_en2     => rst_en2
 	  );
 
   rst_cn <= rst_cn_int;
@@ -893,7 +851,7 @@ begin
     port map (
       -- Clock and reset inputs
       clk_p         => clk_p,
-      clk_e_pos      => clk_e_pos_int,
+      clk_e_pos     => clk_e_pos_int,
       rst_en        => rst_en_int,
       -- Microprogram fields
       pl            => pl,
@@ -910,7 +868,7 @@ begin
       irq0          => irq0,
       irq1          => irq1,
       --dfm_vld       => ddi_vld, --Added by CJ
-      mp_vld          => ltwo,    --Added by CJ
+      mp_vld        => ltwo,    --Added by CJ
       -- Condition inputs
       spreq_n       => spreq_n,
       spack_n       => spack_n,
@@ -970,10 +928,10 @@ begin
       -- Clock input
       clk_p         => clk_p,
       clk_e_pos     => clk_e_pos_int,
-	  rst_n	  		=> rst_en_int,
+	    rst_n	  		  => rst_en_int,
       -- Microprogram fields
       pl            => pl,
-      init_load       => init_ld,
+      init_load     => init_ld,
       --Data inputs
       dbus          => dbus_int,
       -- Flags
@@ -1002,13 +960,13 @@ begin
 			-- Clock and reset inputs
       rst_en     => rst_en_int,
       clk_p      => clk_p,
-      clk_e_pos   => clk_e_pos_int,
-      clk_e_neg   => clk_e_neg_int,
+      clk_e_pos  => clk_e_pos_int,
+      clk_e_neg  => clk_e_neg_int,
       --gate_e     => clk_e_pos_int,
       held_e     => held_e,
       -- Microprogram fields
       pl         => pl,
-      mp_gass	 => mp_gass,
+      mp_gass	   => mp_gass,
       -- Static control inputs
       use_direct => use_direct,
       dbl_direct => dbl_direct,
@@ -1045,7 +1003,7 @@ begin
       -- Clock input
       rst_en        => rst_en_int,
       clk_p         => clk_p,
-      clk_e_pos      => clk_e_pos_int,
+      clk_e_pos     => clk_e_pos_int,
       -- Microprogram fields
       pl            => pl,
       mp_ds         => mp_ds,
@@ -1094,8 +1052,8 @@ begin
     port map (
       -- Clock input
       clk_p     =>  clk_p,
-      clk_e_pos     =>  clk_e_pos_int,
-      rst_en   => rst_en_int,
+      clk_e_pos =>  clk_e_pos_int,
+      rst_en    => rst_en_int,
       -- Microprogram fields
       pl        =>  pl,
       -- Control inputs
@@ -1116,10 +1074,10 @@ begin
       -- Clock and reset functions
       rst_en      => rst_en_int,
       clk_p       => clk_p,
-      clk_e_neg    => clk_e_neg_int,
-      clk_c2_pos      => even_c,
-      clk_d_pos       => clk_d_pos,
-      clk_e_pos       => clk_e_pos_int,
+      clk_e_neg   => clk_e_neg_int,
+      clk_c2_pos  => even_c,
+      clk_d_pos   => clk_d_pos,
+      clk_e_pos   => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
       even_c      => even_c,
       held_e      => held_e,
@@ -1133,7 +1091,7 @@ begin
       t_rcd       => t_rcd,
       t_rp        => t_rp,
       fast_d      => fast_d_int,
-	  short_cycle => short_cycle_int,
+	    short_cycle => short_cycle_int,
 	  --exe         => exe, --CJ Added
       -- Data paths
       dbus        => dbus_int,
@@ -1162,7 +1120,7 @@ begin
       --ve_data     => ve_in_int,
       en_dqo      => ddq_en,
       out_line    => out_line,
-	  ld_dqi_flash => ld_dqi_flash,
+	    ld_dqi_flash => ld_dqi_flash,
       d_a         => da_o,
       d_ba        => dba_o,
       d_dqm       => ddqm,
@@ -1200,8 +1158,8 @@ begin
       -- Clock and reset inputs
       rst_cn      => rst_cn_int,
       clk_p       => clk_p,
-      clk_s_pos       => clk_s_pos,
-      clk_e_pos       => clk_e_pos_int,
+      clk_s_pos   => clk_s_pos,
+      clk_e_pos   => clk_e_pos_int,
       -- Control inputs
       runmode     => runmode,
       spreq_n     => spreq_n,
@@ -1249,12 +1207,12 @@ begin
       --ack_sig        => ack_sig,  --CJ
       rst_en         => rst_en_int,
       clk_p          => clk_p,
-      clk_c_en          => clk_c_en,
-      clk_c2_pos         => even_c,
-      clk_e_pos          => clk_e_pos_int,
-      clk_e_neg          => clk_e_neg_int,
+      clk_c_en       => clk_c_en,
+      clk_c2_pos     => even_c,
+      clk_e_pos      => clk_e_pos_int,
+      clk_e_neg      => clk_e_neg_int,
       --gate_e         => clk_e_pos_int,
-      clk_i_pos          => clk_i_pos,
+      clk_i_pos      => clk_i_pos,
       -- Microprogram fields
       pl             => pl,
       -- Static control inputs
@@ -1295,21 +1253,21 @@ begin
   vector_engine : entity work.ve
     generic map( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES ) 
     port map(
-      CLK_P       => clk_p,
-      CLK_E_POS   => clk_e_pos_int,
-      CLK_E_NEG   => clk_e_neg_int,
-      RST         => rst_en_int,
-      PL          => pl,
-      YBUS        => ybus,
-      DDI_VLD     => vldl_2,--replace it with vldl in later version
-      RE_RDY      => re_rdy_int,
-      VE_RDY      => ve_rdy_int,
-      VE_IN       => ve_in_int,
-      VE_DTM_RDY  => ve_dtm_rdy_int,
-      VE_PUSH_DTM => ve_push_dtm_int,
+      CLK_P        => clk_p,
+      CLK_E_POS    => clk_e_pos_int,
+      CLK_E_NEG    => clk_e_neg_int,
+      RST          => rst_en_int,
+      PL           => pl,
+      YBUS         => ybus,
+      DDI_VLD      => vldl_2,--replace it with vldl in later version
+      RE_RDY       => re_rdy_int,
+      VE_RDY       => ve_rdy_int,
+      VE_IN        => ve_in_int,
+      VE_DTM_RDY   => ve_dtm_rdy_int,
+      VE_PUSH_DTM  => ve_push_dtm_int,
       VE_AUTO_SEND => ve_auto_send_int,
-      VE_OUT_D    => ve_out_d_int,
-      VE_OUT_DTM  => ve_out_dtm_int
+      VE_OUT_D     => ve_out_d_int,
+      VE_OUT_DTM   => ve_out_dtm_int
       );
 ---------------------------------------------------------------------
 -- CMDR
@@ -1317,28 +1275,28 @@ begin
 --Interface of the pe1_core and cluster controller
       cmdr: entity work.cmdr
       port map(
-        CLK_P    => clk_p,
-        RST_EN   => rst_en_int,
-        CLK_E_NEG => clk_e_neg_int,
-        PL       => pl,
-        EXE      => exe,
-        DATA_VLD => ddi_vld,
-        REQ_OUT  => req,
-        REQ_RD_OUT => req_rd,
-        ACK_IN   => ack,
-        DIN      => din_c,
-        DOUT     =>dout_c,
-        YBUS     =>ybus,
-        LD_MPGM  =>ld_mpgm,
-        VE_DIN   =>ve_in_int,
-        DBUS_DATA=>cdfm_int,
-        MPGMM_IN =>mpgmin,
-        DTM_FIFO_RDY => dtm_fifo_rdy,
+        CLK_P         => clk_p,
+        RST_EN        => rst_en_int,
+        CLK_E_NEG     => clk_e_neg_int,
+        PL            => pl,
+        EXE           => exe,
+        DATA_VLD      => ddi_vld,
+        REQ_OUT       => req,
+        REQ_RD_OUT    => req_rd,
+        ACK_IN        => ack,
+        DIN           => din_c,
+        DOUT          => dout_c,
+        YBUS          => ybus,
+        LD_MPGM       => ld_mpgm,
+        VE_DIN        => ve_in_int,
+        DBUS_DATA     => cdfm_int,
+        MPGMM_IN      => mpgmin,
+        DTM_FIFO_RDY  => dtm_fifo_rdy,
         dtm_buf_empty => dtm_buf_empty,
-        VE_DTMO  =>ve_out_dtm_int,
-        VE_DTM_RDY => ve_dtm_rdy_int,
-        VE_PUSH_DTM => ve_push_dtm_int,
-        VE_AUTO_SEND => ve_auto_send_int
+        VE_DTMO       => ve_out_dtm_int,
+        VE_DTM_RDY    => ve_dtm_rdy_int,
+        VE_PUSH_DTM   => ve_push_dtm_int,
+        VE_AUTO_SEND  => ve_auto_send_int
       );
 end;
 

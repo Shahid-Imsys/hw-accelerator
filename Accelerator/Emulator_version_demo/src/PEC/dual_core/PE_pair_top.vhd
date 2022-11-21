@@ -416,58 +416,58 @@ architecture struct of PE_pair_top is
   -- pe1_core/peri driven signals
   -----------------------------------------------------------------------------
   -- Signals to other blocks
-  signal ddi_vld_c1      : std_logic; --CJ
-  signal ddi_vld_c2      : std_logic; --CJ
-  signal pll_frange   : std_logic;
-  signal pll_n        : std_logic_vector(5 downto 0);
-  signal pll_m        : std_logic_vector(2 downto 0);
-  signal en_xosc      : std_logic;
-  signal en_pll       : std_logic;
-  signal sel_pll      : std_logic;
+  signal ddi_vld_c1    : std_logic; --CJ
+  signal ddi_vld_c2    : std_logic; --CJ
+  signal pll_frange    : std_logic;
+  signal pll_n         : std_logic_vector(5 downto 0);
+  signal pll_m         : std_logic_vector(2 downto 0);
+  signal en_xosc       : std_logic;
+  signal en_pll        : std_logic;
+  signal sel_pll       : std_logic;
   signal xout_selected : std_logic;
-  signal test_pll     : std_logic;
-  signal pll_pdn      : std_logic;       --added by HYX,20141115
-  signal erxclk       : std_logic;
-  signal etxclk       : std_logic;
-  signal rst_n        : std_logic;
-  signal rst_cn       : std_logic;
-  signal en_d         : std_logic;
-  signal fast_d       : std_logic;
+  signal test_pll      : std_logic;
+  signal pll_pdn       : std_logic;       --added by HYX,20141115
+  signal erxclk        : std_logic;
+  signal etxclk        : std_logic;
+  signal rst_n         : std_logic;
+  signal rst_cn        : std_logic;
+  signal en_d          : std_logic;
+  signal fast_d        : std_logic;
   signal din_ea        : std_logic;
-  signal din_i        : std_logic;
-  signal din_u        : std_logic;
-  signal din_s        : std_logic;
-  signal din_a        : std_logic;
+  signal din_i         : std_logic;
+  signal din_u         : std_logic;
+  signal din_s         : std_logic;
+  signal din_a         : std_logic;
   --add the following two signals by maning
-  signal clk_in_off     : std_logic;
-  signal clk_main_off   : std_logic;
-  signal sdram_en		: std_logic;
-  signal out_line    : std_logic;
-  signal hold_flash  : std_logic;
-  signal hold_flash_d: std_logic;
-  signal flash_en    : std_logic;
-  signal flash_mode  : std_logic_vector (3 downto 0);
-  signal ld_dqi_flash : std_logic;
-  signal router_ido     : std_logic_vector(7 downto 0);
-  signal core_idi       : std_logic_vector(7 downto 0);
-  signal bmem_a8      : std_logic;
-  signal bmem_d       : std_logic_vector(7 downto 0);
-  signal bmem_ce_n    : std_logic;
-  signal bmem_we_n    : std_logic;
-  signal rst_rtc      : std_logic;
-  signal en_fclk      : std_logic;
-  signal fclk         : std_logic;
-  signal ld_bmem      : std_logic;
-  signal rtc_sel      : std_logic_vector(2 downto 0);
-  signal ach_sel      : std_logic_vector(2 downto 0);
-  signal adc_bits_int : std_logic; -- added by HYX, 20141205
-  signal dac_bits     : std_logic_vector(0 to 1);
-  signal dac_en       : std_logic_vector(0 to 1);
-  signal en_tstamp    : std_logic_vector(1 downto 0);
-  signal tiu_tstamp   : std_logic;
-  signal tstamp       : std_logic_vector(2 downto 0);
-  signal mpll_tsto_o  : std_logic;
-  signal adc_dac      : std_logic;
+  signal clk_in_off    : std_logic;
+  signal clk_main_off  : std_logic;
+  signal sdram_en		   : std_logic;
+  signal out_line      : std_logic;
+  signal hold_flash    : std_logic;
+  signal hold_flash_d  : std_logic;
+  signal flash_en      : std_logic;
+  signal flash_mode    : std_logic_vector (3 downto 0);
+  signal ld_dqi_flash  : std_logic;
+  signal router_ido    : std_logic_vector(7 downto 0);
+  signal core_idi      : std_logic_vector(7 downto 0);
+  signal bmem_a8       : std_logic;
+  signal bmem_d        : std_logic_vector(7 downto 0);
+  signal bmem_ce_n     : std_logic;
+  signal bmem_we_n     : std_logic;
+  signal rst_rtc       : std_logic;
+  signal en_fclk       : std_logic;
+  signal fclk          : std_logic;
+  signal ld_bmem       : std_logic;
+  signal rtc_sel       : std_logic_vector(2 downto 0);
+  signal ach_sel       : std_logic_vector(2 downto 0);
+  signal adc_bits_int  : std_logic; -- added by HYX, 20141205
+  signal dac_bits      : std_logic_vector(0 to 1);
+  signal dac_en        : std_logic_vector(0 to 1);
+  signal en_tstamp     : std_logic_vector(1 downto 0);
+  signal tiu_tstamp    : std_logic;
+  signal tstamp        : std_logic_vector(2 downto 0);
+  signal mpll_tsto_o   : std_logic;
+  signal adc_dac       : std_logic;
   --signals to core2
   signal  c2_core2_en   : std_logic;  -- core2 enable
   signal  c2_rsc_n      : std_logic;
@@ -484,18 +484,18 @@ architecture struct of PE_pair_top is
   signal  c2_t_rcd      : std_logic_vector(1 downto 0);
   signal  c2_t_rp       : std_logic_vector(1 downto 0);
   -- to memories signals
-  signal c1_mprom_a       : std_logic_vector(13 downto 0);
-  signal c1_mprom_ce      : std_logic_vector(1 downto 0);
-  signal c1_mprom_oe      : std_logic_vector(1 downto 0);
-  signal c1_mpram_a       : std_logic_vector(7 downto 0);   --Modified by CJ
-  signal c1_mpram_d       : std_logic_vector(127 downto 0);     --Modified by CJ
-  signal c1_mpram_ce      : std_logic_vector(1 downto 0);
-  signal c1_mpram_oe      : std_logic_vector(1 downto 0);
-  signal c1_mpram_we_n    : std_logic;
-  signal c1_gmem_a        : std_logic_vector(9 downto 0);
-  signal c1_gmem_d        : std_logic_vector(7 downto 0);
-  signal c1_gmem_ce_n     : std_logic;
-  signal c1_gmem_we_n     : std_logic;
+  signal c1_mprom_a    : std_logic_vector(13 downto 0);
+  signal c1_mprom_ce   : std_logic_vector(1 downto 0);
+  signal c1_mprom_oe   : std_logic_vector(1 downto 0);
+  signal c1_mpram_a    : std_logic_vector(7 downto 0);   --Modified by CJ
+  signal c1_mpram_d    : std_logic_vector(127 downto 0);     --Modified by CJ
+  signal c1_mpram_ce   : std_logic_vector(1 downto 0);
+  signal c1_mpram_oe   : std_logic_vector(1 downto 0);
+  signal c1_mpram_we_n : std_logic;
+  signal c1_gmem_a     : std_logic_vector(9 downto 0);
+  signal c1_gmem_d     : std_logic_vector(7 downto 0);
+  signal c1_gmem_ce_n  : std_logic;
+  signal c1_gmem_we_n  : std_logic;
   signal iomem_a       : std_logic_vector(9 downto 0);
   signal iomem_d       : std_logic_vector(15 downto 0);
   signal iomem_ce_n    : std_logic_vector(1 downto 0);
@@ -504,11 +504,11 @@ architecture struct of PE_pair_top is
   signal trcmem_d      : std_logic_vector(31 downto 0);
   signal trcmem_ce_n   : std_logic;
   signal trcmem_we_n   : std_logic;
-  signal c1_pmem_a        : std_logic_vector(10 downto 0);
-  signal c1_pmem_d        : std_logic_vector(1 downto 0);
-  signal c1_pmem_ce_n     : std_logic;
-  signal c1_pmem_we_n     : std_logic;
-  signal en_pmem2	   : std_logic;
+  signal c1_pmem_a     : std_logic_vector(10 downto 0);
+  signal c1_pmem_d     : std_logic_vector(1 downto 0);
+  signal c1_pmem_ce_n  : std_logic;
+  signal c1_pmem_we_n  : std_logic;
+  signal en_pmem2	     : std_logic;
   signal short_cycle   : std_logic;
   -- to PADS
   signal mirqout_o     : std_logic;
@@ -559,7 +559,7 @@ architecture struct of PE_pair_top is
   -- pe1_core driven
   signal dbus        : std_logic_vector(7 downto 0);
   signal rst_en      : std_logic;
-  signal pd_s          : std_logic_vector(2 downto 0);
+  signal pd_s        : std_logic_vector(2 downto 0);
   signal aaddr       : std_logic_vector(4 downto 0);
   signal idack       : std_logic_vector(7 downto 0);
   signal ios_iden    : std_logic;
@@ -610,128 +610,104 @@ architecture struct of PE_pair_top is
 -------------------------------------------------------------------------------
 	signal c1_d_addr   : std_logic_vector(31 downto 0);
 	signal c1_d_cs     : std_logic;  -- CS to SDRAM
-    signal c1_d_ras    : std_logic;  -- RAS to SDRAM
-    signal c1_d_cas    : std_logic;  -- CAS to SDRAM
-    signal c1_d_we     : std_logic;  -- WE to SDRAM
-    signal c1_req_i    : std_logic;  -- Request signal of core1
-    signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
-    signal c1_ack_i    : std_logic;
-    signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
-    signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
-    signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
-    signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
-	  signal c2_d_addr   : std_logic_vector(31 downto 0);
-	  signal c2_d_cs     : std_logic;  -- CS to SDRAM
-    signal c2_d_ras    : std_logic;  -- RAS to SDRAM
-    signal c2_d_cas    : std_logic;  -- CAS to SDRAM
-    signal c2_d_we     : std_logic;  -- WE to SDRAM
-    signal c2_req_i    : std_logic;  --Requset signal of pe1_core 2.
-    signal c2_req_rd_i : std_logic;  -- signal indicate that core2 is reading out request from CMDR fifo.
-    signal c2_ack_i    : std_logic;
-    signal c2_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor
-    signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
-    signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
-    signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
-    signal core2_rdy   : std_logic;
+  signal c1_d_ras    : std_logic;  -- RAS to SDRAM
+  signal c1_d_cas    : std_logic;  -- CAS to SDRAM
+  signal c1_d_we     : std_logic;  -- WE to SDRAM
+  signal c1_req_i    : std_logic;  -- Request signal of core1
+  signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
+  signal c1_ack_i    : std_logic;
+  signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
+  signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+  signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
+  signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
+	signal c2_d_addr   : std_logic_vector(31 downto 0);
+	signal c2_d_cs     : std_logic;  -- CS to SDRAM
+  signal c2_d_ras    : std_logic;  -- RAS to SDRAM
+  signal c2_d_cas    : std_logic;  -- CAS to SDRAM
+  signal c2_d_we     : std_logic;  -- WE to SDRAM
+  signal c2_req_i    : std_logic;  --Requset signal of pe1_core 2.
+  signal c2_req_rd_i : std_logic;  -- signal indicate that core2 is reading out request from CMDR fifo.
+  signal c2_ack_i    : std_logic;
+  signal c2_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor
+  signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
+  signal c2_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
+  signal c2_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
+  signal core2_rdy   : std_logic;
 
-  signal c2_mprom_a       : std_logic_vector(13 downto 0); --CJ
-  signal c2_mprom_ce      : std_logic_vector(1 downto 0);
-  signal c2_mprom_oe      : std_logic_vector(1 downto 0);
-  signal c2_mpram_a       : std_logic_vector(7 downto 0); --CJ
-  signal c2_mpram_d       : std_logic_vector(127 downto 0); --CJ
-  signal c2_mpram_ce      : std_logic_vector(1 downto 0);
-  signal c2_mpram_oe      : std_logic_vector(1 downto 0);
-  signal c2_mpram_we_n    : std_logic;
-  signal c2_gmem_a        : std_logic_vector(9 downto 0);
-  signal c2_gmem_d        : std_logic_vector(7 downto 0);
-  signal c2_gmem_ce_n     : std_logic;
-  signal c2_gmem_we_n     : std_logic;
-  signal c2_pmem_a        : std_logic_vector(10 downto 0);
-  signal c2_pmem_d        : std_logic_vector(1 downto 0);
-  signal c2_pmem_ce_n     : std_logic;
-  signal c2_pmem_we_n     : std_logic;
+  signal c2_mprom_a    : std_logic_vector(13 downto 0); --CJ
+  signal c2_mprom_ce   : std_logic_vector(1 downto 0);
+  signal c2_mprom_oe   : std_logic_vector(1 downto 0);
+  signal c2_mpram_a    : std_logic_vector(7 downto 0); --CJ
+  signal c2_mpram_d    : std_logic_vector(127 downto 0); --CJ
+  signal c2_mpram_ce   : std_logic_vector(1 downto 0);
+  signal c2_mpram_oe   : std_logic_vector(1 downto 0);
+  signal c2_mpram_we_n : std_logic;
+  signal c2_gmem_a     : std_logic_vector(9 downto 0);
+  signal c2_gmem_d     : std_logic_vector(7 downto 0);
+  signal c2_gmem_ce_n  : std_logic;
+  signal c2_gmem_we_n  : std_logic;
+  signal c2_pmem_a     : std_logic_vector(10 downto 0);
+  signal c2_pmem_d     : std_logic_vector(1 downto 0);
+  signal c2_pmem_ce_n  : std_logic;
+  signal c2_pmem_we_n  : std_logic;
 
-  signal mp_ROM0_DO     : std_logic_vector (79 downto 0);
-  signal mp_ROM0_A      : std_logic_vector (13 downto 0);
-  signal mp_ROM0_CS     : std_logic;
-  signal mp_ROM0_OE     : std_logic;
-  signal mp_ROM1_DO     :  std_logic_vector (79 downto 0);
-  signal mp_ROM1_A      :  std_logic_vector (13 downto 0);
-  signal mp_ROM1_CS     :  std_logic;
-  signal mp_ROM1_OE     :  std_logic;
-  signal mp_PM_DO       : std_logic_vector (1 downto 0);
-  signal mp_PM_DI       : std_logic_vector (1 downto 0);
-  signal mp_PM_A        : std_logic_vector (10 downto 0);
-  signal mp_PM_WEB      : std_logic;
-  signal mp_PM_CSB      : std_logic;
+  signal mp_ROM0_DO : std_logic_vector (79 downto 0);
+  signal mp_ROM0_A  : std_logic_vector (13 downto 0);
+  signal mp_ROM0_CS : std_logic;
+  signal mp_ROM0_OE : std_logic;
+  signal mp_ROM1_DO : std_logic_vector (79 downto 0);
+  signal mp_ROM1_A  : std_logic_vector (13 downto 0);
+  signal mp_ROM1_CS : std_logic;
+  signal mp_ROM1_OE : std_logic;
+  signal mp_PM_DO   : std_logic_vector (1 downto 0);
+  signal mp_PM_DI   : std_logic_vector (1 downto 0);
+  signal mp_PM_A    : std_logic_vector (10 downto 0);
+  signal mp_PM_WEB  : std_logic;
+  signal mp_PM_CSB  : std_logic;
 
-  signal mp_RAM0_DO     :  std_logic_vector (127 downto 0);
-  signal mp_RAM0_DI     :  std_logic_vector (127 downto 0);
-  signal mp_RAM0_A      :  std_logic_vector (7 downto 0);
-  signal mp_RAM0_WE     :  std_logic;
-  signal mp_RAM0_WEB    :  std_logic;
-  signal mp_RAM0_OE     :  std_logic;
-  signal mp_RAM0_CS     :  std_logic;
+  signal mp_RAM0_DO  : std_logic_vector (127 downto 0);
+  signal mp_RAM0_DI  : std_logic_vector (127 downto 0);
+  signal mp_RAM0_A   : std_logic_vector (7 downto 0);
+  signal mp_RAM0_WE  : std_logic;
+  signal mp_RAM0_WEB : std_logic;
+  signal mp_RAM0_OE  : std_logic;
+  signal mp_RAM0_CS  : std_logic;
 
-  signal mp_RAM1_DO     :  std_logic_vector (79 downto 0);
-  signal mp_RAM1_DI     :  std_logic_vector (79 downto 0);
-  signal mp_RAM1_A      :  std_logic_vector (13 downto 0);
-  signal mp_RAM1_WEB    :  std_logic;
-  signal mp_RAM1_CS     : std_logic;
+  signal mp_RAM1_DO  : std_logic_vector (79 downto 0);
+  signal mp_RAM1_DI  : std_logic_vector (79 downto 0);
+  signal mp_RAM1_A   : std_logic_vector (13 downto 0);
+  signal mp_RAM1_WEB : std_logic;
+  signal mp_RAM1_CS  : std_logic;
 
-  signal f_addr_in     : std_logic_vector(16 downto 0);
-  signal f_rd_in       : std_logic;  -- low active
-  signal f_wr_in       : std_logic;  -- low active
-  signal f_data_in     : std_logic_vector(7 downto 0); -- Data in from processor
-  signal f_data_out    : std_logic_vector(7 downto 0); -- Data out to processor
-  signal f_CE          : std_logic;
-  signal f_ADDR        : std_logic_vector(12 downto 0);
-  signal f_WRONLY      : std_logic;
-  signal f_PERASE      : std_logic;
-  signal f_SERASE      : std_logic;
-  signal f_MERASE      : std_logic;
-  signal f_PROG        : std_logic;
-  signal f_INF         : std_logic;
-  signal f_POR         : std_logic;
-  signal f_SAVEN       : std_logic;
-  signal f_TM          : std_logic_vector(3 downto 0);
-  signal f_DATA_WR     : std_logic_vector(31 downto 0);
-  signal f0_ALE        : std_logic;
-  signal f0_DATA_IN    :std_logic_vector(31 downto 0);
-  signal f0_RBB        :std_logic;
-  signal f1_ALE        : std_logic;
-  signal f1_DATA_IN    :std_logic_vector(31 downto 0);
-  signal f1_RBB        :std_logic;
-  signal f2_ALE        : std_logic;
-  signal f2_DATA_IN    :std_logic_vector(31 downto 0);
-  signal f2_RBB        :std_logic;
-  signal f3_ALE        : std_logic;
-  signal f3_DATA_IN    :std_logic_vector(31 downto 0);
-  signal f3_RBB        :std_logic;
-        --RAM1
-  signal RAM1_DO         : std_logic_vector (7 downto 0);
-  signal RAM1_DI         : std_logic_vector (7 downto 0);
-  signal RAM1_A          : std_logic_vector (13 downto 0);
-  signal RAM1_WEB        : std_logic;
-  signal RAM1_CS         : std_logic;
-         --RAM2
-  signal RAM2_DO         : std_logic_vector (7 downto 0);
-  signal RAM2_DI         : std_logic_vector (7 downto 0);
-  signal RAM2_A          : std_logic_vector (13 downto 0);
-  signal RAM2_WEB        : std_logic;
-  signal RAM2_CS         : std_logic;
-         --RAM3
-  signal RAM3_DO         : std_logic_vector (7 downto 0);
-  signal RAM3_DI         : std_logic_vector (7 downto 0);
-  signal RAM3_A          : std_logic_vector (13 downto 0);
-  signal RAM3_WEB        : std_logic;
-  signal RAM3_CS         : std_logic;
-         --RAM4
-  signal RAM4_DO         : std_logic_vector (7 downto 0);
-  signal RAM4_DI         : std_logic_vector (7 downto 0);
-  signal RAM4_A          : std_logic_vector (13 downto 0);
-  signal RAM4_WEB        : std_logic;
-  signal RAM4_CS         : std_logic;
+  signal f_addr_in  : std_logic_vector(16 downto 0);
+  signal f_rd_in    : std_logic;  -- low active
+  signal f_wr_in    : std_logic;  -- low active
+  signal f_data_in  : std_logic_vector(7 downto 0); -- Data in from processor
+  signal f_data_out : std_logic_vector(7 downto 0); -- Data out to processor
+  signal f_CE       : std_logic;
+  signal f_ADDR     : std_logic_vector(12 downto 0);
+  signal f_WRONLY   : std_logic;
+  signal f_PERASE   : std_logic;
+  signal f_SERASE   : std_logic;
+  signal f_MERASE   : std_logic;
+  signal f_PROG     : std_logic;
+  signal f_INF      : std_logic;
+  signal f_POR      : std_logic;
+  signal f_SAVEN    : std_logic;
+  signal f_TM       : std_logic_vector(3 downto 0);
+  signal f_DATA_WR  : std_logic_vector(31 downto 0);
+  signal f0_ALE     : std_logic;
+  signal f0_DATA_IN : std_logic_vector(31 downto 0);
+  signal f0_RBB     : std_logic;
+  signal f1_ALE     : std_logic;
+  signal f1_DATA_IN : std_logic_vector(31 downto 0);
+  signal f1_RBB     : std_logic;
+  signal f2_ALE     : std_logic;
+  signal f2_DATA_IN : std_logic_vector(31 downto 0);
+  signal f2_RBB     : std_logic;
+  signal f3_ALE     : std_logic;
+  signal f3_DATA_IN : std_logic_vector(31 downto 0);
+  signal f3_RBB     : std_logic;
 
 
 begin
@@ -1108,39 +1084,39 @@ end generate;
      generic map (
       USE_ASIC_MEMORIES => USE_ASIC_MEMORIES )
      port map(
-      pllout    => HCLK                     ,
-      lp_pwr_ok => lp_pwr_ok                ,
-      ld_bmem   => ld_bmem                  ,  -- Latch enable to the dis_bmem latch
-	    halt_en        => halt_en             ,
-      nap_en         => nap_en              ,
-      wakeup_lp      => wakeup_lp           ,
-      poweron_finish => poweron_finish      ,
-      reset_iso      => reset_iso           ,
-      reset_core_n   => reset_core_n        ,
-      io_iso         => io_iso              ,
-      nap_rec        => nap_rec             ,
-      pmic_core_en   => pmic_core_en        ,
-      pmic_io_en     => pmic_io_en          ,
-      clk_mux_out    => clk_mux_out         ,
+      pllout         => HCLK          ,
+      lp_pwr_ok      => lp_pwr_ok     ,
+      ld_bmem        => ld_bmem       ,  -- Latch enable to the dis_bmem latch
+	    halt_en        => halt_en       ,
+      nap_en         => nap_en        ,
+      wakeup_lp      => wakeup_lp     ,
+      poweron_finish => poweron_finish,
+      reset_iso      => reset_iso     ,
+      reset_core_n   => reset_core_n  ,
+      io_iso         => io_iso        ,
+      nap_rec        => nap_rec       ,
+      pmic_core_en   => pmic_core_en  ,
+      pmic_io_en     => pmic_io_en    ,
+      clk_mux_out    => clk_mux_out   ,
       --gmem1
-      c1_gmem_a     =>  c1_gmem_a           ,
-      c1_gmem_q     =>  c1_gmem_q           ,
-      c1_gmem_d     =>  c1_gmem_d           ,
-      c1_gmem_we_n  =>  c1_gmem_we_n        ,
-      c1_gmem_ce_n  =>  c1_gmem_ce_n        ,
+      c1_gmem_a      => c1_gmem_a     ,
+      c1_gmem_q      => c1_gmem_q     ,
+      c1_gmem_d      => c1_gmem_d     ,
+      c1_gmem_we_n   => c1_gmem_we_n  ,
+      c1_gmem_ce_n   => c1_gmem_ce_n  ,
       --gmem2
-      c2_gmem_a     =>  c2_gmem_a           ,
-      c2_gmem_q     =>  c2_gmem_q           ,
-      c2_gmem_d     =>  c2_gmem_d           ,
-      c2_gmem_we_n  =>  c2_gmem_we_n        ,
-      c2_gmem_ce_n  =>  c2_gmem_ce_n        ,
+      c2_gmem_a      => c2_gmem_a     ,
+      c2_gmem_q      => c2_gmem_q     ,
+      c2_gmem_d      => c2_gmem_d     ,
+      c2_gmem_we_n   => c2_gmem_we_n  ,
+      c2_gmem_ce_n   => c2_gmem_ce_n  ,
       --bmem
-      dbus          =>  dbus                ,
-      bmem_a8       =>  bmem_a8             ,
-      bmem_q        =>  bmem_q              ,
-      bmem_d        =>  bmem_d              ,
-      bmem_we_n     =>  bmem_we_n           ,
-      bmem_ce_n     =>  bmem_ce_n
+      dbus           => dbus          ,
+      bmem_a8        => bmem_a8       ,
+      bmem_q         => bmem_q        ,
+      bmem_d         => bmem_d        ,
+      bmem_we_n      => bmem_we_n     ,
+      bmem_ce_n      => bmem_ce_n
       );
 
   -----------------------------------------------------------------------------
@@ -1250,13 +1226,13 @@ end generate;
     bmem_d        => bmem_d           ,--: out  std_logic_vector(7 downto 0);
     bmem_ce_n     => bmem_ce_n        ,--: out  std_logic;
 	  bmem_we_n     => bmem_we_n        ,
-    exe => EXE                        , --CJ
-    resume => RESUME                  , --CJ
-    id_number => c1_ID                , --CJ
-    req_c1 => c1_req_i                , --CJ
-    req_rd_c1 => c1_req_rd_i          ,
-    ack_c1 => C1_ACK                  ,
-    ddi_vld => ddi_vld_c1             , --CJ
+    exe           => EXE              , --CJ
+    resume        => RESUME           , --CJ
+    id_number     => c1_ID            , --CJ
+    req_c1        => c1_req_i         , --CJ
+    req_rd_c1     => c1_req_rd_i      ,
+    ack_c1        => C1_ACK           ,
+    ddi_vld       => ddi_vld_c1       , --CJ
     -- RTC block signals
     reset_core_n   => reset_core_n    ,
     reset_iso      => reset_iso       ,
@@ -1265,7 +1241,7 @@ end generate;
     nap_rec        => nap_rec         ,
     halt_en        => halt_en         ,
     nap_en         => nap_en          ,
-    ld_bmem       => ld_bmem          ,--: out std_logic;  -- Latch enable to the en_bmem latch
+    ld_bmem        => ld_bmem         ,--: out std_logic;  -- Latch enable to the en_bmem latch
     --  Signals to/from Peripheral block
     dfp           => dfp              ,--: in  std_logic_vector(7 downto 0);
     dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
@@ -1406,29 +1382,29 @@ end generate;
     pmem_q        => c2_pmem_q      ,
     pmem_ce_n     => c2_pmem_ce_n   ,
     pmem_we_n     => c2_pmem_we_n   ,
-    exe          => exe             ,     --CJ
-    req_c2       => c2_req_i        ,
-    req_rd_c2    => c2_req_rd_i     ,
-    ack_c2       => C2_ACK          ,
-    ddi_vld      =>ddi_vld_c2       , --CJ
-    resume => RESUME                ,   --CJ
+    exe           => exe            ,     --CJ
+    req_c2        => c2_req_i       ,
+    req_rd_c2     => c2_req_rd_i    ,
+    ack_c2        => C2_ACK         ,
+    ddi_vld       =>ddi_vld_c2      , --CJ
+    resume        => RESUME         ,   --CJ
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
     -- DRAM signals
-    d_addr        => c2_d_addr      ,
-    dcs_o         => c2_d_cs        ,
-    dras_o        => c2_d_ras       ,
-    dcas_o        => c2_d_cas       ,
-    dwe_o         => c2_d_we        ,
-    ddq_i         => c1_d_dqo_sd    ,
-    ddq_o         => c1_d_dqi_sd    ,
-    ddq_en        => open           ,
-    da_o          => open           ,
-    dba_o         => open           ,
-    dcke_o        => open           , -- Clock enable
+    d_addr        => c2_d_addr  ,
+    dcs_o         => c2_d_cs    ,
+    dras_o        => c2_d_ras   ,
+    dcas_o        => c2_d_cas   ,
+    dwe_o         => c2_d_we    ,
+    ddq_i         => c1_d_dqo_sd,
+    ddq_o         => c1_d_dqi_sd,
+    ddq_en        => open       ,
+    da_o          => open       ,
+    dba_o         => open       ,
+    dcke_o        => open       , -- Clock enable
     -- Cluster interface
-    din_c         => c2_d_dqo       ,   --in std_logic_vector(127 downto 0)-- Data input bus
+    din_c         => c2_d_dqo   ,   --in std_logic_vector(127 downto 0)-- Data input bus
     dout_c        => c2_d_dqi   -- out std_logic_vector(31 downto 0); -- Data output bus
 
     );
@@ -1438,28 +1414,28 @@ end generate;
     mpmem_inf_inst : entity work.pe1_mpmem_inf
   PORT map(
         -- MPRAM signals
-        c1_mpram_a     => c1_mpram_a     ,-- Address
-        c1_mpram_d     => c1_mpram_d     ,-- Data to memory
-        c1_mpram_ce    => c1_mpram_ce    ,-- Chip enable(active high)
-        c1_mpram_oe    => c1_mpram_oe    ,-- Output enable(active high)
-        c1_mpram_we_n  => c1_mpram_we_n  ,-- Write enable(active low)
-        c1_pmem_q      => c1_pmem_q      ,
-        c1_mp_q        => c1_mp_q        ,
+        c1_mpram_a     => c1_mpram_a   ,-- Address
+        c1_mpram_d     => c1_mpram_d   ,-- Data to memory
+        c1_mpram_ce    => c1_mpram_ce  ,-- Chip enable(active high)
+        c1_mpram_oe    => c1_mpram_oe  ,-- Output enable(active high)
+        c1_mpram_we_n  => c1_mpram_we_n,-- Write enable(active low)
+        c1_pmem_q      => c1_pmem_q    ,
+        c1_mp_q        => c1_mp_q      ,
         -- MPRAM signals
-        c2_mpram_a     => c2_mpram_a     ,-- Address
-        c2_mpram_d     => c2_mpram_d     ,-- Data to memory
-        c2_mpram_ce    => c2_mpram_ce    ,-- Chip enable(active high)
-        c2_mpram_oe    => c2_mpram_oe    ,-- Output enable(active high)
-        c2_mpram_we_n  => c2_mpram_we_n  ,-- Write enable(active low)
-        c2_pmem_q      => c2_pmem_q      ,
-        c2_mp_q        => c2_mp_q        ,
-        PM_DO       => mp_PM_DO          ,--: in  std_logic_vector (1 downto 0);
+        c2_mpram_a     => c2_mpram_a   ,-- Address
+        c2_mpram_d     => c2_mpram_d   ,-- Data to memory
+        c2_mpram_ce    => c2_mpram_ce  ,-- Chip enable(active high)
+        c2_mpram_oe    => c2_mpram_oe  ,-- Output enable(active high)
+        c2_mpram_we_n  => c2_mpram_we_n,-- Write enable(active low)
+        c2_pmem_q      => c2_pmem_q    ,
+        c2_mp_q        => c2_mp_q      ,
+        PM_DO          => mp_PM_DO     ,--: in  std_logic_vector (1 downto 0);
         --RAM0
-        RAM0_DO     => mp_RAM0_DO        ,--: in  std_logic_vector (79 downto 0);
-        RAM0_DI     => mp_RAM0_DI        ,--: out std_logic_vector (79 downto 0);
-        RAM0_A      => mp_RAM0_A         ,--: out std_logic_vector (13 downto 0);
-        RAM0_WEB    => mp_RAM0_WEB       ,--: out std_logic;
-        RAM0_OE     => mp_RAM0_OE        ,
+        RAM0_DO     => mp_RAM0_DO      ,--: in  std_logic_vector (79 downto 0);
+        RAM0_DI     => mp_RAM0_DI      ,--: out std_logic_vector (79 downto 0);
+        RAM0_A      => mp_RAM0_A       ,--: out std_logic_vector (13 downto 0);
+        RAM0_WEB    => mp_RAM0_WEB     ,--: out std_logic;
+        RAM0_OE     => mp_RAM0_OE      ,
         RAM0_CS     => mp_RAM0_CS      --: out std_logic;
     );
 
@@ -1468,44 +1444,44 @@ end generate;
   --flash interface
   flash_inf_inst : entity work.pe1_flash_inf
 	PORT MAP(
-	    clk_p       => hclk           ,
-		  even_c		=> even_c		        ,
-	    rst_cn      => rst_n          ,
-	    flash_en    => flash_en       ,
-	    flash_mode  => flash_mode     ,
-	    out_line    => out_line       ,
-	    hold_flash  => hold_flash     ,
-	    hold_flash_d => hold_flash_d  ,
-	    addr_in     => f_addr_in      ,
-      rd_in       => f_rd_in        ,
-      wr_in       => f_wr_in        ,
-      data_in     => f_data_in      ,
-      data_out    => f_data_out     ,
-		  ld_dqi_flash => ld_dqi_flash  ,
-      CE          => f_CE           ,
-      ADDR        => f_ADDR         ,
-      WRONLY      => f_WRONLY       ,
-      PERASE      => f_PERASE       ,
-      SERASE      => f_SERASE       ,
-      MERASE      => f_MERASE       ,
-      PROG        => f_PROG         ,
-      INF         => f_INF          ,
-      POR         => f_POR          ,
-      SAVEN       => f_SAVEN        ,
-      TM          => f_TM           ,
-      DATA_WR     => f_DATA_WR      ,
-      f0_ALE      => f0_ALE         ,
-      f0_DATA_IN  => f0_DATA_IN     ,
-      f0_RBB      => f0_RBB         ,
-      f1_ALE      => f1_ALE         ,
-      f1_DATA_IN  => f1_DATA_IN     ,
-      f1_RBB      => f1_RBB         ,
-      f2_ALE      => f2_ALE         ,
-      f2_DATA_IN  => f2_DATA_IN     ,
-      f2_RBB      => f2_RBB         ,
-      f3_ALE      => f3_ALE         ,
-      f3_DATA_IN  => f3_DATA_IN     ,
-      f3_RBB      => f3_RBB
+	    clk_p        => hclk        ,
+		  even_c		   => even_c		  ,
+	    rst_cn       => rst_n       ,
+	    flash_en     => flash_en    ,
+	    flash_mode   => flash_mode  ,
+	    out_line     => out_line    ,
+	    hold_flash   => hold_flash  ,
+	    hold_flash_d => hold_flash_d,
+	    addr_in      => f_addr_in   ,
+      rd_in        => f_rd_in     ,
+      wr_in        => f_wr_in     ,
+      data_in      => f_data_in   ,
+      data_out     => f_data_out  ,
+		  ld_dqi_flash => ld_dqi_flash,
+      CE           => f_CE        ,
+      ADDR         => f_ADDR      ,
+      WRONLY       => f_WRONLY    ,
+      PERASE       => f_PERASE    ,
+      SERASE       => f_SERASE    ,
+      MERASE       => f_MERASE    ,
+      PROG         => f_PROG      ,
+      INF          => f_INF       ,
+      POR          => f_POR       ,
+      SAVEN        => f_SAVEN     ,
+      TM           => f_TM        ,
+      DATA_WR      => f_DATA_WR   ,
+      f0_ALE       => f0_ALE      ,
+      f0_DATA_IN   => f0_DATA_IN  ,
+      f0_RBB       => f0_RBB      ,
+      f1_ALE       => f1_ALE      ,
+      f1_DATA_IN   => f1_DATA_IN  ,
+      f1_RBB       => f1_RBB      ,
+      f2_ALE       => f2_ALE      ,
+      f2_DATA_IN   => f2_DATA_IN  ,
+      f2_RBB       => f2_RBB      ,
+      f3_ALE       => f3_ALE      ,
+      f3_DATA_IN   => f3_DATA_IN  ,
+      f3_RBB       => f3_RBB
 		);
 
 

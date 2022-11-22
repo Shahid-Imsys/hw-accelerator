@@ -710,7 +710,7 @@ begin
     end if;
   end process;
 
-  mode_state_machine : process(clk_p)
+  mode_state_machine : process(clk_p) --TODO : replace states with variables, save clock cycles and ucode
   begin
     if rising_edge(clk_p) then
       if rst = '0' then

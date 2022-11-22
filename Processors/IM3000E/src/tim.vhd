@@ -181,7 +181,6 @@ architecture rtl of tim is
   signal clkreq_gen_int            : std_logic;
   signal en_pll_int                : std_logic;
   signal gate_i                    : std_logic;
-  signal gate_s                    : std_logic;
   attribute syn_keep               : boolean;
   signal pl_shin_pa_sig            : std_logic_vector(3 downto 0);  -- Used for CALL SP & ACK SPREQ
   signal pl_alud_sig               : std_logic;     -- Only bit 2 used here
@@ -452,17 +451,6 @@ begin
   
   din_s <= din_s_int;
   
-  -- Generate gate_s, which is exactly the same as clk_i but is used for gating.
-  process (clk_p)
-  begin
-    if rising_edge(clk_p) then
-      if rst_cn_int = '0' then
-        gate_s <= '1';
-      elsif (clk_c_en = '1') then
-        gate_s <= din_s_int;
-      end if;
-    end if;
-  end process;
   -- Prescaler 1 is used to generate mckout1, which is a clock output
   -- pin, and as input to prescaler 2.
   process (clk_p, rst_nint)

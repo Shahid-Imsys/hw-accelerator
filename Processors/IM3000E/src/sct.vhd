@@ -116,7 +116,8 @@ architecture rtl of sct is
  	attribute mark_debug : string;
   	attribute mark_debug of st_full: signal is "true"; 
   	attribute mark_debug of st_empty: signal is "true";
-  	attribute mark_debug of seq_dec: signal is "true"; 
+  	attribute mark_debug of seq_des: signal is "true"; 
+	attribute mark_debug of seq_psh: signal is "true"; 
   	attribute mark_debug of seq_pop_des: signal is "true";
   	attribute mark_debug of st_pop: signal is "true"; 
   	attribute mark_debug of st_push: signal is "true";

@@ -70,7 +70,6 @@ architecture convctrl of convcontroller is
   signal bias_addr_reg  : std_logic_vector(7 downto 0);
   signal conv_loop      : unsigned(7 downto 0);
   signal conv_oloop     : unsigned(7 downto 0);
-  signal clockcycle     : integer := 0;
 
 begin
 
@@ -84,17 +83,6 @@ begin
   ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => right);
   addbiasinst   <= (acc  => addbias, quant => trunc);
   clipinst      <= (clip => clip8, outreg => out0);
-
-  process(clk)
-  begin
-    if rising_edge(clk) then
-      if start = '1' then
-        clockcycle <= 0;
-      else
-        clockcycle <= clockcycle + 1;
-      end if;
-    end if;
-  end process;
 
   latch_signals: process(clk)
   begin

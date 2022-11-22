@@ -390,7 +390,6 @@ architecture rtl of ve is
   signal jump_l    : std_logic_vector(7 downto 0);--Jump register
   signal depth_l   : std_logic_vector(7 downto 0);--depth register
   signal config    : std_logic_vector(7 downto 0); --configure register
-  signal ring_end_addr : std_logic_vector(7 downto 0);
   signal ring_start_addr : std_logic_vector(7 downto 0);
   signal curr_ring_addr : std_logic_vector(7 downto 0);
   signal next_ring_addr : std_logic_vector(7 downto 0);
@@ -398,7 +397,6 @@ architecture rtl of ve is
   signal zp_weight  : std_logic_vector(7 downto 0); --zero point addition data
   signal scale      : std_logic_vector(4 downto 0); --shift scale factor
   signal pp_ctl  : std_logic_vector(7 downto 0); --expand this 8 bits, 1209
-  signal bias_index_end : std_logic_vector(7 downto 0);
   signal bias_index_start : std_logic_vector(7 downto 0);
   signal data0_addr_i, data1_addr_i : std_logic_vector(7 downto 0);
   signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
@@ -455,7 +453,6 @@ architecture rtl of ve is
   --output control signals
   signal load_dtm_out : std_logic;
   signal send_req_d : std_logic;
-  signal set_fifo_push : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal outrd_en, woutrd_en, res_assign : std_logic;
   signal mem_read_done, wmem_read_done : std_logic;
@@ -545,13 +542,11 @@ begin
           --dfy_reg           <= (others =>(others => '0'));
           ve_oloop_reg      <= (others => '0'); 
           config            <= (others => '0'); 
-          ring_end_addr     <= (others => '0'); 
           ring_start_addr   <= (others => '0'); 
           zp_data           <= (others => '0');
           zp_weight         <= (others => '0');
           scale             <= (others => '0'); 
           pp_ctl            <= (others => '0');  --Make it 8 bits
-          bias_index_end    <= (others => '0');
           bias_index_start  <= (others => '0');
           au_lcmp           <= (others => (others => '0'));
           au_loffset        <= (others => (others => '0'));
@@ -586,7 +581,7 @@ begin
         elsif reg_in = CONS_CONFIG then
           config <= YBUS;
         elsif reg_in = CONS_RING_END then
-          ring_end_addr <= YBUS;
+          -- NOP
         elsif reg_in = CONS_RING_START then
           ring_start_addr <= YBUS;--counter clear should be added
         elsif reg_in = CONS_ZP_DATA then
@@ -598,7 +593,7 @@ begin
         elsif reg_in = CONS_PP_CTL then
           pp_ctl <= YBUS;
         elsif reg_in = CONS_BIAS_INDEX_END then
-          bias_index_end <= YBUS;
+          -- NOP
         elsif reg_in = CONS_BIAS_INDEX_START then
           bias_index_start <= YBUS;--counter clear should be added
         elsif reg_in = CONS_AU_LOFFSET0 then
@@ -1625,7 +1620,6 @@ begin
       else
         load_dtm_out <= '0';
       end if;
-      set_fifo_push <= load_dtm_out;
     end if;
     --output to dtm
     for i in 0 to 15 loop
@@ -1641,7 +1635,7 @@ begin
     end case;
   end process;
 
-  dtm_ctl_out : process(pp_ctl, load_dtm_out, set_fifo_push)
+  dtm_ctl_out : process(pp_ctl, load_dtm_out)
   begin
     if pp_ctl(5) = '1' then
       ve_dtm_rdy <= load_dtm_out;

@@ -105,7 +105,9 @@ architecture rtl of cpc is
 
   attribute mark_debug : string; 
   attribute mark_debug of dfsr: signal is "true";  
-
+  attribute mark_debug of ld_mar: signal is "true";  
+  attribute mark_debug of clk_e_pos: signal is "true";
+  attribute mark_debug of mar: signal is "true";  
 
 
 begin

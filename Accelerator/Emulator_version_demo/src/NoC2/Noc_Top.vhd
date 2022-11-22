@@ -332,7 +332,6 @@ architecture structural of Noc_Top is
     --NoC_INPUT_REG
     signal NoC_Input_reg_Out    : std_logic_vector(127 downto 0);
     signal NoC_Input_reg_Out_p  : std_logic_vector(127 downto 0);
-    signal NoC_Input_reg_Out_p2 : std_logic_vector(127 downto 0);
     
     --NOC REG
     signal NOC_reg_mux_ctrl     : std_logic_vector(1 downto 0);
@@ -372,30 +371,7 @@ architecture structural of Noc_Top is
     signal Load_IR              : std_logic;
     signal Reset_IR             : std_logic;
 	signal RM_byte_as           : unsigned(3 downto 0);
-	signal RM_as_err            : std_logic;
-	
-	
-    attribute mark_debug : string; 
-    attribute mark_debug of PEC_Ready: signal is "true";
-    attribute mark_debug of PEC_WE: signal is "true";
-    attribute mark_debug of PEC_byte_data: signal is "true";
-    attribute mark_debug of Noc_byte_data: signal is "true";
-    attribute mark_debug of GPP_CMD_Data: signal is "true";
-    attribute mark_debug of NOC_CMD_Data: signal is "true";
-    attribute mark_debug of GPP_CMD_Flag: signal is "true";
-    attribute mark_debug of NOC_CMD_ACK: signal is "true";
-    attribute mark_debug of NOC_CMD_flag: signal is "true";
-    attribute mark_debug of GPP_CMD_ACK: signal is "true";
-    attribute mark_debug of IO_data: signal is "true";
-    attribute mark_debug of NOC_data: signal is "true";
-    attribute mark_debug of NOC_Address: signal is "true";
-    attribute mark_debug of NOC_Length: signal is "true";
-    
-    attribute mark_debug of FIFO_Ready: signal is "true";
-    attribute mark_debug of NOC_DATA_DIR: signal is "true";
-    attribute mark_debug of NOC_DATA_EN: signal is "true";
-    attribute mark_debug of NOC_WRITE_REQ: signal is "true";
-    attribute mark_debug of IO_WRITE_ACK: signal is "true"; 	    
+	signal RM_as_err            : std_logic;	    
 
 begin
 
@@ -412,13 +388,11 @@ begin
 			if (load_Mode_reg = '1') then
 		        Mode_reg <= Control_Data_Out(4 downto 0);
 		    end if;
-		    Sync_pulse_i_p    <= Sync_pulse_i;
-		    		    
-		    NoC_Input_reg_Out_p   <= NoC_Input_reg_Out;
-		    NoC_Input_reg_Out_p2  <= NoC_Input_reg_Out_p;
 		    
-		    PEC_WE_p2     <= PEC_WE_p1;
-		    PEC_WE_p1     <= PEC_WE;
+		    Sync_pulse_i_p      <= Sync_pulse_i;		    
+		    NoC_Input_reg_Out_p <= NoC_Input_reg_Out;
+		    PEC_WE_p2           <= PEC_WE_p1;
+		    PEC_WE_p1           <= PEC_WE;
 		end if;	
 	end process;
 	
@@ -587,7 +561,7 @@ begin
         clk                     => clk,
         Reset                   => Reset,      
         Mux_select              => NOC_reg_mux_ctrl,   
-        Input_reg_data          => NoC_Input_reg_Out, --NoC_Input_reg_Out_p, --aaac1 NoC_Input_reg_Out, --NoC_Input_reg_Out_p2,
+        Input_reg_data          => NoC_Input_reg_Out,
         Root_Memory_data        => RM_Data_Out,
         TP_data                 => Noc_reg_mux,
         Mux_Demux_data          => Mux_Demux_out0,

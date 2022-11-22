@@ -9,7 +9,7 @@ use work.gp_pkg.all;
 entity mprom_memory00 is
 
   generic (
-    g_memory_type : memory_type_t := referens);
+    g_memory_type : memory_type_t := asic);
 
   port (
     address : in  std_logic_vector(11 downto 0);
@@ -141,7 +141,7 @@ architecture rtl of mprom_memory00 is
   
 begin  -- architecture rtl
 
-  g_rom00_asic: if g_memory_type = asic generate
+  g_rom00_asic: if g_memory_type /= fpga generate
   i_mprom00_asic : SNPS_ROM_4Kx80_mprom00
     generic map (
       preloadfilename => "../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00.hex"

@@ -47,7 +47,7 @@ use work.gp_pkg.all;
 
 entity rtc is
   generic (
-    g_memory_type : memory_type_t := referens;
+    g_memory_type : memory_type_t := asic;
     g_clock_frequency : integer -- Frequency in MHz
     );
   port (
@@ -240,23 +240,9 @@ architecture rtl of rtc is
       );
   end component;
 
-  component ram_memory is
-    generic (
-      g_memory_type : memory_type_t := referens);
-    port (
-      clk     : in  std_logic;
-      address : in  std_logic_vector(13 downto 0);
-      ram_di  : in  std_logic_vector(7 downto 0);
-      ram_do  : out std_logic_vector(7 downto 0);
-      we_n    : in  std_logic;
-      cs      : in  std_logic
-      );
-
-  end component;
-
   component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(9 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -268,7 +254,7 @@ architecture rtl of rtc is
 
   component b_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       clk     : in  std_logic;
       address : in  std_logic_vector(8 downto 0);
@@ -387,13 +373,13 @@ begin  -- rtl
   xout_selected <= '1';
 
   -- Disable latch for the power to BMEM
-  process (ld_bmem_iso_0, rtc_sel_iso_0)
-  begin
-    if ld_bmem_iso_0 = '1' then
-      dis_bmem <= rtc_sel_iso_0(0);
-    end if;
-  end process;
-
+--  process (ld_bmem_iso_0, rtc_sel_iso_0)
+--  begin
+--    if ld_bmem_iso_0 = '1' then
+--      dis_bmem <= rtc_sel_iso_0(0);
+--    end if;
+--  end process;
+  dis_bmem <= '0';
 
 
   arst_n <= lp_pwr_ok and not wakeup_lp;

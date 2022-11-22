@@ -28,6 +28,7 @@ entity Mux_Register is
         Control_Data            : in  std_logic_vector(7 downto 0);
         NOC_reg_mux_ctrl        : out std_logic_vector(1 downto 0);
         NOC_data_mux_ctrl       : out std_logic;
+        RM_as_mux               : out std_logic;
         Data_dir                : out std_logic;
         NOC_bus_out_mux_ctrl    : out std_logic;
         Loop_reg_mux_ctrl       : out std_logic;
@@ -43,6 +44,7 @@ begin
 
     NOC_reg_mux_ctrl        <= Mux_reg(1 downto 0);
     NOC_data_mux_ctrl       <= Mux_reg(2);
+    RM_as_mux               <= Mux_reg(3);
     Data_Dir                <= Mux_reg(4);
     NOC_bus_out_mux_ctrl    <= Mux_reg(5);
     Loop_reg_mux_ctrl       <= Mux_reg(6);
@@ -50,7 +52,7 @@ begin
 
     process(clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
             Mux_reg        <= (others => '0');
         elsif rising_edge(clk) then
             if (Load_Mux_Reg = '1') then 

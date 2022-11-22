@@ -56,7 +56,7 @@ begin
     -----Tag_Line_Controller
     process (clk, Reset)
     begin
-        if Reset = '1' then
+        if Reset = '0' then
            Tag_Shift_Counter            <= (others => '0');
            Start_Tag_Shift_pre          <= '0';
            TAG_shift_i                  <= '0';
@@ -79,7 +79,7 @@ begin
     -----TAG INTERFACE
     process (clk, Reset)
     begin  
-        if Reset = '1' then
+        if Reset = '0' then
             PEC_Reg                     <= (others => '0');
             PEC_CMD_Ready               <= '0';
             PEC_Arg_Ready               <= '0';
@@ -88,7 +88,7 @@ begin
         elsif rising_edge(clk) then
             Tag_shift_p                 <= TAG_shift_i;           
             if Load_TAG_Cmd_reg = '1' then
-                PEC_Reg(52 downto 47)   <= PEC_CMD;  -- to add one cycle for CC command buffer
+                PEC_Reg(52 downto 47)   <= PEC_CMD;  
                 PEC_Reg(46)             <= '0';      -- to add one cycle for CC command buffer
                 PEC_CMD_Ready           <= '1';
             end if;

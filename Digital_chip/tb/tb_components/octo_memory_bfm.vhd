@@ -228,9 +228,9 @@ begin  -- architecture bfm
               state <= latency_wait;
               -- old_latency is inverse of RWDS.
               if old_latency = '1' then
-                counter <= 2 * latency_length - 2;
+                counter <= 2 * latency_length;
               else
-                counter <= 4 * latency_length - 2;
+                counter <= 4 * latency_length;
               end if;
             elsif command = CMD_READ_DDR or
               command = CMD_READ_REG then

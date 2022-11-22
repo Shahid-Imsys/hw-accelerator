@@ -71,6 +71,7 @@ architecture tb of main_tb is
   signal OSPI_RWDS  : std_logic;
   signal OSPI_rst_n : std_logic;
 
+  signal spi_rst_n : std_logic := '0';
   signal spi_sclk : std_logic := '0';
   signal spi_cs_n : std_logic := '1';
   signal spi_mosi : std_logic := '0';
@@ -82,7 +83,8 @@ begin  -- architecture tb
 
   dut : entity work.digital_chip
     generic map (
-      g_simulation => true
+      g_memory_type => simulation, -- TODO Should be "simulation", change if committed to something else (can be temporary set to "fpga" to speed up sim)
+      g_simulation  => true
       )
     port map (
       pll_ref_clk => MX1_CK,
@@ -152,6 +154,7 @@ begin  -- architecture tb
       emem_d7    => OSPI_DQ(7),
 
       -- SPI, chip control interface
+      spi_rst_n => spi_rst_n,
       spi_sclk => spi_sclk,
       spi_cs_n => spi_cs_n,
       spi_miso => open,
@@ -167,13 +170,14 @@ begin  -- architecture tb
   mtest <= '0';
 
   pad(A)(7 downto 5) <= "LLL";  --"000";          -- This is read by ROM bootloader
-  pad(A)(4 downto 3) <= "LH";  --"01";           -- Set SP communication at /2 speed
+  pad(A)(4 downto 3) <= "LL";  --"00";           -- Set SP communication at /4 speed
   pad(A)(2 downto 1) <= "LH";  --"01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
 
   -- Reset the circuit for 10 ns;
   MRESET   <= '0', '1' after 10 ns;
   preset_n <= '0', '1' after 5 ns;
+  spi_rst_n <= '0', '1' after 7 ns;
 
   -- This emulates a 31.25 MHz crystal
   mx1_ck_int <= not mx1_ck_int after HALF_CLK_C_CYCLE;
@@ -211,6 +215,7 @@ begin  -- architecture tb
 
   i_uart : entity work.uart_tb
     port map (
+      clk            => MX1_CK,
       tx             => pad(J)(1),
       rx             => pad(J)(0),
       reg_to_block   => reg_to_block,

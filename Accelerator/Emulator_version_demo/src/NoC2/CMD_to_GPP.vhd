@@ -30,7 +30,6 @@ entity CMD_to_GPP is
         ERROR                   : in  std_logic;
         GPP_CMD_ACK             : in  std_logic;
         NOC_CMD_flag            : out std_logic;
-        En_CMD                  : out std_logic;
         NOC_CMD_Data            : out std_logic_vector(7 downto 0)
     );
 end CMD_to_GPP;
@@ -49,7 +48,6 @@ architecture Behavioral of CMD_to_GPP is
     signal  Decoder                 : std_logic_vector(5 downto 0);
     signal  NOC_Ready_FF            : std_logic;
     signal  PEC_ready_FF            : std_logic;
-    signal  PEC_ready_P             : std_logic;
     signal  NOC_CMD_flag_i          : std_logic;
     signal  NOC_CMD_Reg             : std_logic_vector(7 downto 0);
     signal  NOC_ERROR_FF            : std_logic;
@@ -60,49 +58,50 @@ begin
     NOC_CMD_flag            <= NOC_CMD_flag_i;
     NOC_CMD_Data            <= NOC_CMD_Reg;
 
-    Decoder <= "100000" when counter = 0 else   --
-               "100000" when counter = 1 else   --
-               "110000" when counter = 2 else   --
-               "001000" when counter = 3 else   --
-               "100100" when counter = 4 else   --
-               "100010" when counter = 5 else   --
-               "100001" when counter = 6 else   --
-               "100000" when counter = 7;       --
+    Decoder <= "100000" when counter = 0 else   
+               "100000" when counter = 1 else   
+               "110000" when counter = 2 else   
+               "001000" when counter = 3 else   
+               "100100" when counter = 4 else   
+               "100010" when counter = 5 else 
+               "100001" when counter = 6 else  
+               "100000" when counter = 7 else  
+               "100000";  
                                 
-    load_counter            <= Decoder(0);      --
-    Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      --
-    NOC_CMD_FF_value        <= Decoder(3);      --
-    load_NOC_CMD_REG        <= Decoder(4);      --
-    step_counter            <= Decoder(5);      --
+    load_counter            <= Decoder(0);      
+    Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      
+    NOC_CMD_FF_value        <= Decoder(3);      
+    load_NOC_CMD_REG        <= Decoder(4);      
+    step_counter            <= Decoder(5);      
     
     load    <= load_counter or not (NOC_Ready_FF or PEC_ready_FF or NOC_ERROR_FF); --
     enable  <= step_counter or (GPP_CMD_ACK and NOC_CMD_FF_value);  --
     
     process(clk, Reset)
     begin
-        if Reset = '1' then
-            counter                 <= (others => '0');  --
-            PEC_ready_FF            <= '0';     --
-            NOC_Ready_FF            <= '0';     --
-            NOC_ERROR_FF            <= '0';     --       
-            NOC_CMD_Reg             <= (others => '0'); --
+        if Reset = '0' then
+            counter                 <= (others => '0');  
+            PEC_ready_FF            <= '0';     
+            NOC_Ready_FF            <= '0';     
+            NOC_ERROR_FF            <= '0';            
+            NOC_CMD_Reg             <= (others => '0');
             
         elsif rising_edge(clk) then
-            PEC_ready_P             <= PEC_ready;
+            NOC_CMD_flag_i          <= not(GPP_CMD_ACK) and NOC_CMD_FF_value;
         
-            if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '1')) then
+            if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '0')) then
                 NOC_Ready_FF        <= '1';
             else     
                 NOC_Ready_FF        <= '0';
             end if;
             
-            if ((PEC_ready = '1' or PEC_ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(1) = '1') or Reset = '1')) then
+            if ((PEC_ready = '1' or PEC_ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(1) = '1') or Reset = '0')) then
                 PEC_ready_FF        <= '1';
             else     
                 PEC_ready_FF        <= '0';
             end if;
                        
-            if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '1')) then
+            if ((ERROR = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
                 NOC_ERROR_FF        <= '1';
             else     
                 NOC_ERROR_FF        <= '0';

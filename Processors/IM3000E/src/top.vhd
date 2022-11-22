@@ -73,12 +73,13 @@ use work.gp_pkg.all;
 
 entity top is
   generic (
-    g_memory_type     : memory_type_t := fpga;
+    g_memory_type     : memory_type_t := asic;
     g_clock_frequency : integer       := 300  -- Frequency in MHz
     );
   port (
     -- clocks and control signals
     clk_p  : in std_logic;                    -- clk input
+    clk_p_n: in std_logic;                    -- clk input
     clk_rx : in std_logic;
     clk_tx : in std_logic;
 
@@ -139,7 +140,7 @@ entity top is
     ext_ildout : out std_logic;
     ext_inext  : out std_logic;
     ext_idi    : out std_logic_vector(7 downto 0);
-
+    ext_irq    : in  std_logic;
 
     -- Port A
     pa_i  : in  std_logic_vector(7 downto 0);
@@ -232,7 +233,7 @@ architecture struct of top is
 
   component mprom_memory00 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(11 downto 0);
       rom_do  : out std_logic_vector(79 downto 0);
@@ -247,7 +248,7 @@ architecture struct of top is
 
   component mprom_memory11 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(11 downto 0);
       rom_do  : out std_logic_vector(79 downto 0);
@@ -263,7 +264,7 @@ architecture struct of top is
   component mpram_memory is
     generic (
       g_file_name   : string        := "mpram0.data";
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(10 downto 0);
       ram_di  : in  std_logic_vector(79 downto 0);
@@ -275,7 +276,7 @@ architecture struct of top is
 
   component trace_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(7 downto 0);
       ram_di  : in  std_logic_vector(31 downto 0);
@@ -287,7 +288,7 @@ architecture struct of top is
 
   component ram_memory is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(13 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -299,7 +300,7 @@ architecture struct of top is
 
   component memory_1024x8 is
     generic (
-      g_memory_type : memory_type_t := referens);
+      g_memory_type : memory_type_t := asic);
     port (
       address : in  std_logic_vector(9 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -503,6 +504,7 @@ architecture struct of top is
   -- core driven
   signal dbus      : std_logic_vector(7 downto 0);
   signal rst_en    : std_logic;
+  signal wdog2_n   : std_logic;
   --signal rst_en2     : std_logic;
   signal pd_s      : std_logic_vector(2 downto 0);
   signal aaddr     : std_logic_vector(4 downto 0);
@@ -647,6 +649,16 @@ architecture struct of top is
   signal ram_do  : main_ram_data_t;
   signal ram_cs  : main_ram_cs_t;
   signal ram_web : main_ram_web_t;
+
+  attribute mark_debug : string;
+  attribute mark_debug of c1_mprom_a: signal is "true";  
+  attribute mark_debug of c1_mprom_ce: signal is "true";
+  attribute mark_debug of c1_mpram_ce: signal is "true";
+
+  attribute mark_debug of c1_d_addr: signal is "true";
+  attribute mark_debug of c1_d_cs: signal is "true"; 
+  attribute mark_debug of c1_d_we: signal is "true";   
+  attribute mark_debug of idi: signal is "true";   
 
 begin
 
@@ -971,6 +983,7 @@ begin
     port map(
       -- Clocks to/from clock block
       clk_p        => clk_p,            --: in  std_logic;  -- PLL clock
+      clk_p_n      => clk_p_n,          --: in  std_logic;  -- PLL clock
       clk_c_en     => clk_c_en,         --: in  std_logic;  -- CP clock
       even_c       => even_c,
       --clk_c2_pos   => clk_c2_pos,  --: in  std_logic;  -- clk_c / 2
@@ -1222,6 +1235,7 @@ begin
       --  Signals to/from Peripheral block
       --dfp           => dfp     -- BSV
       dfp        => "00100000",         -- BSV          ,
+      wdog2_n    => wdog2_n,
       --dbus        : out std_logic_vector(7 downto 0);
       --rst_en      : out std_logic;
       --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
@@ -1394,6 +1408,7 @@ begin
       g_build_type => g_memory_type)
     port map(
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n,
       clk_c_en    => clk_c_en,
       clk_e_pos   => clk_e_pos,
       clk_e_neg   => clk_e_neg,
@@ -1409,6 +1424,7 @@ begin
       dbus        => dbus,
       dfp         => dfp,
       rst_en      => rst_en,
+      wdog2_n     => wdog2_n,
       --rst_en2     => rst_en2,
       pl_pd       => pd_s,
       pl_aaddr    => aaddr,
@@ -1419,6 +1435,7 @@ begin
       ext_iden    => ext_iden,
       ext_idreq   => ext_idreq,
       ext_idack   => ext_idack,
+      ext_irq     => ext_irq,
       ilioa       => ilioa,
       ildout      => ildout,
       inext       => inext,

@@ -40,6 +40,7 @@ entity tiu is
 
     -- Interface to host  
     clk_p      : in std_logic;
+    clk_p_n    : in std_logic;
     clk_c_en   : in std_logic;          -- Clock 133.3 MHz
     rst_en     : in std_logic;          -- Asynchronous master reset
     reg_wr     : in std_logic;  -- High when reg_addr is written with '1' in bit 7
@@ -264,7 +265,7 @@ begin
       signal wai_start    : std_logic;  -- Wait at start
       signal wai_coi      : std_logic;  -- Wait at coincidence
       signal wai_ff       : std_logic;  -- Disable downcount
-      signal dwnctr       : std_logic_vector(4 downto 0);  -- Downcounter
+      signal dwnctr       : std_logic_vector(5 downto 0);  -- Downcounter
       signal tiu_test_2   : std_logic_vector(4 downto 0);  -- Downcounter
       signal ld_dwnctr    : std_logic;  -- Load cond for ctr
       signal msa          : std_logic_vector(4 downto 0);  -- mantissa
@@ -299,23 +300,21 @@ begin
           drv(i) <= '0';
           wai    <= (others => '0');
         elsif rising_edge(clk_p) then
-          if (clk_param(i) = '1') then 
-            if i < 2 and capt_pend = '1' then
-              msa <= dwnctr;
-            else
-              case reg_addr(5 downto 4) is
-                when "00" => exp(i) <= wdata(7 downto 5);
-                             msa <= wdata(4 downto 0);
-                when "01" => reqi <= wdata(7);
-                             tgl <= wdata(6 downto 5);
-                           coi <= wdata(4 downto 0);
-                when "10" => rep <= wdata(7);
-                             evt(i) <= wdata(6);
-                             drv(i) <= wdata(5);
-                             wai    <= wdata(4 downto 2);
-                when others => null;
-              end case;
-            end if;
+          if i < 2 and cpt = '1' and capt_pend = '1' then
+            msa <= dwnctr(4 downto 0);
+          elsif (clk_param(i) = '1') then 
+            case reg_addr(5 downto 4) is
+              when "00" => exp(i) <= wdata(7 downto 5);
+                           msa <= wdata(4 downto 0);
+              when "01" => reqi <= wdata(7);
+                           tgl <= wdata(6 downto 5);
+                         coi <= wdata(4 downto 0);
+              when "10" => rep <= wdata(7);
+                           evt(i) <= wdata(6);
+                           drv(i) <= wdata(5);
+                           wai    <= wdata(4 downto 2);
+              when others => null;
+            end case;
           end if;
         end if;
       end process;
@@ -345,12 +344,12 @@ begin
       -- The cpt_trig event is edge triggered when wai(0) is set, else level
       -- triggered.
 
-      process (clk_p, trst_n, cpt_trig_int(i), onff(i))
+      process (clk_p_n, trst_n, cpt_trig_int(i), onff(i))
       begin
         if trst_n = '0' or (cpt_trig_int(i) = '1' and onff(i) = '1') then
           wai_ff <= '0';
-        elsif falling_edge(clk_p) then
-          if clk_t(i) = '1' then
+        elsif rising_edge(clk_p_n) then
+          if genclk(i) = '1' then
             if wai(1 downto 0) = "00" then
               wai_ff <= '0';
             elsif wai(2) = '0' and begintime(i) = '1' then
@@ -374,20 +373,29 @@ begin
 
       ------- Counter ----------------------------------
       -- This is the 5-bit downcounter of a timer. 
-      process(clk_p, onff(i))
+      process(clk_p_n, onff(i))
       begin
         if onff(i) = '0' then
-          dwnctr <= "00000";
-        elsif falling_edge(clk_p) then
+          dwnctr <= "000000";
+        elsif rising_edge(clk_p_n) then
           if genclk(i) = '1' then
             if ld_dwnctr = '1' then
-              dwnctr <= msa;
+              if exp(i) = "000" then
+                dwnctr <= '0' & msa;
+              else
+                dwnctr <= '1' & msa;
+              end if;
             elsif wai_ff = '0' then
-              dwnctr <= dwnctr - 1;
+              if (i < 2 and cpt = '1' and dwnctr = "000000") then
+                dwnctr <= "011111";
+              else
+                dwnctr <= dwnctr - 1;
+              end if;
             end if;
           end if;
         end if;
       end process;
+
       -- When a timer counts to zero, it either reloads itself from msa or
       -- wraps around. A single timer is always reloaded, a driving timer
       -- is reloaded only if its ctrldrvg(1) line is held low by the driven
@@ -452,11 +460,11 @@ begin
       -- A driving timer with its rep bit set can be forced to turn itself
       -- off anyway by the driven timer, if the latter sets the former's
       -- ctrldrvg(0) line high. 
-      process (clk_p, trst_n)
+      process (clk_p_n, trst_n)
       begin
         if trst_n = '0' then
           onff(i) <= '0';
-        elsif falling_edge(clk_p) then
+        elsif rising_edge(clk_p_n) then
           if (turn_on(i) = '1') then
             onff(i) <= '1';
           elsif (turn_off_n(i) = '0') then
@@ -472,11 +480,11 @@ begin
       -- begintime from the activation of a timer until the first clk_t after
       -- onff goes from 0 -> 1. It is used mainly to make sure the dwnctr
       -- value is ignored on the first clock.
-      process (clk_p, turn_off_n(i), onff(i))
+      process (clk_p_n, turn_off_n(i), onff(i))
       begin
         if (turn_off_n(i) = '0' or onff(i) = '0') then
           bff <= '0';
-        elsif falling_edge(clk_p) then
+        elsif rising_edge(clk_p_n) then
           if genclk(i) = '1' then
             bff <= onff(i);
           end if;
@@ -489,9 +497,9 @@ begin
       -- only) if reqi is enabled. When capture is enabled, timer 0 generates
       -- only capture interrupt, not end time interrupt.
       -- Note: capture interrupt is async set because external event nature.
-      process (reset_ifl_n(i), trst_n, reqi, capt_event, clk_p)
+      process (reset_ifl_n(i), trst_n, reqi, capt_event, clk_p_n)
       begin
-        if falling_edge(clk_p) then
+        if rising_edge(clk_p_n) then
 	  if i = 0 and (reset_ifl_n(i) = '0' or trst_n = '0') then
 	    ifl(i) <= '0';
 	  else
@@ -510,7 +518,7 @@ begin
 	if i = 0 and capt_event = '1' and reqi = '1' then
 	  ifl(i) <= '1';      -- Timer 0 generates interrupt on capture
 	elsif i > 0 and  (reset_ifl_n(i) = '0' or trst_n = '0') then
-	  ifl(i) <= '1';  -- Timer 0 does not generate wrap interrupt in capture mode
+	  ifl(i) <= '0';  -- Timer 0 does not generate wrap interrupt in capture mode
 	end if;
 	
       end process;
@@ -527,23 +535,22 @@ begin
       process (tgl, chain_coi(i), chain_zero(i), begintime(i))
       begin
         case tgl is
-          when "00" => tgl_set <= '0';
-                       tgl_reset <= '0';
-          when "01" => tgl_set <= begintime(i);
-                       tgl_reset <= chain_zero(i);
-          when "10" => tgl_set <= chain_coi(i);
-                       tgl_reset <= not chain_coi(i);
-          when "11" => tgl_set <= chain_coi(i);
-                       tgl_reset <= chain_zero(i);
-          when others => null;
+          when "00" =>   tgl_set <= '0';
+                         tgl_reset <= '0';
+          when "01" =>   tgl_set <= begintime(i);
+                         tgl_reset <= chain_zero(i);
+          when "10" =>   tgl_set <= chain_coi(i);
+                         tgl_reset <= not chain_coi(i);
+          when others => tgl_set <= chain_coi(i);
+                         tgl_reset <= chain_zero(i);
         end case;
       end process;
                  
-      process (clk_p, onff(i))
+      process (clk_p_n, onff(i))
       begin
         if onff(i) = '0' then
           pulseout_int <= '0';
-        elsif falling_edge(clk_p) then
+        elsif rising_edge(clk_p_n) then
           if first_clock = '1' then
             if chain_cken(i) = '1' then
               if tgl_reset = '1' then
@@ -575,44 +582,12 @@ begin
 
   begin
 
-    -----------------------------------
-    -- TEST SEGMENT
-    -----------------------------------
     -- Frequency divider
-    -- process (first_clk, trst_n)
-    -- begin
-    --   if (trst_n = '0') then
-    --     ff_old(0) <= '0';
-    --   elsif rising_edge(first_clk) then
-    --     if run = '1' or ff_old(0) = '1' then
-    --       ff_old(0) <= not ff_old(0);
-    --     end if;
-    --   end if;
-    -- end process;
-
-    -- freq_old : for i in 1 to 7 generate
-    --   div_old : block
-    --   begin
-    --     process (ff_old(i-1), trst_n)
-    --     begin
-    --       if trst_n = '0' then
-    --         ff_old(i) <= '0';
-    --       elsif falling_edge(ff_old(i-1)) then
-    --         ff_old(i) <= not ff_old(i);
-    --       end if;
-    --     end process;
-    --   end block div_old;
-    -- end generate freq_old;
-    -----------------------------------
-    -- TEST SEGMENT
-    -----------------------------------
-
-    -- Frequency divider
-    process (clk_p, trst_n)
+    process (clk_p_n, trst_n)
     begin
       if (trst_n = '0') then
         ff <= (others => '0');
-      elsif falling_edge(clk_p) then
+      elsif rising_edge(clk_p_n) then
         if first_clock = '1' then
           if run = '1' then
             ff <= ff + 1;
@@ -620,7 +595,6 @@ begin
             ff(0) <= '0';
           end if;
         end if;
-        --assert ff = ff_old report "ff error" severity error;
       end if;
     end process;
 
@@ -640,7 +614,11 @@ begin
     begin
       for i in 0 to TIM_CH_NBR-1 loop
         -- Default frequency selection, controlled by exp
-        tmp(i) := frd(conv_integer(exp(i)));
+        if (exp(i) = "000") then
+          tmp(i) := frd(conv_integer(exp(i)));
+        else
+          tmp(i) := frd(conv_integer(exp(i)-1));
+        end if;
 
         -- Timer may be used for external event counting, clocked by rising
         -- edge on its cpt_trig input. 
@@ -692,20 +670,10 @@ begin
     -- This process creates a clkpulse for writing in parameter registers.
     -- It is distributed to the params block in every timer, but writing
     -- will be performed only in the timer selected by wr(i).
-    -- process (first_clk)
-    -- begin
-    --   if rising_edge(first_clk) then
-    --     if (trst_n = '0' or rst_en = '0') then
-    --       tiu_test <= '0';
-    --     else
-    --       tiu_test <= reg_wr;
-    --     end if;
-    --   end if;
-    -- end process;
 
-    process (clk_p)
+    process (clk_p_n)
     begin
-      if falling_edge(clk_p) then
+      if rising_edge(clk_p_n) then
         if first_clock = '1' then
           if (trst_n = '0' or rst_en = '0') then
             clk_wr <= '0';
@@ -723,8 +691,6 @@ begin
     process (clk_wr, reg_addr, capt_event)
     begin
       clk_param    <= (others => '0');
-      clk_param(0) <= capt_event;
-      clk_param(1) <= capt_event;
       for i in 0 to TIM_CH_NBR-1 loop
         if reg_addr(3) = '0' and (i = conv_integer(reg_addr(2 downto 0))) and clk_wr = '1' then
           clk_param(i) <= '1';
@@ -733,11 +699,11 @@ begin
     end process;
 
     -- This process generates the individual clock for each timer.  
-    process (clk_p, trst_n)
+    process (clk_p_n, trst_n)
     begin
       if (trst_n = '0') then
         clk_t <= (others => '0');
-      elsif falling_edge(clk_p) then
+      elsif rising_edge(clk_p_n) then
         if first_clock = '1' then
           for i in 0 to TIM_CH_NBR-1 loop
             clk_t(i) <= genclk(i);
@@ -757,16 +723,17 @@ begin
     signal sync_0_rx1    : std_logic;
     signal sync_1_rx1    : std_logic;
     signal trig_edge_rx1 : std_logic;
+    signal cpt_prev      : std_logic;
 
   begin
     -- These flipflops detect positive edge of 'capture' inputs from ports,
     -- where they can be polarity controlled.
-    process (clk_p, trst_n)
+    process (clk_p_n, trst_n)
     begin
       if trst_n = '0' then
         sync_0 <= (others => '0');
         sync_1 <= (others => '0');
-      elsif falling_edge(clk_p) then
+      elsif rising_edge(clk_p_n) then
         if first_clock = '1' then
           for i in 0 to TIM_CH_NBR-1 loop
             sync_0(i) <= cpt_trig(i) and not sync_1(i);
@@ -814,9 +781,9 @@ begin
     -- In the capture mode, there is a mechanism to prevent additional capture
     -- as long as the interrupt flag is set.
     -- If cpe is false, Ethernet timestamping is disabled
-    process (clk_p)
+    process (clk_p_n)
     begin
-      if falling_edge(clk_p) then
+      if rising_edge(clk_p_n) then
         if first_clock = '1' then
           sync_0_rx1 <= cpe and tstamp_rx1 and not sync_1_rx1;
           sync_1_rx1 <= ((cpe and tstamp_rx1) and sync_1_rx1) or sync_0_rx1;
@@ -825,9 +792,9 @@ begin
     end process;
 
     -- Clock these flipflops on falling edge instead, to avoid race
-    process (clk_p)
+    process (clk_p_n)
     begin
-      if falling_edge(clk_p) then
+      if rising_edge(clk_p_n) then
         if first_clock = '1' then
           trig_edge_rx1 <= sync_0_rx1 and not sync_1_rx1 and not (cpt and ifl(0));
         end if;
@@ -837,11 +804,31 @@ begin
     -- capt_event is the second event (the end of a signal pulse or a signal
     -- with delay phase), which is used to copy a counter value and generate
     -- interrupt. This event is generated only when cpt is set.    
-    capt_event <= (trig_edge(0) or trig_edge_rx1) and cpt;
+    process (clk_p, trst_n)
+    begin
+      if (trst_n = '0') then
+        capt_event <= '0';
+      elsif rising_edge(clk_p) then
+        capt_event <= capt_pend and cpt;
+      end if;
+    end process;
 
     -- capt_pend is used to tell the msa input mux to load msa from the
     -- downctr rather than from wdata on the capt_event pulse.
-    capt_pend <= (sync_0(0) or sync_0_rx1) and cpt;
+    process (clk_p, trst_n)
+    begin
+      if (trst_n = '0') then
+        cpt_prev  <= '0';
+        capt_pend <= '0';
+      elsif rising_edge(clk_p) then
+        cpt_prev  <= cpt_trig(0);
+        capt_pend <= '0';
+        if (cpt_prev = '1' and cpt_trig(0) = '0') then
+          capt_pend <= '1';
+        end if;
+      end if;
+    end process;
+
 
     -- This flipflop stores the source of capture. '0' means cpt_trig,
     -- '1' means Ethernet timestamp.

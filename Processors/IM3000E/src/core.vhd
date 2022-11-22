@@ -56,6 +56,7 @@ entity core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
+    clk_p_n     : in  std_logic;  -- PLL clock
     clk_c_en    : in  std_logic;  -- CP clock
     even_c      : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2 
@@ -306,7 +307,7 @@ architecture struct of core is
   signal clk_sel   	: std_logic;
   signal en_s       	: std_logic;
   signal speed_s    	: std_logic_vector(1 downto 0);
-  signal speed_u    	: std_logic_vector(6 downto 0);
+  signal speed_u    	: std_logic_vector(9 downto 0);
   signal speed_ps1  	: std_logic_vector(3 downto 0);
   signal speed_ps2  	: std_logic_vector(5 downto 0);
   signal speed_ps3  	: std_logic_vector(4 downto 0);
@@ -426,7 +427,15 @@ architecture struct of core is
   attribute syn_keep of dbus_int  : signal is true;
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
-  
+
+  attribute mark_debug : string;
+  attribute mark_debug of dbus_int: signal is "true";  
+  attribute mark_debug of ybus: signal is "true";  
+  attribute mark_debug of pl: signal is "true";     
+  attribute mark_debug of plsel_n: signal is "true";
+  attribute mark_debug of clk_p: signal is "true"; 
+  attribute mark_debug of even_c: signal is "true"; 
+
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 
@@ -682,6 +691,7 @@ begin
     port map (
       -- Clock
       clk_p       => clk_p,
+      clk_p_n     => clk_p_n, 
       even_c      => even_c,
       clk_c_en       => clk_c_en,            
       --clk_c2_pos      => clk_c2_pos,            

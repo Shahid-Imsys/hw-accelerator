@@ -60,7 +60,7 @@ entity ionoc is
     ------------------------------------------------------
 
 
-    -- Domain clk_noc
+    -- Domain clk_noc (NOC)
     ------------------------------------------------------
     clk_noc       : in  std_logic;                      -- NOC Clock
     -- GPP CMD to NOC
@@ -71,6 +71,15 @@ entity ionoc is
     NOC_CMD_Flag  : in  std_logic;                      -- NOC command byte is valid
     NOC_CMD       : in  std_logic_vector(7 downto 0);   -- Command byte
     GPP_CMD_ACK   : out std_logic;                      -- GPP ack of command byte
+    -- NOC Data interface - for NOC request of data trx
+    NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request
+    NOC_LENGTH    : in  std_logic_vector(15 downto 0);  -- Length of NOC data request
+    NOC_DATA_DIR  : in  std_logic;                      -- Direction of NOC data request
+    NOC_WRITE_REQ : in  std_logic;                      -- NOC address, length and data direction is valid
+    IO_WRITE_ACK  : out std_logic;                      -- NOC data parameters have been read and can now be updated
+
+    -- Domain clk_noc (FIFOS)
+    ------------------------------------------------------
     -- NOC TxFIFO, read by IONOC
     TxFIFO_Ready  : out std_logic;                      -- Interface can accept a word from the TxIFO
     TxFIFO_Valid  : in  std_logic;                      -- TxFIFO has availble data which is presented on bus
@@ -78,21 +87,7 @@ entity ionoc is
     -- NOC RxFIFO, written to by IONOC
     RxFIFO_Ready  : in  std_logic;                      -- RxFIFO can accept a word from the IO-bus
     RxFIFO_Valid  : out std_logic;                      -- Interface has availble data which is presented on bus
-    RxFIFO_Data   : out std_logic_vector(127 downto 0); -- RxFIFO data
-    -- FIFO Level signals
-    TxFIFO_READY_1 : in  std_logic;                     -- 1 word
-    TxFIFO_READY_2 : in  std_logic;                     -- 16 words
-    TxFIFO_READY_3 : in  std_logic;                     -- 24 words
-    --
-    RxFIFO_READY_1  : in  std_logic;                    -- 1 word
-    RxFIFO_READY_2  : in  std_logic;                    -- 16 words
-    RxFIFO_READY_3  : in  std_logic;                    -- 24 words
-    -- NOC Data interface - for NOC request of data trx
-    NOC_ADDRESS   : in  std_logic_vector(31 downto 0);  -- Memory address of NOC data request
-    NOC_LENGTH    : in  std_logic_vector(15 downto 0);  -- Length of NOC data request
-    NOC_DATA_DIR  : in  std_logic;                      -- Direction of NOC data request
-    NOC_WRITE_REQ : in  std_logic;                      -- NOC address, length and data direction is valid
-    IO_WRITE_ACK  : out std_logic                       -- NOC data parameters have been read and can now be updated
+    RxFIFO_Data   : out std_logic_vector(127 downto 0)  -- RxFIFO data
     ------------------------------------------------------
     );
 end ionoc;
@@ -189,6 +184,8 @@ architecture rtl of ionoc is
   signal ionoc_rxfifo_valid_f : std_logic;
 
   -- TxFIFO Data to GPP
+  signal TxFIFO_Ready_int     : std_logic;
+  --
   signal ionoc_txfifo_valid_f : std_logic;
   signal ionoc_rddata_noc     : ionoc_cache_t;  -- Local fifo data cache
   --
@@ -202,6 +199,11 @@ architecture rtl of ionoc is
   --
   signal ionoc_wrdata_pending : boolean;
   signal ionoc_rddata_pending : boolean;
+
+  attribute mark_debug : string;
+  attribute mark_debug of ionoc_rdstatus: signal is "true"; 
+  attribute mark_debug of RxFIFO_Valid_int: signal is "true"; 
+  attribute mark_debug of TxFIFO_Ready_int: signal is "true"; 
 
 begin
 
@@ -226,7 +228,7 @@ begin
 -----------------------
   ionoc_rdstatus(5 downto 4) <= (others => '0'); -- Not in use
 -----------------------
-  ionoc_rdstatus(6)          <= '1' when ionoc_wrdata_pending else
+  ionoc_rdstatus(6) <= '1' when ionoc_wrdata_pending else
                        '0';  -- There is written data not read by RxFIFO
   ionoc_rdstatus(7) <= '1' when ionoc_rddata_pending else
                        '0';  -- There is data read from TxFIFO available
@@ -239,7 +241,7 @@ begin
   ido <= ionoc_rdcmd when cmd_sel = '1' else
          ionoc_rdbyte    when data_sel = '1' else
          ionoc_rdaddr    when addr_sel = '1' else
-         ionoc_rdlength  when addr_sel = '1' else
+         ionoc_rdlength  when length_sel = '1' else
          ionoc_rddatadir when datadir_sel = '1' else
          ionoc_rdstatus;  -- when status_sel = '1' else
 
@@ -272,7 +274,8 @@ begin
 ------------------------------------------------------
 -- clk_noc concurrent statements
 ------------------------------------------------------
-  GPP_CMD_ACK <= GPP_CMD_ACK_int;
+  GPP_CMD_ACK  <= GPP_CMD_ACK_int;
+  TxFIFO_Ready <= TxFIFO_Ready_int;
 ------------------------------------------------------
 
 
@@ -540,9 +543,9 @@ begin
       GPP_CMD      <= (others => '0');
       GPP_CMD_Flag <= '0';
       --
-      RxFIFO_Data  <= (others => '0');
-      RxFIFO_Valid <= '0';
-      TxFIFO_Ready <= '0';
+      RxFIFO_Data      <= (others => '0');
+      RxFIFO_Valid     <= '0';
+      TxFIFO_Ready_int <= '0';
 
       -- Process signals
       GPP_CMD_Flag_int        <= '0';
@@ -632,9 +635,7 @@ begin
         end loop;
       end if;
       --
-      if RxFIFO_Valid_int = '1' then
-        RxFIFO_Valid <= '1';
-      end if;
+      RxFIFO_Valid <= RxFIFO_Valid_int;
       --
       if ionoc_rxfifo_valid_f = '1' and
         not ionoc_wrdata_pending then
@@ -644,7 +645,6 @@ begin
       if RxFIFO_Ready = '1' and
         RxFIFO_Valid_int = '1' then
         RxFIFO_Valid_int     <= '0';
-        RxFIFO_Valid         <= '0';
         ionoc_rxfifo_valid_f <= '1';
       end if;
 
@@ -652,27 +652,28 @@ begin
       -- TxFIFO Interface
       --
 
-      -- TxFIFO is offering data, make copy
-      if TxFIFO_Valid = '1' and
-        ionoc_txfifo_valid_f = '0' then
-        ionoc_txfifo_valid_f <= '1';
-        TxFIFO_Ready         <= '0';    -- Do not allow more data from TxFIFO
-        --
-        for b in ionoc_rddata_noc'range loop
-          ionoc_rddata_noc(b) <= TxFIFO_Data(8*b + 7 downto 8*b);
-        end loop;
-      end if;
-      --
+      -- IO-bus has read data
       if ionoc_txfifo_valid_f = '1' and
         ionoc_rddata_pending then
         -- Data presented to IO-bus interface
         ionoc_txfifo_valid_f <= '0';
       end if;
-      --
-      if ionoc_txfifo_valid_f = '0' and
+
+      -- TxFIFO is offering data, make copy
+      if TxFIFO_Valid     = '1' and
+        TxFIFO_Ready_int     = '1' and
         not ionoc_rddata_pending then
-        -- Data is cumsumed, prepare for next word
-        TxFIFO_Ready <= '1';
+        ionoc_txfifo_valid_f <= '1';
+        TxFIFO_Ready_int     <= '0';    -- Do not allow more data from TxFIFO
+        --
+        for b in ionoc_rddata_noc'range loop
+          ionoc_rddata_noc(b) <= TxFIFO_Data(8*b + 7 downto 8*b);
+        end loop;
+
+      elsif ionoc_txfifo_valid_f = '0' and
+        not ionoc_rddata_pending then
+        -- Data is consumed, prepare for next word
+        TxFIFO_Ready_int <= '1';
       end if;
 
     end if;  -- clk_noc
@@ -697,14 +698,12 @@ begin
       ------------------------------------------------------------
       -- Handle write index and wrdata pending flag
       --
-      if data_wr = '0' or ionoc_rxfifo_valid_f = '1' then
+      if ilioa = '0' then
         ionoc_datawrindex <= 0;         -- Reset write index on new data access
 
       elsif data_wr = '1' and clk_i_pos = '0' then
         -- IO bus writes to word cache
         ionoc_wrdata(ionoc_datawrindex) <= idi;
-        -- Reset pending flag when word is updated
-        ionoc_wrdata_pending            <= false;
         --
         if ionoc_datawrindex /= (ionoc_wrdata'length - 1) then
           ionoc_datawrindex <= ionoc_datawrindex + 1;

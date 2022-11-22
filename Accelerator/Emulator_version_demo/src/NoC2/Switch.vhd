@@ -30,7 +30,8 @@ entity Switch is
         Decoder                 : in  std_logic_vector(15 downto 0);
         switch_input_muxes      : in  std_logic_vector(2 downto 0);
         switch_Noc_bus_mux      : in  std_logic;
-        Noc_bus_out             : out std_logic_vector(127 downto 0);
+        EN_Noc_byte_data        : in  std_logic;
+        Noc_byte_data           : out std_logic_vector(127 downto 0);
         switch_out              : out std_logic_vector(127 downto 0)    
     );        
 end Switch;
@@ -71,7 +72,7 @@ begin
 		end loop;
 	end process;
 	
-	process (Decoder,switch_mux_In)
+	process (switch_mux_In,switch_input_muxes)
     begin
 		for i in 0 to 15 loop
 			if switch_input_muxes(0) ='0' then
@@ -82,7 +83,8 @@ begin
 		end loop;
 	end process;
 	
-	Noc_bus_out    <= switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus when switch_Noc_bus_mux = '1' else
-	                  mux_m(15) & mux_m(14) & mux_m(13) & mux_m(12) & mux_m(11) & mux_m(10) & mux_m(9) & mux_m(8) & mux_m(7) & mux_m(6) & mux_m(5) & mux_m(4) & mux_m(3) & mux_m(2) & mux_m(1) & mux_m(0);
+	Noc_byte_data     <= switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus & switch_bus when (switch_Noc_bus_mux = '1' and EN_Noc_byte_data = '1') else
+	                  mux_m(15) & mux_m(14) & mux_m(13) & mux_m(12) & mux_m(11) & mux_m(10) & mux_m(9) & mux_m(8) & mux_m(7) & mux_m(6) & mux_m(5) & mux_m(4) & mux_m(3) & mux_m(2) & mux_m(1) & mux_m(0) when EN_Noc_byte_data = '1'
+	                  else (others => '0');
     switch_out     <= switch_mux_In(15) & switch_mux_In(14) & switch_mux_In(13) & switch_mux_In(12) & switch_mux_In(11) & switch_mux_In(10) & switch_mux_In(9) & switch_mux_In(8) & switch_mux_In(7) & switch_mux_In(6) & switch_mux_In(5) & switch_mux_In(4) & switch_mux_In(3) & switch_mux_In(2) & switch_mux_In(1) & switch_mux_In(0);
 end Behavioral;

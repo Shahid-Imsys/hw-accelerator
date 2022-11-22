@@ -108,6 +108,8 @@ entity ports is
     rx1_irq    : in  std_logic;
     rx2_irq    : in  std_logic;
     tx_irq     : in  std_logic;
+    wdog2_n    : in  std_logic;
+    noc_irq    : in  std_logic;
     -- signals to/from TIU(timer)
     tiu_out    : in  std_logic_vector(7 downto 0);
     pulseout   : in  std_logic_vector(7 downto 0);
@@ -184,12 +186,12 @@ architecture rtl of ports is
   signal adc_edge     : std_logic;
   signal adc_irq      : std_logic;
 
-  signal port_irq_in    : std_logic_vector(5 downto 0);
-  signal port_irq_rst   : std_logic_vector(5 downto 0);
-  signal port_irq_latch : std_logic_vector(5 downto 0);
-  signal port_irq_ff    : std_logic_vector(5 downto 0);
-  signal port_irq       : std_logic_vector(5 downto 0);
-  signal port_irq_en    : std_logic_vector(5 downto 0);  --add by maning
+  signal port_irq_in    : std_logic_vector(4 downto 0);
+  signal port_irq_rst   : std_logic_vector(4 downto 0);
+  signal port_irq_latch : std_logic_vector(4 downto 0);
+  signal port_irq_ff    : std_logic_vector(4 downto 0);
+  signal port_irq       : std_logic_vector(4 downto 0);
+  signal port_irq_en    : std_logic_vector(4 downto 0);  --add by maning
 
   signal dac_data_d : dac_data_type;
   signal dac_data_int : dac_data_type;
@@ -433,17 +435,17 @@ begin
   -- 4. Processor set the mask bit again to enable further interrupt.
 
   -- Re-assign interrupt control registers.
-  pi_int(PORT_IRQ0) <= irq0_src;        -- Read source vector using DPORT
-  irq0_en           <= pen_int(PORT_IRQ0);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ0) <= irq0_src;           -- Read source vector using DPORT
+  irq0_en           <= pen_int(PORT_IRQ0); -- Write and read enable register using CPORT
 
-  pi_int(PORT_IRQ1) <= irq1_src;        -- Read source vector using DPORT
-  irq1_en           <= pen_int(PORT_IRQ1);  -- Write and read enable register using CPORT
+  pi_int(PORT_IRQ1) <= irq1_src;           -- Read source vector using DPORT
+  irq1_en           <= pen_int(PORT_IRQ1); -- Write and read enable register using CPORT
 
   -- Put together interrupt source vectors.
   irq0_src(7 downto 3) <= rx1_irq & rx2_irq & tx_irq & port_irq(1 downto 0);
   irq0_src(IRQ_ADC)    <= adc_irq;
   irq0_src(1 downto 0) <= tiu_irq & (not mirq0_i);
-  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & port_irq(5 downto 2) & (not mirq1_i);
+  irq1_src             <= uart1_irq & uart2_irq & uart3_irq & (not wdog2_n) & noc_irq & port_irq(3 downto 2) & (not mirq1_i);
 
   -- Mask interrupt sources with interrupt enable registers
   -- and gate them together to form two interrupt request lines
@@ -462,7 +464,7 @@ begin
     end loop;
   end process;
 
-  port_irq_in     <= pbi(5 downto 0);
+  port_irq_in     <= pbi(4 downto 0);
 --      port_irq_rst(1) <= pen_ld(PORT_IRQ0) and dtp(4);
 --      port_irq_rst(0) <= pen_ld(PORT_IRQ0) and dtp(3);
 --      port_irq_rst(5) <= pen_ld(PORT_IRQ1) and dtp(4);
@@ -471,7 +473,7 @@ begin
 --      port_irq_rst(2) <= pen_ld(PORT_IRQ1) and dtp(1);
   port_irq_rst(1) <= po_ld(PORT_IRQ0) and dtp(4);
   port_irq_rst(0) <= po_ld(PORT_IRQ0) and dtp(3);
-  port_irq_rst(5) <= po_ld(PORT_IRQ1) and dtp(4);
+--  port_irq_rst(5) <= po_ld(PORT_IRQ1) and dtp(4);
   port_irq_rst(4) <= po_ld(PORT_IRQ1) and dtp(3);
   port_irq_rst(3) <= po_ld(PORT_IRQ1) and dtp(2);
   port_irq_rst(2) <= po_ld(PORT_IRQ1) and dtp(1);
@@ -508,7 +510,7 @@ begin
 --      end process;
 --------------------maning commented the above codes in 2012-06-15 09:41:32---------------------
 ----------------------------------the modified code start---------------------------------------
-  port_irq_en <= irq1_en(4 downto 1) & irq0_en(4 downto 3);
+  port_irq_en <= irq1_en(3 downto 1) & irq0_en(4 downto 3);
 
   process (clk_p)
   begin
@@ -536,11 +538,11 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst_en = '0' then
-        for i in 0 to 5 loop
+        for i in 0 to 4 loop
           port_irq(i) <= '0';
         end loop;
       else
-        for i in 0 to 5 loop
+        for i in 0 to 4 loop
           if port_irq_rst(i) = '1' or port_irq_en(i) = '0' then  --clear the interrupt when clearing it or not enable
             port_irq(i) <= '0';
           elsif port_irq_latch(i) = '1' and port_irq_ff(i) = '0' then
@@ -652,9 +654,12 @@ begin
             sft_out <= '0';
           end if;
 
-        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then
-          -- Rising edge of sft_clk (after double regs)
+        -- Falling edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '0' and sft_clk_d(0) = '1' then  
           sft_out <= sft_reg(8);
+
+        -- Rising edge of sft_clk (after double regs)
+        elsif sft_clk_d(1) = '1' and sft_clk_d(0) = '0' then  
 
           if pulseout(7) = '0' then
             case sft_in_sel is

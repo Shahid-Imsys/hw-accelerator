@@ -89,6 +89,7 @@ entity acore is
     crb_sel     : out std_logic_vector(3 downto 0);
     --  Signals to/from Peripheral block
     dfp         : in  std_logic_vector(7 downto 0); 
+    wdog2_n     : out std_logic;
     --dbus        : out std_logic_vector(7 downto 0);
     --rst_en      : out std_logic;
     --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
@@ -181,7 +182,7 @@ architecture struct of acore is
   --signal en_mexec   	: std_logic;
   --signal en_s       	: std_logic;
   --signal speed_s    	: std_logic_vector(1 downto 0);
-  --signal speed_u    	: std_logic_vector(6 downto 0);
+  --signal speed_u    	: std_logic_vector(9 downto 0);
   --signal speed_ps1  	: std_logic_vector(3 downto 0);
   --signal speed_ps2  	: std_logic_vector(5 downto 0);
   --signal speed_ps3  	: std_logic_vector(4 downto 0);
@@ -203,7 +204,6 @@ architecture struct of acore is
   signal trace      : std_logic;                    
   signal ld_nreg    : std_logic;                    
   signal reqrun     : std_logic;                    
-  signal wdog_n     : std_logic;                    
   signal ld_crb     : std_logic;                    
   signal rst_seqc_n : std_logic;                    
   signal dsi        : std_logic_vector(7 downto 0); 
@@ -462,7 +462,7 @@ begin
       trace         => trace,           
       ld_nreg       => ld_nreg,           
       reqrun        => reqrun,              
-      wdog_n        => wdog_n,                
+      wdog_n        => wdog2_n,                
       ld_crb        => ld_crb,                
       rst_seqc_n    => rst_seqc_n,             
       --Data Outputs

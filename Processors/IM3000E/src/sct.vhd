@@ -113,6 +113,17 @@ architecture rtl of sct is
 	signal errcode			: std_logic_vector(1 downto 0);		-- Error code
 	signal rin_int			: std_logic_vector(11 downto 0);	-- Internal copy of rin
 
+ 	attribute mark_debug : string;
+  	attribute mark_debug of st_full: signal is "true"; 
+  	attribute mark_debug of st_empty: signal is "true";
+  	attribute mark_debug of seq_des: signal is "true"; 
+	attribute mark_debug of seq_psh: signal is "true"; 
+  	attribute mark_debug of seq_pop_des: signal is "true";
+  	attribute mark_debug of st_pop: signal is "true"; 
+  	attribute mark_debug of st_push: signal is "true";
+  	attribute mark_debug of pl_seqc: signal is "true"; 
+
+
 begin
 	-- Create named signals for overlapping microprogram fields.
 	pl_map		<= pl_ad(3 downto 0);

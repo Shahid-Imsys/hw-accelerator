@@ -229,7 +229,6 @@ end component;
   signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
   signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
-  signal rd_ena         : std_logic;
   signal dataout_vld_o  : std_logic;
   signal continuous_mode: std_logic;
  
@@ -944,16 +943,6 @@ begin
 		   
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	
-  process(clk_e)
-  begin
-  	if rising_edge(clk_e) then
-  		if noc_cmd = "00100" then
-  		  rd_ena <= '1';
-  		else
-  		  rd_ena <= '0';
-  		end if;
-  	end if;
-  end process;
 
 				
   --Memory blocks

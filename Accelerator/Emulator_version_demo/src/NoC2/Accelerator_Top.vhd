@@ -108,6 +108,7 @@ architecture Behavioral of Accelerator_Top is
     signal PEC_WE        : std_logic_vector(PEC_NUMBER -1 downto 0);
     signal C_RDY         : std_logic_vector(PEC_NUMBER -1 downto 0); 
     signal PEC_Ready     : std_logic;
+    signal PEC_WE_noc    : std_logic;
      
 begin
 
@@ -121,7 +122,7 @@ begin
         Reset                   => Reset,
         PEC_Ready               => PEC_Ready,
         --NOC PEC INTERFACE 
-        PEC_WE                  => PEC_WE(0),
+        PEC_WE                  => PEC_WE_noc,
         PEC_byte_data           => PEC_byte_data, 
         Noc_byte_data           => Noc_byte_data,
         Tag_Line                => Tag_Line,
@@ -164,6 +165,7 @@ begin
      );
   end generate;
 
-PEC_Ready <= '1' when to_integer(unsigned(C_RDY)) = 2**PEC_NUMBER - 1 else '0';
+  PEC_Ready <= '1' when to_integer(unsigned(C_RDY)) = 2**PEC_NUMBER - 1 else '0';
+  PEC_WE_noc<= '1' when to_integer(unsigned(PEC_WE)) > 0 else '0';
 
 end Behavioral;

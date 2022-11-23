@@ -23,3 +23,5 @@ mkdir -p ../../To_RacyICS/Accelerator/src
 mkdir -p ../../To_RacyICS/IP
 cp -r ../IP/ ../../To_RacyICS/
 
+cp compile_order.txt ../../To_RacyICS/
+

@@ -203,7 +203,9 @@ architecture rtl of fpga_noc_adapter is
 
   attribute mark_debug : string;
   attribute mark_debug of TxFIFO_Data: signal is "true"; 
+  attribute mark_debug of RxFIFO_Data: signal is "true";
 
+  
 begin
 
   -- NOC interface

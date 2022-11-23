@@ -116,7 +116,7 @@ begin
         elsif mode_a_l = '1' and mode_b_l = '1' then
           bias_rst <= '1';
         end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' then
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and re_loop /=(re_loop'range => '0') then
         left_rst <= '0';
         right_rst <= '0';
         bias_rst <= '0';

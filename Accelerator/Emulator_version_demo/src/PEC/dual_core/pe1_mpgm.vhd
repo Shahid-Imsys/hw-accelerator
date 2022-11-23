@@ -73,12 +73,11 @@ end pe1_mpgm;
 architecture rtl of pe1_mpgm is
 	signal mprom_ce_int   : std_logic_vector(1 downto 0);
 	signal mpram_ce_int   : std_logic_vector(1 downto 0);
-	signal oe_sel  				: std_logic_vector(1 downto 0);
-	signal pmem_ce_nint		: std_logic;
-	signal patch_en				: std_logic;
-	signal patched				: std_logic;
-	signal patch_addr			: std_logic_vector(13 downto 0);
-	signal ram_addr				: std_logic_vector(7 downto 0); --CJ
+	signal oe_sel  	      : std_logic_vector(1 downto 0);
+	signal pmem_ce_nint	  : std_logic;
+	signal patched		  : std_logic;
+	signal patch_addr	  : std_logic_vector(13 downto 0);
+	signal ram_addr	      : std_logic_vector(7 downto 0); --CJ
 
 begin  -- rtl
 	-- Address muxes
@@ -191,19 +190,5 @@ begin  -- rtl
 	mprom_oe(1) <= '1' when oe_sel = "01" and (even_c = '0' or held_e = '1') else '0'; --
 	mpram_oe(0) <= '1' when oe_sel = "10" and (even_c = '0' or held_e = '1') else '0'; --
 	mpram_oe(1) <= '1' when oe_sel = "11" and (even_c = '0' or held_e = '1') else '0'; --
-
-	-- Patch detection, disabled when writing
-	process (clk_p)
-	begin
-	    if rising_edge(clk_p) then
-		    if rst_cn = '0' then
-			    patch_en	<= '0';
-		    elsif (clk_e_neg = '0') then   --falling edge of clk_e
-			    patch_en	<= not pmem_ce_nint and plsel_n and not lmpen;
-			end if;
-		end if;
-	end process;
-
-	--patched <= patch_en and (pmem_q(0) or pmem_q(1));
 
 end rtl;

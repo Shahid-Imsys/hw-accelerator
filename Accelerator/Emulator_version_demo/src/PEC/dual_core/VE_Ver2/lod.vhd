@@ -27,7 +27,7 @@ architecture basic of lod is
   signal to_detect : std_logic_vector(31 downto 0);
   signal leading_one : unsigned(4 downto 0);
   signal lzo1, lzo2, lzo3 : unsigned(4 downto 0);
-  signal to_sign, s1, s2, s3 : std_logic;
+  signal to_sign, s1, s2 : std_logic;
   signal diff1, diff2, diff3, unnorm, unnormb, deta, detb : signed(5 downto 0);
 
 begin
@@ -86,7 +86,6 @@ process(clk)
             s2 <= to_sign;
           elsif ctrl.store = store3 then
             lzo3 <= leading_one;
-            s3 <= to_sign;
           end if;
         end if;
       end if;

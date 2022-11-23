@@ -169,32 +169,32 @@ end component;
 
 
   --Clock signals
-  signal even_p_int     : std_logic                    :='0';        --even pulses of clk_p,should have the same phase as the even_c in PE
-  signal even_p_1       : std_logic                    :='0';        --delta delay signals
-  signal even_p_2       : std_logic                    :='0';        --delta delay signals 
-  signal even_p_3       : std_logic                    :='0';
-  signal rst_i          : std_logic                    :='1';
+  signal even_p_int     : std_logic;        --even pulses of clk_p,should have the same phase as the even_c in PE
+  signal even_p_1       : std_logic;        --delta delay signals
+  signal even_p_2       : std_logic;        --delta delay signals 
+  signal even_p_3       : std_logic;
+  signal rst_i          : std_logic;
   --Control flip-flops  --TBD
-  signal c_rdy_i        : std_logic                    :='1';        --Cluster ready feedback
-  signal exe_i          : std_logic                    :='0';        --Execution
-  signal resume_i       : std_logic                    :='0';        --Continue
-  signal peci_busy      : std_logic                    :='0';   --Cluster interface busy 
-  signal sig_fin        : std_logic                    :='0';   --Tag signal collected
-  signal noc_reg_rdy    : std_logic                    :='0';   --NOC data register ready to interact with cluster memory words
-  signal noc_delay      : std_logic                    :='0';        --one clock_e delay for noc_reg_rdy. Used to trigger 
-  signal noc_write      : std_logic                    :='0';   --Write command
-  signal noc_read       : std_logic                    :='0';   --Read command
-  signal pe_write       : std_logic                    :='0';
-  signal pe_read        : std_logic                    :='0';
-  signal delay          : std_logic                    :='0';   --Delay flipflop
-  signal pe_req_type    : std_logic_vector(1 downto 0) :="00";
-  signal cb_status      : std_logic                    :='0';
-  signal req_bexe       : std_logic                    :='0';
-  signal req_exe        : std_logic                    :='0';
-  signal write_req      : std_logic                    :='0';
-  signal bc_i           : std_logic_vector(6 downto 0) := (others => '0');
-  signal datain_vld     : std_logic                    := '0';
-  signal dataout_vld    : std_logic                    := '0';
+  signal c_rdy_i        : std_logic;        --Cluster ready feedback
+  signal exe_i          : std_logic;        --Execution
+  signal resume_i       : std_logic;        --Continue
+  signal peci_busy      : std_logic;   --Cluster interface busy 
+  signal sig_fin        : std_logic;   --Tag signal collected
+  signal noc_reg_rdy    : std_logic;   --NOC data register ready to interact with cluster memory words
+  signal noc_delay      : std_logic;        --one clock_e delay for noc_reg_rdy. Used to trigger 
+  signal noc_write      : std_logic;   --Write command
+  signal noc_read       : std_logic;   --Read command
+  signal pe_write       : std_logic;
+  signal pe_read        : std_logic;
+  signal delay          : std_logic;   --Delay flipflop
+  signal pe_req_type    : std_logic_vector(1 downto 0);
+  signal cb_status      : std_logic;
+  signal req_bexe       : std_logic;
+  signal req_exe        : std_logic;
+  signal write_req      : std_logic;
+  signal bc_i           : std_logic_vector(6 downto 0);
+  signal datain_vld     : std_logic;
+  signal dataout_vld    : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in         : reg;                             --Input register to memory
@@ -205,39 +205,36 @@ end component;
   signal sync_collector : std_logic_vector(1 downto 0);
   signal pe_data_in     : reg;                             --Input register form pe side
   signal data_core_int  : reg;                             --Data register for PE --pe_data_out
-  signal req_last       : std_logic_vector(5 downto 0)  := (others => '0');    --Request last field
-  signal addr_c         : std_logic_vector(14 downto 0) := (others => '0');   --CMEM column address pointer
-  signal addr_n         : std_logic_vector(14 downto 0) := (others => '0');   --NOC address pointer  
-  signal addr_p         : std_logic_vector(14 downto 0) := (others => '0');   --PE  side address pointer
-  signal req_addr_p     : std_logic_vector(14 downto 0) := (others => '0');
-  signal noc_cmd_buf    : std_logic_vector(4 downto 0)  := (others => '0');    --NOC command buffer
-  signal noc_cmd        : std_logic_vector(4 downto 0)  := (others => '0');    --NOC command control register
-  signal id_num         : std_logic_vector(5 downto 0)  := (others => '0');
-  signal wr_i           : std_logic                     := '0';
-  signal rd_i           : std_logic                     := '0';
+  signal req_last       : std_logic_vector(5 downto 0);    --Request last field
+  signal addr_c         : std_logic_vector(14 downto 0);   --CMEM column address pointer
+  signal addr_n         : std_logic_vector(14 downto 0);   --NOC address pointer  
+  signal addr_p         : std_logic_vector(14 downto 0);   --PE  side address pointer
+  signal noc_cmd_buf    : std_logic_vector(4 downto 0);    --NOC command buffer
+  signal noc_cmd        : std_logic_vector(4 downto 0);    --NOC command control register
+  signal id_num         : std_logic_vector(5 downto 0);
+  signal wr_i           : std_logic;
+  signal rd_i           : std_logic;
   --State machine
-  signal byte_ctr       : std_logic_vector(3 downto 0)  :="0000";  --Byte counter
-  signal len_ctr        : std_logic_vector(14 downto 0) := (others => '0');
-  signal len_ctr_p      : std_logic_vector(8 downto 0)  := (others => '0');
-  signal pk_reg         : std_logic_vector(3 downto 0)  := (others => '0');    --Data pack size register, length TBD or to be a constant instead
-  signal pk_ctr         : std_logic_vector(3 downto 0)  := (others => '0');
-  signal dist_reg       : std_logic_vector(3 downto 0)  := (others => '0');    --Data pack distance register, length TBD
-  signal dist_ctr       : std_logic_vector(3 downto 0)  := (others => '0');
-  signal b_cast_ctr     : std_logic_vector(5 downto 0)  := (others => '0');
-  signal write_count    : std_logic_vector(1 downto 0)  := (others => '0');    --Wr req data counter
+  signal byte_ctr       : std_logic_vector(3 downto 0);  --Byte counter
+  signal len_ctr        : std_logic_vector(14 downto 0);
+  signal len_ctr_p      : std_logic_vector(8 downto 0);
+  signal pk_reg         : std_logic_vector(3 downto 0);    --Data pack size register, length TBD or to be a constant instead
+  signal pk_ctr         : std_logic_vector(3 downto 0);
+  signal dist_reg       : std_logic_vector(3 downto 0);    --Data pack distance register, length TBD
+  signal dist_ctr       : std_logic_vector(3 downto 0);
+  signal b_cast_ctr     : std_logic_vector(5 downto 0);
   --Delay signal
-  signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0) := (others => '0');
-  signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0) := (others => '0');
-  signal delay_pipe     : std_logic_vector(7 downto 0) := (others => '0');    --for delay between tag shift finishes and sync pulse comes
-  signal rd_ena         : std_logic := '0';
-  signal dataout_vld_o  : std_logic := '0';
-  signal continuous_mode: std_logic := '0';
+  signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
+  signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
+  signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
+  signal dataout_vld_o  : std_logic;
+  signal continuous_mode: std_logic;
  
-  signal standby        : std_logic := '1';
-  signal delay2         : std_logic := '0';
+  signal standby        : std_logic;
+  signal delay2         : std_logic;
   signal tag_ctr_2      : unsigned(5 downto 0) := "011110"; --30  --"101101"; --azzz back to 30 to remove addr2, azzzz 45 "to add addr2 in tag line" --"011110"; --30
   signal tag_ctr_3      : unsigned(5 downto 0) := "100110"; --38
-  signal tag_ctr_1      : unsigned(5 downto 0) := "000000";
+  signal tag_ctr_1      : unsigned(5 downto 0);
   
   type cmem_out_type is array(0 to 3) of std_logic_vector(127 downto 0);
   signal cmem_dout : cmem_out_type;
@@ -248,13 +245,13 @@ end component;
   signal cmem_addr : std_logic_vector(12 downto 0);
 
 
-    attribute mark_debug : string; 
-    attribute mark_debug of noc_cmd: signal is "true";
-    attribute mark_debug of sync_collector: signal is "true";
-    attribute mark_debug of datain_vld: signal is "true";
-    attribute mark_debug of dataout_vld: signal is "true";
-    attribute mark_debug of noc_reg_rdy: signal is "true";
-    attribute mark_debug of noc_write: signal is "true";
+  attribute mark_debug : string; 
+  attribute mark_debug of noc_cmd: signal is "true";
+  attribute mark_debug of sync_collector: signal is "true";
+  attribute mark_debug of datain_vld: signal is "true";
+  attribute mark_debug of dataout_vld: signal is "true";
+  attribute mark_debug of noc_reg_rdy: signal is "true";
+  attribute mark_debug of noc_write: signal is "true";
 	attribute mark_debug of wr_i: signal is "true";
 	attribute mark_debug of rd_i: signal is "true";
 	attribute mark_debug of cmem_we: signal is "true";
@@ -577,10 +574,6 @@ begin
 			  		noc_reg_rdy <= '0';
             noc_read    <= '0';
 			  	end if;   
-			  else 
-			  	noc_reg_rdy <= '0';
-          noc_write   <= '0';
-          noc_read    <= '0';
 	      end if;
 			end if;
 		end if;
@@ -753,17 +746,14 @@ begin
  		if rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
 			if noc_cmd = "01111" or RST_E = '0' then
 				pe_req_type <= (others => '0');
-				req_addr_p  <= (others => '0');
 				req_last    <= (others => '0');
         bc_i        <= (others => '0');
 			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
- 				req_addr_p  <= REQ_FIFO(14 downto 0);
  				req_last    <= REQ_FIFO(29 downto 24);
         bc_i(0)     <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
       elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
         pe_req_type <= (others => '0');
-				req_addr_p  <= (others => '0');
 				req_last    <= (others => '0');
         bc_i(0)     <= '0';
  			end if;
@@ -786,6 +776,7 @@ begin
 				cb_status  <= '0';
 				b_cast_ctr <= (others => '0');
 				write_req  <= '0';
+        id_num     <= (others => '0');
 			elsif even_p_int = '0' then 
 			  if req_exe = '0' and req_bexe = '0' then
 			    if pe_req_type = "01" then
@@ -835,7 +826,6 @@ begin
 			if noc_cmd = "01111" or RST_E = '0' then
 				addr_p      <= (others => '0');
 				len_ctr_p   <= (others => '0');
-				write_count <= "00";
 				pe_write    <= '0';
 				pe_read     <= '0';
 			elsif even_p_int = '0' then
@@ -900,8 +890,8 @@ begin
     	      end loop;
     	      	DATA_VLD <= not noc_reg_rdy;
           else
-              DATA_TO_PE <= (others=>'0');
-              DATA_VLD   <= '0';
+            DATA_TO_PE <= (others=>'0');
+            DATA_VLD   <= '0';
           end if;
 			  end if;
       end if;
@@ -947,16 +937,6 @@ begin
 		   
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	
-  process(clk_e)
-  begin
-  	if rising_edge(clk_e) then
-  		if noc_cmd = "00100" then
-  		  rd_ena <= '1';
-  		else
-  		  rd_ena <= '0';
-  		end if;
-  	end if;
-  end process;
 
 				
   --Memory blocks

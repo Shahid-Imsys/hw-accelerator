@@ -183,13 +183,21 @@ begin
             --ve_in_cnt <= (others => '0');
         elsif ld_dtm = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg(8*(to_integer(unsigned(dtm_mux_sel)))+7 downto 8*(to_integer(unsigned(dtm_mux_sel)))) <= YBUS;
-            ve_in_cnt <= (others => '0');
+            --ve_in_cnt <= (others => '0');
         elsif ve_dtm_rdy = '1' then
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
-            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+            if unsigned(ve_in_cnt) /= 3 then
+              ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+            else
+              ve_in_cnt <= (others => '0');
+            end if;
         elsif ld_dtm_v = '1' and CLK_E_POS = '1' then --rising_edge
             dtm_reg <= VE_DTMO(32*(to_integer(unsigned(ve_in_cnt)))+31 downto 32*(to_integer(unsigned(ve_in_cnt))));
-            ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+            if unsigned(ve_in_cnt) /= 3 then
+              ve_in_cnt <= std_logic_vector(to_unsigned(to_integer(unsigned(ve_in_cnt))+1,2));
+            else
+              ve_in_cnt <= (others => '0');
+            end if;
         end if;
     end if;
     end process;

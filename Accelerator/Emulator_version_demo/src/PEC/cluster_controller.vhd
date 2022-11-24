@@ -229,6 +229,7 @@ end component;
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
   signal dataout_vld_o  : std_logic;
   signal continuous_mode: std_logic;
+  signal FIFO_OUT_VLD   : std_logic;
  
   signal standby        : std_logic;
   signal delay2         : std_logic;
@@ -747,26 +748,26 @@ begin
 			if noc_cmd = "01111" or RST_E = '0' then
 				pe_req_type <= (others => '0');
 				req_last    <= (others => '0');
-        bc_i        <= (others => '0');
-			elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
+      --  bc_i        <= (others => '0');
+			elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_last    <= REQ_FIFO(29 downto 24);
-        bc_i(0)     <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
-      elsif (req_exe = '1' or req_bexe = '1')and len_ctr_p = "000000001" then
+      --  bc_i(0)     <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
+      elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
         pe_req_type <= (others => '0');
 				req_last    <= (others => '0');
-        bc_i(0)     <= '0';
+      --  bc_i(0)     <= '0';
  			end if;
-			for i in 0 to 5 loop
-				bc_i(i+1) <= bc_i(i);
-			end loop;
+			--for i in 0 to 5 loop
+			--	bc_i(i+1) <= bc_i(i);
+			--end loop;
  		end if;
  	end process;
 
-  BC<= bc_i(6);
+  --bc_i(6);
     
-	--Generate activation signals of counters for PEs' requests. 
-	--Including broadcast request, unicast request and write request.
+	--Generate activation signals of counters for PEs' requests.     --- this process needs reconstruct later 
+	--Including broadcast request, unicast request and write request.--- 
   process(clk_p) --Reset need to be added 
 	begin 
 		if rising_edge(clk_p) then
@@ -778,13 +779,15 @@ begin
 				write_req  <= '0';
         id_num     <= (others => '0');
 			elsif even_p_int = '0' then 
+        FIFO_OUT_VLD <= FIFO_VLD;
+        BC<= req_bexe;
 			  if req_exe = '0' and req_bexe = '0' then
 			    if pe_req_type = "01" then
 			    	if cb_status = '0' then
 			    		cb_status  <= '1';
 			    		b_cast_ctr <= req_last;
 			    	elsif cb_status = '1' then
-			    		if FIFO_VLD = '1' and b_cast_ctr /= "000000" then
+			    		if FIFO_OUT_VLD = '1' and b_cast_ctr /= "000000" then
 			    			b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6)); --test the last request income case
 			    		elsif b_cast_ctr = "000000" then
 			    			if len_ctr_p /= "000000000" then
@@ -809,8 +812,13 @@ begin
             req_bexe <= '0';
 			  	  cb_status <= '0';
           end if;
-        elsif req_exe = '1' then --Reset unicast signals
-			  	if len_ctr_p = "000000001" then
+        elsif req_exe = '1' then 
+          if cb_status = '1' and pe_req_type = "01" then -- patch the case that there is a uc coming in the middle of bc, cause bc counter not decrement.
+            if FIFO_OUT_VLD = '1' and b_cast_ctr /= "000000" then
+              b_cast_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(b_cast_ctr))-1,6));
+            end if;
+          end if;
+			  	if len_ctr_p = "000000001" then  --Reset unicast signals
             req_exe <= '0';
 			  	end if;
 			    write_req<= '0';
@@ -854,7 +862,7 @@ begin
               pe_write  <= '1';
 							len_ctr_p <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr_p))-1,9)); 
 						end if;
-					elsif FIFO_VLD = '1' and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
+					elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then
 						addr_p    <= REQ_FIFO(14 downto 0);
 						len_ctr_p <= std_logic_vector(unsigned('0' & REQ_FIFO(23 downto 16)) + 1);
 					elsif pe_req_type = "11" then  --Add trade off. For 4B version, the len_ctr is "11" but for 20B version, it is "00" instead.

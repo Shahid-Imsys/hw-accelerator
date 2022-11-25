@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 11.08.2022 15:14:19
 -- Design Name: 
@@ -45,20 +45,18 @@ architecture Behavioral of RM_as_generator is
     type RegL2_data_type is array (0 to 2) of unsigned(19 downto 0);
     type RegL3_data_type is array (0 to 1) of unsigned(19 downto 0);
     
-    signal Reg_L1       : RegL1_data_type;
-    signal Reg_L2       : RegL2_data_type;
-    signal Reg_L3       : RegL3_data_type;
-    signal Reg_L4       : unsigned(19 downto 0);
-    signal Reg_L4_p1    : unsigned(3 downto 0);
-    signal Reg_L4_p2    : unsigned(3 downto 0);
-    signal i            : integer;
-    signal RM_as_counter: unsigned(14 downto 0);
-    signal Load_IR1     : unsigned(5 downto 1);
-    signal err          : std_logic_vector(11 downto 0);
-    signal err_or       : std_logic;
-    signal err_ff       : std_logic;
-    signal Address_steps_0: unsigned(18 downto 0);
-    signal End_values_0 : unsigned(18 downto 0);
+    signal Reg_L1           : RegL1_data_type;
+    signal Reg_L2           : RegL2_data_type;
+    signal Reg_L3           : RegL3_data_type;
+    signal Reg_L4           : unsigned(19 downto 0);
+    signal Reg_L4_p1        : unsigned(3 downto 0);
+    signal Reg_L4_p2        : unsigned(3 downto 0);
+    signal i                : integer;
+    signal RM_as_counter    : unsigned(14 downto 0);
+    signal Load_IR1         : unsigned(5 downto 1);
+    signal err              : std_logic_vector(11 downto 0);
+    signal err_or           : std_logic;
+    signal err_ff           : std_logic;
      
 
 begin
@@ -87,29 +85,27 @@ begin
     err_or      <= err(0) or err(1) or err(2) or err(3) or err(4) or err(5) or err(6) or err(7) or err(8) or err(9) or err(10);
     RM_as_err   <= err_ff;
     
-    Address_steps_0 <= Address_steps(18 downto 0);
-    End_values_0    <= End_values(18 downto 0);
     
     process(clk, Reset)
     begin
         if Reset = '0' then
-            Reg_L1(0) <= (others => '0');
-            Reg_L1(1) <= (others => '0');
-            Reg_L1(2) <= (others => '0');
-            Reg_L1(3) <= (others => '0');
-            Reg_L1(4) <= (others => '0');
-            Reg_L1(5) <= (others => '0');
-            Reg_L2(0) <= (others => '0');
-            Reg_L2(1) <= (others => '0');
-            Reg_L2(2) <= (others => '0');
-            Reg_L3(0) <= (others => '0');
-            Reg_L3(1) <= (others => '0');
-            Reg_L4    <= (others => '0');
+            Reg_L1(0)       <= (others => '0');
+            Reg_L1(1)       <= (others => '0');
+            Reg_L1(2)       <= (others => '0');
+            Reg_L1(3)       <= (others => '0');
+            Reg_L1(4)       <= (others => '0');
+            Reg_L1(5)       <= (others => '0');
+            Reg_L2(0)       <= (others => '0');
+            Reg_L2(1)       <= (others => '0');
+            Reg_L2(2)       <= (others => '0');
+            Reg_L3(0)       <= (others => '0');
+            Reg_L3(1)       <= (others => '0');
+            Reg_L4          <= (others => '0');
             RM_as_counter   <= (others => '0');             
         elsif rising_edge(clk) then
             ---LOAD L1 REGs
             if Load_IR = '1' then
-                Reg_L1(0)  <= Address_steps_0 + Reg_L1(0);
+                Reg_L1(0)   <= Address_steps(18 downto 0) + Reg_L1(0);
             end if;
                         
             for i in 1 to 5 loop

@@ -62,7 +62,7 @@ architecture Behavioral of Accelerator_tb is
       );
     end component;
    
-    type progress_state is (waiting, send_cmd, rd, sending_ucode, sending_params, sending_kernels, sending_bias, sending_data, cmd_exe, executing);
+    type progress_state is (waiting, send_cmd, rd_cm, sending_ucode, sending_params, sending_kernels, sending_bias, sending_data, cmd_exe, executing, result_cmp);
     type program_mem_type   is array (127 downto 0) of std_logic_vector(127 downto 0);
 	  type program_mem_type_b is array (127 downto 0) of bit_vector(127 downto 0);
 	
@@ -96,7 +96,7 @@ architecture Behavioral of Accelerator_tb is
     constant kernels_sa  : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of kernels
     constant bias_sa     : std_logic_vector(14 downto 0) := "000001100000000"; --0x300, start address of bias
     constant data_sa     : std_logic_vector(14 DOWNTO 0) := "000010000000000"; --0x400, start address of input data
-    constant pw_out_a    : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
+    constant pw_out_sa   : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
     constant ucode_len   : integer := 256;
     constant param_len   : integer := 64;
     constant kernels_len : integer := 216;
@@ -267,7 +267,7 @@ architecture Behavioral of Accelerator_tb is
     signal    j             : integer := 0;
     signal    k             : integer := 0;
     signal    l             : integer := 0;
-    signal    m             : integer := 0;
+    signal    m             : integer := (pw_out_len)*16 - 1;
     signal    progress      : progress_state;--integer := 0;
     signal    progress2     : integer := 0;
     signal    broadcast     : integer := 0;
@@ -545,7 +545,13 @@ begin
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(ucode_len, 16)); 
         GPP_CMD_SA          <= ucode_sa;
         wait for 100 ns;
-        GPP_CMD_Flag        <= '0';                   
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
@@ -573,7 +579,13 @@ begin
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(param_len, 16)); 
         GPP_CMD_SA          <= param_sa;
         wait for 100 ns;
-        GPP_CMD_Flag        <= '0';                   
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                   
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
@@ -601,7 +613,13 @@ begin
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(kernels_len, 16)); 
         GPP_CMD_SA          <= kernels_sa;
         wait for 100 ns;
-        GPP_CMD_Flag        <= '0';                   
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                    
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
@@ -629,7 +647,13 @@ begin
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(bias_len, 16)); 
         GPP_CMD_SA          <= bias_sa;
         wait for 100 ns;
-        GPP_CMD_Flag        <= '0';                   
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                   
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
@@ -657,7 +681,13 @@ begin
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(data_len, 16)); 
         GPP_CMD_SA          <= data_sa;
         wait for 100 ns;
-        GPP_CMD_Flag        <= '0';                   
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                    
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
@@ -684,79 +714,99 @@ begin
         GPP_CMD_Data        <= x"00000000000000000000000000000038";
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0'; 
         progress <= executing;
         -----------------------------------------------------------------
-        ------------------------------End--------------------------------
+        --------------------------Wait--ready----------------------------
         -----------------------------------------------------------------
-        
-
+        wait until NOC_CMD_Data = x"02";
         -----------------------------------------------------------------
         ------------------------READ CM->MUX->EM-------------------------
         -----------------------------------------------------------------
---        GPP_CMD_Flag        <= '1';
---        GPP_CMD_Data        <= x"000000000000000000000000FFF00024";--x"00000000000000000000000080000024"; --512 200,  TS--256 TS 100       
---        wait for 200 ns;
---        GPP_CMD_Flag        <= '0';                   
---        wait for 400 ns;        
---        IO_WRITE_ACK        <= '1';
---        wait for 40 ns;
---        IO_WRITE_ACK        <= '0'; 
---        wait for 1000 ns;
---        FIFO_ready          <= "010000";  --FIFO_ready2 =1
---        wait for 380 ns;
---        for i in 0 to (Data_Transfer_Size2) -1 loop
---            FIFO_ready          <= "111000"; --FIFO_ready3 =1;
---            wait for 40 ns;
---            FIFO_ready          <= "001000"; --FIFO_ready3,2 =0;
---            wait for 280 ns; 
---        end loop;     
---        wait for 100ns;
+        progress            <= send_cmd;
+        GPP_CMD_Flag        <= '1';
+        GPP_CMD_Data        <= x"000000000000000000000000FFF00024";--x"00000000000000000000000080000024"; --512 200,  TS--256 TS 100       
+        GPP_CMD_LEN         <= std_logic_vector(to_unsigned(pw_out_len*16, 16)); 
+        GPP_CMD_SA          <= pw_out_sa;
+        wait for 100 ns;
+        GPP_CMD_Flag        <= '0';
+        if NOC_CMD_flag /= '1' then
+          wait;
+        end if;
+        GPP_CMD_ACK         <= '1';    
+        wait for 1000 ns;
+        GPP_CMD_ACK         <= '0';                    
+        wait for 400 ns;        
+        IO_WRITE_ACK        <= '1';
+        wait for 40 ns;
+        IO_WRITE_ACK        <= '0'; 
+        wait for 1000 ns;
+        FIFO_ready          <= "010000";  --FIFO_ready2 =1
+        wait for 380 ns;
+        progress <= rd_cm;
+        for i in 0 to (pw_out_len) -1 loop
+            FIFO_ready          <= "111000"; --FIFO_ready3 =1;
+            wait for 40 ns;
+            FIFO_ready          <= "001000"; --FIFO_ready3,2 =0;
+            wait for 280 ns; 
+        end loop; 
+        progress <= waiting;    
+        wait for 100ns;
         ----------------------------CM->MUX->EM--------------------------        
         ---------------------------------END-----------------------------       
         -----------------------------------------------------------------
 
 
---        -----------------------------Assertion---------------------------
---        wait for 1000ns;
---        progress <= 3;
---        k        <= 0;
---        j        <= 0;
---        if broadcast = 0 and broadcast_indexed = 0 and broadcast_sequential = 0 then
---            for k in 0 to Data_Transfer_Size -1 loop
---              assert (outword(k) = data_Input(k)) report "Incorrect output data in unicast"&integer'image(k) severity warning;
---              wait for 10 ns;
---            end loop;
---        elsif broadcast = 1 then 
---            for k in 0 to Data_Transfer_Size2 -1 loop
---                for j in 0 to 15 loop
---                  assert (outword(k *16 +j) = (data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8) & data_Input(k)(j*8 + 7 downto j*8))) report "Incorrect output data in broadcast"&integer'image(k *16 +j) severity warning;
---                  wait for 10 ns;
---                end loop;
---            end loop;
---            broadcast <= 0;
---        elsif broadcast_indexed = 1 then
---            for l in 0 to Data_Transfer_Size/4 -1 loop
---                for k in 0 to 3 loop
---                    for j in 0 to 3 loop
---                        for i in 0 to 3 loop
---                            assert (outword2((l*64) + (k *16) +(j *4) + i) = Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32))) report "Incorrect output data in broadcast_indexed"&integer'image((l*64) + (k *16) +(j *4) + i) severity warning;
---                        wait for 10 ns;
---                        end loop;
---                    end loop;  
---                end loop;
---            end loop;
---            broadcast_indexed <= 0;
-            
---        elsif broadcast_sequential = 1 then
---            for k in 0 to Data_Transfer_Size/16 -1 loop
---                for j in 0 to 15 loop
---                  assert (outword2(k *16 +j) = (Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8))) report "Incorrect output data in broadcast_sequential"&integer'image(k *16 +j) severity warning;
---                  wait for 10 ns;
---                end loop;
---            end loop;
---            broadcast_sequential <= 0;                     
---        end if;
---        -----------------------------------------------------------------
+        -----------------------------Assertion---------------------------
+        if NOC_DATA_EN /= '0' then
+          wait;
+        end if;
+        progress <= result_cmp;
+        k        <= 0;
+        j        <= 0;
+        if broadcast = 0 and broadcast_indexed = 0 and broadcast_sequential = 0 then
+            for k in 0 to data_len -1 loop
+              assert (outword(k) = data_pw(k)) report "Incorrect output data in unicast"&integer'image(k) severity warning;
+              wait for 10 ns;
+            end loop;
+        elsif broadcast = 1 then 
+            for k in 0 to pw_out_len -1 loop
+                --for j in 0 to 15 loop
+                  --assert (outword(k *16 +j) = (ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8))) report "Incorrect output data in broadcast"&integer'image(k *16 +j) severity warning;
+                  assert(outword(k) = ref_out(k)) report "Incorrect output data in broadcast"&integer'image(k) severity warning;
+                  wait for 10 ns;
+                --end loop;
+            end loop;
+            broadcast <= 0;
+        --elsif broadcast_indexed = 1 then
+        --    for l in 0 to Data_Transfer_Size/4 -1 loop
+        --        for k in 0 to 3 loop
+        --            for j in 0 to 3 loop
+        --                for i in 0 to 3 loop
+        --                    assert (outword2((l*64) + (k *16) +(j *4) + i) = Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32)) & Root_mem_data(i)((k*8) +(j*32) + 7 downto (k*8) +(j*32))) report "Incorrect output data in broadcast_indexed"&integer'image((l*64) + (k *16) +(j *4) + i) severity warning;
+        --                wait for 10 ns;
+        --                end loop;
+        --            end loop;  
+        --        end loop;
+        --    end loop;
+        --    broadcast_indexed <= 0;            
+        --elsif broadcast_sequential = 1 then
+        --    for k in 0 to Data_Transfer_Size/16 -1 loop
+        --        for j in 0 to 15 loop
+        --          assert (outword2(k *16 +j) = (Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8) & Root_mem_data(k)(j*8 + 7 downto j*8))) report "Incorrect output data in broadcast_sequential"&integer'image(k *16 +j) severity warning;
+        --          wait for 10 ns;
+        --        end loop;
+        --    end loop;
+        --    broadcast_sequential <= 0;                     
+        end if;
+        -----------------------------------------------------------------
+        ------------------------------End--------------------------------
+        -----------------------------------------------------------------
 
 
 
@@ -931,8 +981,9 @@ begin
 --        ------------------------------CM->RM-----------------------------       
 --        ---------------------------------END-----------------------------        
 --        -----------------------------------------------------------------
-     
-        wait for 10000000ns;                                  
+          report "simulation end";
+          finish;
+--        wait for 10000000ns;                                  
     end process;
 
     process(clk_e)
@@ -940,23 +991,36 @@ begin
         if rising_edge(clk_e) then
             if NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1C" then
                 outword(m) <= NOC_data;
-                m  <= m +1;
-                progress2 <= 5;
+                if m /= 0 then
+                  m  <= m - 1;
+                  progress2 <= 5; 
+                else
+                  progress2 <= 0;
+                end if;
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1A" then
                 outword(m) <= NOC_data;
-                m  <= m +1;
-                progress2 <= 5; 
+                if m /= 0 then
+                  m  <= m - 1;
+                  progress2 <= 5; 
+                else
+                  progress2 <= 0;
+                end if;
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"24" then
-                outword(m) <= NOC_data;
-                m  <= m +1;
-                progress2 <= 5; 
+                outword((pw_out_len - 1) - m/16)((m mod 16)*8 + 7 downto (m mod 16)*8) <= NOC_data(7 downto 0);
+                if m /= 0 then
+                  m  <= m - 1;
+                  progress2 <= 5; 
+                else
+                  progress2 <= 0;
+                end if; 
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"26" then
                 outword(m) <= NOC_data;
-                m  <= m +1;
-                progress2 <= 5;              
-            elsif m > Data_Transfer_Size -1 then
-                progress2 <= 0;
-                m  <= 0;                    
+                if m /= 0 then
+                  m  <= m - 1;
+                  progress2 <= 5; 
+                else
+                  progress2 <= 0;
+                end if;                                
             end if; 
         end if;   
     end process;

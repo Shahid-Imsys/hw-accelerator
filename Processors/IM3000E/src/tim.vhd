@@ -195,7 +195,9 @@ architecture rtl of tim is
   attribute mark_debug of single_step: signal is "true"; 
   attribute mark_debug of pl_shin_pa_sig: signal is "true";   
   attribute mark_debug of held_e_int: signal is "true"; 
-  attribute mark_debug of hold_flash: signal is "true";   
+  attribute mark_debug of hold_flash: signal is "true";  
+  attribute mark_debug of runmode_int: signal is "true";  
+  attribute mark_debug of sleep: signal is "true";  
 
 
 begin

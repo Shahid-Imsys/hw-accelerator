@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash 
 -- 
 -- Create Date: 04.04.2022 18:11:52
 -- Design Name: 

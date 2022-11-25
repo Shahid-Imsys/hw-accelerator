@@ -58,7 +58,6 @@ architecture Behavioral of Transpose_unit is
 
 begin
    
-
     Noc_reg_mux   <= Noc_reg_mux0  when TP_Interchange_FF = '1' else Noc_reg_mux1;
     Noc_data_mux  <= Noc_data_mux0 when TP_Interchange_FF = '1' else Noc_data_mux1;
     
@@ -95,10 +94,10 @@ begin
                         TP_Data0(addr_cntr0)(3)  & TP_Data0(addr_cntr0)(2)  & TP_Data0(addr_cntr0)(1)  & TP_Data0(addr_cntr0)(0) when Enable_TP0_UP = '1'   and TP0_RW = '0' and Reset = '1' else x"00000000000000000000000000000000" when Reset = '0' else  x"00000000000000000000000000000000";                                            
      
              
-    process(clk, reset)
+    process(clk, Reset)
     variable i : integer range 0 to 15 := 0;
     begin
-        if reset = '0' then
+        if Reset = '0' then
             addr_cntr1              <= 0;
             addr_cntr0              <= 0;      
             TP_Interchange_FF       <= '0';
@@ -168,7 +167,7 @@ begin
                     end if;        
                 end if;                
             end if;                    
-        end if; --reset
+        end if; --Reset
     end process;
 
 end Behavioral;

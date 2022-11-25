@@ -39,7 +39,6 @@ architecture Behavioral of CMD_to_GPP is
     --signal declaration
     signal  counter                 : unsigned(2 downto 0);
     signal  load                    : std_logic;
-    signal  clear                   : std_logic;
     signal  enable                  : std_logic;    
     signal  load_counter            : std_logic;
     signal  Reset_PEC_NOC_ERROR_FF  : std_logic;

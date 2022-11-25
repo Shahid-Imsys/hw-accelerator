@@ -192,7 +192,6 @@ end component;
   signal req_bexe       : std_logic;
   signal req_exe        : std_logic;
   signal write_req      : std_logic;
-  signal bc_i           : std_logic_vector(6 downto 0);
   signal datain_vld     : std_logic;
   signal dataout_vld    : std_logic;
   --Control registers
@@ -411,16 +410,18 @@ begin
 	delay_count: process(clk_e, RST_E)  
 	begin
 		if RST_E = '0' then
-      delay   <= '0';
-      delay2  <= '0';
-      delay_c <= (others => '0');
-      delay_b <= (others => '0');
+      delay      <= '0';
+      delay2     <= '0';
+      delay_c    <= (others => '0');
+      delay_b    <= (others => '0');
+      delay_pipe <= (others => '0');
     elsif rising_edge(clk_e) then
 			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
 				delay   <= '0';
 				delay2  <= '0';
 				delay_c <= (others => '0');
 				delay_b <= (others => '0');
+        delay_pipe <= (others => '0');
 			elsif noc_cmd = "00011" then		--WriteBlockC	
 			  if noc_reg_rdy = '1' and len_ctr = "000000000000001" then  --len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "000000000000000")
 				  delay  <= '0';
@@ -792,23 +793,16 @@ begin
 			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
 				pe_req_type <= (others => '0');
 				req_last    <= (others => '0');
-      --  bc_i        <= (others => '0');
 			elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
  				pe_req_type <= REQ_FIFO(31 downto 30);
  				req_last    <= REQ_FIFO(29 downto 24);
-      --  bc_i(0)     <= (not REQ_FIFO(31)) and REQ_FIFO(30); --Temp, to be integrated to id_num(req_last) field later for 16 PE version.
       elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
         pe_req_type <= (others => '0');
 				req_last    <= (others => '0');
-      --  bc_i(0)     <= '0';
  			end if;
-			--for i in 0 to 5 loop
-			--	bc_i(i+1) <= bc_i(i);
-			--end loop;
  		end if;
  	end process;
 
-  --bc_i(6);
     
 	--Generate activation signals of counters for PEs' requests.     --- this process needs reconstruct later 
 	--Including broadcast request, unicast request and write request.--- 

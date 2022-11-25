@@ -432,13 +432,6 @@ architecture struct of core is
   attribute mark_debug of dbus_int: signal is "true";  
   attribute mark_debug of ybus: signal is "true";  
   attribute mark_debug of pl: signal is "true";     
-  attribute mark_debug of plsel_n: signal is "true";
-  attribute mark_debug of even_c: signal is "true"; 
-
-  attribute mark_debug of hold_e_int: signal is "true";  
-  attribute mark_debug of ios_hold_e: signal is "true";
-  attribute mark_debug of mmr_hold_e: signal is "true";
-  attribute mark_debug of stop_step: signal is "true";
 
 begin
 ---------------------------------------------------------------------

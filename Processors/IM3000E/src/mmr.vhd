@@ -146,15 +146,6 @@ begin
     signal wait_rc        : std_logic;
     signal wait_pr        : std_logic;    
 
-  
-    attribute mark_debug : string;
-    attribute mark_debug of state: signal is "true";  
-    attribute mark_debug of pl_memcp_sig: signal is "true";
-    attribute mark_debug of wait_rp: signal is "true";
-    attribute mark_debug of wait_rc: signal is "true";
-    attribute mark_debug of wait_pr: signal is "true";   
-    attribute mark_debug of wait_dqi: signal is "true";  
-
   begin  -- block mtl
     -- This is the combinatorial part of the state machine
     -- for the SDRAM timing logic.

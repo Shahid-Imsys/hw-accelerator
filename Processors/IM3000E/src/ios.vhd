@@ -125,13 +125,6 @@ architecture rtl of ios is
   signal pl_pd_sig   : std_logic_vector(2 downto 0);   -- PD field
   attribute syn_keep : boolean;
   attribute syn_keep of idreq_int : signal is true;
-
-  attribute mark_debug : string;
-  attribute mark_debug of lioa_pend: signal is "true";  
-  attribute mark_debug of ldout_pend: signal is "true";
-  attribute mark_debug of next_pend: signal is "true";
-  attribute mark_debug of sync_pend: signal is "true";
-  attribute mark_debug of pl_pd_sig: signal is "true"; 
   
 begin
   pl_pd_sig <= ((pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38));

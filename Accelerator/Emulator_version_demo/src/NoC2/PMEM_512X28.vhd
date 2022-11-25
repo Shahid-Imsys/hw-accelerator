@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 31.10.2022 14:20:20
 -- Design Name: 
@@ -20,7 +20,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-
 
 entity PMEM_512X28 is
   Port (

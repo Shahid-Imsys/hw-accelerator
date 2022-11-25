@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 04.04.2022 15:59:21
 -- Design Name: 
@@ -36,7 +36,7 @@ entity Tag_Line_Block is
         PEC_CMD                 : in  std_logic_vector(5 downto 0);
         Tag_Line                : out std_logic;
         TAG_shift               : out std_logic      
-     );
+    );
 end Tag_Line_Block;
 
 architecture Behavioral of Tag_Line_Block is

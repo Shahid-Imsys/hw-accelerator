@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 05.04.2022 22:26:06
 -- Design Name: 
@@ -377,7 +377,7 @@ begin
 
     Tag_Line        <= Tag_Line_i or Sync_pulse_i or Sync_pulse_i_p;
     
-    NOC_data        <= Mux_Demux_out1 when NOC_data_mux_ctrl = '1' else Noc_data_mux;  --????????need to check code
+    NOC_data        <= Mux_Demux_out1 when NOC_data_mux_ctrl = '1' else Noc_data_mux;
     NOC_DATA_DIR    <= Data_Direction;
     
 	process(clk, Reset)
@@ -474,17 +474,17 @@ begin
         Reset                   => Reset,
         GPP_CMD_Flag            => GPP_CMD_Flag,
         Load_GPP_CMD            => Load_GPP_CMD,
-        GPP_CMD_Data            => GPP_CMD_Data,        --INPUT to Noc_top?
+        GPP_CMD_Data            => GPP_CMD_Data,
         Control_data            => Control_Data_Out,
-        Opcode                  => Opcode(7 downto 0),  --LOWER bits of OPCODE?
+        Opcode                  => Opcode(7 downto 0),
         Switch_ctrl             => Switch_ctrl,
         Transfer_size           => Transfer_size,
         RM_address              => RM_address,
         CM_Address0             => CM_Address0,
         CM_Address1             => CM_Address1,
-        Padding_Data            => Padding_Data,        --INPUT to where?
-        NOC_Length              => NOC_Length,          --INPUT to where?
-        NOC_Address             => NOC_Address,             --INPUT to where?
+        Padding_Data            => Padding_Data,
+        NOC_Length              => NOC_Length,
+        NOC_Address             => NOC_Address,
         TSDiv16_Reg             => TSDiv16_Reg,
         CMD_FF                  => CMD_FF,        
         NOC_CMD_ACK             => NOC_CMD_ACK,
@@ -501,8 +501,8 @@ begin
         NOC_Ready               => NOC_Ready,
         ERROR                   => ERROR,
         GPP_CMD_ACK             => GPP_CMD_ACK,
-        NOC_CMD_flag            => NOC_CMD_flag,         --NOC output?
-        NOC_CMD_Data            => NOC_CMD_Data          --NOC output?
+        NOC_CMD_flag            => NOC_CMD_flag,
+        NOC_CMD_Data            => NOC_CMD_Data
     );
     
     Mux_Demux_Inst: Mux_Demux
@@ -538,7 +538,7 @@ begin
     (
         clk                     => clk,
         Reset                   => Reset,
-        Write_Read_Mode         => R_W_RM,  -- from Mux_register
+        Write_Read_Mode         => R_W_RM,
         Enable                  => Enable_Root_memory,
         RM_Address              => std_logic_vector(RM_word_as),
         DataIn                  => switch_data,
@@ -550,7 +550,7 @@ begin
     (
         clk                     => clk,
         Reset                   => Reset,    
-        write_enable            => PEC_WE_p2, --PEC_WE_p1,--PEC_WE,
+        write_enable            => PEC_WE_p2,
         NoC_Input_reg_In        => PEC_byte_data,
         NoC_Input_reg_Out       => NoC_Input_reg_Out
     );
@@ -576,7 +576,7 @@ begin
         Reset                   => Reset, 
         switch_Input            => Noc_Reg_out,
         Decoder                 => Decoder,
-        switch_input_muxes      => Switch_ctrl(2 downto 0),  ---???? 3 or 8?
+        switch_input_muxes      => Switch_ctrl(2 downto 0),
         switch_Noc_bus_mux      => NOC_bus_out_mux_ctrl,
         EN_Noc_byte_data        => EN_Noc_byte_data,
         Noc_byte_data           => Noc_byte_data,

@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 05.04.2022 15:56:34
 -- Design Name: 
@@ -25,6 +25,5 @@ package Acc_data_types is
 
 subtype BYTE1 is std_logic_vector(7 downto 0);
 type switch_data_type is array (15 downto 0) of BYTE1;
-type switch_mux_type is array (1 downto 0) of BYTE1;
 
 end package Acc_data_types;

@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.numeric_std_unsigned.all;
 
 entity sync_fifo is
   generic (
@@ -56,7 +55,7 @@ begin
     end if;
   end process;
 
-  in_ready <= '0' when level = to_slv(2**BITS, level'length) else '1';
+  in_ready <= '0' when to_integer(unsigned(level)) = 2**BITS else '1';
 
   -- read machine
 

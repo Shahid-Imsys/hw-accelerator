@@ -9,7 +9,7 @@ noc2_rtl: xilinx_ip mem_comp
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Byte_counter_decoder.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_from_GPP.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_to_GPP.vhd
-\	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Define.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Define.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Mux_Demux.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Mux_Register.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Input_Reg.vhd

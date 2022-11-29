@@ -59,7 +59,7 @@ architecture Behavioral of Root_Memory is
   end component;
 
 
-  component RMEM_32KX16 is
+  component FPGA_RMEM_32KX16 is
     port(
 		      clk     : in std_logic;
           ena     : in std_logic;
@@ -117,7 +117,7 @@ end generate;
 
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
 
-  Root_Memory_Inst : RMEM_32KX16
+  Root_Memory_Inst : FPGA_RMEM_32KX16
   port map (
       clk       => clk,
       ena       => mem_enable,

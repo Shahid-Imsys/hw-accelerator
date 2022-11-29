@@ -21,7 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity PMEM_512X28 is
+entity FPGA_PMEM_512X28 is
   Port (
         clk   : in  std_logic;
         ena   : in  std_logic;
@@ -30,9 +30,9 @@ entity PMEM_512X28 is
         dina  : in  std_logic_vector(27 downto 0);
         douta : out std_logic_vector(27 downto 0)
    );
-end PMEM_512X28;
+end FPGA_PMEM_512X28;
 
-architecture Behavioral of PMEM_512X28 is
+architecture Behavioral of FPGA_PMEM_512X28 is
 
     type memunit is array (0 to 511) of std_logic_vector(27 downto 0);
     signal mem  : memunit;

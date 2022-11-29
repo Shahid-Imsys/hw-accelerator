@@ -25,6 +25,5 @@ noc2_rtl: xilinx_ip mem_comp
 
 xilinx_ip:
 	$(V_COMP) $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
-	$(V_COMP) $(NOC2_DIR_WIN)/IP/boot_memory/sim/boot_memory.v
         
 include $(PROJECT_PATH)/IP/Synopsys/Makefile

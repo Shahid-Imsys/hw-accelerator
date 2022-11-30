@@ -208,7 +208,7 @@ end top;
 architecture struct of top is
 
   -- pmem
-  component SY180_2048X2X1CM8
+  component mpp_memory
     port(
       A0  : in  std_logic;
       A1  : in  std_logic;
@@ -837,7 +837,7 @@ begin
 
 --  -- pmem
   --    mppmem
-  mppmem : SY180_2048X2X1CM8
+  mppmem : mpp_memory
     port map (
       A0  => mp_PM_A(0),
       A1  => mp_PM_A(1),

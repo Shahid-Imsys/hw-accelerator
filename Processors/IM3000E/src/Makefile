@@ -64,7 +64,7 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/ext/trace_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SY180_2048X2X1CM8.vhd \
+			 	  $(GPP_DIR_WIN)/ext/mpp_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SU180_16384X8X1BM8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SY180_256X32X1CM4.vhd \
 			 	  $(GPP_DIR_WIN)/ext/SU180_2048X80X1BM1.vhd \

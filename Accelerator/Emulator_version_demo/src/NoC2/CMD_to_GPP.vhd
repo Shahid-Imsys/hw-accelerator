@@ -56,16 +56,16 @@ begin
 
     NOC_CMD_flag            <= NOC_CMD_flag_i;
     NOC_CMD_Data            <= NOC_CMD_Reg;
-
+             
     Decoder <= "100000" when counter = 0 else   
                "100000" when counter = 1 else   
                "110000" when counter = 2 else   
                "001000" when counter = 3 else   
-               "100000" when counter = 4 else
+               "100100" when counter = 4 else   
                "100010" when counter = 5 else 
-               "100100" when counter = 6 else
-               "110001" when counter = 7 else
-               "100000";  
+               "100001" when counter = 6 else  
+               "100000" when counter = 7 else  
+               "100000";                 
                                 
     load_counter            <= Decoder(0);      
     Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      

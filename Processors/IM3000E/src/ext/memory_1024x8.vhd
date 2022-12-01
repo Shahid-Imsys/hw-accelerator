@@ -43,7 +43,7 @@ architecture rtl of memory_1024x8 is
   end component;
 
    -- iomem
-  component SY180_1024X8X1CM8     
+  component fpga_SY180_1024X8X1CM8     
     port(
       A0                         :   IN   std_logic;
       A1                         :   IN   std_logic;
@@ -104,7 +104,7 @@ begin  -- architecture rtl
 
   -- Use simulation memory design for FPGA
   else generate
-  io_mem_sim: SY180_1024X8X1CM8
+  io_mem_sim: fpga_SY180_1024X8X1CM8
     port map (
         A0  => address(0),
         A1  => address(1),

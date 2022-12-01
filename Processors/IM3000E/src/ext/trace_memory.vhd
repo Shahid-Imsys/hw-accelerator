@@ -19,7 +19,7 @@ entity trace_memory is
 end entity trace_memory;
 
 architecture rtl of trace_memory is
-component SY180_256X32X1CM4
+component fpga_SY180_256X32X1CM4
   port(
       A0   : in  std_logic;
       A1   : in  std_logic;
@@ -148,7 +148,7 @@ begin  -- architecture rtl
     -- Use simulation memory design for FPGA
   else generate
 
-    trcmem_sim : SY180_256X32X1CM4
+    trcmem_sim : fpga_SY180_256X32X1CM4
       port map (
         A0   => address(0),
         A1   => address(1),

@@ -21,10 +21,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-package ACC_types is
+package Acc_types is
 
 subtype BYTE is std_logic_vector(7 downto 0); 
 type WORD is array (15 downto 0) of BYTE;
 type TP_data_type is array (15 downto 0) of WORD;
+subtype BYTE1 is std_logic_vector(7 downto 0);
+type switch_data_type is array (15 downto 0) of BYTE1;
     
-end package ACC_types;
+end package Acc_types;

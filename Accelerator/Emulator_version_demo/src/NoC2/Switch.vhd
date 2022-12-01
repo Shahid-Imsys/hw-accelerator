@@ -19,8 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library work;
-use work.Acc_data_types.all;
+use work.Acc_types.all;
 
 entity Switch is
     port(

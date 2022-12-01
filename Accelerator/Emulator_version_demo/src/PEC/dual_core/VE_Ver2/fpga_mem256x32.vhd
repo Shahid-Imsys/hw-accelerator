@@ -5,7 +5,7 @@ use ieee.math_real.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 
-entity mem64x64 is
+entity fpga_mem256x32 is
   --generic (
   --  width       : integer := 32;
   --  addressbits : integer := 2;
@@ -15,15 +15,15 @@ entity mem64x64 is
     clk      : in  std_logic;
     read_en  : in  std_logic;
     write_en : in  std_logic;
-    d_in     : in  std_logic_vector(63 downto 0);
-    address  : in  std_logic_vector(5 downto 0);
-    d_out    : out std_logic_vector(63 downto 0)
+    d_in     : in  std_logic_vector(31 downto 0);
+    address  : in  std_logic_vector(7 downto 0);
+    d_out    : out std_logic_vector(31 downto 0)
     );
 end entity;
 
-architecture rtl of mem64x64 is
+architecture rtl of fpga_mem256x32 is
   --constant mem_size    : integer := natural(2 ** real(addressbits));
-  type mem_t is array (0 to 63) of std_logic_vector(63 downto 0);
+  type mem_t is array (0 to 255) of std_logic_vector(31 downto 0);
   signal memory        : mem_t;
   constant data_size   : integer := 8;
 begin

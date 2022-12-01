@@ -67,7 +67,7 @@ end Noc_State_Machine;
 
 architecture Behavioral of Noc_State_Machine is
 
-  component PMEM_512X28
+  component FPGA_PMEM_512X28
     port (
       clk   : in  std_logic;
       ena   : in  std_logic;
@@ -473,7 +473,7 @@ begin
 
   NOC_MEM_GEN_SIM : if not USE_ASIC_MEMORIES generate
 
-    program_memory_Inst : PMEM_512X28
+    program_memory_Inst : FPGA_PMEM_512X28
       port map (
         clk   => clk,
         ena   => '1',

@@ -21,46 +21,6 @@ end entity ram_memory;
 
     architecture str of ram_memory is
 
--- application and microprogram shared memory
-  component SU180_16384X8X1BM8
-    port(
-      A0  : in  std_logic;
-      A1  : in  std_logic;
-      A2  : in  std_logic;
-      A3  : in  std_logic;
-      A4  : in  std_logic;
-      A5  : in  std_logic;
-      A6  : in  std_logic;
-      A7  : in  std_logic;
-      A8  : in  std_logic;
-      A9  : in  std_logic;
-      A10 : in  std_logic;
-      A11 : in  std_logic;
-      A12 : in  std_logic;
-      A13 : in  std_logic;
-      DO0 : out std_logic;
-      DO1 : out std_logic;
-      DO2 : out std_logic;
-      DO3 : out std_logic;
-      DO4 : out std_logic;
-      DO5 : out std_logic;
-      DO6 : out std_logic;
-      DO7 : out std_logic;
-      DI0 : in  std_logic;
-      DI1 : in  std_logic;
-      DI2 : in  std_logic;
-      DI3 : in  std_logic;
-      DI4 : in  std_logic;
-      DI5 : in  std_logic;
-      DI6 : in  std_logic;
-      DI7 : in  std_logic;
-      WEB : in  std_logic;
-      CK  : in  std_logic;
-      CS  : in  std_logic;
-      OE  : in  std_logic
-      );
-  end component;
-
   component SNPS_SP_HD_16Kx8
     port (
       Q        : out std_logic_vector(7 downto 0);

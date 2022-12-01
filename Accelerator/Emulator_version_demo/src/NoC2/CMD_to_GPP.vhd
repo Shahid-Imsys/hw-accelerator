@@ -56,7 +56,7 @@ begin
 
     NOC_CMD_flag            <= NOC_CMD_flag_i;
     NOC_CMD_Data            <= NOC_CMD_Reg;
-
+             
     Decoder <= "100000" when counter = 0 else   
                "100000" when counter = 1 else   
                "110000" when counter = 2 else   
@@ -65,7 +65,7 @@ begin
                "100010" when counter = 5 else 
                "100001" when counter = 6 else  
                "100000" when counter = 7 else  
-               "100000";  
+               "100000";                 
                                 
     load_counter            <= Decoder(0);      
     Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      
@@ -100,7 +100,7 @@ begin
                 PEC_ready_FF        <= '0';
             end if;
                        
-            if ((ERROR = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
+            if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
                 NOC_ERROR_FF        <= '1';
             else     
                 NOC_ERROR_FF        <= '0';
@@ -120,5 +120,5 @@ begin
             end if;            
         end if; --Reset
     end process;                           
-    
+
 end Behavioral;

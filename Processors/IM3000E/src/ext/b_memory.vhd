@@ -45,7 +45,7 @@ architecture rtl of b_memory is
   end component;
 
   --BMEM
-  component SY180_512X8X1CM8
+  component fpga_SY180_512X8X1CM8
     port(
       A0  : in  std_logic;
       A1  : in  std_logic;
@@ -105,7 +105,7 @@ begin  -- architecture rtl
 
   -- Use simulations memory design for FPGA
   else generate
-    b_mem_sim : SY180_512X8X1CM8
+    b_mem_sim : fpga_SY180_512X8X1CM8
       port map (
         A0  => address(0),
         A1  => address(1),

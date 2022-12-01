@@ -63,12 +63,12 @@ gpp_rtl: mem_load_comp fpga_ip
 			 	  $(GPP_DIR_WIN)/ext/memory_1024x8.vhd \
 			 	  $(GPP_DIR_WIN)/ext/trace_memory.vhd \
 			 	  $(GPP_DIR_WIN)/ext/b_memory.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1B.vhd \
+			 	  $(GPP_DIR_WIN)/ext/fpga_SP180_4096X80BM1B.vhd \
 			 	  $(GPP_DIR_WIN)/ext/mpp_memory.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SY180_256X32X1CM4.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SY180_512X8X1CM8.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SP180_4096X80BM1A.vhd \
-			 	  $(GPP_DIR_WIN)/ext/SY180_1024X8X1CM8.vhd
+			 	  $(GPP_DIR_WIN)/ext/fpga_SY180_256X32X1CM4.vhd \
+			 	  $(GPP_DIR_WIN)/ext/fpga_SY180_512X8X1CM8.vhd \
+			 	  $(GPP_DIR_WIN)/ext/fpga_SP180_4096X80BM1A.vhd \
+			 	  $(GPP_DIR_WIN)/ext/fpga_SY180_1024X8X1CM8.vhd
 
 mem_load_comp:
 	$(V_COMP) $(GPP_DIR_WIN)/ext/load_mpram.v

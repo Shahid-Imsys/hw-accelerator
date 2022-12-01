@@ -666,9 +666,8 @@ process (clk_p, rst_cn, nap_rec)
 
         crb_out(7)      <= core2_en_int;
 --        crb_out(6 downto 3) <= ram_partition_int;
-        crb_out(5)          <= '0';
-        crb_out(4)          <= nap_en_int;
-        crb_out(3)          <= poweron_finish; 
+        crb_out(6 downto 4) <= speed_u_int(9 downto 7);
+        crb_out(3)          <= '0'; 
         crb_out(2)          <= short_cycle_int;        
         crb_out(1)          <= bmem_we_nint;    
         crb_out(0)          <= bmem_a8_int;
@@ -771,9 +770,8 @@ process (clk_p, rst_cn, nap_rec)
 
         crb_out_c2(7)      <= core2_en_int;
 --        crb_out(6 downto 3) <= ram_partition_int;
-        crb_out_c2(5)          <= '1';
-        crb_out_c2(4)          <= nap_en_int;
-        crb_out_c2(3)          <= poweron_finish;  
+        crb_out_c2(6 downto 4) <= speed_u_int(9 downto 7);
+        crb_out_c2(3)          <= '1';  
         crb_out_c2(2)          <= short_cycle_int;     
         crb_out_c2(1)          <= bmem_we_nint;    
         crb_out_c2(0)          <= bmem_a8_int;

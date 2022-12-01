@@ -175,10 +175,6 @@ architecture rtl of clc is
 
   attribute mark_debug : string;
   attribute mark_debug of st_ctr: signal is "true";   
-  attribute mark_debug of clkreq: signal is "true"; 
-  attribute mark_debug of set_ackclk: signal is "true"; 
-  attribute mark_debug of ack_clkreq: signal is "true"; 
-  attribute mark_debug of pl_sig15: signal is "true"; 
 
 begin
   -- Create named signals for overlapping microprogram fields.

@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 05.04.2022 21:51:11
 -- Design Name: 
@@ -58,7 +58,7 @@ begin
     
     counter_mux     <= Counter when RM_as_mux = '0' else unsigned(RM_byte_as);   
     
-    decoder <= "0000000000000001"   when counter_mux = "0000" else
+    Decoder <= "0000000000000001"   when counter_mux = "0000" else
                "0000000000000010"   when counter_mux = "0001" else
                "0000000000000100"   when counter_mux = "0010" else
                "0000000000001000"   when counter_mux = "0011" else

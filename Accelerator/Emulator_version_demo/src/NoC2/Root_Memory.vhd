@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company:
--- Engineer:
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 --
 -- Create Date: 04.04.2022 17:39:04
 -- Design Name:
@@ -26,13 +26,13 @@ entity Root_Memory is
         USE_ASIC_MEMORIES   : boolean := false
   );
   Port(
-        clk                 : in  std_logic;
-        Reset               : in  std_logic;
-        Write_Read_Mode     : in  std_logic;    -- '0' = read
-        Enable              : in  std_logic;
-        RM_Address          : in  std_logic_vector(14 downto 0);
-        DataIn              : in  std_logic_vector(127 downto 0);
-        DataOut             : out std_logic_vector(127 downto 0)
+      clk                 : in  std_logic;
+      Reset               : in  std_logic;
+      Write_Read_Mode     : in  std_logic;    -- '0': read memory
+      Enable              : in  std_logic;
+      RM_Address          : in  std_logic_vector(14 downto 0);
+      DataIn              : in  std_logic_vector(127 downto 0);
+      DataOut             : out std_logic_vector(127 downto 0)
    );
 end Root_Memory;
 
@@ -59,9 +59,9 @@ architecture Behavioral of Root_Memory is
   end component;
 
 
-  component RMEM_32KX16 is
+  component FPGA_RMEM_32KX16 is
     port(
-		  clk     : in std_logic;
+		      clk     : in std_logic;
           ena     : in std_logic;
           wea     : in std_logic;
           addra   : in std_logic_vector(14 downto 0);
@@ -78,9 +78,9 @@ architecture Behavioral of Root_Memory is
   signal mem_enable   : std_logic;
 
   type DataOut_RM_type is array(natural range <>) of std_logic_vector(127 downto 0);
-  signal Active_RM  : integer range 0 to 3;
-  signal DataOut_RM : DataOut_RM_type(3 downto 0);
-  signal WE_RM      : std_logic_vector(3 downto 0);
+  signal Active_RM    : integer range 0 to 3;
+  signal DataOut_RM   : DataOut_RM_type(3 downto 0);
+  signal WE_RM        : std_logic_vector(3 downto 0);
 
 begin
 
@@ -115,10 +115,9 @@ rm_asic_gen : if USE_ASIC_MEMORIES generate
     end generate;
 end generate;
 
-
 rm_sim_gen : if not USE_ASIC_MEMORIES generate
 
-  Root_Memory_Inst : RMEM_32KX16
+  Root_Memory_Inst : FPGA_RMEM_32KX16
   port map (
       clk       => clk,
       ena       => mem_enable,

@@ -114,6 +114,17 @@ architecture rtl of gmem is
   signal pl_sig21 : std_logic_vector(1 downto 0);
   signal pl_sig22 : std_logic_vector(1 downto 0);
 
+  attribute mark_debug : string;
+  attribute mark_debug of gmem_a: signal is "true";  
+  attribute mark_debug of gmem_d: signal is "true";  
+  attribute mark_debug of gmem_q: signal is "true";  
+  attribute mark_debug of gctr: signal is "true";  
+  attribute mark_debug of gdata: signal is "true";    
+  attribute mark_debug of g_double: signal is "true";
+  attribute mark_debug of hold_data: signal is "true";    
+  attribute mark_debug of direct: signal is "true";
+  attribute mark_debug of dbl_direct: signal is "true";
+  
 begin
 
   -----------------------------------------------------------------------------

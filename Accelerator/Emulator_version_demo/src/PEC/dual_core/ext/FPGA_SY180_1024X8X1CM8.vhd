@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.all;
 
-entity SU180_16384X8X1BM8 is
+entity FPGA_SY180_1024X8X1CM8 is
 	port (
 		A0		:	in	std_logic; 
 		A1		:	in	std_logic; 
@@ -15,10 +15,6 @@ entity SU180_16384X8X1BM8 is
 		A7		:	in	std_logic; 
 		A8		:	in	std_logic; 
 		A9		:	in	std_logic; 
-		A10		:	in	std_logic;
-		A11		:	in	std_logic;
-		A12		:	in	std_logic;
-		A13		:	in	std_logic;
 		DO0		: out std_logic;
 		DO1		: out std_logic;
 		DO2		: out std_logic;
@@ -37,24 +33,19 @@ entity SU180_16384X8X1BM8 is
 		DI7		: in std_logic;
 		WEB	: in	std_logic;
 		CK	: in	std_logic;
-		CS	: in	std_logic;
-		OE	: in	std_logic);
-end SU180_16384X8X1BM8;
+		CSB	: in	std_logic);
+end FPGA_SY180_1024X8X1CM8;
 
-architecture struct of SU180_16384X8X1BM8 is
-	type ram_type is array (16383 downto 0) of std_logic_vector(7 downto 0);
+architecture struct of FPGA_SY180_1024X8X1CM8 is
+	type ram_type is array (1023 downto 0) of std_logic_vector(7 downto 0);
 	signal RAM	: ram_type;
-	signal addr	: std_logic_vector(13 downto 0);
+	signal addr	: std_logic_vector(9 downto 0);
 	signal di		: std_logic_vector(7 downto 0);
 	signal do		: std_logic_vector(7 downto 0);
 	attribute ram_style					: string;
 	attribute ram_style of RAM	: signal is "block";
 
 begin
-	addr(13)	<= A13; 
-	addr(12)	<= A12; 
-	addr(11)	<= A11; 
-	addr(10)	<= A10; 
 	addr(9)		<= A9; 
 	addr(8)		<= A8; 
 	addr(7)		<= A7; 
@@ -78,7 +69,7 @@ begin
 	process (CK)
 	begin
 		if rising_edge(CK) then
-			if CS = '1' then
+			if CSB = '0' then
 				if WEB = '0' then
 					RAM(conv_integer(addr)) <= di;
 				end if;
@@ -87,14 +78,14 @@ begin
 		end if;
 	end process;
 
-	DO7		<= do(7) when OE = '1' else '0';
-	DO6		<= do(6) when OE = '1' else '0';
-	DO5		<= do(5) when OE = '1' else '0';
-	DO4		<= do(4) when OE = '1' else '0';
-	DO3		<= do(3) when OE = '1' else '0';
-	DO2		<= do(2) when OE = '1' else '0';
-	DO1		<= do(1) when OE = '1' else '0';
-	DO0		<= do(0) when OE = '1' else '0';
+	DO7		<= do(7);
+	DO6		<= do(6);
+	DO5		<= do(5);
+	DO4		<= do(4);
+	DO3		<= do(3);
+	DO2		<= do(2);
+	DO1		<= do(1);
+	DO0		<= do(0);
 end struct;
 
     

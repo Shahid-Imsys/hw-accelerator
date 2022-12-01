@@ -81,6 +81,12 @@ architecture behav of sdram_inf is
   signal valueZero  : std_logic_vector(MEMNUM - 1 downto 0);
   signal row_addr_1 : std_logic_vector (17 downto 0);
   signal row_addr_2 : std_logic_vector (17 downto 0);
+
+  attribute mark_debug : string;
+  attribute mark_debug of c1_data_b1: signal is "true";  
+  attribute mark_debug of c1_data_b2: signal is "true";  
+  attribute mark_debug of fast_d: signal is "true";  
+
 begin
   row_addr_1 <= c1_d_addr(31 downto 14);
   row_addr_2 <= c2_d_addr(31 downto 14);

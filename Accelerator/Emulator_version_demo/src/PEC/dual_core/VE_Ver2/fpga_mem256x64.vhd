@@ -7,7 +7,7 @@ use ieee.math_real.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 
-entity mem256x64 is
+entity fpga_mem256x64 is
   --generic (
   --  width       : integer := 32;
   --  addressbits : integer := 2;
@@ -23,7 +23,7 @@ entity mem256x64 is
     );
 end entity;
 
-architecture rtl of mem256x64 is
+architecture rtl of fpga_mem256x64 is
   --constant mem_size    : integer := natural(2 ** real(addressbits));
   type mem_t is array (0 to 255) of std_logic_vector(63 downto 0);
   signal memory        : mem_t;

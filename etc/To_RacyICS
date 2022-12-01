@@ -1,0 +1,64 @@
+#!/bin/bash
+
+current_dir=$PWD;
+cd $current_dir
+rm -R ../../To_RacyICS
+
+
+
+cd $current_dir
+mkdir -p ../../To_RacyICS/Processors/IM4000/src
+(cd ../Processors/IM3000E/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../To_RacyICS/Processors/IM4000/src)
+cd $current_dir/../../To_RacyICS/Processors/IM4000/src;
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+
+#rm -v *.vhd | grep -i fpga
+cd $current_dir
+
+
+
+
+mkdir -p ../../To_RacyICS/Digital_core/src
+(cd ../Digital_core/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../To_RacyICS/Digital_core/src)
+
+cd $current_dir/../../To_RacyICS/Digital_core/src;
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+cd $current_dir
+
+
+mkdir -p ../../To_RacyICS/Digital_top/src
+(cd ../Digital_top/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../To_RacyICS/Digital_top/src)
+cd $current_dir/../../To_RacyICS/Digital_top/src;
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+cd $current_dir
+
+mkdir -p ../../To_RacyICS/Digital_chip/src
+(cd ../Digital_chip/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../To_RacyICS/Digital_chip/src)
+cd $current_dir/../../To_RacyICS/Digital_chip/src;
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+cd $current_dir
+
+mkdir -p ../../To_RacyICS/Accelerator/src
+(cd ../Accelerator/Emulator_version_demo/src;find -name "*.vhd" -print0 | xargs -0 cp --parents -t $current_dir/../../To_RacyICS/Accelerator/src)
+
+
+cd $current_dir/../../To_RacyICS/Accelerator/src;
+rm -r GPP
+rm -r IO_block
+rm -r NoC
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+cd $current_dir
+
+mkdir -p ../../To_RacyICS/IP
+cp -r ../IP/ ../../To_RacyICS/
+cd $current_dir/../../To_RacyICS/IP;
+find -name fpga_* -print0 | xargs -0 rm -v fpga_*
+find -name tb_* -print0 | xargs -0 rm -v tb_*
+cd $current_dir
+
+

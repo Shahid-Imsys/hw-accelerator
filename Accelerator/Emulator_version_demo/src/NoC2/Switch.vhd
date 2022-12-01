@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Imsys Technologies AB
+-- Engineer: Azadeh Kaffash
 -- 
 -- Create Date: 05.04.2022 15:33:35
 -- Design Name: 
@@ -19,8 +19,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library work;
-use work.Acc_data_types.all;
+use work.Acc_types.all;
 
 entity Switch is
     port(

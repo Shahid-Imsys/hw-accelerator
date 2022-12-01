@@ -145,6 +145,7 @@ begin
     signal wait_rp        : std_logic;
     signal wait_rc        : std_logic;
     signal wait_pr        : std_logic;    
+
   begin  -- block mtl
     -- This is the combinatorial part of the state machine
     -- for the SDRAM timing logic.

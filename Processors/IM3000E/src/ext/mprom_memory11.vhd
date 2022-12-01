@@ -25,7 +25,7 @@ entity mprom_memory11 is
 end entity mprom_memory11;
 
 architecture rtl of mprom_memory11 is
-  component SP180_4096X80BM1B is   
+  component fpga_SP180_4096X80BM1B is   
     port (
       A0   : in  std_logic;
       A1   : in  std_logic;
@@ -158,7 +158,7 @@ begin  -- architecture rtl
       );
   else generate
     
-  mprom00_fpga : SP180_4096X80BM1B
+  mprom00_fpga : fpga_SP180_4096X80BM1B
     port map (
       A0   => address(0),
       A1   => address(1),

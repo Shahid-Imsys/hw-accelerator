@@ -1,12 +1,16 @@
+all: work  rtl tb elab
+
+rtl: pec_rtl noc2_rtl
+
 etb: tb elab
 
-tb: NoCtoPEC_tb.vhd 
+tb: Accelerator_sim 
 
 elab:
-	xelab --debug typical ac_tb
+	xelab --debug typical Accelerator_tb
 
 sim:
-	$(SIM) $(SIM_FLAGS) c_tb_behav --autoloadwcfg
+	$(SIM) $(SIM_FLAGS) work.Accelerator_tb --autoloadwcfg
 work:
 	$(CREATE_WORK)
 

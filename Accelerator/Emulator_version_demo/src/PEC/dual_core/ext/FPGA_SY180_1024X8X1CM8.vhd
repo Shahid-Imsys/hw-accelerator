@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use work.all;
 
-entity SY180_1024X8X1CM8 is
+entity FPGA_SY180_1024X8X1CM8 is
 	port (
 		A0		:	in	std_logic; 
 		A1		:	in	std_logic; 
@@ -34,9 +34,9 @@ entity SY180_1024X8X1CM8 is
 		WEB	: in	std_logic;
 		CK	: in	std_logic;
 		CSB	: in	std_logic);
-end SY180_1024X8X1CM8;
+end FPGA_SY180_1024X8X1CM8;
 
-architecture struct of SY180_1024X8X1CM8 is
+architecture struct of FPGA_SY180_1024X8X1CM8 is
 	type ram_type is array (1023 downto 0) of std_logic_vector(7 downto 0);
 	signal RAM	: ram_type;
 	signal addr	: std_logic_vector(9 downto 0);

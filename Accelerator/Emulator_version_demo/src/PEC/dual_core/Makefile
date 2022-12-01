@@ -14,9 +14,9 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/pe1_debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem64x64.vhd \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x32.vhd \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/mem256x64.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem64x64.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem256x32.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem256x64.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhd \
 					$(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
@@ -61,11 +61,11 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_ampgm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_atim.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acore.vhd \
-				  $(DUAL_CORE_DIR_WIN)/ext/SU180_256X128X1BM1A.vhd \
+				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SU180_256X128X1BM1A.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/SU180_16384X8X1BM8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/SY180_256X32X1CM4.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/SY180_512X8X1CM8.vhd \
-				  $(DUAL_CORE_DIR_WIN)/ext/SY180_1024X8X1CM8.vhd \
+				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SY180_1024X8X1CM8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_flash_inf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_ios.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_core.vhd \

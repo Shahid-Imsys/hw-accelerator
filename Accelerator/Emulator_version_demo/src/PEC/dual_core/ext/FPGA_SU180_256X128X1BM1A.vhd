@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 use std.textio.all;
 use work.all;
 
-entity SU180_256X128X1BM1A is
+entity FPGA_SU180_256X128X1BM1A is
 	port (
 		A0		:	in	std_logic; 
 		A1		:	in	std_logic; 
@@ -277,9 +277,9 @@ entity SU180_256X128X1BM1A is
 		CK	: in	std_logic;
 		CS	: in	std_logic;
 		OE	: in	std_logic);
-end SU180_256X128X1BM1A;
+end FPGA_SU180_256X128X1BM1A;
 
-architecture struct of SU180_256X128X1BM1A is
+architecture struct of FPGA_SU180_256X128X1BM1A is
 	type ram_type is array (255 downto 0) of std_logic_vector(127 downto 0);
 	--type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
 	--	impure function init_ram_from_file (ram_file_name : in string) return ram_type is

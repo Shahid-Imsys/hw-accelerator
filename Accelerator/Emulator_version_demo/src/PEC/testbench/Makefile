@@ -14,6 +14,10 @@ cluster_pw_pec1_tb: cluster_tb
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/Cluster_pw_pec1.vhd 
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/Cluster_pw_pec2.vhd
 
+Accelerator_sim:
+	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_bypass_short/*  .
+	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/NoCtoPEC_tb.vhd
+
 
 
 

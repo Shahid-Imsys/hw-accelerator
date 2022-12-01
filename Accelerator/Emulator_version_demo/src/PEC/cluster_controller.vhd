@@ -125,7 +125,7 @@ architecture rtl of cluster_controller is
       BC2      : in  std_logic);
   end component;
 
-component CMEM_32KX16 is
+component FPGA_CMEM_32KX16 is
    port(
 	   addr_c      :  in std_logic_vector(14 downto 0);
      CK          :  in std_logic;
@@ -1044,7 +1044,7 @@ begin
   end generate;
 
   cmem_sim_gen : if not USE_ASIC_MEMORIES generate
-    clustermem : CMEM_32KX16
+    clustermem : FPGA_CMEM_32KX16
       port map (
         addr_c => addr_c,
         CK     => clk_e,

@@ -231,9 +231,9 @@ architecture Behavioral of Accelerator_tb is
       return RAM;
     end function;
 
-    signal program_mem_data  : program_mem_type := init_program_mem_from_file("program_mem_code.ascii");
-    signal data_Input        : data_in_type := init_input_from_file("input_data.ascii");
-    signal Root_mem_data     : Root_mem_data_type := init_Root_mem_from_file("Root_mem_data.ascii");       	   
+    signal program_mem_data  : program_mem_type := init_program_mem_from_file("tb_program_mem_code.ascii");
+    signal data_Input        : data_in_type := init_input_from_file("tb_input_data.ascii");
+    signal Root_mem_data     : Root_mem_data_type := init_Root_mem_from_file("tb_Root_mem_data.ascii");       	   
     
     signal ucode_pw  : ram_type   := init_ram_from_file("Pointwise_generic_bypass.ascii");
     signal data_pw   : data_in    := init_input_from_file("pwc_data_4x8x144.ascii");

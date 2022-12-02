@@ -287,7 +287,7 @@ architecture rtl of pe1_rtc is
       BC2      : in  std_logic);
   end component;
 
-  component SY180_1024X8X1CM8
+  component FPGA_SY180_1024X8X1CM8
     port(
       A0                         :   IN   std_logic;
       A1                         :   IN   std_logic;
@@ -402,7 +402,7 @@ begin  -- rtl
 gmem_sim_gen : if not USE_ASIC_MEMORIES generate
 
   -- gmem1
-  gmem1: SY180_1024X8X1CM8
+  gmem1: FPGA_SY180_1024X8X1CM8
   PORT MAP (
       A0          => c1_gmem_a_iso_0(0),
       A1          => c1_gmem_a_iso_0(1),
@@ -437,7 +437,7 @@ gmem_sim_gen : if not USE_ASIC_MEMORIES generate
 
 
 -- gmem2
-  gmem2: SY180_1024X8X1CM8
+  gmem2: FPGA_SY180_1024X8X1CM8
   PORT MAP (
       A0          => c2_gmem_a_iso_0(0),
       A1          => c2_gmem_a_iso_0(1),

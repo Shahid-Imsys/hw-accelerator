@@ -36,7 +36,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity CMEM_32KX16 is 
+entity FPGA_CMEM_32KX16 is 
     port(
         addr_c      :  in std_logic_vector(14 downto 0);
         CK          :  in std_logic;
@@ -81,7 +81,7 @@ entity CMEM_32KX16 is
 
 end entity;
 
-architecture struct of CMEM_32KX16 is
+architecture struct of FPGA_CMEM_32KX16 is
     type memunit is array (32767 downto 0) of std_logic_vector(127 downto 0);
     type memword is array (15 downto 0) of std_logic_vector(7 downto 0);
     signal mem  : memunit;

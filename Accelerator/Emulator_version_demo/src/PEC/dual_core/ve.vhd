@@ -120,7 +120,7 @@ architecture rtl of ve is
     );
   end component;
 
-  component mem256x32 is
+  component fpga_mem256x32 is
     port (
       clk      : in  std_logic;
       read_en  : in  std_logic;
@@ -131,7 +131,7 @@ architecture rtl of ve is
       );
   end component;
 
-  component mem256x64 is
+  component fpga_mem256x64 is
     port (
       clk      : in  std_logic;
       read_en  : in  std_logic;
@@ -142,7 +142,7 @@ architecture rtl of ve is
       );
   end component;
 
-  component mem64x64 is
+  component fpga_mem64x64 is
     port (
       clk      : in  std_logic;
       read_en  : in  std_logic;
@@ -705,7 +705,7 @@ begin
     end if;
   end process;
 
-  mode_state_machine : process(clk_p) --TODO : replace states with variables, save clock cycles and ucode
+  mode_state_machine : process(clk_p) 
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
@@ -1158,7 +1158,7 @@ begin
 
   buf_sim_gen : if not USE_ASIC_MEMORIES generate
 --data mem(splited in high and low part)--
-    databuf_0 : mem256x32
+    databuf_0 : fpga_mem256x32
       port map (
         clk      => clk_p,
         read_en  => read_en_o,
@@ -1167,7 +1167,7 @@ begin
         address  => data0addr_to_memory,
         d_out    => data0
         );
-    databuf_1 : mem256x32
+    databuf_1 : fpga_mem256x32
       port map(
         clk      => clk_p,
         read_en  => read_en_o,
@@ -1177,7 +1177,7 @@ begin
         d_out    => data1
         );
     --weight mem--
-    buf_weight : mem256x64
+    buf_weight : fpga_mem256x64
       port map (
         clk      => clk_p,
         read_en  => read_en_w_o,
@@ -1188,7 +1188,7 @@ begin
         );
     
     --bias mem--
-    buf_bias : mem64X64
+    buf_bias : fpga_mem64x64
       port map(
         clk      => clk_p,
         read_en  => read_en_b_o,

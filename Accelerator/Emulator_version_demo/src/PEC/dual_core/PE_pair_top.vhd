@@ -71,7 +71,7 @@ architecture struct of PE_pair_top is
   end component;
 
   --RAM 0
-  component SU180_256X128X1BM1A
+  component FPGA_SU180_256X128X1BM1A
   port(
       A0                          :   IN   std_logic;
       A1                          :   IN   std_logic;
@@ -804,7 +804,7 @@ end generate;
 
 ram0_sim_gen : if not USE_ASIC_MEMORIES generate
 
-  mpram00: SU180_256X128X1BM1A
+  mpram00: FPGA_SU180_256X128X1BM1A
   PORT MAP (
       A0          => mp_RAM0_A(0),
       A1          => mp_RAM0_A(1),

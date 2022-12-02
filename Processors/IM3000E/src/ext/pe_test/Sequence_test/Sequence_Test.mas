@@ -1,0 +1,51 @@
+
+( Pointwise generic bypass v20.
+( The purpose of this is to have a generic fallback pointwise.
+
+*INCLUDE* Definitions_wide_20.mas; ( Always, system microprogram definitions
+*INCLUDE* Definitions_VE_20.mas;
+
+
+
+*PROGRAM*                   (// END of definitions, START of PROGRAM.
+*INCLUDE* AluRegsVe.mas;    (// Register declaration labels
+
+#0000:
+
+DSOURCE CONSTANT 20, PASS D TO W00;
+
+LABEL:
+
+    ASOURCE W00, DECR A, TO W00;
+    GOTO LABEL IF NOT FZ;
+
+    DSOURCE CONSTANT 50, PASS D TO W00;
+
+LABEL_LOOP_16:
+    ( A-D
+    DSOURCE CONSTANT 10, ASOURCE W00, SUBAD;
+    GOTO LABEL_LOOP_8 IF FN;
+
+    ( Else do all this code here!
+
+    DSOURCE CONSTANT 10, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_16;
+
+
+LABEL_LOOP_8:
+    DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00;
+    GOTO LABEL_DONE IF FN;
+
+    ( Else do all this code here!
+
+    DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_8;
+
+
+LABEL_DONE:
+
+READY:
+    PE_RDY, 
+    UNC GOTO READY;
+
+
+#FFFF: PE_RDY; ( DEBUG_NOP;
+*END*

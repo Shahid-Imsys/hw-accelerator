@@ -14,7 +14,7 @@
 --
 -- Engineer: Markus Karlsson
 --
--- Design Name: fpga_noc_adapter
+-- Design Name: noc_adapter
 -- Project Name: IM4000
 -- Description:
 --   Interface/bridge between IO-bus and NOC adapter
@@ -32,7 +32,7 @@ use work.gp_pkg.all;
 
 use ieee.numeric_std.all;
 
-entity fpga_noc_adapter is
+entity noc_adapter is
   generic (
     ionoc_fifo_depth_bits : integer                      := 4;  -- Each FIFO is 2^x = 16 words deep
     ionoc_status_address  : std_logic_vector(7 downto 0) := x"45";
@@ -90,9 +90,9 @@ entity fpga_noc_adapter is
     IO_WRITE_ACK  : out std_logic                       -- NOC data parameters have been read and can now be updated
    -------------------------------------------------------
     );
-end fpga_noc_adapter;
+end noc_adapter;
 
-architecture rtl of fpga_noc_adapter is
+architecture rtl of noc_adapter is
 
   component ionoc is
     generic (

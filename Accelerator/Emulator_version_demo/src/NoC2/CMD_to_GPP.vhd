@@ -50,31 +50,30 @@ architecture Behavioral of CMD_to_GPP is
     signal  NOC_CMD_flag_i          : std_logic;
     signal  NOC_CMD_Reg             : std_logic_vector(7 downto 0);
     signal  NOC_ERROR_FF            : std_logic;
-    signal  NOC_CMD_FF_value        : std_logic;
+    signal  NOC_CMD_Flag_set        : std_logic;
     
 begin
 
-    NOC_CMD_flag            <= NOC_CMD_flag_i;
     NOC_CMD_Data            <= NOC_CMD_Reg;
-             
+
     Decoder <= "100000" when counter = 0 else   
                "100000" when counter = 1 else   
                "110000" when counter = 2 else   
                "001000" when counter = 3 else   
                "100100" when counter = 4 else   
-               "100010" when counter = 5 else 
+               "100010" when counter = 5 else
                "100001" when counter = 6 else  
-               "100000" when counter = 7 else  
-               "100000";                 
-                                
+               "100000" when counter = 7 else   
+               "100000";
+                 
     load_counter            <= Decoder(0);      
     Reset_PEC_NOC_ERROR_FF  <= Decoder(2);      
-    NOC_CMD_FF_value        <= Decoder(3);      
+    NOC_CMD_Flag_set        <= Decoder(3);      
     load_NOC_CMD_REG        <= Decoder(4);      
     step_counter            <= Decoder(5);      
-    
-    load    <= load_counter or not (NOC_Ready_FF or PEC_ready_FF or NOC_ERROR_FF); --
-    enable  <= step_counter or (GPP_CMD_ACK and NOC_CMD_FF_value);  --
+    load                    <= load_counter or not (NOC_Ready_FF or PEC_ready_FF or NOC_ERROR_FF);
+    enable                  <= step_counter or (GPP_CMD_ACK and NOC_CMD_Flag_set);
+    NOC_CMD_flag_i          <= (not(GPP_CMD_ACK)) and NOC_CMD_Flag_set;
     
     process(clk, Reset)
     begin
@@ -84,35 +83,29 @@ begin
             NOC_Ready_FF            <= '0';     
             NOC_ERROR_FF            <= '0';            
             NOC_CMD_Reg             <= (others => '0');
-            
         elsif rising_edge(clk) then
-            NOC_CMD_flag_i          <= not(GPP_CMD_ACK) and NOC_CMD_FF_value;
-        
+            NOC_CMD_flag            <= NOC_CMD_flag_i;
             if ((NOC_Ready = '1' or NOC_Ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(0) = '1') or Reset = '0')) then
                 NOC_Ready_FF        <= '1';
             else     
                 NOC_Ready_FF        <= '0';
             end if;
-            
             if ((PEC_ready = '1' or PEC_ready_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(1) = '1') or Reset = '0')) then
                 PEC_ready_FF        <= '1';
             else     
                 PEC_ready_FF        <= '0';
             end if;
-                       
             if ((Error = '1' or NOC_ERROR_FF = '1') and not((Reset_PEC_NOC_ERROR_FF = '1' and NOC_CMD_Reg(2) = '1') or Reset = '0')) then
                 NOC_ERROR_FF        <= '1';
             else     
                 NOC_ERROR_FF        <= '0';
             end if;            
-            
             if (load_NOC_CMD_REG = '1') then
                 NOC_CMD_Reg(0) <= not(PEC_ready_FF) and not(NOC_ERROR_FF) and NOC_Ready_FF;
                 NOC_CMD_Reg(1) <= not(NOC_ERROR_FF) and PEC_ready_FF ;
                 NOC_CMD_Reg(2) <= NOC_ERROR_FF;
                 NOC_CMD_Reg(7 downto 3) <= "00000";
             end if;         
-                 
             if load = '1' then
                 counter   <= (others => '0');
             elsif enable = '1' then

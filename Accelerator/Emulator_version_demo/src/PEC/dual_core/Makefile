@@ -10,7 +10,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/ram64x8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_sct.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_stack9x14.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_mpgm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
@@ -19,10 +18,10 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem256x64.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhd \
-					$(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
  				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatoreven.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatorodd.vhd \
-					$(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addmul.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_acc.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_alu.vhd \

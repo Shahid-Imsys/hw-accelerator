@@ -154,7 +154,7 @@ end entity digital_core;
 
 architecture rtl of digital_core is
 
-  component fpga_noc_adapter is
+  component noc_adapter is
     generic (
       ionoc_fifo_depth_bits : integer                      := 4;  -- Each FIFO is 2^x = 16 words deep
       ionoc_status_address  : std_logic_vector(7 downto 0) := x"45";
@@ -307,7 +307,7 @@ begin  -- architecture rtl
       NOC_DATA_EN   => NOC_DATA_EN
       );
 
-  noc_adapter_inst : fpga_noc_adapter
+  noc_adapter_inst : noc_adapter
     generic map (
       ionoc_fifo_depth_bits => ionoc_fifo_depth_bits,  -- Each FIFO is 2^x = 16 words deep,
       ionoc_status_address  => x"45",

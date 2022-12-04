@@ -893,7 +893,7 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "main_mem.mif" )
+        initFile      => "Sequence_Test.mif" )
       port map (
         clk     => clk_p,
         address => ram_a(i),

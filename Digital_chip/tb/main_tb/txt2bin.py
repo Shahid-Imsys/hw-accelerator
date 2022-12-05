@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cat noc_code.txt | ./txt2bin.py > noc_code.bin
+# cat boot_ram.txt | ./txt2bin.py > boot_ram.mp
 
 import sys
 import os

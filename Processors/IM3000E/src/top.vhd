@@ -289,7 +289,8 @@ architecture struct of top is
   component ram_memory is
     generic (
       g_memory_type : memory_type_t := asic;
-      initFile      : string);
+      initFile      : string;
+      fpgaMemIndex  : integer       := 0);
     port (
       address : in  std_logic_vector(13 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -875,11 +876,12 @@ begin
 
   --ram_g : for i in 0 to MEMNUM-1 generate
   -- application memories
-  ram_gen0 : for i in 0 to 0 generate
+  ram_gen0 : for i in 0 to 1 generate
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "main_mem.mif" )
+        initFile      => "test_mem.mif",
+        fpgaMemIndex  => 1 )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -889,11 +891,12 @@ begin
         cs      => ram_cs(i));
   end generate;
 
-  ram_gen1 : for i in 1 to MEMNUM-1 generate
+  ram_gen1 : for i in 2 to MEMNUM-1 generate
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "Sequence_Test.mif" )
+        initFile      => "main_mem.mif",
+        fpgaMemIndex  => 0 )
       port map (
         clk     => clk_p,
         address => ram_a(i),

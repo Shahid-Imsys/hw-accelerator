@@ -21,17 +21,17 @@ Accelerator_bypass_short:
 
 Accelerator_DW:
 	cp $(PROJECT_PATH)/Accelerator/Emulator_version_demo/src/NoC2/testbench/*  .
-	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_bypass_short/*  .
+	cp $(PEC_TB_DIR_WIN)/Microcode_File/Depthwise_V2.0/*  .
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/AccDW_tb.vhd
 
 Accelerator_PW_compress:
 	cp $(PROJECT_PATH)/Accelerator/Emulator_version_demo/src/NoC2/testbench/*  .
-	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_bypass_short/*  .
+	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_compress_V2.0/*  .
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/AccPW_compress_tb.vhd
 
 Accelerator_PW_expand:
 	cp $(PROJECT_PATH)/Accelerator/Emulator_version_demo/src/NoC2/testbench/*  .
-	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_bypass_short/*  .
+	cp $(PEC_TB_DIR_WIN)/Microcode_File/Pointwise_expand_V2.0/*  .
 	$(COMP) $(COMP_TB_FLAGS) $(PEC_TB_DIR_WIN)/AccPW_expand_tb.vhd
 
 

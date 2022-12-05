@@ -3,6 +3,7 @@ DUAL_CORE_DIR_WIN=$(PROJECT_PATH_WIN)/Accelerator/Emulator_version_demo/src/PEC/
 
 dual_core_rtl:
 	$(COMP) $(COMP_RTL_FLAGS) $(DUAL_CORE_DIR_WIN)/pe1_mpgmfield_lib.vhd \
+					$(DUAL_CORE_DIR_WIN)/pe1_mpgm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgenpart.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgenhalf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgendec.vhd \

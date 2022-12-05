@@ -4,7 +4,7 @@ rtl: pec_rtl noc2_rtl
 
 etb: tb elab
 
-tb: Accelerator_bypass_short 
+tb: Accelerator_PW_compress 
 
 elab:
 	xelab --debug typical Accelerator_tb

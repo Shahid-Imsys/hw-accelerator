@@ -11,7 +11,7 @@ class mp2coe:
         self.mpFileName = 'Sequence_Test.mp'
         self.mpData = []
 
-        self.coeFileName = 'Sequence_Test.coe'
+        self.coeFileName = 'test_mem.coe'
 
         self.read_mp()
         self.write_coe()

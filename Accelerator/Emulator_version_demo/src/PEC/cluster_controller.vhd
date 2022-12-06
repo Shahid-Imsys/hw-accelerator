@@ -450,7 +450,7 @@ begin
 			    delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
 			elsif noc_cmd = "00100" then     --ReadBlock
-				if byte_ctr = "0000" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
+				if byte_ctr = "1111" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
 					delay  <= '0';
 					delay2 <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
@@ -491,24 +491,24 @@ begin
 	byte_ctr_cal: process (clk_e, RST_E)
 	begin
     if RST_E = '0' then
-      byte_ctr <= "1111";
+      byte_ctr <= "0000";
 		elsif rising_edge(clk_e) then
 			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-				byte_ctr <= "1111";  --azzzz "0000";
+				byte_ctr <= "0000";  --azzzz "0000";
 		    elsif noc_cmd = "00011" or noc_cmd = "00101" then
 	        if delay2 = '1' and datain_vld = '1' then
-           	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
+           	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				  else
-				  	byte_ctr <= "1111"; 
+				  	byte_ctr <= "0000"; 
           end if;
 			elsif noc_cmd = "00100" then
 				if delay = '1' and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
-					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
+					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				else
-					byte_ctr <= "1111"; 
+					byte_ctr <= "0000"; 
 				end if;
 			else
-				byte_ctr <= "0000";
+				byte_ctr <= "1111";
 		  end if;
 		end if;
 	end process;
@@ -544,7 +544,7 @@ begin
 			elsif noc_cmd = "00011" or noc_cmd = "00101" then
 				if sync_collector = "11" then
 					datain_vld <= '1';
-				elsif byte_ctr = "0000" then
+				elsif byte_ctr = "1111" then
 					datain_vld <= '0';
 				end if;		 	
 			end if;
@@ -561,7 +561,7 @@ begin
 			elsif noc_cmd = "00100" then
 				if noc_read = '1' then
 					dataout_vld <= '1';
-				elsif byte_ctr = "0000" then --"0001" then
+				elsif byte_ctr = "1111" then --"0001" then
 					dataout_vld <= '0';
 				end if;
 			else
@@ -585,7 +585,7 @@ begin
         noc_read    <= '0';
       elsif delay = '1' then     
 			  if noc_cmd = "00011" or noc_cmd = "00101" then
-			    if byte_ctr = "0000" then 
+			    if byte_ctr = "1111" then 
 			    	noc_reg_rdy <= '1';
             noc_write   <= '1';
 			  	  noc_read    <= '0';

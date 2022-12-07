@@ -49,8 +49,6 @@ architecture receive_engine of re is
 
 begin
 
-  --assign port
-
   latch_signals: process(clk)
   begin
     if rising_edge(clk) then --latches at the rising_edge of clk_p. 
@@ -60,24 +58,48 @@ begin
         if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
           re_busy <= '1';
         elsif re_loop = (re_loop'range => '0') then 
-          re_busy <= '0';
+          if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
+            if data_valid = '1' then
+              re_busy <= '0';
+            end if;
+          else
+            re_busy <= '0';
+          end if;
         end if;
         --mode a and b will be reflected by config registers when ve_starts
         if re_start = '1' and mode_a = '1' then
           mode_a_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
-          mode_a_l <= '0';
+          if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
+            if data_valid = '1' then
+              mode_a_l <= '0';
+            end if;
+          else
+            mode_a_l <= '0';
+          end if;
         end if;
         if re_start= '1' and mode_b = '1' then
           mode_b_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
-          mode_b_l <= '0';
+          if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
+            if data_valid = '1' then
+              mode_b_l <= '0';
+            end if;
+          else
+            mode_b_l <= '0';
+          end if;
         end if;
         --mode c latch signal --1210
         if re_start = '1' and mode_c = '1' then
           mode_c_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
-          mode_c_l <= '0';
+          if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
+            if data_valid = '1' then
+              mode_c_l <= '0';
+            end if;
+          else
+            mode_c_l <= '0';
+          end if;
         end if;
       end if;
     end if;
@@ -114,7 +136,20 @@ begin
         elsif mode_a_l = '1' and mode_b_l = '1' then
           bias_rst <= '1';
         end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and re_loop /=(re_loop'range => '0') then
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and re_loop /= (re_loop'range => '0') then
+        left_rst <= '0';
+        right_rst <= '0';
+        bias_rst <= '0';
+        if mode_a_l = '1' and mode_b_l = '0'then      
+          left_load <= '1';
+        end if;
+        if mode_b_l = '1' and mode_a_l = '0'then
+          right_load <= '1';
+        end if;
+        if mode_a_l = '1' and mode_b_l = '1' then
+          bias_load <= '1';
+        end if;
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
         left_rst <= '0';
         right_rst <= '0';
         bias_rst <= '0';

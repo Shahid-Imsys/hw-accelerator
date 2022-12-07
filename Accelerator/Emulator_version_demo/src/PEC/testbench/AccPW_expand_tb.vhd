@@ -76,33 +76,33 @@ architecture Behavioral of Accelerator_tb is
     type out_word2  is array ( (Data_Transfer_Size * 16) -1 downto 0) of std_logic_vector(127 downto 0);  
 
     ------------------------------types for pec-----------------------------------------
-    type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
-    type out_byte   is array (294911 downto 0) of std_logic_vector(7 downto 0);
-   	type ram_type   is array (255 downto 0) of std_logic_vector(127 downto 0);
-    type data_in    is array (4095 downto 0) of std_logic_vector(127 downto 0);
-    type kernels_in is array (215 downto 0) of std_logic_vector(127 downto 0);
-    type bias_in    is array (17 downto 0) of std_logic_vector(127 downto 0);
-    type param_in   is array (63 downto 0) of std_logic_vector(127 downto 0);
-    type result_out is array (18431 downto 0) of std_logic_vector(127 downto 0);
-	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
-    type data_in_b  is array (4095 downto 0) of bit_vector(127 downto 0);
-    type kernels_b  is array (215 downto 0) of bit_vector(127 downto 0);
-    type bias_in_b  is array (17 downto 0) of bit_vector(127 downto 0);
-    type res_out_b  is array (18431 downto 0) of bit_vector(127 downto 0);
-    type param_b    is array (63 downto 0) of bit_vector(127 downto 0);
-
-    constant ucode_sa    : std_logic_vector(14 downto 0) := (others => '0'); --microcode start address in CM
+    constant ucode_sa    : std_logic_vector(14 downto 0) := "000000000000000"; --microcode start address in CM
     constant param_sa    : std_logic_vector(14 downto 0) := "000000100000000"; --0x100, start address of parameters
     constant kernels_sa  : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of kernels
     constant bias_sa     : std_logic_vector(14 downto 0) := "000001100000000"; --0x300, start address of bias
     constant data_sa     : std_logic_vector(14 DOWNTO 0) := "000010000000000"; --0x400, start address of input data
-    constant pw_out_sa   : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
+    constant out_sa      : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
     constant ucode_len   : integer := 256;
     constant param_len   : integer := 64;
     constant kernels_len : integer := 216;
     constant bias_len    : integer := 3;
     constant data_len    : integer := 72;
-    constant pw_out_len  : integer := 16;
+    constant out_len     : integer := 16;
+    
+    type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
+    type out_byte   is array (294911 downto 0) of std_logic_vector(7 downto 0);
+   	type ram_type   is array (255 downto 0) of std_logic_vector(127 downto 0);
+    type data_in    is array (data_len - 1 downto 0) of std_logic_vector(127 downto 0);
+    type kernels_in is array (kernels_len - 1 downto 0) of std_logic_vector(127 downto 0);
+    type bias_in    is array (bias_len - 1 downto 0) of std_logic_vector(127 downto 0);
+    type param_in   is array (param_len - 1 downto 0) of std_logic_vector(127 downto 0);
+    type result_out is array (out_len - 1 downto 0) of std_logic_vector(127 downto 0);
+	  type ram_type_b is array (255 downto 0) of bit_vector(127 downto 0);
+    type data_in_b  is array (data_len - 1 downto 0) of bit_vector(127 downto 0);
+    type kernels_b  is array (kernels_len - 1 downto 0) of bit_vector(127 downto 0);
+    type bias_in_b  is array (bias_len - 1 downto 0) of bit_vector(127 downto 0);
+    type res_out_b  is array (out_len - 1 downto 0) of bit_vector(127 downto 0);
+    type param_b    is array (param_len - 1 downto 0) of bit_vector(127 downto 0);
 	  ------------------------------------------------------------------------------------
 
     impure function init_program_mem_from_file (ram_file_name : in string) return program_mem_type is
@@ -223,7 +223,7 @@ architecture Behavioral of Accelerator_tb is
       variable RAM_B : res_out_b;
       variable RAM :result_out;
       begin
-        for i in 0 to pw_out_len - 1 loop
+        for i in 0 to out_len - 1 loop
           readline(ram_file, ram_file_line);
           read(ram_file_line, RAM_B(i));
           RAM(i) := to_stdlogicvector(RAM_B(i));
@@ -235,12 +235,12 @@ architecture Behavioral of Accelerator_tb is
     signal data_Input        : data_in_type := init_input_from_file("tb_input_data.ascii");
     signal Root_mem_data     : Root_mem_data_type := init_Root_mem_from_file("tb_Root_mem_data.ascii");       	   
     
-    signal ucode_pw  : ram_type   := init_ram_from_file("Pointwise_generic_bypass.ascii");
-    signal data_pw   : data_in    := init_input_from_file("pwc_data_4x8x144.ascii");
-    signal kernel_pw : kernels_in := init_kernel_from_file("CM_kernels_pwc_u8_ref.ascii");
-    signal bias_pw   : bias_in    := init_bias_from_file("CM_bias_pwc_s16.ascii");
-    signal param_pw  : param_in   := init_param_from_file("CM_params_bp.ascii");
-    signal ref_out   : result_out := init_out_from_file("pwc_ref_4x8x32.ascii");
+    signal ucode   : ram_type   := init_ram_from_file("Pointwise_generic_bypass.ascii");
+    signal data    : data_in    := init_input_from_file("pwc_data_4x8x144.ascii");
+    signal kernel  : kernels_in := init_kernel_from_file("CM_kernels_pwc_u8_ref.ascii");
+    signal bias    : bias_in    := init_bias_from_file("CM_biasc_s16.ascii");
+    signal param   : param_in   := init_param_from_file("CM_params_bp.ascii");
+    signal ref_out : result_out := init_out_from_file("pwc_ref_4x8x32.ascii");
 
     signal    clk_p         : std_logic;
     signal    clk_e         : std_logic;
@@ -267,7 +267,7 @@ architecture Behavioral of Accelerator_tb is
     signal    j             : integer := 0;
     signal    k             : integer := 0;
     signal    l             : integer := 0;
-    signal    m             : integer := (pw_out_len)*16 - 1;
+    signal    m             : integer := 0;--(out_len)*16 - 1;
     signal    progress      : progress_state;--integer := 0;
     signal    progress2     : integer := 0;
     signal    broadcast     : integer := 0;
@@ -562,10 +562,7 @@ begin
         progress <= sending_ucode;  
         for i in 0 to (ucode_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data      <= ucode_pw(i)(7 downto 0) & ucode_pw(i)(15 downto 8) & ucode_pw(i)(23 downto 16) & ucode_pw(i)(31 downto 24) &
-                            ucode_pw(i)(39 downto 32) & ucode_pw(i)(47 downto 40) & ucode_pw(i)(55 downto 48) & ucode_pw(i)(63 downto 56) &
-                            ucode_pw(i)(71 downto 64) & ucode_pw(i)(79 downto 72) & ucode_pw(i)(87 downto 80) & ucode_pw(i)(95 downto 88) &
-                            ucode_pw(i)(103 downto 96) & ucode_pw(i)(111 downto 104) & ucode_pw(i)(119 downto 112) & ucode_pw(i)(127 downto 120);
+            IO_data      <= ucode(i);
             wait for 40 ns;
         end loop;  
         progress <= waiting;      
@@ -596,10 +593,7 @@ begin
         progress <= sending_params;  
         for i in 0 to (param_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= param_pw(i)(7 downto 0) & param_pw(i)(15 downto 8) & param_pw(i)(23 downto 16) & param_pw(i)(31 downto 24) &
-                           param_pw(i)(39 downto 32) & param_pw(i)(47 downto 40) & param_pw(i)(55 downto 48) & param_pw(i)(63 downto 56) &
-                           param_pw(i)(71 downto 64) & param_pw(i)(79 downto 72) & param_pw(i)(87 downto 80) & param_pw(i)(95 downto 88) &
-                           param_pw(i)(103 downto 96) & param_pw(i)(111 downto 104) & param_pw(i)(119 downto 112) & param_pw(i)(127 downto 120);
+            IO_data     <= param(i);
             wait for 40 ns;
         end loop;   
         progress <= waiting;     
@@ -630,10 +624,7 @@ begin
         progress <= sending_kernels;  
         for i in 0 to (kernels_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= kernel_pw(i)(7 downto 0) & kernel_pw(i)(15 downto 8) & kernel_pw(i)(23 downto 16) & kernel_pw(i)(31 downto 24) &
-                           kernel_pw(i)(39 downto 32) & kernel_pw(i)(47 downto 40) & kernel_pw(i)(55 downto 48) & kernel_pw(i)(63 downto 56) &
-                           kernel_pw(i)(71 downto 64) & kernel_pw(i)(79 downto 72) & kernel_pw(i)(87 downto 80) & kernel_pw(i)(95 downto 88) &
-                           kernel_pw(i)(103 downto 96) & kernel_pw(i)(111 downto 104) & kernel_pw(i)(119 downto 112) & kernel_pw(i)(127 downto 120);
+            IO_data     <= kernel(i);
             wait for 40 ns;
         end loop;
         progress <= waiting;        
@@ -664,10 +655,7 @@ begin
         progress <= sending_bias;  
         for i in 0 to (bias_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= bias_pw(i)(7 downto 0) & bias_pw(i)(15 downto 8) & bias_pw(i)(23 downto 16) & bias_pw(i)(31 downto 24) &
-                           bias_pw(i)(39 downto 32) & bias_pw(i)(47 downto 40) & bias_pw(i)(55 downto 48) & bias_pw(i)(63 downto 56) &
-                           bias_pw(i)(71 downto 64) & bias_pw(i)(79 downto 72) & bias_pw(i)(87 downto 80) & bias_pw(i)(95 downto 88) &
-                           bias_pw(i)(103 downto 96) & bias_pw(i)(111 downto 104) & bias_pw(i)(119 downto 112) & bias_pw(i)(127 downto 120);
+            IO_data     <= bias(i);
             wait for 40 ns;
         end loop;
         progress <= waiting;        
@@ -698,10 +686,7 @@ begin
         progress <= sending_data;  
         for i in 0 to (data_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data        <= data_pw(i)(7 downto 0) & data_pw(i)(15 downto 8) & data_pw(i)(23 downto 16) & data_pw(i)(31 downto 24) &
-                              data_pw(i)(39 downto 32) & data_pw(i)(47 downto 40) & data_pw(i)(55 downto 48) & data_pw(i)(63 downto 56) &
-                              data_pw(i)(71 downto 64) & data_pw(i)(79 downto 72) & data_pw(i)(87 downto 80) & data_pw(i)(95 downto 88) &
-                              data_pw(i)(103 downto 96) & data_pw(i)(111 downto 104) & data_pw(i)(119 downto 112) & data_pw(i)(127 downto 120);
+            IO_data        <= data(i);
             wait for 40 ns;
         end loop;        
         progress <= waiting;
@@ -731,8 +716,8 @@ begin
         progress            <= send_cmd;
         GPP_CMD_Flag        <= '1';
         GPP_CMD_Data        <= x"000000000000000000000000FFF00024";--x"00000000000000000000000080000024"; --512 200,  TS--256 TS 100       
-        GPP_CMD_LEN         <= std_logic_vector(to_unsigned(pw_out_len*16, 16)); 
-        GPP_CMD_SA          <= pw_out_sa;
+        GPP_CMD_LEN         <= std_logic_vector(to_unsigned(out_len*16, 16)); 
+        GPP_CMD_SA          <= out_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
         if NOC_CMD_flag /= '1' then
@@ -749,7 +734,7 @@ begin
         FIFO_ready          <= "010000";  --FIFO_ready2 =1
         wait for 380 ns;
         progress <= rd_cm;
-        for i in 0 to (pw_out_len) -1 loop
+        for i in 0 to (out_len) -1 loop
             FIFO_ready          <= "111000"; --FIFO_ready3 =1;
             wait for 40 ns;
             FIFO_ready          <= "001000"; --FIFO_ready3,2 =0;
@@ -771,11 +756,11 @@ begin
         j        <= 0;
         if broadcast = 0 and broadcast_indexed = 0 and broadcast_sequential = 0 then
             for k in 0 to data_len -1 loop
-              assert (outword(k) = data_pw(k)) report "Incorrect output data in unicast"&integer'image(k) severity warning;
+              assert (outword(k) = data(k)) report "Incorrect output data in unicast"&integer'image(k) severity warning;
               wait for 10 ns;
             end loop;
         elsif broadcast = 1 then 
-            for k in 0 to pw_out_len -1 loop
+            for k in 0 to out_len -1 loop
                 --for j in 0 to 15 loop
                   --assert (outword(k *16 +j) = (ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8) & ref_out(k)(j*8 + 7 downto j*8))) report "Incorrect output data in broadcast"&integer'image(k *16 +j) severity warning;
                   assert(outword(k) = ref_out(k)) report "Incorrect output data in broadcast"&integer'image(k) severity warning;
@@ -991,32 +976,32 @@ begin
         if rising_edge(clk_e) then
             if NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1C" then
                 outword(m) <= NOC_data;
-                if m /= 0 then
-                  m  <= m - 1;
+                if m /= (out_len)*16 - 1 then
+                  m  <= m + 1;
                   progress2 <= 5; 
                 else
                   progress2 <= 0;
                 end if;
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"1A" then
                 outword(m) <= NOC_data;
-                if m /= 0 then
-                  m  <= m - 1;
+                if m /= (out_len)*16 - 1 then
+                  m  <= m + 1;
                   progress2 <= 5; 
                 else
                   progress2 <= 0;
                 end if;
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"24" then
-                outword((pw_out_len - 1) - m/16)((m mod 16)*8 + 7 downto (m mod 16)*8) <= NOC_data(7 downto 0);
-                if m /= 0 then
-                  m  <= m - 1;
+                outword(m/16)((m mod 16)*8 + 7 downto (m mod 16)*8) <= NOC_data(7 downto 0);
+                if m /= (out_len)*16 - 1 then
+                  m  <= m + 1;
                   progress2 <= 5; 
                 else
                   progress2 <= 0;
                 end if; 
             elsif NOC_DATA_EN = '1' and GPP_CMD_Data(7 downto 0)= x"26" then
                 outword(m) <= NOC_data;
-                if m /= 0 then
-                  m  <= m - 1;
+                if m /= (out_len)*16 - 1 then
+                  m  <= m + 1;
                   progress2 <= 5; 
                 else
                   progress2 <= 0;

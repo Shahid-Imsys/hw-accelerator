@@ -59,7 +59,7 @@ begin
           re_busy <= '1';
         elsif re_loop = (re_loop'range => '0') then 
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
-            if data_valid = '1' then
+            if data_valid = '1' and clk_e_pos = '1' then
               re_busy <= '0';
             end if;
           else
@@ -71,7 +71,7 @@ begin
           mode_a_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
-            if data_valid = '1' then
+            if data_valid = '1' and clk_e_pos = '1' then
               mode_a_l <= '0';
             end if;
           else
@@ -82,7 +82,7 @@ begin
           mode_b_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
-            if data_valid = '1' then
+            if data_valid = '1' and clk_e_pos = '1' then
               mode_b_l <= '0';
             end if;
           else
@@ -94,7 +94,7 @@ begin
           mode_c_l <= '1';
         elsif re_loop = (re_loop'range => '0') then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
-            if data_valid = '1' then
+            if data_valid = '1' and clk_e_pos = '1' then
               mode_c_l <= '0';
             end if;
           else

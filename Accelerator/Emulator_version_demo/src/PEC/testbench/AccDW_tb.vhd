@@ -81,7 +81,7 @@ architecture Behavioral of Accelerator_tb is
     constant kernels_sa  : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of kernels
     constant bias_sa     : std_logic_vector(14 downto 0) := "000001100000000"; --0x300, start address of bias
     constant data_sa     : std_logic_vector(14 DOWNTO 0) := "000010000000000"; --0x400, start address of input data
-    constant out_sa      : std_logic_vector(14 downto 0) := "000010000000000"; --0x400, output address in CM.
+    constant out_sa      : std_logic_vector(14 downto 0) := "010110010100100"; --0x2CA4, output address in CM.
     constant ucode_len   : integer := 256;
     constant param_len   : integer := 64;
     constant kernels_len : integer := 81;

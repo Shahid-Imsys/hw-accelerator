@@ -136,20 +136,7 @@ begin
         elsif mode_a_l = '1' and mode_b_l = '1' then
           bias_rst <= '1';
         end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and re_loop /= (re_loop'range => '0') then
-        left_rst <= '0';
-        right_rst <= '0';
-        bias_rst <= '0';
-        if mode_a_l = '1' and mode_b_l = '0'then      
-          left_load <= '1';
-        end if;
-        if mode_b_l = '1' and mode_a_l = '0'then
-          right_load <= '1';
-        end if;
-        if mode_a_l = '1' and mode_b_l = '1' then
-          bias_load <= '1';
-        end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and (re_loop /= (re_loop'range => '0') or wr_counter = (wr_counter'range => '0')) then
         left_rst <= '0';
         right_rst <= '0';
         bias_rst <= '0';

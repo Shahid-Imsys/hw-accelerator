@@ -141,7 +141,7 @@ begin
         VE_DIN <= (others => '0');
         mp_data_int <= (others => '0');
         dbus_reg <= (others => '0');
-      elsif DATA_VLD = '1' then 
+      elsif DATA_VLD = '1' and clk_e_neg = '1' then 
         mp_data_int <= DIN; 
         dbus_reg <= DIN;          --input to microprogram data
       end if;

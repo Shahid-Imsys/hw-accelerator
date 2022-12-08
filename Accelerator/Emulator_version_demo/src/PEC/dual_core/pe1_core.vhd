@@ -287,6 +287,7 @@ architecture struct of pe1_core is
   signal mp_alud    : std_logic;
   signal mp_shin_pa : std_logic_vector(3 downto 0);
   signal mp_gass    : std_logic_vector(1 downto 0);
+  signal mpram_a_int: std_logic_vector(7 downto 0);
 
   -- CRB signals
   signal crb_out    	: std_logic_vector(7 downto 0);
@@ -627,7 +628,7 @@ begin
   process(clk_p) --1 clk_e delay of input to microprogram memory
   begin
     if rising_edge(clk_p) then
-      if clk_e_neg_int = '0' then--clk_e_pos_int = '0' then
+      if clk_e_neg_int = '1' then--clk_e_pos_int = '0' then
         mpram_d     <= mpgmin;
       end if;
     end if;

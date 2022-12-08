@@ -562,10 +562,7 @@ begin
         progress <= sending_ucode;  
         for i in 0 to (ucode_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data      <= ucode(i);--(7 downto 0) & ucode(i)(15 downto 8) & ucode(i)(23 downto 16) & ucode(i)(31 downto 24) &
-                            --ucode(i)(39 downto 32) & ucode(i)(47 downto 40) & ucode(i)(55 downto 48) & ucode(i)(63 downto 56) &
-                            --ucode(i)(71 downto 64) & ucode(i)(79 downto 72) & ucode(i)(87 downto 80) & ucode(i)(95 downto 88) &
-                            --ucode(i)(103 downto 96) & ucode(i)(111 downto 104) & ucode(i)(119 downto 112) & ucode(i)(127 downto 120);
+            IO_data      <= ucode(i);
             wait for 40 ns;
         end loop;  
         progress <= waiting;      
@@ -596,10 +593,7 @@ begin
         progress <= sending_params;  
         for i in 0 to (param_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= param(i);--(7 downto 0) & param(i)(15 downto 8) & param(i)(23 downto 16) & param(i)(31 downto 24) &
-                           --param(i)(39 downto 32) & param(i)(47 downto 40) & param(i)(55 downto 48) & param(i)(63 downto 56) &
-                           --param(i)(71 downto 64) & param(i)(79 downto 72) & param(i)(87 downto 80) & param(i)(95 downto 88) &
-                           --param(i)(103 downto 96) & param(i)(111 downto 104) & param(i)(119 downto 112) & param(i)(127 downto 120);
+            IO_data     <= param(i);
             wait for 40 ns;
         end loop;   
         progress <= waiting;     
@@ -630,10 +624,7 @@ begin
         progress <= sending_kernels;  
         for i in 0 to (kernels_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= kernel(i);--(7 downto 0) & kernel(i)(15 downto 8) & kernel(i)(23 downto 16) & kernel(i)(31 downto 24) &
-                           --kernel(i)(39 downto 32) & kernel(i)(47 downto 40) & kernel(i)(55 downto 48) & kernel(i)(63 downto 56) &
-                           --kernel(i)(71 downto 64) & kernel(i)(79 downto 72) & kernel(i)(87 downto 80) & kernel(i)(95 downto 88) &
-                           --kernel(i)(103 downto 96) & kernel(i)(111 downto 104) & kernel(i)(119 downto 112) & kernel(i)(127 downto 120);
+            IO_data     <= kernel(i);
             wait for 40 ns;
         end loop;
         progress <= waiting;        
@@ -664,10 +655,7 @@ begin
         progress <= sending_bias;  
         for i in 0 to (bias_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data     <= bias(i);--(7 downto 0) & bias(i)(15 downto 8) & bias(i)(23 downto 16) & bias(i)(31 downto 24) &
-                           --bias(i)(39 downto 32) & bias(i)(47 downto 40) & bias(i)(55 downto 48) & bias(i)(63 downto 56) &
-                           --bias(i)(71 downto 64) & bias(i)(79 downto 72) & bias(i)(87 downto 80) & bias(i)(95 downto 88) &
-                           --bias(i)(103 downto 96) & bias(i)(111 downto 104) & bias(i)(119 downto 112) & bias(i)(127 downto 120);
+            IO_data     <= bias(i);
             wait for 40 ns;
         end loop;
         progress <= waiting;        
@@ -698,10 +686,7 @@ begin
         progress <= sending_data;  
         for i in 0 to (data_len) -1 loop        
             wait until NOC_DATA_EN = '1';
-            IO_data        <= data(i);--(7 downto 0) & data(i)(15 downto 8) & data(i)(23 downto 16) & data(i)(31 downto 24) &
-                              --data(i)(39 downto 32) & data(i)(47 downto 40) & data(i)(55 downto 48) & data(i)(63 downto 56) &
-                              --data(i)(71 downto 64) & data(i)(79 downto 72) & data(i)(87 downto 80) & data(i)(95 downto 88) &
-                              --data(i)(103 downto 96) & data(i)(111 downto 104) & data(i)(119 downto 112) & data(i)(127 downto 120);
+            IO_data        <= data(i);
             wait for 40 ns;
         end loop;        
         progress <= waiting;

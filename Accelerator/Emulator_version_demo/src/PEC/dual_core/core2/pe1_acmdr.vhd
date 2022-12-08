@@ -142,7 +142,7 @@ begin
                 VE_DIN <= (others => '0');
                 mp_data_int <= (others => '0');
                 dbus_reg <= (others => '0');
-            elsif DATA_VLD = '1' then
+            elsif DATA_VLD = '1' and CLK_E_POS = '1' then
                 mp_data_int <= DIN;
                 dbus_reg <= DIN;          --input to microprogram data
             end if;
@@ -235,25 +235,6 @@ begin
                         end if;
                     else
                         push_cnt <= 0;
-                    end if;
-                end if;
-            end if;
-        end if;
-    end process;
-
-    process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                cnt_reg <= (others => '0');
-                transfer_type <= "00";
-            else
-                if push_cnt = 0 then
-                    if fifo_push = '1' then
-                        transfer_type <= dtm_reg(31 downto 30);
-                        if dtm_reg (31 downto 30) = "11" then
-                            cnt_reg <= (unsigned(dtm_reg(23 downto 16)) + 1);
-                        end if;
                     end if;
                 end if;
             end if;

@@ -1,4 +1,0 @@
-gds_files = /home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_DP_UHD_512x80
-MPT_PARAMETERS
-bitcell_name = mm17a04_u_22FDSOI_TP185SL_bitcell
-memory_boundary_layer = 62:21

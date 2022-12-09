@@ -3462,3 +3462,21 @@ INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_512x8
 INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_8Kx128
 INFO  [Integrator, IAPI-001]: Running "GENERATE" on component "SNPS_RF_DP_UHD_512x80".
 INFO  [Integrator, IAPI-010]: Finished "GENERATE" on "SNPS_RF_DP_UHD_512x80". Status: Successful
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_DP_HD_256x80
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_1024x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_1024x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_256x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_256x64
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_512x28
+INFO  [Integrator, IAPI-011]: Checking SNPS_RF_SP_UHS_64x64
+INFO  [Integrator, IAPI-011]: Checking SNPS_ROM_4Kx80_mprom00
+INFO  [Integrator, IAPI-011]: Checking SNPS_ROM_4Kx80_mprom11
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_1024x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_16Kx8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_1Kx160
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_256x32
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_2Kx80
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_512x8
+INFO  [Integrator, IAPI-011]: Checking SNPS_SP_HD_8Kx128
+INFO  [Integrator, IAPI-001]: Running "GENERATE" on component "SNPS_RF_DP_HD_256x80".
+INFO  [Integrator, IAPI-010]: Finished "GENERATE" on "SNPS_RF_DP_HD_256x80". Status: Successful

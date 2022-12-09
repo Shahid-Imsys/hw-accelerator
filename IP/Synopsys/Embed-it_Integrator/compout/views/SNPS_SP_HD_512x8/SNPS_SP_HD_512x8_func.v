@@ -26,12 +26,12 @@
 /*                                                                     */
 /*  Built for linux64 and running on linux64.                          */
 /*                                                                     */
-/*  Software           : Rev: S-2021.09-SP1                            */
+/*  Software           : Rev: U-2022.12                                */
 /*  Library Format     : Rev: 1.05.00                                  */
-/*  Compiler Name      : gf22nsd41p11s1dcl02msa04p1                    */
+/*  Compiler Name      : gf22nsd41p11s1dcl02msa05                      */
 /*  Platform           : Linux3.10.0-957.5.1.el7.x86_64                */
 /*                     : #1 SMP Wed Dec 19 10:46:58 EST 2018x86_64     */
-/*  Date of Generation : Mon May 23 16:08:56 CEST 2022                 */
+/*  Date of Generation : Fri Dec 09 14:16:08 CET 2022                  */
 /*                                                                     */
 /*---------------------------------------------------------------------*/
 
@@ -58,16 +58,16 @@ module SNPS_SP_HD_512x8_pin_lt_seg1 (D, LOG0, LOG1, Q, QP, VBN, VBP, VDDP,
     //*** Jumper Report ***
     // Jumper: LOG1 WEM[0] WEM[1] WEM[2] WEM[3]
 
-    mm16a04_u_hdsp_plus_io8x1_sw0_pin X_mm16a04_u_hdsp_plus_io8x1_sw0_pin_S0
+    mm16a05_u_hdsp_plus_io8x1_sw0_pin X_mm16a05_u_hdsp_plus_io8x1_sw0_pin_S0
         (VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], LOG0, LOG1, Q[0], QP[0],
         D[0], WEM[0]);
-    mm16a04_u_hdsp_plus_io8x1_sw0_pin X_mm16a04_u_hdsp_plus_io8x1_sw0_pin_S1
+    mm16a05_u_hdsp_plus_io8x1_sw0_pin X_mm16a05_u_hdsp_plus_io8x1_sw0_pin_S1
         (VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], LOG0, LOG1, Q[1], QP[1],
         D[1], WEM[1]);
-    mm16a04_u_hdsp_plus_io8x1_sw0_pin X_mm16a04_u_hdsp_plus_io8x1_sw0_pin_F1
+    mm16a05_u_hdsp_plus_io8x1_sw0_pin X_mm16a05_u_hdsp_plus_io8x1_sw0_pin_F1
         (VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], LOG0, LOG1, Q[2], QP[2],
         D[2], WEM[2]);
-    mm16a04_u_hdsp_plus_io8x1_sw0_pin X_mm16a04_u_hdsp_plus_io8x1_sw0_pin_F0
+    mm16a05_u_hdsp_plus_io8x1_sw0_pin X_mm16a05_u_hdsp_plus_io8x1_sw0_pin_F0
         (VDDP[3], VDDPI[3], VSS[3], VBP[3], VBN[3], LOG0, LOG1, Q[3], QP[3],
         D[3], WEM[3]);
 endmodule
@@ -91,7 +91,7 @@ module SNPS_SP_HD_512x8_pin_lt (D, LOG0, LOG1, Q, QP, SO_D, SO_Q, VBN, VBP,
     inout [3:0] VSS;
     supply0 [3:0] VSS;
     input [3:0] WEM;
-    mm16a04_u_hdsp_plus_cap_pin_left X_mm16a04_u_hdsp_plus_cap_pin_left (VBP[0],
+    mm16a05_u_hdsp_plus_cap_pin_left X_mm16a05_u_hdsp_plus_cap_pin_left (VBP[0],
         VBN[0], LOG0[0], LOG1[0], SO_D, SO_Q);
     SNPS_SP_HD_512x8_pin_lt_seg1 X_pin_lt_seg1 (.D({D[3],D[2],D[1],D[0]}),
         .LOG0(LOG0[1]), .LOG1(LOG1[1]), .Q({Q[3],Q[2],Q[1],Q[0]}),
@@ -145,16 +145,16 @@ module SNPS_SP_HD_512x8_pin_cnt (BC0, BC1, BC2, CLK, DS, FISO, LOG0, LOG1, LS,
     input [7:0] XADR;
     input [2:0] XBKADR;
     input [3:0] YADR;
-    mm16a04_u_hdsp_plus_buf_pin X_mm16a04_u_hdsp_plus_buf_pin_left (VDDP[0],
+    mm16a05_u_hdsp_plus_buf_pin X_mm16a05_u_hdsp_plus_buf_pin_left (VDDP[0],
         VDDPI[0], VSS[0], VBP[0], VBN[0], LOG0, LOG1);
-    mm16a04_u_hdsp_plus_gcenctrl_pin X_mm16a04_u_hdsp_plus_gcenctrl_pin (VDDF,
+    mm16a05_u_hdsp_plus_gcenctrl_pin X_mm16a05_u_hdsp_plus_gcenctrl_pin (VDDF,
         VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], DS, FISO, LOG0, LOG1, LS,
         RA[0], RA[1], RM[0], RM[1], RM[2], RM[3], RME, RSCEN, RSCIN, RSCLK,
         RSCOUT, RSCRST, SD, TEST1, TEST_RNM, WA[0], WA[1], WPULSE[0], WPULSE[1],
         WPULSE[2], BC0, BC1, BC2, CLK, ME, WE, XADR[0], XADR[1], XADR[2],
         XADR[3], XADR[4], XADR[5], XADR[6], XADR[7], XBKADR[0], XBKADR[1],
         XBKADR[2], YADR[0], YADR[1], YADR[2], YADR[3]);
-    mm16a04_u_hdsp_plus_buf_pin X_mm16a04_u_hdsp_plus_buf_pin (VDDP[2],
+    mm16a05_u_hdsp_plus_buf_pin X_mm16a05_u_hdsp_plus_buf_pin (VDDP[2],
         VDDPI[2], VSS[2], VBP[2], VBN[2], LOG0, LOG1);
 endmodule
 
@@ -186,7 +186,7 @@ module SNPS_SP_HD_512x8_pin_rt (D, LOG0, LOG1, Q, QP, ROP, SO_D, SO_Q, VBN, VBP,
         .VDDPI({VDDPI[3],VDDPI[2],VDDPI[1],VDDPI[0]}),
         .VSS({VSS[3],VSS[2],VSS[1],VSS[0]}),
         .WEM({WEM[3],WEM[2],WEM[1],WEM[0]}));
-    mm16a04_u_hdsp_plus_cap_pin X_mm16a04_u_hdsp_plus_cap_pin (VBP[4], VBN[4],
+    mm16a05_u_hdsp_plus_cap_pin X_mm16a05_u_hdsp_plus_cap_pin (VBP[4], VBN[4],
         ROP, LOG0[1], LOG1[1], SO_D, SO_Q);
 endmodule
 
@@ -356,7 +356,7 @@ module SNPS_SP_HD_512x8_gio_lt_seg1 (CB, CT, D, DCLKT, DIB, DINB, DLYPDB, D_AL,
     // Jumper: WEMB[2] WEM_AL[2]
     // Jumper: WEMB[3] WEM_AL[3]
 
-    mm16a04_u_hdsp_plus_giom8x1 X_mm16a04_u_hdsp_plus_giom8x1_S0 (VDDP[0],
+    mm16a05_u_hdsp_plus_giom8x1 X_mm16a05_u_hdsp_plus_giom8x1_S0 (VDDP[0],
         VDDPI[0], VDDPI_DR[0], VDDP[1], VSS[0], VBP[0], VBN[0], CB[0], CT[0],
         D_AL[0], LDIB[0], LQB[0], LWIB[0], ND_SEL[0], ND_SEL[1], ND_WB[0],
         ND_WB[1], ND_WT[0], ND_WT[1], Q[0], SEL[0], SEL[1], WB_IN[0], WB_IN[1],
@@ -364,7 +364,7 @@ module SNPS_SP_HD_512x8_gio_lt_seg1 (CB, CT, D, DCLKT, DIB, DINB, DLYPDB, D_AL,
         QB[0], QB[1], QT[0], QT[1], D[0], DCLKT, DINB[0], DLYPDB, IV_SEL[0],
         IV_SEL[1], IV_WB[0], IV_WB[1], IV_WT[0], IV_WT[1], LDFTYBUF, GSE_DB,
         GSE_DT, WEM[0], WEMB[0]);
-    mm16a04_u_hdsp_plus_giom8x1 X_mm16a04_u_hdsp_plus_giom8x1_S1 (VDDP[2],
+    mm16a05_u_hdsp_plus_giom8x1 X_mm16a05_u_hdsp_plus_giom8x1_S1 (VDDP[2],
         VDDPI[1], VDDPI_DR[1], VDDP[3], VSS[1], VBP[1], VBN[1], CB[1], CT[1],
         D_AL[1], LDIB[1], LQB[1], LWIB[1], ND_SEL[2], ND_SEL[3], ND_WB[2],
         ND_WB[3], ND_WT[2], ND_WT[3], Q[1], SEL[2], SEL[3], WB_IN[2], WB_IN[3],
@@ -372,7 +372,7 @@ module SNPS_SP_HD_512x8_gio_lt_seg1 (CB, CT, D, DCLKT, DIB, DINB, DLYPDB, D_AL,
         QB[2], QB[3], QT[2], QT[3], D[1], DCLKT, DINB[1], DLYPDB, IV_SEL[2],
         IV_SEL[3], IV_WB[2], IV_WB[3], IV_WT[2], IV_WT[3], LDFTYBUF, GSE_DB,
         GSE_DT, WEM[1], WEMB[1]);
-    mm16a04_u_hdsp_plus_giom8x1 X_mm16a04_u_hdsp_plus_giom8x1_F1 (VDDP[4],
+    mm16a05_u_hdsp_plus_giom8x1 X_mm16a05_u_hdsp_plus_giom8x1_F1 (VDDP[4],
         VDDPI[2], VDDPI_DR[2], VDDP[5], VSS[2], VBP[2], VBN[2], CB[2], CT[2],
         D_AL[2], LDIB[2], LQB[2], LWIB[2], ND_SEL[4], ND_SEL[5], ND_WB[4],
         ND_WB[5], ND_WT[4], ND_WT[5], Q[2], SEL[4], SEL[5], WB_IN[4], WB_IN[5],
@@ -380,7 +380,7 @@ module SNPS_SP_HD_512x8_gio_lt_seg1 (CB, CT, D, DCLKT, DIB, DINB, DLYPDB, D_AL,
         QB[4], QB[5], QT[4], QT[5], D[2], DCLKT, DINB[2], DLYPDB, IV_SEL[4],
         IV_SEL[5], IV_WB[4], IV_WB[5], IV_WT[4], IV_WT[5], LDFTYBUF, GSE_DB,
         GSE_DT, WEM[2], WEMB[2]);
-    mm16a04_u_hdsp_plus_giom8x1 X_mm16a04_u_hdsp_plus_giom8x1_F0 (VDDP[6],
+    mm16a05_u_hdsp_plus_giom8x1 X_mm16a05_u_hdsp_plus_giom8x1_F0 (VDDP[6],
         VDDPI[3], VDDPI_DR[3], VDDP[7], VSS[3], VBP[3], VBN[3], CB[3], CT[3],
         D_AL[3], LDIB[3], LQB[3], LWIB[3], ND_SEL[6], ND_SEL[7], ND_WB[6],
         ND_WB[7], ND_WT[6], ND_WT[7], Q[3], SEL[6], SEL[7], WB_IN[6], WB_IN[7],
@@ -438,7 +438,7 @@ module SNPS_SP_HD_512x8_gio_lt (CB, CT, D, DCLKT, DIB, DINB, DLYPDBL, D_AL,
     input [3:0] WEMB;
     output [3:0] WEM_AL;
     output [7:0] WT_IN;
-    mm16a04_u_hdsp_plus_capgio X_mm16a04_u_hdsp_plus_capgio (VDDP[0], VDDPI[0],
+    mm16a05_u_hdsp_plus_capgio X_mm16a05_u_hdsp_plus_capgio (VDDP[0], VDDPI[0],
         VSS[0], VBP[0], VBN[0], LOG0, LOG1, PWDO, VEDGE);
     SNPS_SP_HD_512x8_gio_lt_seg1 X_gio_lt_seg1 (.CB({CB[3],CB[2],CB[1],CB[0]}),
         .CT({CT[3],CT[2],CT[1],CT[0]}), .D({D[3],D[2],D[1],D[0]}),
@@ -614,13 +614,13 @@ module SNPS_SP_HD_512x8_gio_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BC0, BC1, BC2,
     // Jumper: VDDA[1] VDDP[1] VDDPI[1]
     // Jumper: VDDA[2] VDDP[2] VDDPI[2]
 
-    mm16a04_u_hdsp_plus_gcenbuf_dr X_mm16a04_u_hdsp_plus_gcenbuf_left (VDDA[0],
+    mm16a05_u_hdsp_plus_gcenbuf_dr X_mm16a05_u_hdsp_plus_gcenbuf_left (VDDA[0],
         VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], DCLKT[0], LYBL[0], LYBL[1],
         RASSIST[0], RASSIST[1], ARYSD[0], LSDB, LSDB_BC1, LSDB_BC2,
         ARYSD_BC1[0], ARYSD_BC2[0], DLYPDBL, GSE_DB[0], GSE_DT[0], LDFTYBUF[0],
         LOG0, LOG1, LCLKBIO, LY_ONE, LOG0, LY_ONE, LY_TWO, RAB[0], RAB[1],
         LOG1);
-    mm16a04_u_hdsp_plus_gcen X_mm16a04_u_hdsp_plus_gcen (VDDA[1], VDDF, VDDP[1],
+    mm16a05_u_hdsp_plus_gcen X_mm16a05_u_hdsp_plus_gcen (VDDA[1], VDDF, VDDP[1],
         VDDPI[1], VDDMINB, VSS[1], VBP[1], VBN[1], ARYSDB, ARYSDB_BC1,
         ARYSDB_BC2, CLKDEL, DEF1, DEF1B, DEF2, DEF2B, DEF_MODE, FAST1_MODE,
         FAST2_MODE, LBKADR0, LBKADR1, LBKADR2, LCLKB, LCLKBIO, LCLKT, LITESLP,
@@ -642,7 +642,7 @@ module SNPS_SP_HD_512x8_gio_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BC0, BC1, BC2,
         WMSLOW[3], WPULSE[0], WPULSE[1], WPULSE[2], XADR[0], XADR[1], XADR[2],
         XADR[3], XADR[4], XADR[5], XADR[6], XADR[7], YADR[0], YADR[1], YADR[2],
         YADR[3]);
-    mm16a04_u_hdsp_plus_gcenbuf X_mm16a04_u_hdsp_plus_gcenbuf (VDDA[2], VDDP[2],
+    mm16a05_u_hdsp_plus_gcenbuf X_mm16a05_u_hdsp_plus_gcenbuf (VDDA[2], VDDP[2],
         VDDPI[2], VSS[2], VBP[2], VBN[2], DCLKT[1], LYBH[0], LYBH[1],
         RASSIST[2], RASSIST[3], ARYSD[1], LSDB, LSDB_BC1, LSDB_BC2,
         ARYSD_BC1[1], ARYSD_BC2[1], DLYPDBR, GSE_DB[1], GSE_DT[1], LDFTYBUF[1],
@@ -728,7 +728,7 @@ module SNPS_SP_HD_512x8_gio_rt (CB, CT, D, DCLKT, DIB, DINB, DLYPDBR, D_AL,
         .WEMB({WEMB[3],WEMB[2],WEMB[1],WEMB[0]}),
         .WEM_AL({WEM_AL[3],WEM_AL[2],WEM_AL[1],WEM_AL[0]}),
         .WT_IN({WT_IN[7],WT_IN[6],WT_IN[5],WT_IN[4],WT_IN[3],WT_IN[2],WT_IN[1],WT_IN[0]}));
-    mm16a04_u_hdsp_plus_capgio X_mm16a04_u_hdsp_plus_capgio (VDDP[8], VDDPI[4],
+    mm16a05_u_hdsp_plus_capgio X_mm16a05_u_hdsp_plus_capgio (VDDP[8], VDDPI[4],
         VSS[4], VBP[4], VBN[4], LOG0, LOG1, PWDO, VEDGE);
 endmodule
 
@@ -1018,12 +1018,12 @@ module SNPS_SP_HD_512x8_sampwa (QB, QT, RB, RT, SEL, VBN, VBP, VDDP, VDDPI, VSS,
     // Jumper: VDDP[0] VDDPI[0]
     // Jumper: VDDP[1] VDDPI[1]
 
-    mm16a04_u_hdsp_plus_hs_sacm4x1_wa_64
-        X_mm16a04_u_hdsp_plus_hs_sacm4x1_wa_64_S0 (VDDP[0], VDDPI[0], VSS[0],
+    mm16a05_u_hdsp_plus_hs_sacm4x1_wa_64
+        X_mm16a05_u_hdsp_plus_hs_sacm4x1_wa_64_S0 (VDDP[0], VDDPI[0], VSS[0],
         VSS_WA[0], VBP[0], VBN[0], QB[0], QT[0], RB[0], RT[0], SEL[0], WA[0],
         WA[1], WAPRCLKBUF, WAPRCLKBUFB_RET, WB[0], WB_IN[0], WT[0], WT_IN[0]);
-    mm16a04_u_hdsp_plus_hs_sacm4x1_wa_64
-        X_mm16a04_u_hdsp_plus_hs_sacm4x1_wa_64_F0 (VDDP[1], VDDPI[1], VSS[1],
+    mm16a05_u_hdsp_plus_hs_sacm4x1_wa_64
+        X_mm16a05_u_hdsp_plus_hs_sacm4x1_wa_64_F0 (VDDP[1], VDDPI[1], VSS[1],
         VSS_WA[1], VBP[1], VBN[1], QB[1], QT[1], RB[1], RT[1], SEL[1], WA[0],
         WA[1], WAPRCLKBUF, WAPRCLKBUFB_RET, WB[1], WB_IN[1], WT[1], WT_IN[1]);
 endmodule
@@ -1116,7 +1116,7 @@ module SNPS_SP_HD_512x8_sacwa_lt (LOG0, LOG1, PWDO, QB, QT, RB, RT, SEL, VBN,
     inout [7:0] WB_IN;
     inout [7:0] WT;
     inout [7:0] WT_IN;
-    mm16a04_u_hdsp_plus_capsac_wa X_mm16a04_u_hdsp_plus_capsac_wa_left (VDDP[0],
+    mm16a05_u_hdsp_plus_capsac_wa X_mm16a05_u_hdsp_plus_capsac_wa_left (VDDP[0],
         VDDPI[0], VSS[0], VBP[0], VBN[0], LOG0, LOG1, PWDO, VEDGE, WAPRCLKBUF,
         WAPRCLKBUFB_RET);
     SNPS_SP_HD_512x8_sacwa_lt_seg1 X_sacwa_lt_seg1
@@ -1204,11 +1204,11 @@ module SNPS_SP_HD_512x8_sacwa_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, CENDP, DEF_MODE,
     // Jumper: VDDP[1] VDDPI[1]
     // Jumper: VDDP[2] VDDPI[2]
 
-    mm16a04_u_hdsp_plus_sacbuf_wa X_mm16a04_u_hdsp_plus_sacbuf_wa_left (VDDA[0],
+    mm16a05_u_hdsp_plus_sacbuf_wa X_mm16a05_u_hdsp_plus_sacbuf_wa_left (VDDA[0],
         VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], WAL[0], WAL[1],
         WAPRCLKBUF[0], ARYSD[0], ARYSD_BC1[0], ARYSD_BC2[0], LCGTH[0],
         RASSIST[0], RASSIST[1], WAPRCLKBUFB_RETL, WABUF[0], WABUF[1], WAPRCLK);
-    mm16a04_u_hdsp_plus_sactrl_wa X_mm16a04_u_hdsp_plus_sactrlwa_64 (VDDA[1],
+    mm16a05_u_hdsp_plus_sactrl_wa X_mm16a05_u_hdsp_plus_sactrlwa_64 (VDDA[1],
         VDDMINB, VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], PRCKDLY, TAP1, TAP2,
         TAP3, WAPRCLK, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOAT, FLOAT_RET,
         LBKADR0, LBKADR1, LBKADR2, LCGTH_PCHG, LMATCHB, LOG0, LOG1, LWERD,
@@ -1218,7 +1218,7 @@ module SNPS_SP_HD_512x8_sacwa_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, CENDP, DEF_MODE,
         LWEIB, LXADR[0], LXADR[1], LXADR[2], LXADR[3], LXADR[4], LXADR[5],
         LXADR[6], LXADR[7], LYADR[0], LYADR[1], PRCKDLY, RMT[0], RMT[1], RMT[2],
         RMT[3], T1T);
-    mm16a04_u_hdsp_plus_sacbuf_wa X_mm16a04_u_hdsp_plus_sacbuf_wa (VDDA[2],
+    mm16a05_u_hdsp_plus_sacbuf_wa X_mm16a05_u_hdsp_plus_sacbuf_wa (VDDA[2],
         VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], WAR[0], WAR[1],
         WAPRCLKBUF[1], ARYSD[1], ARYSD_BC1[1], ARYSD_BC2[1], LCGTH[1],
         RASSIST[2], RASSIST[3], WAPRCLKBUFB_RET, WABUF[0], WABUF[1], WAPRCLK);
@@ -1271,7 +1271,7 @@ module SNPS_SP_HD_512x8_sacwa_rt (LOG0, LOG1, PWDO, QB, QT, RB, RT, SEL, VBN,
         .WB_IN({WB_IN[7],WB_IN[6],WB_IN[5],WB_IN[4],WB_IN[3],WB_IN[2],WB_IN[1],WB_IN[0]}),
         .WT({WT[7],WT[6],WT[5],WT[4],WT[3],WT[2],WT[1],WT[0]}),
         .WT_IN({WT_IN[7],WT_IN[6],WT_IN[5],WT_IN[4],WT_IN[3],WT_IN[2],WT_IN[1],WT_IN[0]}));
-    mm16a04_u_hdsp_plus_capsac_wa X_mm16a04_u_hdsp_plus_capsac_wa_64 (VDDP[8],
+    mm16a05_u_hdsp_plus_capsac_wa X_mm16a05_u_hdsp_plus_capsac_wa_64 (VDDP[8],
         VDDPI[8], VSS[8], VBP[8], VBN[8], LOG0, LOG1, PWDO, VEDGE, WAPRCLKBUF,
         WAPRCLKBUFB_RET);
 endmodule
@@ -1452,12 +1452,12 @@ module SNPS_SP_HD_512x8_samp (BYPASS, BYPASS_RET, LCGTH, LOG0, LOG1, QBOUT,
     // Jumper: VDDP[0] VDDPI[0]
     // Jumper: VDDP[1] VDDPI[1]
 
-    mm16a04_u_hdsp_plus_sacm4x1_nor X_mm16a04_u_hdsp_plus_sacm4x1_nor_S0
+    mm16a05_u_hdsp_plus_sacm4x1_nor X_mm16a05_u_hdsp_plus_sacm4x1_nor_S0
         (VDDP[0], VDDPI[0], VSS[0], VSS_WA[0], VBP[0], VBN[0], QBOUT[0],
         QTOUT[0], BYPASS, BYPASS_RET, LCGTH, LOG0, LOG1, RASSISTT[0],
         RASSISTT[1], RB[0], RT[0], SAED, WB[0], WB_IN[0], WT[0], WT_IN[0],
         QB_IN[0], QB_NORIN[0], QT_IN[0], QT_NORIN[0], SAEB, SAPRB, SEL[0]);
-    mm16a04_u_hdsp_plus_sacm4x1_nor X_mm16a04_u_hdsp_plus_sacm4x1_nor_F0
+    mm16a05_u_hdsp_plus_sacm4x1_nor X_mm16a05_u_hdsp_plus_sacm4x1_nor_F0
         (VDDP[1], VDDPI[1], VSS[1], VSS_WA[1], VBP[1], VBN[1], QBOUT[1],
         QTOUT[1], BYPASS, BYPASS_RET, LCGTH, LOG0, LOG1, RASSISTT[0],
         RASSISTT[1], RB[1], RT[1], SAED, WB[1], WB_IN[1], WT[1], WT_IN[1],
@@ -1588,7 +1588,7 @@ module SNPS_SP_HD_512x8_sac_lt (BYPASS, BYPASS_RET, LCGTH, LOG0, LOG1, PWDO,
     inout [7:0] WB_IN;
     inout [7:0] WT;
     inout [7:0] WT_IN;
-    mm16a04_u_hdsp_plus_capsac X_mm16a04_u_hdsp_plus_capsac (VDDP[0], VDDPI[0],
+    mm16a05_u_hdsp_plus_capsac X_mm16a05_u_hdsp_plus_capsac (VDDP[0], VDDPI[0],
         VSS[0], VBP[0], VBN[0], SAED, LOG0, LOG1, PWDO, VEDGE, SAEB);
     SNPS_SP_HD_512x8_sac_lt_seg1 X_sac_lt_seg1 (.BYPASS(BYPASS),
         .BYPASS_RET(BYPASS_RET), .LCGTH(LCGTH), .LOG0(LOG0), .LOG1(LOG1),
@@ -1706,7 +1706,7 @@ module SNPS_SP_HD_512x8_sac_cen (BYPASS, BYP_VLOAD, CENDP, DEF_MODE, ENLPGB,
     // Jumper: RWLBHV RWLBLV
     // Jumper: VDDA VDDP VDDPI
 
-    mm16a04_u_hdsp_plus_sactrl X_mm16a04_u_hdsp_plus_sactrl (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_sactrl X_mm16a05_u_hdsp_plus_sactrl (VDDA, VDDMINB,
         VDDP, VDDPI, VSS, VBP, VBN, FAST1B, LCGTB, LCGTHB, LCGTHLV, LCGTH_PCHG,
         LLBKADRB[0], LLBKADRB[1], LLBKADRB[2], LLBKADRT[0], LLBKADRT[1],
         LLBKADRT[2], LMATCH, LWERD, LWEWR, PM[0], PM[1], PM[2], PM[3], PRCKE_B,
@@ -1760,7 +1760,7 @@ module SNPS_SP_HD_512x8_sac_buf (ARYSD, ARYSD_BC1, ARYSD_BC2, BYPASS,
     // Jumper: LCGTHB LCGTHB_IN
     // Jumper: VDDA VDDP VDDPI
 
-    mm16a04_u_hdsp_plus_sacbuf X_mm16a04_u_hdsp_plus_sacbuf (VDDA, VDDP, VDDPI,
+    mm16a05_u_hdsp_plus_sacbuf X_mm16a05_u_hdsp_plus_sacbuf (VDDA, VDDP, VDDPI,
         VSS, VBP, VBN, LCGTH, SAEB, SAPRB, ARYSD, ARYSD_BC1, ARYSD_BC2, BYPASS,
         BYPASS_RET, LOG0, LOG1, RASSIST[0], RASSIST[1], RASSISTT[0],
         RASSISTT[1], SAED, LCGTHB, LCGTHB_IN, LCGTHHV, SAET, SAPRT);
@@ -1854,7 +1854,7 @@ module SNPS_SP_HD_512x8_sac_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BYPASS,
     // Jumper: LCGTHB LCGTHB_IN[0]
     // Jumper: VDDA[0] VDDP[0] VDDPI[0]
 
-    mm16a04_u_hdsp_plus_sacbuf X_mm16a04_u_hdsp_plus_sacbuf_left (VDDA[0],
+    mm16a05_u_hdsp_plus_sacbuf X_mm16a05_u_hdsp_plus_sacbuf_left (VDDA[0],
         VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], LCGTH[0], SAEBL, SAPRB[0],
         ARYSD[0], ARYSD_BC1[0], ARYSD_BC2[0], BYPASS[0], BYPASS_RET[0], LOG0,
         LOG1, RASSIST[0], RASSIST[1], RASSISTTL[0], RASSISTTL[1], SAEDL, LCGTHB,
@@ -1957,7 +1957,7 @@ module SNPS_SP_HD_512x8_sac_rt (BYPASS, BYPASS_RET, LCGTH, LOG0, LOG1, PWDO,
         .WB_IN({WB_IN[7],WB_IN[6],WB_IN[5],WB_IN[4],WB_IN[3],WB_IN[2],WB_IN[1],WB_IN[0]}),
         .WT({WT[7],WT[6],WT[5],WT[4],WT[3],WT[2],WT[1],WT[0]}),
         .WT_IN({WT_IN[7],WT_IN[6],WT_IN[5],WT_IN[4],WT_IN[3],WT_IN[2],WT_IN[1],WT_IN[0]}));
-    mm16a04_u_hdsp_plus_capsac X_mm16a04_u_hdsp_plus_capsac (VDDP[8], VDDPI[8],
+    mm16a05_u_hdsp_plus_capsac X_mm16a05_u_hdsp_plus_capsac (VDDP[8], VDDPI[8],
         VSS[8], VBP[8], VBN[8], SAED, LOG0, LOG1, PWDO, VEDGE, SAEB);
 endmodule
 
@@ -2180,13 +2180,13 @@ module SNPS_SP_HD_512x8_cmux_tile (BB, BT, CKPRCH, LOG0, LOG1, PO, POWINT,
     // Jumper: VDDA[0] VDDP[0] VDDPI[0]
     // Jumper: VDDA[1] VDDP[1] VDDPI[1]
 
-    mm16a04_u_hdsp_plus_hc_cmux4x1 X_mm16a04_u_hdsp_plus_hc_cmux4x1_S0 (VDDA[0],
+    mm16a05_u_hdsp_plus_hc_cmux4x1 X_mm16a05_u_hdsp_plus_hc_cmux4x1_S0 (VDDA[0],
         VDDAI[0], VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], BB[0], BB[1],
         BB[2], BB[3], BT[0], BT[1], BT[2], BT[3], LOG0, LOG1, PO[0], PO[1],
         POWINT[0], POWINT[1], QB[0], QT[0], RB[0], RT[0], VBA[0], WB[0], WBI[0],
         WT[0], WTI[0], CKPRCH, PRCHRDB[0], PRCHRDB[1], PRCHRDB[2], PRCHRDB[3],
         PRCHWRB[0], PRCHWRB[1], PRCHWRB[2], PRCHWRB[3], SEL[0]);
-    mm16a04_u_hdsp_plus_hc_cmux4x1 X_mm16a04_u_hdsp_plus_hc_cmux4x1_F0 (VDDA[1],
+    mm16a05_u_hdsp_plus_hc_cmux4x1 X_mm16a05_u_hdsp_plus_hc_cmux4x1_F0 (VDDA[1],
         VDDAI[1], VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], BB[4], BB[5],
         BB[6], BB[7], BT[4], BT[5], BT[6], BT[7], LOG0, LOG1, PO[0], PO[1],
         POWINT[0], POWINT[1], QB[1], QT[1], RB[1], RT[1], VBA[1], WB[1], WBI[1],
@@ -2323,7 +2323,7 @@ module SNPS_SP_HD_512x8_mux_lt (BB, BOTEDGE, BT, CKPRCH, LOG0, LOG1, PGIOI, PO,
     //*** Jumper Report ***
     // Jumper: VDDA[0] VDDP[0] VDDPI[0]
 
-    mm16a04_u_hdsp_plus_capmux X_mm16a04_u_hdsp_plus_capmux (VDDA[0], VDDP[0],
+    mm16a05_u_hdsp_plus_capmux X_mm16a05_u_hdsp_plus_capmux (VDDA[0], VDDP[0],
         VDDPI[0], VSS[0], VBP[0], VBN[0], BOTEDGE, LOG0, LOG1, PGIOI, PO,
         VBA[0], VEDGE);
     SNPS_SP_HD_512x8_mux_lt_seg1 X_mux_lt_seg1
@@ -2450,7 +2450,7 @@ module SNPS_SP_HD_512x8_mux_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BOTEDGE,
     // Jumper: XPRBH[2] XPRBL[2]
     // Jumper: XPRBH[3] XPRBL[3]
 
-    mm16a04_u_hdsp_plus_lcenbuf X_mm16a04_u_hdsp_plus_lcenbuf_left (VDDA[0],
+    mm16a05_u_hdsp_plus_lcenbuf X_mm16a05_u_hdsp_plus_lcenbuf_left (VDDA[0],
         VDDP[0], VDDPI[0], VDDWL[0], VSS[0], VBP[0], VBN[0], CKPRCHL, LCGTHB[0],
         PRCHRDBL[0], PRCHRDBL[1], PRCHRDBL[2], PRCHRDBL[3], PRCHWRBL[0],
         PRCHWRBL[1], PRCHWRBL[2], PRCHWRBL[3], RASSISTBL[0], RASSISTBL[1],
@@ -2458,7 +2458,7 @@ module SNPS_SP_HD_512x8_mux_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BOTEDGE,
         CKPRCHB, LCGTH[0], LOG0, LOG1, PRCHRD[0], PRCHRD[1], PRCHRD[2],
         PRCHRD[3], PRCHWR[0], PRCHWR[1], PRCHWR[2], PRCHWR[3], RASSIST[0],
         RASSIST[1]);
-    mm16a04_u_hdsp_plus_lcen X_mm16a04_u_hdsp_plus_lcen (VDDA[1], VDDMINB,
+    mm16a05_u_hdsp_plus_lcen X_mm16a05_u_hdsp_plus_lcen (VDDA[1], VDDMINB,
         VDDP[1], VDDPI[1], VSS[1], VSSC_WL_L, VSSC_WL_R, VBP[1], VBN[1],
         CKPRCHB, LMATCH, PBB[0], PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6],
         PBB[7], PCB[0], PCB[1], PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7],
@@ -2474,7 +2474,7 @@ module SNPS_SP_HD_512x8_mux_cnt (ARYSD, ARYSD_BC1, ARYSD_BC2, BOTEDGE,
         LXADR[4], LXADR[5], LXADR[6], LXADR[7], LYADR[0], LYADR[1], PM[0],
         PM[1], PM[2], PM[3], PRCKE_T, RM3CNT, RMT[0], RMT[1], RMT[2], RMT[3],
         T1T, TEST_RNMB);
-    mm16a04_u_hdsp_plus_lcenbuf X_mm16a04_u_hdsp_plus_lcenbuf (VDDA[2], VDDP[2],
+    mm16a05_u_hdsp_plus_lcenbuf X_mm16a05_u_hdsp_plus_lcenbuf (VDDA[2], VDDP[2],
         VDDPI[2], VDDWL[1], VSS[2], VBP[2], VBN[2], CKPRCHH, LCGTHB[1],
         PRCHRDBH[0], PRCHRDBH[1], PRCHRDBH[2], PRCHRDBH[3], PRCHWRBH[0],
         PRCHWRBH[1], PRCHWRBH[2], PRCHWRBH[3], RASSISTBH[0], RASSISTBH[1],
@@ -2549,7 +2549,7 @@ module SNPS_SP_HD_512x8_mux_rt (BB, BOTEDGE, BT, CKPRCH, LOG0, LOG1, PGIOI, PO,
         .WBI({WBI[7],WBI[6],WBI[5],WBI[4],WBI[3],WBI[2],WBI[1],WBI[0]}),
         .WT({WT[7],WT[6],WT[5],WT[4],WT[3],WT[2],WT[1],WT[0]}),
         .WTI({WTI[7],WTI[6],WTI[5],WTI[4],WTI[3],WTI[2],WTI[1],WTI[0]}));
-    mm16a04_u_hdsp_plus_capmux X_mm16a04_u_hdsp_plus_capmux (VDDA[8], VDDP[8],
+    mm16a05_u_hdsp_plus_capmux X_mm16a05_u_hdsp_plus_capmux (VDDA[8], VDDP[8],
         VDDPI[8], VSS[8], VBP[8], VBN[8], BOTEDGE, LOG0, LOG1, PGIOI, PO,
         VBA[8], VEDGE);
 endmodule
@@ -2754,35 +2754,35 @@ module SNPS_SP_HD_512x8_ary_lt_seg1 (BB, BT, QB, QT, SEL, VBA, VBN, VBP, VDDA,
     inout [7:0] WBI;
     input [3:0] WL;
     inout [7:0] WTI;
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_S0 (VDDA[0],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_S0 (VDDA[0],
         VDDAI[0], VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], BB[0], BB[1],
         BB[2], BB[3], BT[0], BT[1], BT[2], BT[3], QB[0], QT[0], SEL[0], VBA[0],
         WBI[0], WTI[0], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_S1 (VDDA[1],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_S1 (VDDA[1],
         VDDAI[1], VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], BB[4], BB[5],
         BB[6], BB[7], BT[4], BT[5], BT[6], BT[7], QB[1], QT[1], SEL[1], VBA[1],
         WBI[1], WTI[1], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_S2 (VDDA[2],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_S2 (VDDA[2],
         VDDAI[2], VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], BB[8], BB[9],
         BB[10], BB[11], BT[8], BT[9], BT[10], BT[11], QB[2], QT[2], SEL[2],
         VBA[2], WBI[2], WTI[2], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_S3 (VDDA[3],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_S3 (VDDA[3],
         VDDAI[3], VDDP[3], VDDPI[3], VSS[3], VBP[3], VBN[3], BB[12], BB[13],
         BB[14], BB[15], BT[12], BT[13], BT[14], BT[15], QB[3], QT[3], SEL[3],
         VBA[3], WBI[3], WTI[3], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_F3 (VDDA[4],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_F3 (VDDA[4],
         VDDAI[4], VDDP[4], VDDPI[4], VSS[4], VBP[4], VBN[4], BB[16], BB[17],
         BB[18], BB[19], BT[16], BT[17], BT[18], BT[19], QB[4], QT[4], SEL[4],
         VBA[4], WBI[4], WTI[4], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_F2 (VDDA[5],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_F2 (VDDA[5],
         VDDAI[5], VDDP[5], VDDPI[5], VSS[5], VBP[5], VBN[5], BB[20], BB[21],
         BB[22], BB[23], BT[20], BT[21], BT[22], BT[23], QB[5], QT[5], SEL[5],
         VBA[5], WBI[5], WTI[5], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_F1 (VDDA[6],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_F1 (VDDA[6],
         VDDAI[6], VDDP[6], VDDPI[6], VSS[6], VBP[6], VBN[6], BB[24], BB[25],
         BB[26], BB[27], BT[24], BT[25], BT[26], BT[27], QB[6], QT[6], SEL[6],
         VBA[6], WBI[6], WTI[6], WL[0], WL[1], WL[2], WL[3]);
-    mm16a04_u_hdsp_plus_ar4x4m4 X_mm16a04_u_hdsp_plus_ar4x4m4_F0 (VDDA[7],
+    mm16a05_u_hdsp_plus_ar4x4m4 X_mm16a05_u_hdsp_plus_ar4x4m4_F0 (VDDA[7],
         VDDAI[7], VDDP[7], VDDPI[7], VSS[7], VBP[7], VBN[7], BB[28], BB[29],
         BB[30], BB[31], BT[28], BT[29], BT[30], BT[31], QB[7], QT[7], SEL[7],
         VBA[7], WBI[7], WTI[7], WL[0], WL[1], WL[2], WL[3]);
@@ -2818,7 +2818,7 @@ module SNPS_SP_HD_512x8_ary_lt (BB, BT, EDGEB, EDGET, LOG0, LOG1, PGIOI, QB, QT,
     inout [7:0] WBI;
     inout [3:0] WL;
     inout [7:0] WTI;
-    mm16a04_u_hdsp_plus_edge4 X_mm16a04_u_hdsp_plus_edge4 (VDDA[0], VDDP[0],
+    mm16a05_u_hdsp_plus_edge4 X_mm16a05_u_hdsp_plus_edge4 (VDDA[0], VDDP[0],
         VDDPI[0], VSS[0], VBP[0], VBN[0], EDGEB, EDGET, LOG0, LOG1, PGIOI,
         VBA[0], VEDGE, WL[0], WL[1], WL[2], WL[3]);
     SNPS_SP_HD_512x8_ary_lt_seg1 X_ary_lt_seg1
@@ -3204,82 +3204,82 @@ module SNPS_SP_HD_512x8_ary_buf_lt_col (ARYSD, ARYSD_BC1, ARYSD_BC2,
     supply0 VSS;
     output [63:0] WL;
     input [63:0] WLB;
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S0 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S0 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[0], WL[1], WL[2], WL[3], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[0], EDGET[0], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[0], WLB[1], WLB[2],
         WLB[3]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S1 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S1 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[4], WL[5], WL[6], WL[7], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[1], EDGET[1], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[4], WLB[5], WLB[6],
         WLB[7]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S2 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S2 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[8], WL[9], WL[10], WL[11], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[2], EDGET[2], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[8], WLB[9], WLB[10],
         WLB[11]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S3 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S3 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[12], WL[13], WL[14], WL[15], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[3], EDGET[3], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[12], WLB[13], WLB[14],
         WLB[15]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S4 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S4 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[16], WL[17], WL[18], WL[19], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[4], EDGET[4], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[16], WLB[17], WLB[18],
         WLB[19]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S5 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S5 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[20], WL[21], WL[22], WL[23], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[5], EDGET[5], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[20], WLB[21], WLB[22],
         WLB[23]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S6 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S6 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[24], WL[25], WL[26], WL[27], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[6], EDGET[6], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[24], WLB[25], WLB[26],
         WLB[27]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_S7 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_S7 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[28], WL[29], WL[30], WL[31], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[7], EDGET[7], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[28], WLB[29], WLB[30],
         WLB[31]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F7 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F7 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[32], WL[33], WL[34], WL[35], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[8], EDGET[8], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[32], WLB[33], WLB[34],
         WLB[35]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F6 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F6 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[36], WL[37], WL[38], WL[39], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[9], EDGET[9], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[36], WLB[37], WLB[38],
         WLB[39]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F5 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F5 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[40], WL[41], WL[42], WL[43], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[10], EDGET[10], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[40], WLB[41],
         WLB[42], WLB[43]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F4 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F4 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[44], WL[45], WL[46], WL[47], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[11], EDGET[11], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[44], WLB[45],
         WLB[46], WLB[47]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F3 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F3 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[48], WL[49], WL[50], WL[51], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[12], EDGET[12], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[48], WLB[49],
         WLB[50], WLB[51]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F2 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F2 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[52], WL[53], WL[54], WL[55], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[13], EDGET[13], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[52], WLB[53],
         WLB[54], WLB[55]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F1 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F1 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[56], WL[57], WL[58], WL[59], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[14], EDGET[14], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[56], WLB[57],
         WLB[58], WLB[59]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_left_F0 (VDDWL, VDDA,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_left_F0 (VDDWL, VDDA,
         VDDP, VDDPI, VSS, VBP, VBN, WL[60], WL[61], WL[62], WL[63], ARYSD,
         ARYSD_BC1, ARYSD_BC2, EDGEB[15], EDGET[15], LCGTH, LOG0, LOG1,
         RASSIST[0], RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[60], WLB[61],
@@ -3412,7 +3412,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
     // Jumper: PBB[7] B[7] B[15]
     // Jumper: PCB[1] C[8] C[9] C[10] C[11] C[12] C[13] C[14] C[15]
 
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S0 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S0 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[0], WLBH[0],
         WLBH[1], WLBH[2], WLBH[3], WLBL[0], WLBL[1], WLBL[2], WLBL[3],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3425,7 +3425,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S1 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S1 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[1], WLBH[4],
         WLBH[5], WLBH[6], WLBH[7], WLBL[4], WLBL[5], WLBL[6], WLBL[7],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3438,7 +3438,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S2 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S2 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[2], WLBH[8],
         WLBH[9], WLBH[10], WLBH[11], WLBL[8], WLBL[9], WLBL[10], WLBL[11],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3451,7 +3451,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S3 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S3 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[3], WLBH[12],
         WLBH[13], WLBH[14], WLBH[15], WLBL[12], WLBL[13], WLBL[14], WLBL[15],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3464,7 +3464,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S4 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S4 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[4], WLBH[16],
         WLBH[17], WLBH[18], WLBH[19], WLBL[16], WLBL[17], WLBL[18], WLBL[19],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3477,7 +3477,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S5 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S5 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[5], WLBH[20],
         WLBH[21], WLBH[22], WLBH[23], WLBL[20], WLBL[21], WLBL[22], WLBL[23],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3490,7 +3490,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S6 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S6 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[6], WLBH[24],
         WLBH[25], WLBH[26], WLBH[27], WLBL[24], WLBL[25], WLBL[26], WLBL[27],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3503,7 +3503,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_S7 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_S7 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[7], WLBH[28],
         WLBH[29], WLBH[30], WLBH[31], WLBL[28], WLBL[29], WLBL[30], WLBL[31],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3516,7 +3516,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F7 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F7 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[8], WLBH[32],
         WLBH[33], WLBH[34], WLBH[35], WLBL[32], WLBL[33], WLBL[34], WLBL[35],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3529,7 +3529,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F6 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F6 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[9], WLBH[36],
         WLBH[37], WLBH[38], WLBH[39], WLBL[36], WLBL[37], WLBL[38], WLBL[39],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3542,7 +3542,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F5 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F5 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[10], WLBH[40],
         WLBH[41], WLBH[42], WLBH[43], WLBL[40], WLBL[41], WLBL[42], WLBL[43],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3555,7 +3555,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F4 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F4 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[11], WLBH[44],
         WLBH[45], WLBH[46], WLBH[47], WLBL[44], WLBL[45], WLBL[46], WLBL[47],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3568,7 +3568,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F3 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F3 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[12], WLBH[48],
         WLBH[49], WLBH[50], WLBH[51], WLBL[48], WLBL[49], WLBL[50], WLBL[51],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3581,7 +3581,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F2 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F2 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[13], WLBH[52],
         WLBH[53], WLBH[54], WLBH[55], WLBL[52], WLBL[53], WLBL[54], WLBL[55],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3594,7 +3594,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F1 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F1 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[14], WLBH[56],
         WLBH[57], WLBH[58], WLBH[59], WLBL[56], WLBL[57], WLBL[58], WLBL[59],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3607,7 +3607,7 @@ module SNPS_SP_HD_512x8_ary_xdec (.B({B[0]}), BYP_VLOAD, .C({C[0]}), CENDP,
         PBB[1], PBB[2], PBB[3], PBB[4], PBB[5], PBB[6], PBB[7], PCB[0], PCB[1],
         PCB[2], PCB[3], PCB[4], PCB[5], PCB[6], PCB[7], WCLKB[0], WCLKB[1],
         WCLKB[2], WCLKB[3]);
-    mm16a04_u_hdsp_plus_x4dec X_mm16a04_u_hdsp_plus_x4dec_F0 (VDDA, VDDMINB,
+    mm16a05_u_hdsp_plus_x4dec X_mm16a05_u_hdsp_plus_x4dec_F0 (VDDA, VDDMINB,
         VDDP, VDDPI, VSSC_WL_L, VSSC_WL_R, VSS, VBP, VBN, DECL[15], WLBH[60],
         WLBH[61], WLBH[62], WLBH[63], WLBL[60], WLBL[61], WLBL[62], WLBL[63],
         BYP_VLOAD, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOATT, FLOAT_RET, LDFTX,
@@ -3650,82 +3650,82 @@ module SNPS_SP_HD_512x8_ary_buf_col (ARYSD, ARYSD_BC1, ARYSD_BC2,
     supply0 VSS;
     output [63:0] WL;
     input [63:0] WLB;
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S0 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S0 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[0], WL[1], WL[2], WL[3], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[0], EDGET[0], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[0], WLB[1], WLB[2],
         WLB[3]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S1 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S1 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[4], WL[5], WL[6], WL[7], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[1], EDGET[1], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[4], WLB[5], WLB[6],
         WLB[7]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S2 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S2 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[8], WL[9], WL[10], WL[11], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[2], EDGET[2], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[8], WLB[9], WLB[10],
         WLB[11]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S3 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S3 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[12], WL[13], WL[14], WL[15], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[3], EDGET[3], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[12], WLB[13], WLB[14],
         WLB[15]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S4 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S4 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[16], WL[17], WL[18], WL[19], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[4], EDGET[4], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[16], WLB[17], WLB[18],
         WLB[19]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S5 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S5 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[20], WL[21], WL[22], WL[23], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[5], EDGET[5], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[20], WLB[21], WLB[22],
         WLB[23]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S6 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S6 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[24], WL[25], WL[26], WL[27], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[6], EDGET[6], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[24], WLB[25], WLB[26],
         WLB[27]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_S7 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_S7 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[28], WL[29], WL[30], WL[31], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[7], EDGET[7], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[28], WLB[29], WLB[30],
         WLB[31]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F7 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F7 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[32], WL[33], WL[34], WL[35], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[8], EDGET[8], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[32], WLB[33], WLB[34],
         WLB[35]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F6 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F6 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[36], WL[37], WL[38], WL[39], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[9], EDGET[9], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[36], WLB[37], WLB[38],
         WLB[39]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F5 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F5 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[40], WL[41], WL[42], WL[43], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[10], EDGET[10], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[40], WLB[41], WLB[42],
         WLB[43]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F4 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F4 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[44], WL[45], WL[46], WL[47], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[11], EDGET[11], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[44], WLB[45], WLB[46],
         WLB[47]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F3 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F3 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[48], WL[49], WL[50], WL[51], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[12], EDGET[12], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[48], WLB[49], WLB[50],
         WLB[51]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F2 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F2 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[52], WL[53], WL[54], WL[55], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[13], EDGET[13], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[52], WLB[53], WLB[54],
         WLB[55]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F1 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F1 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[56], WL[57], WL[58], WL[59], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[14], EDGET[14], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[56], WLB[57], WLB[58],
         WLB[59]);
-    mm16a04_u_hdsp_plus_x4buf X_mm16a04_u_hdsp_plus_x4buf_F0 (VDDWL, VDDA, VDDP,
+    mm16a05_u_hdsp_plus_x4buf X_mm16a05_u_hdsp_plus_x4buf_F0 (VDDWL, VDDA, VDDP,
         VDDPI, VSS, VBP, VBN, WL[60], WL[61], WL[62], WL[63], ARYSD, ARYSD_BC1,
         ARYSD_BC2, EDGEB[15], EDGET[15], LCGTH, LOG0, LOG1, RASSIST[0],
         RASSIST[1], RASSISTB[0], RASSISTB[1], VBA, WLB[60], WLB[61], WLB[62],
@@ -3932,7 +3932,7 @@ module SNPS_SP_HD_512x8_ary_rt (BB, BT, EDGEB, EDGET, LOG0, LOG1, PGIOI, QB, QT,
         .WBI({WBI[7],WBI[6],WBI[5],WBI[4],WBI[3],WBI[2],WBI[1],WBI[0]}),
         .WL({WL[3],WL[2],WL[1],WL[0]}),
         .WTI({WTI[7],WTI[6],WTI[5],WTI[4],WTI[3],WTI[2],WTI[1],WTI[0]}));
-    mm16a04_u_hdsp_plus_edge4 X_mm16a04_u_hdsp_plus_edge4 (VDDA[8], VDDP[8],
+    mm16a05_u_hdsp_plus_edge4 X_mm16a05_u_hdsp_plus_edge4 (VDDA[8], VDDP[8],
         VDDPI[8], VSS[8], VBP[8], VBN[8], EDGEB, EDGET, LOG0, LOG1, PGIOI,
         VBA[8], VEDGE, WL[0], WL[1], WL[2], WL[3]);
 endmodule
@@ -4594,35 +4594,35 @@ module SNPS_SP_HD_512x8_ref_lt_seg1 (BB, LLSB, LOG0, LOG1, QB, QT, SDB_BC1T,
     // Jumper: VBA[7] VSS[7]
     // Jumper: VDDA VDDP[0] VDDP[1] VDDP[2] VDDP[3] VDDP[4] VDDP[5] VDDP[6] VDDP[7]
 
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S0 (VDDA,
         VDDAI[0], VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], BB[0], BB[1],
         BB[2], BB[3], LOG0, LOG1, QB[0], QT[0], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[0], VBA[0], WBI[0], WTI[0], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S1 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S1 (VDDA,
         VDDAI[1], VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], BB[4], BB[5],
         BB[6], BB[7], LOG0, LOG1, QB[1], QT[1], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[1], VBA[1], WBI[1], WTI[1], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S2 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S2 (VDDA,
         VDDAI[2], VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], BB[8], BB[9],
         BB[10], BB[11], LOG0, LOG1, QB[2], QT[2], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[2], VBA[2], WBI[2], WTI[2], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S3 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S3 (VDDA,
         VDDAI[3], VDDP[3], VDDPI[3], VSS[3], VBP[3], VBN[3], BB[12], BB[13],
         BB[14], BB[15], LOG0, LOG1, QB[3], QT[3], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[3], VBA[3], WBI[3], WTI[3], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F3 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F3 (VDDA,
         VDDAI[4], VDDP[4], VDDPI[4], VSS[4], VBP[4], VBN[4], BB[16], BB[17],
         BB[18], BB[19], LOG0, LOG1, QB[4], QT[4], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[4], VBA[4], WBI[4], WTI[4], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F2 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F2 (VDDA,
         VDDAI[5], VDDP[5], VDDPI[5], VSS[5], VBP[5], VBN[5], BB[20], BB[21],
         BB[22], BB[23], LOG0, LOG1, QB[5], QT[5], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[5], VBA[5], WBI[5], WTI[5], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F1 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F1 (VDDA,
         VDDAI[6], VDDP[6], VDDPI[6], VSS[6], VBP[6], VBN[6], BB[24], BB[25],
         BB[26], BB[27], LOG0, LOG1, QB[6], QT[6], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[6], VBA[6], WBI[6], WTI[6], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F0 (VDDA,
         VDDAI[7], VDDP[7], VDDPI[7], VSS[7], VBP[7], VBN[7], BB[28], BB[29],
         BB[30], BB[31], LOG0, LOG1, QB[7], QT[7], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[7], VBA[7], WBI[7], WTI[7], LLSB, SDB_BC1T, SDB_BC2T);
@@ -4664,7 +4664,7 @@ module SNPS_SP_HD_512x8_ref_lt (BB, LLSB, LOG0, LOG1, PGIOI, QB, QT, SDB_BC1T,
     //*** Jumper Report ***
     // Jumper: LOG1 PGIOI
 
-    mm16a04_u_hdsp_plus_pg_pwedge X_mm16a04_u_hdsp_plus_pg_pwedge_top (VDDA,
+    mm16a05_u_hdsp_plus_pg_pwedge X_mm16a05_u_hdsp_plus_pg_pwedge_top (VDDA,
         VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], LOG0, LOG1, PGIOI, PO,
         SDOR_RET, TOPEDGE, VBA[0], VEDGE, SDOR);
     SNPS_SP_HD_512x8_ref_lt_seg1 X_ref_lt_seg1
@@ -4786,14 +4786,14 @@ module SNPS_SP_HD_512x8_ref_cnt (ARYSD_BC1, ARYSD_BC2, ARYSD_IN, ARYSD_TOP,
     // Jumper: VDDA[1] VDDP[1] VDDPI[1]
     // Jumper: VDDA[2] VDDP[2]
 
-    mm16a04_u_hdsp_plus_rwbuf_left X_mm16a04_u_hdsp_plus_rwbuf_top_left
+    mm16a05_u_hdsp_plus_rwbuf_left X_mm16a05_u_hdsp_plus_rwbuf_top_left
         (VDDA[0], VDDP[0], VDDPI[0], VDDWL[0], VSS[0], VBP[0], VBN[0],
         SDB_BC1T[0], SDB_BC2T[0], ARYSD_TOP[0], LLSB[0], RWL_RD[0], RWL_WR[0],
         SDOR[0], LOG0[0], LOG1[0], PO[0], RASSIST[0], RASSIST[1], RASSISTBL[0],
         RASSISTBL[1], LOG0[1], LOG0[2], TOPEDGE[0], VBA[0], ARYSD_BC1[0],
         ARYSD_BC2[0], ARYSD_IN[0], LCGTH[0], RWLB_RD[0], RWLB_WR[0],
         SDOR_RET[0]);
-    mm16a04_u_hdsp_plus_rw_gf22 X_mm16a04_u_hdsp_plus_rw_top (VDDMINB, VDDA[1],
+    mm16a05_u_hdsp_plus_rw_gf22 X_mm16a05_u_hdsp_plus_rw_top (VDDMINB, VDDA[1],
         VDDP[1], VDDPI[1], VSS[1], VSSC_WL_L, VSSC_WL_R, VBP[1], VBN[1],
         RWLB_RD[1], RWLB_WR[1], RWL_DLY_0, RWL_DLY_2, RWL_DLY_4, RWL_RWLD_AND,
         RWL_RWLD_AND_WR, CENDP, DEF_MODE, FAST1_MODE, FAST2_MODE, FLOAT_RET,
@@ -4805,7 +4805,7 @@ module SNPS_SP_HD_512x8_ref_cnt (ARYSD_BC1, ARYSD_BC2, ARYSD_IN, ARYSD_TOP,
         WPBUF[0], WPBUF[1], WPBUF[2], FLOAT, FLOATT, LWEIB, RMT[0], RMT[1],
         RMT[2], RMT[3], RWLD_RD, RWLD_WR, RWLB_RD[1], RWLB_WR[1],
         RWL_DLY_RD_PGM, RWL_DLY_WR_PGM, WMT[0], WMT[1], WMT[2], WMT[3]);
-    mm16a04_u_hdsp_plus_rwbuf X_mm16a04_u_hdsp_plus_rwbuf_top (VDDA[2], VDDP[2],
+    mm16a05_u_hdsp_plus_rwbuf X_mm16a05_u_hdsp_plus_rwbuf_top (VDDA[2], VDDP[2],
         VDDPI[2], VDDWL[1], VSS[2], VBP[2], VBN[2], SDB_BC1T[1], SDB_BC2T[1],
         ARYSD_TOP[1], LLSB[1], RWL_RD[1], RWL_WR[1], SDOR[1], LCGTHB, LOG0[3],
         LOG1[1], PO[1], RASSIST[2], RASSIST[3], RASSISTBH[0], RASSISTBH[1],
@@ -4853,17 +4853,17 @@ module SNPS_SP_HD_512x8_ref_rt_rwl (BB, LLSB, LOG0, LOG1, QB, QT, RWLD_RD,
     // Jumper: VBA[2] VSS[2]
     // Jumper: VDDA VDDP[0] VDDP[1] VDDP[2]
 
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S0 (VDDA,
         VDDAI[0], VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], BB[0], BB[1],
         BB[2], BB[3], LOG0, LOG1, QB[0], QT[0], RWLD_RD, RWLD_WR, RWL_RD,
         RWL_WR, SDOR, SDOR_RET, SEL[0], VBA[0], WBI[0], WTI[0], LLSB, SDB_BC1T,
         SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F1 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F1 (VDDA,
         VDDAI[1], VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], BB[4], BB[5],
         BB[6], BB[7], LOG0, LOG1, QB[1], QT[1], RWLD_RD, RWLD_WR, RWL_RD,
         RWL_WR, SDOR, SDOR_RET, SEL[1], VBA[1], WBI[1], WTI[1], LLSB, SDB_BC1T,
         SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F0 (VDDA,
         VDDAI[2], VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], BB[8], BB[9],
         BB[10], BB[11], LOG0, LOG1, QB[2], QT[2], RWLD_RD, RWLD_WR, RWL_RD,
         RWL_WR, SDOR, SDOR_RET, SEL[2], VBA[2], WBI[2], WTI[2], LLSB, SDB_BC1T,
@@ -5043,19 +5043,19 @@ module SNPS_SP_HD_512x8_ref_rt_log0 (BB, LLSB, LOG0, LOG1, QB, QT, SDB_BC1T,
     // Jumper: VBA[3] VSS[3]
     // Jumper: VDDA VDDP[0] VDDP[1] VDDP[2] VDDP[3]
 
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S0 (VDDA,
         VDDAI[0], VDDP[0], VDDPI[0], VSS[0], VBP[0], VBN[0], BB[0], BB[1],
         BB[2], BB[3], LOG0, LOG1, QB[0], QT[0], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[0], VBA[0], WBI[0], WTI[0], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_S1 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_S1 (VDDA,
         VDDAI[1], VDDP[1], VDDPI[1], VSS[1], VBP[1], VBN[1], BB[4], BB[5],
         BB[6], BB[7], LOG0, LOG1, QB[1], QT[1], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[1], VBA[1], WBI[1], WTI[1], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F1 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F1 (VDDA,
         VDDAI[2], VDDP[2], VDDPI[2], VSS[2], VBP[2], VBN[2], BB[8], BB[9],
         BB[10], BB[11], LOG0, LOG1, QB[2], QT[2], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[2], VBA[2], WBI[2], WTI[2], LLSB, SDB_BC1T, SDB_BC2T);
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rar4x1_top_F0 (VDDA,
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rar4x1_top_F0 (VDDA,
         VDDAI[3], VDDP[3], VDDPI[3], VSS[3], VBP[3], VBN[3], BB[12], BB[13],
         BB[14], BB[15], LOG0, LOG1, QB[3], QT[3], LOG0, LOG0, LOG0, LOG0, SDOR,
         SDOR_RET, SEL[3], VBA[3], WBI[3], WTI[3], LLSB, SDB_BC1T, SDB_BC2T);
@@ -5215,7 +5215,7 @@ module SNPS_SP_HD_512x8_ref_row_1 (ARYSD_BC1, ARYSD_BC2, ARYSD_IN, ARYSD_TOP,
         .WABUF({WABUF[2],WABUF[1],WABUF[0]}), .WBI({WBI[10],WBI[9],WBI[8]}),
         .WMT({WMT[3],WMT[2],WMT[1],WMT[0]}),
         .WPBUF({WPBUF[2],WPBUF[1],WPBUF[0]}), .WTI({WTI[10],WTI[9],WTI[8]}));
-    mm16a04_u_hdsp_plus_rar4x1 X_mm16a04_u_hdsp_plus_rrtar4x1_top (VDDA[2],
+    mm16a05_u_hdsp_plus_rar4x1 X_mm16a05_u_hdsp_plus_rrtar4x1_top (VDDA[2],
         VDDAIR1, VDDP[15], VDDPI[15], VSS[15], VBP[15], VBN[15], BB[44], BB[45],
         BB[46], BB[47], LOG0[1], LOG1[1], QB[11], QT[11], RWLD_RD, RWLD_WR,
         RWLD_RD, RWLD_WR, SDOR[1], SDOR_RET[1], SEL[11], VBA[14], WBI[11],
@@ -5235,7 +5235,7 @@ module SNPS_SP_HD_512x8_ref_row_1 (ARYSD_BC1, ARYSD_BC2, ARYSD_IN, ARYSD_TOP,
         .VSS({VSS[19],VSS[18],VSS[17],VSS[16]}),
         .WBI({WBI[15],WBI[14],WBI[13],WBI[12]}),
         .WTI({WTI[15],WTI[14],WTI[13],WTI[12]}));
-    mm16a04_u_hdsp_plus_pg_pwedge X_mm16a04_u_hdsp_plus_pg_pwedge_top (VDDA[2],
+    mm16a05_u_hdsp_plus_pg_pwedge X_mm16a05_u_hdsp_plus_pg_pwedge_top (VDDA[2],
         VDDP[20], VDDPI[20], VSS[20], VBP[20], VBN[20], LOG0[1], LOG1[1],
         PGIOI[1], PO, SDOR_RET[1], TOPEDGE[3], VBA[19], VEDGE[1], SDOR[1]);
 endmodule
@@ -5717,14 +5717,14 @@ module SNPS_SP_HD_512x8_TOP_LAY (.ADR({ADR[12], ADR[11], ADR[10], ADR[9],
     input TEST1;
     input TEST_RNM;
     wire [3:0] TOPEDGE;
-    inout [1:0] VDD;
+    input [1:0] VDD;
     supply1 [1:0] VDD;
     wire [1:0] VEDGE;
     inout VNW_N;
     supply0 VNW_N;
     inout VPW_P;
     supply0 VPW_P;
-    inout VSS;
+    input VSS;
     supply0 VSS;
     input [1:0] WA;
     wire [2:0] WABUF;
@@ -5791,13 +5791,13 @@ module SNPS_SP_HD_512x8 (ADR, BC0, BC1, BC2, CLK, D, LS, ME, Q, RM, RME, TEST1,
     input RME;
     input TEST1;
     input TEST_RNM;
-    inout VDD;
+    input VDD;
     supply1 VDD;
     inout VNW_N;
     supply0 VNW_N;
     inout VPW_P;
     supply0 VPW_P;
-    inout VSS;
+    input VSS;
     supply0 VSS;
     input [1:0] WA;
     input WE;

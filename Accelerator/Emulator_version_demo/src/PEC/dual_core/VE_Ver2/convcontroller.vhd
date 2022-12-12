@@ -158,18 +158,32 @@ begin
             conv_oloop <= unsigned(oc_cnt);
           end if;
         elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt)) then
-          if conv_loop = 0 then
-            conv_oloop <= conv_oloop - 1;
-            if config(4) = '1' then --reload by config register, bit 4 in configure register
-              if conv_oloop /= 0 then --do not reload dot products counter if output channel counter is 0
-                conv_loop <= unsigned(dot_cnt);
+          if conv_out_p = '0' or unsigned(dot_cnt) >= 7 then
+            if conv_loop = 0 then
+              if conv_oloop /= 0 then
+                conv_oloop <= conv_oloop - 1;
+                if config(4) = '1' then --reload by config register, bit 4 in configure register
+                  conv_loop <= unsigned(dot_cnt);
+                end if;
+              else
+                conv_oloop <= conv_oloop;
               end if;
+            elsif conv_loop /= 0 then
+              conv_loop <= conv_loop - 1;
             end if;
-            if conv_oloop = 0 then
-              conv_oloop <= conv_oloop;
+          elsif unsigned(dot_cnt) < 7 then
+            if cyclecounter = 7 then
+              if conv_oloop /= 0 then
+                conv_oloop <= conv_oloop - 1;
+                if config(4) = '1' then --reload by config register, bit 4 in configure register
+                  conv_loop <= unsigned(dot_cnt);
+                end if;
+              else
+                conv_oloop <= conv_oloop;
+              end if;
+            elsif conv_loop /= 0 then
+              conv_loop <= conv_loop - 1;
             end if;
-          elsif conv_loop /= 0 then
-            conv_loop <= conv_loop - 1;
           end if;
         end if;
       end if;
@@ -217,7 +231,7 @@ begin
               inst <= sum;
             end if;
             ppinst_s <= sumfirst;
-            if conv_oloop = 0 then
+            if conv_oloop = 0 or (unsigned(dot_cnt) < 7 and pselector_en = '1') then
               inst <= nop;
               ppinst_s <= nop;
             end if;

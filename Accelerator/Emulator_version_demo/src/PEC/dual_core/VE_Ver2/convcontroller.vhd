@@ -68,7 +68,6 @@ architecture convctrl of convcontroller is
   signal ppinst_s       : ppctrl_t;
   signal ppinst_p       : ppctrl_t;
   signal conv_out_sel   : std_logic_vector(2 downto 0);
-  signal bias_addr_reg  : std_logic_vector(7 downto 0);
   signal conv_loop      : unsigned(7 downto 0);
   signal conv_oloop     : unsigned(7 downto 0);
 

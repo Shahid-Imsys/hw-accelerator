@@ -104,7 +104,6 @@ architecture rtl of req_dst_logic is
   signal fifo_rdy       : std_logic;    --active low
   signal add_in_1       : std_logic_vector(3 downto 0);
   signal add_in_2       : std_logic_vector(3 downto 0)  := "0000";
-  signal add_out        : std_logic_vector(3 downto 0);
   signal bs_out         : std_logic_vector(15 downto 0);
   signal pe_mux_out     : std_logic_vector(159 downto 0);
   signal req_core       : std_logic_vector(159 downto 0);
@@ -118,9 +117,7 @@ architecture rtl of req_dst_logic is
   signal ack_sig_i      : std_logic_vector(15 downto 0);  --Will be replaced with a DTM fifo signal.
 --    signal loop_c  : integer := 0;
   signal chain          : std_logic;    --reserved for later use
-  signal data_in_fifo   : std_logic_vector(9 downto 0);
   signal prog_full_i    : std_logic;
-  signal data_vld_out_i : std_logic_vector(15 downto 0);
   signal reset_i        : std_logic;
   signal req_to_noc_i   : std_logic;
   signal req_rd_reg     : std_logic_vector(15 downto 0) := (others => '0');

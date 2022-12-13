@@ -33,6 +33,7 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD.all;
 
 entity fifo is
   generic(
@@ -61,24 +62,28 @@ end entity;
 
 architecture rtl of fifo is
 
-  component SNPS_SP_HD_1Kx160 is
+  component SNPS_RF_DP_HD_256x80 is
     port (
-      Q        : out std_logic_vector(159 downto 0);
-      ADR      : in  std_logic_vector(9 downto 0);
-      D        : in  std_logic_vector(159 downto 0);
-      WE       : in  std_logic;
-      ME       : in  std_logic;
-      CLK      : in  std_logic;
-      TEST1    : in  std_logic;
-      TEST_RNM : in  std_logic;
-      RME      : in  std_logic;
-      RM       : in  std_logic_vector(3 downto 0);
-      WA       : in  std_logic_vector(1 downto 0);
-      WPULSE   : in  std_logic_vector(2 downto 0);
-      LS       : in  std_logic;
-      BC0      : in  std_logic;
-      BC1      : in  std_logic;
-      BC2      : in  std_logic);
+      QB        : out std_logic_vector(79 downto 0);
+      ADRA      : in  std_logic_vector(7 downto 0);
+      DA        : in  std_logic_vector(79 downto 0);
+      WEA       : in  std_logic;
+      MEA       : in  std_logic;
+      CLKA      : in  std_logic;
+      TEST1A    : in  std_logic;
+      TEST_RNMA : in  std_logic;
+      RMEA      : in  std_logic;
+      RMA       : in  std_logic_vector(3 downto 0);
+      WA        : in  std_logic_vector(1 downto 0);
+      WPULSE    : in  std_logic_vector(2 downto 0);
+      LS        : in  std_logic;
+      ADRB      : in  std_logic_vector(7 downto 0);
+      MEB       : in  std_logic;
+      CLKB      : in  std_logic;
+      TEST1B    : in  std_logic;
+      RMEB      : in  std_logic;
+      RMB       : in  std_logic_vector(3 downto 0)
+      );
   end component;
 
   type ram_type is array (DATA_DEPTH-1 downto 0) of std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -95,6 +100,16 @@ architecture rtl of fifo is
   signal prog_full_i    : std_logic;
   signal valid_i        : std_logic;
   signal counter_i      : integer range DATA_DEPTH-1 downto 0;
+
+  type DataOut_DP_type is array(natural range <>) of std_logic_vector(159 downto 0);
+  signal DataOut_DP  : DataOut_DP_type(3 downto 0);
+  signal WE_DP       : std_logic_vector(3 downto 0);
+  signal Head_MemSel : integer range 0 to 3;
+  signal Tail_MemSel : integer range 0 to 3;
+  signal Head_Addr   : std_logic_vector(7 downto 0);
+  signal Tail_Addr   : std_logic_vector(7 downto 0);
+  signal rd_en_d     : std_logic;
+  signal dout_reg    : std_logic_vector(DATA_WIDTH-1 downto 0);
 
   procedure increase (signal index : inout index_type) is
   begin
@@ -123,9 +138,16 @@ begin
   begin
     if rising_edge(clk) then
       if srst = '1' then
-        tail    <= 0;
-        valid_i <= '0';
+        tail     <= 0;
+        valid_i  <= '0';
+        rd_en_d  <= '0';
+        dout_reg <= (others => '0');
       else
+        rd_en_d <= rd_en;
+        if rd_en_d = '1' then
+          dout_reg <= dout;
+        end if;
+        
         if rd_en = '1' and empty_i = '0' then
           increase(tail);
           valid_i <= '1';
@@ -137,60 +159,94 @@ begin
   end process;
 
   --DATA TRANSFER
---  req_fifo_asic_gen: if USE_ASIC_MEMORIES = true generate
+  req_fifo_asic_gen : if USE_ASIC_MEMORIES = true generate
 
---      fifo_addr = head when wr_en = '1' else tail;
-      
---      req_fifo_mem: SNPS_SP_HD_1Kx160
---            port map (
---              Q        => dout,
---              ADR      => fifo_addr,
---              D        => din,
---              WE       => wr_en,
---              ME       => '1',
---              CLK      => clk,
---              TEST1    => '0',
---              TEST_RNM => '0',
---              RME      => '0',
---              RM       => (others => '0'),
---              WA       => (others => '0'),
---              WPULSE   => (others => '0'),
---              LS       => '0',
---              BC0      => '0',
---              BC1      => '0',
---              BC2      => '0');
---  end generate;
-  
---  req_fifo_sim_gen: if USE_ASIC_MEMORIES /= true generate
-      process(clk)
-      begin
-        if rising_edge(clk) then
-          if srst = '1' then
-            ram  <= (others => (others => '0'));
-            dout <= (others => '0');
-          else
-            if wr_en = '1' then
-              ram(head) <= din;
-            end if;
-    
-            if rd_en = '1' then
-              dout <= ram(tail);
-            end if;
+    dout        <= DataOut_DP(Tail_MemSel) when rd_en_d = '1' else dout_reg;
+    Head_MemSel <= head / 256;
+    Head_Addr   <= std_logic_vector(to_unsigned(head mod 256, 8));
+    Tail_MemSel <= tail / 256;
+    Tail_Addr   <= std_logic_vector(to_unsigned(tail mod 256, 8));
+
+    dp_gen : for i in 0 to 3 generate
+      WE_DP(i) <= wr_en when Head_MemSel = i else '0';
+
+
+      req_fifo_mem0 : SNPS_RF_DP_HD_256x80
+        port map (
+          QB        => DataOut_DP(i)(79 downto 0),
+          ADRA      => Head_Addr,
+          DA        => din(79 downto 0),
+          WEA       => WE_DP(i),
+          MEA       => '1',
+          CLKA      => clk,
+          TEST1A    => '0',
+          TEST_RNMA => '0',
+          RMEA      => '0',
+          RMA       => (others => '0'),
+          WA        => (others => '0'),
+          WPULSE    => (others => '0'),
+          LS        => '0',
+          ADRB      => Tail_Addr,
+          MEB       => '1',
+          CLKB      => clk,
+          TEST1B    => '0',
+          RMEB      => '0',
+          RMB       => (others => '0'));
+
+      req_fifo_mem1 : SNPS_RF_DP_HD_256x80
+        port map (
+          QB        => DataOut_DP(i)(159 downto 80),
+          ADRA      => Head_Addr,
+          DA        => din(159 downto 80),
+          WEA       => WE_DP(i),
+          MEA       => '1',
+          CLKA      => clk,
+          TEST1A    => '0',
+          TEST_RNMA => '0',
+          RMEA      => '0',
+          RMA       => (others => '0'),
+          WA        => (others => '0'),
+          WPULSE    => (others => '0'),
+          LS        => '0',
+          ADRB      => Tail_Addr,
+          MEB       => '1',
+          CLKB      => clk,
+          TEST1B    => '0',
+          RMEB      => '0',
+          RMB       => (others => '0'));
+    end generate;
+  end generate;
+
+  req_fifo_sim_gen : if USE_ASIC_MEMORIES /= true generate
+    process(clk)
+    begin
+      if rising_edge(clk) then
+        if srst = '1' then
+          ram  <= (others => (others => '0'));
+          dout <= (others => '0');
+        else
+          if wr_en = '1' then
+            ram(head) <= din;
+          end if;
+
+          if rd_en = '1' then
+            dout <= ram(tail);
           end if;
         end if;
-      end process;
-      ----DATA READ
-      --process(clk)
-      --begin
-      --    if rising_edge(clk) then
-      --        if rd_en = '1' and empty_i = '0' then
-      --            dout <= ram(tail);
-      --        end if;
-      --    end if;
-      --end process;
-      
---  end generate;
-    
+      end if;
+    end process;
+    ----DATA READ
+    --process(clk)
+    --begin
+    --    if rising_edge(clk) then
+    --        if rd_en = '1' and empty_i = '0' then
+    --            dout <= ram(tail);
+    --        end if;
+    --    end if;
+    --end process;
+
+  end generate;
+
   --COUNTER
   process(head, tail)
   begin
@@ -234,7 +290,7 @@ begin
       prog_full_i <= '0';
     end if;
   end process;
-            
+
   --OUTPUT
   empty        <= empty_i;
   almost_empty <= almost_empty_i;

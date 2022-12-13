@@ -336,9 +336,7 @@ architecture rtl of ve is
   signal re_start : std_logic;
   signal re_source : std_logic;
   signal re_source_reg : std_logic;
-  signal re_rdy_int : std_logic;
   --Vector engine signals
-  signal ve_rdy_int : std_logic;
   signal start, conv_start, fft_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
   --signal mac_switch : std_logic;
@@ -346,7 +344,7 @@ architecture rtl of ve is
   signal mode_a : std_logic; --mode A activate
   signal mode_b : std_logic; --mode B activate
   signal mode_c : std_logic; --Vector engine mode c;
-  signal mode_d : std_logic; --Vector engine mode d;
+--  signal mode_d : std_logic; --Vector engine mode d; not impelemented yet
   signal remode_c_l : std_logic; --receive engine's mode c latch signal
   signal vemode_c_l : std_logic; --vector engine's mode c latch signal
   signal reload : std_logic; --reload address counters 
@@ -364,20 +362,18 @@ architecture rtl of ve is
   signal pa_cmp, pa_offset, pb_offset, pb_cmp : au_param;
   signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
   signal re_loop_reg : std_logic_vector(7 downto 0); --receive engine's loop counter register
-  signal re_loop : std_logic_vector(7 downto 0); --receive engine's loop counter
   signal re_saddr_a, re_saddr_b   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source 
   signal ve_saddr_l, ve_saddr_r  : std_logic_vector(7 downto 0); --Left starting address register
   signal left_baseaddress, right_baseaddress : std_logic_vector(7 downto 0);
   signal left_finaladdress, right_finaladdress, bias_finaladdress : std_logic_vector(7 downto 0);
   signal apushback_finaladdress, bpushback_finaladdress : std_logic_vector(7 downto 0);
-  signal ve_loop, ve_oloop, dot_cnt, oc_cnt     : std_logic_vector(7 downto 0);
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
   signal fft_en, fft_done, finalstage : std_logic;
   signal left_loading, right_loading, bias_loading : std_logic_vector(3 downto 0);
   signal left_rst, right_rst, bias_rst : std_logic;
-  signal lrst_from_conv, rrst_from_conv, brst_from_conv : std_logic;
+  signal lrst_from_conv, rrst_from_conv : std_logic;
   signal lrst_from_re, rrst_from_re, brst_from_re : std_logic;
   signal lload_from_re, rload_from_re, bload_from_re : std_logic;
   signal load_from_conv, bload_from_conv : std_logic;
@@ -385,14 +381,8 @@ architecture rtl of ve is
   signal apushback_rst, bpushback_rst : std_logic;
   signal ring_load, ring_rd, ring_wr, ext_load : std_logic;
   signal ext_tigger_en : std_logic;
-  signal offset_l    : std_logic_vector(7 downto 0); --offset register
-  signal offset_r    : std_logic_vector(7 downto 0); --right oprand offset register --expand to 8 bits, 1209
-  signal jump_l    : std_logic_vector(7 downto 0);--Jump register
-  signal depth_l   : std_logic_vector(7 downto 0);--depth register
   signal config    : std_logic_vector(7 downto 0); --configure register
   signal ring_start_addr : std_logic_vector(7 downto 0);
-  signal curr_ring_addr : std_logic_vector(7 downto 0);
-  signal next_ring_addr : std_logic_vector(7 downto 0);
   signal zp_data    : std_logic_vector(7 downto 0); --zero point addition data
   signal zp_weight  : std_logic_vector(7 downto 0); --zero point addition data
   signal scale      : std_logic_vector(4 downto 0); --shift scale factor
@@ -400,7 +390,6 @@ architecture rtl of ve is
   signal bias_index_start : std_logic_vector(7 downto 0);
   signal data0_addr_i, data1_addr_i : std_logic_vector(7 downto 0);
   signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
-  signal bias_index_rd, bias_index_wr : std_logic_vector(7 downto 0);
   signal bias_addr_o : std_logic_vector(5 downto 0);
   signal re_busy : std_logic; --RE start latch
   signal conv_busy : std_logic; --VE start latch
@@ -438,24 +427,17 @@ architecture rtl of ve is
   signal weightaddr_to_memory : std_logic_vector(7 downto 0);
   signal biasaddr_to_memory : std_logic_vector(5 downto 0);
   --data flow control signals
-  signal o_mux_ena : std_logic;
-  signal pp_stage_1 : std_logic; --stage one control, for shifter and bias buffer read signal
-  signal pp_stage_2 : std_logic; --stage two control, for adder and bias mux.
-  signal ve_out_p : std_logic;
   signal adder_ena : std_logic;
   signal shifter_ena : std_logic;
-  signal bias_rd_ena : std_logic;
   signal clip_ena  : std_logic;
   signal output_ena : std_logic;
-  signal ve_out_c : std_logic_vector(2 downto 0); --output byte counter to post processor
   signal output_c : std_logic_vector(3 downto 0); --output byte counter 
   signal mode_c_l : std_logic;
   --output control signals
   signal load_dtm_out : std_logic;
-  signal send_req_d : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal outrd_en, woutrd_en, res_assign : std_logic;
-  signal mem_read_done, wmem_read_done : std_logic;
+  signal mem_read_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
   signal rd_en_conv, b_rd_en_conv : std_logic;
@@ -501,8 +483,7 @@ architecture rtl of ve is
   --------------------------------------------------------
   --Delay FFs
   --------------------------------------------------------
-  signal a_delay : std_logic;
-  signal delay3 : std_logic_vector(9 downto 0);
+  signal delay3 : std_logic_vector(6 downto 0);
 
 
 begin
@@ -1494,6 +1475,8 @@ begin
       end loop;
       if rst = '0' then
         mem_read_done <= '0';
+        mem_no <= '0';
+        swap_int <= '0';
         n <= 0;
         bit_rev <= x"00";
         fft_done_pipe <= (others => '0');
@@ -1564,24 +1547,29 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
-      swap <= swap_int;
-      res_assign <= read_en_o;
-      if fft_done_pipe(10) = '1' and res_assign = '1' then
-        if CLK_E_NEG = '0' then
-          if swap = '1' then
-            fft_result(127 downto 64) <= data0 & data1;
+      if rst = '0' then
+        swap <= '0';
+        res_assign <= '0';
+      else
+        swap <= swap_int;
+        res_assign <= read_en_o;
+        if fft_done_pipe(10) = '1' and res_assign = '1' then
+          if CLK_E_NEG = '0' then
+            if swap = '1' then
+              fft_result(127 downto 64) <= data0 & data1;
+            else
+              fft_result(127 downto 64) <= data1 & data0; 
+            end if;
           else
-            fft_result(127 downto 64) <= data1 & data0; 
+            if swap = '1' then
+              fft_result(63 downto 0) <= data0 & data1;
+            else
+              fft_result(63 downto 0) <= data1 & data0;
+            end if;
           end if;
         else
-          if swap = '1' then
-            fft_result(63 downto 0) <= data0 & data1;
-          else
-            fft_result(63 downto 0) <= data1 & data0;
-          end if;
+          fft_result <= (others => '0');
         end if;
-      else
-        fft_result <= (others => '0');
       end if;
     end if;
   end process;

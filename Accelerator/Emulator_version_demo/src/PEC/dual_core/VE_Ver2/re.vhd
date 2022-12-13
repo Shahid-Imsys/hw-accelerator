@@ -54,6 +54,9 @@ begin
     if rising_edge(clk) then --latches at the rising_edge of clk_p. 
       if rst = '0' then
         re_busy <= '0';
+        mode_a_l <= '0';
+        mode_b_l <= '0';
+        mode_c_l <= '0';
       else
         if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
           re_busy <= '1';

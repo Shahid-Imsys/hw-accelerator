@@ -16,4 +16,5 @@ mem_comp:
 		  $(MEM_DIR_WIN)/SNPS_RF_SP_UHS_1024x8/SNPS_RF_SP_UHS_1024x8_fast_func.v \
 		  $(MEM_DIR_WIN)/SNPS_RF_SP_UHS_1024x32/SNPS_RF_SP_UHS_1024x32_fast_func.v \
 		  $(MEM_DIR_WIN)/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00_fast_func.v \
-		  $(MEM_DIR_WIN)/SNPS_ROM_4Kx80_mprom11/SNPS_ROM_4Kx80_mprom11_fast_func.v
+		  $(MEM_DIR_WIN)/SNPS_ROM_4Kx80_mprom11/SNPS_ROM_4Kx80_mprom11_fast_func.v \
+		  $(MEM_DIR_WIN)/SNPS_RF_DP_HD_256x80/SNPS_RF_DP_HD_256x80_fast_func.v

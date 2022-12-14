@@ -65,22 +65,7 @@ architecture struct of PEC_top is
       RESUME       : out std_logic;     --Resume paused execution
 --Feedback signals
       C_RDY        : out std_logic;
-      PE_RDY_0     : in  std_logic;
-      PE_RDY_1     : in  std_logic;
-      PE_RDY_2     : in  std_logic;
-      PE_RDY_3     : in  std_logic;
-      PE_RDY_4     : in  std_logic;
-      PE_RDY_5     : in  std_logic;
-      PE_RDY_6     : in  std_logic;
-      PE_RDY_7     : in  std_logic;
-      PE_RDY_8     : in  std_logic;
-      PE_RDY_9     : in  std_logic;
-      PE_RDY_10    : in  std_logic;
-      PE_RDY_11    : in  std_logic;
-      PE_RDY_12    : in  std_logic;
-      PE_RDY_13    : in  std_logic;
-      PE_RDY_14    : in  std_logic;
-      PE_RDY_15    : in  std_logic;
+      PES_RDY      : in  std_logic_vector(15 downto 0);
 --PE request
       RST_R        : out std_logic;     --Active low
       REQ_IN       : in  std_logic;     --req to noc in reg logic
@@ -218,22 +203,7 @@ begin
       exe          => exe,
       resume       => resume,
       C_RDY        => C_RDY,
-      PE_RDY_0     => pe_rdy_reg(0),    --'0',--temp
-      PE_RDY_1     => pe_rdy_reg(1),    --'0',--temp
-      PE_RDY_2     => pe_rdy_reg(2),    --'0',--temp
-      PE_RDY_3     => pe_rdy_reg(3),    --'0',--temp
-      PE_RDY_4     => pe_rdy_reg(4),    --'0',--temp
-      PE_RDY_5     => pe_rdy_reg(5),    --'0',--temp
-      PE_RDY_6     => pe_rdy_reg(6),    --'0',--temp
-      PE_RDY_7     => pe_rdy_reg(7),    --'0',--temp
-      PE_RDY_8     => pe_rdy_reg(8),    --'0',--temp
-      PE_RDY_9     => pe_rdy_reg(9),    --'0',--temp
-      PE_RDY_10    => pe_rdy_reg(10),   --'0',--temp
-      PE_RDY_11    => pe_rdy_reg(11),   --'0',--temp
-      PE_RDY_12    => pe_rdy_reg(12),   --'0',--temp
-      PE_RDY_13    => pe_rdy_reg(13),   --'0',--temp
-      PE_RDY_14    => pe_rdy_reg(14),   --'0',--temp
-      PE_RDY_15    => pe_rdy_reg(15),   --'0',--temp        
+      PES_RDY      => pe_rdy_reg,    --'0',--temp     
       RST_R        => rst_i,
       REQ_IN       => req_in_i,
       REQ_FIFO     => req_fifo_i,

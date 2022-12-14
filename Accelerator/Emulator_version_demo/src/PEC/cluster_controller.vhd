@@ -71,22 +71,7 @@ entity cluster_controller is
 		RESUME           : out std_logic;       --Resume paused execution
 	--Feedback signals
 	  C_RDY            : out std_logic;
-		PE_RDY_0         : in std_logic;
-		PE_RDY_1         : in std_logic;
-		PE_RDY_2         : in std_logic;
-		PE_RDY_3         : in std_logic;
-		PE_RDY_4         : in std_logic;
-		PE_RDY_5         : in std_logic;
-		PE_RDY_6         : in std_logic;
-		PE_RDY_7         : in std_logic;
-		PE_RDY_8         : in std_logic;
-		PE_RDY_9         : in std_logic;
-		PE_RDY_10        : in std_logic;
-		PE_RDY_11        : in std_logic;
-		PE_RDY_12        : in std_logic;
-		PE_RDY_13        : in std_logic;
-		PE_RDY_14        : in std_logic;
-		PE_RDY_15        : in std_logic;
+		PES_RDY          : in std_logic_vector(15 downto 0);
 	--Request and distribution logic signals
 	  RST_R            : out std_logic;       --Active low
 		REQ_IN           : in std_logic;        --req to noc in reg logic
@@ -194,6 +179,7 @@ end component;
   signal write_req      : std_logic;
   signal datain_vld     : std_logic;
   signal dataout_vld    : std_logic;
+  signal data_to_pe_en  : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in         : reg;                             --Input register to memory
@@ -942,19 +928,19 @@ begin
     begin
     	if rising_edge(clk_p) then 
 			  if even_p_int = '0' then 
-          if pe_read ='1' then --Data valid asserts together with output data
-    	      for i in 15 downto 0 loop
-    	      	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
-    	      end loop;
+          if pe_read = '1' then --Data valid asserts together with output data    	      
     	      	DATA_VLD <= not noc_reg_rdy;
           else
-            DATA_TO_PE <= (others=>'0');
             DATA_VLD   <= '0';
           end if;
 			  end if;
       end if;
     end process;
 
+    DATA_TO_PE <= data_core_int(15) & data_core_int(14) & data_core_int(13) & data_core_int(12) &
+                  data_core_int(11) & data_core_int(10) & data_core_int(9) & data_core_int(8) &
+                  data_core_int(7) & data_core_int(6) & data_core_int(5) & data_core_int(4) &
+                  data_core_int(3) & data_core_int(2) & data_core_int(1) & data_core_int(0);
 
  --Address & trigger MUX
   process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
@@ -988,10 +974,18 @@ begin
 ---------------------------------------------
 --Cluster ready indecator
 ---------------------------------------------
-  c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
-             PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
-  		       PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
-  		       PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15 when not single_pe_sim else PE_RDY_15;
+  process(clk_e, RST_E)
+  begin
+    if RST_E = '0' then
+      c_rdy_i <= '1';
+    elsif rising_edge(clk_e) then
+      if EXE = '1' then
+        c_rdy_i <= '0';
+      elsif PES_RDY = x"ffff" then
+        c_rdy_i <= '1';
+      end if;
+    end if; 
+  end process;
 		   
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	

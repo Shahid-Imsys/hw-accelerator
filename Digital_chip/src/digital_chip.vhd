@@ -179,8 +179,7 @@ architecture rtl of digital_chip is
   end component;
 
   component ri_adpll_gf22fdx_2gmp
-    generic (
-      ADPLL_STATUS_BITS : integer := 21);
+   
     port (
       ref_clk_i              : in  std_logic;
       scan_clk_i             : in  std_logic;  --scan clock input

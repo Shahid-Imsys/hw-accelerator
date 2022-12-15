@@ -521,9 +521,11 @@ begin
     end if;
   end process;
 
-  mpgm_load : process(clk_p)
+  mpgm_load : process(clk_p, rst_en_int)
   begin
-      if rising_edge(clk_p) then
+    if rst_en_int = '0' then
+      ld_mpgm <= '0';
+    elsif rising_edge(clk_p) then
           if clk_e_neg_int = '0'then
               if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
                   ld_mpgm <= '0';
@@ -564,10 +566,10 @@ begin
   --previously loaded instruction. Init_ld has the highest priority.
   pl_reg: process (clk_p, rst_en_int)
   begin
-    if rising_edge(clk_p) then--
-        if rst_en_int = '0' then
-            pl <= (others => '0');
-        elsif clk_e_pos_int = '0' then --rising_edge(clk_e)
+    if rst_en_int = '0' then
+      pl <= x"8" & x"0000000000000000000000000000000";
+    elsif rising_edge(clk_p) then--
+        if clk_e_pos_int = '0' then --rising_edge(clk_e)
             if exe = '1' then
                 pl <= init_mpgm;
             elsif ld_mpgm = '1' then
@@ -1166,6 +1168,7 @@ begin
       spreq_n     => spreq_n,
       spack_n     => spack_n,
       ld_mar      => ld_mar,
+      ld_mpgm     => ld_mpgm,
       -- Data inputs
       mp_q        => mp_q,
       pmem_q      => pmem_q,

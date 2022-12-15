@@ -179,8 +179,7 @@ architecture rtl of digital_chip is
   end component;
 
   component ri_adpll_gf22fdx_2gmp
-    generic (
-      ADPLL_STATUS_BITS : integer := 21);
+   
     port (
       ref_clk_i              : in  std_logic;
       scan_clk_i             : in  std_logic;  --scan clock input
@@ -1078,6 +1077,20 @@ begin  -- architecture rtl
         pu  => pad_config.enet_rxer.pu,
         di  => enet_rxer_in
         );
+		
+	i_spi_reset_n_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => spi_rst_n,
+        --GPI
+        ie  => '1',
+        ste => "00",
+        pd  => '0',
+        pu  => '0',
+        di  => pre_spi_rst_n
+        );	
 
     i_spi_sclk_pad : entity work.input_pad
       generic map (
@@ -1169,19 +1182,6 @@ begin  -- architecture rtl
         di  => pwr_ok
         );
 
-    i_spi_reset_n_pad : entity work.input_pad
-      generic map (
-        direction => vertical)
-      port map (
-        -- PAD
-        pad => spi_rst_n,
-        --GPI
-        ie  => '1',
-        ste => "00",
-        pd  => '0',
-        pu  => '0',
-        di  => pre_spi_rst_n
-        );
 
     i_mreset_n_pad : entity work.input_pad
       generic map (

@@ -76,18 +76,19 @@ architecture Behavioral of Accelerator_tb is
     type out_word2  is array ( (Data_Transfer_Size * 16) -1 downto 0) of std_logic_vector(127 downto 0);  
 
     ------------------------------types for pec-----------------------------------------
-    constant ucode_sa    : std_logic_vector(14 downto 0) := "000000000000000"; --microcode start address in CM
-    constant param_sa    : std_logic_vector(14 downto 0) := "000000100000000"; --0x100, start address of parameters
-    constant kernels_sa  : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of kernels
-    constant bias_sa     : std_logic_vector(14 downto 0) := "000001100000000"; --0x300, start address of bias
-    constant data_sa     : std_logic_vector(14 DOWNTO 0) := "000010000000000"; --0x400, start address of input data
-    constant out_sa      : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
-    constant ucode_len   : integer := 256;
-    constant param_len   : integer := 64;
-    constant kernels_len : integer := 216;
-    constant bias_len    : integer := 3;
-    constant data_len    : integer := 72;
-    constant out_len     : integer := 16;   
+    constant ucode_sa     : std_logic_vector(14 downto 0) := "000000000000000"; --microcode start address in CM
+    constant param_sa     : std_logic_vector(14 downto 0) := "000000100000000"; --0x100, start address of parameters
+    constant kernels_sa   : std_logic_vector(14 downto 0) := "000001000000000"; --0x200, start address of kernels
+    constant bias_sa      : std_logic_vector(14 downto 0) := "000001100000000"; --0x300, start address of bias
+    constant data_sa      : std_logic_vector(14 DOWNTO 0) := "000010000000000"; --0x400, start address of input data
+    constant out_sa       : std_logic_vector(14 downto 0) := "001010000000000"; --0x1400, pointwise output address in CM.
+    constant ucode_len    : integer := 256;
+    constant param_len    : integer := 64;
+    constant kernels_len  : integer := 216;
+    constant bias_len     : integer := 3;
+    constant data_len     : integer := 72;
+    constant out_len      : integer := 16; 
+    constant clock_period : time    := 20 ns;  
    
     type mem_word   is array (15 downto 0) of std_logic_vector(7 downto 0);
     type out_byte   is array (294911 downto 0) of std_logic_vector(7 downto 0);
@@ -282,7 +283,7 @@ architecture Behavioral of Accelerator_tb is
                   
 begin
     
-    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => false, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
+    UUT: Accelerator_Top generic map(USE_ASIC_MEMORIES => true, PEC_NUMBER => 1) port map (clk_p => clk_p, clk_e => clk_e, Reset => Reset, GPP_CMD_Data => GPP_CMD_Data, NOC_CMD_Data => NOC_CMD_Data, GPP_CMD_Flag => GPP_CMD_Flag, 
     NOC_CMD_ACK => NOC_CMD_ACK, NOC_CMD_flag => NOC_CMD_flag, GPP_CMD_ACK => GPP_CMD_ACK, IO_data => IO_data, NOC_data => NOC_data, NOC_Address => NOC_Address, NOC_Length => NOC_Length, 
     FIFO_Ready => FIFO_Ready, NOC_DATA_DIR => NOC_DATA_DIR, NOC_DATA_EN => NOC_DATA_EN, NOC_WRITE_REQ => NOC_WRITE_REQ, IO_WRITE_ACK => IO_WRITE_ACK); 
 
@@ -294,7 +295,7 @@ begin
         IO_data             <= (others => '0'); 
         GPP_CMD_Flag        <= '0';
         GPP_CMD_ACK         <= '0';              
-        wait for 50 ns;    
+        wait for 40 ns;    
         Reset               <= '0';   
         wait for 40 ns;    
         Reset               <= '1';
@@ -1013,22 +1014,18 @@ begin
     
     process
     begin
+        clk_e <= '1';
+        wait for clock_period/4;
         clk_e <= '0';
-        for i in 1 to 30000000 loop
-            wait for 10ns;
-            clk_e <= not clk_e;
-        end loop;
-        wait;
+        wait for clock_period/4*3;
     end process;  
     
     process
     begin
+        clk_p <= '1';
+        wait for clock_period/4;
         clk_p <= '0';
-        for i in 1 to 30000000 loop
-            wait for 5ns;
-            clk_p <= not clk_p;
-        end loop;
-        wait;
+        wait for clock_period/4;
     end process; 
 
 end Behavioral;

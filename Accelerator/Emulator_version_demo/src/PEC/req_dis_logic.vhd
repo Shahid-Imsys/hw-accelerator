@@ -114,7 +114,6 @@ architecture rtl of req_dst_logic is
 --    signal wr_req  : std_logic;
   signal ack_sig_i      : std_logic_vector(15 downto 0);  --Will be replaced with a DTM fifo signal.
 --    signal loop_c  : integer := 0;
---  signal chain          : std_logic;    --reserved for later use
   signal prog_full_i    : std_logic;
   signal reset_i        : std_logic;
   signal req_to_noc_i   : std_logic;

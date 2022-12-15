@@ -353,11 +353,9 @@ begin
   ready_delay: process(clk_p, rst_en_int)
   begin
     if rst_en_int = '0' then
-      ready <= '0';
-    else
-      if rising_edge(clk_p) then
-        ready <= ready_1;
-      end if;
+      ready <= '1';
+    elsif rising_edge(clk_p) then
+      ready <= ready_1;
     end if;
   end process;
 
@@ -381,7 +379,7 @@ begin
   pl_reg: process (clk_p, rst_en_int)
   begin
     if rst_en_int = '0' then
-      pl <= (others => '0');
+      pl <= x"8" & x"0000000000000000000000000000000";
       core2_en_buf <= '0';
     elsif rising_edge(clk_p) then--rising_edge(clk_e)
         core2_en_buf <= core2_en;

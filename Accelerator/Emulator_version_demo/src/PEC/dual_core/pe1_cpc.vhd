@@ -48,6 +48,7 @@ entity pe1_cpc is
     spreq_n     : in std_logic;      -- SP request from TIM
     spack_n     : in std_logic;      -- SP acknowledge from TIM
     ld_mar      : in std_logic;      -- Catch bus (CALL SP) from TIM
+    ld_mpgm     : in std_logic;      -- ZH
     -- Data inputs
     mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
     pmem_q      : in std_logic_vector(1 downto 0);  -- Patch memory data
@@ -357,13 +358,15 @@ begin
     begin
         if rising_edge(clk_p) then     --rising_edge(clk_s)
             if rst_cn = '0' then
-                plsel_nint      <= '1';
+                plsel_nint      <= '0';
                 plcpe_nint      <= '1';
                 mpram_we_nint   <= '1';
             elsif wcdap = '1' and clk_s_pos = '0' then
                 plsel_nint    <= dfsr_int(0);
                 plcpe_nint    <= dfsr_int(1);
                 mpram_we_nint <= dfsr_int(2);
+            elsif ld_mpgm = '1' then
+                plsel_nint    <= '1';
             end if;
         end if;
     end process cdap_register;

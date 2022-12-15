@@ -335,7 +335,7 @@ architecture rtl of ve is
   --Receive engine signals
   signal re_start : std_logic;
   signal re_source : std_logic;
-  signal re_source_reg : std_logic;
+  --signal re_source_reg : std_logic;
   --Vector engine signals
   signal start, conv_start, fft_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
@@ -347,7 +347,7 @@ architecture rtl of ve is
 --  signal mode_d : std_logic; --Vector engine mode d; not impelemented yet
   signal remode_c_l : std_logic; --receive engine's mode c latch signal
   signal vemode_c_l : std_logic; --vector engine's mode c latch signal
-  signal reload : std_logic; --reload address counters 
+  --signal reload : std_logic; --reload address counters 
   signal reg_in : std_logic_vector(5 downto 0); --parameter register set field, including loop counter.
   signal re_switch : std_logic; --Used to control VE's work mode, RE mode or VE mode.
     
@@ -404,8 +404,8 @@ architecture rtl of ve is
   signal mem_data_in, data_to_mem, bypassed_reg, bypassed_weight : std_logic_vector(63 downto 0);
   signal mem_data_reg    : std_logic_vector(63 downto 0);
   signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
-  signal mode_a_l  : std_logic;
-  signal mode_b_l  : std_logic;
+  --signal mode_a_l  : std_logic;
+  --signal mode_b_l  : std_logic;
   signal read_en_b_i : std_logic;
   signal data_write_enable_i, weight_write_enable_i : std_logic;
   signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
@@ -1582,6 +1582,7 @@ begin
         dtm_data_reg <= (others => (others => '0'));
         output_c <= (others => '0');
         pushback_en <= '0';
+        VE_OUT_D <= (others => '0');
       elsif reg_in = CONS_DFY_REG_SHIFT_IN then --write feedback(dfy) register through y bus
         if clk_e_neg = '1' then
         dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;

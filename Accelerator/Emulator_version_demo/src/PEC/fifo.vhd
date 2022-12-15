@@ -90,8 +90,9 @@ architecture rtl of fifo is
   signal ram : ram_type;
 
   subtype index_type is integer range ram_type'range;
-  signal head : index_type;
-  signal tail : index_type;
+  signal head     : index_type;
+  signal tail     : index_type;
+  signal tail_reg : index_type;
 
   signal almost_full_i  : std_logic;
   signal almost_empty_i : std_logic;
@@ -139,13 +140,19 @@ begin
     if rising_edge(clk) then
       if srst = '1' then
         tail     <= 0;
+        tail_reg <= 0;
         valid_i  <= '0';
         rd_en_d  <= '0';
         dout_reg <= (others => '0');
       else
         rd_en_d <= rd_en;
+        
+        if rd_en = '1' then
+          tail_reg <= tail;
+        end if;
+
         if rd_en_d = '1' then
-          dout_reg <= dout;
+          dout_reg <= DataOut_DP(Tail_MemSel);
         end if;
         
         if rd_en = '1' and empty_i = '0' then
@@ -162,10 +169,12 @@ begin
   req_fifo_asic_gen : if USE_ASIC_MEMORIES = true generate
 
     dout        <= DataOut_DP(Tail_MemSel) when rd_en_d = '1' else dout_reg;
+    Tail_Addr   <= std_logic_vector(to_unsigned(tail mod 256, 8)) when rd_en = '1' else std_logic_vector(to_unsigned(tail_reg mod 256, 8));
+    Tail_MemSel <= tail / 256                                     when rd_en = '1' else tail_reg / 256;
+    
     Head_MemSel <= head / 256;
     Head_Addr   <= std_logic_vector(to_unsigned(head mod 256, 8));
-    Tail_MemSel <= tail / 256;
-    Tail_Addr   <= std_logic_vector(to_unsigned(tail mod 256, 8));
+    
 
     dp_gen : for i in 0 to 3 generate
       WE_DP(i) <= wr_en when Head_MemSel = i else '0';

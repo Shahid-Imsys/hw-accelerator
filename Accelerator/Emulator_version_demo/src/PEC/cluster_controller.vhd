@@ -979,7 +979,7 @@ begin
     if RST_E = '0' then
       c_rdy_i <= '1';
     elsif rising_edge(clk_e) then
-      if EXE = '1' then
+      if exe_i = '1' then
         c_rdy_i <= '0';
       elsif PES_RDY = x"ffff" then
         c_rdy_i <= '1';

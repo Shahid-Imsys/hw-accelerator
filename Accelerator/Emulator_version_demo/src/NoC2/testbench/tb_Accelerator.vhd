@@ -34,6 +34,9 @@ end Accelerator_tb;
 architecture Behavioral of Accelerator_tb is
 
     component Accelerator_Top is
+    Generic(
+      USE_ASIC_MEMORIES      : boolean := false --true
+    );    
     port(
 	    clk_p                : in  std_logic;
         clk_e                : in  std_logic;	    
@@ -196,6 +199,14 @@ begin
               FIFO_ready          <= "000000";  --FIFO_ready2 =0
         end loop;
         
+        wait until NOC_CMD_flag = '1';
+        wait for 20 ns;
+        GPP_CMD_ACK             <= '1';
+        wait for 20 ns;
+        GPP_CMD_ACK             <= '0';        
+        
+        
+                
 --        ----------------------------Boot NOC-----------------------------
 --        -----------------------------------------------------------------
 --        -----------------------------------------------------------------
@@ -447,7 +458,7 @@ begin
         -----------------------------------------------------------------
         -----------------------------------------------------------------       
         GPP_CMD_Flag        <= '1';
-        GPP_CMD_Data        <= x"000000000000000000000000FFF00014"; --x"00000000000000000000000080000014"; --x"00000000000000000000000000100014";  --Data_Transfer_Size =32,00000000000000000000000000200014
+        GPP_CMD_Data        <= x"00000000000000000000000080000014"; --x"00000000000000000000000080000014"; --x"00000000000000000000000000100014";  --Data_Transfer_Size =32,00000000000000000000000000200014
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';                   
         wait for 400 ns;        
@@ -475,14 +486,14 @@ begin
         
         FIFO_ready          <= "001000";  --FIFO_ready2 =0                                           
 --        wait for 2400 ns;
-        -------------------------TEST PEC READY--------------------------
-        wait for 40ns;
-        wait until NOC_CMD_flag = '1';
-        wait for 20 ns;
-        GPP_CMD_ACK             <= '1';
-        wait for 20 ns;
-        GPP_CMD_ACK             <= '0';
-        -----------------------END TEST PEC READY------------------------
+--        -------------------------TEST PEC READY--------------------------
+--        wait for 40ns;
+--        wait until NOC_CMD_flag = '1';
+--        wait for 20 ns;
+--        GPP_CMD_ACK             <= '1';
+--        wait for 20 ns;
+--        GPP_CMD_ACK             <= '0';
+--        -----------------------END TEST PEC READY------------------------
         wait until NOC_CMD_flag = '1';
         wait for 20 ns;
         GPP_CMD_ACK             <= '1';
@@ -490,7 +501,7 @@ begin
         GPP_CMD_ACK             <= '0';        
         ------------------------READ CM->MUX->EM-------------------------
         GPP_CMD_Flag        <= '1';
-        GPP_CMD_Data        <= x"000000000000000000000000FFF00024";          
+        GPP_CMD_Data        <= x"00000000000000000000000080000024";          
         wait for 200 ns;
         GPP_CMD_Flag        <= '0';                   
         wait for 400 ns;        
@@ -519,7 +530,7 @@ begin
      
 
         -----------------------------Assertion---------------------------
-        wait for 1000000ns;
+        wait for 1000ns;
         progress <= 3;
         k        <= 0;
         j        <= 0;

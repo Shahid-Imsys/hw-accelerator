@@ -131,29 +131,31 @@ begin
 --Polling mechanism
 -------------------------------------------------------------
 --Activation 
-  process (clk_p, reset_i)
+  process (clk_p)
   begin
-    if reset_i = '1' then
-      poll_act <= '0';
-    elsif rising_edge(clk_p) then
-      if fifo_rdy = '0' and req_sig /= (req_sig'range => '0') then
-        poll_act <= '1';
-        if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        poll_act <= '0';
+      else
+        if fifo_rdy = '0' and req_sig /= (req_sig'range => '0') then
+          poll_act <= '1';
+          if REQ_RD_IN /= (REQ_RD_IN'range => '0') then
+            poll_act <= '0';
+          end if;
+        else
           poll_act <= '0';
         end if;
-      else
-        poll_act <= '0';
       end if;
     end if;
   end process;
 
 
-  process(clk_p, reset_i)
+  process(clk_p)
   begin
-    if reset_i = '1' then
-      req_to_noc_i <= '0';
-    elsif rising_edge (clk_p) then
-      if EVEN_P = '1'then
+    if rising_edge (clk_p) then
+      if reset_i = '1' then
+        req_to_noc_i <= '0';
+      elsif EVEN_P = '1'then
         if req_rd_reg /= (req_rd_reg'range => '0') then
           req_to_noc_i <= '1';
         else
@@ -240,12 +242,12 @@ begin
 
 --Adder
   add_in_1 <= id_num;
-  process(clk_p, reset_i)                        --add_in_2,wr_req,chain,EVEN_P)
+  process(clk_p)                        --add_in_2,wr_req,chain,EVEN_P)
   begin
-    if reset_i = '1' then
-      id_num <= x"0";
-    elsif rising_edge(clk_p) then
-      if EVEN_P = '1' then              --falling_edge of clk_e, latch id_num
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        id_num <= x"0";
+      elsif EVEN_P = '1' then              --falling_edge of clk_e, latch id_num
         if REQ_SIG = (REQ_SIG'range => '0') and REQ_RD_IN = (REQ_RD_IN'range => '0') then
           id_num <= x"0";
         else
@@ -258,13 +260,13 @@ begin
   end process;
 
 ------synchronize id with request data-------
-  process(clk_p, reset_i)
+  process(clk_p)
   begin
-    if reset_i = '1' then
-      id_syn   <= "0000";
-      id_syn_d <= "0000";
-    elsif rising_edge(clk_p) then
-      if EVEN_P = '1' then
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        id_syn   <= "0000";
+        id_syn_d <= "0000";
+      elsif EVEN_P = '1' then
         id_syn <= id_num;
       end if;
       id_syn_d <= id_syn;
@@ -275,13 +277,13 @@ begin
 --Request Buffer
 ----------------------------------------------------------------
 --PE Mux
-  process(clk_p, reset_i)
+  process(clk_p)
   begin
-    if reset_i = '1' then
-      pe_mux_out <= (others => '0');
-      req_rd_reg <= (others => '0');
-    elsif rising_edge(clk_p) then
-      if EVEN_P = '0' then           --rising_edge (clk_e)
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        pe_mux_out <= (others => '0');
+        req_rd_reg <= (others => '0');
+      elsif EVEN_P = '0' then           --rising_edge (clk_e)
         pe_mux_out <= PE_REQ_IN(to_integer(unsigned(id_syn_d)));  --PE req in comes the same clock cycle when req_sig is raised
         req_rd_reg <= REQ_RD_IN;
       end if;
@@ -289,12 +291,12 @@ begin
   end process;
 
 --Request FIFO
-  process(clk_p, reset_i)
+  process(clk_p)
   begin
-    if reset_i = '1' then
-      wr <= '0';
-    elsif rising_edge(clk_p)then
-      if (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then  --or (wr_req = '1' and EVEN_P = '0')then
+    if rising_edge(clk_p)then
+      if reset_i = '1' then
+        wr <= '0';
+      elsif (req_rd_reg /= (req_rd_reg'range => '0') and EVEN_P = '0') then  --or (wr_req = '1' and EVEN_P = '0')then
         wr <= '1';
       else
         wr <= '0';
@@ -303,16 +305,18 @@ begin
   end process;
 --wr <= poll_act;
 --Output delay for synchronization with clk_e
-  process(clk_p, reset_i)
+  process(clk_p)
   begin
-    if reset_i = '1' then
-      FIFO_VLD    <= '0';
-      CMD_OUTPUT  <= (others => '0');
-      DATA_OUTPUT <= (others => '0');
-    elsif rising_edge(clk_p) then
-      FIFO_VLD    <= valid_d;
-      CMD_OUTPUT  <= dout_d(159 downto 128);
-      DATA_OUTPUT <= dout_d(127 downto 0);
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        FIFO_VLD    <= '0';
+        CMD_OUTPUT  <= (others => '0');
+        DATA_OUTPUT <= (others => '0');
+      else
+        FIFO_VLD    <= valid_d;
+        CMD_OUTPUT  <= dout_d(159 downto 128);
+        DATA_OUTPUT <= dout_d(127 downto 0);
+      end if;
     end if;
   end process;
 
@@ -324,13 +328,13 @@ begin
 --Distribution network
 ----------------------------------------------------------------
 --PE Demux
-  process(clk_p, reset_i)  --Should internal destination listed here?
+  process(clk_p)  --Should internal destination listed here?
   begin
-    if reset_i = '1' then
-      DATA_VLD_OUT <= (others => '0');
-      pe_data_out  <= (others => (others => '0'));
-    elsif rising_edge(clk_p) then
-      if EVEN_P = '0' then
+    if rising_edge(clk_p) then
+      if reset_i = '1' then
+        DATA_VLD_OUT <= (others => '0');
+        pe_data_out  <= (others => (others => '0'));
+      elsif EVEN_P = '0' then
         DATA_VLD_OUT <= (others => '0');
         if B_CAST = '1' then
           for i in 15 downto 0 loop

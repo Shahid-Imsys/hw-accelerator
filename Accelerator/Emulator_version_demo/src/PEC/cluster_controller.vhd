@@ -269,12 +269,12 @@ begin
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
-  rst : process(clk_e, RST_E)
+  rst : process(clk_p, RST_E)
   begin
     if RST_E = '0' then
       rst_i <= '0';
-	  elsif rising_edge(clk_e) then
-	  	if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+	  elsif rising_edge(clk_p) then
+	  	if even_p_int = '0' and noc_cmd = "01111" then --soft reset, cmd not impelement yet
 	  	  rst_i <= '0';
 	  	else
 	  	  rst_i <= '1';
@@ -749,11 +749,11 @@ begin
         RD_FIFO <= '0';
         standby <= '1';
 	  	elsif rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
-	  		if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-	  			RD_FIFO <= '0';
-          standby <= '1';
-        elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
-	  		  if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
+	  		if even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
+	  		  if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
+            RD_FIFO <= '0';
+            standby <= '1';
+          elsif REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 	  		  	RD_FIFO <= '1';
 	  			  standby <= '0';
           elsif REQ_IN = '1' and write_req = '1' then
@@ -776,15 +776,17 @@ begin
       pe_req_type <= (others => '0');
       req_last    <= (others => '0');
  		elsif rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				pe_req_type <= (others => '0');
-				req_last    <= (others => '0');
-			elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
- 				pe_req_type <= REQ_FIFO(31 downto 30);
- 				req_last    <= REQ_FIFO(29 downto 24);
-      elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
-        pe_req_type <= (others => '0');
-				req_last    <= (others => '0');
+      if even_p_int = '0' then 
+        if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+				  pe_req_type <= (others => '0');
+				  req_last    <= (others => '0');
+			  elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
+ 			  	pe_req_type <= REQ_FIFO(31 downto 30);
+ 			  	req_last    <= REQ_FIFO(29 downto 24);
+        elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
+          pe_req_type <= (others => '0');
+			  	req_last    <= (others => '0');
+        end if;
  			end if;
  		end if;
  	end process;
@@ -802,17 +804,17 @@ begin
       write_req  <= '0';
       id_num     <= (others => '0');
     elsif rising_edge(clk_p) then
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				req_exe    <= '0';
-				req_bexe   <= '0';
-				cb_status  <= '0';
-				b_cast_ctr <= (others => '0');
-				write_req  <= '0';
-        id_num     <= (others => '0');
-			elsif even_p_int = '0' then 
+			if even_p_int = '0' then 
         FIFO_OUT_VLD <= FIFO_VLD;
         BC<= req_bexe;
-			  if req_exe = '0' and req_bexe = '0' then
+			  if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+          req_exe    <= '0';
+          req_bexe   <= '0';
+          cb_status  <= '0';
+          b_cast_ctr <= (others => '0');
+          write_req  <= '0';
+          id_num     <= (others => '0');
+        elsif req_exe = '0' and req_bexe = '0' then
 			    if pe_req_type = "01" then
 			    	if cb_status = '0' then
 			    		cb_status  <= '1';
@@ -867,13 +869,13 @@ begin
       pe_write    <= '0';
       pe_read     <= '0';
 		elsif rising_edge(clk_p) then 
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				addr_p      <= (others => '0');
-				len_ctr_p   <= (others => '0');
-				pe_write    <= '0';
-				pe_read     <= '0';
-			elsif even_p_int = '0' then
-				if noc_reg_rdy = '0' then
+			if even_p_int = '0' then
+				if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+          addr_p      <= (others => '0');
+          len_ctr_p   <= (others => '0');
+          pe_write    <= '0';
+          pe_read     <= '0';
+        elsif noc_reg_rdy = '0' then
 					pe_read  <= '0';
 					pe_write <= '0';
 					if req_bexe = '1' then

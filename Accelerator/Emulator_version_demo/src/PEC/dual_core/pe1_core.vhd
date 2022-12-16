@@ -521,19 +521,19 @@ begin
     end if;
   end process;
 
-  mpgm_load : process(clk_p, rst_en_int)
+  mpgm_load : process(clk_p)
   begin
-    if rst_en_int = '0' then
-      ld_mpgm <= '0';
-    elsif rising_edge(clk_p) then
-          if clk_e_neg_int = '0'then
-              if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
-                  ld_mpgm <= '0';
-              else
-                  ld_mpgm <= init_ld;--pl(100) and pl(106) and not pl(98) and not pl(97); --Init pe1_mpgm load and receive_engine start and mod A & B off
-              end if;
-          end if;
+    if rising_edge(clk_p) then
+      if rst_en_int = '0' then
+        ld_mpgm <= '0';
+      elsif clk_e_neg_int = '0'then
+        if temp1 = '0' and ltwo = '1' then  --act at falling_edge of ddi_vld signal
+          ld_mpgm <= '0';
+        else
+          ld_mpgm <= init_ld;--pl(100) and pl(106) and not pl(98) and not pl(97); --Init pe1_mpgm load and receive_engine start and mod A & B off
+        end if;
       end if;
+    end if;
   end process;
 
 --init_ld and not clk_e_neg_int and not ltwo or ld_mpgm and clk_e_neg_int or init_ld and not clk_e_neg_int and temp1
@@ -564,22 +564,22 @@ begin
   --pl_out <= pl;
   -- If ld_mpgm is high, loading is inhibited andthe register keeps a
   --previously loaded instruction. Init_ld has the highest priority.
-  pl_reg: process (clk_p, rst_en_int)
+  pl_reg: process (clk_p)
   begin
-    if rst_en_int = '0' then
-      pl <= x"8" & x"0000000000000000000000000000000";
-    elsif rising_edge(clk_p) then--
-        if clk_e_pos_int = '0' then --rising_edge(clk_e)
-            if exe = '1' then
-                pl <= init_mpgm;
-            elsif ld_mpgm = '1' then
-                pl <= pl;
-            elsif plsel_n = '1' then
-                pl <= mp_q;
-            elsif plcpe_n = '0' then
-                pl <= udo;
-            end if;
+    if rising_edge(clk_p) then--
+      if rst_en_int = '0' then
+        pl <= x"8" & x"0000000000000000000000000000000";
+      elsif clk_e_pos_int = '0' then --rising_edge(clk_e)
+        if exe = '1' then
+          pl <= init_mpgm;
+        elsif ld_mpgm = '1' then
+          pl <= pl;
+        elsif plsel_n = '1' then
+          pl <= mp_q;
+        elsif plcpe_n = '0' then
+          pl <= udo;
         end if;
+      end if;
     end if;
   end process pl_reg;
 
@@ -596,7 +596,7 @@ begin
 
 
 ---------------------------------------------------------------------
--- MPGM
+-- MPGM -- sync reset
 ---------------------------------------------------------------------
   pe1_mpgm: entity work.pe1_mpgm
     port map (
@@ -641,7 +641,7 @@ begin
   pmem_we_n   <= mpram_we_nint and lmpwe_n;
 
 ---------------------------------------------------------------------
--- CRB - configuration register block
+-- CRB - configuration register block -- async reset
 ---------------------------------------------------------------------
   pe1_crb: entity work.pe1_crb
     port map (
@@ -848,7 +848,7 @@ begin
   clk_e_pos <= clk_e_pos_int;
   clk_e_neg <= clk_e_neg_int;
 ---------------------------------------------------------------------
--- CLC
+-- CLC -- sync reset
 ---------------------------------------------------------------------
   pe1_clc: entity work.pe1_clc
     port map (
@@ -924,7 +924,7 @@ begin
       mar           => mar);
 
 ---------------------------------------------------------------------
--- ALU
+-- ALU -- sync reset
 ---------------------------------------------------------------------
   pe1_alu: entity work.pe1_alu
     port map (
@@ -956,7 +956,7 @@ begin
       y_reg         => y_reg);
 
 ---------------------------------------------------------------------
--- GMEM
+-- GMEM --sync reset
 ---------------------------------------------------------------------
   pe1_gmem: entity work.pe1_gmem
     port map (
@@ -999,7 +999,7 @@ begin
       gmem_q     => gmem_q);
 
 ---------------------------------------------------------------------
--- DSL
+-- DSL --sync reset
 ---------------------------------------------------------------------
   pe1_dsl: entity work.pe1_dsl
     port map (
@@ -1049,7 +1049,7 @@ begin
       latch         => latch);
 
 ---------------------------------------------------------------------
--- MBM
+-- MBM --sync reset
 ---------------------------------------------------------------------
   pe1_mbm: entity work.pe1_mbm
     port map (
@@ -1070,7 +1070,7 @@ begin
       y_bittst  =>  y_bittst);
 
 ---------------------------------------------------------------------
--- MMR
+-- MMR --sync reset
 ---------------------------------------------------------------------
   pe1_mmr: entity work.pe1_mmr
     port map (
@@ -1132,7 +1132,7 @@ begin
       --LD_MPGM     => ld_mpgm);  --CJ
 
 ---------------------------------------------------------------------
--- MPLL
+-- MPLL --sync reset
 ---------------------------------------------------------------------
   ldmp_sig <= pl(43) xor pl(39);
   pe1_mpll: entity work.pe1_mpll
@@ -1154,7 +1154,7 @@ begin
     udo         => udo);
 
 ---------------------------------------------------------------------
--- CPC
+-- CPC --sync reset
 ---------------------------------------------------------------------
   pe1_cpc: entity work.pe1_cpc
     port map (
@@ -1203,7 +1203,7 @@ begin
       );
 
 ---------------------------------------------------------------------
--- IOS
+-- IOS --sync reset
 ---------------------------------------------------------------------
   pe1_ios: entity work.pe1_ios
     port map (
@@ -1252,7 +1252,7 @@ begin
 
       --CJ Added
 ---------------------------------------------------------------------
--- VE
+-- VE -- sync reset
 ---------------------------------------------------------------------
   vector_engine : entity work.ve
     generic map( USE_ASIC_MEMORIES => USE_ASIC_MEMORIES ) 
@@ -1274,7 +1274,7 @@ begin
       VE_OUT_DTM   => ve_out_dtm_int
       );
 ---------------------------------------------------------------------
--- CMDR
+-- CMDR -- sync reset
 ---------------------------------------------------------------------
 --Interface of the pe1_core and cluster controller
       cmdr: entity work.cmdr

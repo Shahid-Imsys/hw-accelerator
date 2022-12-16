@@ -133,14 +133,14 @@ begin
     end if;
   end process;
 
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if RST_EN = '0' then
-      VE_DIN <= (others => '0');
-      mp_data_int <= (others => '0');
-      dbus_reg <= (others => '0');
-    elsif rising_edge(clk_p) then
-      if DATA_VLD = '1' and clk_e_neg = '1' then 
+    if rising_edge(clk_p) then
+      if RST_EN = '0' then
+        VE_DIN <= (others => '0');
+        mp_data_int <= (others => '0');
+        dbus_reg <= (others => '0');  
+      elsif DATA_VLD = '1' and clk_e_neg = '1' then 
         mp_data_int <= DIN; 
         dbus_reg <= DIN;          --input to microprogram data
       end if;
@@ -171,13 +171,13 @@ begin
   end process;
   init_mpgm_rq <= "01000111111111110000000000000000"; --Broadcast request for 7 PEs.
   init_mpgm_rq_single <= "01000000111111110000000000000000"; --Broadcast request for 1 PE.
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then
-      dtm_reg <= (others => '0');
-      ve_in_cnt <= (others => '0');
-    elsif rising_edge(clk_p) then --
-      if EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
+    if rising_edge(clk_p) then --
+      if rst_en = '0' then
+        dtm_reg <= (others => '0');
+        ve_in_cnt <= (others => '0');    
+      elsif EXE = '1' then   --load DTM with initial microcode loading word when receives exe command from cluster controller
         dtm_reg <= init_mpgm_rq;
         ve_in_cnt <= (others => '0');
       elsif ld_dtm = '1' and CLK_E_NEG = '1' then --rising_edge
@@ -201,12 +201,12 @@ begin
     end if;
     end process;
     --Fifo control signals
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then
-      fifo_wr_en <= '0';
-    elsif rising_edge(clk_p) then
-      if EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
+    if rising_edge(clk_p) then
+      if rst_en = '0' then
+        fifo_wr_en <= '0';
+      elsif EXE = '1' or fifo_push = '1' then --push data to fifo at falling edge of clock e.
         if CLK_E_NEG = '0' then
           fifo_wr_en <= '1';
         else
@@ -220,11 +220,9 @@ begin
     end if;
   end process;
 
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then
-      requesting  <= '0';
-    elsif rising_edge(clk_p) then 
+    if rising_edge(clk_p) then 
       if rst_en = '0' then
         requesting <= '0';
       else
@@ -236,14 +234,14 @@ begin
     end if;
   end process;
 
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then
-      send_req_d <= '0';
-      send_req <= '0';
-      rd_trig <= '0';
-    elsif rising_edge(clk_p) then
-      if clk_e_neg = '1' then --rising_edge
+    if rising_edge(clk_p) then
+      if rst_en = '0' then
+        send_req_d <= '0';
+        send_req <= '0';
+        rd_trig <= '0';
+      elsif clk_e_neg = '1' then --rising_edge
         if fb = '1' then            -- if got feedback from cluster net, start to read the fifo and stop send request.
           rd_trig <= '1';
           send_req <= '0';
@@ -261,12 +259,12 @@ begin
     end if;
   end process;
 
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then 
-      fifo_rd_en <= '0';
-    elsif rising_edge(clk_p) then
-      if rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
+    if rising_edge(clk_p) then
+      if rst_en = '0' then 
+        fifo_rd_en <= '0';
+      elsif rd_trig = '1' and CLK_E_NEG = '0' and empty = '0' then
         fifo_rd_en <= '1';
       else
         fifo_rd_en <= '0';
@@ -274,12 +272,12 @@ begin
     end if;
   end process;
 
-  process(clk_p, rst_en) --send_req set the req flag and ack(fb) resets the req_flag.
+  process(clk_p) --send_req set the req flag and ack(fb) resets the req_flag.
   begin
-    if rst_en = '0' then
-      req <= '0';
-    elsif rising_edge(clk_p) then
-      if clk_e_neg = '1' then
+    if rising_edge(clk_p) then
+      if rst_en = '0' then
+        req <= '0';
+      elsif clk_e_neg = '1' then
         if fb = '0' then
           if send_req = '1' then
             req <= '1';
@@ -300,14 +298,14 @@ begin
 
     --Widen the bandwith to 20B. Use a collecting logic instead of fifo here.
     --output register used as a data collector, col_ctr used as a data counter that triggers empty and prog_full signals
-  process(clk_p, rst_en)
+  process(clk_p)
   begin
-    if rst_en = '0' then
-      output_register <= (others => '0');
-      dout <= (others => '0');
-      col_ctr <= 5;
-    elsif rising_edge(clk_p) then
-      if fifo_wr_en = '1' and col_ctr /= 0 then
+    if rising_edge(clk_p) then
+      if rst_en = '0' then
+        output_register <= (others => '0');
+        dout <= (others => '0');
+        col_ctr <= 5;
+      elsif fifo_wr_en = '1' and col_ctr /= 0 then
         output_register(32*col_ctr-1 downto 32*col_ctr - 32) <= dtm_reg;
         col_ctr <= col_ctr-1;
       elsif fifo_rd_en = '1' then

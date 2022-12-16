@@ -27,37 +27,38 @@ use work.gp_pkg.all;
 
 entity sdram_inf is
   port (
-    clk_p       : in  std_logic;
-    clk_d_pos   : in  std_logic;
-    clk_da_pos  : in  std_logic;
-    rst_n       : in  std_logic;
-    fast_d      : in  std_logic;
-    short_cycle : in  std_logic;
+    clk_p       : in std_logic;
+    even_c      : in std_logic;
+    clk_d_pos   : in std_logic;
+    clk_da_pos  : in std_logic;
+    rst_n       : in std_logic;
+    fast_d      : in std_logic;
+    short_cycle : in std_logic;
     -----core1 sdram interface
-    c1_d_addr   : in  std_logic_vector(31 downto 0);
-    c1_d_cs     : in  std_logic;                     -- CS to SDRAM
-    c1_d_ras    : in  std_logic;                     -- RAS to SDRAM
-    c1_d_cas    : in  std_logic;                     -- CAS to SDRAM
-    c1_d_we     : in  std_logic;                     -- WE to SDRAM
-    c1_d_dqi    : in  std_logic_vector(7 downto 0);  -- Data in from processor
-    c1_d_dqi_sd : in  std_logic_vector(7 downto 0);  -- Data in from sdram
-    c1_d_dqo    : out std_logic_vector(7 downto 0);  -- Data out to processor
+    c1_d_addr   : in std_logic_vector(31 downto 0);
+    c1_d_cs     : in std_logic;                     -- CS to SDRAM
+    c1_d_ras    : in std_logic;                     -- RAS to SDRAM
+    c1_d_cas    : in std_logic;                     -- CAS to SDRAM
+    c1_d_we     : in std_logic;                     -- WE to SDRAM
+    c1_d_dqi    : in std_logic_vector(7 downto 0);  -- Data in from processor
+    c1_d_dqi_sd : in std_logic_vector(7 downto 0);  -- Data in from sdram
+    c1_d_dqo    : out std_logic_vector(7 downto 0); -- Data out to processor
     -----core2 sdram interface
-    c2_d_addr   : in  std_logic_vector(31 downto 0);
-    c2_d_cs     : in  std_logic;                     -- CS to SDRAM
-    c2_d_ras    : in  std_logic;                     -- RAS to SDRAM
-    c2_d_cas    : in  std_logic;                     -- CAS to SDRAM
-    c2_d_we     : in  std_logic;                     -- WE to SDRAM
-    c2_d_dqi    : in  std_logic_vector(7 downto 0);  -- Data in from processor
-    c2_d_dqo    : out std_logic_vector(7 downto 0);  -- Data out to processor
+    c2_d_addr : in std_logic_vector(31 downto 0);
+    c2_d_cs   : in std_logic;                     -- CS to SDRAM
+    c2_d_ras  : in std_logic;                     -- RAS to SDRAM
+    c2_d_cas  : in std_logic;                     -- CAS to SDRAM
+    c2_d_we   : in std_logic;                     -- WE to SDRAM
+    c2_d_dqi  : in std_logic_vector(7 downto 0);  -- Data in from processor
+    c2_d_dqo  : out std_logic_vector(7 downto 0); -- Data out to processor
     --memory interface
-    ram_a       : out main_ram_address_t;
-    ram_di      : out main_ram_data_t;
-    ram_do      : in  main_ram_data_t;
-    ram_cs      : out main_ram_cs_t;
-    ram_web     : out main_ram_web_t
+    ram_a   : out main_ram_address_t;
+    ram_di  : out main_ram_data_t;
+    ram_do  : in main_ram_data_t;
+    ram_cs  : out main_ram_cs_t;
+    ram_web : out main_ram_web_t
 
-    );
+  );
 end sdram_inf;
 
 architecture behav of sdram_inf is
@@ -79,40 +80,41 @@ architecture behav of sdram_inf is
   signal data_en_c1 : std_logic_vector(MEMNUM - 1 downto 0);
   signal data_en_c2 : std_logic_vector(MEMNUM - 1 downto 0);
   signal valueZero  : std_logic_vector(MEMNUM - 1 downto 0);
-  signal row_addr_1 : std_logic_vector (17 downto 0);
-  signal row_addr_2 : std_logic_vector (17 downto 0);
+  signal row_addr_1 : std_logic_vector (16 downto 0);
+  signal row_addr_2 : std_logic_vector (16 downto 0);
 
-  attribute mark_debug : string;
-  attribute mark_debug of c1_data_b1: signal is "true";  
-  attribute mark_debug of c1_data_b2: signal is "true";  
-  attribute mark_debug of fast_d: signal is "true";  
+  signal c1_dqo_buffer : std_logic_vector (7 downto 0);
+  signal c2_dqo_buffer : std_logic_vector (7 downto 0);
+
+  attribute mark_debug               : string;
+  attribute mark_debug of c1_data_b1 : signal is "true";
+  attribute mark_debug of c1_data_b2 : signal is "true";
+  attribute mark_debug of fast_d     : signal is "true";
 
 begin
-  row_addr_1 <= c1_d_addr(31 downto 14);
-  row_addr_2 <= c2_d_addr(31 downto 14);
 
+  valueZero <= (others => '0');
 
-  fix_toreq2_p : process (row_addr_2) is
-  begin  -- process fix_toreq2_p
-    toReq_c2                                   <= (others => '0');
-    if unsigned(row_addr_2) < MEMNUM then -- Verify that adress is whitin memory.
-      toReq_c2(to_integer(unsigned(row_addr_2))) <= '1';
-      end if;
-  end process fix_toreq2_p;
+  -- Each row_addr contains two ram instances
+  row_addr_1 <= c1_d_addr(31 downto 15);
+  row_addr_2 <= c2_d_addr(31 downto 15);
 
   fix_toreq1_p : process (row_addr_1) is
-  begin  -- process fix_toreq2_p
-    toReq_c1                                   <= (others => '0');
-    if unsigned(row_addr_1) < MEMNUM then -- Verify that adress is whitin memory.
-      toReq_c1(to_integer(unsigned(row_addr_1))) <= '1';
+  begin -- process fix_toreq2_p
+    toReq_c1 <= (others => '0');
+    if unsigned(row_addr_1) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
+      toReq_c1(to_integer(unsigned(row_addr_1)) * 2) <= '1';
     end if;
   end process fix_toreq1_p;
 
-  fix_to_req_g : for i in toReq_c2'range generate
+  fix_toreq2_p : process (row_addr_2) is
+  begin -- process fix_toreq2_p
+    toReq_c2 <= (others => '0');
+    if unsigned(row_addr_2) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
+      toReq_c2(to_integer(unsigned(row_addr_2))) <= '1';
+    end if;
+  end process fix_toreq2_p;
 
-  end generate fix_to_req_g;
-
-  valueZero <= (others => '0');
   process (clk_p, rst_n)
   begin
     if rst_n = '0' then
@@ -120,8 +122,9 @@ begin
       c1_data_b2 <= x"00";
       data_en_c1 <= (others => '0');
       exSD_en    <= '0';
+
     elsif (rising_edge(clk_p)) then
-      if clk_d_pos = '0' then           --rising_edge(clk_d)
+      if clk_d_pos = '0' then --rising_edge(clk_d)
         if (data_en_c1 /= valueZero) then
           c1_data_b1 <= c1_data_inner;
         end if;
@@ -133,8 +136,6 @@ begin
           else
             exSD_en <= '0';
           end if;
---                      else
---                          data_en_c1 <= (others => '0');
         end if;
       end if;
     end if;
@@ -146,58 +147,162 @@ begin
       c2_data_b1 <= x"00";
       c2_data_b2 <= x"00";
       data_en_c2 <= (others => '0');
+
     elsif (rising_edge(clk_p)) then
-      if clk_da_pos = '0' then          --rising_edge(clk_d)
+      if clk_da_pos = '0' then --rising_edge(clk_d)
         if (data_en_c2 /= valueZero) then
           c2_data_b1 <= c2_data_inner;
         end if;
         c2_data_b2 <= c2_data_b1;
         if (c2_csb = '0') then
           data_en_c2 <= toReq_c2;
---                      else 
---                          data_en_c2 <= (others => '0');
         end if;
       end if;
     end if;
   end process;
+
   c1_d_dqo <= c1_d_dqi_sd when exSD_en = '1' else
-              c1_data_inner when short_cycle = '1' else
-              c1_data_b1    when fast_d = '0' else
-              c1_data_b2;
+    c1_data_inner when short_cycle = '1' else
+    c1_data_b1 when fast_d = '0' else
+    c1_data_b2;
   c2_d_dqo <= c2_data_inner when short_cycle = '1' else
-              c2_data_b1 when fast_d = '0' else
-              c2_data_b2;
+    c2_data_b1 when fast_d = '0' else
+    c2_data_b2;
+
+  dqo_dqo_buffer : process (clk_p, rst_n)
+  begin
+    if rst_n = '0' then
+      c1_dqo_buffer <= x"00";
+      c2_dqo_buffer <= x"00";
+
+    elsif (rising_edge(clk_p)) then
+      if (c1_d_addr(0) = '0') then
+
+        -- Core 1
+        if (even_c = '0') then
+        for i in 0 to (MEMNUM/2 - 1) loop
+          c1_dqo_buffer <= ram_do(2 * i + 1) when data_en_c1(i) = '1';
+        end loop;
+
+        -- Core 2
+        else
+        for i in 0 to (MEMNUM/2 - 1) loop
+          c2_dqo_buffer <= ram_do(2 * i + 1) when data_en_c2(i) = '1';
+        end loop;
+        end if;
+      else
+
+      -- Core 1
+      if (even_c = '0') then
+        for i in 0 to (MEMNUM/2 - 1) loop
+          c1_dqo_buffer <= ram_do(2 * i) when data_en_c1(i) = '1';
+        end loop;
+
+      -- Core 2
+      else
+        for i in 0 to (MEMNUM/2 - 1) loop
+          c2_dqo_buffer <= ram_do(2 * i) when data_en_c2(i) = '1';
+        end loop;
+      end if;
+      end if;
+    end if;
+  end process;
 
   choose_ram_data_p : process (c1_d_dqi, c2_d_dqi, data_en_c1,
-                               data_en_c2, ram_do) is
-  begin  -- process choose_ram_data_p
+    data_en_c2, ram_do, even_c) is
+  begin -- process choose_ram_data_p
     c1_data_inner <= c1_d_dqi;
     c2_data_inner <= c2_d_dqi;
 
-    for i in ram_do'range loop
-      c1_data_inner <= ram_do(i) when data_en_c1(i) = '1';
-      c2_data_inner <= ram_do(i) when data_en_c2(i) = '1';
-    end loop;  -- i
-  end process choose_ram_data_p;
+    -- Core1
+    if (c1_d_addr(0) = '0') then
+      if (even_c = '0') then
+        for i in ram_do'left to (ram_do'right - 1) loop
+          c1_data_inner <= ram_do(i) when data_en_c1(i) = '1';
+        end loop; -- i
+      else
+        c1_data_inner <= c1_dqo_buffer;
+      end if;
 
+    else
+      if (even_c = '0') then
+        for i in ram_do'left to (ram_do'right - 1) loop
+          c1_data_inner <= ram_do(i + 1) when data_en_c1(i) = '1';
+        end loop; -- i
+      else
+        c1_data_inner <= c1_dqo_buffer;
+      end if;
+    end if;
+
+    -- Core2
+    if (c2_d_addr(0) = '0') then
+      if (even_c = '1') then
+        for i in ram_do'left to (ram_do'right - 1) loop
+          c2_data_inner <= ram_do(i) when data_en_c2(i) = '1';
+        end loop; -- i
+      else
+        c2_data_inner <= c2_dqo_buffer;
+      end if;
+
+    else
+      if (even_c = '1') then
+        for i in ram_do'left to (ram_do'right - 1) loop
+          c2_data_inner <= ram_do(i + 1) when data_en_c2(i) = '1';
+        end loop; -- i
+      else
+        c2_data_inner <= c2_dqo_buffer;
+      end if;
+    end if;
+
+  end process choose_ram_data_p;
 
   c1_csb <= c1_d_cs or (not c1_d_ras) or c1_d_cas;
   c2_csb <= c2_d_cs or (not c2_d_ras) or c2_d_cas;
 
-  c1_wr_n <= c1_d_cs or (not c1_d_ras) or c1_d_cas or c1_d_we;
+  c1_wr_n <= c1_d_cs or c1_d_we; --(not c1_d_ras) or c1_d_cas or c1_d_we;
   c2_wr_n <= c2_d_cs or (not c2_d_ras) or c2_d_cas or c2_d_we;
 
------------------------RAM0----------------------       index is 1
+  -----------------------RAM0----------------------       index is 1
 
   set_ram_adress_g : for i in ram_a'range generate
-    ram_a(i)   <= c2_d_addr(13 downto 0) when toReq_c2(i) = '1' and c2_csb = '0' else c1_d_addr(13 downto 0);
-    ram_di(i)  <= c2_d_dqi               when toReq_c2(i) = '1' and c2_csb = '0' else c1_d_dqi;
-    ram_cs(i)  <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
-    ram_web(i) <= (c1_wr_n or (not toReq_c1(i))) and (c2_wr_n or (not toReq_c2(i)));
+    ram_a(i) <= c2_d_addr(14 downto 1) when toReq_c2(i) = '1' and c2_csb = '0' else
+    c1_d_addr(14 downto 1);
+    ram_di(i) <= c2_d_dqi when toReq_c2(i) = '1' and c2_csb = '0' else
+    c1_d_dqi;
+    --ram_cs(i) <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
+    --ram_web(i) <= (c1_wr_n or (not toReq_c1(i))) and (c2_wr_n or (not toReq_c2(i)));
   end generate set_ram_adress_g;
 
+  process (c1_csb, toReq_c1, c2_csb, toReq_c2) -- CS adjusted for interleaved memory
+  begin
 
------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------
+    for i in 0 to (MEMNUM/2 - 1) loop
+      ram_cs(2 * i)     <= not ((c1_csb or (not toReq_c1(i * 2))) and (c2_csb or (not toReq_c2(i * 2))));
+      ram_cs(2 * i + 1) <= not ((c1_csb or (not toReq_c1(i * 2))) and (c2_csb or (not toReq_c2(i * 2))));
+    end loop;
+  end process;
+
+  process (c1_wr_n, c2_wr_n, toReq_c1, toReq_c2, even_c) -- WE adjusted for interleaved memory
+  begin
+    for i in 0 to (MEMNUM/2 - 1) loop
+      ram_web(2 * i)     <= '1';
+      ram_web(2 * i + 1) <= '1';
+      if (c1_d_addr(0) = '0') then
+        if (even_c = '1') then
+          ram_web(2 * i) <= (c1_wr_n or (not toReq_c1(i * 2))) and (c2_wr_n or (not toReq_c2(i * 2)));
+        else
+          ram_web(2 * i + 1) <= (c1_wr_n or (not toReq_c1(i * 2))) and (c2_wr_n or (not toReq_c2(i * 2)));
+        end if;
+      else
+        if (even_c = '1') then
+          ram_web(2 * i + 1) <= (c1_wr_n or (not toReq_c1(i * 2))) and (c2_wr_n or (not toReq_c2(i * 2)));
+        else
+          ram_web(2 * i) <= (c1_wr_n or (not toReq_c1(i * 2))) and (c2_wr_n or (not toReq_c2(i * 2)));
+        end if;
+      end if;
+    end loop;
+  end process;
+  -----------------------------------------------------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------------------------------------
 
 end behav;

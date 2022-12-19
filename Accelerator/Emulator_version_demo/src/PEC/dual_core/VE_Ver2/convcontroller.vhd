@@ -51,6 +51,7 @@ end entity;
 
 architecture convctrl of convcontroller is
   --signals
+  signal cyclecounter   : integer;
   signal bypass_int     : std_logic;
   signal bypass_int_reg : std_logic;
   signal bias_load_int  : std_logic;
@@ -65,7 +66,6 @@ architecture convctrl of convcontroller is
   signal ppinst_s       : ppctrl_t;
   signal ppinst_p       : ppctrl_t;
   signal conv_out_sel   : std_logic_vector(2 downto 0);
-  signal bias_addr_reg  : std_logic_vector(7 downto 0);
   signal conv_loop      : unsigned(7 downto 0);
   signal conv_oloop     : unsigned(7 downto 0);
 
@@ -81,6 +81,22 @@ begin
   ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => right);
   addbiasinst   <= (acc  => addbias, quant => trunc);
   clipinst      <= (clip => clip8, outreg => out0);
+
+  cycle_counter : process(clk)
+  begin
+    if rising_edge(clk) then
+      if rst = '0' then
+        cyclecounter <= 0;
+      elsif start = '1' then
+        cyclecounter <= 0;
+      elsif busy = '1' then
+        cyclecounter <= cyclecounter + 1;
+        if (unsigned(dot_cnt) < 7 and conv_out_sel = (conv_out_sel'range => '1')) or (unsigned(dot_cnt) >= 7 and conv_loop = 0) then
+          cyclecounter <= 0;
+        end if;
+      end if;
+    end if;
+  end process;
 
   latch_signals: process(clk)
   begin
@@ -98,23 +114,23 @@ begin
           busy <= '1';
         elsif bypass_reg = '1' and data_valid = '0' then
           busy <= '0';
-        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = 0 then
           busy <= '0';
-        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then 
+        elsif conv_oloop = 0 and conv_loop = 0 then 
           busy <= '0';
         end if;
         if start = '1' and mode_c = '1' then
           mode_c_l <= '1';
-        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = 0 then
           mode_c_l <= '0';
-        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
+        elsif conv_oloop = 0 and conv_loop = 0 then
           mode_c_l <= '0';
         end if;
         if bypass = '1' then
           bypass_int <= '1';
-        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = (conv_loop'range => '0') then
+        elsif oc_cnt = (oc_cnt'range => '0') and conv_loop = 0 then
           bypass_int <= '0';
-        elsif conv_oloop = (conv_oloop'range => '0') and conv_loop = (conv_loop'range => '0') then
+        elsif conv_oloop = 0 and conv_loop = 0 then
           bypass_int <= '0';
         end if;
         bypass_int_reg <= bypass_int;----dumb solution for sync data in bypass mode
@@ -123,40 +139,67 @@ begin
     end if;
   end process;
 
-  conv_addr_gen: process(clk)
+  conv_loop_cnt: process(clk)
   begin
     if rising_edge(clk) then
       if RST = '0' then
-        left_rst <= '0';
-        right_rst <= '0';
-        bias_load_int <= '0';
-        bias_rd_en_int <= '0';
-        ext_load <= '0';
         conv_loop <= (others => '0');
         conv_oloop <= (others => '0');
       elsif en = '1' then
         if cnt_rst = '1' and clk_e_pos = '1' then
           conv_loop <= unsigned(dot_cnt);
           conv_oloop <= unsigned(oc_cnt);
-          if mode_c_l = '0' then
-            if mode_a = '1' then
-              left_rst <= '1';
-            end if;
-            if mode_b = '1' then
-              right_rst <= '1';
-            end if;
-          else
-            left_rst <= '0';
-            right_rst <= '0';
+        elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then
+          if cnt_rst = '1' then
+            conv_loop <= unsigned(dot_cnt);
+            conv_oloop <= unsigned(oc_cnt);
           end if;
-        elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then--and cnt_rst = '1' then --load vector engine's outer loop  and inner loop by the control of microinstructions, ring mode doesn't need a address reload
+        elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt)) then
+          if conv_out_p = '0' or unsigned(dot_cnt) >= 7 then
+            if conv_loop = 0 then
+              if conv_oloop /= 0 then
+                conv_oloop <= conv_oloop - 1;
+                if config(4) = '1' then --reload by config register, bit 4 in configure register
+                  conv_loop <= unsigned(dot_cnt);
+                end if;
+              else
+                conv_oloop <= conv_oloop;
+              end if;
+            elsif conv_loop /= 0 then
+              conv_loop <= conv_loop - 1;
+            end if;
+          elsif unsigned(dot_cnt) < 7 then
+            if cyclecounter = 7 then
+              if conv_oloop /= 0 then
+                conv_oloop <= conv_oloop - 1;
+                if config(4) = '1' then --reload by config register, bit 4 in configure register
+                  conv_loop <= unsigned(dot_cnt);
+                end if;
+              else
+                conv_oloop <= conv_oloop;
+              end if;
+            elsif conv_loop /= 0 then
+              conv_loop <= conv_loop - 1;
+            end if;
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+
+  conv_inst_gen: process(clk)
+  begin
+    if rising_edge(clk) then
+      if RST = '0' then
+        inst <= nop;
+        ppinst_s <= nop;
+      elsif en = '1' then
+        if (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then
           if config(1) = '0' then -- when this bit is not set clear the accumulator for each new computation.
             ppinst_s <= sumfirst;
           else 
             ppinst_s <= sum;
           end if;
-          left_rst <= '0';
-          right_rst <= '0';
           if conv_out_p = '1' then
             inst <= firstconv;
             if max_sel = '1' then
@@ -165,40 +208,7 @@ begin
           else
             inst <= sum;
           end if;
-          if pp_ctl(0) = '0' then
-            bias_load_int <= '1';
-            bias_rd_en_int <= '1';
-          else
-            bias_load_int <= '0';
-            bias_rd_en_int <= '0';
-          end if;
-          load <= '1';
-          rd_en <= '1';
-          if cnt_rst = '1' then
-            conv_loop <= unsigned(dot_cnt);
-            conv_oloop <= unsigned(oc_cnt);
-            if mode_c_l = '0' then
-              if mode_a = '1' or mode_b = '1' then
-                if mode_a = '1' and clk_e_pos = '1' then
-                  left_rst <= '1';
-                end if;
-                if mode_b = '1' and clk_e_pos = '1' then
-                  right_rst <= '1';
-                end if;
-              end if;
-            end if;
-          end if;
-        elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt))then--and conv_oloop /= (conv_oloop'range => '0')then --when outer loop is not 0, do self reload.
-          left_rst <= '0';
-          right_rst <= '0';
-          bias_load_int <= '0';
-          bias_rd_en_int <= '0';
-          if bypass_reg = '1' then
-            if data_valid = '0' then
-              load <= '0';
-              rd_en <= '0';
-            end if;
-          end if;
+        elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt)) then
           ppinst_s <= sum;
           if conv_out_p = '1' then
             inst <= conv;
@@ -208,7 +218,7 @@ begin
           else
             inst <= sum;
           end if;
-          if conv_loop = x"00" then
+          if conv_loop = 0 then
             if conv_out_p = '1' then
               inst <= firstconv;
               if max_sel = '1' then
@@ -218,45 +228,13 @@ begin
               inst <= sum;
             end if;
             ppinst_s <= sumfirst;
-            ext_load <= '0';
-            if pp_ctl(0) = '0' then
-              bias_load_int <= '1';
-              bias_rd_en_int <= '1';
-            else
-              bias_load_int <= '0';
-              bias_rd_en_int <= '0';
-            end if;
-            conv_oloop <= conv_oloop - 1;
-            if config(4) = '1' then --reload by config register, bit 4 in configure register
-              if conv_oloop /= x"00" then --do not reload dot products counter if out put channel counter is 0
-                conv_loop <= unsigned(dot_cnt);
-              end if;
-            end if;
-            if conv_oloop = x"00" then
-              load <= '0';
-              rd_en <= '0';
-              bias_load_int <= '0';
-              bias_rd_en_int <= '0';
+            if conv_oloop = 0 or (unsigned(dot_cnt) < 7 and pselector_en = '1') then
               inst <= nop;
               ppinst_s <= nop;
-              conv_oloop <= conv_oloop;
             end if;
-          elsif conv_loop /= x"00" then
-            conv_loop <= conv_loop - 1;
-            load <= '1';
-            rd_en <= '1';    
-            ext_load <= '0'; 
-            if conv_loop = x"01" then
+          elsif conv_loop /= 0 then
+            if conv_loop = 1 then
               ppinst_s <= sum;
-              if mode_c_l = '1' then
-                ext_load <= '1';
-              end if;
-              if config(2) = '1' then 
-                left_rst <= '1';
-              end if;
-              if config(3) = '1' then
-                right_rst <= '1';
-              end if;
               if conv_out_p = '1' then
                 inst <= lastconv;
                 if max_sel = '1' then
@@ -268,10 +246,6 @@ begin
             end if;
           end if;
         else
-          load <= '0';
-          rd_en <= '0';
-          bias_load_int <= '0';
-          bias_rd_en_int <= '0';
           inst <= nop;
           ppinst_s <= nop;
         end if;
@@ -280,10 +254,110 @@ begin
   end process;
 
   
+  conv_addr_ctrl: process(clk)
+  begin
+    if rising_edge(clk) then
+      if RST = '0' then
+        left_rst <= '0';
+        right_rst <= '0';
+        bias_load_int <= '0';
+        bias_rd_en_int <= '0';
+        ext_load <= '0';
+      elsif en = '1' then
+        if cnt_rst = '1' and clk_e_pos = '1' then
+          if mode_c_l = '0' then
+            if mode_a = '1' then
+              left_rst <= '1';
+            end if;
+            if mode_b = '1' then
+              right_rst <= '1';
+            end if;
+          else
+            left_rst <= '0';
+            right_rst <= '0';
+          end if;
+        elsif (start = '1' and busy = '1') or (data_valid = '1' and busy = '0') then
+          left_rst <= '0';
+          right_rst <= '0';
+          if pp_ctl(0) = '0' then
+            bias_load_int <= '1';
+            bias_rd_en_int <= '1';
+          else
+            bias_load_int <= '0';
+            bias_rd_en_int <= '0';
+          end if;
+          load <= '1';
+          rd_en <= '1';
+          if cnt_rst = '1' then
+            if mode_c_l = '0' then
+              if mode_a = '1' or mode_b = '1' then
+                if mode_a = '1' and clk_e_pos = '1' then
+                  left_rst <= '1';
+                end if;
+                if mode_b = '1' and clk_e_pos = '1' then
+                  right_rst <= '1';
+                end if;
+              end if;
+            end if;
+          end if;
+        elsif busy = '1' or (data_valid = '1' and busy = '0' and conv_loop /= unsigned(dot_cnt)) then
+          left_rst <= '0';
+          right_rst <= '0';
+          bias_load_int <= '0';
+          bias_rd_en_int <= '0';
+          if bypass_reg = '1' then
+            if data_valid = '0' then
+              load <= '0';
+              rd_en <= '0';
+            end if;
+          end if;
+          if conv_loop = 0 then
+            ext_load <= '0';
+            if pp_ctl(0) = '0' then
+              bias_load_int <= '1';
+              bias_rd_en_int <= '1';
+            else
+              bias_load_int <= '0';
+              bias_rd_en_int <= '0';
+            end if;
+            if conv_oloop = 0 then
+              load <= '0';
+              rd_en <= '0';
+              bias_load_int <= '0';
+              bias_rd_en_int <= '0';
+            end if;
+          elsif conv_loop /= 0 then
+            load <= '1';
+            rd_en <= '1';    
+            ext_load <= '0'; 
+            if conv_loop = 1 then
+              if mode_c_l = '1' then
+                ext_load <= '1';
+              end if;
+              if config(2) = '1' then 
+                left_rst <= '1';
+              end if;
+              if config(3) = '1' then
+                right_rst <= '1';
+              end if;
+            end if;
+          end if;
+        else
+          load <= '0';
+          rd_en <= '0';
+          bias_load_int <= '0';
+          bias_rd_en_int <= '0';
+        end if;
+      end if;
+    end if;
+  end process;
+
   process(clk)
   begin
     if rising_edge(clk) then
-      if conv_loop = x"02" then
+      if rst = '0' then
+        pselector_en <= '0';
+      elsif (((unsigned(dot_cnt) < 7 and cyclecounter = unsigned(dot_cnt)) or (unsigned(dot_cnt) >=7 and conv_loop = 2)) and busy = '1') then
         if conv_out_p = '1' then
           pselector_en <= '1';
         else

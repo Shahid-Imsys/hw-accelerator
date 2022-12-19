@@ -26,16 +26,16 @@
 //                                                                     
 //  Built for linux64 and running on linux64.                          
 //                                                                     
-//  Software           : Rev: S-2021.09-SP1                            
+//  Software           : Rev: U-2022.12                                
 //  Library Format     : Rev: 1.05.00                                  
-//  Compiler Name      : gf22nsd41p11s1dcl02msa04p1                    
+//  Compiler Name      : gf22nsd41p11s1dcl02msa05                      
 //  Platform           : Linux3.10.0-957.5.1.el7.x86_64                
 //                     : #1 SMP Wed Dec 19 10:46:58 EST 2018x86_64     
-//  Date of Generation : Mon May 23 16:09:03 CEST 2022                 
+//  Date of Generation : Fri Dec 09 14:16:15 CET 2022                  
 //                                                                     
 //---------------------------------------------------------------------
 //   --------------------------------------------------------------     
-//                       Template Revision : 6.2.5                      
+//                       Template Revision : 6.4.7                      
 //   --------------------------------------------------------------     
 //                      * Synchronous, 1-Port SRAM *                  
 //                    * Verilog Behavioral/RTL Model *                
@@ -590,8 +590,8 @@ specify
     Tccrm1 = 0.887,
     Tccrm2 = 0.568,
     Tccrm3 = 0.410,
-    Tccrm4 = 0.395,
-    Tccrm5 = 0.372,
+    Tccrm4 = 7777.000,
+    Tccrm5 = 7777.000,
     TT1C = 0.031,
     TCT1X = 0.896,
     Ttrnmc = 0.031,
@@ -623,10 +623,10 @@ specify
     Tcqrm2x = 0.343,
     Tcqrm3 = 0.358,
     Tcqrm3x = 0.282,
-    Tcqrm4 = 0.343,
-    Tcqrm4x = 0.270,
-    Tcqrm5 = 0.320,
-    Tcqrm5x = 0.252,
+    Tcqrm4 = 7777.000,
+    Tcqrm4x = 7777.000,
+    Tcqrm5 = 7777.000,
+    Tcqrm5x = 7777.000,
     Tcqtest1x = 0.143,
     Tcqtest1 = 0.183;
      if (   !RME & !LS & !TEST1 )
@@ -950,6 +950,8 @@ end // end of always block blk_address_0
 assign RM_int = ((RME_buf===1'b1)?RM_buf[2:0]:((RME_buf===1'b0)?3'b011:3'bx));
 wire llsb;
 assign llsb = (!(mux_ls) || BC0_buf);
+
+
 
 
 

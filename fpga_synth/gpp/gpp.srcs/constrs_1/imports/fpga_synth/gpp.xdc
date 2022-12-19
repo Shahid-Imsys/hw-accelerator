@@ -254,6 +254,3 @@ set_false_path -to [get_ports MIRQOUT]
 set_false_path -to [get_ports ENET_RST_N]
 
 
-
-
-

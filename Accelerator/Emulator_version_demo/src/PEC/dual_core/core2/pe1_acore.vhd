@@ -350,12 +350,12 @@ begin
   -- If plsel_n is low and plcpe_n is high, loading is inhibited and
   -- the register keeps a previously loaded instruction.
   --pl_out <= pl
-  ready_delay: process(clk_p, rst_en_int)
+  ready_delay: process(clk_p)
   begin
-    if rst_en_int = '0' then
-      ready <= '0';
-    else
-      if rising_edge(clk_p) then
+    if rising_edge(clk_p) then
+      if rst_en_int = '0' then
+        ready <= '1';
+      else
         ready <= ready_1;
       end if;
     end if;
@@ -378,16 +378,16 @@ begin
     end if;
   end process;
 
-  pl_reg: process (clk_p, rst_en_int)
+  pl_reg: process (clk_p)
   begin
-    if rst_en_int = '0' then
-      pl <= (others => '0');
-      core2_en_buf <= '0';
-    elsif rising_edge(clk_p) then--rising_edge(clk_e)
-        core2_en_buf <= core2_en;
-        if clk_e_pos_int = '0' then
-            pl <= mp_q;
-        end if;
+    if rising_edge(clk_p) then--rising_edge(clk_e)
+      core2_en_buf <= core2_en;
+      if rst_en_int = '0' then
+        pl <= x"8" & x"0000000000000000000000000000000";
+        core2_en_buf <= '0';
+      elsif clk_e_pos_int = '0' then
+        pl <= mp_q;
+      end if;
     end if;
   end process pl_reg;
 

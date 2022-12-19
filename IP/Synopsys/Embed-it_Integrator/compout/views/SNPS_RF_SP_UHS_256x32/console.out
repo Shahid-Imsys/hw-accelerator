@@ -2,24 +2,34 @@
                                       VMC 
                                Embed-It! (R)  VMC
 
-               Version S-2021.09-SP1 for linux64 - Oct 15, 2021 
+                 Version U-2022.12 for linux64 - Nov 25, 2022 
 
-                    Copyright (c) 1988 - 2021 Synopsys, Inc.
+                    Copyright (c) 1988 - 2022 Synopsys, Inc.
    This software and the associated documentation are proprietary to Synopsys,
  Inc. This software may only be used in accordance with the terms and conditions
  of a written license agreement with Synopsys, Inc. All other use, reproduction,
-            or distribution of this software is strictly prohibited.
+   or distribution of this software is strictly prohibited.  Licensed Products
+     communicate with Synopsys servers for the purpose of providing software
+    updates, detecting software piracy and verifying that customers are using
+    Licensed Products in conformity with the applicable License Key for such
+  Licensed Products. Synopsys will use information gathered in connection with
+    this process to deliver software updates and pursue software pirates and
+                                   infringers.
+
+ Inclusivity & Diversity - Visit SolvNetPlus to read the "Synopsys Statement on
+            Inclusivity and Diversity" (Refer to article 000036315 at
+                        https://solvnetplus.synopsys.com)
 INFO  [VMC, VMC-264]: Load of compiler database ...
-INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/cadet.prm' ...
-INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/memory.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/U-2022.12/data/cadet.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/U-2022.12/data/memory.prm' ...
 INFO  [VMC, CFG-216]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa.prm' ...
 INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa04p1.glb' ...
 INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa04p1_custom.glb' ...
 INFO  [VMC, CFG-018]: Reading file '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32.cfg' ...
 INFO  [VMC, CFG-230]: Load of cfg settings complete
-INFO  [VMC, VMC-131]: Load of compiler database took 0.25 secs.
+INFO  [VMC, VMC-131]: Load of compiler database took 0.26 secs.
 INFO  [VMC, VMC-233]: Input parameters validation ...
-INFO  [VMC, VMC-131]: Input parameters validation took 0.44 secs.
+INFO  [VMC, VMC-131]: Input parameters validation took 0.46 secs.
 INFO  [VMC, BDIST-000]: rebuf_seg_number is 0
 center_decode=0 nb=32 NBR=32 r_rebuf_insertion_point=0 r_sps=1.0 NBRS1=32 NBRS2=0 NBRS3=0 NBRS4=0 NBRS5=0 NBRS6=0 NBRS7=0 NBRS8=0 
 center_decode=0 nb=32 NBL=0 l_rebuf_insertion_point=0 l_sps=0.0 NBLS1=0 NBLS2=0 NBLS3=0 NBLS4=0 NBLS5=0 NBLS6=0 NBLS7=0 NBLS8=0
@@ -33,72 +43,180 @@ center_decode=0 nb=32 NBL=0 l_rebuf_insertion_point=0 l_sps=0.0 NBLS1=0 NBLS2=0 
 NBL=0 NBR=32
 INFO  [VMC, VMC-234]: Delay calculation ...
 INFO  [VMC, CHAR-020]: Loading project ...
-INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/cadet.prm' ...
-INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/S-2021.09-SP1/data/memory.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/U-2022.12/data/cadet.prm' ...
+INFO  [VMC, CFG-216]: Reading file '/usr/local/synopsys/embedit/U-2022.12/data/memory.prm' ...
 INFO  [VMC, CFG-216]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa.prm' ...
 INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa04p1.glb' ...
 INFO  [VMC, CFG-018]: Reading file '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa04p1_custom.glb' ...
 INFO  [VMC, CHAR-060]: Project loaded from /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/gf22nsd41p11s1srl256sa.cpj
-INFO  [VMC, CHAR-131]: Loading project took 7.85 secs.
+INFO  [VMC, CHAR-131]: Loading project took 7.41 secs.
 /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/char/arch_char
 /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/char
 INFO  [VMC, CHAR-105]: Running instance evaluation...
 INFO  [VMC, CHAR-109]: Validating the project...
-INFO  [VMC, CHAR-109]: (29-06-2022 15:14:02)  Corners validation done
+INFO  [VMC, CHAR-109]: (09-12-2022 13:54:33)  Corners validation done
 INFO  [VMC, CHAR-131]: Validating netlist files took 0.00 secs.
 INFO  [VMC, CHAR-113]: The project is valid
-INFO  [VMC, CHAR-131]: Validating project took 0.81 secs.
+INFO  [VMC, CHAR-131]: Validating project took 0.70 secs.
 INFO  [VMC, CHAR-140]: Initializing tables...
 INFO  [VMC, CHAR-180]: Initialized all tables
 INFO  [VMC, CHAR-200]: Determining what results are needed...
-INFO  [VMC, CHAR-240]: Determined that 46125 results are needed so far
-INFO  [VMC, CHAR-240]: Regular results:    819 needed,   819 final, 0 failed
-INFO  [VMC, CHAR-240]: Equation results: 45306 needed, 45306 final, 0 failed
-INFO  [VMC, CHAR-131]: Determining results took 33.65 secs.
+INFO  [VMC, CHAR-240]: Determined that 76875 results are needed so far
+INFO  [VMC, CHAR-240]: Regular results:   1365 needed,  1365 final, 0 failed
+INFO  [VMC, CHAR-240]: Equation results: 75510 needed, 75510 final, 0 failed
+INFO  [VMC, CHAR-131]: Determining results took 34.24 secs.
+Coming here for mas op_ccs_K_rop_h_rise with 0 -0.0024990000000000004 and tryign to set 0.00011
+Coming here for mas op_ccs_K_rop_h_rise with 0.00011 -0.002458169704960204 and tryign to set 0.00021999999999999987
+Coming here for mas op_ccs_K_rop_h_rise with 0.00021999999999999987 -0.0022899746067826503 and tryign to set 0.00032999999999999973
+Coming here for mas op_ccs_K_rop_h_rise with 0.00032999999999999973 -0.002090974606061167 and tryign to set 0.0004399999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.0004399999999999996 -0.001891974605339684 and tryign to set 0.0005499999999999994
+Coming here for mas op_ccs_K_rop_h_rise with 0.0005499999999999994 -0.00160797460430878 and tryign to set 0.0006599999999999992
+Coming here for mas op_ccs_K_rop_h_rise with 0.0006599999999999992 -0.0013229746032750716 and tryign to set 0.0007699999999999991
+Coming here for mas op_ccs_K_rop_h_rise with 0.0007699999999999991 -0.0010389746022450557 and tryign to set 0.000879999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.000879999999999999 -0.0007549746012150398 and tryign to set 0.000989999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.000989999999999999 -0.00047097460018413577 and tryign to set 0.001099999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.001099999999999999 -0.0001869745991541199 and tryign to set 0.001209999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.001209999999999999 -2.7974598577671858e-5 and tryign to set 0.0013199999999999991
+Coming here for mas op_ccs_K_rop_h_rise with 0.0013199999999999991 0.0001400254020320086 and tryign to set 0.0014299999999999992
+Coming here for mas op_ccs_K_rop_h_rise with 0.0014299999999999992 0.00026802540249576574 and tryign to set 0.0015399999999999993
+Coming here for mas op_ccs_K_rop_h_rise with 0.0015399999999999993 0.0003750254028846451 and tryign to set 0.0016499999999999993
+Coming here for mas op_ccs_K_rop_h_rise with 0.0016499999999999993 0.0004670254032181371 and tryign to set 0.0017599999999999994
+Coming here for mas op_ccs_K_rop_h_rise with 0.0017599999999999994 0.0005520254035266698 and tryign to set 0.0018699999999999995
+Coming here for mas op_ccs_K_rop_h_rise with 0.0018699999999999995 0.0006380254038380068 and tryign to set 0.0019799999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.0019799999999999996 0.0007160254041215803 and tryign to set 0.0020899999999999994
+Coming here for mas op_ccs_K_rop_h_rise with 0.0020899999999999994 0.0007940254044042656 and tryign to set 0.0021999999999999993
+Coming here for mas op_ccs_K_rop_h_rise with 0.0021999999999999993 0.0008720254046869508 and tryign to set 0.002309999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.002309999999999999 0.0009500254049705243 and tryign to set 0.002419999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.002419999999999999 0.0010210254052273621 and tryign to set 0.002529999999999999
+Coming here for mas op_ccs_K_rop_h_rise with 0.002529999999999999 0.0010920254054850882 and tryign to set 0.0026399999999999987
+Coming here for mas op_ccs_K_rop_h_rise with 0.0026399999999999987 0.0011630254057428142 and tryign to set 0.0027499999999999985
+Coming here for mas op_ccs_K_rop_h_rise with 0.0027499999999999985 0.0012340254060005402 and tryign to set 0.0028599999999999984
+Coming here for mas op_ccs_K_rop_h_rise with 0.0028599999999999984 0.0013060254062610705 and tryign to set 0.0029699999999999982
+Coming here for mas op_ccs_K_rop_h_rise with 0.0029699999999999982 0.0013770254065187965 and tryign to set 0.003079999999999998
+Coming here for mas op_ccs_K_rop_h_rise with 0.003079999999999998 0.00145502540680237 and tryign to set 0.003189999999999998
+Coming here for mas op_ccs_K_rop_h_rise with 0.003189999999999998 0.0015400254071100145 and tryign to set 0.003299999999999998
+Coming here for mas op_ccs_K_rop_h_rise with 0.003299999999999998 0.0016320254074443947 and tryign to set 0.0034099999999999977
+Coming here for mas op_ccs_K_rop_h_rise with 0.0034099999999999977 0.0017460254078573451 and tryign to set 0.0035199999999999975
+Coming here for mas op_ccs_K_rop_h_rise with 0.0035199999999999975 0.0018740254083219905 and tryign to set 0.0036299999999999974
+Coming here for mas op_ccs_K_rop_h_rise with 0.0036299999999999974 0.002030025408887361 and tryign to set 0.0037399999999999972
+Coming here for mas op_ccs_K_rop_h_rise with 0.0037399999999999972 0.0022150254095589256 and tryign to set 0.003849999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.003849999999999997 0.0024570254104365214 and tryign to set 0.003959999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.003959999999999997 0.002556025410795861 and tryign to set 0.004069999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.004069999999999997 0.0026560254111588927 and tryign to set 0.004179999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.004179999999999997 0.002755025411517344 and tryign to set 0.004289999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.004289999999999997 0.0029400254121889086 and tryign to set 0.004399999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.004399999999999997 0.003167025413012005 and tryign to set 0.004509999999999997
+Coming here for mas op_ccs_K_rop_h_rise with 0.004509999999999997 0.0033800254137851832 and tryign to set 0.0046199999999999965
+Coming here for mas op_ccs_K_rop_h_rise with 0.0046199999999999965 0.003593025414557473 and tryign to set 0.004729999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.004729999999999996 0.0038070254153334555 and tryign to set 0.004839999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.004839999999999996 0.0040200254161066335 and tryign to set 0.004949999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.004949999999999996 0.004233025416878923 and tryign to set 0.005059999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.005059999999999996 0.004446025417652101 and tryign to set 0.005169999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.005169999999999996 0.0046740254184788905 and tryign to set 0.005279999999999996
+Coming here for mas op_ccs_K_rop_h_rise with 0.005279999999999996 0.004901025419301987 and tryign to set 0.0053899999999999955
+Coming here for mas op_ccs_K_rop_h_rise with 0.0053899999999999955 0.005128025420125972 and tryign to set 0.005499999999999995
+Coming here for mas op_ccs_K_rop_h_rise with 0.005499999999999995 0.005356025420952761 and tryign to set 0.005609999999999995
+Coming here for mas op_ccs_K_rop_h_rise with 0.005609999999999995 0.0055830254217758574 and tryign to set 0.005719999999999995
+Coming here for mas op_ccs_K_rop_h_rise with 0 -0.0024990000000000004 and tryign to set 0.00011
+Coming here for mas op_ccs_K_rop_h_rise with 0.00011 -0.001891974605339684 and tryign to set 0.00021999999999999987
+Coming here for mas op_ccs_K_q_h_rise with 0 -0.0023998730373642734 and tryign to set 0.00011
+Coming here for mas op_ccs_K_q_h_rise with 0.00011 -0.0023018730370077383 and tryign to set 0.00021999999999999987
+Coming here for mas op_ccs_K_q_h_rise with 0.00021999999999999987 -0.002201873036642042 and tryign to set 0.00032999999999999973
+Coming here for mas op_ccs_K_q_h_rise with 0.00032999999999999973 -0.0019858730358586745 and tryign to set 0.0004399999999999996
+Coming here for mas op_ccs_K_q_h_rise with 0.0004399999999999996 -0.0017618730350457672 and tryign to set 0.0005499999999999994
+Coming here for mas op_ccs_K_q_h_rise with 0.0005499999999999994 -0.0014488730339104455 and tryign to set 0.0006599999999999992
+Coming here for mas op_ccs_K_q_h_rise with 0.0006599999999999992 -0.0011358730327751237 and tryign to set 0.0007699999999999991
+Coming here for mas op_ccs_K_q_h_rise with 0.0007699999999999991 -0.0008238730316443826 and tryign to set 0.000879999999999999
+Coming here for mas op_ccs_K_q_h_rise with 0.000879999999999999 -0.0005398730306134785 and tryign to set 0.000989999999999999
+Coming here for mas op_ccs_K_q_h_rise with 0.000989999999999999 -0.0002548730295779938 and tryign to set 0.001099999999999999
+Coming here for mas op_ccs_K_q_h_rise with 0.001099999999999999 5.712697155274733e-5 and tryign to set 0.001209999999999999
+Coming here for mas op_ccs_K_q_h_rise with 0.001209999999999999 0.0003701269726880691 and tryign to set 0.0013199999999999991
+Coming here for mas op_ccs_K_q_h_rise with 0.0013199999999999991 0.0006831269738233909 and tryign to set 0.0014299999999999992
+Coming here for mas op_ccs_K_q_h_rise with 0.0014299999999999992 0.000995126974954132 and tryign to set 0.0015399999999999993
+Coming here for mas op_ccs_K_q_h_rise with 0.0015399999999999993 0.0013081269760894538 and tryign to set 0.0016499999999999993
+Coming here for mas op_ccs_K_q_h_rise with 0.0016499999999999993 0.001620126977220195 and tryign to set 0.0017599999999999994
+Coming here for mas op_ccs_K_q_20_h_rise with 0 -0.0023998730373642734 and tryign to set 0.00011
+Coming here for mas op_ccs_K_q_20_h_rise with 0.00011 -0.0023018730370077383 and tryign to set 0.00021999999999999987
+Coming here for mas op_ccs_K_q_20_h_rise with 0.00021999999999999987 -0.002201873036642042 and tryign to set 0.00032999999999999973
+Coming here for mas op_ccs_K_q_20_h_rise with 0.00032999999999999973 -0.0019858730358586745 and tryign to set 0.0004399999999999996
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0004399999999999996 -0.0017618730350457672 and tryign to set 0.0005499999999999994
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0005499999999999994 -0.0014488730339104455 and tryign to set 0.0006599999999999992
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0006599999999999992 -0.0011358730327751237 and tryign to set 0.0007699999999999991
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0007699999999999991 -0.0008238730316443826 and tryign to set 0.000879999999999999
+Coming here for mas op_ccs_K_q_20_h_rise with 0.000879999999999999 -0.0005398730306134785 and tryign to set 0.000989999999999999
+Coming here for mas op_ccs_K_q_20_h_rise with 0.000989999999999999 -0.0002548730295779938 and tryign to set 0.001099999999999999
+Coming here for mas op_ccs_K_q_20_h_rise with 0.001099999999999999 5.712697155274733e-5 and tryign to set 0.001209999999999999
+Coming here for mas op_ccs_K_q_20_h_rise with 0.001209999999999999 0.0003701269726880691 and tryign to set 0.0013199999999999991
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0013199999999999991 0.0006831269738233909 and tryign to set 0.0014299999999999992
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0014299999999999992 0.000995126974954132 and tryign to set 0.0015399999999999993
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0015399999999999993 0.0013081269760894538 and tryign to set 0.0016499999999999993
+Coming here for mas op_ccs_K_q_20_h_rise with 0.0016499999999999993 0.001620126977220195 and tryign to set 0.0017599999999999994
 INFO  [VMC, CHAR-460]: Writing of output files completed
 INFO  [VMC, CHAR-434]: Instance evaluation completed
 INFO  [VMC, VMC-053]: Reading delay files ...
 INFO  [VMC, VMC-054]: Calculating delays for 'tt0p8v25c_0p8v_0v_0v' conditions
 INFO  [VMC, VMC-054]: Calculating delays for 'ssg_fcmax0p72v125c_0p72v_0v_0v' conditions
 INFO  [VMC, VMC-054]: Calculating delays for 'ssg_fcmax0p72vn40c_0p72v_0v_0v' conditions
-INFO  [VMC, VMC-131]: Reading delay files took 0.50 secs.
-INFO  [VMC, VMC-131]: Delay calculation took 54.52 secs.
+INFO  [VMC, VMC-054]: Calculating delays for 'ffg_fcmin0p84vn40c_0p84v_0v_0v' conditions
+INFO  [VMC, VMC-054]: Calculating delays for 'ffg_fcmin0p84v150c_0p84v_0v_0v' conditions
+INFO  [VMC, VMC-131]: Reading delay files took 0.87 secs.
+INFO  [VMC, VMC-131]: Delay calculation took 63.42 secs.
 INFO  [VMC, VMC-235]: CAF flow ...
 INFO  [VMC, VMC-236]: CAF initialization ...
-INFO  [VMC, VMC-131]: CAF initialization took 1.50 secs.
+INFO  [VMC, VMC-131]: CAF initialization took 0.50 secs.
 INFO  [VMC, VMC-237]: CAF loading ...
-INFO  [VMC, VMC-131]: CAF loading took 7.52 secs.
+INFO  [VMC, VMC-131]: CAF loading took 0.22 secs.
 INFO  [VMC, VMC-238]: CAF top assembly creation ...
-INFO  [VMC, VMC-131]: CAF top assembly creation took 4.11 secs.
+INFO  [VMC, VMC-131]: CAF top assembly creation took 0.71 secs.
 INFO  [VMC, VMC-239]: CAF execution ...
 INFO  [VMC, CAF-1175]: cadet.tiler: INFO+9: Running the caf.tile flow on <Top(name='SNPS_RF_SP_UHS_256x32')> ...
 INFO  [VMC, CAF-1237]: cadet.tiler: INFO+9: The caf.tile flow completed: 0 Cells have errors, 0 Cells have warnings.
-INFO  [VMC, CAF-1238]: cadet.tiler: INFO+9: Running the caf.tile flow on <Top(name='SNPS_RF_SP_UHS_256x32')> took 6.23 secs.
-INFO  [VMC, VMC-131]: CAF execution took 6.38 secs.
+INFO  [VMC, CAF-1238]: cadet.tiler: INFO+9: Running the caf.tile flow on <Top(name='SNPS_RF_SP_UHS_256x32')> took 4.42 secs.
+INFO  [VMC, VMC-131]: CAF execution took 4.58 secs.
 INFO  [VMC, VMC-240]: Pin map generation ...
 INFO  [VMC, VMC-131]: Pin map generation took 0.00 secs.
-INFO  [VMC, VMC-131]: CAF flow took 19.50 secs.
+INFO  [VMC, VMC-131]: CAF flow took 6.02 secs.
 INFO  [VMC, VMC-193]: Expanding templates ...
 INFO  [VMC, EXP-001]: Expanding 'Combined Datasheet for all PVT corners' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_allpvt.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32_allpvt.ds'
 INFO  [VMC, EXP-001]: Expanding 'Datasheet for HTML' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_allpvthtml.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32_allpvt.html'
 INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/tt0p8v25c_0p8v_0v_0v/SNPS_RF_SP_UHS_256x32.summ'
 INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.summ'
 INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.summ'
+INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84vn40c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.summ'
+INFO  [VMC, EXP-001]: Expanding 'Summary' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_dssum.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84v150c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.summ'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral/RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/tt0p8v25c_0p8v_0v_0v/SNPS_RF_SP_UHS_256x32.v'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral/RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.v'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral/RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.v'
+INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral/RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84vn40c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.v'
+INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral/RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84v150c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.v'
+INFO  [VMC, EXP-001]: Expanding 'Synopsys Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_syn.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/tt0p8v25c_0p8v_0v_0v/SNPS_RF_SP_UHS_256x32.lib'
+INFO  [VMC, EXP-001]: Expanding 'Synopsys Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_syn.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.lib'
+INFO  [VMC, EXP-001]: Expanding 'Synopsys Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_syn.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32.lib'
+INFO  [VMC, EXP-001]: Expanding 'Synopsys Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_syn.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84vn40c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.lib'
+INFO  [VMC, EXP-001]: Expanding 'Synopsys Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_syn.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84v150c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32.lib'
 INFO  [VMC, EXP-001]: Expanding 'VHDL RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_vhd_rtl.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/tt0p8v25c_0p8v_0v_0v/SNPS_RF_SP_UHS_256x32_rtl.vhd'
 INFO  [VMC, EXP-001]: Expanding 'VHDL RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_vhd_rtl.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32_rtl.vhd'
 INFO  [VMC, EXP-001]: Expanding 'VHDL RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_vhd_rtl.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32_rtl.vhd'
+INFO  [VMC, EXP-001]: Expanding 'VHDL RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_vhd_rtl.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84vn40c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32_rtl.vhd'
+INFO  [VMC, EXP-001]: Expanding 'VHDL RTL Model' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_vhd_rtl.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84v150c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32_rtl.vhd'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral Model and Vital Behavioral Model Testbench' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog_vhd_stim.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/tt0p8v25c_0p8v_0v_0v/SNPS_RF_SP_UHS_256x32_verilog_vhd_stim.v'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral Model and Vital Behavioral Model Testbench' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog_vhd_stim.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72v125c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32_verilog_vhd_stim.v'
 INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral Model and Vital Behavioral Model Testbench' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog_vhd_stim.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ssg_fcmax0p72vn40c_0p72v_0v_0v/SNPS_RF_SP_UHS_256x32_verilog_vhd_stim.v'
+INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral Model and Vital Behavioral Model Testbench' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog_vhd_stim.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84vn40c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32_verilog_vhd_stim.v'
+INFO  [VMC, EXP-001]: Expanding 'Verilog Behavioral Model and Vital Behavioral Model Testbench' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_verilog_vhd_stim.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/ffg_fcmin0p84v150c_0p84v_0v_0v/SNPS_RF_SP_UHS_256x32_verilog_vhd_stim.v'
 INFO  [VMC, EXP-001]: Expanding 'Fast functional Verilog Model ' template '/usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/mc_fast_func_verilog.tpl' to '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32_fast_func.v'
-INFO  [VMC, VMC-131]: Expanding templates took 6.99 secs.
+INFO  [VMC, VMC-131]: Expanding templates took 20.00 secs.
+INFO  [VMC, VMC-214]: Reducing /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/design2gf_xltt.csv file to /home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/xltt.csv ...
+INFO  [VMC, VMC-131]: Reducing /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1srl256sa04p1/design2gf_xltt.csv file to /home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/xltt.csv took 0.03 secs.
+INFO  [VMC, VMC-244]: Layer translation ...
+INFO  [VMC, G2G-014]: Converting layers using layers mapping file '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/xltt.csv'
+INFO  [VMC, VMC-131]: Layer translation took 0.42 secs.
+INFO  [VMC, VMC-247]: Complete OASIS generation ...
+INFO  [VMC, VMC-131]: Complete OASIS generation took 0.15 secs.
 INFO  [VMC, VMC-149]: Extracting straps ...
 INFO  [VMC, VMC-173]: File '/home/jeme/project/Imsys_copy/memory/Imsys_2/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32.masis': not found
 INFO  [VMC, VMC-150]: Skipping strap extraction
 INFO  [VMC, VMC-131]: Extracting straps took 0.00 secs.
-INFO  [VMC, VMC-131]: Complete component generation took 83.31 secs.
-INFO  [VMC, VMC-093]: Peak memory used: 1275.02 M
+INFO  [VMC, VMC-131]: Complete component generation took 92.64 secs.
+INFO  [VMC, VMC-093]: Peak memory used: 1531.75 M
 INFO  [VMC, VMC-046]: Errors: 0, Warnings: 0

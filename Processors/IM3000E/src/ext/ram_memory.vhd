@@ -7,7 +7,9 @@ use work.gp_pkg.all;
 
 entity ram_memory is
   generic (
-    g_memory_type : memory_type_t := asic);
+    g_memory_type : memory_type_t := asic;
+    initFile      : string        := "main_mem.mif";
+    fpgaMemIndex  : integer       := 0 );
   port (
     clk     : in  std_logic;
     address : in  std_logic_vector(13 downto 0);
@@ -20,6 +22,8 @@ entity ram_memory is
 end entity ram_memory;
 
     architecture str of ram_memory is
+
+-- application and microprogram shared memory
 
   component SNPS_SP_HD_16Kx8
     port (
@@ -53,6 +57,17 @@ end entity ram_memory;
       );
   end component;
 
+  component test_mem
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
   component load_ram is
     generic (
       initFile : string);
@@ -70,7 +85,7 @@ begin  -- architecture str
       -- pragma synthesis_off
     i_load_ram : load_ram
       generic map (
-        initFile => "main_mem.mif");
+        initFile => initFile );
     -- pragma synthesis_on
     
     ram0_asic : SNPS_SP_HD_16Kx8
@@ -93,9 +108,21 @@ begin  -- architecture str
         BC2      => '0'
         );
 
-  else generate -- if g_memory_type = fpga generate
+  elsif fpgaMemIndex = 0 generate
 
-    ram0 : main_mem
+    fpga0 : main_mem
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  else generate
+
+    fpga1 : test_mem
       port map (
         clka  => clk,
         ena   => cs,

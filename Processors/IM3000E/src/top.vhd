@@ -1369,6 +1369,7 @@ begin
   sdram_inf_inst : entity work.sdram_inf
     port map(
       clk_p       => clk_p,
+      even_c      => even_c,
       clk_d_pos   => clk_d_pos,
       clk_da_pos  => clk_da_pos,
       rst_n       => rst_n,
@@ -1377,7 +1378,7 @@ begin
       -----core1 sdram interface
       c1_d_addr   => c1_d_addr,
       c1_d_cs     => c1_d_cs,
-      c1_d_ras    => c1_d_ras,
+      c1_d_ras    => '1',
       c1_d_cas    => c1_d_cas,
       c1_d_we     => c1_d_we,
       c1_d_dqi    => c1_d_dqi,

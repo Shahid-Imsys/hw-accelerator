@@ -71,22 +71,7 @@ entity cluster_controller is
 		RESUME           : out std_logic;       --Resume paused execution
 	--Feedback signals
 	  C_RDY            : out std_logic;
-		PE_RDY_0         : in std_logic;
-		PE_RDY_1         : in std_logic;
-		PE_RDY_2         : in std_logic;
-		PE_RDY_3         : in std_logic;
-		PE_RDY_4         : in std_logic;
-		PE_RDY_5         : in std_logic;
-		PE_RDY_6         : in std_logic;
-		PE_RDY_7         : in std_logic;
-		PE_RDY_8         : in std_logic;
-		PE_RDY_9         : in std_logic;
-		PE_RDY_10        : in std_logic;
-		PE_RDY_11        : in std_logic;
-		PE_RDY_12        : in std_logic;
-		PE_RDY_13        : in std_logic;
-		PE_RDY_14        : in std_logic;
-		PE_RDY_15        : in std_logic;
+		PES_RDY          : in std_logic_vector(15 downto 0);
 	--Request and distribution logic signals
 	  RST_R            : out std_logic;       --Active low
 		REQ_IN           : in std_logic;        --req to noc in reg logic
@@ -194,6 +179,7 @@ end component;
   signal write_req      : std_logic;
   signal datain_vld     : std_logic;
   signal dataout_vld    : std_logic;
+  signal data_to_pe_en  : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in         : reg;                             --Input register to memory
@@ -283,12 +269,12 @@ begin
   ------------------------------------------------------------------------------
   -- NOC commnad decoding
   ------------------------------------------------------------------------------
-  rst : process(clk_e, RST_E)
+  rst : process(clk_p, RST_E)
   begin
     if RST_E = '0' then
       rst_i <= '0';
-	  elsif rising_edge(clk_e) then
-	  	if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+	  elsif rising_edge(clk_p) then
+	  	if even_p_int = '0' and noc_cmd = "01111" then --soft reset, cmd not impelement yet
 	  	  rst_i <= '0';
 	  	else
 	  	  rst_i <= '1';
@@ -450,7 +436,7 @@ begin
 			    delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
 			elsif noc_cmd = "00100" then     --ReadBlock
-				if byte_ctr = "0000" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
+				if byte_ctr = "1111" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
 					delay  <= '0';
 					delay2 <= '0';
 				elsif peci_busy = '1' and sig_fin = '1' then
@@ -491,24 +477,24 @@ begin
 	byte_ctr_cal: process (clk_e, RST_E)
 	begin
     if RST_E = '0' then
-      byte_ctr <= "1111";
+      byte_ctr <= "0000";
 		elsif rising_edge(clk_e) then
 			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-				byte_ctr <= "1111";  --azzzz "0000";
+				byte_ctr <= "0000";  --azzzz "0000";
 		    elsif noc_cmd = "00011" or noc_cmd = "00101" then
 	        if delay2 = '1' and datain_vld = '1' then
-           	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
+           	byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				  else
-				  	byte_ctr <= "1111"; 
+				  	byte_ctr <= "0000"; 
           end if;
 			elsif noc_cmd = "00100" then
 				if delay = '1' and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
-					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))-1,4));
+					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				else
-					byte_ctr <= "1111"; 
+					byte_ctr <= "0000"; 
 				end if;
 			else
-				byte_ctr <= "0000";
+				byte_ctr <= "1111";
 		  end if;
 		end if;
 	end process;
@@ -544,7 +530,7 @@ begin
 			elsif noc_cmd = "00011" or noc_cmd = "00101" then
 				if sync_collector = "11" then
 					datain_vld <= '1';
-				elsif byte_ctr = "0000" then
+				elsif byte_ctr = "1111" then
 					datain_vld <= '0';
 				end if;		 	
 			end if;
@@ -561,7 +547,7 @@ begin
 			elsif noc_cmd = "00100" then
 				if noc_read = '1' then
 					dataout_vld <= '1';
-				elsif byte_ctr = "0000" then --"0001" then
+				elsif byte_ctr = "1111" then --"0001" then
 					dataout_vld <= '0';
 				end if;
 			else
@@ -585,7 +571,7 @@ begin
         noc_read    <= '0';
       elsif delay = '1' then     
 			  if noc_cmd = "00011" or noc_cmd = "00101" then
-			    if byte_ctr = "0000" then 
+			    if byte_ctr = "1111" then 
 			    	noc_reg_rdy <= '1';
             noc_write   <= '1';
 			  	  noc_read    <= '0';
@@ -763,11 +749,11 @@ begin
         RD_FIFO <= '0';
         standby <= '1';
 	  	elsif rising_edge(clk_p) then --RD_REQ raises at falling_edge of clk_e
-	  		if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-	  			RD_FIFO <= '0';
-          standby <= '1';
-        elsif even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
-	  		  if REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
+	  		if even_p_int = '1' then --RD_FIFO raises at falling_edge of clk_e
+	  		  if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
+            RD_FIFO <= '0';
+            standby <= '1';
+          elsif REQ_IN = '1' and req_exe = '0' and write_req = '0' and standby = '1' then --normal case
 	  		  	RD_FIFO <= '1';
 	  			  standby <= '0';
           elsif REQ_IN = '1' and write_req = '1' then
@@ -790,15 +776,17 @@ begin
       pe_req_type <= (others => '0');
       req_last    <= (others => '0');
  		elsif rising_edge(clk_p) then --0628 --only have meaning at falling_edge of clk_e
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				pe_req_type <= (others => '0');
-				req_last    <= (others => '0');
-			elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
- 				pe_req_type <= REQ_FIFO(31 downto 30);
- 				req_last    <= REQ_FIFO(29 downto 24);
-      elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
-        pe_req_type <= (others => '0');
-				req_last    <= (others => '0');
+      if even_p_int = '0' then 
+        if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+				  pe_req_type <= (others => '0');
+				  req_last    <= (others => '0');
+			  elsif FIFO_VLD = '1' then--and req_exe = '0' and req_bexe = '0' and write_req = '0' and cb_status = '0'then 
+ 			  	pe_req_type <= REQ_FIFO(31 downto 30);
+ 			  	req_last    <= REQ_FIFO(29 downto 24);
+        elsif (req_exe = '1' or req_bexe = '1') and len_ctr_p = "000000001" then
+          pe_req_type <= (others => '0');
+			  	req_last    <= (others => '0');
+        end if;
  			end if;
  		end if;
  	end process;
@@ -816,17 +804,17 @@ begin
       write_req  <= '0';
       id_num     <= (others => '0');
     elsif rising_edge(clk_p) then
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				req_exe    <= '0';
-				req_bexe   <= '0';
-				cb_status  <= '0';
-				b_cast_ctr <= (others => '0');
-				write_req  <= '0';
-        id_num     <= (others => '0');
-			elsif even_p_int = '0' then 
+			if even_p_int = '0' then 
         FIFO_OUT_VLD <= FIFO_VLD;
         BC<= req_bexe;
-			  if req_exe = '0' and req_bexe = '0' then
+			  if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+          req_exe    <= '0';
+          req_bexe   <= '0';
+          cb_status  <= '0';
+          b_cast_ctr <= (others => '0');
+          write_req  <= '0';
+          id_num     <= (others => '0');
+        elsif req_exe = '0' and req_bexe = '0' then
 			    if pe_req_type = "01" then
 			    	if cb_status = '0' then
 			    		cb_status  <= '1';
@@ -881,13 +869,13 @@ begin
       pe_write    <= '0';
       pe_read     <= '0';
 		elsif rising_edge(clk_p) then 
-			if noc_cmd = "01111" then --soft reset, cmd not impelement yet
-				addr_p      <= (others => '0');
-				len_ctr_p   <= (others => '0');
-				pe_write    <= '0';
-				pe_read     <= '0';
-			elsif even_p_int = '0' then
-				if noc_reg_rdy = '0' then
+			if even_p_int = '0' then
+				if noc_cmd = "01111" then --soft reset, cmd not impelement yet
+          addr_p      <= (others => '0');
+          len_ctr_p   <= (others => '0');
+          pe_write    <= '0';
+          pe_read     <= '0';
+        elsif noc_reg_rdy = '0' then
 					pe_read  <= '0';
 					pe_write <= '0';
 					if req_bexe = '1' then
@@ -942,19 +930,19 @@ begin
     begin
     	if rising_edge(clk_p) then 
 			  if even_p_int = '0' then 
-          if pe_read ='1' then --Data valid asserts together with output data
-    	      for i in 15 downto 0 loop
-    	      	DATA_TO_PE(8*i+7 downto 8*i) <= data_core_int(i);
-    	      end loop;
+          if pe_read = '1' then --Data valid asserts together with output data    	      
     	      	DATA_VLD <= not noc_reg_rdy;
           else
-            DATA_TO_PE <= (others=>'0');
             DATA_VLD   <= '0';
           end if;
 			  end if;
       end if;
     end process;
 
+    DATA_TO_PE <= data_core_int(15) & data_core_int(14) & data_core_int(13) & data_core_int(12) &
+                  data_core_int(11) & data_core_int(10) & data_core_int(9) & data_core_int(8) &
+                  data_core_int(7) & data_core_int(6) & data_core_int(5) & data_core_int(4) &
+                  data_core_int(3) & data_core_int(2) & data_core_int(1) & data_core_int(0);
 
  --Address & trigger MUX
   process(noc_reg_rdy,addr_p, addr_n, noc_write, noc_read, pe_write, pe_read)				
@@ -988,10 +976,18 @@ begin
 ---------------------------------------------
 --Cluster ready indecator
 ---------------------------------------------
-  c_rdy_i <= PE_RDY_0 and PE_RDY_1 and PE_RDY_2 and PE_RDY_3 and
-             PE_RDY_4 and PE_RDY_5 and PE_RDY_6 and PE_RDY_7 and
-  		       PE_RDY_8 and PE_RDY_9 and PE_RDY_10 and PE_RDY_11 and
-  		       PE_RDY_12 and PE_RDY_13 and PE_RDY_14 and PE_RDY_15 when not single_pe_sim else PE_RDY_15;
+  process(clk_e, RST_E)
+  begin
+    if RST_E = '0' then
+      c_rdy_i <= '1';
+    elsif rising_edge(clk_e) then
+      if exe_i = '1' then
+        c_rdy_i <= '0';
+      elsif PES_RDY = x"ffff" then
+        c_rdy_i <= '1';
+      end if;
+    end if; 
+  end process;
 		   
   C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
 ----------------------------------------------------------------------------------	

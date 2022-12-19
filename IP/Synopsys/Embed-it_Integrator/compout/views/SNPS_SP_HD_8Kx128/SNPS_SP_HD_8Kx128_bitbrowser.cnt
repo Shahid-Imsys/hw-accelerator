@@ -1,0 +1,24 @@
+scramble_file = /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa05/scramble.tcl
+#Scramble TCL file (part of the memory compiler). Is needed for Bit Browsing.
+
+NB = 128
+#Number of bits of the memory instance. Is needed for Bit Browsing.
+
+NW = 8192
+#Number of words of the memory instance. Is needed for Bit Browsing.
+
+CM = 8
+#Column mux of the memory instance. Is needed for Bit Browsing.
+
+def_file = /usr/local/designkits/GF/22nm/synopsys/gf22nsd41p11s1dcl02msa05/gdsview.cfg
+#Layers Definition and colors file. Could be from the memory compiler.
+
+gds_file = SNPS_SP_HD_8Kx128.gds
+#The GDSII file. Could be given an absolute path, or relative to the control file.
+
+BK = 4
+#Number of Banks of the memory instance. Is needed for Bit Browsing.
+
+bitcell_name = mm16a05_u_22FDSOI_P124_bitcell
+#Name of the of the memory Bit structure in the gds. Is needed for Bit Browsing. If the name is not given, Bit Browser trys to autodetect it.
+

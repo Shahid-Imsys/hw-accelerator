@@ -3,6 +3,7 @@ DUAL_CORE_DIR_WIN=$(PROJECT_PATH_WIN)/Accelerator/Emulator_version_demo/src/PEC/
 
 dual_core_rtl:
 	$(COMP) $(COMP_RTL_FLAGS) $(DUAL_CORE_DIR_WIN)/pe1_mpgmfield_lib.vhd \
+				  $(DUAL_CORE_DIR_WIN)/pe1_mpgm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgenpart.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgenhalf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_fgendec.vhd \
@@ -10,7 +11,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/ram64x8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_sct.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_stack9x14.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_mpgm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
@@ -19,10 +19,10 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem256x64.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/re.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/convcontroller.vhd \
-					$(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fftcontroller.vhd \
  				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatoreven.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/accumulatorodd.vhd \
-					$(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhd \
+				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addressingunit.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/addmul.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_acc.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/ctrlmap_alu.vhd \
@@ -62,9 +62,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_atim.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acore.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SU180_256X128X1BM1A.vhd \
-				  $(DUAL_CORE_DIR_WIN)/ext/SU180_16384X8X1BM8.vhd \
-				  $(DUAL_CORE_DIR_WIN)/ext/SY180_256X32X1CM4.vhd \
-				  $(DUAL_CORE_DIR_WIN)/ext/SY180_512X8X1CM8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SY180_1024X8X1CM8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_flash_inf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_ios.vhd \

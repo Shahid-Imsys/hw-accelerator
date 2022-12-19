@@ -1,218 +1,226 @@
-xvlog /home/jenmell/Project/tags_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_2Kx80/SNPS_SP_HD_2Kx80_fast_func.v \
-	  /home/jenmell/Project/tags_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_8Kx128/SNPS_SP_HD_8Kx128_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_16Kx8/SNPS_SP_HD_16Kx8_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_256x32/SNPS_SP_HD_256x32_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_512x8/SNPS_SP_HD_512x8_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_1024x8/SNPS_SP_HD_1024x8_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_64x64/SNPS_RF_SP_UHS_64x64_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_256x64/SNPS_RF_SP_UHS_256x64_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_512x28/SNPS_RF_SP_UHS_512x28_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x8/SNPS_RF_SP_UHS_1024x8_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x32/SNPS_RF_SP_UHS_1024x32_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00_fast_func.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom11/SNPS_ROM_4Kx80_mprom11_fast_func.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/load_mpram.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/load_ram.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/mpram_mem/sim/mpram_mem.v
-#xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mpgmfield_lib.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/gp_pkg.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/fgendec.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/fgenpart.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/fgenhalf.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/fgen.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ram32x8.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/alu.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/sct.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/stack9x14.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/clc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/clk_mux.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/clk_gen.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/pads/YA2GSD.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/iopads.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/rtc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/rtc_iso.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mpgm.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/crb.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/tim.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/gmem.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/dsl.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mbm.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mmr.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mpll.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/debug_trace.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/cpc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ios_dackgen.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ios_dmap.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ios_dma.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ios.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/core.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/core2/ampgm.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/core2/atim.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/core2/acore.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/mpmem_inf.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/sdram_inf.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/pdi.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/tiu.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/ports.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/port_mux.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/io_mux.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/uart.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/eth_crc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/eth_rx.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/eth_tx.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/eth.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/adc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/dac.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/OctoSPI.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/peri/peri.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/top.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/mprom_memory00.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/mprom_memory11.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/mpram_memory.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/ram_memory.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/memory_1024x8.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/trace_memory.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/b_memory.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SP180_4096X80BM1B.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SY180_2048X2X1CM8.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SU180_16384X8X1BM8.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SY180_256X32X1CM4.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SU180_2048X80X1BM1.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SY180_512X8X1CM8.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SP180_4096X80BM1A.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Processors/IM3000E/src/ext/SY180_1024X8X1CM8.vhd
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
-xvlog /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/IP/boot_memory/sim/boot_memory.v
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/cluster_pkg.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Acc_data_types.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Accelerator_Top.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Byte_counter_decoder.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMD_from_GPP.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMD_to_GPP.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMEM_32KX16.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Define.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Mux_Demux.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Mux_Register.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Input_Reg.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Register.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/NoC_state_machine.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Top.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Root_Memory.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Switch.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Tag_Line_Block.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Transpose_unit.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/RM_as_generator.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/PMEM_512X28.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/RMEM_32KX16.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpgmfield_lib.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgenpart.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgenhalf.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgendec.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgen.vhd\
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ram64x8.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_sct.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_stack9x14.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpgm.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_debug_trace.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/mem64x64.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/mem256x32.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/mem256x64.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/re.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/convcontroller.vhd \
-				/home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fftcontroller.vhd \
- 				  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/accumulatoreven.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/accumulatorodd.vhd \
-				/home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/addressingunit.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/addmul.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ctrlmap_acc.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ctrlmap_alu.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/lod.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/memreg.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppadd.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppmap1.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppshift.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ve_wctrlpipe.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vearith.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vecore.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/writebuff.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_alu.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_clc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//cmdr.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_cpc.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_crb.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_dsl.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgen.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gmem.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gp_pkg.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dackgen.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dmap.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dma.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mbm.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mmr.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpll.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpmem_inf.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc_iso.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_tim.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ve.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acmdr.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_ampgm.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_atim.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acore.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/SU180_256X128X1BM1A.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/SU180_16384X8X1BM8.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/SY180_256X32X1CM4.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/SY180_512X8X1CM8.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/SY180_1024X8X1CM8.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_flash_inf.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_core.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//PE_pair_top.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/arithmetic\ IP/fifo.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_pkg.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_controller.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/CMEM_32KX16.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/PEC_top.vhd \
-		 	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/req_dis_logic.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_core/src/digital_core.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_core/src/fpga_noc_adapter.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_core/src/ionoc.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_core/src/sync_fifo.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/project_settings.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/register_pack_spi_test.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/data_types_pack.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/register_block_spi_test.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/spi_interface.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/test_spi_interface/test_spi_interface.vhd
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/clock_gate.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/reset_sync.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/clk_mux_top.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/fpga_clock_reset.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/clock_reset.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_top/src/digital_top.vhd
-xvlog -d RI_ADPLL_GF22FDX_2GMP_BEHAVIORAL /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_BOND_PADS.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPO_RVT28_H.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPO_RVT28_V.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPI_RVT28_H.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPI_RVT28_V.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPIO_RVT28_H.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPIO_RVT28_V.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/racyic_modules/common_sync.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/racyic_modules/common_sync_pedge.v \
-                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/racyic_modules/common_clkbuf.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/ri_adpll_gf22fdx_2gmp.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/behavioral_simple/ri_adpll_gf22fdx_2gmp_behavioral.v \
-	  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/ri_adpll_gf22fdx_2gmp.v
-xvhdl --2008 /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_chip/src/pad_instance_package.vhd \
-                                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_chip/src/inoutput_pad.vhd \
-                                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_chip/src/input_pad.vhd \
-                                  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_chip/src/output_pad.vhd \
-			  /home/jenmell/Project/tags_old_accelerator/hw-accelerator/Digital_chip/src/digital_chip.vhd
+cd ../../../../fw-test-im3000e; \
+mkdir -p build && cd build; \
+cmake -DIMSYS_IMTOOLS_DIR=/opt/tool-imtools ..; \
+cmake --build .; \
+
+xvlog /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_2Kx80/SNPS_SP_HD_2Kx80_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_8Kx128/SNPS_SP_HD_8Kx128_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_16Kx8/SNPS_SP_HD_16Kx8_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_256x32/SNPS_SP_HD_256x32_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_512x8/SNPS_SP_HD_512x8_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_SP_HD_1024x8/SNPS_SP_HD_1024x8_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_64x64/SNPS_RF_SP_UHS_64x64_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_256x32/SNPS_RF_SP_UHS_256x32_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_256x64/SNPS_RF_SP_UHS_256x64_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_512x28/SNPS_RF_SP_UHS_512x28_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x8/SNPS_RF_SP_UHS_1024x8_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_SP_UHS_1024x32/SNPS_RF_SP_UHS_1024x32_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom11/SNPS_ROM_4Kx80_mprom11_fast_func.v \
+	  /home/shahid/hw-accelerator/IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_RF_DP_HD_256x80/SNPS_RF_DP_HD_256x80_fast_func.v
+xvlog /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/load_mpram.v
+xvlog /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/load_ram.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/mpram_mem/sim/mpram_mem.v
+#xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
+xvhdl --2008 /home/shahid/hw-accelerator/Processors/IM3000E/src/mpgmfield_lib.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/gp_pkg.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/fgendec.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/fgenpart.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/fgenhalf.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/fgen.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ram32x8.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/alu.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/sct.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/stack9x14.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/clc.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/clk_mux.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/clk_gen.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/pads/YA2GSD.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/iopads.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/rtc.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/rtc_iso.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/mpgm.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/crb.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/tim.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/gmem.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/dsl.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/mbm.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/mmr.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/mpll.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/debug_trace.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/cpc.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ios_dackgen.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ios_dmap.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ios_dma.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ios.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/core.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/core2/ampgm.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/core2/atim.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/core2/acore.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/mpmem_inf.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/sdram_inf.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/pdi.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/tiu.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/ports.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/port_mux.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/io_mux.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/uart.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/eth_crc.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/eth_rx.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/eth_tx.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/eth.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/adc.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/dac.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/OctoSPI.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/peri/peri.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/top.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/mprom_memory00.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/mprom_memory11.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/mpram_memory.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/ram_memory.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/memory_1024x8.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/trace_memory.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/b_memory.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SP180_4096X80BM1B.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/mpp_memory.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SY180_256X32X1CM4.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SY180_512X8X1CM8.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SP180_4096X80BM1A.vhd \
+		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SY180_1024X8X1CM8.vhd
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Accelerator_Top.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Byte_counter_decoder.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMD_from_GPP.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMD_to_GPP.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Acc_types_pkg.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Mux_Demux.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Mux_Register.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Input_Reg.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Register.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/NoC_state_machine.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Top.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Root_Memory.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Switch.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Tag_Line_Block.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Transpose_unit.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/RM_as_generator.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/FPGA_PMEM_512X28.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/FPGA_RMEM_32KX16.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpgmfield_lib.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpgm.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgenpart.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgenhalf.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgendec.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgen.vhd\
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ram64x8.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_sct.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_stack9x14.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_debug_trace.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fpga_mem64x64.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fpga_mem256x32.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fpga_mem256x64.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/re.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/convcontroller.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fftcontroller.vhd \
+ 				  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/accumulatoreven.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/accumulatorodd.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/addressingunit.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/addmul.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ctrlmap_acc.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ctrlmap_alu.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/lod.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/memreg.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppadd.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppmap1.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ppshift.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/ve_wctrlpipe.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vearith.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vecore.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/writebuff.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_alu.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_clc.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//cmdr.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_cpc.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_crb.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_dsl.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgen.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gmem.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gp_pkg.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dackgen.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dmap.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dma.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mbm.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mmr.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpll.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpmem_inf.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc_iso.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_tim.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ve.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acmdr.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_ampgm.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_atim.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acore.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/FPGA_SU180_256X128X1BM1A.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/FPGA_SY180_1024X8X1CM8.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_flash_inf.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_core.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//PE_pair_top.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_pkg.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_controller.vhd \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/FPGA_CMEM_32KX16.vhd   \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/PEC_top.vhd            \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/req_dis_logic.vhd      \
+		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/fifo.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_core/src/digital_core.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_core/src/noc_adapter.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_core/src/ionoc.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_core/src/sync_fifo.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/project_settings.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/register_pack_spi_test.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/data_types_pack.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/register_block_spi_test.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/spi_interface.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/test_spi_interface/test_spi_interface.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_top/src/clock_gate.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/reset_sync.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/clk_mux_top.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/fpga_clock_reset.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/clock_reset.vhd \
+			  /home/shahid/hw-accelerator/Digital_top/src/digital_top.vhd
+xvlog -d RI_ADPLL_GF22FDX_2GMP_BEHAVIORAL /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_BOND_PADS.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPO_RVT28_H.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPO_RVT28_V.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPI_RVT28_H.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPI_RVT28_V.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPIO_RVT28_H.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/rilib_gf22fdx_io_EG1d80V/v1.2.2.49.01/source/behavioral/verilog/RIIO_EG1D80V_GPIO_RVT28_V.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/racyic_modules/common_sync.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/racyic_modules/common_sync_pedge.v \
+                  /home/shahid/hw-accelerator/IP/RacyICS/racyic_modules/common_clkbuf.v \
+	  /home/shahid/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/ri_adpll_gf22fdx_2gmp.v \
+	  /home/shahid/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/behavioral_simple/ri_adpll_gf22fdx_2gmp_behavioral.v \
+	  /home/shahid/hw-accelerator/IP/RacyICS/ri_adpll_gf22fdx_2gmp/v1.1.9.49.01/ri_adpll_gf22fdx_2gmp/behavioral/ri_adpll_gf22fdx_2gmp.v
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_chip/src/pad_instance_package.vhd \
+                                  /home/shahid/hw-accelerator/Digital_chip/src/inoutput_pad.vhd \
+                                  /home/shahid/hw-accelerator/Digital_chip/src/input_pad.vhd \
+                                  /home/shahid/hw-accelerator/Digital_chip/src/output_pad.vhd \
+			  /home/shahid/hw-accelerator/Digital_chip/src/digital_chip.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/digital_sim_pack.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/tb_components_pkg.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/register_tb_definitions.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/register_tb_package.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/spi_tb_pack.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/uart_tb.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/debug_interface_bfm.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/octo_memory_bfm.vhd \
+			 /home/shahid/hw-accelerator/Digital_chip/tb/tb_components/spiflash_bfm.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Digital_chip/tb/main_tb/main_tb.vhd
+xelab --relax --debug typical main_tb

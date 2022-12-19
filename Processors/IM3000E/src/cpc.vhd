@@ -103,13 +103,6 @@ architecture rtl of cpc is
   signal plcpe_nint     : std_logic;
   signal mpram_we_nint  : std_logic;
 
-  attribute mark_debug : string; 
-  attribute mark_debug of dfsr: signal is "true";  
-  attribute mark_debug of ld_mar: signal is "true";  
-  attribute mark_debug of clk_e_pos: signal is "true";
-  attribute mark_debug of mar: signal is "true";  
-
-
 begin
   dfsr <= dfsr_int;
   mpram_we_n <= mpram_we_nint;
@@ -128,11 +121,6 @@ begin
     signal cnt_tc     : std_logic;  -- Bit counter terminal count (active high)
     signal rx_stop    : std_logic;  -- Stop bit (active high)
 
-    --attribute mark_debug : string; 
-    attribute mark_debug of sipo_reg: signal is "true";    
-    attribute mark_debug of rx_en: signal is "true"; 
-    attribute mark_debug of rx_stop: signal is "true"; 
-    
   begin
     -- The rx_en signal is set by an incoming start bit
     -- (msdin low) and cleared when the bit counter reaches

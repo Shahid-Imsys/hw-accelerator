@@ -86,11 +86,6 @@ architecture behav of sdram_inf is
   signal c1_dqo_buffer : std_logic_vector (7 downto 0);
   signal c2_dqo_buffer : std_logic_vector (7 downto 0);
 
-  attribute mark_debug               : string;
-  attribute mark_debug of c1_data_b1 : signal is "true";
-  attribute mark_debug of c1_data_b2 : signal is "true";
-  attribute mark_debug of fast_d     : signal is "true";
-
 begin
 
   valueZero <= (others => '0');

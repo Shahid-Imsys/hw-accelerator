@@ -123,8 +123,8 @@ package body digital_top_sim_pack is
 
       --Error of Fast data transfer between memory function: not using in current testprogram
       when 16#A0# => write_code(core, "FASTMEM_ERR");
-      when 16#A1# => write_code(core, "FAST_ERR1");
-      when 16#A2# => write_code(core, "FAST_ERR2");
+      when 16#A1# => write_code(core, "FAST_RD_ERR");
+      when 16#A2# => write_code(core, "FAST_WR_ERR");
 
                      --when 16#A3# => write_code(core, "CORE1");
 

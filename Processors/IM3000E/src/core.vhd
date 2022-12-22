@@ -428,6 +428,11 @@ architecture struct of core is
   attribute syn_keep of ybus      : signal is true;
   attribute syn_keep of curr_mpga : signal is true;
 
+  attribute mark_debug : string;
+  attribute mark_debug of dbus_int: signal is "true";  
+  attribute mark_debug of ybus: signal is "true";  
+  attribute mark_debug of pl: signal is "true";     
+
 begin
 ---------------------------------------------------------------------
 -- External test clock gating 

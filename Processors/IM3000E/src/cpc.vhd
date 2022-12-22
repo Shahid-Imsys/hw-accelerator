@@ -120,7 +120,6 @@ begin
     signal cnt        : std_logic_vector(2 downto 0); -- Bit counter
     signal cnt_tc     : std_logic;  -- Bit counter terminal count (active high)
     signal rx_stop    : std_logic;  -- Stop bit (active high)
-
   begin
     -- The rx_en signal is set by an incoming start bit
     -- (msdin low) and cleared when the bit counter reaches
@@ -196,11 +195,6 @@ begin
     signal cnt        : std_logic_vector(2 downto 0); -- Bit counter
     signal cnt_tc     : std_logic;   -- Bit counter terminal count (active high)
     signal msdout_int : std_logic;
-
-    attribute mark_debug of piso_reg: signal is "true"; 
-    attribute mark_debug of tx_en: signal is "true"; 
-    attribute mark_debug of cnt: signal is "true"; 
-  
   begin  
     msdout_gen: process (clk_p)
     begin
@@ -280,8 +274,6 @@ begin
     signal parm_rec     : std_logic;
     signal byte_rec_dly : std_logic;
 
-  --attribute mark_debug : string;
-  attribute mark_debug of cmd_reg: signal is "true";  
 
   begin
     -- When the byte counter (byte_cnt) is zero, the command register

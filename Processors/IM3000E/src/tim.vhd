@@ -187,12 +187,6 @@ architecture rtl of tim is
   attribute syn_keep of held_e_int : signal is true;
   signal counter_s                 : std_logic_vector(5 downto 0);
 
-
-  attribute mark_debug : string; 
-  attribute mark_debug of ack_spreq: signal is "true";
-  attribute mark_debug of call_sp: signal is "true";     
-
-
 begin
 ---------------------------------------------------------------------
 -- Reset generation &

@@ -461,7 +461,14 @@ begin
     signal ma2          : std_logic;
     signal ma1          : std_logic;
     signal m_double     : std_logic;    
-  begin  -- block mapc
+
+    attribute mark_debug               : string;
+    attribute mark_debug of m_double : signal is "true";
+    attribute mark_debug of dirc : signal is "true";
+    attribute mark_debug of adl : signal is "true";
+    attribute mark_debug of dec_inc_adl : signal is "true";
+
+    begin  -- block mapc
     -- Decode of the PC field from the microprogram word, used to
     -- control the address registers.
     -- ld_adp if high when an adp register is loaded from ybus.

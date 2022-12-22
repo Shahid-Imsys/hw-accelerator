@@ -288,7 +288,9 @@ architecture struct of top is
 
   component ram_memory is
     generic (
-      g_memory_type : memory_type_t := asic);
+      g_memory_type : memory_type_t := asic;
+      initFile      : string;
+      fpgaMemIndex  : integer       := 0);
     port (
       address : in  std_logic_vector(13 downto 0);
       ram_di  : in  std_logic_vector(7 downto 0);
@@ -651,16 +653,15 @@ architecture struct of top is
   signal ram_web : main_ram_web_t;
 
   attribute mark_debug : string;
-  attribute mark_debug of c1_mprom_a: signal is "true";  
+  attribute mark_debug of c1_mprom_a: signal is "true";
   attribute mark_debug of c1_mprom_ce: signal is "true";
   attribute mark_debug of c1_mpram_ce: signal is "true";
-
   attribute mark_debug of c1_d_addr: signal is "true";
   attribute mark_debug of c1_d_cs: signal is "true"; 
   attribute mark_debug of c1_d_we: signal is "true";  
   attribute mark_debug of c1_d_dqo: signal is "true";  
   attribute mark_debug of c1_d_dqi: signal is "true";  
-  attribute mark_debug of idi: signal is "true";   
+  attribute mark_debug of dbus: signal is "true";  
 
 begin
 
@@ -872,11 +873,14 @@ begin
       cs_n    => trcmem_ce_n
       );
 
-  ram_g : for i in 0 to MEMNUM-1 generate
-    ---application memories
-    ram1 : ram_memory
+  --ram_g : for i in 0 to MEMNUM-1 generate
+  -- application memories
+  ram_gen0 : for i in 0 to 1 generate
+    ram_memory_inst : ram_memory
       generic map (
-        g_memory_type => g_memory_type)
+        g_memory_type => g_memory_type,
+        initFile      => "test_mem.mif",
+        fpgaMemIndex  => 1 )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -884,7 +888,22 @@ begin
         ram_do  => ram_do(i),
         we_n    => ram_web(i),
         cs      => ram_cs(i));
-  end generate ram_g;
+  end generate;
+
+  ram_gen1 : for i in 2 to MEMNUM-1 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem.mif",
+        fpgaMemIndex  => 0 )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
 
   -----------------------------------------------------------------------------
   -- Clock generation block
@@ -1145,11 +1164,11 @@ begin
 ---------------------------------------------------------------------
       -- Misc. signals
       --mpordis_i     => '1',--MPORDIS, --: in  std_logic;  -- 'power on' from pad
-      mreset_i        => mreset,  --: in  std_logic;  -- Asynchronous reset input 
+      mreset_i        => mreset,  --: in  std_logic;  -- Asynchronous reset input
       mirqout_o       => MIRQOUT,  --: out std_logic;  -- Interrupt  request output
       mckout1_o       => MCKOUT1,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_en,
-      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
+      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug)
       msdout_o        => MSDOUT,        --: out std_logic;  -- Serial data out
       mrstout_o       => MRSTOUT,       --: out std_logic;  -- Reset out
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output
@@ -1387,7 +1406,7 @@ begin
       -----core2 sdram interface
       c2_d_addr   => c2_d_addr,
       c2_d_cs     => c2_d_cs,
-      c2_d_ras    => c2_d_ras,
+      c2_d_ras    => '1',
       c2_d_cas    => c2_d_cas,
       c2_d_we     => c2_d_we,
       c2_d_dqi    => c2_d_dqi,

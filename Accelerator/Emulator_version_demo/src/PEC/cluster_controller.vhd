@@ -231,22 +231,6 @@ end component;
   signal cmem_addr : std_logic_vector(12 downto 0);
 
 
-  attribute mark_debug : string; 
-  attribute mark_debug of noc_cmd: signal is "true";
-  attribute mark_debug of sync_collector: signal is "true";
-  attribute mark_debug of datain_vld: signal is "true";
-  attribute mark_debug of dataout_vld: signal is "true";
-  attribute mark_debug of noc_reg_rdy: signal is "true";
-  attribute mark_debug of noc_write: signal is "true";
-	attribute mark_debug of wr_i: signal is "true";
-	attribute mark_debug of rd_i: signal is "true";
-	attribute mark_debug of cmem_we: signal is "true";
-	attribute mark_debug of cmem_din: signal is "true";
-	attribute mark_debug of cmem_dout: signal is "true";
-	attribute mark_debug of cmem_addr: signal is "true";
-
-
- 
 begin
 ----------------------------
 --Clock domains

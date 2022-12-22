@@ -42,12 +42,7 @@ architecture receive_engine of re is
   --signals
   signal mode_a_l        : std_logic;
   signal mode_b_l        : std_logic;
-  signal re_loop         : std_logic_vector(7 downto 0);
-  signal ring_end_addr   : std_logic_vector(7 downto 0);
-  signal ring_start_addr : std_logic_vector(7 downto 0);
-  signal curr_ring_addr  : std_logic_vector(7 downto 0);
-  signal next_ring_addr  : std_logic_vector(7 downto 0);
-  signal offset_l        : std_logic_vector(7 downto 0); --offset register
+  signal re_loop         : unsigned(7 downto 0);
 
 begin
 
@@ -62,7 +57,7 @@ begin
       else
         if re_start = '1' and re_source = '0' then --only used when the source is from DFM register
           re_busy <= '1';
-        elsif re_loop = (re_loop'range => '0') then 
+        elsif re_loop = 0 then 
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
             if data_valid = '1' and clk_e_pos = '1' then
               re_busy <= '0';
@@ -74,7 +69,7 @@ begin
         --mode a and b will be reflected by config registers when ve_starts
         if re_start = '1' and mode_a = '1' then
           mode_a_l <= '1';
-        elsif re_loop = (re_loop'range => '0') then
+        elsif re_loop = 0 then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
             if data_valid = '1' and clk_e_pos = '1' then
               mode_a_l <= '0';
@@ -85,7 +80,7 @@ begin
         end if;
         if re_start= '1' and mode_b = '1' then
           mode_b_l <= '1';
-        elsif re_loop = (re_loop'range => '0') then
+        elsif re_loop = 0 then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
             if data_valid = '1' and clk_e_pos = '1' then
               mode_b_l <= '0';
@@ -97,7 +92,7 @@ begin
         --mode c latch signal --1210
         if re_start = '1' and mode_c = '1' then
           mode_c_l <= '1';
-        elsif re_loop = (re_loop'range => '0') then
+        elsif re_loop = 0 then
           if wr_counter = (wr_counter'range => '0') then --special case when just want to load 1 buffer word.
             if data_valid = '1' and clk_e_pos = '1' then
               mode_c_l <= '0';
@@ -116,9 +111,9 @@ begin
       if RST = '0' then
         re_loop <= (others => '0');
       elsif re_start = '1' and clk_e_pos = '1' and re_source = '0' then
-        re_loop <= wr_counter;
-      elsif re_source = '0' and re_busy = '1' and re_loop /=(re_loop'range => '0') and (left_load = '1' or right_load = '1' or bias_load = '1') then
-        re_loop <= std_logic_vector(to_unsigned(to_integer(unsigned(re_loop))-1,8));
+        re_loop <= unsigned(wr_counter);
+      elsif re_source = '0' and re_busy = '1' and re_loop /= 0 and (left_load = '1' or right_load = '1' or bias_load = '1') then
+        re_loop <= re_loop - 1;
       end if;
     end if;
   end process;
@@ -141,7 +136,7 @@ begin
         elsif mode_a_l = '1' and mode_b_l = '1' then
           bias_rst <= '1';
         end if;
-      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and (re_loop /= (re_loop'range => '0') or wr_counter = (wr_counter'range => '0')) then
+      elsif re_source = '0' and re_busy = '1' and data_valid = '1' and (re_loop /= 0 or unsigned(wr_counter) = 0) then
         left_rst <= '0';
         right_rst <= '0';
         bias_rst <= '0';

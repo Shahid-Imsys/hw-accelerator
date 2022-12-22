@@ -103,13 +103,6 @@ architecture rtl of cpc is
   signal plcpe_nint     : std_logic;
   signal mpram_we_nint  : std_logic;
 
-  attribute mark_debug : string; 
-  attribute mark_debug of dfsr: signal is "true";  
-  attribute mark_debug of ld_mar: signal is "true";  
-  attribute mark_debug of clk_e_pos: signal is "true";
-  attribute mark_debug of mar: signal is "true";  
-
-
 begin
   dfsr <= dfsr_int;
   mpram_we_n <= mpram_we_nint;
@@ -127,12 +120,6 @@ begin
     signal cnt        : std_logic_vector(2 downto 0); -- Bit counter
     signal cnt_tc     : std_logic;  -- Bit counter terminal count (active high)
     signal rx_stop    : std_logic;  -- Stop bit (active high)
-
-    --attribute mark_debug : string; 
-    attribute mark_debug of sipo_reg: signal is "true";    
-    attribute mark_debug of rx_en: signal is "true"; 
-    attribute mark_debug of rx_stop: signal is "true"; 
-    
   begin
     -- The rx_en signal is set by an incoming start bit
     -- (msdin low) and cleared when the bit counter reaches
@@ -208,11 +195,6 @@ begin
     signal cnt        : std_logic_vector(2 downto 0); -- Bit counter
     signal cnt_tc     : std_logic;   -- Bit counter terminal count (active high)
     signal msdout_int : std_logic;
-
-    attribute mark_debug of piso_reg: signal is "true"; 
-    attribute mark_debug of tx_en: signal is "true"; 
-    attribute mark_debug of cnt: signal is "true"; 
-  
   begin  
     msdout_gen: process (clk_p)
     begin
@@ -292,8 +274,6 @@ begin
     signal parm_rec     : std_logic;
     signal byte_rec_dly : std_logic;
 
-  --attribute mark_debug : string;
-  attribute mark_debug of cmd_reg: signal is "true";  
 
   begin
     -- When the byte counter (byte_cnt) is zero, the command register

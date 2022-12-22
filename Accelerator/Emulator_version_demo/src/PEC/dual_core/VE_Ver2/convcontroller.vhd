@@ -406,7 +406,7 @@ process(clk)
 begin
   if rising_edge(clk) then
     if conv_out_p = '0' then
-      if conv_loop = x"01" then
+      if conv_loop = 1 then
         if pp_ctl(1) = '0' then 
           o_mux_ena <= '1';
         else
@@ -460,13 +460,13 @@ end process;
         stall <= x"00";
       else
         if pp_ctl(4 downto 3) = "01" then 
-          if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = x"01" then
+          if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = 1 then
             stall <= x"01";--stall the ve core for one clock cycle to push the result back to mem buffer.
           else
             stall <= x"00";
           end if;
         elsif bypass_reg = '1' then
-          if (conv_oloop /= x"00" or conv_loop /= x"00") and data_valid = '0' and busy = '1' then --pause the ve 
+          if (conv_oloop /= 0 or conv_loop /= 0) and data_valid = '0' and busy = '1' then --pause the ve 
             stall <= unsigned(re_loop);
           elsif data_valid = '1' then
             stall <= x"00";

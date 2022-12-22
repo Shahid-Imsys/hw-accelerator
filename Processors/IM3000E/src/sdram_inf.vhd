@@ -195,37 +195,6 @@ begin
           end if;
         end if;
       end loop;
-
-      ---- Core 2
-      --if (c1_d_addr(0) = '0') then
-
-      --  -- Core 1
-      --  if (even_c = '0') then
-      --    for i in 0 to (MEMNUM/2 - 1) loop
-      --      c1_dqo_buffer <= ram_do(2 * i + 1) when data_en_c1(i) = '1';
-      --    end loop;
-
-      --    -- Core 2
-      --  else
-      --    for i in 0 to (MEMNUM/2 - 1) loop
-      --      c2_dqo_buffer <= ram_do(2 * i + 1) when data_en_c2(i) = '1';
-      --    end loop;
-      --  end if;
-      --else
-
-      --  -- Core 1
-      --  if (even_c = '0') then
-      --    for i in 0 to (MEMNUM/2 - 1) loop
-      --      c1_dqo_buffer <= ram_do(2 * i) when data_en_c1(i) = '1';
-      --    end loop;
-
-      --    -- Core 2
-      --  else
-      --    for i in 0 to (MEMNUM/2 - 1) loop
-      --      c2_dqo_buffer <= ram_do(2 * i) when data_en_c2(i) = '1';
-      --    end loop;
-      --  end if;
-      --end if;
     end if;
   end process;
 
@@ -259,7 +228,7 @@ begin
     if (c2_d_addr(0) = '0') then
       if (even_c = '1') then
         for i in 0 to (MEMNUM/2 - 1) loop
-          c2_data_inner <= ram_do(i * 2) when data_en_c2(i * 2) = '1';
+          c2_data_inner <= ram_do(i * 2) when data_en_c2(i) = '1';
         end loop; -- i
       else
         c2_data_inner <= c2_dqo_buffer;
@@ -268,7 +237,7 @@ begin
     else
       if (even_c = '1') then
         for i in 0 to (MEMNUM/2 - 1) loop
-          c2_data_inner <= ram_do(i * 2 + 1) when data_en_c2(i * 2) = '1';
+          c2_data_inner <= ram_do(i * 2 + 1) when data_en_c2(i) = '1';
         end loop; -- i
       else
         c2_data_inner <= c2_dqo_buffer;
@@ -280,26 +249,45 @@ begin
   c1_csb <= c1_d_cs or (not c1_d_ras) or c1_d_cas;
   c2_csb <= c2_d_cs or (not c2_d_ras) or c2_d_cas;
 
-  c1_wr_n <= c1_d_cs or c1_d_we; --(not c1_d_ras) or c1_d_cas or c1_d_we;
-  c2_wr_n <= c2_d_cs or c2_d_we; -- (not c2_d_ras) or c2_d_cas or c2_d_we;
+  c1_wr_n <= c1_d_cs or c1_d_we;
+  c2_wr_n <= c2_d_cs or c2_d_we;
 
-  -----------------------RAM0----------------------       index is 1
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr)
+  begin
+    for i in 0 to (MEMNUM/2 - 1) loop
+      ram_a(2 * i)     <= (others => '0');
+      ram_a(2 * i + 1) <= (others => '0');
+      if (toReq_c2(i) = '1' and c2_csb = '0') then
+        ram_a(2 * i)     <= c2_d_addr(14 downto 1);
+        ram_a(2 * i + 1) <= c2_d_addr(14 downto 1);
+      elsif (toReq_c1(i) = '1' and c1_csb = '0') then
+        ram_a(2 * i)     <= c1_d_addr(14 downto 1);
+        ram_a(2 * i + 1) <= c1_d_addr(14 downto 1);
+      end if;
+    end loop;
+  end process;
 
-  set_ram_adress_g : for i in ram_a'range generate
-    ram_a(i) <= c2_d_addr(14 downto 1) when toReq_c2(i) = '1' and c2_csb = '0' else
-    c1_d_addr(14 downto 1);
-    ram_di(i) <= c2_d_dqi when toReq_c2(i) = '1' and c2_csb = '0' else
-    c1_d_dqi;
-    --ram_cs(i) <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
-    --ram_web(i) <= (c1_wr_n or (not toReq_c1(i))) and (c2_wr_n or (not toReq_c2(i)));
-  end generate set_ram_adress_g;
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi)
+  begin
+    for i in 0 to (MEMNUM/2 - 1) loop
+      ram_di(2 * i)     <= (others => '0');
+      ram_di(2 * i + 1) <= (others => '0');
+      if (toReq_c2(i) = '1' and c2_csb = '0') then
+        ram_di(2 * i)     <= c2_d_dqi;
+        ram_di(2 * i + 1) <= c2_d_dqi;
+      elsif (toReq_c1(i) = '1' and c1_csb = '0') then
+        ram_di(2 * i)     <= c1_d_dqi;
+        ram_di(2 * i + 1) <= c1_d_dqi;
+      end if;
+    end loop;
+  end process;
 
   process (c1_csb, toReq_c1, c2_csb, toReq_c2) -- CS adjusted for interleaved memory
   begin
 
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_cs(2 * i)     <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i * 2))));
-      ram_cs(2 * i + 1) <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i * 2))));
+      ram_cs(2 * i)     <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
+      ram_cs(2 * i + 1) <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
     end loop;
   end process;
 
@@ -324,9 +312,10 @@ begin
             ram_web(2 * i) <= '0';
           end if;
         end if;
+      end if;
 
-        -- Core 2
-      elsif (c2_wr_n = '0' and toReq_c2(i * 2) = '1') then
+      -- Core 2
+      if (c2_wr_n = '0' and toReq_c2(i * 2) = '1') then
         if (c2_d_addr(0) = '0') then
           if (even_c = '0') then
             ram_web(2 * i) <= '0';
@@ -343,7 +332,5 @@ begin
       end if;
     end loop;
   end process;
-  -----------------------------------------------------------------------------------------------------------------------------------------
-  -----------------------------------------------------------------------------------------------------------------------------------------
 
 end behav;

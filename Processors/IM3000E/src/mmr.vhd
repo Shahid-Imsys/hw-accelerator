@@ -266,13 +266,13 @@ begin
       case operation is
         when Act =>
           if even_c = '1' then
-            d_cs <= '0';
+            --d_cs <= '0';
             d_ras <= '0';
             if allras = '1' then        -- Refresh or MRS
               d_cas <= '0';
-              if pl_memcp_sig = RW then     -- MRS
-                d_we <= '0';
-              end if;
+              --if pl_memcp_sig = RW then     -- MRS
+              --  d_we <= '0';
+              --end if;
             end if;
           end if;
         when Rd =>
@@ -291,9 +291,9 @@ begin
           NULL;
       end case;
       if pra_operation = '1' then
-        d_cs <= '0';
+        --d_cs <= '0';
         d_ras <= '0';
-        d_we <= '0';
+        --d_we <= '0';
       end if;
     end process mtl_decode_op;
 

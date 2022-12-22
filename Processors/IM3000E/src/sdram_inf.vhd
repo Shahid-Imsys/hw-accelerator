@@ -251,18 +251,17 @@ begin
 
   c1_wr_n <= c1_d_cs or c1_d_we;
   c2_wr_n <= c2_d_cs or c2_d_we;
+  --c1_wr_n <= c1_d_cs or (not c1_d_ras) or c1_d_cas or c1_d_we;
+  --c2_wr_n <= c2_d_cs or (not c2_d_ras) or c2_d_cas or c2_d_we;
 
   process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_a(2 * i)     <= (others => '0');
-      ram_a(2 * i + 1) <= (others => '0');
+      ram_a(2 * i)     <= c1_d_addr(14 downto 1);
+      ram_a(2 * i + 1) <= c1_d_addr(14 downto 1);
       if (toReq_c2(i) = '1' and c2_csb = '0') then
         ram_a(2 * i)     <= c2_d_addr(14 downto 1);
         ram_a(2 * i + 1) <= c2_d_addr(14 downto 1);
-      elsif (toReq_c1(i) = '1' and c1_csb = '0') then
-        ram_a(2 * i)     <= c1_d_addr(14 downto 1);
-        ram_a(2 * i + 1) <= c1_d_addr(14 downto 1);
       end if;
     end loop;
   end process;
@@ -270,14 +269,11 @@ begin
   process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_di(2 * i)     <= (others => '0');
-      ram_di(2 * i + 1) <= (others => '0');
+      ram_di(2 * i)     <= c1_d_dqi;
+      ram_di(2 * i + 1) <= c1_d_dqi;
       if (toReq_c2(i) = '1' and c2_csb = '0') then
         ram_di(2 * i)     <= c2_d_dqi;
         ram_di(2 * i + 1) <= c2_d_dqi;
-      elsif (toReq_c1(i) = '1' and c1_csb = '0') then
-        ram_di(2 * i)     <= c1_d_dqi;
-        ram_di(2 * i + 1) <= c1_d_dqi;
       end if;
     end loop;
   end process;

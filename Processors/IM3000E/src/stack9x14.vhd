@@ -60,8 +60,6 @@ architecture latch_based of stack9x14 is
 
 	attribute syn_keep : boolean;
 	attribute syn_keep of decode_n : signal is true;
-	attribute mark_debug : string;
-  	attribute mark_debug of stack: signal is "true"; 
 
 begin
 	-- Word select line decode. Decodes the incoming stack

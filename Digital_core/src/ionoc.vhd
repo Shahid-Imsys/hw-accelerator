@@ -200,11 +200,6 @@ architecture rtl of ionoc is
   signal ionoc_wrdata_pending : boolean;
   signal ionoc_rddata_pending : boolean;
 
-  attribute mark_debug : string;
-  attribute mark_debug of ionoc_rdstatus: signal is "true"; 
-  attribute mark_debug of RxFIFO_Valid_int: signal is "true"; 
-  attribute mark_debug of TxFIFO_Ready_int: signal is "true"; 
-
 begin
 
 ------------------------------------------------------

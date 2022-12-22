@@ -653,10 +653,9 @@ architecture struct of top is
   signal ram_web : main_ram_web_t;
 
   attribute mark_debug : string;
-  attribute mark_debug of c1_mprom_a: signal is "true";  
+  attribute mark_debug of c1_mprom_a: signal is "true";
   attribute mark_debug of c1_mprom_ce: signal is "true";
   attribute mark_debug of c1_mpram_ce: signal is "true";
-
   attribute mark_debug of c1_d_addr: signal is "true";
   attribute mark_debug of c1_d_cs: signal is "true"; 
   attribute mark_debug of c1_d_we: signal is "true";  
@@ -1165,11 +1164,11 @@ begin
 ---------------------------------------------------------------------
       -- Misc. signals
       --mpordis_i     => '1',--MPORDIS, --: in  std_logic;  -- 'power on' from pad
-      mreset_i        => mreset,  --: in  std_logic;  -- Asynchronous reset input 
+      mreset_i        => mreset,  --: in  std_logic;  -- Asynchronous reset input
       mirqout_o       => MIRQOUT,  --: out std_logic;  -- Interrupt  request output
       mckout1_o       => MCKOUT1,  --: out std_logic;  -- Programmable clock out
       mckout1_o_en    => mckout1_en,
-      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug) 
+      msdin_i         => msdin_i,  --: in  std_logic;  -- Serial data in (debug)
       msdout_o        => MSDOUT,        --: out std_logic;  -- Serial data out
       mrstout_o       => MRSTOUT,       --: out std_logic;  -- Reset out
       mexec_o         => mexec_o,  --: out std_logic;  -- clk_e test output

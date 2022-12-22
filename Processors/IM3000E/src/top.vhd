@@ -1386,7 +1386,7 @@ begin
       -----core2 sdram interface
       c2_d_addr   => c2_d_addr,
       c2_d_cs     => c2_d_cs,
-      c2_d_ras    => c2_d_ras,
+      c2_d_ras    => '1',
       c2_d_cas    => c2_d_cas,
       c2_d_we     => c2_d_we,
       c2_d_dqi    => c2_d_dqi,

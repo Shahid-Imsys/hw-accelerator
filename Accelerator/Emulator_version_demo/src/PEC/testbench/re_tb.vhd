@@ -40,6 +40,9 @@ end re_tb;
 
 architecture Behavioral of re_tb is
 component ve
+    generic(
+    USE_ASIC_MEMORIES : boolean := false
+    );
     port(
     CLK_P        : in std_logic;
     CLK_E_POS    : in std_logic;
@@ -394,6 +397,82 @@ end loop;
 DDI_VLD <= '0';
 wait for 90 ns;
 
+load_mem <= '1';
+wait for 30 ns;
+load_mem <= '0';
+wait for 60 ns;
+pl(94) <= '1';
+wait for 30 ns;
+pl(94) <= '0'; 
+pl <= re_loop;
+ybus <= x"FF";
+wait for 30.01 ns;
+progress <= re_mode_l;
+pl <= au_test_loffset0;
+ybus <= x"01";
+wait for 30.01 ns;
+pl <= au_test_lcmp0;
+ybus <= x"ff";
+wait for 30.01 ns;
+pl <= re_saddr_l;
+ybus <= x"00";
+wait for 30.01 ns;
+pl(95) <= '1'; --start
+pl(96) <= '0'; --resource 0
+pl(98) <= '1'; --mode a 
+pl(97) <= '0'; --mode b 
+pl(99) <= '1';
+wait for 30 ns;
+pl(95) <= '0'; --start
+pl(98) <= '0'; --mode a off
+pl(97) <= '0'; --mode b off
+pl(99) <= '0';
+wait for 30 ns;
+ve_in <= data_memory0(0) & data_memory1(0);
+wait for 15 ns;
+DDI_VLD <= '1';
+for i in 1 to 255 loop
+  ve_in <= data_memory0(i) & data_memory1(i);
+  wait for 15 ns;
+end loop;
+  wait for 15 ns;
+DDI_VLD <= '0';
+
+wait for 30 ns;
+pl <= au_test_roffset0;
+ybus <= x"01";
+wait for 30.01 ns;
+pl <= au_test_roffset1;
+ybus <= x"00";
+wait for 30.01 ns;
+pl <= au_test_rcmp0;
+ybus <= x"ff";
+wait for 30.01 ns;
+pl <= re_saddr_r;
+ybus <= x"00";
+wait for 30.01 ns;
+pl(95) <= '1'; --start
+pl(96) <= '0'; --resource 0
+pl(98) <= '0'; --mode a 
+pl(97) <= '1'; --mode b 
+pl(99) <= '1';
+wait for 30 ns;
+pl(95) <= '0'; --start
+pl(98) <= '0'; --mode a off
+pl(97) <= '0'; --mode b off
+pl(99) <= '0';
+wait for 30 ns;
+ve_in <= weight_memory(0);
+wait for 15 ns;
+DDI_VLD <= '1';
+for i in 1 to 255 loop
+  ve_in <= weight_memory(i);
+  wait for 15 ns;
+end loop;
+  wait for 15 ns;
+DDI_VLD <= '0';
+wait for 30 ns;
+
 pl(94) <= '0';
 pl(107) <= '1';
 wait for 30 ns;
@@ -574,7 +653,7 @@ pl <= au_test_loffset3;
 ybus <= x"00";
 wait for 30.01 ns;
 pl <= pp_ctl;
-ybus <= x"FD";
+ybus <= x"F5";
 pl(99) <= '1'; --cnt_rst = '1'
 wait for 30.01 ns;
 pl(95) <= '1';
@@ -739,6 +818,9 @@ end if;
 end process;
 
 vector_engine: ve
+generic map(
+  USE_ASIC_MEMORIES => false
+  )
 port map(
     CLK_P        => clk_p,
     CLK_E_POS    => clk_e_pos,

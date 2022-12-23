@@ -53,7 +53,7 @@ begin
 
   add_res <= add_input0 + add_input1;
 
-  max_value <= accumulator when add_sign = '0' else add_input0;
+  max_value <= add_input0 when ctrl.add = zero else accumulator when add_sign = '1' else add_input0;  
 
   process(clk)
   begin

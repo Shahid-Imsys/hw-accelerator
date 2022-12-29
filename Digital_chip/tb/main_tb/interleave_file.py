@@ -19,10 +19,18 @@ suffix = '.mif'
 if len( sys.argv ) > 1:
     prefix = sys.argv[1]
 
+add_newline = False
 for line in sys.stdin:
     for ch in line:
         n = ord( ch )
-        if (n != 13) and (n != 10 ):
+        if n == 13:
+            pass
+        elif n == 10:
+            if add_newline:
+                byteArray.append( n )
+                byteArray.append( n )
+            add_newline = not add_newline
+        else:
             byteArray.append( n )
 
 file0 = prefix + '0' + suffix

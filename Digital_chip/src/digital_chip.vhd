@@ -179,7 +179,6 @@ architecture rtl of digital_chip is
   end component;
 
   component ri_adpll_gf22fdx_2gmp
-   
     port (
       ref_clk_i              : in  std_logic;
       scan_clk_i             : in  std_logic;  --scan clock input
@@ -211,7 +210,7 @@ architecture rtl of digital_chip is
       c_disable_lock_i       : in  std_logic;  -- force lock bit to 0
       c_ref_bypass_i         : in  std_logic;  --bypass reference clock to core clock output
       c_ct_compensation_i    : in  std_logic;  --in case of finetune underflow/overflow coarsetune will be increased/decreased
-      adpll_status_o         : out std_logic_vector(ADPLL_STATUS_BITS-1 downto 0);  --ADPLL status
+      adpll_status_o         : out std_logic_vector(21-1 downto 0);  --ADPLL status
       adpll_status_ack_o     : out std_logic;
       adpll_status_capture_i : in  std_logic;  --capture Bit for APDLL status, rising edge of adpll_status_capture_i captures status
       scan_in_i              : in  std_logic_vector(2 downto 0);

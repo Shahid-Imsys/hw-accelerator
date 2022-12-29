@@ -183,6 +183,8 @@ architecture rtl of pe1_clc is
   signal pl_sig15     : std_logic_vector(4 downto 0);
   signal pl_ld_mpgm  : std_logic; --Added by CJ
 
+    attribute mark_debug : string;
+    attribute mark_debug of pc: signal is "true"; 
 
 
 begin

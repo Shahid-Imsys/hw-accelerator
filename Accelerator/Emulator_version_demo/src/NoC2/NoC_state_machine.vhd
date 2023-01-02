@@ -591,6 +591,7 @@ begin
       TC_mux_ctrl              <= '0';
       load_Mode_reg            <= '0';
       Reset_IR                 <= '0';
+      Write_REQ                <= '0';
       boot_as_counter          <= (others => '0');
     elsif rising_edge(clk) then
       FF                      <= not(boot_FF);

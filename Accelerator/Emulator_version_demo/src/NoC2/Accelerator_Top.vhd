@@ -109,7 +109,10 @@ architecture Behavioral of Accelerator_Top is
     signal C_RDY         : std_logic_vector(PEC_NUMBER -1 downto 0); 
     signal PEC_Ready     : std_logic;
     signal PEC_WE_noc    : std_logic;
-     
+
+    attribute mark_debug : string;
+    attribute mark_debug of PEC_Ready: signal is "true"; 
+
 begin
 
     Noc_Top_Inst: Noc_Top

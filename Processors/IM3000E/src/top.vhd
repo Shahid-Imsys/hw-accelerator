@@ -654,8 +654,6 @@ architecture struct of top is
 
   attribute mark_debug : string;
   attribute mark_debug of c1_mprom_a: signal is "true";
-  attribute mark_debug of c1_mprom_ce: signal is "true";
-  attribute mark_debug of c1_mpram_ce: signal is "true";
   attribute mark_debug of c1_d_addr: signal is "true";
   attribute mark_debug of c1_d_cs: signal is "true"; 
   attribute mark_debug of c1_d_we: signal is "true";  
@@ -875,11 +873,26 @@ begin
 
   --ram_g : for i in 0 to MEMNUM-1 generate
   -- application memories
-  ram_gen0 : for i in 0 to 1 generate
+  ram_gen0 : for i in 0 to 0 generate
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "test_mem.mif",
+        initFile      => "testmem_part0.mif",
+        fpgaMemIndex  => 0 )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen1 : for i in 1 to 1 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "testmem_part1.mif",
         fpgaMemIndex  => 1 )
       port map (
         clk     => clk_p,
@@ -890,12 +903,42 @@ begin
         cs      => ram_cs(i));
   end generate;
 
-  ram_gen1 : for i in 2 to MEMNUM-1 generate
+  ram_gen2 : for i in 2 to 2 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "mainmem_part0.mif",
+        fpgaMemIndex  => 2 )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen3 : for i in 3 to 3 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "mainmem_part1.mif",
+        fpgaMemIndex  => 3 )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_genx : for i in 4 to MEMNUM-1 generate
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
         initFile      => "main_mem.mif",
-        fpgaMemIndex  => 0 )
+        fpgaMemIndex  => 4 )
       port map (
         clk     => clk_p,
         address => ram_a(i),

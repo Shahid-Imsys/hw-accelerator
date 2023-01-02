@@ -176,6 +176,7 @@ begin
     aR7     when R7,
     aR5     when R5,
     aR3     when R3,
+    cone    when one,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -236,6 +237,7 @@ begin
     aR6     when R6,
     aR5     when R5,
     aR3     when R3,
+    cone    when one,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -298,6 +300,7 @@ begin
     aR5     when R5,
     aR4     when R4,
     aR2     when R2,
+    cone    when one,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -357,6 +360,7 @@ begin
     aR6     when R6,
     aR4     when R4,
     aR2     when R2,
+    cone    when one,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -531,6 +535,7 @@ begin
     aR2     when R2,
     aR1     when R1,
     aR0     when R0,
+    cone    when one,
     conefft when onefft,
     aL2     when L2;
 
@@ -586,6 +591,7 @@ begin
     aR4     when R4,
     aR2     when R2,
     aR0     when R0,
+    cone    when one,
     conefft when onefft,
     aL2     when L2;
 

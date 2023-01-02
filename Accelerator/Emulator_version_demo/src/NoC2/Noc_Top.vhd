@@ -371,7 +371,11 @@ architecture structural of Noc_Top is
     signal Load_IR              : std_logic;
     signal Reset_IR             : std_logic;
 	signal RM_byte_as           : unsigned(3 downto 0);
-	signal RM_as_err            : std_logic;	    
+	signal RM_as_err            : std_logic;	
+
+    attribute mark_debug : string;
+    attribute mark_debug of RM_address: signal is "true"; 
+    
 
 begin
 

@@ -111,10 +111,7 @@ architecture rtl of alu is
   signal pl_sig12 : std_logic_vector(2 downto 0);
   signal pl_sig14 : std_logic_vector(3 downto 0);
   signal pl_sig13 : std_logic_vector(1 downto 0);
-
-  attribute mark_debug : string;
-  attribute mark_debug of flag_yz: signal is "true"; 
-  attribute mark_debug of flag_yan: signal is "true";   
+  
 begin
 ----------------------------------------------------------------------
   -- Function generator, controlled by ALUF field. 

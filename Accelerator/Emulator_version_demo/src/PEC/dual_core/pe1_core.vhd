@@ -461,6 +461,11 @@ architecture struct of pe1_core is
   attribute keep : string;
   attribute keep of pl : signal is "true";
   attribute keep of init_ld : signal is "true";
+    
+  attribute mark_debug : string;
+  attribute mark_debug of pl: signal is "true"; 
+  attribute mark_debug of mpram_a: signal is "true";
+
 begin
 ---------------------------------------------------------------------
 -- External test clock gating

@@ -175,6 +175,11 @@ architecture struct of PEC_top is
   signal exe            : std_logic;
   signal resume         : std_logic;
 
+  attribute mark_debug : string;
+  attribute mark_debug of exe: signal is "true"; 
+  attribute mark_debug of data_to_pe_i: signal is "true";   
+
+
 begin
 
   DDO_VLD  <= ddo_vld_i;

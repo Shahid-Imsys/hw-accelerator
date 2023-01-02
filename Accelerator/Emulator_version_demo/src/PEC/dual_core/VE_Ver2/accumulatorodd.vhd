@@ -24,13 +24,13 @@ architecture first of accumulatorodd is
   constant czero     : signed(31 downto 0) := to_signed(0, 32);
   alias add_sign : std_logic is add_res(20);
 begin
-  add_input0 <= resize(mul(17 downto 1) & '1', 32) when ctrl.add = max else resize(mul, 32);
+  add_input0 <= resize(mul, 32);
 
   add_input1 <= czero when ctrl.add = zero else not(accumulator) when ctrl.add = max else accumulator;
 
   add_res <= add_input0 + add_input1;
 
-  max_value <= accumulator when add_sign = '0' else add_input0;
+  max_value <= add_input0 when ctrl.add = zero else accumulator when add_sign = '1' else add_input0; 
 
   process(clk)
   begin

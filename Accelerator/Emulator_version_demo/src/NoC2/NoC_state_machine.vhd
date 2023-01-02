@@ -592,6 +592,15 @@ begin
       load_Mode_reg            <= '0';
       Reset_IR                 <= '0';
       Write_REQ                <= '0';
+      FF                       <= '0';
+      MSB_as                   <= '0';
+      Step_BC                  <= '0';
+      Load_IR                  <= '0';
+      load_program_mem         <= '0';
+      Load_Boot_FF             <= '0';
+      FF_data                  <= '0';
+      Reset_Boot_as_counter    <= '0';
+      ERROR                    <= '0';
       boot_as_counter          <= (others => '0');
     elsif rising_edge(clk) then
       FF                      <= not(boot_FF);

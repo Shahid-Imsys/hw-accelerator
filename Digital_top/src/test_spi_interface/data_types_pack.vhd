@@ -86,6 +86,30 @@ package data_types_pack is
     mtest       : input_pad_config_record_t;
     mwake       : input_pad_config_record_t;
     mrxout      : output_pad_config_record_t;
+	
+    io_dack0_n  : input_pad_config_record_t;	
+    io_dreq0_n  : output_pad_config_record_t;	
+    io_dack1_n  : input_pad_config_record_t;	
+    io_dreq1_n  : output_pad_config_record_t;
+    io_dack2_n  : input_pad_config_record_t;	
+    io_dreq2_n  : output_pad_config_record_t;
+    io_dack3_n  : input_pad_config_record_t;	
+    io_dreq3_n  : output_pad_config_record_t;	
+    
+    io_d0       : inoutput_pad_config_record_t;
+    io_d1       : inoutput_pad_config_record_t;
+    io_d2       : inoutput_pad_config_record_t;
+    io_d3       : inoutput_pad_config_record_t;
+	io_d4       : inoutput_pad_config_record_t;
+    io_d5       : inoutput_pad_config_record_t;	
+    io_d6       : inoutput_pad_config_record_t;	
+    io_d7       : inoutput_pad_config_record_t;	
+    
+    io_ldout_n  : output_pad_config_record_t;	
+    io_next_n   : output_pad_config_record_t;	
+    io_clk	    : output_pad_config_record_t;  
+    io_ioa_n    : output_pad_config_record_t;
+	
   end record pad_config_record_t;
 
   type pll_registers_record_t is record

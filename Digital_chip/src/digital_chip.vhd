@@ -73,7 +73,33 @@ entity digital_chip is
     emem_d5    : inout std_logic;
     emem_d6    : inout std_logic;
     emem_d7    : inout std_logic;
-
+	
+	--IO Interface, left open
+	io_dack0_n    : inout std_logic;	
+    io_dreq0_n    : out std_logic;	
+    io_dack1_n    : inout std_logic;	
+    io_dreq1_n    : out std_logic;
+    io_dack2_n    : inout std_logic;	
+    io_dreq2_n    : out std_logic;	
+    io_dack3_n    : inout std_logic;	
+    io_dreq3_n    : out std_logic;		
+    
+    io_d0    : inout std_logic;
+    io_d1    : inout std_logic;
+    io_d2    : inout std_logic;
+    io_d3    : inout std_logic;
+	io_d4    : inout std_logic;
+    io_d5    : inout std_logic;	
+    io_d6    : inout std_logic;	
+    io_d7    : inout std_logic;	
+    
+    io_ldout_n    : out std_logic;	
+    io_next_n     : out std_logic;	
+    io_clk	      : out std_logic;  
+    io_ioa_n	  : out std_logic;  
+    
+    
+    
     -- SPI, chip control interface
     spi_sclk : inout std_logic;
     spi_cs_n : inout std_logic;
@@ -278,7 +304,33 @@ architecture rtl of digital_chip is
   signal ospi_rwds_in     : std_logic;
   signal ospi_rwds_out    : std_logic;
   signal ospi_rwds_enable : std_logic;
+ 
+	--IO Interface, left open
+/*   signal io_dack0_n_in     : std_logic;	
+  signal io_dreq0_n_out    : std_logic;	
+  signal io_dack1_n_in     : std_logic;	
+  signal io_dreq1_n_out    : std_logic;	
+  signal io_dack2_n_in     : std_logic;	
+  signal io_dreq2_n_out    : std_logic;	
+  signal io_dack3_n_in     : std_logic;	
+  signal io_dreq3_n_out    : std_logic;	
+       
+  signal io_d0_inout       : std_logic;
+  signal io_d1_inout       : std_logic;
+  signal io_d2_inout       : std_logic;
+  signal io_d3_inout       : std_logic;
+  signal io_d4_inout       : std_logic;
+  signal io_d5_inout       : std_logic;	
+  signal io_d6_inout       : std_logic;	
+  signal io_d7_inout       : std_logic;	
   
+  signal io_ldout_n_out    : std_logic;	
+  signal io_next_n_out     : std_logic;	
+  signal io_clk_out	       : std_logic;  
+  signal io_ioa_n_out	   : std_logic; */  
+           
+  
+    
   signal enet_mdin     : std_logic;
   signal enet_mdout    : std_logic;
   signal enet_mdc_out  : std_logic;
@@ -856,7 +908,335 @@ begin  -- architecture rtl
     ---------------------------------------------------------------------------
     -- South side pads
     ---------------------------------------------------------------------------
+ 
+    i_io_dack0_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_dack0_n,
+        --GPI
+        ie  => '1',
+        ste => pad_config.io_dack0_n.ste,
+        pd  => pad_config.io_dack0_n.pd,
+        pu  => pad_config.io_dack0_n.pu,
+        di  => open --io_dack0_n_in --'0'
+        );	
+		
+    o_io_dreq0_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_dreq0_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_dreq0_n.ds & "00",
+        sr  => pad_config.io_dreq0_n.sr,
+        co  => pad_config.io_dreq0_n.co,
+        oe  => '1',       
+        odp => pad_config.io_dreq0_n.odp,
+        odn => pad_config.io_dreq0_n.odn
+        );
+		
+    i_io_dack1_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_dack1_n,
+        --GPI
+        ie  => '1',
+        ste => pad_config.io_dack1_n.ste,
+        pd  => pad_config.io_dack1_n.pd,
+        pu  => pad_config.io_dack1_n.pu,
+        di  => open 
+        );	
+		
+    o_io_dreq1_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_dreq1_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_dreq1_n.ds & "00",
+        sr  => pad_config.io_dreq1_n.sr,
+        co  => pad_config.io_dreq1_n.co,
+        oe  => '1',       
+        odp => pad_config.io_dreq1_n.odp,
+        odn => pad_config.io_dreq1_n.odn
+        );		
+		
+    i_io_dack2_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_dack2_n,
+        --GPI
+        ie  => '1',
+        ste => pad_config.io_dack2_n.ste,
+        pd  => pad_config.io_dack2_n.pd,
+        pu  => pad_config.io_dack2_n.pu,
+        di  => open--'1'
+        );	
+		
+    o_io_dreq2_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_dreq2_n,
+        --GPIO
+        do  => '1',--open,
+        ds  => pad_config.io_dreq2_n.ds & "00",
+        sr  => pad_config.io_dreq2_n.sr,
+        co  => pad_config.io_dreq2_n.co,
+        oe  => '1',       
+        odp => pad_config.io_dreq2_n.odp,
+        odn => pad_config.io_dreq2_n.odn
+        );	
+
+    i_io_dack3_n_pad : entity work.input_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_dack3_n,
+        --GPI
+        ie  => '1',
+        ste => pad_config.io_dack3_n.ste,
+        pd  => pad_config.io_dack3_n.pd,
+        pu  => pad_config.io_dack3_n.pu,
+        di  => open
+        );	
+		
+    o_io_dreq3_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_dreq3_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_dreq3_n.ds & "00",
+        sr  => pad_config.io_dreq3_n.sr,
+        co  => pad_config.io_dreq3_n.co,
+        oe  => '1',       
+        odp => pad_config.io_dreq3_n.odp,
+        odn => pad_config.io_dreq3_n.odn
+        );		
+		
+	
+    io_io_d1_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d1,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d1.ds & "00",
+        sr  => pad_config.io_d1.sr,
+        co  => pad_config.io_d1.co,
+        oe  => '1',          
+        odp => pad_config.io_d1.odp,
+        odn => pad_config.io_d1.odn,
+        ste => pad_config.io_d1.ste,
+        pd  => pad_config.io_d1.pd,
+        pu  => pad_config.io_d1.pu,
+        di  => open
+        );
+
+    io_io_d2_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d2,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d2.ds & "00",
+        sr  => pad_config.io_d2.sr,
+        co  => pad_config.io_d2.co,
+        oe  => '1',          
+        odp => pad_config.io_d2.odp,
+        odn => pad_config.io_d2.odn,
+        ste => pad_config.io_d2.ste,
+        pd  => pad_config.io_d2.pd,
+        pu  => pad_config.io_d2.pu,
+        di  => open
+        );
+
+    io_io_d3_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d3,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d3.ds & "00",
+        sr  => pad_config.io_d3.sr,
+        co  => pad_config.io_d3.co,
+        oe  => '1',          
+        odp => pad_config.io_d3.odp,
+        odn => pad_config.io_d3.odn,
+        ste => pad_config.io_d3.ste,
+        pd  => pad_config.io_d3.pd,
+        pu  => pad_config.io_d3.pu,
+        di  => open
+        );
+
+    io_io_d4_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d4,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d4.ds & "00",
+        sr  => pad_config.io_d4.sr,
+        co  => pad_config.io_d4.co,
+        oe  => '1',          
+        odp => pad_config.io_d4.odp,
+        odn => pad_config.io_d4.odn,
+        ste => pad_config.io_d4.ste,
+        pd  => pad_config.io_d4.pd,
+        pu  => pad_config.io_d4.pu,
+        di  => open
+        );		
+
+    io_io_d5_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d5,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d5.ds & "00",
+        sr  => pad_config.io_d5.sr,
+        co  => pad_config.io_d5.co,
+        oe  => '1',          
+        odp => pad_config.io_d5.odp,
+        odn => pad_config.io_d5.odn,
+        ste => pad_config.io_d5.ste,
+        pd  => pad_config.io_d5.pd,
+        pu  => pad_config.io_d5.pu,
+        di  => open
+        ); 
+		
+    io_io_d6_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d6,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d6.ds & "00",
+        sr  => pad_config.io_d6.sr,
+        co  => pad_config.io_d6.co,
+        oe  => '1',          
+        odp => pad_config.io_d6.odp,
+        odn => pad_config.io_d6.odn,
+        ste => pad_config.io_d6.ste,
+        pd  => pad_config.io_d6.pd,
+        pu  => pad_config.io_d6.pu,
+        di  => open
+        );		
+		
+    io_io_d7_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d7,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d7.ds & "00",
+        sr  => pad_config.io_d7.sr,
+        co  => pad_config.io_d7.co,
+        oe  => '1',          
+        odp => pad_config.io_d7.odp,
+        odn => pad_config.io_d7.odn,
+        ste => pad_config.io_d7.ste,
+        pd  => pad_config.io_d7.pd,
+        pu  => pad_config.io_d7.pu,
+        di  => open 
+        );		
+ 
+    o_io_ldout_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_ldout_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_ldout_n.ds & "00",
+        sr  => pad_config.io_ldout_n.sr,
+        co  => pad_config.io_ldout_n.co,
+        oe  => '1',       
+        odp => pad_config.io_ldout_n.odp,
+        odn => pad_config.io_ldout_n.odn
+        );	
+
+    o_io_next_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_next_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_next_n.ds & "00",
+        sr  => pad_config.io_next_n.sr,
+        co  => pad_config.io_next_n.co,
+        oe  => '1',       
+        odp => pad_config.io_next_n.odp,
+        odn => pad_config.io_next_n.odn
+        );	
+
+    o_io_clk_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_clk,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_clk.ds & "00",
+        sr  => pad_config.io_clk.sr,
+        co  => pad_config.io_clk.co,
+        oe  => '1',       
+        odp => pad_config.io_clk.odp,
+        odn => pad_config.io_clk.odn
+        );	
+
+    o_io_ioa_n_pad : entity work.output_pad   
+      generic map (
+        direction =>  vertical)
+      port map (
+        -- PAD
+        pad => io_ioa_n,
+        --GPIO
+        do  => '1',
+        ds  => pad_config.io_ioa_n.ds & "00",
+        sr  => pad_config.io_ioa_n.sr,
+        co  => pad_config.io_ioa_n.co,
+        oe  => '1',       
+        odp => pad_config.io_ioa_n.odp,
+        odn => pad_config.io_ioa_n.odn
+        );			
     
+	
+    
+	
     ---------------------------------------------------------------------------
     -- East side pads
     ---------------------------------------------------------------------------

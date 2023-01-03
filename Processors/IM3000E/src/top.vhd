@@ -877,7 +877,7 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "testmem_part0.mif",
+        initFile      => "test_mem_p0.mif",
         fpgaMemIndex  => 0 )
       port map (
         clk     => clk_p,
@@ -892,7 +892,7 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "testmem_part1.mif",
+        initFile      => "test_mem_p1.mif",
         fpgaMemIndex  => 1 )
       port map (
         clk     => clk_p,
@@ -907,7 +907,7 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "mainmem_part0.mif",
+        initFile      => "main_mem_p0.mif",
         fpgaMemIndex  => 2 )
       port map (
         clk     => clk_p,
@@ -922,7 +922,7 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "mainmem_part1.mif",
+        initFile      => "main_mem_p1.mif",
         fpgaMemIndex  => 3 )
       port map (
         clk     => clk_p,

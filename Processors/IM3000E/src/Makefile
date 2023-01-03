@@ -79,6 +79,10 @@ fpga_ip:
 #	          $(IP_DIR_WIN)/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
 #		  $(IP_DIR_WIN)/gpp.gen/sources_1/ip/dist_mem_gen_0/sim/dist_mem_gen_0.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p0/sim/main_mem_p0.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p1/sim/main_mem_p1.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/test_mem_p0/sim/test_mem_p0.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/test_mem_p1/sim/test_mem_p1.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/mpram_mem/sim/mpram_mem.v
 	#$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
 

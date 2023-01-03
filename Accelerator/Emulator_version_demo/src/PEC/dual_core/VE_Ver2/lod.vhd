@@ -27,8 +27,10 @@ architecture basic of lod is
   signal to_detect : std_logic_vector(31 downto 0);
   signal leading_one : unsigned(4 downto 0);
   signal lzo1, lzo2, lzo3 : unsigned(4 downto 0);
-  signal to_sign, s1, s2 : std_logic;
-  signal diff1, diff2, diff3, unnorm, unnormb, deta, detb : signed(5 downto 0);
+  signal to_sign, s1, s2, s3 : std_logic;
+  --signal diff1, diff3, unnorm, unnormb, deta, detb : signed(5 downto 0);
+  signal diff1, diff3 : signed(5 downto 0);
+  signal unnorm, unnormb, deta : unsigned(5 downto 0);
 
 begin
   to_detect <= data3 when ctrl.word = "11" else
@@ -86,18 +88,20 @@ process(clk)
             s2 <= to_sign;
           elsif ctrl.store = store3 then
             lzo3 <= leading_one;
+            s3 <= to_sign;
           end if;
         end if;
       end if;
     end process;
 
 diff1 <= signed(resize(lzo1, 6)) - signed(resize(lzo2, 6));
---diff2 <= -diff1;
-unnorm <= diff1 + 22;
-deta <= diff1 + 14;
+--unnorm <= diff1 + 22; -- (30 - frac), for 8f
+unnorm <= unsigned(diff1 + 18); -- (30 - frac), for 12f
+-- deta <= unsigned(diff1 + 14); -- (30 - 2*frac), for 8f
+deta <= unsigned(diff1 + 6); -- (30 - 2*frac), for 12f
 diff3 <= signed(resize(lzo3, 6)) - signed(resize(lzo2, 6));
---detb <= diff3 + 14;
-unnormb <= diff3 + 22;
+--unnormb <= unsigned(diff3 + 22); -- (30 - frac), for 8f
+unnormb <= unsigned(diff3 + 18); -- (30 - frac), for 12f
 
     process(clk)
         begin
@@ -109,14 +113,6 @@ unnormb <= diff3 + 22;
               if ctrl.output = val then
                 to_shift.shift <= to_integer(unsigned(leading_one));
                 to_shift.shift_dir <= left;
-              --elsif ctrl.output = diff then
-              --  if diff1(5) = '0' then
-              --    to_shift.shift <= to_integer(diff1);
-              --    to_shift.shift_dir <= left;
-              --  else
-              --    to_shift.shift <= to_integer(diff2);
-              --    to_shift.shift_dir <= right;
-              --  end if;
               elsif ctrl.output = nrit then
                 to_shift.shift <= to_integer(unnorm);
                 to_shift.shift_dir <= right;
@@ -124,9 +120,6 @@ unnormb <= diff3 + 22;
               elsif ctrl.output = det1 then
                 to_shift.shift <= to_integer(deta);
                 to_shift.shift_dir <= right;
-              --elsif ctrl.output = det2 then
-              --  to_shift.shift <= to_integer(detb);
-              --  to_shift.shift_dir <= right;
               elsif ctrl.output = nrit2 then
                 to_shift.shift <= to_integer(unnormb);
                 to_shift.shift_dir <= right;

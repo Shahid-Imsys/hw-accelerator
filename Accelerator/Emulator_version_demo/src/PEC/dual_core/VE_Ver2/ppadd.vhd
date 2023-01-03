@@ -20,6 +20,7 @@ entity ppadd is
     in2     : in  signed(31 downto 0);
     in1     : in  signed(31 downto 0);
     in0     : in  signed(31 downto 0);
+    loadin  : in  signed(31 downto 0);
     ctrl    : in  pp_ctrl;
     result  : out signed(32 downto 0)
     );
@@ -74,6 +75,8 @@ begin
       if en = '1' then
         if ctrl.reg = enable then
           resreg <= rese(33 downto 1);
+        elsif ctrl.reg = load then
+          resreg <= resize(loadin, 33);
         end if;
       end if;
     end if;

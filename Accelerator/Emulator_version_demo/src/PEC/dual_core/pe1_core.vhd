@@ -573,7 +573,7 @@ begin
   begin
     if rising_edge(clk_p) then--
       if rst_en_int = '0' then
-        pl <= x"8" & x"0000000000000000000000000000000";
+        pl <= x"00000000000000000000000000000000";
       elsif clk_e_pos_int = '0' then --rising_edge(clk_e)
         if exe = '1' then
           pl <= init_mpgm;

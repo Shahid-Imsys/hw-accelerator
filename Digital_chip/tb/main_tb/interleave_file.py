@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-# cat ../../sim/vivado/maintb/main_mem.mif | ./interleave_file.py mainmem_part
-# cat ../../sim/vivado/maintb/test_mem.mif | ./interleave_file.py testmem_part
+# cat ../../sim/vivado/maintb/main_mem.mif | ./interleave_file.py main_mem_p
+# cat ../../sim/vivado/maintb/test_mem.mif | ./interleave_file.py test_mem_p
+# mv main_mem_p0.mif ../../sim/vivado/maintb/
+# mv main_mem_p1.mif ../../sim/vivado/maintb/
+# mv test_mem_p0.mif ../../sim/vivado/maintb/
+# mv test_mem_p1.mif ../../sim/vivado/maintb/
 
 import sys
 import os

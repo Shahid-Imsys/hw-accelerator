@@ -354,7 +354,7 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst_en_int = '0' then
-        ready <= '1';
+        ready <= '0';
       else
         ready <= ready_1;
       end if;
@@ -383,7 +383,7 @@ begin
     if rising_edge(clk_p) then--rising_edge(clk_e)
       core2_en_buf <= core2_en;
       if rst_en_int = '0' then
-        pl <= x"8" & x"0000000000000000000000000000000";
+        pl <= x"00000000000000000000000000000000";
         core2_en_buf <= '0';
       elsif clk_e_pos_int = '0' then
         pl <= mp_q;

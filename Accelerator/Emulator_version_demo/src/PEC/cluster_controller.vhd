@@ -221,6 +221,7 @@ end component;
   signal tag_ctr_2      : unsigned(5 downto 0) := "011110"; --30  --"101101"; --azzz back to 30 to remove addr2, azzzz 45 "to add addr2 in tag line" --"011110"; --30
   signal tag_ctr_3      : unsigned(5 downto 0) := "100110"; --38
   signal tag_ctr_1      : unsigned(5 downto 0);
+  signal rdy_cycle      : integer range 0 to 7;
   
   type cmem_out_type is array(0 to 3) of std_logic_vector(127 downto 0);
   signal cmem_dout : cmem_out_type;
@@ -964,16 +965,24 @@ begin
   begin
     if RST_E = '0' then
       c_rdy_i <= '1';
+      rdy_cycle <= 0;
     elsif rising_edge(clk_e) then
       if exe_i = '1' then
         c_rdy_i <= '0';
+        rdy_cycle <= 0;
       elsif PES_RDY = x"ffff" then
         c_rdy_i <= '1';
+        if rdy_cycle = 7 then
+          c_rdy_i <= '0';
+          rdy_cycle <= rdy_cycle;
+        else
+          rdy_cycle <= rdy_cycle + 1;
+        end if;
       end if;
     end if; 
   end process;
 		   
-  C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
+  C_RDY <= c_rdy_i when rdy_cycle = 6 else '0';
 ----------------------------------------------------------------------------------	
 
 				

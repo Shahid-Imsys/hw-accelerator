@@ -354,7 +354,7 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst_en_int = '0' then
-        ready <= '1';
+        ready <= '0';
       else
         ready <= ready_1;
       end if;

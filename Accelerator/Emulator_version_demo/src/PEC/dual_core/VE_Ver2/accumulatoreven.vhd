@@ -14,7 +14,6 @@ entity accumulatoreven is
     mul     : in  signed(17 downto 0);
     mul_odd : in  signed(17 downto 0);
     ctrl    : in  acce_ctrl;
-    bias    : in  signed(31 downto 0);
     result  : out signed(31 downto 0);
     sign_o  : out std_logic
     );
@@ -41,7 +40,7 @@ begin
   mul_odd_abs <= signed(shift_left(resize(unsigned(not(mul_odd(14 downto 7))), 31), 7)) & '1' when sign = '1' else
                  signed(shift_left(resize(unsigned(mul_odd(14 downto 7)), 31), 7)) & '0';
 
-  add_input0 <= mul_abs when ctrl.add = abs16 else resize(mul, 32);
+  add_input0 <= mul_abs when ctrl.add = abs16 else resize(mul(17 downto 1) & '1', 32) when ctrl.add = max else resize(mul, 32);
 
   with ctrl.add select add_input1 <=
     czero                              when zero,
@@ -53,7 +52,7 @@ begin
 
   add_res <= add_input0 + add_input1;
 
-  max_value <= add_input0 when ctrl.add = zero else accumulator when add_sign = '1' else add_input0;  
+  max_value <= add_input0 when ctrl.add = zero else accumulator when add_sign = '1' else add_input0;
 
   process(clk)
   begin
@@ -65,8 +64,6 @@ begin
           accumulator <= (others => '0');
         elsif ctrl.acc = max then
           accumulator <= max_value;
-        elsif ctrl.acc = loadbias then
-          accumulator <= bias;
         end if;
       end if;
     end if;

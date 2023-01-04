@@ -16,29 +16,30 @@ package vetypes is
   type addsub_t is (add, sub);
   type addsub2_t is (add, sub, subl);
   type enable_t is (enable, hold);
+  type enable_w_load_t is (enable, hold, load);
 
   type mux7l0_t is (zero, L7, F5, F7);
   -- TODO
   --type mux7l1_t is (zpd, zero, R7, L3, onefft, L5);
   type mux7l1_t is (zpd, zero, R7, L3, L5);
-  type mux7r0_t is (R7, R3, R5, one, onefft, L1, F1, F3, F5);
+  type mux7r0_t is (R7, R3, R5, onefft, L1, F1, F3, F5);
   type mux7r1_t is (zpw, zero);
 
   type mux6l0_t is (zero, L6, F4, F6);
   -- TODO
   --type mux6l1_t is (zpd, zero, R6, L2, L0, L4);
   type mux6l1_t is (zpd, zero, R6, L2, L4);
-  type mux6r0_t is (R6, R3, R5, R7, one, onefft, L1, F1, F3, F5);
+  type mux6r0_t is (R6, R3, R5, R7, onefft, L1, F1, F3, F5);
   type mux6r1_t is (zpw, zero);
 
   type mux5l0_t is (zero, L5, L7, F5, F7);
   type mux5l1_t is (zpd, zero, R5, L3, L5);
-  type mux5r0_t is (R5, R2, R4, R6, one, onefft, L0, F0, F2, F4);
+  type mux5r0_t is (R5, R2, R4, R6, onefft, L0, F0, F2, F4);
   type mux5r1_t is (zpw, zero);
 
   type mux4l0_t is (zero, L4, L6, F4, F6);
   type mux4l1_t is (zpd, zero, R4, L2, L4);
-  type mux4r0_t is (R4, R2, R6, one, onefft, L0, F0, F2, F4);
+  type mux4r0_t is (R4, R2, R6, onefft, L0, F0, F2, F4);
   type mux4r1_t is (zpw, zero);
 
   type mux3l0_t is (zero, L3, L5, F7);
@@ -53,15 +54,15 @@ package vetypes is
 
   type mux1l0_t is (L1, L5);
   type mux1l1_t is (zpd, zero, R1, L1);
-  type mux1r0_t is (R1, R0, R2, R4, R6, one, onefft, L2);
+  type mux1r0_t is (R1, R0, R2, R4, R6, onefft, L2);
   type mux1r1_t is (zpw, zero);
 
   type mux0l0_t is (zero, L0, L4);
   type mux0l1_t is (zpd, zero, R0, L0);
-  type mux0r0_t is (R0, R2, R4, R6, one, onefft, L2);
+  type mux0r0_t is (R0, R2, R4, R6, onefft, L2);
   type mux0r1_t is (zpw, zero);
 
-  type acc_t is (keep, acc, zero, max, loadbias);
+  type acc_t is (keep, acc, zero, max);
   type addo_t is (zero, acc, max);
   type adde_t is (zero, acc, odd, odd8, abs16, max);
   type reg_t is (keep, add, acc, max);
@@ -71,13 +72,13 @@ package vetypes is
   type ppadd_t is (zero, acc);
   type ppacc_t is (pass, negate, addbias);
   type shift_t is (left, right);
-  type clip_t is (none, clip8, clip16, clipone16, clipzero);
+  type clip_t is (none, clip8, clip16, clipone16, clipone16_12f, clipzero);
   type outreg_t is (none, out7, out6, out5, out4, out3, out2, out1, out0, out76, out54, out32, out10);
   type quant_t is (trunc, round, unbiased);
   type lzod_t is (none, store1, store2, store3);
   --type lzod_out_t is (none, val, diff, nrit, nrit2, det1, det2);
   type lzod_out_t is (none, val, nrit, nrit2, det1);
-  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum, sumall,
+  type ppctrl_t is (nop, add32, add10, add21, fftsub0, fftsub1, sumfirst, sum,
                     select7, select6, select5, select4, select3, select2, select1,
                     select0, unitri, sum16, sum16left, matmulleft, nrit);
   --function to_ppctrl_t (v : std_logic_vector(3 downto 0)) return ppctrl_t;
@@ -184,7 +185,7 @@ package vetypes is
     mux0   : ppeven_t;
     acc    : ppadd_t;
     addsub : addsub2_t;
-    reg    : enable_t;
+    reg    : enable_w_load_t;
   end record pp_ctrl;
 
   type ppshift_shift_ctrl is record

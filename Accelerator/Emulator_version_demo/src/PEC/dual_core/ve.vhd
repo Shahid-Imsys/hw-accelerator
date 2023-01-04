@@ -115,7 +115,7 @@ architecture rtl of ve is
       outreg_o         : out std_logic_vector(63 downto 0);
       writebuffer_o    : out std_logic_vector(63 downto 0);
       -- en
-      stall            : in unsigned(7 downto 0) := (others => '0');
+      stall            : in unsigned(3 downto 0) := (others => '0');
       en_o             : out std_logic
     );
   end component;
@@ -277,7 +277,6 @@ architecture rtl of ve is
       bypass           : in std_logic;
       config           : in std_logic_vector(7 downto 0);
       pp_ctl           : in std_logic_vector(7 downto 0);
-      re_loop          : in std_logic_vector(7 downto 0);
       dot_cnt          : in std_logic_vector(7 downto 0);
       oc_cnt           : in std_logic_vector(7 downto 0);
       scale            : in std_logic_vector(4 downto 0);
@@ -300,7 +299,7 @@ architecture rtl of ve is
       ppshiftinst      : out ppshift_shift_ctrl;
       addbiasinst      : out ppshift_addbias_ctrl;
       clipinst         : out ppshift_clip_ctrl;
-      stall            : out unsigned(7 downto 0);
+      stall            : out unsigned(3 downto 0);
       busy             : out std_logic
     );
   end component;
@@ -325,7 +324,42 @@ architecture rtl of ve is
       inst_shift   : out ppshift_shift_ctrl;
       inst_addbias : out ppshift_addbias_ctrl;
       inst_clip    : out ppshift_clip_ctrl;
-      stall        : out unsigned(7 downto 0)
+      stall        : out unsigned(3 downto 0)
+    );
+  end component;
+
+  component matinvcontroller12f
+    port(
+      clk                   : in std_logic;
+      start                 : in std_logic;
+      en_i                  : in std_logic;
+      nt                    : in std_logic_vector(3 downto 0) := "0011";--integer range 0 to 15 := 3;
+      done                  : out std_logic;
+
+      data0_addr_o          : out std_logic_vector(7 downto 0);
+      data1_addr_o          : out std_logic_vector(7 downto 0);
+      weight_addr_o         : out std_logic_vector(7 downto 0);
+      bias_addr_o           : out std_logic_vector(7 downto 0);
+      bias_addr_ctrl_o      : out bias_addr_t;
+      data_read_enable_o    : out std_logic;
+      data_write_enable_o   : out std_logic;
+      weight_read_enable_o  : out std_logic;
+      weight_write_enable_o : out std_logic;
+      bias_ren_o            : out std_logic;
+
+      memreg_c_o            : out memreg_ctrl;
+      writebuff_c_o         : out memreg_ctrl;
+      inst_o                : out instruction;
+      ppinst_o              : out ppctrl_t;
+      ppshiftinst_shift_o   : out ppshift_shift_ctrl;
+      ppshiftinst_addbias_o : out ppshift_addbias_ctrl;
+      ppshiftinst_clip_o    : out ppshift_clip_ctrl;
+      lzod_o                : out lzod_ctrl;
+      feedback_ctrl_o       : out feedback_t;
+      zpdata_o              : out std_logic_vector(7 downto 0);
+      zpweight_o            : out std_logic_vector(7 downto 0);
+
+      en_max_o              : out unsigned(3 downto 0)
     );
   end component;
 
@@ -337,7 +371,7 @@ architecture rtl of ve is
   signal re_source : std_logic;
   --signal re_source_reg : std_logic;
   --Vector engine signals
-  signal start, conv_start, fft_start : std_logic;
+  signal start, conv_start, fft_start, matinv_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
   --signal mac_switch : std_logic;
   --Shared signals
@@ -370,7 +404,7 @@ architecture rtl of ve is
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
-  signal fft_en, fft_done, finalstage : std_logic;
+  signal fft_en, fft_done, finalstage, matinv_en, matinv_done : std_logic;
   signal left_loading, right_loading, bias_loading : std_logic_vector(3 downto 0);
   signal left_rst, right_rst, bias_rst : std_logic;
   signal lrst_from_conv, rrst_from_conv : std_logic;
@@ -404,8 +438,6 @@ architecture rtl of ve is
   signal mem_data_in, data_to_mem, bypassed_reg, bypassed_weight : std_logic_vector(63 downto 0);
   signal mem_data_reg    : std_logic_vector(63 downto 0);
   signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
-  --signal mode_a_l  : std_logic;
-  --signal mode_b_l  : std_logic;
   signal read_en_b_i : std_logic;
   signal data_write_enable_i, weight_write_enable_i : std_logic;
   signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
@@ -442,29 +474,25 @@ architecture rtl of ve is
   signal weight_read_enable_i : std_logic;
   signal rd_en_conv, b_rd_en_conv : std_logic;
   signal fft_read_en, fft_write_en : std_logic;
-  signal memreg_c_i       : memreg_ctrl;
-  signal conv_memreg_c    : memreg_ctrl;
-  signal fft_memreg_c     : memreg_ctrl;
-  signal writebuff_c_i    : memreg_ctrl;
-  signal conv_writebuff_c : memreg_ctrl;
-  signal fft_writebuff_c  : memreg_ctrl;
-  signal inst_i           : instruction;
-  signal conv_ins        : instruction;
-  signal fft_inst         : instruction;
-  signal ppinst_i         : ppctrl_t;
-  signal conv_ppins      : ppctrl_t;
-  signal fft_ppinst       : ppctrl_t;
-  signal ppshiftinst_i    : ppshift_shift_ctrl;
-  signal conv_ppshiftinst : ppshift_shift_ctrl;
-  signal fft_ppshiftinst  : ppshift_shift_ctrl;
-  signal addbiasinst_i    : ppshift_addbias_ctrl;
-  signal conv_addbiasinst : ppshift_addbias_ctrl;
-  signal fft_addbiasinst  : ppshift_addbias_ctrl;
-  signal clipinst_i       : ppshift_clip_ctrl;
-  signal conv_clipinst    : ppshift_clip_ctrl;
-  signal fft_clipinst     : ppshift_clip_ctrl;
+  signal memreg_c_i, conv_memreg_c, fft_memreg_c, matinv_memreg_c : memreg_ctrl;
+  signal writebuff_c_i, conv_writebuff_c, fft_writebuff_c, matinv_writebuff_c : memreg_ctrl;
+  signal inst_i, conv_ins, fft_inst, matinv_inst : instruction;
+  signal ppinst_i, conv_ppins, fft_ppinst, matinv_ppinst : ppctrl_t;
+  signal ppshiftinst_i, conv_ppshiftinst, fft_ppshiftinst, matinv_ppshiftinst : ppshift_shift_ctrl;
+  signal addbiasinst_i, conv_addbiasinst, fft_addbiasinst, matinv_addbiasinst : ppshift_addbias_ctrl;
+  signal clipinst_i, conv_clipinst, fft_clipinst, matinv_clipinst : ppshift_clip_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
-  signal fft_stall, conv_stall, stall : unsigned(7 downto 0) := (others => '0');
+  signal fft_stall, conv_stall, stall : unsigned(3 downto 0);
+  signal matinv_data0_addr_to_mux, matinv_data1_addr_to_mux : std_logic_vector(7 downto 0);
+  signal matinv_weight_addr_to_mux, matinv_bias_addr_to_mux : std_logic_vector(7 downto 0);
+  signal bias_addr_ctrl_i, matinv_bias_addr_ctrl : bias_addr_t;
+  signal matinv_data_read_en_to_mux, matinv_data_write_en_to_mux, matinv_bias_ren_to_mux : std_logic; 
+  signal matinv_weight_read_en_to_mux, matinv_weight_write_en_to_mux : std_logic;
+  signal lzod_i, matinv_lzod : lzod_ctrl;
+  signal feedback_ctrl_i, matinv_feedback_ctrl : feedback_t;
+  signal matinv_zpdata_o, matinv_zpweight_o : std_logic_vector(7 downto 0);
+  signal matinv_stall : unsigned(3 downto 0);
+  signal nt : std_logic_vector(3 downto 0);
   signal en_o : std_logic;
   signal pushback_en : std_logic;
   signal data0_addr_o : std_logic_vector(7 downto 0);
@@ -904,7 +932,7 @@ begin
     --dot_cnt      <= x"00";
     --oc_cnt       <= x"00";
     fft_stages   <= "000";
-    stall        <= x"00";
+    stall        <= x"0";
     re_cnt_rst   <= '0';
     conv_cnt_rst <= '0';
     bypass_valid    <= '0';
@@ -1291,7 +1319,6 @@ begin
       bypass           => bypass,
       config           => config,
       pp_ctl           => pp_ctl,
-      re_loop          => re_loop_reg,
       dot_cnt          => ve_loop_reg,--dot_cnt,
       oc_cnt           => ve_oloop_reg,--oc_cnt,
       scale            => scale,
@@ -1339,6 +1366,37 @@ begin
       inst_addbias => fft_addbiasinst,
       inst_clip    => fft_clipinst,
       stall        => fft_stall
+    );
+
+  matinvcontroller12f_i : matinvcontroller12f
+    port map(
+      clk                   => clk_p,
+      start                 => matinv_start,
+      en_i                  => matinv_en,
+      nt                    => nt,
+      done                  => matinv_done,
+      data0_addr_o          => matinv_data0_addr_to_mux,
+      data1_addr_o          => matinv_data1_addr_to_mux,
+      weight_addr_o         => matinv_weight_addr_to_mux,
+      bias_addr_o           => matinv_bias_addr_to_mux,
+      bias_addr_ctrl_o      => matinv_bias_addr_ctrl,--: out bias_addr_t;
+      data_read_enable_o    => matinv_data_read_en_to_mux,
+      data_write_enable_o   => matinv_data_write_en_to_mux,
+      weight_read_enable_o  => matinv_weight_read_en_to_mux,
+      weight_write_enable_o => matinv_weight_write_en_to_mux,
+      bias_ren_o            => matinv_bias_ren_to_mux,
+      memreg_c_o            => matinv_memreg_c,
+      writebuff_c_o         => matinv_writebuff_c,
+      inst_o                => matinv_inst,
+      ppinst_o              => matinv_ppinst,
+      ppshiftinst_shift_o   => matinv_ppshiftinst,
+      ppshiftinst_addbias_o => matinv_addbiasinst,
+      ppshiftinst_clip_o    => matinv_clipinst,
+      lzod_o                => matinv_lzod,--: out lzod_ctrl;
+      feedback_ctrl_o       => matinv_feedback_ctrl,--: out feedback_t;
+      zpdata_o              => matinv_zpdata_o,
+      zpweight_o            => matinv_zpweight_o,
+      en_max_o              => matinv_stall 
     );
 
   ve_wctrlpipe_inst : ve_wctrlpipe

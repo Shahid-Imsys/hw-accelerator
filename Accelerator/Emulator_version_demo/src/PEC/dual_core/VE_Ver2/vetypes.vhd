@@ -22,44 +22,44 @@ package vetypes is
   -- TODO
   --type mux7l1_t is (zpd, zero, R7, L3, onefft, L5);
   type mux7l1_t is (zpd, zero, R7, L3, L5);
-  type mux7r0_t is (R7, R3, R5, onefft, L1, F1, F3, F5);
+  type mux7r0_t is (R7, R3, R5, oneint, onefft, L1, F1, F3, F5);
   type mux7r1_t is (zpw, zero);
 
   type mux6l0_t is (zero, L6, F4, F6);
   -- TODO
   --type mux6l1_t is (zpd, zero, R6, L2, L0, L4);
   type mux6l1_t is (zpd, zero, R6, L2, L4);
-  type mux6r0_t is (R6, R3, R5, R7, onefft, L1, F1, F3, F5);
+  type mux6r0_t is (R6, R3, R5, R7, oneint, onefft, L1, F1, F3, F5);
   type mux6r1_t is (zpw, zero);
 
   type mux5l0_t is (zero, L5, L7, F5, F7);
   type mux5l1_t is (zpd, zero, R5, L3, L5);
-  type mux5r0_t is (R5, R2, R4, R6, onefft, L0, F0, F2, F4);
+  type mux5r0_t is (R5, R2, R4, R6, oneint, onefft, L0, F0, F2, F4);
   type mux5r1_t is (zpw, zero);
 
   type mux4l0_t is (zero, L4, L6, F4, F6);
   type mux4l1_t is (zpd, zero, R4, L2, L4);
-  type mux4r0_t is (R4, R2, R6, onefft, L0, F0, F2, F4);
+  type mux4r0_t is (R4, R2, R6, oneint, onefft, L0, F0, F2, F4);
   type mux4r1_t is (zpw, zero);
 
   type mux3l0_t is (zero, L3, L5, F7);
   type mux3l1_t is (zpd, zero, R3, L1);
-  type mux3r0_t is (R3, R1, R5, R7, one, onefft, L3);
+  type mux3r0_t is (R3, R1, R5, R7, one, oneint, onefft, L3);
   type mux3r1_t is (zpw, zero);
 
   type mux2l0_t is (zero, L2, L4, F6);
   type mux2l1_t is (zpd, zero, R2, L0);
-  type mux2r0_t is (R2, R1, R3, R5, R7, one, onefft, L3);
+  type mux2r0_t is (R2, R1, R3, R5, R7, one, oneint, onefft, L3);
   type mux2r1_t is (zpw, zero);
 
   type mux1l0_t is (L1, L5);
   type mux1l1_t is (zpd, zero, R1, L1);
-  type mux1r0_t is (R1, R0, R2, R4, R6, onefft, L2);
+  type mux1r0_t is (R1, R0, R2, R4, R6, oneint, onefft, L2);
   type mux1r1_t is (zpw, zero);
 
   type mux0l0_t is (zero, L0, L4);
   type mux0l1_t is (zpd, zero, R0, L0);
-  type mux0r0_t is (R0, R2, R4, R6, onefft, L2);
+  type mux0r0_t is (R0, R2, R4, R6, oneint, onefft, L2);
   type mux0r1_t is (zpw, zero);
 
   type acc_t is (keep, acc, zero, max);

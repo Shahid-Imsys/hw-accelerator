@@ -61,7 +61,7 @@ architecture first of vearith is
 -- Constants
   constant czero   : std_logic_vector(7 downto 0) := "00000000";
   constant conefft : std_logic_vector(7 downto 0) := "10000000";
-  --constant cone    : std_logic_vector(7 downto 0) := "00000001"; -- for 8f
+  constant coneint : std_logic_vector(7 downto 0) := "00000001"; -- for max
   constant cone    : std_logic_vector(7 downto 0) := "00010000"; -- for 12f
 
 -- Multiplexer outputs
@@ -179,6 +179,7 @@ begin
     aR7     when R7,
     aR5     when R5,
     aR3     when R3,
+    coneint when oneint,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -238,6 +239,7 @@ begin
     aR6     when R6,
     aR5     when R5,
     aR3     when R3,
+    coneint when oneint,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -299,6 +301,7 @@ begin
     aR5     when R5,
     aR4     when R4,
     aR2     when R2,
+    coneint when oneint,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -357,6 +360,7 @@ begin
     aR6     when R6,
     aR4     when R4,
     aR2     when R2,
+    coneint when oneint,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -417,6 +421,7 @@ begin
     aR3     when R3,
     aR1     when R1,
     cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL3     when L3;
 
@@ -473,6 +478,7 @@ begin
     aR2     when R2,
     aR1     when R1,
     cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL3     when L3;
 
@@ -528,6 +534,7 @@ begin
     aR2     when R2,
     aR1     when R1,
     aR0     when R0,
+    coneint when oneint,
     conefft when onefft,
     aL2     when L2;
 
@@ -582,6 +589,7 @@ begin
     aR4     when R4,
     aR2     when R2,
     aR0     when R0,
+    coneint when oneint,
     conefft when onefft,
     aL2     when L2;
 

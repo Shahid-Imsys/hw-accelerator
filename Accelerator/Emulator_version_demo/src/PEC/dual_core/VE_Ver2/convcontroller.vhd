@@ -81,7 +81,7 @@ begin
   writebuff_c   <= (swap => noswap, datareg => enable, weightreg => enable);
   ppinst        <= ppinst_p when conv_out_p = '1' else ppinst_s;
   ppshiftinst   <= (acce => enable, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => right) when max_sel = '0'
-                    else (acce => enable, shift => 7, use_lod => '0', shift_dir => right);
+                    else (acce => enable, shift => 0, use_lod => '0', shift_dir => right);
   addbiasinst   <= (acc => addbias, quant => trunc) when max_sel = '0' else (acc => pass, quant => unbiased);
   clipinst      <= (clip => clip8, outreg => out0) when max_sel = '0' else (clip => none, outreg => out10);
 

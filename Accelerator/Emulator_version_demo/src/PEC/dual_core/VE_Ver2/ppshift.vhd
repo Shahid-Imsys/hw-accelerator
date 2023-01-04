@@ -35,6 +35,7 @@ architecture first of ppshift is
   constant cone          : signed(32 downto 0)           := to_signed(1, 33);
   constant czero16       : std_logic_vector(15 downto 0) := (others => '0');
   constant cone16        : std_logic_vector(15 downto 0) := std_logic_vector(to_signed(256, 16));
+  constant cone16_12f    : std_logic_vector(15 downto 0) := std_logic_vector(to_signed(4096, 16));
   signal addinput0       : signed(32 downto 0);  -- Adder input multiplexer
   signal addinput1       : signed(32 downto 0);  -- Adder input multiplexer
   signal addresult       : signed(32 downto 0);  -- Adder result
@@ -213,6 +214,9 @@ begin
       when clipone16 =>
         -- set to one
         clipresult <= cone16;
+      when clipone16_12f =>
+        -- set to one
+        clipresult <= cone16_12f;
       when clipzero =>
         -- set to zero
         clipresult <= czero16;

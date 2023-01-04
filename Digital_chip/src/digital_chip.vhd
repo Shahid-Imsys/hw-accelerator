@@ -36,7 +36,8 @@ entity digital_chip is
 
   generic (
     g_memory_type     : memory_type_t := asic;
-    g_simulation      : boolean       := false
+    g_simulation      : boolean       := false;
+	ADPLL_STATUS_BITS : integer       := 21
     );
   port (
     -- PLL reference clock

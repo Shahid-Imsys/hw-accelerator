@@ -581,19 +581,7 @@ begin
 		end if;
 	end process;
 	
-	continuous_mode <= '1' when dataout_vld = '1' and sync_collector= "11" else
-	                   '0' when dataout_vld = '0' and sync_collector= "11" else 
-	                   '0';
-	
-	--one clock delay of noc_read to load data in noc_data_out register to output port
-	process(clk_e)
-	begin
-		if rising_edge(clk_e) then
-			dataout_vld_o <= dataout_vld;
-		end if;
-	end process;
-	
-	DDO_VLD <= dataout_vld;  --aaac1 was dataout_vld_o
+	DDO_VLD <= dataout_vld;
 	
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e, RST_E)--(noc_cmd, byte_ctr, delay, DATA)
@@ -615,7 +603,7 @@ begin
 	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
     begin
 		if rising_edge(clk_e) then
-	    if dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode = '1') then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
+	    if dataout_vld = '1' then
 	      DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
 	    else
 	      DATA_OUT <= (others => '0');

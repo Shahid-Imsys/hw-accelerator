@@ -41,7 +41,6 @@ dual_core_rtl:
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_cpc.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_crb.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_dsl.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_fgen.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_gmem.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_gp_pkg.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_ios_dackgen.vhd \
@@ -54,8 +53,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/pe1_rtc.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_rtc_iso.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_tim.vhd \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
-				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ve.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acmdr.vhd \
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_ampgm.vhd \

@@ -188,11 +188,11 @@ begin
         rst                     => Reset,
         enable                  => '1',     --need to check
          
-        data_from_noc_switch    => Noc_byte_data,
+        data_from_noc_switch    => Noc_byte_data((8*PEC_NUMBER) -1 downto 0),
         data_to_cc              => data_to_cc,
     
         data_from_cc            => data_from_cc,
-        data_to_noc_switch      => PEC_byte_data,
+        data_to_noc_switch      => PEC_byte_data((8*PEC_NUMBER) -1 downto 0),
     
         tag_from_master         => Tag_Line,
         tag_to_cc               => Tag_Line_to_cc,
@@ -231,6 +231,8 @@ begin
  
   PEC_Ready     <= '1' when to_integer(unsigned(PEC_Ready_to_master)) = 2**PEC_NUMBER - 1 else '0';
   PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE_to_master)) > 0 else '0';
+  
+  PEC_byte_data(127 downto (8*PEC_NUMBER)) <= (others => '0') when PEC_NUMBER < 16;
   
 --  PEC_Ready     <= '1' when to_integer(unsigned(C_RDY_to_master)) = 2**PEC_NUMBER - 1 else '0';
 --  PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE)) > 0 else '0';  

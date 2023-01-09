@@ -104,7 +104,6 @@ entity pe1_acore is
 ---------------------------------------------------------------------
     -- MPROM signals
     mprom_a     : out std_logic_vector(13 downto 0);-- Address  --CJ
-    mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address
@@ -121,10 +120,8 @@ entity pe1_acore is
     gmem_ce_n   : out std_logic;
     gmem_we_n   : out std_logic;
     -- PMEM signals (Patch memory)
-    pmem_a      : out std_logic_vector(10 downto 0);
     pmem_d      : out std_logic_vector(1  downto 0);
     pmem_q      : in  std_logic_vector(1  downto 0);
-    pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
     -- CC signal
     req_c2    : out std_logic;
@@ -424,12 +421,9 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mprom_ce    => mprom_ce,
       mpram_ce    => mpram_ce,
       -- PMEM
-      pmem_a      => pmem_a,
-      pmem_q      => pmem_q,
-      pmem_ce_n   => pmem_ce_n);
+      pmem_q      => pmem_q);
 
   --mprom_a     <= mpga;
   mpram_d     <= mpgmin;--(others => '1');

@@ -232,7 +232,7 @@ architecture Behavioral of Accelerator_tb is
       return RAM;
     end function;
 
-    signal program_mem_data  : program_mem_type := init_program_mem_from_file("tb_program_mem_code.ascii");
+    signal program_mem_data  : program_mem_type := init_program_mem_from_file("tb_program_mem_code_regen_0.ascii");
     signal data_Input        : data_in_type := init_input_from_file("tb_input_data.ascii");
     signal Root_mem_data     : Root_mem_data_type := init_Root_mem_from_file("tb_Root_mem_data.ascii");       	   
     
@@ -767,10 +767,8 @@ begin
         -----------------------------------------------------------------
 
 
-        -----------------------------Assertion---------------------------
-        if NOC_DATA_EN /= '0' then
-          wait;
-        end if;
+        -----------------------------Assertion--------------------------- 
+        wait until NOC_DATA_EN = '0';
         progress <= result_cmp;
         k        <= 0;
         j        <= 0;

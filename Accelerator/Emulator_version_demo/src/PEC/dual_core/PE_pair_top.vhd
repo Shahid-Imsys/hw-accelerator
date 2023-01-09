@@ -485,7 +485,6 @@ architecture struct of PE_pair_top is
   signal  c2_t_rp       : std_logic_vector(1 downto 0);
   -- to memories signals
   signal c1_mprom_a    : std_logic_vector(13 downto 0);
-  signal c1_mprom_ce   : std_logic_vector(1 downto 0);
   signal c1_mprom_oe   : std_logic_vector(1 downto 0);
   signal c1_mpram_a    : std_logic_vector(7 downto 0);   --Modified by CJ
   signal c1_mpram_d    : std_logic_vector(127 downto 0);     --Modified by CJ
@@ -504,9 +503,7 @@ architecture struct of PE_pair_top is
   signal trcmem_d      : std_logic_vector(31 downto 0);
   signal trcmem_ce_n   : std_logic;
   signal trcmem_we_n   : std_logic;
-  signal c1_pmem_a     : std_logic_vector(10 downto 0);
   signal c1_pmem_d     : std_logic_vector(1 downto 0);
-  signal c1_pmem_ce_n  : std_logic;
   signal c1_pmem_we_n  : std_logic;
   signal en_pmem2	     : std_logic;
   signal short_cycle   : std_logic;
@@ -635,7 +632,6 @@ architecture struct of PE_pair_top is
   signal core2_rdy   : std_logic;
 
   signal c2_mprom_a    : std_logic_vector(13 downto 0); --CJ
-  signal c2_mprom_ce   : std_logic_vector(1 downto 0);
   signal c2_mprom_oe   : std_logic_vector(1 downto 0);
   signal c2_mpram_a    : std_logic_vector(7 downto 0); --CJ
   signal c2_mpram_d    : std_logic_vector(127 downto 0); --CJ
@@ -646,9 +642,7 @@ architecture struct of PE_pair_top is
   signal c2_gmem_d     : std_logic_vector(7 downto 0);
   signal c2_gmem_ce_n  : std_logic;
   signal c2_gmem_we_n  : std_logic;
-  signal c2_pmem_a     : std_logic_vector(10 downto 0);
   signal c2_pmem_d     : std_logic_vector(1 downto 0);
-  signal c2_pmem_ce_n  : std_logic;
   signal c2_pmem_we_n  : std_logic;
 
   signal mp_ROM0_DO : std_logic_vector (79 downto 0);
@@ -1113,7 +1107,6 @@ end generate;
       --bmem
       dbus           => dbus          ,
       bmem_a8        => bmem_a8       ,
-      bmem_q         => bmem_q        ,
       bmem_d         => bmem_d        ,
       bmem_we_n      => bmem_we_n     ,
       bmem_ce_n      => bmem_ce_n
@@ -1169,7 +1162,6 @@ end generate;
     ---------------------------------------------------------------------
     -- MPROM signals
     mprom_a       => c1_mprom_a       , --: out std_logic_vector(13 downto 0);-- Address
-    mprom_ce      => c1_mprom_ce      , --: out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mprom_oe      => c1_mprom_oe      , --: out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a       => c1_mpram_a       , --: out std_logic_vector(13 downto 0);-- Address
@@ -1198,10 +1190,8 @@ end generate;
     trcmem_ce_n   => trcmem_ce_n      , --: out std_logic;
     trcmem_we_n   => trcmem_we_n      , --: out std_logic;
     -- PMEM signals (Patch memory)
-    pmem_a        => c1_pmem_a        ,--: out std_logic_vector(10 downto 0);
     pmem_d        => c1_pmem_d        ,--: out std_logic_vector(1  downto 0);
     pmem_q        => c1_pmem_q        ,--: in  std_logic_vector(1  downto 0);
-    pmem_ce_n     => c1_pmem_ce_n     ,--: out std_logic;
     pmem_we_n     => c1_pmem_we_n     ,
 
     c2_core2_en   => c2_core2_en      ,
@@ -1222,7 +1212,7 @@ end generate;
     short_cycle   => short_cycle      ,
     -- BMEM block signals
     bmem_a8       => bmem_a8          ,--: out  std_logic;
-    bmem_q        => bmem_q           ,--: in   std_logic_vector(7 downto 0);
+  --  bmem_q        => bmem_q           ,--: in   std_logic_vector(7 downto 0);
     bmem_d        => bmem_d           ,--: out  std_logic_vector(7 downto 0);
     bmem_ce_n     => bmem_ce_n        ,--: out  std_logic;
 	  bmem_we_n     => bmem_we_n        ,
@@ -1360,7 +1350,6 @@ end generate;
 ---------------------------------------------------------------------
     -- MPROM signals
     mprom_a       => c2_mprom_a     ,
-    mprom_ce      => c2_mprom_ce    ,
     mprom_oe      => c2_mprom_oe    ,
     -- MPRAM signals
     mpram_a       => c2_mpram_a     ,-- Address
@@ -1377,10 +1366,8 @@ end generate;
     gmem_ce_n     => c2_gmem_ce_n   ,
     gmem_we_n     => c2_gmem_we_n   ,
     -- PMEM signals (Patch memory)
-    pmem_a        => c2_pmem_a      ,
     pmem_d        => c2_pmem_d      ,
     pmem_q        => c2_pmem_q      ,
-    pmem_ce_n     => c2_pmem_ce_n   ,
     pmem_we_n     => c2_pmem_we_n   ,
     exe           => exe            ,     --CJ
     req_c2        => c2_req_i       ,

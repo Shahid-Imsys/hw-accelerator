@@ -171,10 +171,6 @@ constant word_59 : std_logic_vector(127 downto 0) := "00000000000000000000001100
 constant load_lc  : std_logic_vector(127 downto 0) := x"00000080000000000000000000000000";
 --constant start    : std_logic_vector(127 downto 0) :="";
 --fft test data
-constant fft256_rand_data0  : string := "fft256_data0.dat";
-constant fft256_rand_data1  : string := "fft256_data1.dat";
-constant fft256_rand_weight : string := "fft256_weight.dat";
-constant fftcopy            : string := "fftcopy.dat";
 constant fft_points         : integer := 256;
 
 
@@ -199,7 +195,7 @@ begin
   clk_e_neg <= not clk_e_pos;
   
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_data0.dat";
+  file load_text_file : text open read_mode is "FFT_data0_256.dat";
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -214,7 +210,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_data1.dat";
+  file load_text_file : text open read_mode is "FFT_data1_256.dat";
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -229,7 +225,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_weight.dat";
+  file load_text_file : text open read_mode is "FFT_TF_256.dat";
   variable text_line : line;
   variable val_bias : std_logic_vector(63 downto 0);
   begin

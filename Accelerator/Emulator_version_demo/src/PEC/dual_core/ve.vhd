@@ -371,7 +371,7 @@ architecture rtl of ve is
   signal re_source : std_logic;
   --signal re_source_reg : std_logic;
   --Vector engine signals
-  signal start, conv_start, fft_start, matinv_start : std_logic;
+  signal start, start_reg, conv_start, fft_start, matinv_start : std_logic;
   signal dfy_dest_sel : std_logic_vector(3 downto 0);
   --signal mac_switch : std_logic;
   --Shared signals
@@ -717,6 +717,7 @@ begin
   mode_state_machine : process(clk_p) 
   begin
     if rising_edge(clk_p) then
+      start_reg <= start;
       if rst = '0' then
         mode_latch <= idle;
       elsif clk_e_pos = '1' then
@@ -947,7 +948,7 @@ begin
                       left_rst     <= lrst_from_conv when mode_c_l = '0' else '0';
                       right_rst    <= rrst_from_conv;
                       bias_rst     <= '0';
-      when fft     => fft_start    <= start;
+      when fft     => fft_start    <= start and start_reg;
                       fft_stages   <= unsigned(ve_loop_reg(2 downto 0));
                       stall        <= fft_stall;
       when re_mode => re_start     <= start;

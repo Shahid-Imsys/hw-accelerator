@@ -121,7 +121,7 @@ entity pe1_core is
 --    c2_en_mexec   	: out std_logic;
     -- BMEM block signals
     bmem_a8     : out  std_logic;
-    bmem_q      : in   std_logic_vector(7 downto 0);
+  --  bmem_q      : in   std_logic_vector(7 downto 0);
     bmem_d      : out  std_logic_vector(7 downto 0);
     bmem_we_n   : out  std_logic;
     short_cycle : out std_logic;
@@ -187,7 +187,6 @@ entity pe1_core is
 ---------------------------------------------------------------------
     -- MPROM signals
     mprom_a     : out std_logic_vector(13 downto 0);-- Address
-    mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address  -- CJ
@@ -216,10 +215,8 @@ entity pe1_core is
     trcmem_ce_n : out std_logic;
     trcmem_we_n : out std_logic;
     -- PMEM signals (Patch memory)
-    pmem_a      : out std_logic_vector(10 downto 0);
     pmem_d      : out std_logic_vector(1  downto 0);
     pmem_q      : in  std_logic_vector(1  downto 0);
-    pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
@@ -624,12 +621,9 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mprom_ce    => mprom_ce,
       mpram_ce    => mpram_ce,
       -- PMEM
-      pmem_a      => pmem_a,
-      pmem_q      => pmem_q,
-      pmem_ce_n   => pmem_ce_n);
+      pmem_q      => pmem_q);
 
   --mprom_a     <= mpga; --deleted by CJ
   process(clk_p) --1 clk_e delay of input to microprogram memory
@@ -739,7 +733,7 @@ begin
     	-- BMEM block interface
       bmem_a8     => bmem_a8,
       core2_en    => c2_core2_en,
-      bmem_q      => bmem_q ,
+    --  bmem_q      => bmem_q ,
       bmem_d      => bmem_d,
       bmem_we_n   => bmem_we_n,
       short_cycle => short_cycle_int,

@@ -44,11 +44,7 @@ entity pe1_debug_trace is
     read_trace_cmd : std_logic_vector(3 downto 0));
   port (
     clk_p   : in  std_logic;
---    clk_e   : in  std_logic;    -- Trace data clock
     clk_e_pos  : in std_logic;
---    clk_s   : in  std_logic;    -- SP clock
-    clk_s_pos   : in  std_logic;
---    rst     : in  std_logic;    -- Asynchronous reset
     rst_cn   : in  std_logic;
     -- Control signals
     go      : out std_logic;    -- Waiting-for-trig status output (active high)
@@ -126,7 +122,7 @@ begin
 			set_sel <= '0';
 			go_sel <= '0';
       read_sel <= '0';
-		elsif clk_s_pos = '0' then
+    else
 			if wr = '1' then
 	      read_sel <= '0';
 				if cmdstrt = '1' then
@@ -161,7 +157,7 @@ begin
   if rising_edge(clk_p) then
     if gone = '1' or reset = '1' then
       go_int <= '0';
-    elsif clk_s_pos = '0' then
+    else
       if go_wen = '1' then
         go_int <= wdata(0);
       end if;
@@ -173,7 +169,7 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
-      if clk_s_pos = '0' and go_wen = '1' then
+      if go_wen = '1' then
         trig_pt <= wdata(7 downto 6);
       end if;
     end if;
@@ -189,7 +185,7 @@ begin
   if rising_edge(clk_p) then
     if read_sel = '0' then
       i_byte_sel <= "00";
-    elsif clk_s_pos = '0' then
+    else
       if rd = '1' then
         i_byte_sel <= i_byte_sel + 1;
       end if;
@@ -205,7 +201,7 @@ begin
   if rising_edge(clk_p) then
     if ((rst_cn = '0') or (stepped = '1')) then
       step <= '0';
-    elsif clk_s_pos = '0' then
+    else
       if rd = '1' and i_byte_sel = "11" then
         step <= '1';
       end if;
@@ -446,7 +442,7 @@ begin
   mask_trig_flipflops : process(clk_p)
   begin
     if  rising_edge(clk_p) then
-      if clk_s_pos = '0' and set_wen = '1' then
+      if set_wen = '1' then
         trig(31 downto 24) <= wdata;
         trig(23 downto 16) <= trig(31 downto 24);
         trig(15 downto 8)  <= trig(23 downto 16);

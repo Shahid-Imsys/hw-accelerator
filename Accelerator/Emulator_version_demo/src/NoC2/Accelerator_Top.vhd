@@ -20,6 +20,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use work.noc_types_pkg.all;
 
 entity Accelerator_Top is
     Generic(
@@ -54,7 +55,7 @@ architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := true
+      USE_ASIC_MEMORIES      : boolean := false --true
     );
     Port(
 	      clk                  : in  std_logic;
@@ -101,18 +102,46 @@ architecture Behavioral of Accelerator_Top is
     );
     end component;
     
+    component noc_bus is
+    generic(
+      PEC_NUMBER             : integer := 16
+    );    
+    port(
+        clk                     : in  std_logic;
+        rst                     : in  std_logic;
+        enable                  : in  std_logic;
     
-    signal PEC_byte_data : std_logic_vector(127 downto 0):= (others => '0');
-    signal Noc_byte_data : std_logic_vector(127 downto 0):= (others => '0');
-    signal Tag_Line      : std_logic;
-    signal PEC_WE        : std_logic_vector(PEC_NUMBER -1 downto 0);
-    signal C_RDY         : std_logic_vector(PEC_NUMBER -1 downto 0); 
-    signal PEC_Ready     : std_logic;
-    signal PEC_WE_noc    : std_logic;
-
-    attribute mark_debug : string;
-    attribute mark_debug of PEC_Ready: signal is "true"; 
-
+        data_from_noc_switch    : in  std_logic_vector((8*PEC_NUMBER) -1 downto 0);
+        data_to_cc              : out noc_data_t(PEC_NUMBER -1 downto 0);
+    
+        data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
+        data_to_noc_switch      : out std_logic_vector((8*PEC_NUMBER) -1 downto 0);
+    
+        tag_from_master         : in  std_logic;
+        tag_to_cc               : out std_logic;
+    
+        tag_to_master           : out noc_tag_t(PEC_NUMBER -1 downto 0);
+        tag_from_cc             : in  noc_tag_t(PEC_NUMBER -1 downto 0)
+    );
+    end component;
+    
+    
+    signal PEC_byte_data  : std_logic_vector(127 downto 0):= (others => '0');
+    signal Noc_byte_data  : std_logic_vector(127 downto 0):= (others => '0');
+    signal Tag_Line       : std_logic;
+    signal PEC_WE         : std_logic_vector(PEC_NUMBER -1 downto 0);
+    signal C_RDY          : std_logic_vector(PEC_NUMBER -1 downto 0); 
+    signal PEC_Ready      : std_logic;
+    signal PEC_WE_noc     : std_logic;
+    signal Tag_Line_to_cc : std_logic;
+    signal C_RDY_to_master: std_logic_vector(PEC_NUMBER -1 downto 0);
+    signal data_to_cc     : noc_data_t(PEC_NUMBER -1 downto 0);
+    signal data_from_cc   : noc_data_t(PEC_NUMBER -1 downto 0);
+    signal Tag_to_master  : noc_tag_t(PEC_NUMBER -1 downto 0);
+    signal Tag_from_cc    : noc_tag_t(PEC_NUMBER -1 downto 0);
+    signal PEC_Ready_to_master: std_logic_vector(PEC_NUMBER -1 downto 0);
+    signal PEC_WE_to_master: std_logic_vector(PEC_NUMBER -1 downto 0);
+     
 begin
 
     Noc_Top_Inst: Noc_Top
@@ -148,6 +177,29 @@ begin
         NOC_WRITE_REQ           => NOC_WRITE_REQ,
         IO_WRITE_ACK            => IO_WRITE_ACK
     );
+    
+    noc_bus_Inst: noc_bus
+    Generic map(
+      PEC_NUMBER         => PEC_NUMBER
+    )
+    port map
+    (
+        clk                     => clk_e,
+        rst                     => Reset,
+        enable                  => '1',     --need to check
+         
+        data_from_noc_switch    => Noc_byte_data((8*PEC_NUMBER) -1 downto 0),
+        data_to_cc              => data_to_cc,
+    
+        data_from_cc            => data_from_cc,
+        data_to_noc_switch      => PEC_byte_data((8*PEC_NUMBER) -1 downto 0),
+    
+        tag_from_master         => Tag_Line,
+        tag_to_cc               => Tag_Line_to_cc,
+    
+        tag_to_master           => Tag_to_master,--C_RDY_to_master,
+        tag_from_cc             => Tag_from_cc  --C_RDY
+    );
 
   pec_gen : for i in 0 to PEC_NUMBER -1 generate
     PEC_top_Inst : PEC_top
@@ -160,15 +212,29 @@ begin
         CLK_E                   => clk_e,
         RST_E                   => Reset,
         DDO_VLD                 => PEC_WE(i),
-        TAG                     => Tag_Line,
+        TAG                     => Tag_Line_to_cc,
         TAG_FB                  => open,
         C_RDY                   => C_RDY(i),
-        DATA                    => Noc_byte_data(8*i+7 downto 8*i),
-        DATA_OUT                => PEC_byte_data(8*i+7 downto 8*i)
+        DATA                    => data_to_cc(i),
+        DATA_OUT                => data_from_cc(i)
      );
   end generate;
 
-  PEC_Ready <= '1' when to_integer(unsigned(C_RDY)) = 2**PEC_NUMBER - 1 else '0';
-  PEC_WE_noc<= '1' when to_integer(unsigned(PEC_WE)) > 0 else '0';
+  Tag_gen : for i in 0 to PEC_NUMBER -1 generate  
+      Tag_from_cc(i)   <= C_RDY(i) & PEC_WE(i);
+  end generate;
+  
+    Tag_to_master_gen : for i in 0 to PEC_NUMBER -1 generate  
+      PEC_Ready_to_master(i)   <= Tag_to_master(i)(1);
+      PEC_WE_to_master(i)      <= Tag_to_master(i)(0);
+  end generate;    
+ 
+  PEC_Ready     <= '1' when to_integer(unsigned(PEC_Ready_to_master)) = 2**PEC_NUMBER - 1 else '0';
+  PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE_to_master)) > 0 else '0';
+  
+  PEC_byte_data(127 downto (8*PEC_NUMBER)) <= (others => '0') when PEC_NUMBER < 16;
+  
+--  PEC_Ready     <= '1' when to_integer(unsigned(C_RDY_to_master)) = 2**PEC_NUMBER - 1 else '0';
+--  PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE)) > 0 else '0';  
 
 end Behavioral;

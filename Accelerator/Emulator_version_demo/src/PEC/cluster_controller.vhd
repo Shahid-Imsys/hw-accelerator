@@ -212,8 +212,6 @@ end component;
   signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
   signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
-  signal dataout_vld_o  : std_logic;
-  signal continuous_mode: std_logic;
   signal FIFO_OUT_VLD   : std_logic;
  
   signal standby        : std_logic;
@@ -473,7 +471,7 @@ begin
 				  	byte_ctr <= "0000"; 
           end if;
 			elsif noc_cmd = "00100" then
-				if delay = '1' and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
+				if delay = '1' and dataout_vld = '1' then
 					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				else
 					byte_ctr <= "0000"; 
@@ -581,19 +579,7 @@ begin
 		end if;
 	end process;
 	
-	continuous_mode <= '1' when dataout_vld = '1' and sync_collector= "11" else
-	                   '0' when dataout_vld = '0' and sync_collector= "11" else 
-	                   '0';
-	
-	--one clock delay of noc_read to load data in noc_data_out register to output port
-	process(clk_e)
-	begin
-		if rising_edge(clk_e) then
-			dataout_vld_o <= dataout_vld;
-		end if;
-	end process;
-	
-	DDO_VLD <= dataout_vld;  --aaac1 was dataout_vld_o
+	DDO_VLD <= dataout_vld;
 	
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e, RST_E)--(noc_cmd, byte_ctr, delay, DATA)
@@ -612,10 +598,10 @@ begin
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
+	data_read : process (clk_e)
     begin
 		if rising_edge(clk_e) then
-	    if dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode = '1') then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
+	    if dataout_vld = '1' then
 	      DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
 	    else
 	      DATA_OUT <= (others => '0');

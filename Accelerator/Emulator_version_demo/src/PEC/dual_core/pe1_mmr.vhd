@@ -48,7 +48,6 @@ entity pe1_mmr is
     rst_en:     in  std_logic;  -- Asynchronous master reset
     clk_e_neg    : in std_logic;
     clk_c2_pos:     in  std_logic;  --
-    clk_d_pos:      in  std_logic;  -- SDRAM clock
     clk_e_pos:      in  std_logic;  -- Execution clock
     --gate_e:     in  std_logic; -- Copy of execution clock used for gating
     even_c:     in  std_logic;  -- High on even (first of two) clk_c cycles
@@ -222,7 +221,7 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 pra_operation <= '0';
-            elsif clk_d_pos = '0' then
+            else
                 pra_operation <= pra_pending and not pra_operation;
             end if;
         end if;
@@ -336,7 +335,7 @@ begin
                 ld_dqi <= '0';
             elsif short_cycle = '1' and ld_dqi_flash = '1' then
                 ld_dqi <= '1';
-            elsif clk_d_pos = '0' then
+            else
                 if (even_c = '1' or use_direct_int = '1') then
 --                    if (ld_dqi_flash = '1') then
 --						            ld_dqi <= '1';--add one load for reading flash
@@ -716,7 +715,7 @@ begin
         WAIT UNTIL (rising_edge(clk_p));
             if rst_en = '0' then
                 row_addr_buf <= (others => '0');
-            elsif inv_col = '1' and clk_d_pos = '0' then
+            elsif inv_col = '1' then
                 row_addr_buf(3 downto 0) <= m_addr(11 downto 8);
                 row_addr_buf(15 downto 4) <= m_addr(31 downto 20);
             end if;
@@ -898,7 +897,7 @@ begin
                 odd_kept <= '0';
                 dfm_kept <= '0';
                 held_ff <= '0';
-            elsif clk_d_pos = '0' then
+            else
                 odd_kept <= (ld_dqi or odd_kept) and dfm_kept;
                 dfm_kept <= (ld_dqi or dfm_kept) and held_ff;
                 held_ff <= held_e;
@@ -913,7 +912,7 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 dfm_keep <= x"00";
-            elsif ld_dqi = '1' and held_ff = '1' and clk_d_pos = '0' then
+            elsif ld_dqi = '1' and held_ff = '1' then
                 dfm_keep <= d_dqi;
             end if;
         end if;
@@ -927,7 +926,7 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 odd_keep <= x"00";
-            elsif ld_dqi = '1' and dfm_kept = '1' and clk_d_pos = '0' then
+            elsif ld_dqi = '1' and dfm_kept = '1' then
                 odd_keep <= d_dqi;
             end if;
         end if;
@@ -958,7 +957,7 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 dfm_odd <= x"00";
-            elsif clk_d_pos = '0' then
+            else
                 if ld_dqi = '1' and even_c = '1' and held_ff = '0' then
                     dfm_odd <= d_dqi;
                 elsif odd_kept = '1' then

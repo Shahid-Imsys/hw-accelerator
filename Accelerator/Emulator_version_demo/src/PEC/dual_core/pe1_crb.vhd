@@ -174,7 +174,7 @@ entity pe1_crb is
     short_cycle : out std_logic;
     --ram_partition   : out std_logic_vector(3 downto 0);
     bmem_a8     : out  std_logic;  --change to core2_en by maning 2013-01-17 14:31:27
-    bmem_q      : in   std_logic_vector(7 downto 0);
+  --  bmem_q      : in   std_logic_vector(7 downto 0);
     bmem_d      : out  std_logic_vector(7 downto 0);
     bmem_we_n   : out  std_logic;
     bmem_ce_n   : out  std_logic;
@@ -593,7 +593,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out <= x"00";
     case crb_sel is
@@ -678,8 +678,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(2)          <= short_cycle_int;
         crb_out(1)          <= bmem_we_nint;
         crb_out(0)          <= bmem_a8_int;
-      when "1101" => -- BMEM data
-        crb_out             <= bmem_q;
+      --when "1101" => -- BMEM data
+      --  crb_out             <= bmem_q;
       --when "1111" => -- RTC data
       --  crb_out             <= rtc_data;
       when others =>
@@ -697,7 +697,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, bmem_q, nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out_c2 <= x"00";
     case crb_sel_c2 is
@@ -782,8 +782,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(2)          <= short_cycle_int;
         crb_out_c2(1)          <= bmem_we_nint;
         crb_out_c2(0)          <= bmem_a8_int;
-      when "1101" => -- BMEM data
-        crb_out_c2             <= bmem_q;
+      --when "1101" => -- BMEM data
+      --  crb_out_c2             <= bmem_q;
       --when "1111" => -- RTC data
       --  crb_out_c2             <= rtc_data;
       when others =>

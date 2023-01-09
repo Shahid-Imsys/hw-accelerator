@@ -199,7 +199,7 @@ begin
   end process;
 
   choose_ram_data_p : process (c1_d_dqi, c2_d_dqi, data_en_c1,
-    data_en_c2, ram_do, even_c) is
+    data_en_c2, ram_do, even_c, c1_d_addr, c1_dqo_buffer, c2_d_addr, c2_dqo_buffer) is
   begin -- process choose_ram_data_p
     c1_data_inner <= c1_d_dqi;
     c2_data_inner <= c2_d_dqi;
@@ -287,7 +287,7 @@ begin
     end loop;
   end process;
 
-  process (c1_wr_n, c2_wr_n, toReq_c1, toReq_c2, even_c) -- WE adjusted for interleaved memory
+  process (c1_wr_n, c2_wr_n, toReq_c1, toReq_c2, even_c, c1_d_addr, c2_d_addr) -- WE adjusted for interleaved memory
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
       ram_web(2 * i)     <= '1';
@@ -311,7 +311,7 @@ begin
       end if;
 
       -- Core 2
-      if (c2_wr_n = '0' and toReq_c2(i * 2) = '1') then
+      if (c2_wr_n = '0' and toReq_c2(i) = '1') then
         if (c2_d_addr(0) = '0') then
           if (even_c = '0') then
             ram_web(2 * i) <= '0';

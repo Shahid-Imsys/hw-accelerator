@@ -57,14 +57,10 @@ entity pe1_core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p        : in  std_logic;  -- PLL clock
-    clk_c_en     : in  std_logic;  -- CP clock
     even_c       : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2
     clk_e_pos    : out std_logic;  -- Execution clock
     clk_e_neg    : out std_logic;  -- Execution clock
-    clk_i_pos    : in  std_logic;  -- I/O clock
-    clk_d_pos    : in  std_logic;  -- DRAM clock
-    clk_s_pos    : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
     rst_n        : out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn       : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
@@ -121,7 +117,7 @@ entity pe1_core is
 --    c2_en_mexec   	: out std_logic;
     -- BMEM block signals
     bmem_a8     : out  std_logic;
-    bmem_q      : in   std_logic_vector(7 downto 0);
+  --  bmem_q      : in   std_logic_vector(7 downto 0);
     bmem_d      : out  std_logic_vector(7 downto 0);
     bmem_we_n   : out  std_logic;
     short_cycle : out std_logic;
@@ -186,8 +182,6 @@ entity pe1_core is
     -- Memory signals
 ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a     : out std_logic_vector(13 downto 0);-- Address
-    mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address  -- CJ
@@ -206,7 +200,6 @@ entity pe1_core is
     -- IOMEM signals
     iomem_a     : out std_logic_vector(9 downto 0);
     iomem_d     : out std_logic_vector(15 downto 0);
-    iomem_q     : in  std_logic_vector(15 downto 0);
     iomem_ce_n  : out std_logic_vector(1 downto 0);
     iomem_we_n  : out std_logic;
     -- TRCMEM signals (Trace memory)
@@ -216,10 +209,8 @@ entity pe1_core is
     trcmem_ce_n : out std_logic;
     trcmem_we_n : out std_logic;
     -- PMEM signals (Patch memory)
-    pmem_a      : out std_logic_vector(10 downto 0);
     pmem_d      : out std_logic_vector(1  downto 0);
     pmem_q      : in  std_logic_vector(1  downto 0);
-    pmem_ce_n   : out std_logic;
     pmem_we_n   : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
@@ -233,8 +224,6 @@ entity pe1_core is
     msdin_i     : in  std_logic;  -- Serial data in (debug)
     msdout_o    : out std_logic;  -- Serial data out
     mrstout_o   : out std_logic;  -- Reset out
-    mxout_o     : out std_logic;  -- Oscillator test output
-    mexec_o     : out std_logic;  -- clk_e test output
     mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL
     mwake_i     : in  std_logic;  -- wake up
@@ -624,12 +613,9 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mprom_ce    => mprom_ce,
       mpram_ce    => mpram_ce,
       -- PMEM
-      pmem_a      => pmem_a,
-      pmem_q      => pmem_q,
-      pmem_ce_n   => pmem_ce_n);
+      pmem_q      => pmem_q);
 
   --mprom_a     <= mpga; --deleted by CJ
   process(clk_p) --1 clk_e delay of input to microprogram memory
@@ -739,7 +725,7 @@ begin
     	-- BMEM block interface
       bmem_a8     => bmem_a8,
       core2_en    => c2_core2_en,
-      bmem_q      => bmem_q ,
+    --  bmem_q      => bmem_q ,
       bmem_d      => bmem_d,
       bmem_we_n   => bmem_we_n,
       short_cycle => short_cycle_int,
@@ -780,7 +766,6 @@ begin
       -- Clock
       clk_p       => clk_p,
       even_c      => even_c,
-      clk_c_en    => clk_c_en,
       --clk_c2_pos      => clk_c2_pos,
       clk_e_pos   => clk_e_pos_int,
 	    clk_e_neg	  => clk_e_neg_int,
@@ -1084,7 +1069,6 @@ begin
       clk_p       => clk_p,
       clk_e_neg   => clk_e_neg_int,
       clk_c2_pos  => even_c,
-      clk_d_pos   => clk_d_pos,
       clk_e_pos   => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
       even_c      => even_c,
@@ -1166,7 +1150,6 @@ begin
       -- Clock and reset inputs
       rst_cn      => rst_cn_int,
       clk_p       => clk_p,
-      clk_s_pos   => clk_s_pos,
       clk_e_pos   => clk_e_pos_int,
       -- Control inputs
       runmode     => runmode,
@@ -1216,12 +1199,10 @@ begin
       --ack_sig        => ack_sig,  --CJ
       rst_en         => rst_en_int,
       clk_p          => clk_p,
-      clk_c_en       => clk_c_en,
       clk_c2_pos     => even_c,
       clk_e_pos      => clk_e_pos_int,
       clk_e_neg      => clk_e_neg_int,
       --gate_e         => clk_e_pos_int,
-      clk_i_pos      => clk_i_pos,
       -- Microprogram fields
       pl             => pl,
       -- Static control inputs
@@ -1252,8 +1233,7 @@ begin
       iomem_ce_n     => iomem_ce_n,
       iomem_we_n     => iomem_we_n,
       iomem_a        => iomem_a,
-      iomem_d        => iomem_d,
-      iomem_q        => iomem_q);
+      iomem_d        => iomem_d);
 
       --CJ Added
 ---------------------------------------------------------------------

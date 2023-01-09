@@ -9,12 +9,14 @@ noc2_rtl: xilinx_ip mem_comp
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_from_GPP.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_to_GPP.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Acc_types_pkg.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/noc_types_pkg.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Mux_Demux.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Mux_Register.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Input_Reg.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Register.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/NoC_state_machine.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Top.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/noc_bus.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Root_Memory.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Switch.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Tag_Line_Block.vhd

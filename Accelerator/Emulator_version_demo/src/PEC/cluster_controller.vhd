@@ -212,8 +212,6 @@ end component;
   signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
   signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
-  signal dataout_vld_o  : std_logic;
-  signal continuous_mode: std_logic;
   signal FIFO_OUT_VLD   : std_logic;
  
   signal standby        : std_logic;
@@ -473,7 +471,7 @@ begin
 				  	byte_ctr <= "0000"; 
           end if;
 			elsif noc_cmd = "00100" then
-				if delay = '1' and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
+				if delay = '1' and dataout_vld = '1' then
 					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				else
 					byte_ctr <= "0000"; 
@@ -600,7 +598,7 @@ begin
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
+	data_read : process (clk_e)
     begin
 		if rising_edge(clk_e) then
 	    if dataout_vld = '1' then

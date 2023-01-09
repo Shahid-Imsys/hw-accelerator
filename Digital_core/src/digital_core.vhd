@@ -282,7 +282,7 @@ architecture rtl of digital_core is
 begin  -- architecture rtl
 
   NOC_IO_DIR <= NOC_DATA_DIR; -- Use same signal for both FIFO xfer and IO request direction
-  
+
   Accelerator_Top_inst : Accelerator_Top
     generic map(
       USE_ASIC_MEMORIES => g_memory_type /= fpga )
@@ -359,23 +359,53 @@ begin  -- architecture rtl
       clk_p_n   => clk_p_cpu_n,
       clk_rx    => clk_rx,
       clk_tx    => clk_tx,
-      MRESET    => MRESET,
-      rst_n     => cpu_rst_n,
-      c1_wdog_n => c1_wdog_n,
-      MRSTOUT   => MRSTOUT,
-      MIRQOUT   => MIRQOUT,
-      MCKOUT0   => MCKOUT0,
-      MCKOUT1   => MCKOUT1,
-      MTEST     => MTEST,
-      MIRQ0     => MIRQ0,
-      MIRQ1     => MIRQ1,
+      
+      MRESET     => MRESET,
+      rst_n      => cpu_rst_n,
+      c1_wdog_n  => c1_wdog_n,
+      MRSTOUT    => MRSTOUT,
+      MIRQOUT    => MIRQOUT,
+      MCKOUT0    => MCKOUT0,
+      MCKOUT1    => MCKOUT1,
+      mckout1_en => mckout1_en,
+      MTEST      => MTEST,
+      MBYPASS    => MBYPASS,
+      MIRQ0      => MIRQ0,
+      MIRQ1      => MIRQ1,
       -- SW debug
-      MSDIN     => MSDIN,
-      MSDOUT    => MSDOUT,
-
-      clock_in_off => clock_in_off,
+      MSDIN      => MSDIN,
+      MSDOUT     => MSDOUT,
+      
+      MWAKEUP_LP => MWAKEUP_LP,
+      MLP_PWR_OK => MLP_PWR_OK,
+      
+      MPMIC_CORE => MPMIC_CORE,
+      MPMIC_IO   => MPMIC_IO,
+      
+      -- Clock control signals
       clock_sel    => clock_sel,
-
+      clock_in_off => clock_in_off,
+      
+      -- Analog internal signals
+      pwr_ok     => pwr_ok,
+      dis_bmem   => dis_bmem,
+      vdd_bmem   => vdd_bmem,
+      VCC18LP    => VCC18LP,
+      rxout      => rxout,
+      ach_sel0   => ach_sel0,
+      ach_sel1   => ach_sel1,
+      ach_sel2   => ach_sel2,
+      adc_bits   => adc_bits,
+      adc_ref2v  => adc_ref2v,
+      adc_extref => adc_extref,
+      adc_diff   => adc_diff,
+      adc_en     => adc_en,
+      dac0_bits  => dac0_bits,
+      dac1_bits  => dac1_bits,
+      dac0_en    => dac0_en,
+      dac1_en    => dac1_en,
+      clk_a      => clk_a,
+   
       -- IO-bus interface to NOC adapter
       ext_i_pos  => clk_i_pos,
       ext_ido    => ext_ido,
@@ -439,23 +469,13 @@ begin  -- architecture rtl
       p3_hi => p3_hi,
       p3_sr => p3_sr,
 
-      MBYPASS    => MBYPASS,
-      MWAKEUP_LP => MWAKEUP_LP,
-      MLP_PWR_OK => MLP_PWR_OK,
-
       OSPI_Out    => ospi_out,
       OSPI_DQ_i   => ospi_dq_in,
       OSPI_DQ_o   => ospi_dq_out,
       OSPI_DQ_e   => ospi_dq_enable,
       OSPI_RWDS_i => ospi_rwds_in,
       OSPI_RWDS_o => ospi_rwds_out,
-      OSPI_RWDS_e => ospi_rwds_enable,
-
-      pwr_ok   => '1',
-      vdd_bmem => '0',
-      VCC18LP  => '1',
-      rxout    => rxout,
-      adc_bits => adc_bits
+      OSPI_RWDS_e => ospi_rwds_enable
       );
 
 end architecture rtl;

@@ -113,18 +113,17 @@ entity digital_chip is
     msdout  : inout std_logic;
     mirqout : inout std_logic;
 
-
     -- IM4000 Boot interface
     pa0_sin : inout std_logic;
     pa5_cs_n : inout std_logic;
     pa6_sck : inout std_logic;
     pa7_sout : inout std_logic;
 
-    -- I/O bus
-
-    -- DAC and ADC pins
+    -- DAC pins
     aout0 : inout std_logic;
     aout1 : inout std_logic;
+    
+    -- ADC pin
     ach0  : inout  std_logic;
 
     -- UART
@@ -307,7 +306,8 @@ architecture rtl of digital_chip is
   signal ospi_rwds_enable : std_logic;
  
 	--IO Interface, left open
-/*   signal io_dack0_n_in     : std_logic;	
+/*
+  signal io_dack0_n_in     : std_logic;	
   signal io_dreq0_n_out    : std_logic;	
   signal io_dack1_n_in     : std_logic;	
   signal io_dreq1_n_out    : std_logic;	
@@ -328,9 +328,8 @@ architecture rtl of digital_chip is
   signal io_ldout_n_out    : std_logic;	
   signal io_next_n_out     : std_logic;	
   signal io_clk_out	       : std_logic;  
-  signal io_ioa_n_out	   : std_logic; */  
-           
-  
+  signal io_ioa_n_out	   : std_logic;
+*/
     
   signal enet_mdin     : std_logic;
   signal enet_mdout    : std_logic;
@@ -426,18 +425,43 @@ begin  -- architecture rtl
         pll_ref_clk   => pll_ref_clk_in,
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
-        MRESET  => mreset,
-        MRSTOUT => mrstout_n,  -- Missing pad.
-        MIRQOUT => mirqout_out,
-        MCKOUT0 => mckout0,
-        MCKOUT1 => MCKOUT1,
-        MTEST   => mtest_in,
-        MIRQ0   => mirq0,
-        MIRQ1   => mirq1,
+        MRESET        => mreset,
+        MRSTOUT       => mrstout_n,  -- Missing pad.
+        MIRQOUT       => mirqout_out,
+        MCKOUT0       => mckout0,
+        MCKOUT1       => MCKOUT1,
+        mckout1_en    => open,
+        MTEST         => mtest_in,
+        MBYPASS       => '0', --MBYPASS,
+        MIRQ0         => mirq0,
+        MIRQ1         => mirq1,
         -- SW debug
-        MSDIN   => msdin_in,
-        MSDOUT  => msdout_out,
+        MSDIN         => msdin_in,
+        MSDOUT        => msdout_out,
 
+        MWAKEUP_LP    => '0',    -- MWAKE,
+        MLP_PWR_OK    => mreset, -- MLP_PWR_OK,
+
+        -- Analog internal signals
+        pwr_ok     => pwr_ok,
+        dis_bmem   => open,
+        vdd_bmem   => '0',
+        VCC18LP    => '1',
+        rxout      => mrxout,
+        ach_sel0   => open,
+        ach_sel1   => open,
+        ach_sel2   => open,
+        adc_bits   => adc_bits,
+        adc_ref2v  => open,
+        adc_extref => open,
+        adc_diff   => open,
+        adc_en     => open,
+        dac0_bits  => dac0_bits,
+        dac1_bits  => dac1_bits,
+        dac0_en    => open,
+        dac1_en    => open,
+        clk_a      => open,
+              
         -- Port A
         pa_i  => pa_i,
         pa_en => pa_en,
@@ -489,11 +513,6 @@ begin  -- architecture rtl
         p3_hi => p3_hi,
         p3_sr => p3_sr,
 
-
-        MBYPASS    => '0', --MBYPASS,
-        MWAKEUP_LP => '0', --MWAKE,
-        MLP_PWR_OK => mreset,  --MLP_PWR_OK,
-
         ospi_cs_n  => ospi_cs_n,
         ospi_ck_n  => ospi_ck_n,
         ospi_ck_p  => ospi_ck_p,
@@ -504,16 +523,7 @@ begin  -- architecture rtl
         ospi_rwds_in => ospi_rwds_in,
         ospi_rwds_out => ospi_rwds_out,
         ospi_rwds_enable => ospi_rwds_enable,
-
-        spi_sclk      => spi_sclk_in,
-        spi_cs_n      => spi_cs_n_in,
-        spi_mosi      => spi_mosi_in,
-        spi_miso      => spi_miso_out,
-        spi_miso_oe_n => spi_miso_oe_n,
-        pad_config    => pad_config,
-        pll_config    => pll_config,
-        adpll_config  => adpll_config,
-
+        
         -- enet_mdin  => enet_mdin,
         -- enet_mdout => enet_mdout,
         -- enet_mdc   => enet_mdc_out,
@@ -526,12 +536,15 @@ begin  -- architecture rtl
         -- enet_rxer  => enet_rxer_in,
         -- enet_rxd0  => enet_rxd0_in,
         -- enet_rxd1  => enet_rxd1_in,
-
-        pwr_ok   => pwr_ok,
-        vdd_bmem => '0',
-        VCC18LP  => '1',
-        rxout    => mrxout,
-        adc_bits => adc_bits
+        
+        spi_sclk      => spi_sclk_in,
+        spi_cs_n      => spi_cs_n_in,
+        spi_mosi      => spi_mosi_in,
+        spi_miso      => spi_miso_out,
+        spi_miso_oe_n => spi_miso_oe_n,
+        pad_config    => pad_config,
+        pll_config    => pll_config,
+        adpll_config  => adpll_config
       );
 
     ---------------------------------------------------------------------------

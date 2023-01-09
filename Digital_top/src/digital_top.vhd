@@ -62,7 +62,7 @@ entity digital_top is
     MPMIC_IO   : out std_logic;
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+    pwr_ok     : in  std_logic;         -- Power on detector output (active high)
     dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
     vdd_bmem   : in  std_logic;         -- Power for the BMEM block
     VCC18LP    : in  std_logic;         -- Power for the RTC block
@@ -70,10 +70,10 @@ entity digital_top is
     ach_sel0   : out std_logic;         -- ADC channel select, bit 0
     ach_sel1   : out std_logic;         -- ADC channel select, bit 1
     ach_sel2   : out std_logic;         -- ADC channel select, bit 2
-    adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
-    adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
-    adc_extref : out std_logic;  -- Select external ADC reference (internal)
-    adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
+    adc_bits   : in  std_logic;         -- Bitstream from the analog part of ADC
+    adc_ref2v  : out std_logic;         -- Select 2V internal ADC reference (1V)
+    adc_extref : out std_logic;         -- Select external ADC reference (internal)
+    adc_diff   : out std_logic;         -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
     dac1_bits  : out std_logic;         -- Bitstream to DAC1
@@ -143,8 +143,6 @@ entity digital_top is
     ospi_rwds_in     : in  std_logic;
     ospi_rwds_out    : out std_logic;
     ospi_rwds_enable : out std_logic;
-    
-    led_clk : out std_logic;
 
     -- SPI, chip control interface
     spi_sclk      : in  std_logic;
@@ -175,8 +173,6 @@ architecture rtl of digital_top is
       );
   end component;
 
-  signal ospi_dq_out_int : std_logic_vector(7 downto 0);
-
   signal clk_p_cpu   : std_logic;
   signal clk_p_cpu_n : std_logic;
   signal clk_p_acc_int   : std_logic;
@@ -196,10 +192,6 @@ architecture rtl of digital_top is
   signal pi_data : std_logic_vector(7 downto 0);
 
 begin  -- architecture rtl
-
-  ospi_dq_out <= ospi_dq_out_int;
-
-  led_clk <= clk_p_cpu;
 
   clk_rst_asic_gen : if g_memory_type /= fpga generate
 
@@ -300,21 +292,49 @@ begin  -- architecture rtl
 
       cpu_rst_n => cpu_rst_n,
 
-      MRESET    => MRESET,
-      c1_wdog_n => c1_wdog_n,
-      MRSTOUT   => MRSTOUT,
-      MIRQOUT   => MIRQOUT,
-      MCKOUT0   => MCKOUT0,
-      MCKOUT1   => MCKOUT1,
-      MTEST     => MTEST,
-      MIRQ0     => MIRQ0,
-      MIRQ1     => MIRQ1,
+      MRESET     => MRESET,
+      c1_wdog_n  => c1_wdog_n,
+      MRSTOUT    => MRSTOUT,
+      MIRQOUT    => MIRQOUT,
+      MCKOUT0    => MCKOUT0,
+      MCKOUT1    => MCKOUT1,
+      mckout1_en => mckout1_en,
+      MTEST      => MTEST,
+      MBYPASS    => MBYPASS,
+      MIRQ0      => MIRQ0,
+      MIRQ1      => MIRQ1,
       -- SW debug
-      MSDIN     => MSDIN,
-      MSDOUT    => MSDOUT,
+      MSDIN      => MSDIN,
+      MSDOUT     => MSDOUT,
+
+      MWAKEUP_LP => MWAKEUP_LP,
+      MLP_PWR_OK => MLP_PWR_OK,
+
+      MPMIC_CORE => MPMIC_CORE,
+      MPMIC_IO   => MPMIC_IO,
 
       clock_in_off => clock_in_off,
       clock_sel    => clock_sel,
+
+      -- Analog internal signals
+      pwr_ok     => pwr_ok,
+      dis_bmem   => dis_bmem,
+      vdd_bmem   => vdd_bmem,
+      VCC18LP    => VCC18LP,
+      rxout      => rxout,
+      ach_sel0   => ach_sel0,
+      ach_sel1   => ach_sel1,
+      ach_sel2   => ach_sel2,
+      adc_bits   => adc_bits,
+      adc_ref2v  => adc_ref2v,
+      adc_extref => adc_extref,
+      adc_diff   => adc_diff,
+      adc_en     => adc_en,
+      dac0_bits  => dac0_bits,
+      dac1_bits  => dac1_bits,
+      dac0_en    => dac0_en,
+      dac1_en    => dac1_en,
+      clk_a      => clk_a,
 
       -- Port A
       pa_i  => pa_i,
@@ -367,28 +387,16 @@ begin  -- architecture rtl
       p3_hi => p3_hi,
       p3_sr => p3_sr,
 
-
-      MBYPASS    => MBYPASS,
-      MWAKEUP_LP => MWAKEUP_LP,
-      MLP_PWR_OK => MLP_PWR_OK,
-
       ospi_out.cs_n    => ospi_cs_n,
       ospi_out.ck_n    => ospi_ck_n,
       ospi_out.ck_p    => ospi_ck_p,
       ospi_out.reset_n => ospi_reset_n,
       ospi_dq_in       => ospi_dq_in,
-      ospi_dq_out      => ospi_dq_out_int,
+      ospi_dq_out      => ospi_dq_out,
       ospi_dq_enable   => ospi_dq_enable,
       ospi_rwds_in     => ospi_rwds_in,
       ospi_rwds_out    => ospi_rwds_out,
-      ospi_rwds_enable => ospi_rwds_enable,
-
-
-      pwr_ok   => '1',
-      vdd_bmem => '0',
-      VCC18LP  => '1',
-      rxout    => rxout,
-      adc_bits => adc_bits
+      ospi_rwds_enable => ospi_rwds_enable
       );
 
   i_test_spi_interface : test_spi_interface

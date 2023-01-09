@@ -331,7 +331,6 @@ architecture structural of Noc_Top is
     signal RM_Data_Out          : std_logic_vector(127 downto 0);
     --NoC_INPUT_REG
     signal NoC_Input_reg_Out    : std_logic_vector(127 downto 0);
-    signal NoC_Input_reg_Out_p  : std_logic_vector(127 downto 0);
     
     --NOC REG
     signal NOC_reg_mux_ctrl     : std_logic_vector(1 downto 0);
@@ -393,8 +392,7 @@ begin
 		        Mode_reg <= Control_Data_Out(4 downto 0);
 		    end if;
 		    
-		    Sync_pulse_i_p      <= Sync_pulse_i;		    
-		    NoC_Input_reg_Out_p <= NoC_Input_reg_Out;
+		    Sync_pulse_i_p      <= Sync_pulse_i;
 		    PEC_WE_p2           <= PEC_WE_p1;
 		    PEC_WE_p1           <= PEC_WE;
 		end if;	

@@ -174,6 +174,9 @@ begin  -- architecture tb
   pad(A)(2 downto 1) <= "LH";  --"01";           -- Set PLL multiplier to 4
   pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
 
+  pad(F)(1) <= '0'; -- Ethernet tx clock
+  pad(G)(1) <= '0'; -- Ethernet rx clock
+  
   -- Reset the circuit for 10 ns;
   MRESET   <= '0', '1' after 10 ns;
   preset_n <= '0', '1' after 5 ns;

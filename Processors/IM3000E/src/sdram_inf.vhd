@@ -311,7 +311,7 @@ begin
       end if;
 
       -- Core 2
-      if (c2_wr_n = '0' and toReq_c2(i * 2) = '1') then
+      if (c2_wr_n = '0' and toReq_c2(i) = '1') then
         if (c2_d_addr(0) = '0') then
           if (even_c = '0') then
             ram_web(2 * i) <= '0';

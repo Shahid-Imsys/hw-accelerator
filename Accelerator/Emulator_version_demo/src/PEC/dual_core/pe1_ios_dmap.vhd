@@ -42,7 +42,6 @@ entity pe1_ios_dmap is
     clk_c2_pos    : in  std_logic;
 --    even_c    : in  std_logic;
     clk_e_pos     : in  std_logic;
-    clk_i_pos    : in  std_logic;
     rst_en       : in std_logic;
     -- Channel settings
     active    : in  std_logic;
@@ -90,7 +89,7 @@ begin
     if rising_edge(clk_p) then --rising_edge(clk_i)
         if rst_en = '0' then
             dmap_int <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             dmap_int <= dmap_next;
         end if;
     end if;

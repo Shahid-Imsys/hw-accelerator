@@ -38,7 +38,6 @@ use work.pe1_gp_pkg.all;
 entity pe1_ios_dackgen is
   port (
     clk_p       : in    std_logic;
-    clk_i_pos   : in    std_logic;
     rst_en      : in    std_logic;
     idreq       : in    std_logic_vector(DMA_CHANNELS-1 downto 0);
     active      : in    std_logic_vector(DMA_CHANNELS-1 downto 0);
@@ -159,7 +158,7 @@ begin  -- rtl
         if rst_en = '0' then
             h_ack_any  <= '0';
             h_ack_code <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             h_ack_any  <= '0';
             if p_ack_dir = '1' and block_out = '1' then
               h_ack_any  <= '1';
@@ -182,7 +181,7 @@ begin  -- rtl
             ack_any   <= '0';
             ack_code  <= (others => '0');
             ack_dir   <= '1';
-        elsif clk_i_pos = '0' then
+        else
             ack_any   <= '0';
             ack_dir   <= '1';
             if p_ack_any = '1' then

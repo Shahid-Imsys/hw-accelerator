@@ -41,7 +41,6 @@ entity pe1_cpc is
     -- Clock and reset inputs
     rst_cn      : in std_logic;      -- system reset
     clk_p       : in std_logic;
-    clk_s_pos   : in std_logic;      -- SP clock
     clk_e_pos   : in std_logic;      -- exe clock
     -- Control inputs
     runmode     : in std_logic;      -- TIM in run mode
@@ -134,7 +133,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 rx_en <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 rx_en <= (not msdin or rx_en) and not rx_stop and not cnt_tc;
         end if;
       end if;
@@ -147,7 +146,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             sipo_reg <= (others => '0');
-        elsif rx_en = '1' and clk_s_pos = '0' then
+        elsif rx_en = '1' then
           sipo_reg <= msdin & sipo_reg(7 downto 1);
         end if;
       end if;
@@ -161,7 +160,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if rx_en = '1' then
                     cnt <= cnt + 1;
                 else
@@ -179,7 +178,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 rx_stop <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 rx_stop <= cnt_tc;
             end if;
         end if;
@@ -206,7 +205,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 msdout_int <= '1';
-            elsif clk_s_pos = '0' then
+            else
                 if tx_load = '1' then
                     msdout_int <= '0';
                 elsif msdout_int = '0' or tx_en = '1' then
@@ -226,7 +225,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 tx_en <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 tx_en <= not msdout_int or (tx_en and not cnt_tc);
             end if;
         end if;
@@ -241,7 +240,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             piso_reg <= (others => '0');
-        elsif clk_s_pos = '0' then
+        else
             if tx_load = '1' then
               piso_reg <= dtsr;
             elsif msdout_int = '0' or tx_en = '1' then
@@ -259,7 +258,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if tx_en = '1' then
                     cnt <= cnt + 1;
                 else
@@ -291,7 +290,7 @@ begin
             if rst_cn = '0' then
                 cmd_reg <= (others => '0');
                 byte_cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if tx_load = '1' then
                     cmd_reg <= (others => '0');
                     byte_cnt <= (others => '0');
@@ -330,7 +329,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 byte_rec_dly <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 byte_rec_dly <= byte_rec;
             end if;
         end if;
@@ -361,7 +360,7 @@ begin
                 plsel_nint      <= '0';
                 plcpe_nint      <= '1';
                 mpram_we_nint   <= '1';
-            elsif wcdap = '1' and clk_s_pos = '0' then
+            elsif wcdap = '1' then
                 plsel_nint    <= dfsr_int(0);
                 plcpe_nint    <= dfsr_int(1);
                 mpram_we_nint <= dfsr_int(2);
@@ -377,7 +376,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             dtcl <= (others => '0');
-        elsif wdclc = '1' and clk_s_pos = '0' then
+        elsif wdclc = '1' then
             dtcl <= dfsr_int;
         end if;
       end if;
@@ -389,7 +388,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             dtal <= (others => '0');
-        elsif wdalc = '1' and clk_s_pos = '0' then
+        elsif wdalc = '1' then
             dtal <= dfsr_int;
         end if;
       end if;
@@ -530,7 +529,6 @@ begin
 --        clk_e   => clk_e,
         clk_p   => clk_p,
         clk_e_pos => clk_e_pos,
-        clk_s_pos   => clk_s_pos,
         rst_cn     => rst_cn,
         go      => go,
         wdata   => wdata,
@@ -544,10 +542,10 @@ begin
         d       => dbus,
         y       => ybus,
         i       => trcmem_q,
-        o       => open,--trcmem_d,
+        o       => trcmem_d,
         a       => trcmem_a,
         adsc_n  => trcmem_ce_n,
-        gw_n    => open,--trcmem_we_n,
+        gw_n    => trcmem_we_n,
         oe_n    => open);
 --    go <= '0';
 --    rdata <= (others => '0');

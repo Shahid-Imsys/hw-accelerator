@@ -59,7 +59,6 @@ entity pe1_tim is
 		-- Clock
 		clk_p           : in  std_logic; -- clock buffer to PLL
 		even_c          : in std_logic;
-		clk_c_en        : in  std_logic; -- PLL clock input
 		--clk_c2_pos  : out  std_logic; -- clk_c / 2
 		clk_e_pos       : out  std_logic; -- Execution clock input
 		clk_e_neg       : out std_logic;
@@ -344,7 +343,7 @@ begin
 		    if rst_cn_int = '0' or en_i = '0' then
 			    split_i4 <= '0';
 			    split_i8 <= '0';
-		    elsif clk_c_en = '1' then
+        else
 			    if speed_i = "10" or speed_i = "11" then
 				    split_i4 <= not even_c xor split_i4;
 			    end if;
@@ -392,7 +391,7 @@ begin
 	    if rising_edge(clk_p) then
 		    if rst_cn_int = '0' then
 			    gate_i <= '1';
-		    elsif (clk_c_en = '1') then
+        else
 			    gate_i <= din_i_int;
 			end if;
 		end if;
@@ -416,7 +415,7 @@ begin
 		    if rst_cn_int = '0' then
 			    fract_u <= "000";
 			    ctr_u <= "0000";
-		    elsif clk_c_en = '1' then
+        else
 			    if ctr_u = "0000" then
 				    fract_u <= sum_u(2 downto 0);
 				    ctr_u <= speed_u(6 downto 3) + sum_u(3);
@@ -438,7 +437,7 @@ begin
 		    if rst_cn_int = '0' or en_s = '0' then
 			    split_s4 <= '0';
 			    split_s8 <= '0';
-		    elsif clk_c_en = '1' then
+        else
 			    if speed_s = "10" or speed_s = "11" then
 				    split_s4 <= not even_c xor split_s4;
 			    end if;
@@ -475,7 +474,7 @@ begin
 	    if rising_edge(clk_p) then
 		    if rst_cn_int = '0' then
 			    gate_s <= '1';
-		    elsif (clk_c_en = '1') then
+        else
 			    gate_s <= din_s_int;
 			end if;
 		end if;

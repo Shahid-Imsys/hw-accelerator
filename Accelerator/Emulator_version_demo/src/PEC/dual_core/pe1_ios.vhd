@@ -41,14 +41,9 @@ entity pe1_ios is
     -- Clock and reset signals
     rst_en      : in    std_logic;      -- Reset (active low)
     clk_p       : in    std_logic;
-    clk_c_en    : in    std_logic;      -- Oscillator clock
     clk_c2_pos  : in    std_logic;      -- clk_c / 2
---    even_c      : in    std_logic;      -- High during even clk_c cycles
     clk_e_pos       : in    std_logic;      -- Execution clock
     clk_e_neg       : in    std_logic;      -- Execution clock
-    --gate_e      : in    std_logic;      -- Copy of execution clock used for gating
-    clk_i_pos       : in    std_logic;      -- I/O clock
---    gate_i      : in    std_logic;      -- Copy of clk_i used for gating
     -- Microprogram fields
     pl         : in    std_logic_vector(127 downto 0);   -- PD field
     -- Static control inputs
@@ -80,8 +75,7 @@ entity pe1_ios is
     iomem_ce_n  : out   std_logic_vector(1 downto 0);   -- Chip enable (active low)
     iomem_we_n  : out   std_logic;      -- Write enable (active low)
     iomem_a     : out   std_logic_vector(IOMEM_ADDR_WIDTH-2 downto 0);  -- Address
-    iomem_d     : out   std_logic_vector(15 downto 0);  -- Data in
-    iomem_q     : in    std_logic_vector(15 downto 0) -- Data out
+    iomem_d     : out   std_logic_vector(15 downto 0)
     --CJ start
     --req_logic_sig         : out std_logic; --used to generate req_sig
     --ack_sig               : in std_logic;
@@ -123,7 +117,6 @@ architecture rtl of pe1_ios is
   signal iden_core   : std_logic; -- I/O data bus enable from DMA controller
   signal ido_dma     : std_logic_vector(7 downto 0); -- I/O data bus output from DMA controller
   signal iden_dma    : std_logic; -- I/O data bus enable from DMA controller
-  signal ido_mem     : std_logic_vector(7 downto 0);-- I/O data bus output from IOMEM
   signal iden_mem    : std_logic; -- I/O data bus enable from IOMEM
 
   signal ilioa_int   : std_logic; -- Load I/O address, active low
@@ -146,7 +139,7 @@ begin
 --           ido_mem  when "01",
 --           ido_core when others;
 	ido <=	ido_dma when iden_dma = '1' and iden_mem = '0' else
-					ido_mem when iden_dma = '0' and iden_mem = '1' else
+				--	ido_mem when iden_dma = '0' and iden_mem = '1' else
 					ido_core;
 
   -------------------------------------------------------------------------------
@@ -234,7 +227,7 @@ begin
             ilioa_int <= '1';
             ildout_int <= '1';
             inext_int <= '1';
-        elsif clk_i_pos = '0' then
+        else
             ilioa_int <= '1';
             ildout_int <= '1';
             inext_int <= '1';
@@ -259,7 +252,7 @@ begin
     if rising_edge(clk_p) then--rising_edge(clk_i)
         if rst_en = '0' then
             blocked_pio <= '0';
-        elsif clk_i_pos = '0' then
+        else
             blocked_pio <= (lioa_i or ldout_i) and block_out and not pend_dma;
         end if;
     end if;
@@ -275,7 +268,7 @@ begin
     if rising_edge(clk_p) then --rising_edge(clk_i)
         if rst_en = '0' then
             ido_core <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             if lioa_i = '1' or ldout_i = '1' then
               if lioa_pend = '0' and ldout_pend = '0' then
                 ido_core <= dbus;
@@ -322,7 +315,7 @@ begin
     if rising_edge(clk_p) then    --rising_edge(clk_i)
         if rst_en = '0' then
             idi_reg <= (others => '0');
-        elsif inext_int = '0' and clk_i_pos = '0' then
+        elsif inext_int = '0' then
             idi_reg <= idi;
       end if;
     end if;
@@ -360,13 +353,11 @@ begin
     port map (
       rst_en       => rst_en,
       clk_p        => clk_p,
-      clk_c_en        => clk_c_en,
       clk_c2_pos       => clk_c2_pos,
 --      even_c       => even_c,
       clk_e_pos        => clk_e_pos,
       clk_e_neg        => clk_e_neg,
       --gate_e       => gate_e,
-      clk_i_pos        => clk_i_pos,
       use_direct   => use_direct,
       dbl_direct   => dbl_direct,
       i_double     => i_double,
@@ -390,14 +381,12 @@ begin
       idreq        => idreq_int,
       idi          => idi,
       ido_core     => ido_core,
-      ido_mem      => ido_mem,
       iden_mem     => iden_mem,
       ido_dma      => ido_dma,
       iden_dma     => iden_dma,
       iomem_ce_n   => iomem_ce_n,
       iomem_we_n   => iomem_we_n,
       iomem_a      => iomem_a,
-      iomem_d      => iomem_d,
-      iomem_q      => iomem_q);
+      iomem_d      => iomem_d);
   i_direct <= i_direct_int;
 end rtl;

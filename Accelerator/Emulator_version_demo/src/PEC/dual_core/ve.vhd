@@ -417,8 +417,8 @@ architecture rtl of ve is
   signal ext_tigger_en : std_logic;
   signal config    : std_logic_vector(7 downto 0); --configure register
   signal ring_start_addr : std_logic_vector(7 downto 0);
-  signal zp_data    : std_logic_vector(7 downto 0); --zero point addition data
-  signal zp_weight  : std_logic_vector(7 downto 0); --zero point addition data
+  signal zp_data, zpdata_i    : std_logic_vector(7 downto 0); --zero point addition data
+  signal zp_weight, zpweight_i  : std_logic_vector(7 downto 0); --zero point addition data
   signal scale      : std_logic_vector(4 downto 0); --shift scale factor
   signal pp_ctl  : std_logic_vector(7 downto 0); --expand this 8 bits, 1209
   signal bias_index_start : std_logic_vector(7 downto 0);
@@ -483,11 +483,11 @@ architecture rtl of ve is
   signal clipinst_i, conv_clipinst, fft_clipinst, matinv_clipinst : ppshift_clip_ctrl;
   signal outreg : std_logic_vector(63 downto 0);
   signal fft_stall, conv_stall, stall : unsigned(3 downto 0);
-  signal matinv_data0_addr_to_mux, matinv_data1_addr_to_mux : std_logic_vector(7 downto 0);
-  signal matinv_weight_addr_to_mux, matinv_bias_addr_to_mux : std_logic_vector(7 downto 0);
+  signal matinv_data0_addr, matinv_data1_addr : std_logic_vector(7 downto 0);
+  signal matinv_weight_addr, matinv_bias_addr : std_logic_vector(7 downto 0);
   signal bias_addr_ctrl_i, matinv_bias_addr_ctrl : bias_addr_t;
-  signal matinv_data_read_en_to_mux, matinv_data_write_en_to_mux, matinv_bias_ren_to_mux : std_logic; 
-  signal matinv_weight_read_en_to_mux, matinv_weight_write_en_to_mux : std_logic;
+  signal matinv_data_read_en, matinv_data_write_en, matinv_bias_ren : std_logic; 
+  signal matinv_weight_read_en, matinv_weight_write_en : std_logic;
   signal lzod_i, matinv_lzod : lzod_ctrl;
   signal feedback_ctrl_i, matinv_feedback_ctrl : feedback_t;
   signal matinv_zpdata_o, matinv_zpweight_o : std_logic_vector(7 downto 0);
@@ -789,6 +789,7 @@ begin
   end process;
 
   fft_en <= '1' when mode_latch = fft else '0'; -- more enable signals should be added to controllers later
+  matinv_en <= '1' when mode_latch = matrix else '0';
 
   --********************************
   --Mode c. Shared by RE and VE
@@ -863,7 +864,7 @@ begin
     end case;
   end process;
 
-  addrfromctrl_pointer_mux : process(all)
+  addrfromctrl_pointer_mux : process(all) --select generated address and feed it into pipelines
   begin
     case mode_latch is
       when re_mode => data0_addr_i  <= left_finaladdress;
@@ -878,6 +879,10 @@ begin
                       data1_addr_i  <= ve_fftaddr_d1;
                       weight_addr_i <= ve_fftaddr_tf;
                       bias_addr_i   <= x"00";
+      when matrix  => data0_addr_i  <= matinv_data0_addr;
+                      data1_addr_i  <= matinv_data1_addr;
+                      weight_addr_i <= matinv_weight_addr;
+                      bias_addr_i   <= matinv_bias_addr;
       when others  => data0_addr_i  <= x"00";
                       data1_addr_i  <= x"00";
                       weight_addr_i <= x"00";
@@ -885,7 +890,7 @@ begin
     end case;
   end process;
   
-  addrtomem_pointer_mux: process(all)
+  addrtomem_pointer_mux: process(all) --select address and feed it to local buffer
   begin
     case mode_latch is 
       when re_mode => biasaddr_to_memory <= bias_finaladdress(5 downto 0);
@@ -916,22 +921,21 @@ begin
       when others  => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
                       data0addr_to_memory  <= data0_addr_o;
-                      data1addr_to_memory  <= data1_addr_o;-- for now
+                      data1addr_to_memory  <= data1_addr_o;
     end case;
   end process;
 
 
-  start_demux : process(all)
+  start_demux : process(all) --control bit to function controllers
   begin
     --if rising_edge(clk_p) then
     conv_start   <= '0';
     fft_start    <= '0';
+    matinv_start <= '0';
     re_start     <= '0';
     left_rst     <= '0';
     right_rst    <= '0';
     bias_rst     <= '0';
-    --dot_cnt      <= x"00";
-    --oc_cnt       <= x"00";
     fft_stages   <= "000";
     stall        <= x"0";
     re_cnt_rst   <= '0';
@@ -941,9 +945,7 @@ begin
     case mode_latch is
       when conv    => conv_start   <= start;
                       conv_cnt_rst <= cnt_rst;
-                      --dot_cnt      <= ve_loop_reg;
-                      --oc_cnt       <= ve_oloop_reg;
-                      bypass_valid    <= DDI_VLD;
+                      bypass_valid <= DDI_VLD;
                       stall        <= conv_stall;
                       left_rst     <= lrst_from_conv when mode_c_l = '0' else '0';
                       right_rst    <= rrst_from_conv;
@@ -951,6 +953,9 @@ begin
       when fft     => fft_start    <= start and start_reg;
                       fft_stages   <= unsigned(ve_loop_reg(2 downto 0));
                       stall        <= fft_stall;
+      when matrix  => matinv_start <= start and start_reg;
+                      nt           <= ve_loop_reg(3 downto 0);
+                      stall        <= matinv_stall;
       when re_mode => re_start     <= start;
                       re_cnt_rst   <= cnt_rst;
                       rcving_data  <= DDI_VLD;
@@ -962,30 +967,57 @@ begin
     --end if;
   end process;
 
-  instruction_mux : process(all)
+  instruction_mux : process(all) -- select generated instructions and feed to pipelines
   begin
     case mode_latch is
-      when conv   => memreg_c_i    <= conv_memreg_c;
-                     writebuff_c_i <= conv_writebuff_c;
-                     inst_i        <= conv_ins;
-                     ppinst_i      <= conv_ppins;
-                     ppshiftinst_i <= conv_ppshiftinst;
-                     addbiasinst_i <= conv_addbiasinst;
-                     clipinst_i    <= conv_clipinst;
-      when fft    => memreg_c_i    <= fft_memreg_c;
-                     writebuff_c_i <= fft_writebuff_c;
-                     inst_i        <= fft_inst;
-                     ppinst_i      <= fft_ppinst;
-                     ppshiftinst_i <= fft_ppshiftinst;
-                     addbiasinst_i <= fft_addbiasinst;
-                     clipinst_i    <= fft_clipinst;
-      when others => memreg_c_i    <= (swap => noswap, datareg => hold, weightreg => hold);
-                     writebuff_c_i <= (swap => noswap, datareg => hold, weightreg => hold);
-                     inst_i        <= nop;
-                     ppinst_i      <= nop;
-                     ppshiftinst_i <= (acce => hold, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => left);
-                     addbiasinst_i <= (acc  => pass, quant => unbiased);
-                     clipinst_i    <= (clip => none, outreg => none);
+      when conv   => memreg_c_i      <= conv_memreg_c;
+                     writebuff_c_i   <= conv_writebuff_c;
+                     inst_i          <= conv_ins;
+                     ppinst_i        <= conv_ppins;
+                     ppshiftinst_i   <= conv_ppshiftinst;
+                     addbiasinst_i   <= conv_addbiasinst;
+                     clipinst_i      <= conv_clipinst;
+                     lzod_i          <= (word => "00", store => none, output => none);
+                     feedback_ctrl_i <= clip_to_1;
+                     zpdata_i        <= zp_data;
+                     zpweight_i      <= zp_weight;
+                     bias_addr_ctrl_i<= ctrl;
+      when fft    => memreg_c_i      <= fft_memreg_c;
+                     writebuff_c_i   <= fft_writebuff_c;
+                     inst_i          <= fft_inst;
+                     ppinst_i        <= fft_ppinst;
+                     ppshiftinst_i   <= fft_ppshiftinst;
+                     addbiasinst_i   <= fft_addbiasinst;
+                     clipinst_i      <= fft_clipinst;
+                     lzod_i          <= (word => "00", store => none, output => none);
+                     feedback_ctrl_i <= clip_to_1;
+                     zpdata_i        <= x"00";
+                     zpweight_i      <= x"00";
+                     bias_addr_ctrl_i<= ctrl;
+      when matrix => memreg_c_i      <= matinv_memreg_c;
+                     writebuff_c_i   <= matinv_writebuff_c;
+                     inst_i          <= matinv_inst;
+                     ppinst_i        <= matinv_ppinst;
+                     ppshiftinst_i   <= matinv_ppshiftinst;
+                     addbiasinst_i   <= matinv_addbiasinst;
+                     clipinst_i      <= matinv_clipinst;
+                     lzod_i          <= matinv_lzod;
+                     feedback_ctrl_i <= matinv_feedback_ctrl;
+                     zpdata_i        <= matinv_zpdata_o;
+                     zpweight_i      <= matinv_zpweight_o;
+                     bias_addr_ctrl_i<= matinv_bias_addr_ctrl;
+      when others => memreg_c_i      <= (swap => noswap, datareg => hold, weightreg => hold);
+                     writebuff_c_i   <= (swap => noswap, datareg => hold, weightreg => hold);
+                     inst_i          <= nop;
+                     ppinst_i        <= nop;
+                     ppshiftinst_i   <= (acce => hold, shift => to_integer(unsigned(scale)), use_lod => '0', shift_dir => left);
+                     addbiasinst_i   <= (acc  => pass, quant => unbiased);
+                     clipinst_i      <= (clip => none, outreg => none);
+                     lzod_i          <= (word => "00", store => none, output => none);
+                     feedback_ctrl_i <= clip_to_1;
+                     zpdata_i        <= x"00";
+                     zpweight_i      <= x"00";
+                     bias_addr_ctrl_i<= ctrl;
     end case;
   end process;
 
@@ -1020,6 +1052,12 @@ begin
         weight_read_enable_i <= fft_read_en;
         weight_write_enable_i <= '0';
         read_en_b_i <= '0';
+      elsif mode_latch = matrix then
+        data_read_enable_i <= matinv_data_read_en;
+        data_write_enable_i <= matinv_data_write_en;
+        weight_read_enable_i <= matinv_weight_read_en;
+        weight_write_enable_i <= matinv_weight_write_en;
+        read_en_b_i <= matinv_bias_ren;
       else
         data_read_enable_i <= '0';
         data_write_enable_i <= '0';
@@ -1065,6 +1103,12 @@ begin
         read_en_o   <= outrd_en;
         read_en_w_o <= woutrd_en;
       end if;
+    elsif mode_latch = matrix then
+      read_en_o    <= read_en_to_mux;
+      write_en_o   <= write_en_to_mux;
+      read_en_w_o  <= read_en_w_to_mux;
+      write_en_w_o <= write_en_w_to_mux;
+      write_en_b_o <= read_en_b_to_mux;
     end if;
   end process;
 
@@ -1376,16 +1420,16 @@ begin
       en_i                  => matinv_en,
       nt                    => nt,
       done                  => matinv_done,
-      data0_addr_o          => matinv_data0_addr_to_mux,
-      data1_addr_o          => matinv_data1_addr_to_mux,
-      weight_addr_o         => matinv_weight_addr_to_mux,
-      bias_addr_o           => matinv_bias_addr_to_mux,
+      data0_addr_o          => matinv_data0_addr,
+      data1_addr_o          => matinv_data1_addr,
+      weight_addr_o         => matinv_weight_addr,
+      bias_addr_o           => matinv_bias_addr,
       bias_addr_ctrl_o      => matinv_bias_addr_ctrl,--: out bias_addr_t;
-      data_read_enable_o    => matinv_data_read_en_to_mux,
-      data_write_enable_o   => matinv_data_write_en_to_mux,
-      weight_read_enable_o  => matinv_weight_read_en_to_mux,
-      weight_write_enable_o => matinv_weight_write_en_to_mux,
-      bias_ren_o            => matinv_bias_ren_to_mux,
+      data_read_enable_o    => matinv_data_read_en,
+      data_write_enable_o   => matinv_data_write_en,
+      weight_read_enable_o  => matinv_weight_read_en,
+      weight_write_enable_o => matinv_weight_write_en,
+      bias_ren_o            => matinv_bias_ren,
       memreg_c_o            => matinv_memreg_c,
       writebuff_c_o         => matinv_writebuff_c,
       inst_o                => matinv_inst,
@@ -1407,7 +1451,7 @@ begin
       data1_addr_i    => data1_addr_i,
       weight_addr_i   => weight_addr_i,
       bias_addr_i     => bias_addr_i, 
-      bias_addr_ctrl_i=> ctrl, 
+      bias_addr_ctrl_i=> bias_addr_ctrl_i, 
       data_ren_i      => data_read_enable_i,
       data_wen_i      => data_write_enable_i,
       weight_ren_i    => weight_read_enable_i,
@@ -1423,10 +1467,10 @@ begin
       ppshiftinst_i   => ppshiftinst_i,
       addbiasinst_i   => addbiasinst_i,
       clipinst_i      => clipinst_i,
-      lzod_i          => (word => "00", store => none, output => none),
-      feedback_ctrl_i => clip_to_1, --in feedback_t;
-      zpdata_i        => zp_data,
-      zpweight_i      => zp_weight,
+      lzod_i          => lzod_i,
+      feedback_ctrl_i => feedback_ctrl_i, --in feedback_t;
+      zpdata_i        => zpdata_i,
+      zpweight_i      => zpweight_i,
       bias_i          => bias_buf_out,
       data0_addr_o    => data0_addr_o,
       data1_addr_o    => data1_addr_o,  

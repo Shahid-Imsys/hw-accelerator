@@ -58,15 +58,9 @@ entity pe1_acore is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
-    clk_c_en       : in  std_logic;  -- CP clock
     even_c      : in std_logic;
-    --clk_c2_pos      : in  std_logic;  -- clk_c / 2
     clk_e_pos       : out  std_logic;  -- Execution clock
-	clk_d_pos		: in  std_logic;
     -- Control outputs to the clock block
-    --rst_n       : out std_logic;  -- Asynchronous reset to clk_gen
-    --rst_cn      : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-    --din_e       : out std_logic;  -- D input to FF generating clk_e
     --ID
     id_number    : in std_logic_vector(5 downto 0); --Added by CJ
     -- signals from the master core
@@ -103,7 +97,6 @@ entity pe1_acore is
     -- Memory signals
 ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a     : out std_logic_vector(13 downto 0);-- Address  --CJ
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address
@@ -440,7 +433,6 @@ begin
     port map (
       -- Clock
       clk_p       => clk_p,
-      clk_c_en    => clk_c_en,
       clk_c2_pos  => odd_c,
       clk_e_pos   => clk_e_pos_int,
       clk_e_neg	  => clk_e_neg_int,
@@ -694,7 +686,6 @@ begin
       clk_p       => clk_p,
       clk_e_neg    => clk_e_neg_int,
       clk_c2_pos      => odd_c,
-      clk_d_pos       => clk_d_pos,
       clk_e_pos       => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
       even_c      => odd_c,

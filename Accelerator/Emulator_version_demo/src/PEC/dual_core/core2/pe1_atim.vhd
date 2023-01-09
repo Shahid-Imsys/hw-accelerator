@@ -55,7 +55,6 @@ entity pe1_atim is
 	port(
 		-- Clock
 		clk_p      : in  std_logic; -- clock buffer to PLL
-		clk_c_en   : in  std_logic; -- PLL clock input
 		clk_c2_pos     : in  std_logic; -- clk_c / 2
 		clk_e_pos		: out std_logic;
 		clk_e_neg		: out std_logic;

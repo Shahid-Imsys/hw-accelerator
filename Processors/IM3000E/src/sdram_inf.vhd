@@ -83,8 +83,16 @@ architecture behav of sdram_inf is
   signal row_addr_1 : std_logic_vector (16 downto 0);
   signal row_addr_2 : std_logic_vector (16 downto 0);
 
-  signal c1_dqo_buffer : std_logic_vector (7 downto 0);
-  signal c2_dqo_buffer : std_logic_vector (7 downto 0);
+  signal c1_dqo_buffer   : std_logic_vector (7 downto 0);
+  signal c2_dqo_buffer   : std_logic_vector (7 downto 0);
+  signal c1_dqi_buffer   : std_logic_vector (7 downto 0);
+  signal c2_dqi_buffer   : std_logic_vector (7 downto 0);
+  signal c1_addr_buffer  : std_logic_vector (31 downto 0);
+  signal c2_addr_buffer  : std_logic_vector (31 downto 0);
+  signal toReq_c1_buffer : std_logic_vector(MEMNUM - 1 downto 0);
+  signal toReq_c2_buffer : std_logic_vector(MEMNUM - 1 downto 0);
+  signal c1_buf          : std_logic;
+  signal c2_buf          : std_logic;
 
 begin
 
@@ -164,7 +172,7 @@ begin
     c2_data_b1 when fast_d = '0' else
     c2_data_b2;
 
-  dqo_dqo_buffer : process (clk_p, rst_n)
+  dqo_buffer : process (clk_p, rst_n)
   begin
     if rst_n = '0' then
       c1_dqo_buffer <= x"00";
@@ -174,24 +182,20 @@ begin
 
       -- Core 1
       for i in 0 to (MEMNUM/2 - 1) loop
-        if (data_en_c1(i) = '1') then
-          if (even_c = '0') then
+        if (even_c = '0' and data_en_c1(i) = '1') then
             if (c1_d_addr(0) = '0') then
               c1_dqo_buffer <= ram_do(2 * i + 1);
             else
               c1_dqo_buffer <= ram_do(2 * i);
-            end if;
           end if;
         end if;
 
         -- Core 2
-        if (data_en_c2(i) = '1') then
-          if (even_c = '1') then
+        if (even_c = '1' and data_en_c2(i) = '1') then
             if (c2_d_addr(0) = '0') then
               c2_dqo_buffer <= ram_do(2 * i + 1);
             else
               c2_dqo_buffer <= ram_do(2 * i);
-            end if;
           end if;
         end if;
       end loop;
@@ -251,29 +255,126 @@ begin
 
   c1_wr_n <= c1_d_cs or c1_d_we;
   c2_wr_n <= c2_d_cs or c2_d_we;
-  --c1_wr_n <= c1_d_cs or (not c1_d_ras) or c1_d_cas or c1_d_we;
-  --c2_wr_n <= c2_d_cs or (not c2_d_ras) or c2_d_cas or c2_d_we;
 
-  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr)
+  dqi_buffer : process (clk_p, rst_n)
+  begin
+    if rst_n = '0' then
+      c1_dqi_buffer   <= x"00";
+      c2_dqi_buffer   <= x"00";
+      c1_addr_buffer  <= (others => '0');
+      c2_addr_buffer  <= (others => '0');
+      toReq_c1_buffer <= (others => '0');
+      toReq_c2_buffer <= (others => '0');
+      c1_buf          <= '0';
+      c2_buf          <= '0';
+
+    elsif (rising_edge(clk_p)) then
+      c1_dqi_buffer   <= x"00";
+      c2_dqi_buffer   <= x"00";
+      c1_addr_buffer  <= (others => '0');
+      c2_addr_buffer  <= (others => '0');
+      toReq_c1_buffer <= (others => '0');
+      toReq_c2_buffer <= (others => '0');
+      c1_buf          <= '0';
+      c2_buf          <= '0';
+
+      -- Core 1
+      if (even_c = '0' and c1_d_we = '0') then
+        c1_dqi_buffer   <= c1_d_dqi;
+        toReq_c1_buffer <= toReq_c1;
+        c1_buf          <= '1';
+        if (c1_d_addr(0) = '0') then
+          c1_addr_buffer <= std_logic_vector(unsigned(c1_d_addr) + 1);
+        else
+          c1_addr_buffer <= std_logic_vector(unsigned(c1_d_addr) - 1);
+        end if;
+
+        -- Core 2
+      elsif (even_c = '1' and c2_d_we = '0') then
+        c2_dqi_buffer   <= c2_d_dqi;
+        toReq_c2_buffer <= toReq_c2;
+        c2_buf          <= '1';
+        if (c2_d_addr(0) = '0') then
+          c2_addr_buffer <= std_logic_vector(unsigned(c2_d_addr) + 1);
+        else
+          c2_addr_buffer <= std_logic_vector(unsigned(c2_d_addr) - 1);
+        end if;
+      end if;
+    end if;
+  end process;
+
+  --------------------------------
+  -- RAM
+  --------------------------------
+
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr, even_c)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_a(2 * i)     <= c1_d_addr(14 downto 1);
-      ram_a(2 * i + 1) <= c1_d_addr(14 downto 1);
-      if (toReq_c2(i) = '1' and c2_csb = '0') then
+      -- Core 1
+      if (even_c = '1') then
+        ram_a(2 * i)     <= c1_d_addr(14 downto 1);
+        ram_a(2 * i + 1) <= c1_d_addr(14 downto 1);
+
+        if (c1_buf = '1' and toReq_c1_buffer(i) = '1') then
+          if (c1_addr_buffer(0) = '0') then
+            ram_a(2 * i) <= c1_addr_buffer(14 downto 1);
+          else
+            ram_a(2 * i + 1) <= c1_addr_buffer(14 downto 1);
+          end if;
+        end if;
+
+        -- Core 2
+      else
         ram_a(2 * i)     <= c2_d_addr(14 downto 1);
         ram_a(2 * i + 1) <= c2_d_addr(14 downto 1);
+
+        if (c2_buf = '1' and toReq_c2_buffer(i) = '1') then
+          if (c2_addr_buffer(0) = '0') then
+            ram_a(2 * i) <= c2_addr_buffer(14 downto 1);
+          else
+            ram_a(2 * i + 1) <= c2_addr_buffer(14 downto 1);
+          end if;
+        end if;
       end if;
+
     end loop;
   end process;
 
-  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi)
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi, even_c, c1_d_addr, c2_d_addr, c1_buf, c2_buf)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_di(2 * i)     <= c1_d_dqi;
-      ram_di(2 * i + 1) <= c1_d_dqi;
-      if (toReq_c2(i) = '1' and c2_csb = '0') then
-        ram_di(2 * i)     <= c2_d_dqi;
-        ram_di(2 * i + 1) <= c2_d_dqi;
+
+      -- Core1
+      if (even_c = '1') then
+        if (c1_d_addr(0) = '0') then
+          ram_di(2 * i) <= c1_d_dqi;
+        else
+          ram_di(2 * i + 1) <= c1_d_dqi;
+        end if;
+
+        if (c1_buf = '1' and toReq_c1_buffer(i) = '1') then
+          if (c1_addr_buffer(0) = '0') then
+            ram_di(2 * i) <= c1_dqi_buffer;
+          else
+            ram_di(2 * i + 1) <= c1_dqi_buffer;
+          end if;
+        end if;
+
+        -- Core 2
+      else
+        if (c2_d_addr(0) = '0') then
+          ram_di(2 * i) <= c2_d_dqi;
+        else
+          ram_di(2 * i + 1) <= c2_d_dqi;
+        end if;
+
+        if (c2_buf = '1' and toReq_c2_buffer(i) = '1') then
+          if (c2_addr_buffer(0) = '0') then
+            ram_di(2 * i) <= c2_dqi_buffer;
+          else
+            ram_di(2 * i + 1) <= c2_dqi_buffer;
+          end if;
+        end if;
       end if;
     end loop;
   end process;
@@ -282,8 +383,8 @@ begin
   begin
 
     for i in 0 to (MEMNUM/2 - 1) loop
-      ram_cs(2 * i)     <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
-      ram_cs(2 * i + 1) <= not ((c1_csb or (not toReq_c1(i))) and (c2_csb or (not toReq_c2(i))));
+      ram_cs(2 * i)     <= not (((c1_csb and (not c1_buf)) or (not toReq_c1(i))) and ((c2_csb and (not c2_buf)) or (not toReq_c2(i))));
+      ram_cs(2 * i + 1) <= not (((c1_csb and (not c1_buf)) or (not toReq_c1(i))) and ((c2_csb and (not c2_buf)) or (not toReq_c2(i))));
     end loop;
   end process;
 
@@ -294,39 +395,46 @@ begin
       ram_web(2 * i + 1) <= '1';
 
       -- Core 1
-      if (c1_wr_n = '0' and toReq_c1(i) = '1') then
-        if (c1_d_addr(0) = '0') then
-          if (even_c = '1') then
+      if (even_c = '1') then
+        if (c1_wr_n = '0' and toReq_c1(i) = '1') then
+          if (c1_d_addr(0) = '0') then
             ram_web(2 * i) <= '0';
           else
             ram_web(2 * i + 1) <= '0';
           end if;
-        else
-          if (even_c = '1') then
-            ram_web(2 * i + 1) <= '0';
-          else
+        end if;
+        if (c1_buf = '1' and toReq_c1_buffer(i) = '1') then
+          if (c1_addr_buffer(0) = '0') then
             ram_web(2 * i) <= '0';
+          else
+            ram_web(2 * i + 1) <= '0';
           end if;
         end if;
       end if;
 
       -- Core 2
-      if (c2_wr_n = '0' and toReq_c2(i) = '1') then
-        if (c2_d_addr(0) = '0') then
-          if (even_c = '0') then
+      if (even_c = '0') then
+        if (c2_wr_n = '0' and toReq_c2(i) = '1') then
+          if (c2_d_addr(0) = '0') then
             ram_web(2 * i) <= '0';
           else
             ram_web(2 * i + 1) <= '0';
           end if;
-        else
-          if (even_c = '0') then
-            ram_web(2 * i + 1) <= '0';
-          else
+        end if;
+        if (c2_buf = '1' and toReq_c2_buffer(i) = '1') then
+          if (c2_addr_buffer(0) = '0') then
             ram_web(2 * i) <= '0';
+          else
+            ram_web(2 * i + 1) <= '0';
           end if;
         end if;
       end if;
+
     end loop;
   end process;
+
+  --------------------------------
+  -- RAM
+  --------------------------------
 
 end behav;

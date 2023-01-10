@@ -10,7 +10,6 @@ entity pe1_rtc_iso is
 	  -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-      pllout          : in  std_logic;
       ld_bmem         : in  std_logic;  -- Latch enable to the dis_bmem latch
       clk_mux_out     : in  std_logic;
 

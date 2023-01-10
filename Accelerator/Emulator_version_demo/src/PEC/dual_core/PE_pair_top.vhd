@@ -348,41 +348,25 @@ architecture struct of PE_pair_top is
   -----------------------------------------------------------------------------
   -- Internal signals driven by (i.e. "output" from) each block
   -----------------------------------------------------------------------------
-  signal hclk_i       : std_logic;  -- 16.7mhz clk
   signal msdin_i      : std_logic;
   signal mbypass_i    : std_logic;
   signal mreset_i     : std_logic;
   signal mtest_i      : std_logic;
 
   -- Core clock buffers
-  signal clk_d  : std_logic;
-  signal clk_u_pos  : std_logic;
-  signal clk_i  : std_logic;
   signal clk_e_pos  : std_logic;
   signal clk_e_neg  : std_logic;
-  signal clk_rx : std_logic;
-  signal clk_tx : std_logic;
-  signal clk_a_pos  : std_logic;
-  signal clk_c2a_pos : std_logic;
-  signal clk_ea_pos : std_logic;
-
-  -- RTC block
-  signal mrxout_o        : std_logic;
-  signal rtc_data        : std_logic_vector(7 downto 0);
-  signal dis_bmem_int    : std_logic;
 
   signal halt_en             : std_logic;   --high active, will go to halt state
   signal nap_en              : std_logic;   --high active, will go to nap state
   signal wakeup_lp           : std_logic;  -- From wakeup_lp input IO
   signal poweron_finish      : std_logic;  --
   signal reset_iso           : std_logic;  -- to isolate the pe1_core reset
-  signal reset_iso_clear     : std_logic; --clear reset isolate
   signal reset_core_n        : std_logic;  -- to reset pe1_core, low active
   signal io_iso              : std_logic;  -- to isolate the io signals in nap mode
   signal nap_rec             : std_logic;  -- will recover from nap mode
   signal pmic_core_en        : std_logic;
   signal pmic_io_en          : std_logic;
-  signal clk_mux_out         : std_logic;
 
   signal lp_pwr_ok       : std_logic;
 
@@ -392,14 +376,8 @@ architecture struct of PE_pair_top is
   -- Signals to other blocks
   signal ddi_vld_c1    : std_logic; --CJ
   signal ddi_vld_c2    : std_logic; --CJ
-  signal en_xosc       : std_logic;
-  signal en_pll        : std_logic;
-  signal sel_pll       : std_logic;
-  signal xout_selected : std_logic;
-  signal test_pll      : std_logic;
   signal rst_n         : std_logic;
   signal rst_cn        : std_logic;
-  signal en_d          : std_logic;
   signal fast_d        : std_logic;
   signal din_ea        : std_logic;
   signal din_i         : std_logic;
@@ -454,7 +432,6 @@ architecture struct of PE_pair_top is
   signal trcmem_we_n   : std_logic;
   signal c1_pmem_d     : std_logic_vector(1 downto 0);
   signal c1_pmem_we_n  : std_logic;
-  signal en_pmem2	     : std_logic;
   signal short_cycle   : std_logic;
   -- to PADS
   signal mirqout_o     : std_logic;
@@ -503,16 +480,10 @@ architecture struct of PE_pair_top is
   signal inext       : std_logic;
   signal iden        : std_logic;
   signal dqm_size    : std_logic_vector(1 downto 0);
-  signal en_uart1    : std_logic;
-  signal en_uart2    : std_logic;
-  signal en_uart3    : std_logic;
-  signal en_eth      : std_logic_vector(1 downto 0);
   signal en_iobus    : std_logic_vector(1 downto 0);
   signal ddqm        : std_logic_vector(7 downto 0);
   signal en_tiu      : std_logic;
-  signal run_tiu     : std_logic;
   -- Peri driven
-  signal dfp         : std_logic_vector(7 downto 0);
   signal idreq       : std_logic_vector(7 downto 0);
   signal idi         : std_logic_vector(7 downto 0);
   signal irq0        : std_logic;
@@ -603,7 +574,6 @@ begin
 
 
 
-  hclk_i <= HCLK;
   mreset_i <= MRESET;
   MIRQOUT <= mirqout_o;
   MCKOUT1 <= mckout1_o;
@@ -982,7 +952,6 @@ end generate;
       nap_rec        => nap_rec       ,
       pmic_core_en   => pmic_core_en  ,
       pmic_io_en     => pmic_io_en    ,
-      clk_mux_out    => clk_mux_out   ,
       --gmem1
       c1_gmem_a      => c1_gmem_a     ,
       c1_gmem_q      => c1_gmem_q     ,
@@ -1018,19 +987,12 @@ end generate;
     -- Control outputs to the clock block
     rst_n         => rst_n            , --: out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn        => rst_cn           , --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-    en_d          => en_d             , --: out std_logic;  -- Enable clk_d
     fast_d        => fast_d           , --: out std_logic;  -- clk_d speed select
     din_i         => din_i            , --: out std_logic;  -- D input to FF generating clk_i
     din_u         => din_u            , --: out std_logic;  -- D input to FF generating clk_u
     din_s         => din_s            , --: out std_logic;  -- D input to FF generating clk_s
     clk_in_off    => clk_in_off       ,
     clk_main_off  => clk_main_off     ,
-    -- Control signals to/from the oscillator and PLL
-    en_xosc       => en_xosc          , --: out std_logic;  -- Enable XOSC
-    en_pll        => en_pll           , --: out std_logic;  -- Enable PLL
-	  sel_pll       => sel_pll          , --: out std_logic;  -- Select PLL as clock source
-	  test_pll      => test_pll         , --: out std_logic;  -- PLL in test mode
-    xout          => hclk_i           , --: in  std_logic;  -- XOSC ref. clock output -- 16.7 mhz clk
     -- Power on signal
     pwr_ok        => std_logic'('1')  , --'1',--pwr_ok,  --: in  std_logic;  -- Power is on --change by maning to '1'
 	---------------------------------------------------------------------
@@ -1098,14 +1060,12 @@ end generate;
     -- RTC block signals
     reset_core_n   => reset_core_n    ,
     reset_iso      => reset_iso       ,
-	  reset_iso_clear=> reset_iso_clear ,
     poweron_finish => poweron_finish  ,
     nap_rec        => nap_rec         ,
     halt_en        => halt_en         ,
     nap_en         => nap_en          ,
     ld_bmem        => ld_bmem         ,--: out std_logic;  -- Latch enable to the en_bmem latch
     --  Signals to/from Peripheral block
-    dfp           => dfp              ,--: in  std_logic_vector(7 downto 0);
     dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
     rst_en        => rst_en           ,--: out std_logic;
     pd            => pd_s             ,--: out std_logic_vector(2 downto 0);  -- pl_pd
@@ -1121,12 +1081,7 @@ end generate;
     iden          => iden             ,--: in  std_logic;
     dqm_size      => dqm_size         ,--: out std_logic_vector(1 downto 0);
     adc_dac       => adc_dac          ,--: out std_logic;
-    en_uart1      => en_uart1         ,--: out std_logic;
-    en_uart2      => en_uart2         ,--: out std_logic;
-    en_uart3      => en_uart3         ,--: out std_logic;
-    en_eth        => en_eth           ,--: out std_logic_vector(1 downto 0);
     en_tiu        => en_tiu           ,--: out std_logic;
-    run_tiu       => run_tiu          ,--: out std_logic;
     en_iobus      => en_iobus         ,--: out std_logic_vector(1 downto 0);
     ddqm          => ddqm             ,--: out std_logic_vector(7  downto 0);
     irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0
@@ -1147,7 +1102,6 @@ end generate;
     mbypass_i     => mbypass_i        ,--: in  std_logic;  -- bypass PLL
     mwake_i       => std_logic'('0')  , --'0',--: in  std_logic;  -- wake up
     -- DRAM signals
-	  en_pmem2      => en_pmem2         ,
     d_addr        => c1_d_addr        ,--to internal sram block
     dcs_o         => c1_d_cs          ,  --: out std_logic;  -- Chip select
     dras_o        => c1_d_ras         , --: out std_logic;  -- Row address strobe
@@ -1182,7 +1136,6 @@ end generate;
     clk_p         => HCLK             ,
     even_c        => even_c           ,
     ready         => core2_rdy        ,
-    clk_e_pos     => clk_ea_pos       ,
     -- signals from the master pe1_core
     rst_cn        => c2_core2_en      ,       --reset core2 if disabled
     rsc_n         => c2_rsc_n         ,
@@ -1205,7 +1158,6 @@ end generate;
 
     crb_sel       => c2_crb_sel       ,
     --  Signals to/from Peripheral block
-    dfp           => dfp              ,
     ddqm          => open             ,
     irq0          => std_logic'('1')  , --'1',  -- Interrupt request 0
     irq1          => std_logic'('1')  , --'1',  -- Interrupt request 1
@@ -1291,7 +1243,6 @@ end generate;
   -- Peripherals
   -----------------------------------------------------------------------------
 
-	dfp <= "00000000";
 	iden <= '0';
 	idreq <= "11111111";
 	idi <= "00000000";

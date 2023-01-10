@@ -59,7 +59,6 @@ entity pe1_acore is
     -- Clocks to/from clock block
     clk_p       : in  std_logic;  -- PLL clock
     even_c      : in std_logic;
-    clk_e_pos       : out  std_logic;  -- Execution clock
     -- Control outputs to the clock block
     --ID
     id_number    : in std_logic_vector(5 downto 0); --Added by CJ
@@ -85,7 +84,6 @@ entity pe1_acore is
     -- signal to core1
     crb_sel     : out std_logic_vector(3 downto 0);
     --  Signals to/from Peripheral block
-    dfp         : in  std_logic_vector(7 downto 0);
     --dbus        : out std_logic_vector(7 downto 0);
     --rst_en      : out std_logic;
     --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
@@ -636,7 +634,6 @@ begin
       dsi           => dsi,
       gdata         => gdata,
       dtal          => dtal,
-      dfp           => dfp,
        --CJ added
        VE_OUT_D      => ve_out_d_int,
        CDFM         => cdfm_int,
@@ -788,5 +785,4 @@ begin
     dfio <= x"00";
     dtal <= x"00";
     dtcl <= x"00";
-    clk_e_pos <= clk_e_pos_int;
 end;

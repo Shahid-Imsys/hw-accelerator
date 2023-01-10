@@ -101,8 +101,7 @@ entity pe1_rtc is
     io_iso              : out std_logic;  -- to isolate the io signals in nap mode
     nap_rec             : out std_logic;  -- will recover from nap mode
     pmic_core_en        : out std_logic;
-    pmic_io_en          : out std_logic;
-    clk_mux_out         : out std_logic
+    pmic_io_en          : out std_logic
     );
 end pe1_rtc;
 
@@ -186,7 +185,6 @@ architecture rtl of pe1_rtc is
       -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-      pllout          : in  std_logic;
       ld_bmem			    : in  std_logic;  -- Latch enable to the dis_bmem latch
       clk_mux_out     : in  std_logic;
 
@@ -295,7 +293,6 @@ begin  -- rtl
       clk_iso        => clk_iso,
       halt_en        => halt_en,
       nap_en         => nap_en,
-      pllout         => pllout,
       ld_bmem        => ld_bmem,
 
       c1_gmem_a      =>  c1_gmem_a,
@@ -465,7 +462,6 @@ end generate;
   --  clk1_selected => xout_selected,
   --  clk_mux_out   => clk_mux_out_int);
    clk_mux_out_int <= pllout;
-   clk_mux_out <= clk_mux_out_iso_1;
 
    --clk_mux_2: clk_mux
    --port map (

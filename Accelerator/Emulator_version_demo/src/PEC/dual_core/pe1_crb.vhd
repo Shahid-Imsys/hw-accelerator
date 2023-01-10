@@ -82,8 +82,6 @@ entity pe1_crb is
     pup_irq     : out std_logic_vector(1 downto 0);
     en_i        : out std_logic;
     -- MORG register
-    en_pmem2  : out std_logic;
-    en_d        : out std_logic;
     r_size      : out std_logic_vector(1 downto 0);
     c_size      : out std_logic_vector(1 downto 0);
     dqm_size    : out std_logic_vector(1 downto 0);
@@ -94,10 +92,8 @@ entity pe1_crb is
     t_rp        : out std_logic_vector(1 downto 0);
     -- PLLC register
     en_tiu      : out std_logic;
-    run_tiu     : out std_logic;
     dis_pll     : out std_logic;
     dis_xosc    : out std_logic;
-    en_mxout    : out std_logic;
     clk_sel    : out std_logic;
     -- PLLM register
     -- SECC register
@@ -105,10 +101,6 @@ entity pe1_crb is
     speed_s     : out std_logic_vector(1 downto 0);
     -- PMXC register
     adc_dac     : out std_logic;
-    en_uart1    : out std_logic;
-    en_uart2    : out std_logic;
-    en_uart3    : out std_logic;
-    en_eth      : out std_logic_vector(1 downto 0);
     en_iobus    : out std_logic_vector(1 downto 0);
     -- UACC register
     adc_ref2v   : out std_logic;  -- Select 2V internal ADC reference (1V)
@@ -190,8 +182,6 @@ architecture rtl of pe1_crb is
   signal pup_clk_int    : std_logic;
   signal pup_irq_int    : std_logic_vector(1 downto 0);
   signal en_i_int       : std_logic;
-  signal en_pmem2_int   : std_logic;
-  signal en_d_int       : std_logic;
   signal r_size_int     : std_logic_vector(1 downto 0);
   signal c_size_int     : std_logic_vector(1 downto 0);
   signal dqm_size_int   : std_logic_vector(1 downto 0);
@@ -200,10 +190,8 @@ architecture rtl of pe1_crb is
   signal t_rcd_int      : std_logic_vector(1 downto 0);
   signal t_rp_int       : std_logic_vector(1 downto 0);
   signal en_tiu_int     : std_logic;
-  signal run_tiu_int    : std_logic;
   signal dis_pll_int    : std_logic;
   signal dis_xosc_int   : std_logic;
-  signal en_mxout_int   : std_logic;
 --  signal en_mexec_int   : std_logic;
   signal clk_sel_int    : std_logic;-- change en_mexec to clk_sel
   signal en_s_int       : std_logic;
@@ -211,10 +199,6 @@ architecture rtl of pe1_crb is
   signal security       : std_logic;
   signal stick          : std_logic_vector(3 downto 0);
   signal adc_dac_int    : std_logic;
-  signal en_uart1_int   : std_logic;
-  signal en_uart2_int   : std_logic;
-  signal en_uart3_int   : std_logic;
-  signal en_eth_int     : std_logic_vector(1 downto 0);
   signal en_iobus_int   : std_logic_vector(1 downto 0);
   signal adc_ref2v_int  : std_logic;
   signal speed_u_int    : std_logic_vector(6 downto 0);
@@ -259,8 +243,6 @@ begin
       pup_irq_int   <= "00";
       en_i_int      <= '0';
       -- MORG register
-      en_pmem2_int  <= '0';
-      en_d_int      <= '1';  --change default value to 1 by maning
       r_size_int    <= "00";
       c_size_int    <= "00";
       dqm_size_int  <= "00";
@@ -271,11 +253,7 @@ begin
       t_rp_int      <= "11";
       -- PLLC register
       en_tiu_int    <= '0';
-      run_tiu_int   <= '0';
---      dis_pll_int   <= '1'; -- change default value to '1' by maning 2012-06-15 15:06:27
       dis_pll_int   <= '0'; -- change default value to '1' by HYX, 20141115
---    dis_xosc_int  <= '0'; -- In the next process due to different reset
-      en_mxout_int  <= '1';
       clk_sel_int  <= '0';--select PLL
       -- PLLM register
       -- SECC register
@@ -285,10 +263,6 @@ begin
       stick(2)      <= '0';
       -- PMXC register
       adc_dac_int   <= '0';
-      en_uart1_int  <= '0';
-      en_uart2_int  <= '0';
-      en_uart3_int  <= '0';
-      en_eth_int    <= "00";
       en_iobus_int  <= "00";
       -- UACC register
       adc_ref2v_int <= '1';
@@ -343,8 +317,6 @@ begin
             pup_irq_int   <= dbus(2 downto 1);
             en_i_int      <= dbus(0);
           when "0001" => -- MORG register
-            en_pmem2_int  <= dbus(7);
-            en_d_int      <= dbus(6);
             r_size_int    <= dbus(5 downto 4);
             c_size_int    <= dbus(3 downto 2);
             dqm_size_int  <= dbus(1 downto 0);
@@ -355,10 +327,8 @@ begin
             t_rp_int      <= dbus(1 downto 0);
           when "0011" => -- PLLC register
             en_tiu_int    <= dbus(7);
-            run_tiu_int   <= dbus(6);
             dis_pll_int   <= dbus(5);
 --          dis_xosc_int  <= dbus(4); -- In the next process due to different reset
-            en_mxout_int  <= dbus(1);
             clk_sel_int  <= dbus(0);
           --when "0100" => -- PLLM register
           when "0101" => -- SECC register
@@ -371,10 +341,6 @@ begin
 --          if dbus(0) = '1' then stick(0)  <= '1'; end if; -- In the next process due to different reset
           when "0110" => -- PMXC register
             adc_dac_int   <= dbus(7);
-            en_uart1_int  <= dbus(6);
-            en_uart2_int  <= dbus(5);
-            en_uart3_int  <= dbus(4);
-            en_eth_int    <= dbus(3 downto 2);
             en_iobus_int  <= dbus(1 downto 0);
           when "0111" => -- UACC register
             adc_ref2v_int <= dbus(7);
@@ -549,12 +515,12 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
 --234567890123456789012345678901234567890123456789012345678901234567890123456789
   process (crb_sel, en_pmem_int, speed_i_int, en_wdog_int, pup_clk_int,
-           en_i_int, en_pmem2_int, en_d_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
-           t_ras_int, t_rcd_int, en_tiu_int, run_tiu_int, dis_pll_int,
-           dis_xosc_int, en_mxout_int, clk_sel_int,
+           en_i_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
+           t_ras_int, t_rcd_int, en_tiu_int, dis_pll_int,
+           dis_xosc_int, clk_sel_int,
            en_s_int, speed_s_int, security,
-           stick, adc_dac_int, en_uart1_int, pup_irq_int, en_uart2_int,
-           en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
+           stick, adc_dac_int, pup_irq_int,
+           en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
            p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
@@ -569,8 +535,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(2 downto 1) <= pup_irq_int;
         crb_out(0)          <= en_i_int;
       when "0001" => -- MORG register
-        crb_out(7)      <= en_pmem2_int;
-        crb_out(6)          <= en_d_int;
         crb_out(5 downto 4) <= r_size_int;
         crb_out(3 downto 2) <= c_size_int;
         crb_out(1 downto 0) <= dqm_size_int;
@@ -581,10 +545,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(1 downto 0) <= t_rcd_int;
       when "0011" => -- PLLC register
         crb_out(7)          <= en_tiu_int;
-        crb_out(6)          <= run_tiu_int;
         crb_out(5)          <= dis_pll_int;
         crb_out(4)          <= dis_xosc_int;
-        crb_out(1)          <= en_mxout_int;
         crb_out(0)          <= clk_sel_int;
       --when "0100" => -- PLLM register
       when "0101" => -- SECC register
@@ -594,10 +556,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(3 downto 0) <= stick;
       when "0110" => -- PMXC register
         crb_out(7)          <= adc_dac_int;
-        crb_out(6)          <= en_uart1_int;
-        crb_out(5)          <= en_uart2_int;
-        crb_out(4)          <= en_uart3_int;
-        crb_out(3 downto 2) <= en_eth_int;
         crb_out(1 downto 0) <= en_iobus_int;
       when "0111" => -- UACC register
         crb_out(7)          <= adc_ref2v_int;
@@ -648,12 +606,12 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
 --234567890123456789012345678901234567890123456789012345678901234567890123456789
   process (crb_sel_c2, en_pmem_int, speed_i_int, en_wdog_int, pup_clk_int,
-           en_i_int, en_pmem2_int, en_d_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
-           t_ras_int, t_rcd_int, en_tiu_int, run_tiu_int, dis_pll_int,
-           dis_xosc_int, en_mxout_int, clk_sel_int,
+           en_i_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
+           t_ras_int, t_rcd_int, en_tiu_int, dis_pll_int,
+           dis_xosc_int, clk_sel_int,
            en_s_int, speed_s_int, security,
-           stick, adc_dac_int, en_uart1_int, pup_irq_int, en_uart2_int,
-           en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
+           stick, adc_dac_int, pup_irq_int,
+           en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
            p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
@@ -668,8 +626,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(2 downto 1) <= pup_irq_int;
         crb_out_c2(0)          <= en_i_int;
       when "0001" => -- MORG register
-        crb_out_c2(7)      <= en_pmem2_int;
-        crb_out_c2(6)          <= en_d_int;
         crb_out_c2(5 downto 4) <= r_size_int;
         crb_out_c2(3 downto 2) <= c_size_int;
         crb_out_c2(1 downto 0) <= dqm_size_int;
@@ -680,10 +636,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(1 downto 0) <= t_rcd_int;
       when "0011" => -- PLLC register
         crb_out_c2(7)          <= en_tiu_int;
-        crb_out_c2(6)          <= run_tiu_int;
         crb_out_c2(5)          <= dis_pll_int;
         crb_out_c2(4)          <= dis_xosc_int;
-        crb_out_c2(1)          <= en_mxout_int;
         crb_out_c2(0)          <= clk_sel_int;
       --when "0100" => -- PLLM register
       when "0101" => -- SECC register
@@ -693,10 +647,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(3 downto 0) <= stick;
       when "0110" => -- PMXC register
         crb_out_c2(7)          <= adc_dac_int;
-        crb_out_c2(6)          <= en_uart1_int;
-        crb_out_c2(5)          <= en_uart2_int;
-        crb_out_c2(4)          <= en_uart3_int;
-        crb_out_c2(3 downto 2) <= en_eth_int;
         crb_out_c2(1 downto 0) <= en_iobus_int;
       when "0111" => -- UACC register
         crb_out_c2(7)          <= adc_ref2v_int;
@@ -751,8 +701,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   pup_clk     <= pup_clk_int;
   pup_irq     <= pup_irq_int;
   en_i        <= en_i_int;
-  en_pmem2    <= en_pmem2_int;--added by maning
-  en_d        <= en_d_int;
   r_size      <= r_size_int;
   c_size      <= c_size_int;
   dqm_size    <= dqm_size_int;
@@ -761,18 +709,12 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   t_rcd       <= t_rcd_int;
   t_rp        <= t_rp_int;
   en_tiu      <= en_tiu_int;
-  run_tiu     <= run_tiu_int;
   dis_pll     <= dis_pll_int;
   dis_xosc    <= dis_xosc_int;
-  en_mxout    <= en_mxout_int;
   clk_sel    <= clk_sel_int;
   en_s        <= en_s_int and not security;
   speed_s     <= speed_s_int;
   adc_dac     <= adc_dac_int;
-  en_uart1    <= en_uart1_int;
-  en_uart2    <= en_uart2_int;
-  en_uart3    <= en_uart3_int;
-  en_eth      <= en_eth_int;
   en_iobus    <= en_iobus_int;
   adc_ref2v   <= adc_ref2v_int;
   speed_u     <= speed_u_int;
@@ -798,26 +740,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   core2_en <= core2_en_int;
 --  ram_partition <= ram_partition_int;
 
---  router_ir_en <= router_ir_en_int;       --delete by HYX, 20141027
---  north_en     <= north_en_int;            --delete by HYX, 20141027
---  south_en     <= south_en_int;            --delete by HYX, 20141027
---  west_en    <= west_en_int;              --delete by HYX, 20141027
---  east_en    <= east_en_int;              --delete by HYX, 20141027
---  router_clk_en <= router_clk_en_int;     --delete by HYX, 20141027
-
   d_lo    <= not d_hi_int;
-  -- pc_hi    <= '0' when en_iobus_int = "11" else p1_hi_int;   -- PC used for I/O bus when en_iobus = 11
-  -- pc_lo_n  <= '1' when en_iobus_int = "11" else p1_hi_int;
-  -- ph_hi    <= '0' when en_iobus_int(1) = '1' else p1_hi_int; -- PH used for I/O bus when en_iobus = 10,11
-  -- ph_lo_n  <= '1' when en_iobus_int(1) = '1' else p1_hi_int;
-  -- pi_hi    <= '0' when en_iobus_int /= "00" else p1_hi_int;  -- PI used for I/O bus when en_iobus = 01,10,11
-  -- pi_lo_n  <= '1' when en_iobus_int /= "00" else p1_hi_int;
-  -- pel_hi <= p2_hi_int and not en_uart2_int;
-  -- peh_hi <= p2_hi_int and not en_uart3_int;
-  -- pdll_hi  <= '0' when dqm_size_int /= "00" else p2_hi_int;  -- Bits 0,1 of PD used for DQM when dqm_size = 01,10,11
-  -- pdlh_hi  <= '0' when dqm_size_int(1) = '1' else p2_hi_int; -- Bits 2,3 of PD used for DQM when dqm_size = 10,11
-  -- pdh_hi <= '0' when dqm_size_int = "11" else p2_hi_int;   -- Bits 4-7 of PD used for DQM when dqm_size = 11
-  -- pf_hi    <= '0' when en_eth_int /= "00" else p3_hi_int;    -- PF used for Ethernet when en_eth = 01,10,11
-  -- pg_hi    <= '0' when en_eth_int(0) = '1' else p3_hi_int;   -- PG used for Ethernet when en_eth = 01,11
 
 end;

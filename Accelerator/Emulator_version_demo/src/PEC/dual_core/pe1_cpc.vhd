@@ -71,12 +71,8 @@ entity pe1_cpc is
     dfsr        : out std_logic_vector(7 downto 0);  -- data to 'MPLL'
     -- External pins
     msdin       : in  std_logic;         -- Serial data input
-    msdout      : out std_logic;         -- Serial data out
---    -- TRCMEM signals
-    trcmem_d    : out std_logic_vector(31 downto 0); -- Data out to trace memory
-    trcmem_a    : out std_logic_vector(7 downto 0);  -- Trace memory address
-    trcmem_ce_n : out std_logic;        -- Trace memory chip select(active low)
-    trcmem_we_n : out std_logic);       -- Trace memory write enable(active low)
+    msdout      : out std_logic         -- Serial data out
+  );
     attribute dont_touch : string;
     attribute dont_touch of pe1_cpc : entity is "yes";
 end pe1_cpc;
@@ -93,9 +89,6 @@ architecture rtl of pe1_cpc is
   signal byte_cnt       : std_logic_vector(3 downto 0);--std_logic_vector(3 downto 0);--CJ
   signal byte_cnt_zero  : std_logic;
   signal dbreg          : std_logic_vector(7 downto 0);
-  -- TRC signals
-  constant mem_addr_sz  : positive := 8;
-  signal go             : std_logic;
   -- Internal copies
   signal dfsr_int       : std_logic_vector(7 downto 0);
   signal plsel_nint     : std_logic;
@@ -465,7 +458,7 @@ begin
     -- Mux for data to transmit shift register (dtsr).
     dtsr_mux: process(tx_sel, dbus, ybus, mar, mpd_muxout, mpram_we_nint,
                       plcpe_nint, plsel_nint, runmode, spreq_n, spack_n,
-                      go, dbreg)
+                      dbreg)
     begin
       case tx_sel is
         when "000" =>
@@ -481,9 +474,9 @@ begin
           dtsr <= ybus;
         when "101" =>
           dtsr <= dbreg;
-        when "110" =>
-          dtsr <= runmode & '0' & spreq_n & spack_n & go &
-                  mpram_we_nint & plcpe_nint & plsel_nint;
+        --when "110" =>
+        --  dtsr <= runmode & '0' & spreq_n & spack_n &
+        --          mpram_we_nint & plcpe_nint & plsel_nint;
         --when "111" =>
         --  dtsr <= rdata;
         when others => null;
@@ -516,33 +509,33 @@ begin
     end process;
 
 --    -- Instance of trace
-    trace : entity work.pe1_debug_trace
-      generic map(
-        mem_addr_sz     => mem_addr_sz,
-        set_trace_cmd   => x"6",
-        go_trace_cmd    => x"7",
-        read_trace_cmd  => x"F")
-      port map(
+--    trace : entity work.pe1_debug_trace
+--      generic map(
+--        mem_addr_sz     => mem_addr_sz,
+--        set_trace_cmd   => x"6",
+--        go_trace_cmd    => x"7",
+--        read_trace_cmd  => x"F")
+--      port map(
 --        clk_e   => clk_e,
-        clk_p   => clk_p,
-        clk_e_pos => clk_e_pos,
-        rst_cn     => rst_cn,
-        go      => go,
-        wdata   => wdata,
-        wr      => byte_rec,
-        cmdstrt => cmdstrt,
-        cmdend  => cmdend,
+--        clk_p   => clk_p,
+--        clk_e_pos => clk_e_pos,
+--        rst_cn     => rst_cn,
+--        go      => go,
+--        wdata   => wdata,
+--        wr      => byte_rec,
+--        cmdstrt => cmdstrt,
+--        cmdend  => cmdend,
 --        rdata   => rdata,
-        rd      => rd,
-        rsel    => open,
-        mpg_a   => curr_mpga,
-        d       => dbus,
-        y       => ybus,
-        o       => trcmem_d,
-        a       => trcmem_a,
-        adsc_n  => trcmem_ce_n,
-        gw_n    => trcmem_we_n,
-        oe_n    => open);
+--        rd      => rd,
+--        rsel    => open,
+--        mpg_a   => curr_mpga,
+--        d       => dbus,
+--        y       => ybus,
+--        o       => trcmem_d,
+--        a       => trcmem_a,
+--        adsc_n  => trcmem_ce_n,
+--        gw_n    => trcmem_we_n,
+--        oe_n    => open);
 --    go <= '0';
 --    rdata <= (others => '0');
 

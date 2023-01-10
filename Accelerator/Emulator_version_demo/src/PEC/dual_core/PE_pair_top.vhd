@@ -1019,11 +1019,6 @@ end generate;
     iomem_d       => iomem_d          , --: out std_logic_vector(15 downto 0);
     iomem_ce_n    => iomem_ce_n       , --: out std_logic_vector(1 downto 0);
     iomem_we_n    => iomem_we_n       , --: out std_logic;
-    -- TRCMEM signals (Trace memory)
-    trcmem_a      => trcmem_a         , --: out std_logic_vector(7 downto 0);
-    trcmem_d      => trcmem_d         , --: out std_logic_vector(31 downto 0);
-    trcmem_ce_n   => trcmem_ce_n      , --: out std_logic;
-    trcmem_we_n   => trcmem_we_n      , --: out std_logic;
     -- PMEM signals (Patch memory)
     pmem_d        => c1_pmem_d        ,--: out std_logic_vector(1  downto 0);
     pmem_we_n     => c1_pmem_we_n     ,

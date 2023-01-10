@@ -10,7 +10,6 @@ entity pe1_rtc_iso is
 	  -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-      ld_bmem         : in  std_logic;  -- Latch enable to the dis_bmem latch
       clk_mux_out     : in  std_logic;
 
           --gmem1
@@ -27,12 +26,7 @@ entity pe1_rtc_iso is
 
       --bmem
       dbus              : in    std_logic_vector(7 downto 0);
-      bmem_a8           : in    std_logic;
-      bmem_d            : in    std_logic_vector(7 downto 0);
-      bmem_we_n         : in    std_logic;
-      bmem_ce_n         : in    std_logic;
 
-      ld_bmem_iso_0   : out std_logic;
       halt_en_iso_0     : out std_logic;
       nap_en_iso_0      : out std_logic;
 
@@ -45,7 +39,6 @@ entity pe1_rtc_iso is
 
       dbus_iso_0        : out std_logic_vector(7 downto 0);
       bmem_a8_iso_0     : out std_logic;
-      bmem_d_iso_0      : out std_logic_vector(7 downto 0);
 
       clk_mux_out_iso_1   : out  std_logic;
 
@@ -65,7 +58,6 @@ begin
 
 	-- These input signals are gated off to 0 using iso, make
 	-- sure this is synthezised into simple AND gates!
-      ld_bmem_iso_0	        <= ld_bmem          and (not iso);
       halt_en_iso_0         <= halt_en          and (not iso);
       nap_en_iso_0          <= nap_en           and (not iso);
 
@@ -79,7 +71,6 @@ begin
             c1_gmem_d_iso_0(i) <= c1_gmem_d(i)  and (not iso);
             c2_gmem_d_iso_0(i) <= c2_gmem_d(i)  and (not iso);
             dbus_iso_0(i) <= dbus(i)            and (not iso);
-            bmem_d_iso_0(i) <= bmem_d(i)        and (not iso);
       end generate data_bus_gen;
 
       --ram_addr_gen : for i in 0 to 13 generate

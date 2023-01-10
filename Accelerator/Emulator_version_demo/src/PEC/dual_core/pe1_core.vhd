@@ -98,12 +98,7 @@ entity pe1_core is
     c2_t_ras       : out std_logic_vector(2 downto 0);
     c2_t_rcd       : out std_logic_vector(1 downto 0);
     c2_t_rp        : out std_logic_vector(1 downto 0);
-    -- BMEM block signals
-    bmem_a8     : out  std_logic;
-    bmem_d      : out  std_logic_vector(7 downto 0);
-    bmem_we_n   : out  std_logic;
     short_cycle : out std_logic;
-    bmem_ce_n   : out  std_logic;
     -- CC signal
     req_c1     : out std_logic;
     req_rd_c1  : out std_logic;
@@ -116,7 +111,6 @@ entity pe1_core is
     nap_rec         : in std_logic;  -- will recover from nap mode
     halt_en         : out std_logic;
     nap_en          : out std_logic;
-    ld_bmem     : out std_logic;  -- Latch enable to the en_bmem latch
     --  Signals to/from Peripheral block
     dbus        : out std_logic_vector(7 downto 0);
     rst_en      : out std_logic;
@@ -158,14 +152,6 @@ entity pe1_core is
     gmem_q      : in  std_logic_vector(7 downto 0);
     gmem_ce_n   : out std_logic;
     gmem_we_n   : out std_logic;
-    -- IOMEM signals
-    iomem_a     : out std_logic_vector(9 downto 0);
-    iomem_d     : out std_logic_vector(15 downto 0);
-    iomem_ce_n  : out std_logic_vector(1 downto 0);
-    iomem_we_n  : out std_logic;
-    -- PMEM signals (Patch memory)
-    pmem_d      : out std_logic_vector(1  downto 0);
-    pmem_we_n   : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
@@ -576,8 +562,6 @@ begin
   end process;
   --n_temp <= not temp;
   mpram_we_n  <= not temp1 when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
-  pmem_d      <= udo(1 downto 0);
-  pmem_we_n   <= mpram_we_nint and lmpwe_n;
 
 ---------------------------------------------------------------------
 -- CRB - configuration register block -- async reset
@@ -654,13 +638,8 @@ begin
       p3_hi          => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
       p3_sr          => p3_sr          ,   --: out std_logic; -- Slew rate limit on port group 3 pins
     	-- BMEM block interface
-      bmem_a8     => bmem_a8,
       core2_en    => c2_core2_en,
-    --  bmem_q      => bmem_q ,
-      bmem_d      => bmem_d,
-      bmem_we_n   => bmem_we_n,
       short_cycle => short_cycle_int,
-      bmem_ce_n   => bmem_ce_n,
 
       crb_out_c2  => c2_crb_out,
       crb_sel_c2  => c2_crb_sel,
@@ -668,8 +647,7 @@ begin
       poweron_finish   => poweron_finish   ,-- differ start from begginning or halt mode
       nap_rec     => nap_rec     , -- will recover from nap mode
       halt_en     => halt_en     ,
-      nap_en      => nap_en      ,
-      ld_bmem     => ld_bmem);
+      nap_en      => nap_en);
 
     fast_d		    <= fast_d_int;
 	  dqm_size	    <= dqm_size_int;
@@ -1141,12 +1119,7 @@ begin
       ilioa          => ilioa,
       ildout         => ildout,
       inext          => inext,
-      iden           => iden,
-      -- IOMEM signals
-      iomem_ce_n     => iomem_ce_n,
-      iomem_we_n     => iomem_we_n,
-      iomem_a        => iomem_a,
-      iomem_d        => iomem_d);
+      iden           => iden);
 
       --CJ Added
 ---------------------------------------------------------------------

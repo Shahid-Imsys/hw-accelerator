@@ -73,12 +73,7 @@ entity pe1_ios_dma is
     ido_core    : in  std_logic_vector(7 downto 0); -- I/O data bus input from pe1_core
     iden_mem    : out std_logic;  -- I/O data bus enable from IOMEM
     ido_dma     : out std_logic_vector(7 downto 0); -- I/O data bus output from DMA ctrl
-    iden_dma    : out std_logic;  -- I/O data bus enable from DMA ctrl
-    -- IOMEM signals
-    iomem_ce_n  : out std_logic_vector(1 downto 0);   -- Chip enable (active low)
-    iomem_we_n  : out std_logic;  -- Write enable (active low)
-    iomem_a     : out std_logic_vector(IOMEM_ADDR_WIDTH-2 downto 0);  -- Address
-    iomem_d     : out std_logic_vector(15 downto 0)); -- Data out
+    iden_dma    : out std_logic); -- Data out
 end pe1_ios_dma;
 
 architecture rtl of pe1_ios_dma is
@@ -426,18 +421,18 @@ begin
   -- Chip enable to even or odd half of memory whenever processor or I/O
   -- accesses, selected by the low bit of the logical address. Enable both
   -- halves on processor double-byte accesses.
-  iomem_ce_n(0) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '0'
-                   else '0' when pio_ce = '1' and dbl_direct = '1'
-                   else '1';
-  iomem_ce_n(1) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '1'
-                   else '0' when pio_ce = '1' and dbl_direct = '1'
-                   else '1';
+  --iomem_ce_n(0) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '0'
+  --                 else '0' when pio_ce = '1' and dbl_direct = '1'
+  --                 else '1';
+  --iomem_ce_n(1) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '1'
+  --                 else '0' when pio_ce = '1' and dbl_direct = '1'
+  --                 else '1';
 
   -- Write enable is true on write accesses from either side.
-  iomem_we_n <= '0' when (dma_we = '1' or pio_we = '1') else '1';
+  --iomem_we_n <= '0' when (dma_we = '1' or pio_we = '1') else '1';
 
   -- Physical address to both halves is high ten bits of logical address.
-  iomem_a <= maddr(IOMEM_ADDR_WIDTH-1 downto 1);
+  --iomem_a <= maddr(IOMEM_ADDR_WIDTH-1 downto 1);
 
   ------------------------------------------------------------------------------
   -- Data path
@@ -480,14 +475,14 @@ begin
   -- side is writing to memory, otherwise from the even input register
   -- when double byte transfers on the direct bus are used, else from
   -- the odd input register.
-  iomem_d(7 downto 0) <= idi when dma_we = '1' else
-                         even_in when dbl_direct = '1' else
-                         odd_in;
+  --iomem_d(7 downto 0) <= idi when dma_we = '1' else
+  --                       even_in when dbl_direct = '1' else
+  --                       odd_in;
 
   -- Data in to the odd IOMEM half, taken from the id bus when the DMA
   -- side is writing to memory, otherwise from the odd input register.
-  iomem_d(15 downto 8) <= idi when dma_we = '1' else
-                          odd_in;
+  --iomem_d(15 downto 8) <= idi when dma_we = '1' else
+  --                        odd_in;
 
   -- On I/O side read accesses, save low bit of logical address to determine
   -- from which half data shall be taken in the next cycle. Also enable the

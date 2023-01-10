@@ -115,14 +115,6 @@ entity pe1_crb is
     clk_in_off  : out std_logic;
     clk_main_off : out std_logic;
     reqrun      : in std_logic;
-  --router control register
---  router_ir_en : out std_logic;      --delete by HYX, 20141027
---  north_en   : out std_logic;         --delete by HYX, 20141027
---  south_en   : out std_logic;         --delete by HYX, 20141027
---  west_en    : out std_logic;        --delete by HYX, 20141027
---  east_en    : out std_logic;        --delete by HYX, 20141027
---  router_clk_en : out std_logic;     --delete by HYX, 20141027
-
 
     -- IOCTRL register & pad control
     d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
@@ -135,43 +127,16 @@ entity pe1_crb is
     p3_hi       : out std_logic; -- High drive on port group 3 pins
     p3_sr       : out std_logic; -- Slew rate limit on port group 3 pins
 
-    -- pc_hi       : out std_logic;  -- High drive on port C pins
-    -- pc_lo_n     : out std_logic;  -- Not low drive port C pins
-    -- ph_hi       : out std_logic;  -- High drive on port H pins
-    -- ph_lo_n     : out std_logic;  -- Not low drive port H pins
-    -- pi_hi       : out std_logic;  -- High drive on port I pins
-    -- pi_lo_n     : out std_logic;  -- Not low drive port I pins
-    -- pel_hi      : out std_logic;  -- High drive on low half of port E pins
-    -- peh_hi      : out std_logic;  -- High drive on high half of port E pins
-    -- pdll_hi     : out std_logic;  -- High drive low dibit, low half of port D
-    -- pdlh_hi     : out std_logic;  -- High drive high dibit, low half of port D
-    -- pdh_hi      : out std_logic;  -- High drive on high half of port D pins
-    -- pf_hi       : out std_logic;  -- High drive on port F pins
-    -- pg_hi       : out std_logic); -- High drive on port G pins
-
-    -- BMEM block interface
     core2_en    : out std_logic;
     crb_out_c2  : out std_logic_vector(7 downto 0); -- CRB output, to DSL in core2_en
     crb_sel_c2  : in std_logic_vector(3 downto 0); -- CRB output select, from core2
     c2_ready    : in std_logic; -- core2 ready signal, from core2
     short_cycle : out std_logic;
-    --ram_partition   : out std_logic_vector(3 downto 0);
-    bmem_a8     : out  std_logic;  --change to core2_en by maning 2013-01-17 14:31:27
-  --  bmem_q      : in   std_logic_vector(7 downto 0);
-    bmem_d      : out  std_logic_vector(7 downto 0);
-    bmem_we_n   : out  std_logic;
-    bmem_ce_n   : out  std_logic;
     -- RTC block interface
     poweron_finish   : in std_logic; -- differ start from begginning or halt mode
     nap_rec     : in std_logic;  -- will recover from nap mode
     halt_en     : out std_logic;
-    nap_en      : out std_logic;
-  --  rst_rtc     : out std_logic;  -- Reset RTC counter byte
-  --  en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
-  --  fclk        : out std_logic;  -- Fast clock to RTC counter byte
-    ld_bmem     : out std_logic);  -- Latch enable to the en_bmem latch
-  --  rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
-  --  rtc_data    : in  std_logic_vector(7 downto 0));  -- RTC data
+    nap_en      : out std_logic);  -- Latch enable to the en_bmem latch
 end;
 
 architecture rtl of pe1_crb is
@@ -227,8 +192,6 @@ architecture rtl of pe1_crb is
   signal halt_en_int  : std_logic;
   signal nap_en_int  : std_logic;
   signal short_cycle_int : std_logic;
-  signal bmem_we_nint   : std_logic;
-  signal bmem_a8_int    : std_logic;
   signal pl_sig15 : std_logic_vector(3 downto 0);
 begin
   pl_sig15 <= pl(6)&pl(54)&pl(27)&pl(49);
@@ -284,28 +247,9 @@ begin
       p3_hi_int <= '0';
       p3_sr_int <= '0';
     --router control
---    router_ir_en_int <= '0';       --delete by HYX, 20141027
---    north_en_int <= '0';           --delete by HYX, 20141027
---    south_en_int <= '0';           --delete by HYX, 20141027
---    west_en_int <= '0';            --delete by HYX, 20141027
---    east_en_int <= '0';            --delete by HYX, 20141027
---    router_clk_en_int <= '0';      --delete by HYX, 20141027
       core2_en_int <= '0';
---      ram_partition_int <= "0100";
       halt_en_int <= '0';                 -- added bu HYX, 20150707
       short_cycle_int <= '0';
-      -- BMEM control
-      bmem_we_nint <= '1';
-      bmem_a8_int  <= '0';
-      -- BMEM data
-      bmem_d  <= x"00";
-       -- RTC control
-    --  rst_rtc <= '0';
-    --  en_fclk <= '0';
-    --  fclk    <= '1';
-      ld_bmem <= '0';
-    --  rtc_sel <= "111";
---  elsif clk_e = '0' then          -- Latch based implementation
     elsif rising_edge(clk_p) then   -- Register based implementation
       if ld_crb = '1' and clk_e_pos = '0' then
         case pl_sig15 is
@@ -382,17 +326,12 @@ begin
 --            ram_partition_int <= dbus(6 downto 3);
             halt_en_int <= dbus(3);           -- added bu HYX, 20150707
             short_cycle_int <= dbus(2);
-      -- BMEM control
-            bmem_we_nint <= dbus(1);
-            bmem_a8_int  <= dbus(0);
 
-          when "1101" => -- BMEM data
-            bmem_d  <= dbus;
-          when "1111" => -- RTC control
+          --when "1101" => -- BMEM data
+          --when "1111" => -- RTC control
           --  rst_rtc <= dbus(7);
           --  en_fclk <= dbus(6);
           --  fclk    <= dbus(5);
-            ld_bmem <= dbus(4);
           --  rtc_sel <= dbus(2 downto 0);
           when others =>
             NULL;
@@ -439,7 +378,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 --------------------------------------------end by maning-------------------------------------------------
 
   -- CE to BMEM active when BMEM address is written
-  bmem_ce_n <= '0' when ld_crb = '1' and pl_sig15 = "1110" else '1';
 
   -- This process handles the 'dis_xosc' bit in the PLLC register,
   -- because its reset differs from most of the CRB register bits.
@@ -523,7 +461,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out <= x"00";
     case crb_sel is
@@ -593,8 +531,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(4)          <= nap_en_int;
         crb_out(3)          <= poweron_finish;
         crb_out(2)          <= short_cycle_int;
-        crb_out(1)          <= bmem_we_nint;
-        crb_out(0)          <= bmem_a8_int;
       --when "1101" => -- BMEM data
       --  crb_out             <= bmem_q;
       --when "1111" => -- RTC data
@@ -614,7 +550,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
            en_iobus_int, adc_ref2v_int, speed_u_int,
            speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
-           p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
+           p3_hi_int, p3_sr_int, core2_en_int , nap_en_int,poweron_finish,short_cycle_int)--
   begin
     crb_out_c2 <= x"00";
     case crb_sel_c2 is
@@ -684,8 +620,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(4)          <= nap_en_int;
         crb_out_c2(3)          <= poweron_finish;
         crb_out_c2(2)          <= short_cycle_int;
-        crb_out_c2(1)          <= bmem_we_nint;
-        crb_out_c2(0)          <= bmem_a8_int;
       --when "1101" => -- BMEM data
       --  crb_out_c2             <= bmem_q;
       --when "1111" => -- RTC data
@@ -732,11 +666,9 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   p2_sr       <= p2_sr_int;
   p3_hi       <= p3_hi_int;
   p3_sr       <= p3_sr_int;
-  bmem_we_n   <= bmem_we_nint;
   short_cycle <= short_cycle_int;
   halt_en     <= halt_en_int;
   nap_en      <= nap_en_int;
-  bmem_a8     <= bmem_a8_int;
   core2_en <= core2_en_int;
 --  ram_partition <= ram_partition_int;
 

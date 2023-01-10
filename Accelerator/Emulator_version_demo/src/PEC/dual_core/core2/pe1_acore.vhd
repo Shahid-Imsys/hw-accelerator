@@ -110,9 +110,6 @@ entity pe1_acore is
     gmem_q      : in  std_logic_vector(7 downto 0);
     gmem_ce_n   : out std_logic;
     gmem_we_n   : out std_logic;
-    -- PMEM signals (Patch memory)
-    pmem_d      : out std_logic_vector(1  downto 0);
-    pmem_we_n   : out std_logic;
     -- CC signal
     req_c2    : out std_logic;
     req_rd_c2 : out std_logic;
@@ -416,8 +413,6 @@ begin
   --mprom_a     <= mpga;
   mpram_d     <= mpgmin;--(others => '1');
   mpram_we_n  <= '1';
-  pmem_d      <= "11";
-  pmem_we_n   <= '1';
 
 ---------------------------------------------------------------------
 -- TIM - timing logic

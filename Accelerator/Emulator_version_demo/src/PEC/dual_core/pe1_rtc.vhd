@@ -64,34 +64,10 @@ entity pe1_rtc is
 
     --bmem
     dbus              : in    std_logic_vector(7 downto 0);
-    bmem_a8           : in    std_logic;
-    bmem_d            : in    std_logic_vector(7 downto 0);
-    bmem_we_n         : in    std_logic;
-    bmem_ce_n         : in    std_logic;
---
-  --  --RAM0
-  --  RAM0_DO           : out   std_logic_vector (7 downto 0);
-  --  RAM0_DI           : in 	  std_logic_vector (7 downto 0);
-  --  RAM0_A            : in 	  std_logic_vector (13 downto 0);
-  --  RAM0_WEB          : in 	  std_logic;
-  --  RAM0_CS           : in 	  std_logic;
 
-  --  xout                : in  std_logic;  -- external high frequency oscillator clock --Now same as the xout clock, by CJ.
     pllout              : in  std_logic;
-  --  sel_pll             : in  std_logic;
-  --  xout_selected       : out std_logic;
     lp_pwr_ok           : in  std_logic;  -- Core power indicator, controls mrxout_o
-  --  rxout               : in  std_logic;  -- 32KHz oscillator input
-  --  mrxout_o            : out std_logic;  -- 32KHz oscillator output or external wake
-  --  rst_rtc             : in  std_logic;  -- Reset RTC counter byte
-  --  en_fclk             : in  std_logic;  -- Enable fast clocking of RTC counter byte
-  --  fclk                : in  std_logic;  -- Fast clock to RTC counter byte
-    ld_bmem             : in  std_logic;  -- Latch enable to the dis_bmem latch
-  --  rtc_sel             : in  std_logic_vector(2 downto 0);  -- RTC byte select
-  --  rtc_data            : out std_logic_vector(7 downto 0);  -- RTC data
-  --  dis_bmem            : out std_logic;  -- Disable power to BMEM
 
-  --  reset_iso_clear     : in  std_logic;
     halt_en             : in  std_logic;   --high active, will go to halt state
     nap_en              : in  std_logic;   --high active, will go to nap state
     wakeup_lp           : in  std_logic;  -- From wakeup_lp input IO
@@ -125,7 +101,6 @@ architecture rtl of pe1_rtc is
 
   -- bmem
   signal dbus_iso_0             : std_logic_vector(7 downto 0);
-  signal bmem_d_iso_0           : std_logic_vector(7 downto 0);
 
   -- RAM0
   signal RAM0_DI_iso_0       	: std_logic_vector(7 downto 0);
@@ -139,7 +114,6 @@ architecture rtl of pe1_rtc is
   signal rst_rtc_iso_0	: std_logic;
   signal en_fclk_iso_0	: std_logic;
   signal fclk_iso_0		  : std_logic;
-  signal ld_bmem_iso_0	: std_logic;
   signal rtc_sel_iso_0	: std_logic_vector(2 downto 0);
   signal halt_en_iso_0   : std_logic;
   signal nap_en_iso_0    : std_logic;
@@ -185,7 +159,6 @@ architecture rtl of pe1_rtc is
       -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-      ld_bmem			    : in  std_logic;  -- Latch enable to the dis_bmem latch
       clk_mux_out     : in  std_logic;
 
           --gmem1
@@ -202,12 +175,7 @@ architecture rtl of pe1_rtc is
 
       --bmem
       dbus              : in    std_logic_vector(7 downto 0);
-      bmem_a8           : in    std_logic;
-      bmem_d            : in    std_logic_vector(7 downto 0);
-      bmem_we_n         : in    std_logic;
-      bmem_ce_n         : in    std_logic;
 
-      ld_bmem_iso_0	    : out std_logic;
       halt_en_iso_0   : out std_logic;
       nap_en_iso_0    : out std_logic;
 
@@ -218,7 +186,6 @@ architecture rtl of pe1_rtc is
       c2_gmem_d_iso_0   : out std_logic_vector(7 downto 0);
 
       dbus_iso_0        : out std_logic_vector(7 downto 0);
-      bmem_d_iso_0      : out std_logic_vector(7 downto 0);
 
       clk_mux_out_iso_1   : out  std_logic;
 
@@ -293,23 +260,18 @@ begin  -- rtl
       clk_iso        => clk_iso,
       halt_en        => halt_en,
       nap_en         => nap_en,
-      ld_bmem        => ld_bmem,
 
       c1_gmem_a      =>  c1_gmem_a,
       c1_gmem_d      =>  c1_gmem_d,
       c2_gmem_a      =>  c2_gmem_a,
       c2_gmem_d      =>  c2_gmem_d,
       dbus           =>  dbus,
-      bmem_a8        =>  bmem_a8,
-      bmem_d         =>  bmem_d,
       clk_mux_out    =>  clk_mux_out_int,
 
       c1_gmem_we_n   =>  c1_gmem_we_n,
       c1_gmem_ce_n   =>  c1_gmem_ce_n,
       c2_gmem_we_n   =>  c2_gmem_we_n,
       c2_gmem_ce_n   =>  c2_gmem_ce_n,
-      bmem_we_n      =>  bmem_we_n,
-      bmem_ce_n      =>  bmem_ce_n,
 
       halt_en_iso_0     => halt_en_iso_0,
       nap_en_iso_0      => nap_en_iso_0,
@@ -320,7 +282,6 @@ begin  -- rtl
       c2_gmem_a_iso_0     =>  c2_gmem_a_iso_0,
       c2_gmem_d_iso_0     =>  c2_gmem_d_iso_0,
       dbus_iso_0          =>  dbus_iso_0,
-      bmem_d_iso_0        =>  bmem_d_iso_0,
       clk_mux_out_iso_1   =>  clk_mux_out_iso_1,
 
       c1_gmem_we_n_iso_1  =>  c1_gmem_we_n_iso_1,

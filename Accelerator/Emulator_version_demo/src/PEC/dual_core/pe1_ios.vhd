@@ -70,19 +70,7 @@ entity pe1_ios is
     idi         : in    std_logic_vector(7 downto 0);   -- I/O data bus input
     ido         : out   std_logic_vector(7 downto 0);   -- I/O data bus output
     ios_iden    : out   std_logic;      -- I/O data bus enable
-    iden        : in    std_logic;      -- High when I/O bus is driven by on-chip peripheral
-    -- IOMEM signals
-    iomem_ce_n  : out   std_logic_vector(1 downto 0);   -- Chip enable (active low)
-    iomem_we_n  : out   std_logic;      -- Write enable (active low)
-    iomem_a     : out   std_logic_vector(IOMEM_ADDR_WIDTH-2 downto 0);  -- Address
-    iomem_d     : out   std_logic_vector(15 downto 0)
-    --CJ start
-    --req_logic_sig         : out std_logic; --used to generate req_sig
-    --ack_sig               : in std_logic;
-    --pe_request            : out std_logic_vector(31 downto 0); --used to generate pe_req_in
-    --data_dfm              : in std_logic_vector(127 downto 0);
-    --dfm_vld               : in std_logic
-
+    iden        : in    std_logic      -- High when I/O bus is driven by on-chip peripheral
   );
 
 
@@ -383,10 +371,6 @@ begin
       ido_core     => ido_core,
       iden_mem     => iden_mem,
       ido_dma      => ido_dma,
-      iden_dma     => iden_dma,
-      iomem_ce_n   => iomem_ce_n,
-      iomem_we_n   => iomem_we_n,
-      iomem_a      => iomem_a,
-      iomem_d      => iomem_d);
+      iden_dma     => iden_dma);
   i_direct <= i_direct_int;
 end rtl;

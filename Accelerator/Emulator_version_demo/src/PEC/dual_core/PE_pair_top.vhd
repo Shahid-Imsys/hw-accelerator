@@ -386,15 +386,6 @@ architecture struct of PE_pair_top is
   --add the following two signals by maning
   signal clk_in_off    : std_logic;
   signal clk_main_off  : std_logic;
-  signal bmem_a8       : std_logic;
-  signal bmem_d        : std_logic_vector(7 downto 0);
-  signal bmem_ce_n     : std_logic;
-  signal bmem_we_n     : std_logic;
-  signal ld_bmem       : std_logic;
-  signal en_tstamp     : std_logic_vector(1 downto 0);
-  signal tiu_tstamp    : std_logic;
-  signal tstamp        : std_logic_vector(2 downto 0);
-  signal mpll_tsto_o   : std_logic;
   signal adc_dac       : std_logic;
   --signals to core2
   signal  c2_core2_en   : std_logic;  -- core2 enable
@@ -422,16 +413,6 @@ architecture struct of PE_pair_top is
   signal c1_gmem_d     : std_logic_vector(7 downto 0);
   signal c1_gmem_ce_n  : std_logic;
   signal c1_gmem_we_n  : std_logic;
-  signal iomem_a       : std_logic_vector(9 downto 0);
-  signal iomem_d       : std_logic_vector(15 downto 0);
-  signal iomem_ce_n    : std_logic_vector(1 downto 0);
-  signal iomem_we_n    : std_logic;
-  signal trcmem_a      : std_logic_vector(7 downto 0);
-  signal trcmem_d      : std_logic_vector(31 downto 0);
-  signal trcmem_ce_n   : std_logic;
-  signal trcmem_we_n   : std_logic;
-  signal c1_pmem_d     : std_logic_vector(1 downto 0);
-  signal c1_pmem_we_n  : std_logic;
   signal short_cycle   : std_logic;
   -- to PADS
   signal mirqout_o     : std_logic;
@@ -498,10 +479,6 @@ architecture struct of PE_pair_top is
   signal c1_gmem_q    : std_logic_vector(7 downto 0);
   signal c2_gmem_q    : std_logic_vector(7 downto 0);
 
-  -- BMEM (battery backed memory)
-  signal bmem_q    : std_logic_vector(7 downto 0);
-
-  signal rom0_addr_sig : std_logic_vector(11 downto 0);
 -------------------------------------------------------------------------------
 ---------------dual core related----------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -540,11 +517,8 @@ architecture struct of PE_pair_top is
   signal c2_gmem_d     : std_logic_vector(7 downto 0);
   signal c2_gmem_ce_n  : std_logic;
   signal c2_gmem_we_n  : std_logic;
-  signal c2_pmem_d     : std_logic_vector(1 downto 0);
-  signal c2_pmem_we_n  : std_logic;
 
   signal mp_ROM0_DO : std_logic_vector (79 downto 0);
-  signal mp_ROM0_A  : std_logic_vector (13 downto 0);
   signal mp_ROM0_CS : std_logic;
   signal mp_ROM0_OE : std_logic;
   signal mp_ROM1_DO : std_logic_vector (79 downto 0);
@@ -612,7 +586,6 @@ begin
  -----------------------------------------------------------------------------
  -----------------------------------------------------------------------------
 
- rom0_addr_sig <= mp_ROM0_A(12) & mp_ROM0_A(10 downto 0);
   -----------------------------------------------------------------------------
   -- Instantiation of memories
   -----------------------------------------------------------------------------
@@ -941,7 +914,6 @@ end generate;
      port map(
       pllout         => HCLK          ,
       lp_pwr_ok      => lp_pwr_ok     ,
-      ld_bmem        => ld_bmem       ,  -- Latch enable to the dis_bmem latch
 	    halt_en        => halt_en       ,
       nap_en         => nap_en        ,
       wakeup_lp      => wakeup_lp     ,
@@ -965,11 +937,7 @@ end generate;
       c2_gmem_we_n   => c2_gmem_we_n  ,
       c2_gmem_ce_n   => c2_gmem_ce_n  ,
       --bmem
-      dbus           => dbus          ,
-      bmem_a8        => bmem_a8       ,
-      bmem_d         => bmem_d        ,
-      bmem_we_n      => bmem_we_n     ,
-      bmem_ce_n      => bmem_ce_n
+      dbus           => dbus          
       );
 
   -----------------------------------------------------------------------------
@@ -1014,14 +982,6 @@ end generate;
     gmem_q        => c1_gmem_q        , --: in  std_logic_vector(7 downto 0);
     gmem_ce_n     => c1_gmem_ce_n     , --: out std_logic;
     gmem_we_n     => c1_gmem_we_n     , --: out std_logic;
-    -- IOMEM signals
-    iomem_a       => iomem_a          , --: out std_logic_vector(9 downto 0);
-    iomem_d       => iomem_d          , --: out std_logic_vector(15 downto 0);
-    iomem_ce_n    => iomem_ce_n       , --: out std_logic_vector(1 downto 0);
-    iomem_we_n    => iomem_we_n       , --: out std_logic;
-    -- PMEM signals (Patch memory)
-    pmem_d        => c1_pmem_d        ,--: out std_logic_vector(1  downto 0);
-    pmem_we_n     => c1_pmem_we_n     ,
 
     c2_core2_en   => c2_core2_en      ,
     c2_rsc_n      => c2_rsc_n         ,
@@ -1039,12 +999,6 @@ end generate;
     c2_t_rcd      => c2_t_rcd         ,
     c2_t_rp       => c2_t_rp          ,
     short_cycle   => short_cycle      ,
-    -- BMEM block signals
-    bmem_a8       => bmem_a8          ,--: out  std_logic;
-  --  bmem_q        => bmem_q           ,--: in   std_logic_vector(7 downto 0);
-    bmem_d        => bmem_d           ,--: out  std_logic_vector(7 downto 0);
-    bmem_ce_n     => bmem_ce_n        ,--: out  std_logic;
-	  bmem_we_n     => bmem_we_n        ,
     exe           => EXE              , --CJ
     resume        => RESUME           , --CJ
     id_number     => c1_ID            , --CJ
@@ -1059,7 +1013,6 @@ end generate;
     nap_rec        => nap_rec         ,
     halt_en        => halt_en         ,
     nap_en         => nap_en          ,
-    ld_bmem        => ld_bmem         ,--: out std_logic;  -- Latch enable to the en_bmem latch
     --  Signals to/from Peripheral block
     dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
     rst_en        => rst_en           ,--: out std_logic;
@@ -1175,9 +1128,6 @@ end generate;
     gmem_q        => c2_gmem_q      ,
     gmem_ce_n     => c2_gmem_ce_n   ,
     gmem_we_n     => c2_gmem_we_n   ,
-    -- PMEM signals (Patch memory)
-    pmem_d        => c2_pmem_d      ,
-    pmem_we_n     => c2_pmem_we_n   ,
     exe           => exe            ,     --CJ
     req_c2        => c2_req_i       ,
     req_rd_c2     => c2_req_rd_i    ,

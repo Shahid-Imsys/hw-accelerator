@@ -114,7 +114,6 @@ entity pe1_acore is
     gmem_we_n   : out std_logic;
     -- PMEM signals (Patch memory)
     pmem_d      : out std_logic_vector(1  downto 0);
-    pmem_q      : in  std_logic_vector(1  downto 0);
     pmem_we_n   : out std_logic;
     -- CC signal
     req_c2    : out std_logic;
@@ -133,7 +132,6 @@ entity pe1_acore is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(7 downto 0); -- Data input bus --CJ
     ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus --CJ
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
@@ -414,9 +412,8 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mpram_ce    => mpram_ce,
-      -- PMEM
-      pmem_q      => pmem_q);
+      mpram_ce    => mpram_ce
+      );
 
   --mprom_a     <= mpga;
   mpram_d     <= mpgmin;--(others => '1');
@@ -723,11 +720,9 @@ begin
       d_ras       => dras_o,
       d_cas       => dcas_o,
       d_we        => dwe_o,
-      d_dqi       => ddq_i,
       d_dqo       => ddq_o,
       --ve_data     => ve_in_int,
       en_dqo      => ddq_en,
-	  ld_dqi_flash => std_logic'('0'), --'0',
       d_a         => da_o,
       d_ba        => dba_o,
       d_dqm       => ddqm,

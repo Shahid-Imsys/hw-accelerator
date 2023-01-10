@@ -73,17 +73,7 @@ entity pe1_core is
     clk_in_off   : out std_logic;  -- close all input clock
     clk_main_off : out std_logic; -- close main clock except clk_p
     sdram_en     : out std_logic; --off chip sdram enable
-    --flash Control
-    out_line     : out std_logic;  -- one line is 8x4 = 32 bytes
-    hold_flash   : in std_logic;
-    hold_flash_d : in std_logic;
-    flash_en     : out std_logic;
-    flash_mode   : out std_logic_vector (3 downto 0);
-	  ld_dqi_flash : in std_logic;
     -- Control signals to/from the oscillator and PLL
-    pll_frange  : out std_logic;  -- Frequency range select
-    pll_n       : out std_logic_vector(5 downto 0);   -- Multiplier
-    pll_m       : out std_logic_vector(2 downto 0);   -- Divider
     en_xosc     : out std_logic;  -- Enable XOSC
     en_pll      : out std_logic;  -- Enable PLL
 		sel_pll     : out std_logic;  -- Select PLL as clock source
@@ -172,7 +162,6 @@ entity pe1_core is
     en_eth      : out std_logic_vector(1 downto 0);
     en_tiu      : out std_logic;
     run_tiu     : out std_logic;
-    en_tstamp   : out std_logic_vector(1 downto 0);
     en_iobus    : out std_logic_vector(1 downto 0);
     ddqm        : out std_logic_vector(7  downto 0);
     irq0        : in  std_logic;  -- Interrupt request 0
@@ -205,12 +194,10 @@ entity pe1_core is
     -- TRCMEM signals (Trace memory)
     trcmem_a    : out std_logic_vector(7 downto 0);
     trcmem_d    : out std_logic_vector(31 downto 0);
-    trcmem_q    : in  std_logic_vector(31 downto 0);
     trcmem_ce_n : out std_logic;
     trcmem_we_n : out std_logic;
     -- PMEM signals (Patch memory)
     pmem_d      : out std_logic_vector(1  downto 0);
-    pmem_q      : in  std_logic_vector(1  downto 0);
     pmem_we_n   : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
@@ -234,7 +221,6 @@ entity pe1_core is
     dras_o      : out std_logic;  -- Row address strobe
     dcas_o      : out std_logic;  -- Column address strobe
     dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(7 downto 0); -- Ext memory data input bus
     ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
     ddq_en      : out std_logic;  -- Data output bus enable
     da_o        : out std_logic_vector(13 downto 0);  -- Address
@@ -243,9 +229,6 @@ entity pe1_core is
     --CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
     dout_c      : out std_logic_vector(159 downto 0);
-
-    -- Port A
-    pa_i        : in  std_logic_vector(4 downto 0);
 	--pl_out          : out std_logic_vector(79 downto 0);--maning
 		-- I/O cell configuration control outputs
     d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
@@ -613,9 +596,8 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mpram_ce    => mpram_ce,
-      -- PMEM
-      pmem_q      => pmem_q);
+      mpram_ce    => mpram_ce
+      );
 
   --mprom_a     <= mpga; --deleted by CJ
   process(clk_p) --1 clk_e delay of input to microprogram memory
@@ -650,7 +632,6 @@ begin
       rd_crb      => rd_crb,
       c2_ready    => c2_ready,
       mwake_i     => mwake_i,
-      pa_i        => pa_i,
       -- Data paths
       dbus        => dbus_int,
       state_ps3   => state_ps3,
@@ -679,13 +660,9 @@ begin
       run_tiu     => run_tiu,
       dis_pll     => dis_pll,
       dis_xosc    => dis_xosc,
-      en_tstamp   => en_tstamp,
       en_mxout    => en_mxout,
       clk_sel    => clk_sel,
       -- PLLM register
-			pll_frange	=> pll_frange,
-      pll_n       => pll_n,
-      pll_m       => pll_m,
       -- SECC register
       en_s        => en_s,
       speed_s     => speed_s,
@@ -707,11 +684,7 @@ begin
       en_mckout1  => en_mckout1,
       clk_in_off   => clk_in_off   ,
       clk_main_off => clk_main_off ,
-      sdram_en => sdram_en,
       reqrun      => reqrun,
-      --flash control
-      flash_en    => flash_en,
-      flash_mode => flash_mode,
 	    -- IOCTRL register & pad control   --delete by HYX, 20141027
       d_hi           => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
       d_sr           => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
@@ -792,8 +765,6 @@ begin
       mbypass_i   => mbypass_i,
       -- Inputs from other pe1_core blocks
       hold_e      => hold_e_int,
-      hold_flash  => hold_flash,
-      hold_flash_d => hold_flash_d,
       gen_spreq   => gen_spreq,
       rsc_n       => rsc_n,
       stop_step   => stop_step,
@@ -1107,12 +1078,9 @@ begin
       d_ras       => dras_o,
       d_cas       => dcas_o,
       d_we        => dwe_o,
-      d_dqi       => ddq_i,
       d_dqo       => ddq_o,
       --ve_data     => ve_in_int,
       en_dqo      => ddq_en,
-      out_line    => out_line,
-	    ld_dqi_flash => ld_dqi_flash,
       d_a         => da_o,
       d_ba        => dba_o,
       d_dqm       => ddqm,
@@ -1159,7 +1127,6 @@ begin
       ld_mpgm     => ld_mpgm,
       -- Data inputs
       mp_q        => mp_q,
-      pmem_q      => pmem_q,
       curr_mpga   => curr_mpga,
       mar         => mar,
       dbus        => dbus_int,
@@ -1183,7 +1150,6 @@ begin
       msdin       => msdin_i,
       msdout      => msdout_o,--,
       -- TRCMEM signals
-      trcmem_q    => trcmem_q,
       trcmem_d    => trcmem_d,
       trcmem_a    => trcmem_a,
       trcmem_ce_n => trcmem_ce_n,

@@ -69,7 +69,6 @@ entity pe1_crb is
     ld_crb      : in  std_logic;  -- Load data in CRB reg from D bus, from CLC
     rd_crb      : in  std_logic;  -- Output CRB reg on crb_out, from DSL
     mwake_i     : in  std_logic;  -- Wake-up signal from external pin
-    pa_i        : in  std_logic_vector(4 downto 0); -- Port A input, for port init
     -- Data paths
     dbus        : in  std_logic_vector(7 downto 0); -- D bus, from DSL
     state_ps3   : in  std_logic_vector(4 downto 0); -- State of prescaler 3, from TIM
@@ -98,13 +97,9 @@ entity pe1_crb is
     run_tiu     : out std_logic;
     dis_pll     : out std_logic;
     dis_xosc    : out std_logic;
-    en_tstamp   : out std_logic_vector(1 downto 0);
     en_mxout    : out std_logic;
     clk_sel    : out std_logic;
     -- PLLM register
-    pll_frange  : out std_logic;
-    pll_n       : out std_logic_vector(5 downto 0); -- Expanded
-    pll_m       : out std_logic_vector(2 downto 0); -- Expanded
     -- SECC register
     en_s        : out std_logic;
     speed_s     : out std_logic_vector(1 downto 0);
@@ -127,11 +122,7 @@ entity pe1_crb is
     -- power management register added in 2012-06-14 16:29:32 by maning
     clk_in_off  : out std_logic;
     clk_main_off : out std_logic;
-    sdram_en    : out std_logic;
     reqrun      : in std_logic;
-    --flash control signals
-    flash_en     : out std_logic;
-    flash_mode   : out std_logic_vector(3 downto 0);
   --router control register
 --  router_ir_en : out std_logic;      --delete by HYX, 20141027
 --  north_en   : out std_logic;         --delete by HYX, 20141027
@@ -212,13 +203,9 @@ architecture rtl of pe1_crb is
   signal run_tiu_int    : std_logic;
   signal dis_pll_int    : std_logic;
   signal dis_xosc_int   : std_logic;
-  signal en_tstamp_int  : std_logic_vector(1 downto 0);
   signal en_mxout_int   : std_logic;
 --  signal en_mexec_int   : std_logic;
   signal clk_sel_int    : std_logic;-- change en_mexec to clk_sel
-  signal pll_frange_int : std_logic;
-  signal pll_n_int      : std_logic_vector(4 downto 0);
-  signal pll_m_int      : std_logic_vector(1 downto 0);
   signal en_s_int       : std_logic;
   signal speed_s_int    : std_logic_vector(1 downto 0);
   signal security       : std_logic;
@@ -237,9 +224,6 @@ architecture rtl of pe1_crb is
   signal en_mckout1_int : std_logic;
   signal clk_in_off_int   : std_logic;
   signal clk_main_off_int   : std_logic;
-  signal sdram_en_int  : std_logic;
-  signal flash_en_int  : std_logic;
-  signal flash_mode_int : std_logic_vector(3 downto 0);
   signal d_hi_int       : std_logic;
   signal d_sr_int       : std_logic;
   signal p1_hi_int      : std_logic;
@@ -264,7 +248,7 @@ architecture rtl of pe1_crb is
   signal pl_sig15 : std_logic_vector(3 downto 0);
 begin
   pl_sig15 <= pl(6)&pl(54)&pl(27)&pl(49);
-  process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, pa_i)
+  process (clk_p, rst_cn, ld_crb, pl_sig15, dbus)
   begin
     if rst_cn = '0' then
       -- CCFF register
@@ -291,21 +275,12 @@ begin
 --      dis_pll_int   <= '1'; -- change default value to '1' by maning 2012-06-15 15:06:27
       dis_pll_int   <= '0'; -- change default value to '1' by HYX, 20141115
 --    dis_xosc_int  <= '0'; -- In the next process due to different reset
-      en_tstamp_int <= "00";
       en_mxout_int  <= '1';
       clk_sel_int  <= '0';--select PLL
       -- PLLM register
-      pll_frange_int  <= '1';
-      pll_n_int(4)    <= '0';
-      pll_n_int(3)    <= pa_i(2);
-      pll_n_int(2)    <= pa_i(1);
-      pll_n_int(1)    <= '0';
-      pll_n_int(0)    <= '0';
-      pll_m_int(1)    <= '0';
-      pll_m_int(0)    <= pa_i(0);
       -- SECC register
       en_s_int      <= '1';
-      speed_s_int   <= pa_i(4 downto 3);
+      speed_s_int   <= "00";
       security      <= '0';
       stick(2)      <= '0';
       -- PMXC register
@@ -325,10 +300,6 @@ begin
       speed_ps3_int   <= "11111";
       en_mckout1_int  <= '0';
       -- off chip sdram enable
-      sdram_en_int <= '0';
-      -- flash control
-      flash_en_int <= '0';
-      flash_mode_int <= "0000";
       -- IOCTRL register
       d_hi_int  <= '0';
       d_sr_int  <= '0';
@@ -387,13 +358,9 @@ begin
             run_tiu_int   <= dbus(6);
             dis_pll_int   <= dbus(5);
 --          dis_xosc_int  <= dbus(4); -- In the next process due to different reset
-            en_tstamp_int <= dbus(3 downto 2);
             en_mxout_int  <= dbus(1);
             clk_sel_int  <= dbus(0);
-          when "0100" => -- PLLM register
-            pll_frange_int  <= dbus(7);
-            pll_n_int       <= dbus(6 downto 2);
-            pll_m_int       <= dbus(1 downto 0);
+          --when "0100" => -- PLLM register
           when "0101" => -- SECC register
             en_s_int      <= dbus(7);
             speed_s_int   <= dbus(6 downto 5);
@@ -419,10 +386,7 @@ begin
             speed_ps2_int(1 downto 0) <= dbus(7 downto 6);
             speed_ps3_int             <= dbus(5 downto 1);
             en_mckout1_int            <= dbus(0);
-          when "1010" => -- off chip sdram enable
-            sdram_en_int <= dbus(5);
-            flash_en_int <= dbus(4);
-            flash_mode_int <= dbus(3 downto 0);
+          --when "1010" => -- off chip sdram enable
           when "1011" => -- IOCTRL register
             d_hi_int  <= dbus(7);
             d_sr_int  <= dbus(6);
@@ -587,11 +551,11 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   process (crb_sel, en_pmem_int, speed_i_int, en_wdog_int, pup_clk_int,
            en_i_int, en_pmem2_int, en_d_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
            t_ras_int, t_rcd_int, en_tiu_int, run_tiu_int, dis_pll_int,
-           dis_xosc_int, en_tstamp_int, en_mxout_int, clk_sel_int,
-           pll_frange_int, pll_n_int, pll_m_int, en_s_int, speed_s_int, security,
+           dis_xosc_int, en_mxout_int, clk_sel_int,
+           en_s_int, speed_s_int, security,
            stick, adc_dac_int, en_uart1_int, pup_irq_int, en_uart2_int,
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
-           speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
+           speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
            p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
   begin
@@ -620,13 +584,9 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(6)          <= run_tiu_int;
         crb_out(5)          <= dis_pll_int;
         crb_out(4)          <= dis_xosc_int;
-        crb_out(3 downto 2) <= en_tstamp_int;
         crb_out(1)          <= en_mxout_int;
         crb_out(0)          <= clk_sel_int;
-      when "0100" => -- PLLM register
-        crb_out(7)          <= pll_frange_int;
-        crb_out(6 downto 2) <= pll_n_int;
-        crb_out(1 downto 0) <= pll_m_int;
+      --when "0100" => -- PLLM register
       when "0101" => -- SECC register
         crb_out(7)          <= en_s_int;
         crb_out(6 downto 5) <= speed_s_int;
@@ -652,7 +612,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
       when "1010" => -- PSS register
         crb_out(7) <= clk_in_off_int;
         crb_out(6) <= clk_main_off_int;
-        crb_out(5) <= sdram_en_int;
         crb_out(4 downto 0) <= state_ps3;
       when "1011" => -- IOCTRL register
         crb_out(7)          <= d_hi_int;
@@ -691,11 +650,11 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   process (crb_sel_c2, en_pmem_int, speed_i_int, en_wdog_int, pup_clk_int,
            en_i_int, en_pmem2_int, en_d_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
            t_ras_int, t_rcd_int, en_tiu_int, run_tiu_int, dis_pll_int,
-           dis_xosc_int, en_tstamp_int, en_mxout_int, clk_sel_int,
-           pll_frange_int, pll_n_int, pll_m_int, en_s_int, speed_s_int, security,
+           dis_xosc_int, en_mxout_int, clk_sel_int,
+           en_s_int, speed_s_int, security,
            stick, adc_dac_int, en_uart1_int, pup_irq_int, en_uart2_int,
            en_uart3_int, en_eth_int, en_iobus_int, adc_ref2v_int, speed_u_int,
-           speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, sdram_en_int, state_ps3,
+           speed_ps1_int, speed_ps2_int, speed_ps3_int, en_mckout1_int, clk_in_off_int, clk_main_off_int, state_ps3,
            d_hi_int, d_sr_int, p1_hi_int, p1_sr_int, p2_hi_int, p2_sr_int,
            p3_hi_int, p3_sr_int, core2_en_int , bmem_a8_int, bmem_we_nint, nap_en_int,poweron_finish,short_cycle_int)--
   begin
@@ -724,13 +683,9 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(6)          <= run_tiu_int;
         crb_out_c2(5)          <= dis_pll_int;
         crb_out_c2(4)          <= dis_xosc_int;
-        crb_out_c2(3 downto 2) <= en_tstamp_int;
         crb_out_c2(1)          <= en_mxout_int;
         crb_out_c2(0)          <= clk_sel_int;
-      when "0100" => -- PLLM register
-        crb_out_c2(7)          <= pll_frange_int;
-        crb_out_c2(6 downto 2) <= pll_n_int;
-        crb_out_c2(1 downto 0) <= pll_m_int;
+      --when "0100" => -- PLLM register
       when "0101" => -- SECC register
         crb_out_c2(7)          <= en_s_int;
         crb_out_c2(6 downto 5) <= speed_s_int;
@@ -756,7 +711,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
       when "1010" => -- PSS register
         crb_out_c2(7) <= clk_in_off_int;
         crb_out_c2(6) <= clk_main_off_int;
-        crb_out_c2(5) <= sdram_en_int;
         crb_out_c2(4 downto 0) <= state_ps3;
       when "1011" => -- IOCTRL register
         crb_out_c2(7)          <= d_hi_int;
@@ -810,12 +764,8 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   run_tiu     <= run_tiu_int;
   dis_pll     <= dis_pll_int;
   dis_xosc    <= dis_xosc_int;
-  en_tstamp   <= en_tstamp_int;
   en_mxout    <= en_mxout_int;
   clk_sel    <= clk_sel_int;
-  pll_frange  <= pll_frange_int;
-  pll_n       <= "100000" when pll_n_int = "00000" else '0' & pll_n_int; --Expand
-  pll_m       <= "101" when pll_m_int = "00" else '0' & pll_m_int;      --Expand
   en_s        <= en_s_int and not security;
   speed_s     <= speed_s_int;
   adc_dac     <= adc_dac_int;
@@ -832,9 +782,6 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   en_mckout1  <= en_mckout1_int;
   clk_in_off <= clk_in_off_int;
   clk_main_off <= clk_main_off_int;
-  sdram_en <= sdram_en_int;
-  flash_en <= flash_en_int;
-  flash_mode <= flash_mode_int;
   d_hi        <= d_hi_int;
   d_sr        <= d_sr_int;
   p1_hi       <= p1_hi_int;

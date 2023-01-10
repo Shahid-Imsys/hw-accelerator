@@ -50,7 +50,6 @@ entity pe1_cpc is
     ld_mpgm     : in std_logic;      -- ZH
     -- Data inputs
     mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
-    pmem_q      : in std_logic_vector(1 downto 0);  -- Patch memory data
     curr_mpga   : in std_logic_vector(7 downto 0); -- Current pe1_mpgm address
     mar         : in std_logic_vector(7 downto 0); -- MAR register, from CLC
     dbus        : in std_logic_vector(7 downto 0); -- D bus
@@ -74,7 +73,6 @@ entity pe1_cpc is
     msdin       : in  std_logic;         -- Serial data input
     msdout      : out std_logic;         -- Serial data out
 --    -- TRCMEM signals
-    trcmem_q    : in  std_logic_vector(31 downto 0); -- Data in from trace memory
     trcmem_d    : out std_logic_vector(31 downto 0); -- Data out to trace memory
     trcmem_a    : out std_logic_vector(7 downto 0);  -- Trace memory address
     trcmem_ce_n : out std_logic;        -- Trace memory chip select(active low)
@@ -97,7 +95,6 @@ architecture rtl of pe1_cpc is
   signal dbreg          : std_logic_vector(7 downto 0);
   -- TRC signals
   constant mem_addr_sz  : positive := 8;
-  signal rdata          : std_logic_vector(7 downto 0);
   signal go             : std_logic;
   -- Internal copies
   signal dfsr_int       : std_logic_vector(7 downto 0);
@@ -423,7 +420,7 @@ begin
   begin
 
     -- Mux for microprogram data. Feeds into the dtsr mux below.
-    mpd_mux: process(byte_cnt, mp_q, pmem_q)
+    mpd_mux: process(byte_cnt, mp_q)
     begin
       case byte_cnt is
         when "0001" =>
@@ -468,7 +465,7 @@ begin
     -- Mux for data to transmit shift register (dtsr).
     dtsr_mux: process(tx_sel, dbus, ybus, mar, mpd_muxout, mpram_we_nint,
                       plcpe_nint, plsel_nint, runmode, spreq_n, spack_n,
-                      rdata, go, dbreg)
+                      go, dbreg)
     begin
       case tx_sel is
         when "000" =>
@@ -487,8 +484,8 @@ begin
         when "110" =>
           dtsr <= runmode & '0' & spreq_n & spack_n & go &
                   mpram_we_nint & plcpe_nint & plsel_nint;
-        when "111" =>
-          dtsr <= rdata;
+        --when "111" =>
+        --  dtsr <= rdata;
         when others => null;
       end case;
     end process dtsr_mux;
@@ -535,13 +532,12 @@ begin
         wr      => byte_rec,
         cmdstrt => cmdstrt,
         cmdend  => cmdend,
-        rdata   => rdata,
+--        rdata   => rdata,
         rd      => rd,
         rsel    => open,
         mpg_a   => curr_mpga,
         d       => dbus,
         y       => ybus,
-        i       => trcmem_q,
         o       => trcmem_d,
         a       => trcmem_a,
         adsc_n  => trcmem_ce_n,

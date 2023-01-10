@@ -89,8 +89,6 @@ entity pe1_tim is
 		mbypass_i       : in  std_logic; -- MBYPASS pad input
 		-- Inputs from other pe1_core blocks
 		hold_e          : in  std_logic; -- Hold input for clk_e, stops high when set
-		hold_flash      : in  std_logic;
-		hold_flash_d    : in std_logic;
 		gen_spreq       : in  std_logic; -- Generate SPREQ (act H)
 		rsc_n           : in  std_logic; -- DCRS command from CPC (active low)
 		stop_step       : in  std_logic; -- SSCU command from CPC (active high)
@@ -331,8 +329,8 @@ begin
 	-- Generate din_e, this is the D input expression for the
 	-- FF in the clock block that generates clk_e. Also generate
 	-- gate_e, a copy of clk_e used for gating, not for clocking.
-	clk_e_neg <= not even_c or held_e_int or hold_flash;
-  clk_e_pos <= even_c or held_e_int or hold_flash;
+	clk_e_neg <= not even_c or held_e_int;
+  clk_e_pos <= even_c or held_e_int;
     --gate_e <= even_c or held_e_int;
 
 	-- These FFs split clk_c by four and eight for clk_i generation.
@@ -645,7 +643,7 @@ begin
 	-- held_e is high when hold_e is high or runmode is low.
 	-- single_step high overrides hold_e though, and forces
 	-- held_e low.
-	held_e_int <= (not single_step) and (hold_e or (not runmode_int) or hold_flash_d);
+	held_e_int <= (not single_step) and (hold_e or (not runmode_int));
 	held_e <= held_e_int;
 
 ---------------------------------------------------------------------
@@ -687,7 +685,7 @@ begin
 			    spackn_int <= '0';
 			    spack_cmd_c2 <= '0';
 		    elsif (even_c = '0') then
-			    if call_sp = '1' and held_e_int = '0' and hold_flash = '0' then
+			    if call_sp = '1' and held_e_int = '0' then
 			    	spackn_int <= '1';
 			    elsif spack_cmd = '1' and spack_cmd_c2 = '0' then
 			    	spackn_int <= '0';
@@ -715,7 +713,7 @@ begin
 		    elsif even_c = '0' then
 			    if gen_spreq = '1' and gen_spreq_c2 = '0' then
 			    	spreqn_int <= '0';
-			    elsif ack_spreq = '1' and held_e_int = '0' and hold_flash = '0' then
+			    elsif ack_spreq = '1' and held_e_int = '0' then
 			    	spreqn_int <= '1';
 			    end if;
 			    gen_spreq_c2 <= gen_spreq;

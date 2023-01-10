@@ -62,18 +62,14 @@ entity pe1_mpgm is
 		mpram_a     : out std_logic_vector(7 downto 0);  -- MPG RAM address    --CJ
 		mprom_oe    : out std_logic_vector(1 downto 0);   -- ROM output enable (active high)
 		mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
-		mpram_ce    : out std_logic_vector(1 downto 0);		-- RAM chip enable (active high)
-		-- Outputs to PMEM
-		pmem_q      : in  std_logic_vector(1 downto 0));   									-- PMEM chip enable (active high)
+		mpram_ce    : out std_logic_vector(1 downto 0)		-- RAM chip enable (active high)
+  );
 end pe1_mpgm;
 
 architecture rtl of pe1_mpgm is
-	signal mprom_ce_int   : std_logic_vector(1 downto 0);
+
 	signal mpram_ce_int   : std_logic_vector(1 downto 0);
 	signal oe_sel  	      : std_logic_vector(1 downto 0);
-	signal pmem_ce_nint	  : std_logic;
-	signal patched		  : std_logic;
-	signal patch_addr	  : std_logic_vector(13 downto 0);
 	signal ram_addr	      : std_logic_vector(7 downto 0); --CJ
 
 begin  -- rtl

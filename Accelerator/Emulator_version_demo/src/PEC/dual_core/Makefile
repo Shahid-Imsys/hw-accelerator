@@ -60,7 +60,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acore.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SU180_256X128X1BM1A.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SY180_1024X8X1CM8.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_flash_inf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_ios.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_core.vhd \
 				  $(DUAL_CORE_DIR_WIN)/PE_pair_top.vhd

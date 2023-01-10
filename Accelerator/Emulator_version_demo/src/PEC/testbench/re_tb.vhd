@@ -171,7 +171,11 @@ constant word_59 : std_logic_vector(127 downto 0) := "00000000000000000000001100
 constant load_lc  : std_logic_vector(127 downto 0) := x"00000080000000000000000000000000";
 --constant start    : std_logic_vector(127 downto 0) :="";
 --fft test data
-constant fft_points         : integer := 256;
+constant fft_test_data0     : string := "FFT_data0_4.dat";
+constant fft_test_data1     : string := "FFT_data1_4.dat";
+constant fft_test_tf        : string := "FFT_TF_4.dat";
+constant fft_points         : integer := 4;
+constant fft_stages         : std_logic_vector := x"00";--max 7 = 512 point
 
 
 begin
@@ -195,7 +199,7 @@ begin
   clk_e_neg <= not clk_e_pos;
   
   process(load_mem)
-  file load_text_file : text open read_mode is "FFT_data0_256.dat";
+  file load_text_file : text open read_mode is fft_test_data0;
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -210,7 +214,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "FFT_data1_256.dat";
+  file load_text_file : text open read_mode is fft_test_data1;
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -225,7 +229,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "FFT_TF_256.dat";
+  file load_text_file : text open read_mode is fft_test_tf;
   variable text_line : line;
   variable val_bias : std_logic_vector(63 downto 0);
   begin
@@ -757,7 +761,7 @@ wait for 30 ns;
 pl(106) <= '1'; --fft
 wait for 30 ns;
 pl <= ve_loop;
-ybus <= x"06";
+ybus <= fft_stages;
 wait for 30.01 ns;
 pl(95) <= '1';
 wait for 30 ns;

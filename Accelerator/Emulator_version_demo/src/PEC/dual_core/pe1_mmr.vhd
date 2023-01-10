@@ -86,11 +86,8 @@ entity pe1_mmr is
     d_ras:      out std_logic;  -- RAS to SDRAM
     d_cas:      out std_logic;  -- CAS to SDRAM
     d_we:       out std_logic;  -- WE to SDRAM
-    d_dqi:      in  std_logic_vector(7 downto 0); -- Data in from SDRAM
     d_dqo:      out std_logic_vector(7 downto 0); -- Data out to SDRAM
     en_dqo:     out std_logic;  -- Output enable to SDRAM data bus
-    out_line:   out std_logic;  -- one line is 8x4 = 32 bytes
-	  ld_dqi_flash:  in std_logic;
     d_a:        out std_logic_vector(13 downto 0);
     d_ba:       out std_logic_vector(1 downto 0);
     d_dqm:      out std_logic_vector(7 downto 0);
@@ -333,8 +330,6 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 ld_dqi <= '0';
-            elsif short_cycle = '1' and ld_dqi_flash = '1' then
-                ld_dqi <= '1';
             else
                 if (even_c = '1' or use_direct_int = '1') then
 --                    if (ld_dqi_flash = '1') then
@@ -913,7 +908,7 @@ begin
             if rst_en = '0' then
                 dfm_keep <= x"00";
             elsif ld_dqi = '1' and held_ff = '1' then
-                dfm_keep <= d_dqi;
+                dfm_keep <= dbus;
             end if;
         end if;
     end process;
@@ -927,7 +922,7 @@ begin
             if rst_en = '0' then
                 odd_keep <= x"00";
             elsif ld_dqi = '1' and dfm_kept = '1' then
-                odd_keep <= d_dqi;
+                odd_keep <= dbus;
             end if;
         end if;
     end process;
@@ -941,7 +936,7 @@ begin
                 dfm_int <= x"00";
             elsif clk_e_pos = '0' then
                 if ld_dqi = '1' then
-                    dfm_int <= d_dqi;
+                    dfm_int <= dbus;
                 elsif dfm_kept = '1' then
                     dfm_int <= dfm_keep;
                 end if;
@@ -959,7 +954,7 @@ begin
                 dfm_odd <= x"00";
             else
                 if ld_dqi = '1' and even_c = '1' and held_ff = '0' then
-                    dfm_odd <= d_dqi;
+                    dfm_odd <= dbus;
                 elsif odd_kept = '1' then
                     dfm_odd <= odd_keep;
                 end if;
@@ -1036,9 +1031,5 @@ begin
     direct <= direct_int;
   end block dtmc;
   en_dqo <= en_dqo_int;
-
-  --line is changed if the page is changed or the line is changed
-
-  out_line <= page_changed or line_changed;
 
 end;

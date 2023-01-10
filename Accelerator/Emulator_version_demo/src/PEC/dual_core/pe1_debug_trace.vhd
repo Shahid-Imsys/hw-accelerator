@@ -52,7 +52,6 @@ entity pe1_debug_trace is
     wr      : in std_logic;     -- Write signal from parallel port(active high)
     cmdstrt : in std_logic;     -- Start of parallel port command
     cmdend  : in std_logic;     -- End of parallel port command
-    rdata   : out std_logic_vector(7 downto 0); -- Data out to plll port
     rd      : in std_logic;     -- Read signal from parallel port (active high)
     rsel    : out std_logic;    -- rdata output select
     -- Trace port interface
@@ -60,7 +59,6 @@ entity pe1_debug_trace is
     d       : in  std_logic_vector(7 downto 0);  -- Trace data (D-bus)
     y       : in  std_logic_vector(7 downto 0);  -- Trace data (Y-bus)
     -- Trace memory interface
-    i       : in  std_logic_vector(31 downto 0); -- Data in from trace memory
     o       : out std_logic_vector(31 downto 0); -- Data out to trace memory
     a       : out std_logic_vector(mem_addr_sz-1 downto 0); --Trace memory address
     adsc_n  : out std_logic;    -- Trace memory chip select (active low)
@@ -212,10 +210,10 @@ begin
   -- rdata selector, will select the right byte from the trace memory data
   -- based on the i_byte_sel counter.
 
-  rdata <= i(7 downto 0)   when i_byte_sel = "00" else
-           i(15 downto 8)  when i_byte_sel = "01" else
-           i(23 downto 16) when i_byte_sel = "10" else
-           i(31 downto 24);
+  --rdata <= i(7 downto 0)   when i_byte_sel = "00" else
+  --         i(15 downto 8)  when i_byte_sel = "01" else
+  --         i(23 downto 16) when i_byte_sel = "10" else
+  --         i(31 downto 24);
 
   -- rsel is high when reading from the trace memory, will tell the above when
   -- rdata is valid.

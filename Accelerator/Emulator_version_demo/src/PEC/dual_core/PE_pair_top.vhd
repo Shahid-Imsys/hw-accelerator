@@ -350,31 +350,12 @@ architecture struct of PE_pair_top is
   -----------------------------------------------------------------------------
   signal hclk_i       : std_logic;  -- 16.7mhz clk
   signal msdin_i      : std_logic;
-  signal pd_i         : std_logic_vector(7 downto 0);
-  signal pj_i         : std_logic_vector(7 downto 0);
-  signal pi_i         : std_logic_vector(7 downto 0);
-  signal ph_i         : std_logic_vector(7 downto 0);
-  signal pc_i         : std_logic_vector(7 downto 0);
   signal mbypass_i    : std_logic;
   signal mreset_i     : std_logic;
   signal mtest_i      : std_logic;
-  signal mwake_i      : std_logic;
-  signal mirq0_i      : std_logic;
-  signal mirq1_i      : std_logic;
-  signal pe_i         : std_logic_vector(7 downto 0);
-  signal pf_i         : std_logic_vector(7 downto 0);
-  signal pg_i         : std_logic_vector(7 downto 0);
-  signal pa_i         : std_logic_vector(7 downto 0);
-  signal pb_i         : std_logic_vector(7 downto 0);
-
--- PLL
-    -- PLL
-  signal tcko         : std_logic;
-  signal const_0      : std_logic;
 
   -- Core clock buffers
   signal clk_d  : std_logic;
-  signal clk_da_pos  : std_logic;
   signal clk_u_pos  : std_logic;
   signal clk_i  : std_logic;
   signal clk_e_pos  : std_logic;
@@ -411,17 +392,11 @@ architecture struct of PE_pair_top is
   -- Signals to other blocks
   signal ddi_vld_c1    : std_logic; --CJ
   signal ddi_vld_c2    : std_logic; --CJ
-  signal pll_frange    : std_logic;
-  signal pll_n         : std_logic_vector(5 downto 0);
-  signal pll_m         : std_logic_vector(2 downto 0);
   signal en_xosc       : std_logic;
   signal en_pll        : std_logic;
   signal sel_pll       : std_logic;
   signal xout_selected : std_logic;
   signal test_pll      : std_logic;
-  signal pll_pdn       : std_logic;       --added by HYX,20141115
-  signal erxclk        : std_logic;
-  signal etxclk        : std_logic;
   signal rst_n         : std_logic;
   signal rst_cn        : std_logic;
   signal en_d          : std_logic;
@@ -430,32 +405,14 @@ architecture struct of PE_pair_top is
   signal din_i         : std_logic;
   signal din_u         : std_logic;
   signal din_s         : std_logic;
-  signal din_a         : std_logic;
   --add the following two signals by maning
   signal clk_in_off    : std_logic;
   signal clk_main_off  : std_logic;
-  signal sdram_en		   : std_logic;
-  signal out_line      : std_logic;
-  signal hold_flash    : std_logic;
-  signal hold_flash_d  : std_logic;
-  signal flash_en      : std_logic;
-  signal flash_mode    : std_logic_vector (3 downto 0);
-  signal ld_dqi_flash  : std_logic;
-  signal router_ido    : std_logic_vector(7 downto 0);
-  signal core_idi      : std_logic_vector(7 downto 0);
   signal bmem_a8       : std_logic;
   signal bmem_d        : std_logic_vector(7 downto 0);
   signal bmem_ce_n     : std_logic;
   signal bmem_we_n     : std_logic;
-  signal rst_rtc       : std_logic;
-  signal en_fclk       : std_logic;
-  signal fclk          : std_logic;
   signal ld_bmem       : std_logic;
-  signal rtc_sel       : std_logic_vector(2 downto 0);
-  signal ach_sel       : std_logic_vector(2 downto 0);
-  signal adc_bits_int  : std_logic; -- added by HYX, 20141205
-  signal dac_bits      : std_logic_vector(0 to 1);
-  signal dac_en        : std_logic_vector(0 to 1);
   signal en_tstamp     : std_logic_vector(1 downto 0);
   signal tiu_tstamp    : std_logic;
   signal tstamp        : std_logic_vector(2 downto 0);
@@ -509,25 +466,15 @@ architecture struct of PE_pair_top is
   signal da_o          : std_logic_vector(13 downto 0);
   signal dba_o         : std_logic_vector(1 downto 0);
   signal dcke_o        : std_logic_vector(3 downto 0);
-  signal pa_en         : std_logic_vector(7 downto 0);
   signal pa_o          : std_logic_vector(7 downto 0);
-  signal pb_en         : std_logic_vector(7 downto 0);
   signal pb_o          : std_logic_vector(7 downto 0);
-  signal pc_en         : std_logic_vector(7 downto 0);
   signal pc_o          : std_logic_vector(7 downto 0);
-  signal pd_en         : std_logic_vector(7 downto 0);
   signal pd_o          : std_logic_vector(7 downto 0);
-  signal pe_en         : std_logic_vector(7 downto 0);
   signal pe_o          : std_logic_vector(7 downto 0);
-  signal pf_en         : std_logic_vector(7 downto 0);
   signal pf_o          : std_logic_vector(7 downto 0);
-  signal pg_en         : std_logic_vector(7 downto 0);
   signal pg_o          : std_logic_vector(7 downto 0);
-  signal ph_en         : std_logic_vector(7 downto 0);
   signal ph_o          : std_logic_vector(7 downto 0);
-  signal pi_en         : std_logic_vector(7 downto 0);
   signal pi_o          : std_logic_vector(7 downto 0);
-  signal pj_en         : std_logic_vector(7 downto 0);
   signal pj_o          : std_logic_vector(7 downto 0);
 
   signal d_hi          : std_logic;
@@ -579,14 +526,7 @@ architecture struct of PE_pair_top is
   -- GMEM
   signal c1_gmem_q    : std_logic_vector(7 downto 0);
   signal c2_gmem_q    : std_logic_vector(7 downto 0);
-  -- IOMEM0, IOMEM1
 
-  -- TRCMEM
-  signal trcmem_q  : std_logic_vector(31 downto 0);
-
-  -- PMEM (Patch memory)
-  signal c1_pmem_q    : std_logic_vector(1  downto 0);
-  signal c2_pmem_q    : std_logic_vector(1  downto 0);
   -- BMEM (battery backed memory)
   signal bmem_q    : std_logic_vector(7 downto 0);
 
@@ -604,7 +544,6 @@ architecture struct of PE_pair_top is
   signal c1_ack_i    : std_logic;
   signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
   signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
-  signal c1_d_dqo_sd : std_logic_vector(7 downto 0); -- Data out to processor from sdram
   signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
 	signal c2_d_addr   : std_logic_vector(31 downto 0);
 	signal c2_d_cs     : std_logic;  -- CS to SDRAM
@@ -641,7 +580,6 @@ architecture struct of PE_pair_top is
   signal mp_ROM1_A  : std_logic_vector (13 downto 0);
   signal mp_ROM1_CS : std_logic;
   signal mp_ROM1_OE : std_logic;
-  signal mp_PM_DO   : std_logic_vector (1 downto 0);
   signal mp_PM_DI   : std_logic_vector (1 downto 0);
   signal mp_PM_A    : std_logic_vector (10 downto 0);
   signal mp_PM_WEB  : std_logic;
@@ -661,37 +599,6 @@ architecture struct of PE_pair_top is
   signal mp_RAM1_WEB : std_logic;
   signal mp_RAM1_CS  : std_logic;
 
-  signal f_addr_in  : std_logic_vector(16 downto 0);
-  signal f_rd_in    : std_logic;  -- low active
-  signal f_wr_in    : std_logic;  -- low active
-  signal f_data_in  : std_logic_vector(7 downto 0); -- Data in from processor
-  signal f_data_out : std_logic_vector(7 downto 0); -- Data out to processor
-  signal f_CE       : std_logic;
-  signal f_ADDR     : std_logic_vector(12 downto 0);
-  signal f_WRONLY   : std_logic;
-  signal f_PERASE   : std_logic;
-  signal f_SERASE   : std_logic;
-  signal f_MERASE   : std_logic;
-  signal f_PROG     : std_logic;
-  signal f_INF      : std_logic;
-  signal f_POR      : std_logic;
-  signal f_SAVEN    : std_logic;
-  signal f_TM       : std_logic_vector(3 downto 0);
-  signal f_DATA_WR  : std_logic_vector(31 downto 0);
-  signal f0_ALE     : std_logic;
-  signal f0_DATA_IN : std_logic_vector(31 downto 0);
-  signal f0_RBB     : std_logic;
-  signal f1_ALE     : std_logic;
-  signal f1_DATA_IN : std_logic_vector(31 downto 0);
-  signal f1_RBB     : std_logic;
-  signal f2_ALE     : std_logic;
-  signal f2_DATA_IN : std_logic_vector(31 downto 0);
-  signal f2_RBB     : std_logic;
-  signal f3_ALE     : std_logic;
-  signal f3_DATA_IN : std_logic_vector(31 downto 0);
-  signal f3_RBB     : std_logic;
-
-
 begin
 
 
@@ -702,8 +609,6 @@ begin
   MCKOUT1 <= mckout1_o;
   mtest_i <= MTEST;
   mbypass_i <= MBYPASS;
-  mirq0_i <= MIRQ0;
-  mirq1_i <= MIRQ1;
   -- SW debug
   msdin_i <= MSDIN;
   MSDOUT <= msdout_o;
@@ -1120,18 +1025,7 @@ end generate;
     din_s         => din_s            , --: out std_logic;  -- D input to FF generating clk_s
     clk_in_off    => clk_in_off       ,
     clk_main_off  => clk_main_off     ,
-	  sdram_en      => sdram_en         ,
-    --flash Control   -coreflag
-    out_line      => out_line         ,
-    hold_flash    => hold_flash       ,
-    hold_flash_d  => hold_flash_d     ,
-    flash_en      => flash_en         ,
-    flash_mode    => flash_mode       ,
-    ld_dqi_flash  => ld_dqi_flash     ,
     -- Control signals to/from the oscillator and PLL
-    pll_frange    => pll_frange       , --: out std_logic;  -- Frequency range select
-    pll_n         => pll_n            , --: out std_logic_vector(5 downto 0);   -- Multiplier
-    pll_m         => pll_m            , --: out std_logic_vector(2 downto 0);   -- Divider
     en_xosc       => en_xosc          , --: out std_logic;  -- Enable XOSC
     en_pll        => en_pll           , --: out std_logic;  -- Enable PLL
 	  sel_pll       => sel_pll          , --: out std_logic;  -- Select PLL as clock source
@@ -1166,12 +1060,10 @@ end generate;
     -- TRCMEM signals (Trace memory)
     trcmem_a      => trcmem_a         , --: out std_logic_vector(7 downto 0);
     trcmem_d      => trcmem_d         , --: out std_logic_vector(31 downto 0);
-    trcmem_q      => trcmem_q         , --: in  std_logic_vector(31 downto 0);
     trcmem_ce_n   => trcmem_ce_n      , --: out std_logic;
     trcmem_we_n   => trcmem_we_n      , --: out std_logic;
     -- PMEM signals (Patch memory)
     pmem_d        => c1_pmem_d        ,--: out std_logic_vector(1  downto 0);
-    pmem_q        => c1_pmem_q        ,--: in  std_logic_vector(1  downto 0);
     pmem_we_n     => c1_pmem_we_n     ,
 
     c2_core2_en   => c2_core2_en      ,
@@ -1235,7 +1127,6 @@ end generate;
     en_eth        => en_eth           ,--: out std_logic_vector(1 downto 0);
     en_tiu        => en_tiu           ,--: out std_logic;
     run_tiu       => run_tiu          ,--: out std_logic;
-    en_tstamp     => en_tstamp        ,--: out std_logic_vector(1 downto 0);
     en_iobus      => en_iobus         ,--: out std_logic_vector(1 downto 0);
     ddqm          => ddqm             ,--: out std_logic_vector(7  downto 0);
     irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0
@@ -1262,7 +1153,6 @@ end generate;
     dras_o        => c1_d_ras         , --: out std_logic;  -- Row address strobe
     dcas_o        => c1_d_cas         , --: out std_logic;  -- Column address strobe
     dwe_o         => c1_d_we          ,  --: out std_logic;  -- Write enable
-    ddq_i         => c1_d_dqo_sd      ,
     ddq_o         => c1_d_dqi_sd      ,
     ddq_en        => ddq_en           , --: out std_logic;  -- Data output bus enable
     da_o          => da_o             ,   --: out std_logic_vector(13 downto 0);  -- Address
@@ -1271,8 +1161,6 @@ end generate;
     -- Cluster interface
     din_c         => c1_d_dqo         ,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
     dout_c        => c1_d_dqi         ,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
-    -- Port A
-    pa_i          => pa_i(4 downto 0) , --: in  std_logic_vector(4 downto 0);
 		-- I/O cell configuration control outputs
     d_hi          => d_hi             ,   --: out std_logic; -- High drive on DRAM interface
     d_sr          => d_sr             ,   --: out std_logic; -- Slew rate limit on DRAM interface
@@ -1342,7 +1230,6 @@ end generate;
     gmem_we_n     => c2_gmem_we_n   ,
     -- PMEM signals (Patch memory)
     pmem_d        => c2_pmem_d      ,
-    pmem_q        => c2_pmem_q      ,
     pmem_we_n     => c2_pmem_we_n   ,
     exe           => exe            ,     --CJ
     req_c2        => c2_req_i       ,
@@ -1359,7 +1246,6 @@ end generate;
     dras_o        => c2_d_ras   ,
     dcas_o        => c2_d_cas   ,
     dwe_o         => c2_d_we    ,
-    ddq_i         => c1_d_dqo_sd,
     ddq_o         => c1_d_dqi_sd,
     ddq_en        => open       ,
     da_o          => open       ,
@@ -1381,7 +1267,6 @@ end generate;
         c1_mpram_ce    => c1_mpram_ce  ,-- Chip enable(active high)
         c1_mpram_oe    => c1_mpram_oe  ,-- Output enable(active high)
         c1_mpram_we_n  => c1_mpram_we_n,-- Write enable(active low)
-        c1_pmem_q      => c1_pmem_q    ,
         c1_mp_q        => c1_mp_q      ,
         -- MPRAM signals
         c2_mpram_a     => c2_mpram_a   ,-- Address
@@ -1389,9 +1274,7 @@ end generate;
         c2_mpram_ce    => c2_mpram_ce  ,-- Chip enable(active high)
         c2_mpram_oe    => c2_mpram_oe  ,-- Output enable(active high)
         c2_mpram_we_n  => c2_mpram_we_n,-- Write enable(active low)
-        c2_pmem_q      => c2_pmem_q    ,
         c2_mp_q        => c2_mp_q      ,
-        PM_DO          => mp_PM_DO     ,--: in  std_logic_vector (1 downto 0);
         --RAM0
         RAM0_DO     => mp_RAM0_DO      ,--: in  std_logic_vector (79 downto 0);
         RAM0_DI     => mp_RAM0_DI      ,--: out std_logic_vector (79 downto 0);
@@ -1403,73 +1286,17 @@ end generate;
 
 
 
-  --flash interface
-  flash_inf_inst : entity work.pe1_flash_inf
-	PORT MAP(
-	    clk_p        => hclk        ,
-		  even_c		   => even_c		  ,
-	    rst_cn       => rst_n       ,
-	    flash_en     => flash_en    ,
-	    flash_mode   => flash_mode  ,
-	    out_line     => out_line    ,
-	    hold_flash   => hold_flash  ,
-	    hold_flash_d => hold_flash_d,
-	    addr_in      => f_addr_in   ,
-      rd_in        => f_rd_in     ,
-      wr_in        => f_wr_in     ,
-      data_in      => f_data_in   ,
-      data_out     => f_data_out  ,
-		  ld_dqi_flash => ld_dqi_flash,
-      CE           => f_CE        ,
-      ADDR         => f_ADDR      ,
-      WRONLY       => f_WRONLY    ,
-      PERASE       => f_PERASE    ,
-      SERASE       => f_SERASE    ,
-      MERASE       => f_MERASE    ,
-      PROG         => f_PROG      ,
-      INF          => f_INF       ,
-      POR          => f_POR       ,
-      SAVEN        => f_SAVEN     ,
-      TM           => f_TM        ,
-      DATA_WR      => f_DATA_WR   ,
-      f0_ALE       => f0_ALE      ,
-      f0_DATA_IN   => f0_DATA_IN  ,
-      f0_RBB       => f0_RBB      ,
-      f1_ALE       => f1_ALE      ,
-      f1_DATA_IN   => f1_DATA_IN  ,
-      f1_RBB       => f1_RBB      ,
-      f2_ALE       => f2_ALE      ,
-      f2_DATA_IN   => f2_DATA_IN  ,
-      f2_RBB       => f2_RBB      ,
-      f3_ALE       => f3_ALE      ,
-      f3_DATA_IN   => f3_DATA_IN  ,
-      f3_RBB       => f3_RBB
-		);
-
 
   -----------------------------------------------------------------------------
   -- Peripherals
   -----------------------------------------------------------------------------
 
-	erxclk <= '0';
-	etxclk <= '0';
-	din_a <= '0';
 	dfp <= "00000000";
 	iden <= '0';
 	idreq <= "11111111";
 	idi <= "00000000";
 	irq0 <= '1';
 	irq1 <= '1';
-	pa_en <= "00000000";
-	pb_en <= "00000000";
-	pc_en <= "00000000";
-	pd_en <= "00000000";
-	pe_en <= "00000000";
-	pf_en <= "00000000";
-	pg_en <= "00000000";
-	ph_en <= "00000000";
-	pi_en <= "00000000";
-	pj_en <= "00000000";
 
 
 

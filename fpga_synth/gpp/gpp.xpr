@@ -65,13 +65,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="99"/>
-    <Option Name="WTModelSimExportSim" Val="99"/>
-    <Option Name="WTQuestaExportSim" Val="99"/>
+    <Option Name="WTXSimExportSim" Val="102"/>
+    <Option Name="WTModelSimExportSim" Val="102"/>
+    <Option Name="WTQuestaExportSim" Val="102"/>
     <Option Name="WTIesExportSim" Val="2"/>
-    <Option Name="WTVcsExportSim" Val="99"/>
-    <Option Name="WTRivieraExportSim" Val="99"/>
-    <Option Name="WTActivehdlExportSim" Val="99"/>
+    <Option Name="WTVcsExportSim" Val="102"/>
+    <Option Name="WTRivieraExportSim" Val="102"/>
+    <Option Name="WTActivehdlExportSim" Val="102"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -672,12 +672,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_flash_inf.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_mbm.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -745,12 +739,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_alu.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_debug_trace.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>

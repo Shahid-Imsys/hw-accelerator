@@ -11,7 +11,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/ram64x8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_sct.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_stack9x14.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem64x64.vhd \

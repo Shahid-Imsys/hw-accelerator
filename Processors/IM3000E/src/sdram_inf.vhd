@@ -80,8 +80,8 @@ architecture behav of sdram_inf is
   signal data_en_c1 : std_logic_vector(MEMNUM - 1 downto 0);
   signal data_en_c2 : std_logic_vector(MEMNUM - 1 downto 0);
   signal valueZero  : std_logic_vector(MEMNUM - 1 downto 0);
-  signal row_addr_1 : std_logic_vector (16 downto 0);
-  signal row_addr_2 : std_logic_vector (16 downto 0);
+  signal pair_addr_1 : std_logic_vector (16 downto 0);
+  signal pair_addr_2 : std_logic_vector (16 downto 0);
 
   signal c1_dqo_buffer   : std_logic_vector (7 downto 0);
   signal c2_dqo_buffer   : std_logic_vector (7 downto 0);
@@ -91,30 +91,30 @@ architecture behav of sdram_inf is
   signal c2_addr_buffer  : std_logic_vector (31 downto 0);
   signal toReq_c1_buffer : std_logic_vector(MEMNUM - 1 downto 0);
   signal toReq_c2_buffer : std_logic_vector(MEMNUM - 1 downto 0);
-  signal c1_buf          : std_logic;
-  signal c2_buf          : std_logic;
+  signal c1_buf          : std_logic; -- Buffer flag for fast writing
+  signal c2_buf          : std_logic; -- Buffer flag for fast writing
 
 begin
 
   valueZero <= (others => '0');
 
-  -- Each row_addr contains two ram instances
-  row_addr_1 <= c1_d_addr(31 downto 15);
-  row_addr_2 <= c2_d_addr(31 downto 15);
+  -- Each pair_addr contains two ram instances
+  pair_addr_1 <= c1_d_addr(31 downto 15);
+  pair_addr_2 <= c2_d_addr(31 downto 15);
 
-  fix_toreq1_p : process (row_addr_1) is
+  fix_toreq1_p : process (pair_addr_1) is
   begin -- process fix_toreq2_p
     toReq_c1 <= (others => '0');
-    if unsigned(row_addr_1) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
-      toReq_c1(to_integer(unsigned(row_addr_1))) <= '1';
+    if unsigned(pair_addr_1) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
+      toReq_c1(to_integer(unsigned(pair_addr_1))) <= '1';
     end if;
   end process fix_toreq1_p;
 
-  fix_toreq2_p : process (row_addr_2) is
+  fix_toreq2_p : process (pair_addr_2) is
   begin -- process fix_toreq2_p
     toReq_c2 <= (others => '0');
-    if unsigned(row_addr_2) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
-      toReq_c2(to_integer(unsigned(row_addr_2))) <= '1';
+    if unsigned(pair_addr_2) < (MEMNUM / 2) then -- Verify that adress is whitin memory.
+      toReq_c2(to_integer(unsigned(pair_addr_2))) <= '1';
     end if;
   end process fix_toreq2_p;
 
@@ -164,14 +164,7 @@ begin
     end if;
   end process;
 
-  c1_d_dqo <= c1_d_dqi_sd when exSD_en = '1' else
-    c1_data_inner when short_cycle = '1' else
-    c1_data_b1 when fast_d = '0' else
-    c1_data_b2;
-  c2_d_dqo <= c2_data_inner when short_cycle = '1' else
-    c2_data_b1 when fast_d = '0' else
-    c2_data_b2;
-
+  -- Choose what data goes into dqo buffer to handle fast transfer
   dqo_buffer : process (clk_p, rst_n)
   begin
     if rst_n = '0' then
@@ -183,32 +176,30 @@ begin
       -- Core 1
       for i in 0 to (MEMNUM/2 - 1) loop
         if (even_c = '0' and data_en_c1(i) = '1') then
-            if (c1_d_addr(0) = '0') then
-              c1_dqo_buffer <= ram_do(2 * i + 1);
-            else
-              c1_dqo_buffer <= ram_do(2 * i);
+          if (c1_d_addr(0) = '0') then
+            c1_dqo_buffer <= ram_do(2 * i + 1);
+          else
+            c1_dqo_buffer <= ram_do(2 * i);
           end if;
         end if;
 
         -- Core 2
         if (even_c = '1' and data_en_c2(i) = '1') then
-            if (c2_d_addr(0) = '0') then
-              c2_dqo_buffer <= ram_do(2 * i + 1);
-            else
-              c2_dqo_buffer <= ram_do(2 * i);
+          if (c2_d_addr(0) = '0') then
+            c2_dqo_buffer <= ram_do(2 * i + 1);
+          else
+            c2_dqo_buffer <= ram_do(2 * i);
           end if;
         end if;
       end loop;
     end if;
   end process;
 
-  choose_ram_data_p : process (c1_d_dqi, c2_d_dqi, data_en_c1,
-    data_en_c2, ram_do, even_c, c1_d_addr, c1_dqo_buffer, c2_d_addr, c2_dqo_buffer) is
-  begin -- process choose_ram_data_p
+  -- Get data from RAM or dqo buffer. Core 1 reads data from buffer when Core 2 reads from RAM and vice versa
+  choose_ram_data1_p : process (c1_d_dqi, data_en_c1, ram_do, even_c, c1_d_addr, c1_dqo_buffer)
+  begin
     c1_data_inner <= c1_d_dqi;
-    c2_data_inner <= c2_d_dqi;
 
-    -- Core1
     if (c1_d_addr(0) = '0') then
       if (even_c = '0') then
         for i in 0 to (MEMNUM/2 - 1) loop
@@ -227,8 +218,12 @@ begin
         c1_data_inner <= c1_dqo_buffer;
       end if;
     end if;
+  end process;
 
-    -- Core2
+  choose_ram_data2_p : process (c2_d_dqi, data_en_c2, ram_do, even_c, c2_d_addr, c2_dqo_buffer)
+  begin
+    c2_data_inner <= c2_d_dqi;
+
     if (c2_d_addr(0) = '0') then
       if (even_c = '1') then
         for i in 0 to (MEMNUM/2 - 1) loop
@@ -247,15 +242,20 @@ begin
         c2_data_inner <= c2_dqo_buffer;
       end if;
     end if;
+  end process;
 
-  end process choose_ram_data_p;
+  c1_d_dqo <= c1_d_dqi_sd when exSD_en = '1' else
+    c1_data_inner when short_cycle = '1' else
+    c1_data_b1 when fast_d = '0' else
+    c1_data_b2;
+  c2_d_dqo <= c2_data_inner when short_cycle = '1' else
+    c2_data_b1 when fast_d = '0' else
+    c2_data_b2;
 
-  c1_csb <= c1_d_cs or (not c1_d_ras) or c1_d_cas;
-  c2_csb <= c2_d_cs or (not c2_d_ras) or c2_d_cas;
-
-  c1_wr_n <= c1_d_cs or c1_d_we;
-  c2_wr_n <= c2_d_cs or c2_d_we;
-
+  -- If Core 1 tries to write data to RAM on Core 2's clock cycle or vice versa
+  -- then buffer data, address and RAM instance pair as well as set a flag.
+  -- If address is even then incrementing addresses are used
+  -- If address is odd then decrementing addresses are used
   dqi_buffer : process (clk_p, rst_n)
   begin
     if rst_n = '0' then
@@ -303,11 +303,18 @@ begin
     end if;
   end process;
 
+  c1_csb <= c1_d_cs or (not c1_d_ras) or c1_d_cas;
+  c2_csb <= c2_d_cs or (not c2_d_ras) or c2_d_cas;
+
+  c1_wr_n <= c1_d_cs or c1_d_we;
+  c2_wr_n <= c2_d_cs or c2_d_we;
+
   --------------------------------
   -- RAM
   --------------------------------
 
-  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr, even_c)
+  -- Set RAM address. Include buffered address for writing if buffer flag is set
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_addr, c2_d_addr, even_c, c1_buf, c2_buf, toReq_c1_buffer, toReq_c2_buffer, c1_addr_buffer, c2_addr_buffer)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
       -- Core 1
@@ -340,7 +347,8 @@ begin
     end loop;
   end process;
 
-  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi, even_c, c1_d_addr, c2_d_addr, c1_buf, c2_buf)
+  -- Set data in to RAM. Include buffered data if buffer flag is set
+  process (toReq_c1, toReq_c2, c1_csb, c2_csb, c1_d_dqi, c2_d_dqi, even_c, c1_d_addr, c2_d_addr, c1_buf, c2_buf, c1_addr_buffer, c2_addr_buffer, toReq_c1_buffer, toReq_c2_buffer, c1_dqi_buffer, c2_dqi_buffer)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
 
@@ -379,7 +387,7 @@ begin
     end loop;
   end process;
 
-  process (c1_csb, toReq_c1, c2_csb, toReq_c2) -- CS adjusted for interleaved memory
+  process (c1_csb, toReq_c1, c2_csb, toReq_c2, c1_buf, c2_buf) -- CS adjusted for interleaved memory
   begin
 
     for i in 0 to (MEMNUM/2 - 1) loop
@@ -388,7 +396,8 @@ begin
     end loop;
   end process;
 
-  process (c1_wr_n, c2_wr_n, toReq_c1, toReq_c2, even_c, c1_d_addr, c2_d_addr) -- WE adjusted for interleaved memory
+  -- Activate correct write enable when writing to RAM. Include buffered address if buffer flag is set
+  process (c1_wr_n, c2_wr_n, toReq_c1, toReq_c2, even_c, c1_d_addr, c2_d_addr, c1_buf, c2_buf, toReq_c1_buffer, toReq_c2_buffer, c1_addr_buffer, c2_addr_buffer)
   begin
     for i in 0 to (MEMNUM/2 - 1) loop
       ram_web(2 * i)     <= '1';

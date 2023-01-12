@@ -343,6 +343,122 @@ entity register_block_spi_test is
           adpll_status0_adpll_status_0 : in  adpll_status0_adpll_status_0_t;
           adpll_status1_adpll_status_1 : in  adpll_status1_adpll_status_1_t;
           adpll_status2_adpll_status_2 : in  adpll_status2_adpll_status_2_t;
+          io_dack0_n_ste : out io_dack0_n_ste_t;
+          io_dack0_n_pd : out io_dack0_n_pd_t;
+          io_dack0_n_pu : out io_dack0_n_pu_t;
+          io_dreq0_n_ds : out io_dreq0_n_ds_t;
+          io_dreq0_n_sr : out io_dreq0_n_sr_t;
+          io_dreq0_n_co : out io_dreq0_n_co_t;
+          io_dreq0_n_odp : out io_dreq0_n_odp_t;
+          io_dreq0_n_odn : out io_dreq0_n_odn_t;
+          io_dack1_n_ste : out io_dack1_n_ste_t;
+          io_dack1_n_pd : out io_dack1_n_pd_t;
+          io_dack1_n_pu : out io_dack1_n_pu_t;
+          io_dreq1_n_ds : out io_dreq1_n_ds_t;
+          io_dreq1_n_sr : out io_dreq1_n_sr_t;
+          io_dreq1_n_co : out io_dreq1_n_co_t;
+          io_dreq1_n_odp : out io_dreq1_n_odp_t;
+          io_dreq1_n_odn : out io_dreq1_n_odn_t;
+          io_dack2_n_ste : out io_dack2_n_ste_t;
+          io_dack2_n_pd : out io_dack2_n_pd_t;
+          io_dack2_n_pu : out io_dack2_n_pu_t;
+          io_dreq2_n_ds : out io_dreq2_n_ds_t;
+          io_dreq2_n_sr : out io_dreq2_n_sr_t;
+          io_dreq2_n_co : out io_dreq2_n_co_t;
+          io_dreq2_n_odp : out io_dreq2_n_odp_t;
+          io_dreq2_n_odn : out io_dreq2_n_odn_t;
+          io_dack3_n_ste : out io_dack3_n_ste_t;
+          io_dack3_n_pd : out io_dack3_n_pd_t;
+          io_dack3_n_pu : out io_dack3_n_pu_t;
+          io_dreq3_n_ds : out io_dreq3_n_ds_t;
+          io_dreq3_n_sr : out io_dreq3_n_sr_t;
+          io_dreq3_n_co : out io_dreq3_n_co_t;
+          io_dreq3_n_odp : out io_dreq3_n_odp_t;
+          io_dreq3_n_odn : out io_dreq3_n_odn_t;
+          io_d0_out_ds : out io_d0_out_ds_t;
+          io_d0_out_sr : out io_d0_out_sr_t;
+          io_d0_out_co : out io_d0_out_co_t;
+          io_d0_out_odp : out io_d0_out_odp_t;
+          io_d0_out_odn : out io_d0_out_odn_t;
+          io_d0_in_ste : out io_d0_in_ste_t;
+          io_d0_in_pd : out io_d0_in_pd_t;
+          io_d0_in_pu : out io_d0_in_pu_t;
+          io_d1_out_ds : out io_d1_out_ds_t;
+          io_d1_out_sr : out io_d1_out_sr_t;
+          io_d1_out_co : out io_d1_out_co_t;
+          io_d1_out_odp : out io_d1_out_odp_t;
+          io_d1_out_odn : out io_d1_out_odn_t;
+          io_d1_in_ste : out io_d1_in_ste_t;
+          io_d1_in_pd : out io_d1_in_pd_t;
+          io_d1_in_pu : out io_d1_in_pu_t;
+          io_d2_out_ds : out io_d2_out_ds_t;
+          io_d2_out_sr : out io_d2_out_sr_t;
+          io_d2_out_co : out io_d2_out_co_t;
+          io_d2_out_odp : out io_d2_out_odp_t;
+          io_d2_out_odn : out io_d2_out_odn_t;
+          io_d2_in_ste : out io_d2_in_ste_t;
+          io_d2_in_pd : out io_d2_in_pd_t;
+          io_d2_in_pu : out io_d2_in_pu_t;
+          io_d3_out_ds : out io_d3_out_ds_t;
+          io_d3_out_sr : out io_d3_out_sr_t;
+          io_d3_out_co : out io_d3_out_co_t;
+          io_d3_out_odp : out io_d3_out_odp_t;
+          io_d3_out_odn : out io_d3_out_odn_t;
+          io_d3_in_ste : out io_d3_in_ste_t;
+          io_d3_in_pd : out io_d3_in_pd_t;
+          io_d3_in_pu : out io_d3_in_pu_t;
+          io_d4_out_ds : out io_d4_out_ds_t;
+          io_d4_out_sr : out io_d4_out_sr_t;
+          io_d4_out_co : out io_d4_out_co_t;
+          io_d4_out_odp : out io_d4_out_odp_t;
+          io_d4_out_odn : out io_d4_out_odn_t;
+          io_d4_in_ste : out io_d4_in_ste_t;
+          io_d4_in_pd : out io_d4_in_pd_t;
+          io_d4_in_pu : out io_d4_in_pu_t;
+          io_d5_out_ds : out io_d5_out_ds_t;
+          io_d5_out_sr : out io_d5_out_sr_t;
+          io_d5_out_co : out io_d5_out_co_t;
+          io_d5_out_odp : out io_d5_out_odp_t;
+          io_d5_out_odn : out io_d5_out_odn_t;
+          io_d5_in_ste : out io_d5_in_ste_t;
+          io_d5_in_pd : out io_d5_in_pd_t;
+          io_d5_in_pu : out io_d5_in_pu_t;
+          io_d6_out_ds : out io_d6_out_ds_t;
+          io_d6_out_sr : out io_d6_out_sr_t;
+          io_d6_out_co : out io_d6_out_co_t;
+          io_d6_out_odp : out io_d6_out_odp_t;
+          io_d6_out_odn : out io_d6_out_odn_t;
+          io_d6_in_ste : out io_d6_in_ste_t;
+          io_d6_in_pd : out io_d6_in_pd_t;
+          io_d6_in_pu : out io_d6_in_pu_t;
+          io_d7_out_ds : out io_d7_out_ds_t;
+          io_d7_out_sr : out io_d7_out_sr_t;
+          io_d7_out_co : out io_d7_out_co_t;
+          io_d7_out_odp : out io_d7_out_odp_t;
+          io_d7_out_odn : out io_d7_out_odn_t;
+          io_d7_in_ste : out io_d7_in_ste_t;
+          io_d7_in_pd : out io_d7_in_pd_t;
+          io_d7_in_pu : out io_d7_in_pu_t;
+          io_ldout_n_ds : out io_ldout_n_ds_t;
+          io_ldout_n_sr : out io_ldout_n_sr_t;
+          io_ldout_n_co : out io_ldout_n_co_t;
+          io_ldout_n_odp : out io_ldout_n_odp_t;
+          io_ldout_n_odn : out io_ldout_n_odn_t;
+          io_next_n_ds : out io_next_n_ds_t;
+          io_next_n_sr : out io_next_n_sr_t;
+          io_next_n_co : out io_next_n_co_t;
+          io_next_n_odp : out io_next_n_odp_t;
+          io_next_n_odn : out io_next_n_odn_t;
+          io_clk_ds : out io_clk_ds_t;
+          io_clk_sr : out io_clk_sr_t;
+          io_clk_co : out io_clk_co_t;
+          io_clk_odp : out io_clk_odp_t;
+          io_clk_odn : out io_clk_odn_t;
+          io_ioa_n_ds : out io_ioa_n_ds_t;
+          io_ioa_n_sr : out io_ioa_n_sr_t;
+          io_ioa_n_co : out io_ioa_n_co_t;
+          io_ioa_n_odp : out io_ioa_n_odp_t;
+          io_ioa_n_odn : out io_ioa_n_odn_t;
 
 
           -- SPI Interface
@@ -689,6 +805,122 @@ architecture rtl of register_block_spi_test  is
     signal s_adpll_status0_adpll_status_0 : adpll_status0_adpll_status_0_t;
     signal s_adpll_status1_adpll_status_1 : adpll_status1_adpll_status_1_t;
     signal s_adpll_status2_adpll_status_2 : adpll_status2_adpll_status_2_t;
+    signal s_io_dack0_n_ste : io_dack0_n_ste_t;
+    signal s_io_dack0_n_pd : io_dack0_n_pd_t;
+    signal s_io_dack0_n_pu : io_dack0_n_pu_t;
+    signal s_io_dreq0_n_ds : io_dreq0_n_ds_t;
+    signal s_io_dreq0_n_sr : io_dreq0_n_sr_t;
+    signal s_io_dreq0_n_co : io_dreq0_n_co_t;
+    signal s_io_dreq0_n_odp : io_dreq0_n_odp_t;
+    signal s_io_dreq0_n_odn : io_dreq0_n_odn_t;
+    signal s_io_dack1_n_ste : io_dack1_n_ste_t;
+    signal s_io_dack1_n_pd : io_dack1_n_pd_t;
+    signal s_io_dack1_n_pu : io_dack1_n_pu_t;
+    signal s_io_dreq1_n_ds : io_dreq1_n_ds_t;
+    signal s_io_dreq1_n_sr : io_dreq1_n_sr_t;
+    signal s_io_dreq1_n_co : io_dreq1_n_co_t;
+    signal s_io_dreq1_n_odp : io_dreq1_n_odp_t;
+    signal s_io_dreq1_n_odn : io_dreq1_n_odn_t;
+    signal s_io_dack2_n_ste : io_dack2_n_ste_t;
+    signal s_io_dack2_n_pd : io_dack2_n_pd_t;
+    signal s_io_dack2_n_pu : io_dack2_n_pu_t;
+    signal s_io_dreq2_n_ds : io_dreq2_n_ds_t;
+    signal s_io_dreq2_n_sr : io_dreq2_n_sr_t;
+    signal s_io_dreq2_n_co : io_dreq2_n_co_t;
+    signal s_io_dreq2_n_odp : io_dreq2_n_odp_t;
+    signal s_io_dreq2_n_odn : io_dreq2_n_odn_t;
+    signal s_io_dack3_n_ste : io_dack3_n_ste_t;
+    signal s_io_dack3_n_pd : io_dack3_n_pd_t;
+    signal s_io_dack3_n_pu : io_dack3_n_pu_t;
+    signal s_io_dreq3_n_ds : io_dreq3_n_ds_t;
+    signal s_io_dreq3_n_sr : io_dreq3_n_sr_t;
+    signal s_io_dreq3_n_co : io_dreq3_n_co_t;
+    signal s_io_dreq3_n_odp : io_dreq3_n_odp_t;
+    signal s_io_dreq3_n_odn : io_dreq3_n_odn_t;
+    signal s_io_d0_out_ds : io_d0_out_ds_t;
+    signal s_io_d0_out_sr : io_d0_out_sr_t;
+    signal s_io_d0_out_co : io_d0_out_co_t;
+    signal s_io_d0_out_odp : io_d0_out_odp_t;
+    signal s_io_d0_out_odn : io_d0_out_odn_t;
+    signal s_io_d0_in_ste : io_d0_in_ste_t;
+    signal s_io_d0_in_pd : io_d0_in_pd_t;
+    signal s_io_d0_in_pu : io_d0_in_pu_t;
+    signal s_io_d1_out_ds : io_d1_out_ds_t;
+    signal s_io_d1_out_sr : io_d1_out_sr_t;
+    signal s_io_d1_out_co : io_d1_out_co_t;
+    signal s_io_d1_out_odp : io_d1_out_odp_t;
+    signal s_io_d1_out_odn : io_d1_out_odn_t;
+    signal s_io_d1_in_ste : io_d1_in_ste_t;
+    signal s_io_d1_in_pd : io_d1_in_pd_t;
+    signal s_io_d1_in_pu : io_d1_in_pu_t;
+    signal s_io_d2_out_ds : io_d2_out_ds_t;
+    signal s_io_d2_out_sr : io_d2_out_sr_t;
+    signal s_io_d2_out_co : io_d2_out_co_t;
+    signal s_io_d2_out_odp : io_d2_out_odp_t;
+    signal s_io_d2_out_odn : io_d2_out_odn_t;
+    signal s_io_d2_in_ste : io_d2_in_ste_t;
+    signal s_io_d2_in_pd : io_d2_in_pd_t;
+    signal s_io_d2_in_pu : io_d2_in_pu_t;
+    signal s_io_d3_out_ds : io_d3_out_ds_t;
+    signal s_io_d3_out_sr : io_d3_out_sr_t;
+    signal s_io_d3_out_co : io_d3_out_co_t;
+    signal s_io_d3_out_odp : io_d3_out_odp_t;
+    signal s_io_d3_out_odn : io_d3_out_odn_t;
+    signal s_io_d3_in_ste : io_d3_in_ste_t;
+    signal s_io_d3_in_pd : io_d3_in_pd_t;
+    signal s_io_d3_in_pu : io_d3_in_pu_t;
+    signal s_io_d4_out_ds : io_d4_out_ds_t;
+    signal s_io_d4_out_sr : io_d4_out_sr_t;
+    signal s_io_d4_out_co : io_d4_out_co_t;
+    signal s_io_d4_out_odp : io_d4_out_odp_t;
+    signal s_io_d4_out_odn : io_d4_out_odn_t;
+    signal s_io_d4_in_ste : io_d4_in_ste_t;
+    signal s_io_d4_in_pd : io_d4_in_pd_t;
+    signal s_io_d4_in_pu : io_d4_in_pu_t;
+    signal s_io_d5_out_ds : io_d5_out_ds_t;
+    signal s_io_d5_out_sr : io_d5_out_sr_t;
+    signal s_io_d5_out_co : io_d5_out_co_t;
+    signal s_io_d5_out_odp : io_d5_out_odp_t;
+    signal s_io_d5_out_odn : io_d5_out_odn_t;
+    signal s_io_d5_in_ste : io_d5_in_ste_t;
+    signal s_io_d5_in_pd : io_d5_in_pd_t;
+    signal s_io_d5_in_pu : io_d5_in_pu_t;
+    signal s_io_d6_out_ds : io_d6_out_ds_t;
+    signal s_io_d6_out_sr : io_d6_out_sr_t;
+    signal s_io_d6_out_co : io_d6_out_co_t;
+    signal s_io_d6_out_odp : io_d6_out_odp_t;
+    signal s_io_d6_out_odn : io_d6_out_odn_t;
+    signal s_io_d6_in_ste : io_d6_in_ste_t;
+    signal s_io_d6_in_pd : io_d6_in_pd_t;
+    signal s_io_d6_in_pu : io_d6_in_pu_t;
+    signal s_io_d7_out_ds : io_d7_out_ds_t;
+    signal s_io_d7_out_sr : io_d7_out_sr_t;
+    signal s_io_d7_out_co : io_d7_out_co_t;
+    signal s_io_d7_out_odp : io_d7_out_odp_t;
+    signal s_io_d7_out_odn : io_d7_out_odn_t;
+    signal s_io_d7_in_ste : io_d7_in_ste_t;
+    signal s_io_d7_in_pd : io_d7_in_pd_t;
+    signal s_io_d7_in_pu : io_d7_in_pu_t;
+    signal s_io_ldout_n_ds : io_ldout_n_ds_t;
+    signal s_io_ldout_n_sr : io_ldout_n_sr_t;
+    signal s_io_ldout_n_co : io_ldout_n_co_t;
+    signal s_io_ldout_n_odp : io_ldout_n_odp_t;
+    signal s_io_ldout_n_odn : io_ldout_n_odn_t;
+    signal s_io_next_n_ds : io_next_n_ds_t;
+    signal s_io_next_n_sr : io_next_n_sr_t;
+    signal s_io_next_n_co : io_next_n_co_t;
+    signal s_io_next_n_odp : io_next_n_odp_t;
+    signal s_io_next_n_odn : io_next_n_odn_t;
+    signal s_io_clk_ds : io_clk_ds_t;
+    signal s_io_clk_sr : io_clk_sr_t;
+    signal s_io_clk_co : io_clk_co_t;
+    signal s_io_clk_odp : io_clk_odp_t;
+    signal s_io_clk_odn : io_clk_odn_t;
+    signal s_io_ioa_n_ds : io_ioa_n_ds_t;
+    signal s_io_ioa_n_sr : io_ioa_n_sr_t;
+    signal s_io_ioa_n_co : io_ioa_n_co_t;
+    signal s_io_ioa_n_odp : io_ioa_n_odp_t;
+    signal s_io_ioa_n_odn : io_ioa_n_odn_t;
 
     signal s_address : integer range 0 to (2**7) - 1;
 
@@ -1026,6 +1258,122 @@ begin
       s_pll_5_disable_lock <= pll_5_disable_lock_reset_c;
       s_pll_5_ref_bypass <= pll_5_ref_bypass_reset_c;
       s_pll_5_ct_compensation <= pll_5_ct_compensation_reset_c;
+      s_io_dack0_n_ste <= io_dack0_n_ste_reset_c;
+      s_io_dack0_n_pd <= io_dack0_n_pd_reset_c;
+      s_io_dack0_n_pu <= io_dack0_n_pu_reset_c;
+      s_io_dreq0_n_ds <= io_dreq0_n_ds_reset_c;
+      s_io_dreq0_n_sr <= io_dreq0_n_sr_reset_c;
+      s_io_dreq0_n_co <= io_dreq0_n_co_reset_c;
+      s_io_dreq0_n_odp <= io_dreq0_n_odp_reset_c;
+      s_io_dreq0_n_odn <= io_dreq0_n_odn_reset_c;
+      s_io_dack1_n_ste <= io_dack1_n_ste_reset_c;
+      s_io_dack1_n_pd <= io_dack1_n_pd_reset_c;
+      s_io_dack1_n_pu <= io_dack1_n_pu_reset_c;
+      s_io_dreq1_n_ds <= io_dreq1_n_ds_reset_c;
+      s_io_dreq1_n_sr <= io_dreq1_n_sr_reset_c;
+      s_io_dreq1_n_co <= io_dreq1_n_co_reset_c;
+      s_io_dreq1_n_odp <= io_dreq1_n_odp_reset_c;
+      s_io_dreq1_n_odn <= io_dreq1_n_odn_reset_c;
+      s_io_dack2_n_ste <= io_dack2_n_ste_reset_c;
+      s_io_dack2_n_pd <= io_dack2_n_pd_reset_c;
+      s_io_dack2_n_pu <= io_dack2_n_pu_reset_c;
+      s_io_dreq2_n_ds <= io_dreq2_n_ds_reset_c;
+      s_io_dreq2_n_sr <= io_dreq2_n_sr_reset_c;
+      s_io_dreq2_n_co <= io_dreq2_n_co_reset_c;
+      s_io_dreq2_n_odp <= io_dreq2_n_odp_reset_c;
+      s_io_dreq2_n_odn <= io_dreq2_n_odn_reset_c;
+      s_io_dack3_n_ste <= io_dack3_n_ste_reset_c;
+      s_io_dack3_n_pd <= io_dack3_n_pd_reset_c;
+      s_io_dack3_n_pu <= io_dack3_n_pu_reset_c;
+      s_io_dreq3_n_ds <= io_dreq3_n_ds_reset_c;
+      s_io_dreq3_n_sr <= io_dreq3_n_sr_reset_c;
+      s_io_dreq3_n_co <= io_dreq3_n_co_reset_c;
+      s_io_dreq3_n_odp <= io_dreq3_n_odp_reset_c;
+      s_io_dreq3_n_odn <= io_dreq3_n_odn_reset_c;
+      s_io_d0_out_ds <= io_d0_out_ds_reset_c;
+      s_io_d0_out_sr <= io_d0_out_sr_reset_c;
+      s_io_d0_out_co <= io_d0_out_co_reset_c;
+      s_io_d0_out_odp <= io_d0_out_odp_reset_c;
+      s_io_d0_out_odn <= io_d0_out_odn_reset_c;
+      s_io_d0_in_ste <= io_d0_in_ste_reset_c;
+      s_io_d0_in_pd <= io_d0_in_pd_reset_c;
+      s_io_d0_in_pu <= io_d0_in_pu_reset_c;
+      s_io_d1_out_ds <= io_d1_out_ds_reset_c;
+      s_io_d1_out_sr <= io_d1_out_sr_reset_c;
+      s_io_d1_out_co <= io_d1_out_co_reset_c;
+      s_io_d1_out_odp <= io_d1_out_odp_reset_c;
+      s_io_d1_out_odn <= io_d1_out_odn_reset_c;
+      s_io_d1_in_ste <= io_d1_in_ste_reset_c;
+      s_io_d1_in_pd <= io_d1_in_pd_reset_c;
+      s_io_d1_in_pu <= io_d1_in_pu_reset_c;
+      s_io_d2_out_ds <= io_d2_out_ds_reset_c;
+      s_io_d2_out_sr <= io_d2_out_sr_reset_c;
+      s_io_d2_out_co <= io_d2_out_co_reset_c;
+      s_io_d2_out_odp <= io_d2_out_odp_reset_c;
+      s_io_d2_out_odn <= io_d2_out_odn_reset_c;
+      s_io_d2_in_ste <= io_d2_in_ste_reset_c;
+      s_io_d2_in_pd <= io_d2_in_pd_reset_c;
+      s_io_d2_in_pu <= io_d2_in_pu_reset_c;
+      s_io_d3_out_ds <= io_d3_out_ds_reset_c;
+      s_io_d3_out_sr <= io_d3_out_sr_reset_c;
+      s_io_d3_out_co <= io_d3_out_co_reset_c;
+      s_io_d3_out_odp <= io_d3_out_odp_reset_c;
+      s_io_d3_out_odn <= io_d3_out_odn_reset_c;
+      s_io_d3_in_ste <= io_d3_in_ste_reset_c;
+      s_io_d3_in_pd <= io_d3_in_pd_reset_c;
+      s_io_d3_in_pu <= io_d3_in_pu_reset_c;
+      s_io_d4_out_ds <= io_d4_out_ds_reset_c;
+      s_io_d4_out_sr <= io_d4_out_sr_reset_c;
+      s_io_d4_out_co <= io_d4_out_co_reset_c;
+      s_io_d4_out_odp <= io_d4_out_odp_reset_c;
+      s_io_d4_out_odn <= io_d4_out_odn_reset_c;
+      s_io_d4_in_ste <= io_d4_in_ste_reset_c;
+      s_io_d4_in_pd <= io_d4_in_pd_reset_c;
+      s_io_d4_in_pu <= io_d4_in_pu_reset_c;
+      s_io_d5_out_ds <= io_d5_out_ds_reset_c;
+      s_io_d5_out_sr <= io_d5_out_sr_reset_c;
+      s_io_d5_out_co <= io_d5_out_co_reset_c;
+      s_io_d5_out_odp <= io_d5_out_odp_reset_c;
+      s_io_d5_out_odn <= io_d5_out_odn_reset_c;
+      s_io_d5_in_ste <= io_d5_in_ste_reset_c;
+      s_io_d5_in_pd <= io_d5_in_pd_reset_c;
+      s_io_d5_in_pu <= io_d5_in_pu_reset_c;
+      s_io_d6_out_ds <= io_d6_out_ds_reset_c;
+      s_io_d6_out_sr <= io_d6_out_sr_reset_c;
+      s_io_d6_out_co <= io_d6_out_co_reset_c;
+      s_io_d6_out_odp <= io_d6_out_odp_reset_c;
+      s_io_d6_out_odn <= io_d6_out_odn_reset_c;
+      s_io_d6_in_ste <= io_d6_in_ste_reset_c;
+      s_io_d6_in_pd <= io_d6_in_pd_reset_c;
+      s_io_d6_in_pu <= io_d6_in_pu_reset_c;
+      s_io_d7_out_ds <= io_d7_out_ds_reset_c;
+      s_io_d7_out_sr <= io_d7_out_sr_reset_c;
+      s_io_d7_out_co <= io_d7_out_co_reset_c;
+      s_io_d7_out_odp <= io_d7_out_odp_reset_c;
+      s_io_d7_out_odn <= io_d7_out_odn_reset_c;
+      s_io_d7_in_ste <= io_d7_in_ste_reset_c;
+      s_io_d7_in_pd <= io_d7_in_pd_reset_c;
+      s_io_d7_in_pu <= io_d7_in_pu_reset_c;
+      s_io_ldout_n_ds <= io_ldout_n_ds_reset_c;
+      s_io_ldout_n_sr <= io_ldout_n_sr_reset_c;
+      s_io_ldout_n_co <= io_ldout_n_co_reset_c;
+      s_io_ldout_n_odp <= io_ldout_n_odp_reset_c;
+      s_io_ldout_n_odn <= io_ldout_n_odn_reset_c;
+      s_io_next_n_ds <= io_next_n_ds_reset_c;
+      s_io_next_n_sr <= io_next_n_sr_reset_c;
+      s_io_next_n_co <= io_next_n_co_reset_c;
+      s_io_next_n_odp <= io_next_n_odp_reset_c;
+      s_io_next_n_odn <= io_next_n_odn_reset_c;
+      s_io_clk_ds <= io_clk_ds_reset_c;
+      s_io_clk_sr <= io_clk_sr_reset_c;
+      s_io_clk_co <= io_clk_co_reset_c;
+      s_io_clk_odp <= io_clk_odp_reset_c;
+      s_io_clk_odn <= io_clk_odn_reset_c;
+      s_io_ioa_n_ds <= io_ioa_n_ds_reset_c;
+      s_io_ioa_n_sr <= io_ioa_n_sr_reset_c;
+      s_io_ioa_n_co <= io_ioa_n_co_reset_c;
+      s_io_ioa_n_odp <= io_ioa_n_odp_reset_c;
+      s_io_ioa_n_odn <= io_ioa_n_odn_reset_c;
     elsif clk 'event and clk = '1' then  -- rising clock edge
       if enable = '1' then
         case s_address is
@@ -1609,6 +1957,206 @@ begin
           when adpll_status0_address_c => 
           when adpll_status1_address_c => 
           when adpll_status2_address_c => 
+          when io_dack0_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dack0_n_ste <= data_in(io_dack0_n_ste_msb_c downto io_dack0_n_ste_lsb_c);
+              s_io_dack0_n_pd <= data_in(io_dack0_n_pd_msb_c);
+              s_io_dack0_n_pu <= data_in(io_dack0_n_pu_msb_c);
+            end if;
+          when io_dreq0_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dreq0_n_ds <= data_in(io_dreq0_n_ds_msb_c downto io_dreq0_n_ds_lsb_c);
+              s_io_dreq0_n_sr <= data_in(io_dreq0_n_sr_msb_c);
+              s_io_dreq0_n_co <= data_in(io_dreq0_n_co_msb_c);
+              s_io_dreq0_n_odp <= data_in(io_dreq0_n_odp_msb_c);
+              s_io_dreq0_n_odn <= data_in(io_dreq0_n_odn_msb_c);
+            end if;
+          when io_dack1_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dack1_n_ste <= data_in(io_dack1_n_ste_msb_c downto io_dack1_n_ste_lsb_c);
+              s_io_dack1_n_pd <= data_in(io_dack1_n_pd_msb_c);
+              s_io_dack1_n_pu <= data_in(io_dack1_n_pu_msb_c);
+            end if;
+          when io_dreq1_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dreq1_n_ds <= data_in(io_dreq1_n_ds_msb_c downto io_dreq1_n_ds_lsb_c);
+              s_io_dreq1_n_sr <= data_in(io_dreq1_n_sr_msb_c);
+              s_io_dreq1_n_co <= data_in(io_dreq1_n_co_msb_c);
+              s_io_dreq1_n_odp <= data_in(io_dreq1_n_odp_msb_c);
+              s_io_dreq1_n_odn <= data_in(io_dreq1_n_odn_msb_c);
+            end if;
+          when io_dack2_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dack2_n_ste <= data_in(io_dack2_n_ste_msb_c downto io_dack2_n_ste_lsb_c);
+              s_io_dack2_n_pd <= data_in(io_dack2_n_pd_msb_c);
+              s_io_dack2_n_pu <= data_in(io_dack2_n_pu_msb_c);
+            end if;
+          when io_dreq2_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dreq2_n_ds <= data_in(io_dreq2_n_ds_msb_c downto io_dreq2_n_ds_lsb_c);
+              s_io_dreq2_n_sr <= data_in(io_dreq2_n_sr_msb_c);
+              s_io_dreq2_n_co <= data_in(io_dreq2_n_co_msb_c);
+              s_io_dreq2_n_odp <= data_in(io_dreq2_n_odp_msb_c);
+              s_io_dreq2_n_odn <= data_in(io_dreq2_n_odn_msb_c);
+            end if;
+          when io_dack3_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dack3_n_ste <= data_in(io_dack3_n_ste_msb_c downto io_dack3_n_ste_lsb_c);
+              s_io_dack3_n_pd <= data_in(io_dack3_n_pd_msb_c);
+              s_io_dack3_n_pu <= data_in(io_dack3_n_pu_msb_c);
+            end if;
+          when io_dreq3_n_address_c => 
+            if write_cmd = '1' then
+              s_io_dreq3_n_ds <= data_in(io_dreq3_n_ds_msb_c downto io_dreq3_n_ds_lsb_c);
+              s_io_dreq3_n_sr <= data_in(io_dreq3_n_sr_msb_c);
+              s_io_dreq3_n_co <= data_in(io_dreq3_n_co_msb_c);
+              s_io_dreq3_n_odp <= data_in(io_dreq3_n_odp_msb_c);
+              s_io_dreq3_n_odn <= data_in(io_dreq3_n_odn_msb_c);
+            end if;
+          when io_d0_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d0_out_ds <= data_in(io_d0_out_ds_msb_c downto io_d0_out_ds_lsb_c);
+              s_io_d0_out_sr <= data_in(io_d0_out_sr_msb_c);
+              s_io_d0_out_co <= data_in(io_d0_out_co_msb_c);
+              s_io_d0_out_odp <= data_in(io_d0_out_odp_msb_c);
+              s_io_d0_out_odn <= data_in(io_d0_out_odn_msb_c);
+            end if;
+          when io_d0_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d0_in_ste <= data_in(io_d0_in_ste_msb_c downto io_d0_in_ste_lsb_c);
+              s_io_d0_in_pd <= data_in(io_d0_in_pd_msb_c);
+              s_io_d0_in_pu <= data_in(io_d0_in_pu_msb_c);
+            end if;
+          when io_d1_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d1_out_ds <= data_in(io_d1_out_ds_msb_c downto io_d1_out_ds_lsb_c);
+              s_io_d1_out_sr <= data_in(io_d1_out_sr_msb_c);
+              s_io_d1_out_co <= data_in(io_d1_out_co_msb_c);
+              s_io_d1_out_odp <= data_in(io_d1_out_odp_msb_c);
+              s_io_d1_out_odn <= data_in(io_d1_out_odn_msb_c);
+            end if;
+          when io_d1_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d1_in_ste <= data_in(io_d1_in_ste_msb_c downto io_d1_in_ste_lsb_c);
+              s_io_d1_in_pd <= data_in(io_d1_in_pd_msb_c);
+              s_io_d1_in_pu <= data_in(io_d1_in_pu_msb_c);
+            end if;
+          when io_d2_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d2_out_ds <= data_in(io_d2_out_ds_msb_c downto io_d2_out_ds_lsb_c);
+              s_io_d2_out_sr <= data_in(io_d2_out_sr_msb_c);
+              s_io_d2_out_co <= data_in(io_d2_out_co_msb_c);
+              s_io_d2_out_odp <= data_in(io_d2_out_odp_msb_c);
+              s_io_d2_out_odn <= data_in(io_d2_out_odn_msb_c);
+            end if;
+          when io_d2_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d2_in_ste <= data_in(io_d2_in_ste_msb_c downto io_d2_in_ste_lsb_c);
+              s_io_d2_in_pd <= data_in(io_d2_in_pd_msb_c);
+              s_io_d2_in_pu <= data_in(io_d2_in_pu_msb_c);
+            end if;
+          when io_d3_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d3_out_ds <= data_in(io_d3_out_ds_msb_c downto io_d3_out_ds_lsb_c);
+              s_io_d3_out_sr <= data_in(io_d3_out_sr_msb_c);
+              s_io_d3_out_co <= data_in(io_d3_out_co_msb_c);
+              s_io_d3_out_odp <= data_in(io_d3_out_odp_msb_c);
+              s_io_d3_out_odn <= data_in(io_d3_out_odn_msb_c);
+            end if;
+          when io_d3_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d3_in_ste <= data_in(io_d3_in_ste_msb_c downto io_d3_in_ste_lsb_c);
+              s_io_d3_in_pd <= data_in(io_d3_in_pd_msb_c);
+              s_io_d3_in_pu <= data_in(io_d3_in_pu_msb_c);
+            end if;
+          when io_d4_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d4_out_ds <= data_in(io_d4_out_ds_msb_c downto io_d4_out_ds_lsb_c);
+              s_io_d4_out_sr <= data_in(io_d4_out_sr_msb_c);
+              s_io_d4_out_co <= data_in(io_d4_out_co_msb_c);
+              s_io_d4_out_odp <= data_in(io_d4_out_odp_msb_c);
+              s_io_d4_out_odn <= data_in(io_d4_out_odn_msb_c);
+            end if;
+          when io_d4_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d4_in_ste <= data_in(io_d4_in_ste_msb_c downto io_d4_in_ste_lsb_c);
+              s_io_d4_in_pd <= data_in(io_d4_in_pd_msb_c);
+              s_io_d4_in_pu <= data_in(io_d4_in_pu_msb_c);
+            end if;
+          when io_d5_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d5_out_ds <= data_in(io_d5_out_ds_msb_c downto io_d5_out_ds_lsb_c);
+              s_io_d5_out_sr <= data_in(io_d5_out_sr_msb_c);
+              s_io_d5_out_co <= data_in(io_d5_out_co_msb_c);
+              s_io_d5_out_odp <= data_in(io_d5_out_odp_msb_c);
+              s_io_d5_out_odn <= data_in(io_d5_out_odn_msb_c);
+            end if;
+          when io_d5_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d5_in_ste <= data_in(io_d5_in_ste_msb_c downto io_d5_in_ste_lsb_c);
+              s_io_d5_in_pd <= data_in(io_d5_in_pd_msb_c);
+              s_io_d5_in_pu <= data_in(io_d5_in_pu_msb_c);
+            end if;
+          when io_d6_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d6_out_ds <= data_in(io_d6_out_ds_msb_c downto io_d6_out_ds_lsb_c);
+              s_io_d6_out_sr <= data_in(io_d6_out_sr_msb_c);
+              s_io_d6_out_co <= data_in(io_d6_out_co_msb_c);
+              s_io_d6_out_odp <= data_in(io_d6_out_odp_msb_c);
+              s_io_d6_out_odn <= data_in(io_d6_out_odn_msb_c);
+            end if;
+          when io_d6_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d6_in_ste <= data_in(io_d6_in_ste_msb_c downto io_d6_in_ste_lsb_c);
+              s_io_d6_in_pd <= data_in(io_d6_in_pd_msb_c);
+              s_io_d6_in_pu <= data_in(io_d6_in_pu_msb_c);
+            end if;
+          when io_d7_out_address_c => 
+            if write_cmd = '1' then
+              s_io_d7_out_ds <= data_in(io_d7_out_ds_msb_c downto io_d7_out_ds_lsb_c);
+              s_io_d7_out_sr <= data_in(io_d7_out_sr_msb_c);
+              s_io_d7_out_co <= data_in(io_d7_out_co_msb_c);
+              s_io_d7_out_odp <= data_in(io_d7_out_odp_msb_c);
+              s_io_d7_out_odn <= data_in(io_d7_out_odn_msb_c);
+            end if;
+          when io_d7_in_address_c => 
+            if write_cmd = '1' then
+              s_io_d7_in_ste <= data_in(io_d7_in_ste_msb_c downto io_d7_in_ste_lsb_c);
+              s_io_d7_in_pd <= data_in(io_d7_in_pd_msb_c);
+              s_io_d7_in_pu <= data_in(io_d7_in_pu_msb_c);
+            end if;
+          when io_ldout_n_address_c => 
+            if write_cmd = '1' then
+              s_io_ldout_n_ds <= data_in(io_ldout_n_ds_msb_c downto io_ldout_n_ds_lsb_c);
+              s_io_ldout_n_sr <= data_in(io_ldout_n_sr_msb_c);
+              s_io_ldout_n_co <= data_in(io_ldout_n_co_msb_c);
+              s_io_ldout_n_odp <= data_in(io_ldout_n_odp_msb_c);
+              s_io_ldout_n_odn <= data_in(io_ldout_n_odn_msb_c);
+            end if;
+          when io_next_n_address_c => 
+            if write_cmd = '1' then
+              s_io_next_n_ds <= data_in(io_next_n_ds_msb_c downto io_next_n_ds_lsb_c);
+              s_io_next_n_sr <= data_in(io_next_n_sr_msb_c);
+              s_io_next_n_co <= data_in(io_next_n_co_msb_c);
+              s_io_next_n_odp <= data_in(io_next_n_odp_msb_c);
+              s_io_next_n_odn <= data_in(io_next_n_odn_msb_c);
+            end if;
+          when io_clk_address_c => 
+            if write_cmd = '1' then
+              s_io_clk_ds <= data_in(io_clk_ds_msb_c downto io_clk_ds_lsb_c);
+              s_io_clk_sr <= data_in(io_clk_sr_msb_c);
+              s_io_clk_co <= data_in(io_clk_co_msb_c);
+              s_io_clk_odp <= data_in(io_clk_odp_msb_c);
+              s_io_clk_odn <= data_in(io_clk_odn_msb_c);
+            end if;
+          when io_ioa_n_address_c => 
+            if write_cmd = '1' then
+              s_io_ioa_n_ds <= data_in(io_ioa_n_ds_msb_c downto io_ioa_n_ds_lsb_c);
+              s_io_ioa_n_sr <= data_in(io_ioa_n_sr_msb_c);
+              s_io_ioa_n_co <= data_in(io_ioa_n_co_msb_c);
+              s_io_ioa_n_odp <= data_in(io_ioa_n_odp_msb_c);
+              s_io_ioa_n_odn <= data_in(io_ioa_n_odn_msb_c);
+            end if;
           when others => null;
         end case;
       end if;
@@ -1679,7 +2227,29 @@ begin
                                 s_pll_4_pfd_select, s_pll_4_lock_window_sel, s_pll_4_div_core_mux_sel, s_pll_4_filter_shift,
                                 s_pll_4_en_fast_lock, s_pll_5_sar_limit, s_pll_5_set_op_lock, s_pll_5_disable_lock,
                                 s_pll_5_ref_bypass, s_pll_5_ct_compensation, s_adpll_status0_adpll_status_0,
-                                s_adpll_status1_adpll_status_1, s_adpll_status2_adpll_status_2)
+                                s_adpll_status1_adpll_status_1, s_adpll_status2_adpll_status_2, s_io_dack0_n_ste, s_io_dack0_n_pd,
+                                s_io_dack0_n_pu, s_io_dreq0_n_ds, s_io_dreq0_n_sr, s_io_dreq0_n_co, s_io_dreq0_n_odp,
+                                s_io_dreq0_n_odn, s_io_dack1_n_ste, s_io_dack1_n_pd, s_io_dack1_n_pu, s_io_dreq1_n_ds,
+                                s_io_dreq1_n_sr, s_io_dreq1_n_co, s_io_dreq1_n_odp, s_io_dreq1_n_odn, s_io_dack2_n_ste,
+                                s_io_dack2_n_pd, s_io_dack2_n_pu, s_io_dreq2_n_ds, s_io_dreq2_n_sr, s_io_dreq2_n_co,
+                                s_io_dreq2_n_odp, s_io_dreq2_n_odn, s_io_dack3_n_ste, s_io_dack3_n_pd, s_io_dack3_n_pu,
+                                s_io_dreq3_n_ds, s_io_dreq3_n_sr, s_io_dreq3_n_co, s_io_dreq3_n_odp, s_io_dreq3_n_odn,
+                                s_io_d0_out_ds, s_io_d0_out_sr, s_io_d0_out_co, s_io_d0_out_odp, s_io_d0_out_odn,
+                                s_io_d0_in_ste, s_io_d0_in_pd, s_io_d0_in_pu, s_io_d1_out_ds, s_io_d1_out_sr, s_io_d1_out_co,
+                                s_io_d1_out_odp, s_io_d1_out_odn, s_io_d1_in_ste, s_io_d1_in_pd, s_io_d1_in_pu, s_io_d2_out_ds,
+                                s_io_d2_out_sr, s_io_d2_out_co, s_io_d2_out_odp, s_io_d2_out_odn, s_io_d2_in_ste,
+                                s_io_d2_in_pd, s_io_d2_in_pu, s_io_d3_out_ds, s_io_d3_out_sr, s_io_d3_out_co,
+                                s_io_d3_out_odp, s_io_d3_out_odn, s_io_d3_in_ste, s_io_d3_in_pd, s_io_d3_in_pu, s_io_d4_out_ds,
+                                s_io_d4_out_sr, s_io_d4_out_co, s_io_d4_out_odp, s_io_d4_out_odn, s_io_d4_in_ste,
+                                s_io_d4_in_pd, s_io_d4_in_pu, s_io_d5_out_ds, s_io_d5_out_sr, s_io_d5_out_co,
+                                s_io_d5_out_odp, s_io_d5_out_odn, s_io_d5_in_ste, s_io_d5_in_pd, s_io_d5_in_pu, s_io_d6_out_ds,
+                                s_io_d6_out_sr, s_io_d6_out_co, s_io_d6_out_odp, s_io_d6_out_odn, s_io_d6_in_ste,
+                                s_io_d6_in_pd, s_io_d6_in_pu, s_io_d7_out_ds, s_io_d7_out_sr, s_io_d7_out_co,
+                                s_io_d7_out_odp, s_io_d7_out_odn, s_io_d7_in_ste, s_io_d7_in_pd, s_io_d7_in_pu,
+                                s_io_ldout_n_ds, s_io_ldout_n_sr, s_io_ldout_n_co, s_io_ldout_n_odp, s_io_ldout_n_odn,
+                                s_io_next_n_ds, s_io_next_n_sr, s_io_next_n_co, s_io_next_n_odp, s_io_next_n_odn, s_io_clk_ds,
+                                s_io_clk_sr, s_io_clk_co, s_io_clk_odp, s_io_clk_odn, s_io_ioa_n_ds, s_io_ioa_n_sr,
+                                s_io_ioa_n_co, s_io_ioa_n_odp, s_io_ioa_n_odn)
   begin
     data_out <= (others => '0');
 
@@ -2104,6 +2674,150 @@ begin
           data_out(adpll_status1_adpll_status_1_msb_c downto adpll_status1_adpll_status_1_lsb_c) <= s_adpll_status1_adpll_status_1;
         when adpll_status2_address_c => 
           data_out(adpll_status2_adpll_status_2_msb_c downto adpll_status2_adpll_status_2_lsb_c) <= s_adpll_status2_adpll_status_2;
+        when io_dack0_n_address_c => 
+          data_out(io_dack0_n_ste_msb_c downto io_dack0_n_ste_lsb_c) <= s_io_dack0_n_ste;
+          data_out(io_dack0_n_pd_msb_c) <= s_io_dack0_n_pd;
+          data_out(io_dack0_n_pu_msb_c) <= s_io_dack0_n_pu;
+        when io_dreq0_n_address_c => 
+          data_out(io_dreq0_n_ds_msb_c downto io_dreq0_n_ds_lsb_c) <= s_io_dreq0_n_ds;
+          data_out(io_dreq0_n_sr_msb_c) <= s_io_dreq0_n_sr;
+          data_out(io_dreq0_n_co_msb_c) <= s_io_dreq0_n_co;
+          data_out(io_dreq0_n_odp_msb_c) <= s_io_dreq0_n_odp;
+          data_out(io_dreq0_n_odn_msb_c) <= s_io_dreq0_n_odn;
+        when io_dack1_n_address_c => 
+          data_out(io_dack1_n_ste_msb_c downto io_dack1_n_ste_lsb_c) <= s_io_dack1_n_ste;
+          data_out(io_dack1_n_pd_msb_c) <= s_io_dack1_n_pd;
+          data_out(io_dack1_n_pu_msb_c) <= s_io_dack1_n_pu;
+        when io_dreq1_n_address_c => 
+          data_out(io_dreq1_n_ds_msb_c downto io_dreq1_n_ds_lsb_c) <= s_io_dreq1_n_ds;
+          data_out(io_dreq1_n_sr_msb_c) <= s_io_dreq1_n_sr;
+          data_out(io_dreq1_n_co_msb_c) <= s_io_dreq1_n_co;
+          data_out(io_dreq1_n_odp_msb_c) <= s_io_dreq1_n_odp;
+          data_out(io_dreq1_n_odn_msb_c) <= s_io_dreq1_n_odn;
+        when io_dack2_n_address_c => 
+          data_out(io_dack2_n_ste_msb_c downto io_dack2_n_ste_lsb_c) <= s_io_dack2_n_ste;
+          data_out(io_dack2_n_pd_msb_c) <= s_io_dack2_n_pd;
+          data_out(io_dack2_n_pu_msb_c) <= s_io_dack2_n_pu;
+        when io_dreq2_n_address_c => 
+          data_out(io_dreq2_n_ds_msb_c downto io_dreq2_n_ds_lsb_c) <= s_io_dreq2_n_ds;
+          data_out(io_dreq2_n_sr_msb_c) <= s_io_dreq2_n_sr;
+          data_out(io_dreq2_n_co_msb_c) <= s_io_dreq2_n_co;
+          data_out(io_dreq2_n_odp_msb_c) <= s_io_dreq2_n_odp;
+          data_out(io_dreq2_n_odn_msb_c) <= s_io_dreq2_n_odn;
+        when io_dack3_n_address_c => 
+          data_out(io_dack3_n_ste_msb_c downto io_dack3_n_ste_lsb_c) <= s_io_dack3_n_ste;
+          data_out(io_dack3_n_pd_msb_c) <= s_io_dack3_n_pd;
+          data_out(io_dack3_n_pu_msb_c) <= s_io_dack3_n_pu;
+        when io_dreq3_n_address_c => 
+          data_out(io_dreq3_n_ds_msb_c downto io_dreq3_n_ds_lsb_c) <= s_io_dreq3_n_ds;
+          data_out(io_dreq3_n_sr_msb_c) <= s_io_dreq3_n_sr;
+          data_out(io_dreq3_n_co_msb_c) <= s_io_dreq3_n_co;
+          data_out(io_dreq3_n_odp_msb_c) <= s_io_dreq3_n_odp;
+          data_out(io_dreq3_n_odn_msb_c) <= s_io_dreq3_n_odn;
+        when io_d0_out_address_c => 
+          data_out(io_d0_out_ds_msb_c downto io_d0_out_ds_lsb_c) <= s_io_d0_out_ds;
+          data_out(io_d0_out_sr_msb_c) <= s_io_d0_out_sr;
+          data_out(io_d0_out_co_msb_c) <= s_io_d0_out_co;
+          data_out(io_d0_out_odp_msb_c) <= s_io_d0_out_odp;
+          data_out(io_d0_out_odn_msb_c) <= s_io_d0_out_odn;
+        when io_d0_in_address_c => 
+          data_out(io_d0_in_ste_msb_c downto io_d0_in_ste_lsb_c) <= s_io_d0_in_ste;
+          data_out(io_d0_in_pd_msb_c) <= s_io_d0_in_pd;
+          data_out(io_d0_in_pu_msb_c) <= s_io_d0_in_pu;
+        when io_d1_out_address_c => 
+          data_out(io_d1_out_ds_msb_c downto io_d1_out_ds_lsb_c) <= s_io_d1_out_ds;
+          data_out(io_d1_out_sr_msb_c) <= s_io_d1_out_sr;
+          data_out(io_d1_out_co_msb_c) <= s_io_d1_out_co;
+          data_out(io_d1_out_odp_msb_c) <= s_io_d1_out_odp;
+          data_out(io_d1_out_odn_msb_c) <= s_io_d1_out_odn;
+        when io_d1_in_address_c => 
+          data_out(io_d1_in_ste_msb_c downto io_d1_in_ste_lsb_c) <= s_io_d1_in_ste;
+          data_out(io_d1_in_pd_msb_c) <= s_io_d1_in_pd;
+          data_out(io_d1_in_pu_msb_c) <= s_io_d1_in_pu;
+        when io_d2_out_address_c => 
+          data_out(io_d2_out_ds_msb_c downto io_d2_out_ds_lsb_c) <= s_io_d2_out_ds;
+          data_out(io_d2_out_sr_msb_c) <= s_io_d2_out_sr;
+          data_out(io_d2_out_co_msb_c) <= s_io_d2_out_co;
+          data_out(io_d2_out_odp_msb_c) <= s_io_d2_out_odp;
+          data_out(io_d2_out_odn_msb_c) <= s_io_d2_out_odn;
+        when io_d2_in_address_c => 
+          data_out(io_d2_in_ste_msb_c downto io_d2_in_ste_lsb_c) <= s_io_d2_in_ste;
+          data_out(io_d2_in_pd_msb_c) <= s_io_d2_in_pd;
+          data_out(io_d2_in_pu_msb_c) <= s_io_d2_in_pu;
+        when io_d3_out_address_c => 
+          data_out(io_d3_out_ds_msb_c downto io_d3_out_ds_lsb_c) <= s_io_d3_out_ds;
+          data_out(io_d3_out_sr_msb_c) <= s_io_d3_out_sr;
+          data_out(io_d3_out_co_msb_c) <= s_io_d3_out_co;
+          data_out(io_d3_out_odp_msb_c) <= s_io_d3_out_odp;
+          data_out(io_d3_out_odn_msb_c) <= s_io_d3_out_odn;
+        when io_d3_in_address_c => 
+          data_out(io_d3_in_ste_msb_c downto io_d3_in_ste_lsb_c) <= s_io_d3_in_ste;
+          data_out(io_d3_in_pd_msb_c) <= s_io_d3_in_pd;
+          data_out(io_d3_in_pu_msb_c) <= s_io_d3_in_pu;
+        when io_d4_out_address_c => 
+          data_out(io_d4_out_ds_msb_c downto io_d4_out_ds_lsb_c) <= s_io_d4_out_ds;
+          data_out(io_d4_out_sr_msb_c) <= s_io_d4_out_sr;
+          data_out(io_d4_out_co_msb_c) <= s_io_d4_out_co;
+          data_out(io_d4_out_odp_msb_c) <= s_io_d4_out_odp;
+          data_out(io_d4_out_odn_msb_c) <= s_io_d4_out_odn;
+        when io_d4_in_address_c => 
+          data_out(io_d4_in_ste_msb_c downto io_d4_in_ste_lsb_c) <= s_io_d4_in_ste;
+          data_out(io_d4_in_pd_msb_c) <= s_io_d4_in_pd;
+          data_out(io_d4_in_pu_msb_c) <= s_io_d4_in_pu;
+        when io_d5_out_address_c => 
+          data_out(io_d5_out_ds_msb_c downto io_d5_out_ds_lsb_c) <= s_io_d5_out_ds;
+          data_out(io_d5_out_sr_msb_c) <= s_io_d5_out_sr;
+          data_out(io_d5_out_co_msb_c) <= s_io_d5_out_co;
+          data_out(io_d5_out_odp_msb_c) <= s_io_d5_out_odp;
+          data_out(io_d5_out_odn_msb_c) <= s_io_d5_out_odn;
+        when io_d5_in_address_c => 
+          data_out(io_d5_in_ste_msb_c downto io_d5_in_ste_lsb_c) <= s_io_d5_in_ste;
+          data_out(io_d5_in_pd_msb_c) <= s_io_d5_in_pd;
+          data_out(io_d5_in_pu_msb_c) <= s_io_d5_in_pu;
+        when io_d6_out_address_c => 
+          data_out(io_d6_out_ds_msb_c downto io_d6_out_ds_lsb_c) <= s_io_d6_out_ds;
+          data_out(io_d6_out_sr_msb_c) <= s_io_d6_out_sr;
+          data_out(io_d6_out_co_msb_c) <= s_io_d6_out_co;
+          data_out(io_d6_out_odp_msb_c) <= s_io_d6_out_odp;
+          data_out(io_d6_out_odn_msb_c) <= s_io_d6_out_odn;
+        when io_d6_in_address_c => 
+          data_out(io_d6_in_ste_msb_c downto io_d6_in_ste_lsb_c) <= s_io_d6_in_ste;
+          data_out(io_d6_in_pd_msb_c) <= s_io_d6_in_pd;
+          data_out(io_d6_in_pu_msb_c) <= s_io_d6_in_pu;
+        when io_d7_out_address_c => 
+          data_out(io_d7_out_ds_msb_c downto io_d7_out_ds_lsb_c) <= s_io_d7_out_ds;
+          data_out(io_d7_out_sr_msb_c) <= s_io_d7_out_sr;
+          data_out(io_d7_out_co_msb_c) <= s_io_d7_out_co;
+          data_out(io_d7_out_odp_msb_c) <= s_io_d7_out_odp;
+          data_out(io_d7_out_odn_msb_c) <= s_io_d7_out_odn;
+        when io_d7_in_address_c => 
+          data_out(io_d7_in_ste_msb_c downto io_d7_in_ste_lsb_c) <= s_io_d7_in_ste;
+          data_out(io_d7_in_pd_msb_c) <= s_io_d7_in_pd;
+          data_out(io_d7_in_pu_msb_c) <= s_io_d7_in_pu;
+        when io_ldout_n_address_c => 
+          data_out(io_ldout_n_ds_msb_c downto io_ldout_n_ds_lsb_c) <= s_io_ldout_n_ds;
+          data_out(io_ldout_n_sr_msb_c) <= s_io_ldout_n_sr;
+          data_out(io_ldout_n_co_msb_c) <= s_io_ldout_n_co;
+          data_out(io_ldout_n_odp_msb_c) <= s_io_ldout_n_odp;
+          data_out(io_ldout_n_odn_msb_c) <= s_io_ldout_n_odn;
+        when io_next_n_address_c => 
+          data_out(io_next_n_ds_msb_c downto io_next_n_ds_lsb_c) <= s_io_next_n_ds;
+          data_out(io_next_n_sr_msb_c) <= s_io_next_n_sr;
+          data_out(io_next_n_co_msb_c) <= s_io_next_n_co;
+          data_out(io_next_n_odp_msb_c) <= s_io_next_n_odp;
+          data_out(io_next_n_odn_msb_c) <= s_io_next_n_odn;
+        when io_clk_address_c => 
+          data_out(io_clk_ds_msb_c downto io_clk_ds_lsb_c) <= s_io_clk_ds;
+          data_out(io_clk_sr_msb_c) <= s_io_clk_sr;
+          data_out(io_clk_co_msb_c) <= s_io_clk_co;
+          data_out(io_clk_odp_msb_c) <= s_io_clk_odp;
+          data_out(io_clk_odn_msb_c) <= s_io_clk_odn;
+        when io_ioa_n_address_c => 
+          data_out(io_ioa_n_ds_msb_c downto io_ioa_n_ds_lsb_c) <= s_io_ioa_n_ds;
+          data_out(io_ioa_n_sr_msb_c) <= s_io_ioa_n_sr;
+          data_out(io_ioa_n_co_msb_c) <= s_io_ioa_n_co;
+          data_out(io_ioa_n_odp_msb_c) <= s_io_ioa_n_odp;
+          data_out(io_ioa_n_odn_msb_c) <= s_io_ioa_n_odn;
         when others => null;
       end case;
     end if;
@@ -2442,6 +3156,122 @@ begin
   s_adpll_status0_adpll_status_0 <= adpll_status0_adpll_status_0;
   s_adpll_status1_adpll_status_1 <= adpll_status1_adpll_status_1;
   s_adpll_status2_adpll_status_2 <= adpll_status2_adpll_status_2;
+  io_dack0_n_ste <= s_io_dack0_n_ste;
+  io_dack0_n_pd <= s_io_dack0_n_pd;
+  io_dack0_n_pu <= s_io_dack0_n_pu;
+  io_dreq0_n_ds <= s_io_dreq0_n_ds;
+  io_dreq0_n_sr <= s_io_dreq0_n_sr;
+  io_dreq0_n_co <= s_io_dreq0_n_co;
+  io_dreq0_n_odp <= s_io_dreq0_n_odp;
+  io_dreq0_n_odn <= s_io_dreq0_n_odn;
+  io_dack1_n_ste <= s_io_dack1_n_ste;
+  io_dack1_n_pd <= s_io_dack1_n_pd;
+  io_dack1_n_pu <= s_io_dack1_n_pu;
+  io_dreq1_n_ds <= s_io_dreq1_n_ds;
+  io_dreq1_n_sr <= s_io_dreq1_n_sr;
+  io_dreq1_n_co <= s_io_dreq1_n_co;
+  io_dreq1_n_odp <= s_io_dreq1_n_odp;
+  io_dreq1_n_odn <= s_io_dreq1_n_odn;
+  io_dack2_n_ste <= s_io_dack2_n_ste;
+  io_dack2_n_pd <= s_io_dack2_n_pd;
+  io_dack2_n_pu <= s_io_dack2_n_pu;
+  io_dreq2_n_ds <= s_io_dreq2_n_ds;
+  io_dreq2_n_sr <= s_io_dreq2_n_sr;
+  io_dreq2_n_co <= s_io_dreq2_n_co;
+  io_dreq2_n_odp <= s_io_dreq2_n_odp;
+  io_dreq2_n_odn <= s_io_dreq2_n_odn;
+  io_dack3_n_ste <= s_io_dack3_n_ste;
+  io_dack3_n_pd <= s_io_dack3_n_pd;
+  io_dack3_n_pu <= s_io_dack3_n_pu;
+  io_dreq3_n_ds <= s_io_dreq3_n_ds;
+  io_dreq3_n_sr <= s_io_dreq3_n_sr;
+  io_dreq3_n_co <= s_io_dreq3_n_co;
+  io_dreq3_n_odp <= s_io_dreq3_n_odp;
+  io_dreq3_n_odn <= s_io_dreq3_n_odn;
+  io_d0_out_ds <= s_io_d0_out_ds;
+  io_d0_out_sr <= s_io_d0_out_sr;
+  io_d0_out_co <= s_io_d0_out_co;
+  io_d0_out_odp <= s_io_d0_out_odp;
+  io_d0_out_odn <= s_io_d0_out_odn;
+  io_d0_in_ste <= s_io_d0_in_ste;
+  io_d0_in_pd <= s_io_d0_in_pd;
+  io_d0_in_pu <= s_io_d0_in_pu;
+  io_d1_out_ds <= s_io_d1_out_ds;
+  io_d1_out_sr <= s_io_d1_out_sr;
+  io_d1_out_co <= s_io_d1_out_co;
+  io_d1_out_odp <= s_io_d1_out_odp;
+  io_d1_out_odn <= s_io_d1_out_odn;
+  io_d1_in_ste <= s_io_d1_in_ste;
+  io_d1_in_pd <= s_io_d1_in_pd;
+  io_d1_in_pu <= s_io_d1_in_pu;
+  io_d2_out_ds <= s_io_d2_out_ds;
+  io_d2_out_sr <= s_io_d2_out_sr;
+  io_d2_out_co <= s_io_d2_out_co;
+  io_d2_out_odp <= s_io_d2_out_odp;
+  io_d2_out_odn <= s_io_d2_out_odn;
+  io_d2_in_ste <= s_io_d2_in_ste;
+  io_d2_in_pd <= s_io_d2_in_pd;
+  io_d2_in_pu <= s_io_d2_in_pu;
+  io_d3_out_ds <= s_io_d3_out_ds;
+  io_d3_out_sr <= s_io_d3_out_sr;
+  io_d3_out_co <= s_io_d3_out_co;
+  io_d3_out_odp <= s_io_d3_out_odp;
+  io_d3_out_odn <= s_io_d3_out_odn;
+  io_d3_in_ste <= s_io_d3_in_ste;
+  io_d3_in_pd <= s_io_d3_in_pd;
+  io_d3_in_pu <= s_io_d3_in_pu;
+  io_d4_out_ds <= s_io_d4_out_ds;
+  io_d4_out_sr <= s_io_d4_out_sr;
+  io_d4_out_co <= s_io_d4_out_co;
+  io_d4_out_odp <= s_io_d4_out_odp;
+  io_d4_out_odn <= s_io_d4_out_odn;
+  io_d4_in_ste <= s_io_d4_in_ste;
+  io_d4_in_pd <= s_io_d4_in_pd;
+  io_d4_in_pu <= s_io_d4_in_pu;
+  io_d5_out_ds <= s_io_d5_out_ds;
+  io_d5_out_sr <= s_io_d5_out_sr;
+  io_d5_out_co <= s_io_d5_out_co;
+  io_d5_out_odp <= s_io_d5_out_odp;
+  io_d5_out_odn <= s_io_d5_out_odn;
+  io_d5_in_ste <= s_io_d5_in_ste;
+  io_d5_in_pd <= s_io_d5_in_pd;
+  io_d5_in_pu <= s_io_d5_in_pu;
+  io_d6_out_ds <= s_io_d6_out_ds;
+  io_d6_out_sr <= s_io_d6_out_sr;
+  io_d6_out_co <= s_io_d6_out_co;
+  io_d6_out_odp <= s_io_d6_out_odp;
+  io_d6_out_odn <= s_io_d6_out_odn;
+  io_d6_in_ste <= s_io_d6_in_ste;
+  io_d6_in_pd <= s_io_d6_in_pd;
+  io_d6_in_pu <= s_io_d6_in_pu;
+  io_d7_out_ds <= s_io_d7_out_ds;
+  io_d7_out_sr <= s_io_d7_out_sr;
+  io_d7_out_co <= s_io_d7_out_co;
+  io_d7_out_odp <= s_io_d7_out_odp;
+  io_d7_out_odn <= s_io_d7_out_odn;
+  io_d7_in_ste <= s_io_d7_in_ste;
+  io_d7_in_pd <= s_io_d7_in_pd;
+  io_d7_in_pu <= s_io_d7_in_pu;
+  io_ldout_n_ds <= s_io_ldout_n_ds;
+  io_ldout_n_sr <= s_io_ldout_n_sr;
+  io_ldout_n_co <= s_io_ldout_n_co;
+  io_ldout_n_odp <= s_io_ldout_n_odp;
+  io_ldout_n_odn <= s_io_ldout_n_odn;
+  io_next_n_ds <= s_io_next_n_ds;
+  io_next_n_sr <= s_io_next_n_sr;
+  io_next_n_co <= s_io_next_n_co;
+  io_next_n_odp <= s_io_next_n_odp;
+  io_next_n_odn <= s_io_next_n_odn;
+  io_clk_ds <= s_io_clk_ds;
+  io_clk_sr <= s_io_clk_sr;
+  io_clk_co <= s_io_clk_co;
+  io_clk_odp <= s_io_clk_odp;
+  io_clk_odn <= s_io_clk_odn;
+  io_ioa_n_ds <= s_io_ioa_n_ds;
+  io_ioa_n_sr <= s_io_ioa_n_sr;
+  io_ioa_n_co <= s_io_ioa_n_co;
+  io_ioa_n_odp <= s_io_ioa_n_odp;
+  io_ioa_n_odn <= s_io_ioa_n_odn;
 
 end rtl;
 

@@ -1043,6 +1043,25 @@ begin  -- architecture rtl
         odn => pad_config.io_dreq3_n.odn
         );		
 		
+    io_io_d0_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d1,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d0.ds & "00",
+        sr  => pad_config.io_d0.sr,
+        co  => pad_config.io_d0.co,
+        oe  => '1',          
+        odp => pad_config.io_d0.odp,
+        odn => pad_config.io_d0.odn,
+        ste => pad_config.io_d0.ste,
+        pd  => pad_config.io_d0.pd,
+        pu  => pad_config.io_d0.pu,
+        di  => open
+        );
 	
     io_io_d1_pad : entity work.inoutput_pad
       generic map (

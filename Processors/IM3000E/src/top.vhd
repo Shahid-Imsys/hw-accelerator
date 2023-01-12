@@ -663,6 +663,20 @@ architecture struct of top is
 
 begin
 
+  -- Dummy drivers for currently non connected signals
+  ach_sel0     <= '0';
+  ach_sel1     <= '0';
+  ach_sel2     <= '0';
+  adc_bits_int <= '0';
+  --
+  dac0_bits <= '0';
+  dac1_bits <= '0';
+  dac0_en   <= '0';
+  dac1_en   <= '0';
+  --
+  tiu_tstamp <= '0';
+
+
   -- IO-bus signals to NOC adapter
   ext_i_pos  <= clk_i_pos;
   ext_ilioa  <= ilioa;

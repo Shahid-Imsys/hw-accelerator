@@ -71,9 +71,6 @@ entity pe1_core is
     clk_in_off   : out std_logic;  -- close all input clock
     clk_main_off : out std_logic; -- close main clock except clk_p
     sdram_en     : out std_logic; --off chip sdram enable
-    -- Control signals to/from the oscillator and PLL
-    en_pll      : out std_logic;  -- Enable PLL
-		sel_pll     : out std_logic;  -- Select PLL as clock source
     -- Power on signal
     pwr_ok      : in  std_logic;  -- Power is on
     -- Execution signal

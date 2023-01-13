@@ -75,11 +75,11 @@ architecture behav of sdram_inf is
   signal c2_data_b1    : std_logic_vector (7 downto 0);
   signal c2_data_b2    : std_logic_vector (7 downto 0);
 
-  signal toReq_c1   : std_logic_vector(MEMNUM - 1 downto 0);
-  signal toReq_c2   : std_logic_vector(MEMNUM - 1 downto 0);
-  signal data_en_c1 : std_logic_vector(MEMNUM - 1 downto 0);
-  signal data_en_c2 : std_logic_vector(MEMNUM - 1 downto 0);
-  signal valueZero  : std_logic_vector(MEMNUM - 1 downto 0);
+  signal toReq_c1    : std_logic_vector(MEMNUM - 1 downto 0);
+  signal toReq_c2    : std_logic_vector(MEMNUM - 1 downto 0);
+  signal data_en_c1  : std_logic_vector(MEMNUM - 1 downto 0);
+  signal data_en_c2  : std_logic_vector(MEMNUM - 1 downto 0);
+  signal valueZero   : std_logic_vector(MEMNUM - 1 downto 0);
   signal pair_addr_1 : std_logic_vector (16 downto 0);
   signal pair_addr_2 : std_logic_vector (16 downto 0);
 
@@ -172,6 +172,8 @@ begin
       c2_dqo_buffer <= x"00";
 
     elsif (rising_edge(clk_p)) then
+      c1_dqo_buffer <= x"00";
+      c2_dqo_buffer <= x"00";
 
       -- Core 1
       for i in 0 to (MEMNUM/2 - 1) loop
@@ -354,11 +356,8 @@ begin
 
       -- Core1
       if (even_c = '1') then
-        if (c1_d_addr(0) = '0') then
-          ram_di(2 * i) <= c1_d_dqi;
-        else
-          ram_di(2 * i + 1) <= c1_d_dqi;
-        end if;
+        ram_di(2 * i)     <= c1_d_dqi;
+        ram_di(2 * i + 1) <= c1_d_dqi;
 
         if (c1_buf = '1' and toReq_c1_buffer(i) = '1') then
           if (c1_addr_buffer(0) = '0') then
@@ -370,11 +369,8 @@ begin
 
         -- Core 2
       else
-        if (c2_d_addr(0) = '0') then
-          ram_di(2 * i) <= c2_d_dqi;
-        else
-          ram_di(2 * i + 1) <= c2_d_dqi;
-        end if;
+        ram_di(2 * i)     <= c2_d_dqi;
+        ram_di(2 * i + 1) <= c2_d_dqi;
 
         if (c2_buf = '1' and toReq_c2_buffer(i) = '1') then
           if (c2_addr_buffer(0) = '0') then

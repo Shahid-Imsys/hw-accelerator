@@ -38,7 +38,6 @@ entity pe1_rtc_iso is
       c2_gmem_d_iso_0   : out std_logic_vector(7 downto 0);
 
       dbus_iso_0        : out std_logic_vector(7 downto 0);
-      bmem_a8_iso_0     : out std_logic;
 
       clk_mux_out_iso_1   : out  std_logic;
 

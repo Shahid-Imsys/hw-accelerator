@@ -280,7 +280,7 @@ architecture rtl of digital_chip is
   signal pg_en : std_logic_vector(7 downto 0);
   signal mtest_in : std_logic;
   signal mwake_in : std_logic;
-  signal mrxout_out : std_logic;
+  signal mrxout_in : std_logic;
 
   signal pj_o : std_logic_vector(7 downto 0);
   signal pj_i : std_logic_vector(7 downto 0);
@@ -447,7 +447,7 @@ begin  -- architecture rtl
         dis_bmem   => open,
         vdd_bmem   => '0',
         VCC18LP    => '1',
-        rxout      => mrxout_out,
+        rxout      => mrxout_in,
         ach_sel0   => open,
         ach_sel1   => open,
         ach_sel2   => open,
@@ -1895,21 +1895,19 @@ begin  -- architecture rtl
         );
     
       
-    i_mrxout_pad : entity work.output_pad  input in digital_top but output pad in excel-dok?
+    i_mrxout_pad : entity work.input_pad -- input in digital_top but output pad in excel-dok?
       generic map (
         direction => vertical)
       port map (
         -- PAD
         pad => mrxout,
-        --GPIO
-        do  => mrxout_out,
-        ds  => "1000",
-        sr  => '1',
-        co  => '0',
-        oe  => '1',
-        odp => '0',
-        odn => '0'
-    --    );
+        --GPI
+        ie  => '1',
+        ste => (others => '0'),
+        pd  => '0',
+        pu  => '0',
+        di  => mrxout_in
+        );
 
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
      --  port map (

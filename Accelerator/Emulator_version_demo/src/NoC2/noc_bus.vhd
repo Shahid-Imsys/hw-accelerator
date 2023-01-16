@@ -7,7 +7,7 @@ use work.Acc_types_pkg.all;
 entity noc_bus is
     Generic(
       PEC_NUMBER             : integer := 16;
-      REGEN_POINTS           : integer := 0
+      REGEN_POINTS           : integer := 2
     );    
   port (
     clk                     : in  std_logic;

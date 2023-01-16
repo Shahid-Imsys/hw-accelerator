@@ -97,25 +97,26 @@ architecture Behavioral of Accelerator_Top is
         TAG      : in std_logic;
         TAG_FB   : out std_logic;
         C_RDY    : out std_logic;
-        DATA     : in std_logic_vector(7 downto 0);
+        DATA     : in std_logic_vector(7 downto 0);        
         DATA_OUT : out std_logic_vector(7 downto 0)
     );
     end component;
     
     component noc_bus is
     generic(
-      PEC_NUMBER             : integer := 16
+      PEC_NUMBER             : integer := 16;
+      REGEN_POINTS           : integer := 2
     );    
     port(
         clk                     : in  std_logic;
         rst                     : in  std_logic;
         enable                  : in  std_logic;
     
-        data_from_noc_switch    : in  std_logic_vector((8*PEC_NUMBER) -1 downto 0);
-        data_to_cc              : out noc_data_t(PEC_NUMBER -1 downto 0);
+        data_from_noc_switch    : in  std_logic_vector(127 downto 0);
+        data_to_cc              : out noc_data_t(15 downto 0);
     
         data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
-        data_to_noc_switch      : out std_logic_vector((8*PEC_NUMBER) -1 downto 0);
+        data_to_noc_switch      : out std_logic_vector(127 downto 0);
     
         tag_from_master         : in  std_logic;
         tag_to_cc               : out std_logic;
@@ -180,7 +181,8 @@ begin
     
     noc_bus_Inst: noc_bus
     Generic map(
-      PEC_NUMBER         => PEC_NUMBER
+      PEC_NUMBER         => PEC_NUMBER,
+      REGEN_POINTS       => 2
     )
     port map
     (
@@ -188,7 +190,7 @@ begin
         rst                     => Reset,
         enable                  => '1',     --need to check
          
-        data_from_noc_switch    => Noc_byte_data((8*PEC_NUMBER) -1 downto 0),
+        data_from_noc_switch    => Noc_byte_data(127 downto 0),
         data_to_cc              => data_to_cc,
     
         data_from_cc            => data_from_cc,

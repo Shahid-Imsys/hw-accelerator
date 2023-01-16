@@ -21,6 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use work.cluster_pkg.all;
+use work.noc_types_pkg.all;
 
 entity PEC_top is
   generic (USE_ASIC_MEMORIES : boolean := true);

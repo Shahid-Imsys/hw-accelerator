@@ -6,7 +6,8 @@ use work.Acc_types_pkg.all;
 
 entity noc_bus is
     Generic(
-      PEC_NUMBER             : integer := 16
+      PEC_NUMBER             : integer := 16;
+      REGEN_POINTS           : integer := 0
     );    
   port (
     clk                     : in  std_logic;
@@ -69,14 +70,16 @@ begin  -- architecture rtl
     end if;
   end process data_to_cc_proc;
 
---  data_to_cc      <= master_noc_data_array(master_noc_data_array'left);
---  data_to_master  <= cc_noc_data_array(cc_noc_data_array'left);
---  tag_to_cc <= master_tag_array(master_tag_array'left);
---  tag_to_master <= cc_tag_array(cc_tag_array'left);
-
-  data_to_cc      <= data_from_master;
-  data_to_master  <= data_from_cc;
-  tag_to_cc <= tag_from_master;
-  tag_to_master <= tag_from_cc;
+  BUS_REGEN_POINTS : if REGEN_POINTS = 2 generate
+      data_to_cc      <= master_noc_data_array(master_noc_data_array'left);
+      data_to_master  <= cc_noc_data_array(cc_noc_data_array'left);
+      tag_to_cc <= master_tag_array(master_tag_array'left);
+      tag_to_master <= cc_tag_array(cc_tag_array'left);
+  elsif REGEN_POINTS = 0 generate  
+      data_to_cc      <= data_from_master;
+      data_to_master  <= data_from_cc;
+      tag_to_cc <= tag_from_master;
+      tag_to_master <= tag_from_cc;
+  end generate;    
 
 end architecture rtl;

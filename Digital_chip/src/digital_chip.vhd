@@ -447,7 +447,7 @@ begin  -- architecture rtl
         dis_bmem   => open,
         vdd_bmem   => '0',
         VCC18LP    => '1',
-        rxout      => mrxout,
+        rxout      => mrxout_out,
         ach_sel0   => open,
         ach_sel1   => open,
         ach_sel2   => open,
@@ -1895,20 +1895,20 @@ begin  -- architecture rtl
         );
     
       
-    --i_mrxout_pad : entity work.output_pad  input in digital_top but output pad in excel-dok?
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => mrxout,
-    --    --GPIO
-    --    do  => mrxout_out,
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => '1',
-    --    odp => '0',
-    --    odn => '0'
+    i_mrxout_pad : entity work.output_pad  input in digital_top but output pad in excel-dok?
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mrxout,
+        --GPIO
+        do  => mrxout_out,
+        ds  => "1000",
+        sr  => '1',
+        co  => '0',
+        oe  => '1',
+        odp => '0',
+        odn => '0'
     --    );
 
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (

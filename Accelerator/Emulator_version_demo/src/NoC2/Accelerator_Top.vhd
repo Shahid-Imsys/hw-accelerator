@@ -88,7 +88,10 @@ architecture Behavioral of Accelerator_Top is
     end component;
 
     component PEC_top is
-    generic ( USE_ASIC_MEMORIES : boolean := true );
+    generic(
+      USE_ASIC_MEMORIES      : boolean := true;
+      PEC_NUMBER             : integer := 2
+    );    
     Port( 
         CLK_P    : in std_logic;
         CLK_E    : in std_logic;
@@ -97,7 +100,7 @@ architecture Behavioral of Accelerator_Top is
         TAG      : in std_logic;
         TAG_FB   : out std_logic;
         C_RDY    : out std_logic;
-        DATA_True_Broadcast : in noc_data_t(15 downto 0);
+        DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
         DATA     : in std_logic_vector(7 downto 0);        
         DATA_OUT : out std_logic_vector(7 downto 0)
     );
@@ -208,7 +211,8 @@ begin
   pec_gen : for i in 0 to PEC_NUMBER -1 generate
     PEC_top_Inst : PEC_top
     Generic map(
-      USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES
+      USE_ASIC_MEMORIES         => USE_ASIC_MEMORIES,
+      PEC_NUMBER                => PEC_NUMBER   
     )    
     port map
     ( 

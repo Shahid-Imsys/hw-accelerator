@@ -6,7 +6,7 @@ use work.Acc_types_pkg.all;
 
 entity noc_bus is
     Generic(
-      PEC_NUMBER             : integer := 16;
+      PEC_NUMBER             : integer := 2;
       REGEN_POINTS           : integer := 2
     );    
   port (

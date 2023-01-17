@@ -55,7 +55,7 @@ architecture Behavioral of Accelerator_Top is
 
     component Noc_Top is
     Generic(
-      USE_ASIC_MEMORIES      : boolean := false --true
+      USE_ASIC_MEMORIES      : boolean := true
     );
     Port(
 	      clk                  : in  std_logic;
@@ -104,7 +104,7 @@ architecture Behavioral of Accelerator_Top is
     
     component noc_bus is
     generic(
-      PEC_NUMBER             : integer := 16;
+      PEC_NUMBER             : integer := 2;
       REGEN_POINTS           : integer := 2
     );    
     port(

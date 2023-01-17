@@ -511,7 +511,7 @@ architecture rtl of ve is
   --------------------------------------------------------
   --Delay FFs
   --------------------------------------------------------
-  signal delay3 : std_logic_vector(6 downto 0);
+  signal delay3 : std_logic_vector(3 downto 0);
 
 
 begin
@@ -1494,7 +1494,7 @@ begin
   begin
     if rising_edge(clk_p) then
       delay3(0) <= clip_ena;
-      for i in 0 to 5 loop
+      for i in 0 to 2 loop
         delay3(i+1) <= delay3(i);
       end loop;
       output_ena <= delay3(3); 

@@ -1048,7 +1048,7 @@ begin  -- architecture rtl
         direction => vertical)
       port map (
         -- PAD
-        pad => io_d1,
+        pad => io_d0,
         -- GPIO
         do  => '1',
         ds  => pad_config.io_d0.ds & "00",

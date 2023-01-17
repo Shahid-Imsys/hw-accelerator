@@ -39,22 +39,22 @@ architecture tb of main_tb is
   signal MIRQ1    : std_logic;
   signal D_DQ     : std_logic_vector(7 downto 0) := (others => 'Z');
 
-  signal pa_i  : std_logic_vector(7 downto 0);
-  signal PB    : std_logic_vector(7 downto 0);
-  signal PC    : std_logic_vector(7 downto 0);
-  signal PD    : std_logic_vector(7 downto 0);
-  signal PE    : std_logic_vector(7 downto 0);
-  signal PF    : std_logic_vector(7 downto 0);
-  signal PG    : std_logic_vector(7 downto 0);
-  signal PH    : std_logic_vector(7 downto 0);
-  signal PI    : std_logic_vector(7 downto 0);
-  signal pi_i  : std_logic_vector(7 downto 0);
-  signal pi_o  : std_logic_vector(7 downto 0);
-  signal pi_en : std_logic_vector(7 downto 0);
-  signal PJ    : std_logic_vector(7 downto 0);
-  signal pj_i  : std_logic_vector(7 downto 0);
-  signal pj_o  : std_logic_vector(7 downto 0);
-  signal pj_en : std_logic_vector(7 downto 0);
+--  signal pa_i  : std_logic_vector(7 downto 0);
+--  signal PB    : std_logic_vector(7 downto 0);
+--  signal PC    : std_logic_vector(7 downto 0);
+--  signal PD    : std_logic_vector(7 downto 0);
+--  signal PE    : std_logic_vector(7 downto 0);
+--  signal PF    : std_logic_vector(7 downto 0);
+--  signal PG    : std_logic_vector(7 downto 0);
+--  signal PH    : std_logic_vector(7 downto 0);
+--  signal PI    : std_logic_vector(7 downto 0);
+--  signal pi_i  : std_logic_vector(7 downto 0);
+--  signal pi_o  : std_logic_vector(7 downto 0);
+--  signal pi_en : std_logic_vector(7 downto 0);
+--  signal PJ    : std_logic_vector(7 downto 0);
+--  signal pj_i  : std_logic_vector(7 downto 0);
+--  signal pj_o  : std_logic_vector(7 downto 0);
+--  signal pj_en : std_logic_vector(7 downto 0);
 
   signal MBYPASS    : std_logic;
   signal MWAKE      : std_logic;
@@ -69,7 +69,6 @@ architecture tb of main_tb is
   signal OSPI_Out   : OSPI_InterfaceOut_t;
   signal OSPI_DQ    : std_logic_vector(7 downto 0);
   signal OSPI_RWDS  : std_logic;
-  signal OSPI_rst_n : std_logic;
 
   signal spi_rst_n : std_logic := '0';
   signal spi_sclk : std_logic := '0';
@@ -142,7 +141,7 @@ begin  -- architecture tb
       -- Octal_spi
       emem_cs_n  => OSPI_Out.CS_n,
       emem_clk   => OSPI_Out.CK_p,
-      emem_rst_n => OSPI_rst_n,
+      emem_rst_n => OSPI_Out.RESET_n,
       emem_rwds  => OSPI_RWDS,
       emem_d0    => OSPI_DQ(0),
       emem_d1    => OSPI_DQ(1),
@@ -172,7 +171,8 @@ begin  -- architecture tb
   pad(A)(7 downto 5) <= "LLL";  --"000";          -- This is read by ROM bootloader
   pad(A)(4 downto 3) <= "LL";  --"00";           -- Set SP communication at /4 speed
   pad(A)(2 downto 1) <= "LH";  --"01";           -- Set PLL multiplier to 4
-  pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
+  -- PA0 will be "pulled down" in the BFM (dual drivers otherwise)
+  -- pad(A)(0)          <= 'L';   --'1';            -- Set PLL divider to 1
 
   pad(F)(1) <= '0'; -- Ethernet tx clock
   pad(G)(1) <= '0'; -- Ethernet rx clock
@@ -231,7 +231,7 @@ begin  -- architecture tb
       cs      => OSPI_Out.CS_n,
       rwds    => OSPI_RWDS,
       dq      => OSPI_DQ,
-      reset_n => OSPI_rst_n
+      reset_n => OSPI_Out.RESET_n
       );
 
   spiflash_bfm : entity work.spiflash_bfm

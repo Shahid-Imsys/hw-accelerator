@@ -47,7 +47,7 @@ begin  -- architecture rtl
 
   split_in_data: for i in (PEC_NUMBER -1) downto 0 generate
     data_from_master(i) <= data_from_noc_switch(i*8 + 7 downto i*8);
-    data_to_noc_switch <= data_to_master(i);
+    data_to_noc_switch <= data_to_master;
   end generate split_in_data;
   
   -----------------------------------------------------------------------------

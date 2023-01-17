@@ -116,7 +116,7 @@ architecture Behavioral of Accelerator_Top is
         data_to_cc              : out noc_data_t(15 downto 0);
     
         data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
-        data_to_noc_switch      : out std_logic_vector(127 downto 0);
+        data_to_noc_switch      : out noc_data_t(PEC_NUMBER -1 downto 0);
     
         tag_from_master         : in  std_logic;
         tag_to_cc               : out std_logic;
@@ -128,6 +128,7 @@ architecture Behavioral of Accelerator_Top is
     
     
     signal PEC_byte_data  : std_logic_vector(127 downto 0):= (others => '0');
+    signal PEC_data       : noc_data_t(PEC_NUMBER -1 downto 0);  
     signal Noc_byte_data  : std_logic_vector(127 downto 0):= (others => '0');
     signal Tag_Line       : std_logic;
     signal PEC_WE         : std_logic_vector(PEC_NUMBER -1 downto 0);
@@ -194,7 +195,7 @@ begin
         data_to_cc              => data_to_cc,
     
         data_from_cc            => data_from_cc,
-        data_to_noc_switch      => PEC_byte_data((8*PEC_NUMBER) -1 downto 0),
+        data_to_noc_switch      => PEC_data,
     
         tag_from_master         => Tag_Line,
         tag_to_cc               => Tag_Line_to_cc,
@@ -235,7 +236,11 @@ begin
   PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE_to_master)) > 0 else '0';
   
   PEC_byte_data(127 downto (8*PEC_NUMBER)) <= (others => '0') when PEC_NUMBER < 16;
-  
+
+  PEC_byte_data_gen : for i in 0 to PEC_NUMBER -1 generate  
+      PEC_byte_data((i*8+7) downto i*8)  <= PEC_data(i);
+  end generate;
+    
 --  PEC_Ready     <= '1' when to_integer(unsigned(C_RDY_to_master)) = 2**PEC_NUMBER - 1 else '0';
 --  PEC_WE_noc    <= '1' when to_integer(unsigned(PEC_WE)) > 0 else '0';  
 

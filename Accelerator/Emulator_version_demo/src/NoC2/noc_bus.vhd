@@ -18,7 +18,7 @@ entity noc_bus is
     data_to_cc              : out noc_data_t(PEC_NUMBER -1 downto 0);
 
     data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
-    data_to_noc_switch      : out std_logic_vector((8*PEC_NUMBER) -1 downto 0);
+    data_to_noc_switch      : out noc_data_t(PEC_NUMBER -1 downto 0);
 
     tag_from_master         : in  std_logic;
     tag_to_cc               : out std_logic;
@@ -47,7 +47,7 @@ begin  -- architecture rtl
 
   split_in_data: for i in (PEC_NUMBER -1) downto 0 generate
     data_from_master(i) <= data_from_noc_switch(i*8 + 7 downto i*8);
-    data_to_noc_switch(i*8 + 7 downto i*8) <= data_to_master(i);
+    data_to_noc_switch <= data_to_master(i);
   end generate split_in_data;
   
   -----------------------------------------------------------------------------

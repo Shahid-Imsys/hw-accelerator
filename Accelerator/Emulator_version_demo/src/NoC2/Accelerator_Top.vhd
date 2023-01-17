@@ -97,6 +97,7 @@ architecture Behavioral of Accelerator_Top is
         TAG      : in std_logic;
         TAG_FB   : out std_logic;
         C_RDY    : out std_logic;
+        DATA_True_Broadcast : in noc_data_t(15 downto 0);
         DATA     : in std_logic_vector(7 downto 0);        
         DATA_OUT : out std_logic_vector(7 downto 0)
     );
@@ -218,6 +219,7 @@ begin
         TAG                     => Tag_Line_to_cc,
         TAG_FB                  => open,
         C_RDY                   => C_RDY(i),
+        DATA_True_Broadcast     => data_to_cc,
         DATA                    => data_to_cc(i),
         DATA_OUT                => data_from_cc(i)
      );

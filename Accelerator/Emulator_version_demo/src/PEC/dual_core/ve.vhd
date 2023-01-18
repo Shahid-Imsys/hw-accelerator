@@ -938,6 +938,7 @@ begin
     bias_rst     <= '0';
     fft_stages   <= "000";
     stall        <= x"0";
+    nt           <= x"0";
     re_cnt_rst   <= '0';
     conv_cnt_rst <= '0';
     bypass_valid    <= '0';

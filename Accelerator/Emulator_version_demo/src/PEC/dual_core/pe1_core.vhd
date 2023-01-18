@@ -126,7 +126,6 @@ entity pe1_core is
     adc_dac     : out std_logic;
     en_tiu      : out std_logic;
     en_iobus    : out std_logic_vector(1 downto 0);
-    ddqm        : out std_logic_vector(7  downto 0);
     irq0        : in  std_logic;  -- Interrupt request 0
     irq1        : in  std_logic;  -- Interrupt request 1
     adc_ref2v		: out	std_logic;	-- Select 2V internal ADC reference (1V)
@@ -164,17 +163,6 @@ entity pe1_core is
     mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL
     mwake_i     : in  std_logic;  -- wake up
-    -- DRAM signals
-    d_addr      : out std_logic_vector(31 downto 0);--2012-02-09 14:00:40 maning
-    dcs_o       : out std_logic;  -- Chip select
-    dras_o      : out std_logic;  -- Row address strobe
-    dcas_o      : out std_logic;  -- Column address strobe
-    dwe_o       : out std_logic;  -- Write enable
-    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
-    ddq_en      : out std_logic;  -- Data output bus enable
-    da_o        : out std_logic_vector(13 downto 0);  -- Address
-    dba_o       : out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
     --CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
     dout_c      : out std_logic_vector(159 downto 0);
@@ -998,20 +986,7 @@ begin
       i_double    => i_double,
       lmpen       => lmpen,
       adl_cy      => adl_cy,
-      hold_e      => mmr_hold_e,
-      -- SDRAM signals
-      d_addr      => d_addr,
-      d_cs        => dcs_o,
-      d_ras       => dras_o,
-      d_cas       => dcas_o,
-      d_we        => dwe_o,
-      d_dqo       => ddq_o,
-      --ve_data     => ve_in_int,
-      en_dqo      => ddq_en,
-      d_a         => da_o,
-      d_ba        => dba_o,
-      d_dqm       => ddqm,
-      d_cke       => dcke_o);
+      hold_e      => mmr_hold_e);
       --MPGMM_IN     => mpgmin,
       --LD_MPGM     => ld_mpgm);  --CJ
 

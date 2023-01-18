@@ -83,12 +83,6 @@ entity pe1_acore is
     short_cycle : in std_logic;
     -- signal to core1
     crb_sel     : out std_logic_vector(3 downto 0);
-    --  Signals to/from Peripheral block
-    --dbus        : out std_logic_vector(7 downto 0);
-    --rst_en      : out std_logic;
-    --pd          : out std_logic_vector(2 downto 0);  -- pl_pd
-    --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
-    ddqm        : out std_logic_vector(7  downto 0);
     irq0        : in  std_logic;  -- Interrupt request 0
     irq1        : in  std_logic;  -- Interrupt request 1
 ---------------------------------------------------------------------
@@ -118,20 +112,6 @@ entity pe1_acore is
     exe       : in std_logic; --CONT need to be added
     resume    : in std_logic;
     ready     : out std_logic;
----------------------------------------------------------------------
-    -- PADS
----------------------------------------------------------------------
-    -- DRAM signals
-    d_addr      : out std_logic_vector(31 downto 0);--2012-02-09 14:00:40 maning
-    dcs_o       : out std_logic;  -- Chip select
-    dras_o      : out std_logic;  -- Row address strobe
-    dcas_o      : out std_logic;  -- Column address strobe
-    dwe_o       : out std_logic;  -- Write enable
-    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus --CJ
-    ddq_en      : out std_logic;  -- Data output bus enable
-    da_o        : out std_logic_vector(13 downto 0);  -- Address
-    dba_o       : out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
     -- CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
     dout_c      : out std_logic_vector(159 downto 0)
@@ -161,32 +141,6 @@ architecture struct of pe1_acore is
   signal odd_c      : std_logic;
   signal clk_e_pos_int  : std_logic;  -- Execution clock
   signal clk_e_neg_int  : std_logic;  -- Execution clock
-  -- CRB signals
-  --signal crb_out    	: std_logic_vector(7 downto 0);
-  --signal en_pmem    	: std_logic;
-  --signal speed_i    	: std_logic_vector(1 downto 0);
-  --signal en_wdog    	: std_logic;
-  --signal pup_clk    	: std_logic;
-  --signal pup_irq    	: std_logic_vector(1 downto 0);
-  --signal en_i       	: std_logic;
-  --signal r_size     	: std_logic_vector(1 downto 0);
-  --signal c_size     	: std_logic_vector(1 downto 0);
-  --signal dqm_size_int	: std_logic_vector(1 downto 0);
-  --signal fast_d_int 	: std_logic;
-  --signal t_ras      	: std_logic_vector(2 downto 0);
-  --signal t_rcd      	: std_logic_vector(1 downto 0);
-  --signal t_rp       	: std_logic_vector(1 downto 0);
-  --signal dis_pll    	: std_logic;
-  --signal dis_xosc   	: std_logic;
-  --signal en_mxout   	: std_logic;
-  --signal en_mexec   	: std_logic;
-  --signal en_s       	: std_logic;
-  --signal speed_s    	: std_logic_vector(1 downto 0);
-  --signal speed_u    	: std_logic_vector(6 downto 0);
-  --signal speed_ps1  	: std_logic_vector(3 downto 0);
-  --signal speed_ps2  	: std_logic_vector(5 downto 0);
-  --signal speed_ps3  	: std_logic_vector(4 downto 0);
-  --signal en_mckout1 	: std_logic;
   -- TIM signals
   --signal gate_e     : std_logic;
   signal held_e     : std_logic;
@@ -705,24 +659,7 @@ begin
       i_double    => i_double,
       lmpen       => lmpen,
       adl_cy      => adl_cy,
-      hold_e      => mmr_hold_e,
-      -- SDRAM signals
-      d_addr      => d_addr,
-      d_cs        => dcs_o,
-      d_ras       => dras_o,
-      d_cas       => dcas_o,
-      d_we        => dwe_o,
-      d_dqo       => ddq_o,
-      --ve_data     => ve_in_int,
-      en_dqo      => ddq_en,
-      d_a         => da_o,
-      d_ba        => dba_o,
-      d_dqm       => ddqm,
-      --exe         => exe,    --Added by CJ
-      --LD_MPGM     => std_logic'('0'), --'0',
-
-      --ddi_vld     => ddi_vld,  --Added by CJ
-      d_cke       => dcke_o);
+      hold_e      => mmr_hold_e);
 ---------------------------------------------------------------------
 -- VE
 ---------------------------------------------------------------------

@@ -474,11 +474,12 @@ begin
           dtsr <= ybus;
         when "101" =>
           dtsr <= dbreg;
-        --when "110" =>
+        when "110" =>
+          dtsr <= x"00";
         --  dtsr <= runmode & '0' & spreq_n & spack_n &
         --          mpram_we_nint & plcpe_nint & plsel_nint;
-        --when "111" =>
-        --  dtsr <= rdata;
+        when "111" =>
+          dtsr <= x"00";
         when others => null;
       end case;
     end process dtsr_mux;

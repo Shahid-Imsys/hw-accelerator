@@ -379,7 +379,6 @@ architecture struct of PE_pair_top is
   signal rst_n         : std_logic;
   signal rst_cn        : std_logic;
   signal fast_d        : std_logic;
-  signal din_ea        : std_logic;
   signal din_i         : std_logic;
   signal din_u         : std_logic;
   signal din_s         : std_logic;
@@ -462,7 +461,6 @@ architecture struct of PE_pair_top is
   signal iden        : std_logic;
   signal dqm_size    : std_logic_vector(1 downto 0);
   signal en_iobus    : std_logic_vector(1 downto 0);
-  signal ddqm        : std_logic_vector(7 downto 0);
   signal en_tiu      : std_logic;
   -- Peri driven
   signal idreq       : std_logic_vector(7 downto 0);
@@ -491,7 +489,6 @@ architecture struct of PE_pair_top is
   signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
   signal c1_ack_i    : std_logic;
   signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
-  signal c1_d_dqi_sd : std_logic_vector(7 downto 0); -- Data in from processor to sdram
   signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
 	signal c2_d_addr   : std_logic_vector(31 downto 0);
 	signal c2_d_cs     : std_logic;  -- CS to SDRAM
@@ -560,9 +557,6 @@ begin
 
   wakeup_lp <= MWAKEUP_LP;
   lp_pwr_ok <= MLP_PWR_OK;
-  pmic_core_en <= '1';
-  pmic_io_en <= '1';
-  io_iso <= '1';
 
   ddi_vld_c1 <= C1_DDI_VLD;
   ddi_vld_c2 <= C2_DDI_VLD;
@@ -1031,7 +1025,6 @@ end generate;
     adc_dac       => adc_dac          ,--: out std_logic;
     en_tiu        => en_tiu           ,--: out std_logic;
     en_iobus      => en_iobus         ,--: out std_logic_vector(1 downto 0);
-    ddqm          => ddqm             ,--: out std_logic_vector(7  downto 0);
     irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0
     irq1          => irq1             ,--: in  std_logic;  -- Interrupt request 1
     adc_ref2v  	  => open             ,--: out	std_logic;	-- Select 2V internal ADC reference (1V)
@@ -1049,17 +1042,6 @@ end generate;
     mtest_i       => mtest_i          ,--: in  std_logic;  -- Test mode---
     mbypass_i     => mbypass_i        ,--: in  std_logic;  -- bypass PLL
     mwake_i       => std_logic'('0')  , --'0',--: in  std_logic;  -- wake up
-    -- DRAM signals
-    d_addr        => c1_d_addr        ,--to internal sram block
-    dcs_o         => c1_d_cs          ,  --: out std_logic;  -- Chip select
-    dras_o        => c1_d_ras         , --: out std_logic;  -- Row address strobe
-    dcas_o        => c1_d_cas         , --: out std_logic;  -- Column address strobe
-    dwe_o         => c1_d_we          ,  --: out std_logic;  -- Write enable
-    ddq_o         => c1_d_dqi_sd      ,
-    ddq_en        => ddq_en           , --: out std_logic;  -- Data output bus enable
-    da_o          => da_o             ,   --: out std_logic_vector(13 downto 0);  -- Address
-    dba_o         => dba_o            ,  --: out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o        => dcke_o           , --: out std_logic_vector(3 downto 0); -- Clock enable
     -- Cluster interface
     din_c         => c1_d_dqo         ,  --: in  std_logic_vector(7 downto 0); -- Data input bus  --in std_logic_vector(127 downto 0);
     dout_c        => c1_d_dqi         ,  --: out std_logic_vector(7 downto 0); -- Data output bus --out std_logic_vector(31 downto 0);
@@ -1106,7 +1088,6 @@ end generate;
 
     crb_sel       => c2_crb_sel       ,
     --  Signals to/from Peripheral block
-    ddqm          => open             ,
     irq0          => std_logic'('1')  , --'1',  -- Interrupt request 0
     irq1          => std_logic'('1')  , --'1',  -- Interrupt request 1
 ---------------------------------------------------------------------
@@ -1134,20 +1115,6 @@ end generate;
     ack_c2        => C2_ACK         ,
     ddi_vld       =>ddi_vld_c2      , --CJ
     resume        => RESUME         ,   --CJ
----------------------------------------------------------------------
-    -- PADS
----------------------------------------------------------------------
-    -- DRAM signals
-    d_addr        => c2_d_addr  ,
-    dcs_o         => c2_d_cs    ,
-    dras_o        => c2_d_ras   ,
-    dcas_o        => c2_d_cas   ,
-    dwe_o         => c2_d_we    ,
-    ddq_o         => c1_d_dqi_sd,
-    ddq_en        => open       ,
-    da_o          => open       ,
-    dba_o         => open       ,
-    dcke_o        => open       , -- Clock enable
     -- Cluster interface
     din_c         => c2_d_dqo   ,   --in std_logic_vector(127 downto 0)-- Data input bus
     dout_c        => c2_d_dqi   -- out std_logic_vector(31 downto 0); -- Data output bus

@@ -79,19 +79,8 @@ entity pe1_mmr is
     i_double:   out std_logic;
     lmpen:      out std_logic;
     adl_cy:     out std_logic;
-    hold_e:     out std_logic;  -- Set high by this block to delay clk_e
-    -- SDRAM signals
-    d_addr:     out std_logic_vector(31 downto 0);
-    d_cs:       out std_logic;  -- CS to SDRAM
-    d_ras:      out std_logic;  -- RAS to SDRAM
-    d_cas:      out std_logic;  -- CAS to SDRAM
-    d_we:       out std_logic;  -- WE to SDRAM
-    d_dqo:      out std_logic_vector(7 downto 0); -- Data out to SDRAM
-    en_dqo:     out std_logic;  -- Output enable to SDRAM data bus
-    d_a:        out std_logic_vector(13 downto 0);
-    d_ba:       out std_logic_vector(1 downto 0);
-    d_dqm:      out std_logic_vector(7 downto 0);
-    d_cke:      out std_logic_vector(3 downto 0));
+    hold_e:     out std_logic  -- Set high by this block to delay clk_e
+   );
 end;
 
 architecture rtl of pe1_mmr is
@@ -102,7 +91,7 @@ architecture rtl of pe1_mmr is
   signal col            : std_logic;
   signal ld_dqi         : std_logic;
   signal m_addr         : std_logic_vector(31 downto 0);
-  signal en_dqo_int     : std_logic;
+  --signal en_dqo_int     : std_logic;
 
   signal line_changed     : std_logic;-- for flash
   signal page_changed     : std_logic;-- for flash
@@ -252,47 +241,47 @@ begin
     inv_col <= not col;
 
     -- Decode current SDRAM operation to SDRAM control signals.
-    mtl_decode_op: process (even_c, operation, pra_operation, dbl_direct_int,
-                            allras, pl_memcp_sig)
-    begin
-      d_cs <= '1';
-      d_ras <= '1';
-      d_cas <= '1';
-      d_we <= '1';
-      en_dqo_int <= '0';
-      case operation is
-        when Act =>
-          if even_c = '1' then
-            d_cs <= '0';
-            d_ras <= '0';
-            if allras = '1' then        -- Refresh or MRS
-              d_cas <= '0';
-              if pl_memcp_sig = RW then     -- MRS
-                d_we <= '0';
-              end if;
-            end if;
-          end if;
-        when Rd =>
-          if even_c = '1' or dbl_direct_int = '1' then
-            d_cs <= '0';
-            d_cas <= '0';
-          end if;
-        when Wr =>
-          if even_c = '1' or dbl_direct_int = '1' then
-            d_cs <= '0';
-            d_cas <= '0';
-            d_we <= '0';
-            en_dqo_int <= '1';
-          end if;
-        when others =>
-          NULL;
-      end case;
-      if pra_operation = '1' then
-        d_cs <= '0';
-        d_ras <= '0';
-        d_we <= '0';
-      end if;
-    end process mtl_decode_op;
+    --mtl_decode_op: process (even_c, operation, pra_operation, dbl_direct_int,
+    --                        allras, pl_memcp_sig)
+    --begin
+    --  d_cs <= '1';
+    --  d_ras <= '1';
+    --  d_cas <= '1';
+    --  d_we <= '1';
+    --  en_dqo_int <= '0';
+    --  case operation is
+    --    when Act =>
+    --      if even_c = '1' then
+    --        d_cs <= '0';
+    --        d_ras <= '0';
+    --        if allras = '1' then        -- Refresh or MRS
+    --          d_cas <= '0';
+    --          if pl_memcp_sig = RW then     -- MRS
+    --            d_we <= '0';
+    --          end if;
+    --        end if;
+    --      end if;
+    --    when Rd =>
+    --      if even_c = '1' or dbl_direct_int = '1' then
+    --        d_cs <= '0';
+    --        d_cas <= '0';
+    --      end if;
+    --    when Wr =>
+    --      if even_c = '1' or dbl_direct_int = '1' then
+    --        d_cs <= '0';
+    --        d_cas <= '0';
+    --        d_we <= '0';
+    --        en_dqo_int <= '1';
+    --      end if;
+    --    when others =>
+    --      NULL;
+    --  end case;
+    --  if pra_operation = '1' then
+    --    d_cs <= '0';
+    --    d_ras <= '0';
+    --    d_we <= '0';
+    --  end if;
+    --end process mtl_decode_op;
 
     -- This process creates the ld_dqi signal by delaying the (operation = Rd)
     -- signal by three when fast_d is set (CL = 3) or two when not (CL = 2).
@@ -704,7 +693,7 @@ begin
     --2012-02-09 13:44:38 maning change latch to register, 2012-03-21 17:31:46 change register back to latch because of timing problem
     --if load ADH is followed by read SDRAM data, there will be problem
     --2012-03-22 09:38:12 change latch back to register and add a group of registers
-    d_addr  <= lm_addr(31 downto 0);
+    --d_addr  <= lm_addr(31 downto 0);
     process
     begin
         WAIT UNTIL (rising_edge(clk_p));
@@ -765,17 +754,17 @@ begin
 
     -- Row/column address selector
     -- 12 x 2to1, 2 x AND2, 1 x INV = 12x3 + 2x1.5 + 0.5 = 39.5 gates
-    d_a(13 downto 0) <=
-      col_addr(13 downto 0) when col = '1' else
-      row_addr(13 downto 0);
+    --d_a(13 downto 0) <=
+    --  col_addr(13 downto 0) when col = '1' else
+    --  row_addr(13 downto 0);
 
     -- Bank address
     -- 1 x 2to1 = 3 gates
-    d_ba(0) <=
-      lm_addr(11) when r_size = "00" else
-      lm_addr(20);
-    d_ba(1) <=
-      lm_addr(21);
+    --d_ba(0) <=
+    --  lm_addr(11) when r_size = "00" else
+    --  lm_addr(20);
+    --d_ba(1) <=
+    --  lm_addr(21);
 
     -- 10-bit address shifter controlled by c_size
     -- 10 x 4to1 = 10x7.5 = 75 gates
@@ -822,36 +811,36 @@ begin
     -- DQM line demultiplexer
     -- 1 x NOR2, 1 x NAND2, 3 x INV, 2 x OR2, 8 x NAND4 = 1 + 1 + 3x0.5 + 2x1.5
     -- + 8x2 = 22.5 gates
-    dqm_2 <= dqm_size(1) or dqm_size(0);
-    dqm_4 <= dqm_size(1);
-    dqm_8 <= dqm_size(1) and dqm_size(0);
-    d_dqm(0) <= not dqm_2 or mux_r(20) or (dqm_4 and mux_r(21)) or
-                (dqm_8 and mux_r(22));
-    d_dqm(1) <= not dqm_2 or not mux_r(20) or (dqm_4 and mux_r(21)) or
-                (dqm_8 and mux_r(22));
-    d_dqm(2) <= not dqm_4 or mux_r(20) or not mux_r(21) or (dqm_8 and mux_r(22));
-    d_dqm(3) <= not dqm_4 or not mux_r(20) or not mux_r(21) or
-                (dqm_8 and mux_r(22));
-    d_dqm(4) <= not dqm_8 or mux_r(20) or mux_r(21) or not mux_r(22);
-    d_dqm(5) <= not dqm_8 or not mux_r(20) or mux_r(21) or not mux_r(22);
-    d_dqm(6) <= not dqm_8 or mux_r(20) or not mux_r(21) or not mux_r(22);
-    d_dqm(7) <= not dqm_8 or not mux_r(20) or not mux_r(21) or not mux_r(22);
+    --dqm_2 <= dqm_size(1) or dqm_size(0);
+    --dqm_4 <= dqm_size(1);
+    --dqm_8 <= dqm_size(1) and dqm_size(0);
+    --d_dqm(0) <= not dqm_2 or mux_r(20) or (dqm_4 and mux_r(21)) or
+    --            (dqm_8 and mux_r(22));
+    --d_dqm(1) <= not dqm_2 or not mux_r(20) or (dqm_4 and mux_r(21)) or
+    --            (dqm_8 and mux_r(22));
+    --d_dqm(2) <= not dqm_4 or mux_r(20) or not mux_r(21) or (dqm_8 and mux_r(22));
+    --d_dqm(3) <= not dqm_4 or not mux_r(20) or not mux_r(21) or
+    --            (dqm_8 and mux_r(22));
+    --d_dqm(4) <= not dqm_8 or mux_r(20) or mux_r(21) or not mux_r(22);
+    --d_dqm(5) <= not dqm_8 or not mux_r(20) or mux_r(21) or not mux_r(22);
+    --d_dqm(6) <= not dqm_8 or mux_r(20) or not mux_r(21) or not mux_r(22);
+    --d_dqm(7) <= not dqm_8 or not mux_r(20) or not mux_r(21) or not mux_r(22);
 
     -- CKE line demultiplexer
     -- 2 x INV, 4 x NOR2 = 2x0.5 + 4x1 = 5 gates
-    process (mux_dqm, allras)
-    begin
-      for i in 0 to 3 loop
-        if mux_dqm(21 downto 20) = i then
-          d_cke(i) <= '1';
-        else
-          d_cke(i) <= '0';
-        end if;
-      end loop;
-      if allras = '1' then
-        d_cke <= "1111";
-      end if;
-    end process;
+    --process (mux_dqm, allras)
+    --begin
+    --  for i in 0 to 3 loop
+    --    if mux_dqm(21 downto 20) = i then
+    --      d_cke(i) <= '1';
+    --    else
+    --      d_cke(i) <= '0';
+    --    end if;
+    --  end loop;
+    --  if allras = '1' then
+    --    d_cke <= "1111";
+    --  end if;
+    --end process;
   end block adrc;
 
 --*******************************************************************
@@ -1022,14 +1011,14 @@ begin
     -- register, except when we are transferring two bytes per
     -- clk_e cycle over the direct bus and this is the first one. Then it
     -- will be driven from dtm_even instead.
-    d_dqo <=  dtm_even when (dbl_direct_int = '1' and en_dqo_int = '1'
-                             and clk_e_pos = '1') else
-              dtm;
+    --d_dqo <=  dtm_even when (dbl_direct_int = '1' and en_dqo_int = '1'
+    --                         and clk_e_pos = '1') else
+    --          dtm;
 
     -- Assignments needed just because VHDL is stupid
     dfm <= dfm_int;
     direct <= direct_int;
   end block dtmc;
-  en_dqo <= en_dqo_int;
+  --en_dqo <= en_dqo_int;
 
 end;

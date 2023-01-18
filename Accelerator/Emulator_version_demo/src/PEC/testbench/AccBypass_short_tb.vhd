@@ -246,7 +246,6 @@ architecture Behavioral of Accelerator_tb is
     signal    clk_p         : std_logic;
     signal    clk_e         : std_logic;
     signal    Reset         : std_logic;
-    signal    PEC_Ready     : std_logic;
     --Command interface signals 
     signal    GPP_CMD_Data  : std_logic_vector(127 downto 0);  
     signal    NOC_CMD_Data  : std_logic_vector(7 downto 0);

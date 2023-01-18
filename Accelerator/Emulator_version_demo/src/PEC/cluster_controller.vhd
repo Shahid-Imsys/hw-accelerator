@@ -40,6 +40,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cluster_pkg.all;
+use work.noc_types_pkg.all;
 use work.all;
 
 --use work.defines.all;
@@ -47,44 +48,45 @@ use work.all;
 entity cluster_controller is
 	generic(
 	    USE_ASIC_MEMORIES   : boolean := false;
-      single_pe_sim       : boolean := false;
-		  TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
+	    PEC_NUMBER          : integer := 2;
+        single_pe_sim       : boolean := false;
+		TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
 												--To be moved to defines
-		);
+	);
   	port(
 	--Clock inputs
-    CLK_P            : in std_logic;        --PE clock, clock from the oscillator --0628
-	  CLK_E            : in std_logic;        --NOC clock
+        CLK_P            : in  std_logic;        --PE clock, clock from the oscillator --0628
+	    CLK_E            : in  std_logic;        --NOC clock
 	--Power reset input:
-		RST_E            : in std_logic;        --active low --For reset clk_e generator
+		RST_E            : in  std_logic;        --active low --For reset clk_e generator
 	--Clock outputs
 		DDO_VLD          : out std_logic;       --Output data valid port
 		EVEN_P           : out std_logic;       --To PE and network
 	--Tag line
-		TAG              : in std_logic;
+		TAG              : in  std_logic;
 		TAG_FB           : out std_logic;
-	--Data line   
-		DATA             : in std_logic_vector(7 downto 0);
+	--Data line
+	    DATA_True_Broadcast: in noc_data_t(PEC_NUMBER -1 downto 0);   
+		DATA             : in  std_logic_vector(7 downto 0);
 		DATA_OUT         : out std_logic_vector(7 downto 0);
 	--PE Control
-	  EXE              : out std_logic;       --Start execution
+	    EXE              : out std_logic;       --Start execution
 		RESUME           : out std_logic;       --Resume paused execution
 	--Feedback signals
-	  C_RDY            : out std_logic;
-		PES_RDY          : in std_logic_vector(15 downto 0);
+	    C_RDY            : out std_logic;
+		PES_RDY          : in  std_logic_vector(15 downto 0);
 	--Request and distribution logic signals
-	  RST_R            : out std_logic;       --Active low
-		REQ_IN           : in std_logic;        --req to noc in reg logic
-		REQ_FIFO         : in std_logic_vector(31 downto 0);
-		DATA_FROM_PE     : in std_logic_vector(127 downto 0);
+	    RST_R            : out std_logic;       --Active low
+		REQ_IN           : in  std_logic;        --req to noc in reg logic
+		REQ_FIFO         : in  std_logic_vector(31 downto 0);
+		DATA_FROM_PE     : in  std_logic_vector(127 downto 0);
 		DATA_TO_PE       : out std_logic_vector(127 downto 0);
 		DATA_VLD         : out std_logic;
 		PE_UNIT          : out std_logic_vector(5 downto 0);
 		BC               : out std_logic;       --Broadcast handshake
 		RD_FIFO          : out std_logic;
-		FIFO_VLD         : in std_logic
-
-		); 
+		FIFO_VLD         : in  std_logic
+	);
 end entity cluster_controller;
 
 	   
@@ -112,8 +114,8 @@ architecture rtl of cluster_controller is
 
 component FPGA_CMEM_32KX16 is
    port(
-	   addr_c      :  in std_logic_vector(14 downto 0);
-     CK          :  in std_logic;
+	    addr_c       :  in std_logic_vector(14 downto 0);
+     	CK           :  in std_logic;
 		 WR          :  in std_logic;
 		 RD          :  in std_logic;
 		 DI0         :  in std_logic_vector(7 downto 0);
@@ -418,6 +420,22 @@ begin
 			    end loop;
 			    delay <= delay_b(TAG_CMD_DECODE_TIME-4);
 				end if;
+			elsif noc_cmd = "00010" then		--WriteBlockTrue Broadcast	
+			  if noc_reg_rdy = '1' and len_ctr = "000000000000001" then
+				  delay  <= '0';
+				  delay2 <= '0';
+			  elsif peci_busy = '1' and sig_fin = '1' then
+			  	  delay_c(0) <= '1';
+		          for i in 0 to TAG_CMD_DECODE_TIME-10 loop
+			  		delay_c(i+1) <= delay_c(i);
+			  	  end loop;
+				  delay <= delay_c(TAG_CMD_DECODE_TIME-9);
+			  end if;
+			  delay_pipe(0) <= delay;
+		      for i in 0 to 3 loop
+			    delay_pipe(i+1) <= delay_pipe(i);
+			  end loop;
+			  delay2 <= delay_pipe(3);			
 			elsif noc_cmd = "00100" then     --ReadBlock
 				if byte_ctr = "1111" and len_ctr = "000000000000000" then  --azzz as len_ctr decreases after noc_reg_rdy = '1' (len_ctr = "111111111111111")
 					delay  <= '0';
@@ -490,8 +508,8 @@ begin
 		elsif rising_edge(clk_e) then
 			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
 				sync_collector <= (others => '0');
-			elsif noc_cmd = "00011" or noc_cmd = "00101" or noc_cmd = "00100" then
-        if delay = '1' then
+			elsif noc_cmd = "00011" or noc_cmd = "00101" or noc_cmd = "00100" or noc_cmd = "00010" then
+                if delay = '1' then
 					sync_collector(0) <= tag;
 					sync_collector(1) <= sync_collector(0);
 				else
@@ -542,41 +560,49 @@ begin
 	
 	--This process generates memory interaction signals to control the write or read.
 	mem_activation : process(clk_e, RST_E)
-  begin
-    if RST_E = '0' then
-      noc_reg_rdy <= '0';
-      noc_write   <= '0';
-      noc_read    <= '0';
-		elsif rising_edge(clk_e) then
-			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-				noc_reg_rdy <= '0';
-        noc_write   <= '0';
-        noc_read    <= '0';
-      elsif delay = '1' then     
-			  if noc_cmd = "00011" or noc_cmd = "00101" then
-			    if byte_ctr = "1111" then 
-			    	noc_reg_rdy <= '1';
-            noc_write   <= '1';
-			  	  noc_read    <= '0';
-			    else
-			      noc_reg_rdy <= '0';
+    begin
+        if RST_E = '0' then
+            noc_reg_rdy <= '0';
             noc_write   <= '0';
-			  	end if;
-			  elsif noc_cmd = "00100" then
-			  	if sync_collector= "11" then
-			  		noc_reg_rdy <= '1';
-            noc_read    <= '1';
-			  	else 
-			  		noc_reg_rdy <= '0';
             noc_read    <= '0';
-			  	end if;
-        else
-          noc_reg_rdy <= '0';
-          noc_write   <= '0';
-          noc_read    <= '0';   
-	      end if;
-			end if;
-		end if;
+        elsif rising_edge(clk_e) then
+            if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
+                noc_reg_rdy <= '0';
+                noc_write   <= '0';
+                noc_read    <= '0';
+            elsif delay = '1' then     
+                if noc_cmd = "00011" or noc_cmd = "00101" then
+                    if byte_ctr = "1111" then 
+                        noc_reg_rdy <= '1';
+                        noc_write   <= '1';
+                        noc_read    <= '0';
+                    else
+                        noc_reg_rdy <= '0';
+                        noc_write   <= '0';
+                    end if;
+                elsif noc_cmd = "00010" then
+                    if sync_collector= "11" then
+                        noc_reg_rdy <= '1';
+                        noc_write   <= '1';
+                    else 
+                        noc_reg_rdy <= '0';
+                        noc_write   <= '0';
+                    end if;	
+                elsif noc_cmd = "00100" then
+                    if sync_collector= "11" then
+                        noc_reg_rdy <= '1';
+                        noc_read    <= '1';
+                    else 
+                        noc_reg_rdy <= '0';
+                        noc_read    <= '0';
+                    end if;
+                else
+                    noc_reg_rdy <= '0';
+                    noc_write   <= '0';
+                    noc_read    <= '0';   
+                end if;
+            end if;
+        end if;
 	end process;
 	
 	DDO_VLD <= dataout_vld;
@@ -584,17 +610,35 @@ begin
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e, RST_E)--(noc_cmd, byte_ctr, delay, DATA)
 	begin
-    if RST_E = '0' then
-      noc_data_in <= (others => (others => '0'));
-		elsif rising_edge(clk_e) then
-			if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
-				noc_data_in <= (others => (others => '0'));
-			elsif delay2 = '1' then
-        if noc_cmd = "00011" or noc_cmd ="00101" then
-				  noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
-			  end if;
-			end if;
-		end if;
+        if RST_E = '0' then
+            noc_data_in <= (others => (others => '0'));
+        elsif rising_edge(clk_e) then
+            if noc_cmd = "01111" then  --soft reset, cmd not impelement yet
+                noc_data_in <= (others => (others => '0'));
+            elsif delay2 = '1' then
+                if noc_cmd = "00011" or noc_cmd ="00101" then
+                    noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
+                end if;
+                if noc_cmd = "00010" then						--need to change later to connect all 16 bytes
+                    noc_data_in(0) <= DATA_True_Broadcast(0);
+                    noc_data_in(1) <= DATA_True_Broadcast(0);
+                    noc_data_in(2) <= DATA_True_Broadcast(0);
+                    noc_data_in(3) <= DATA_True_Broadcast(0);
+                    noc_data_in(4) <= DATA_True_Broadcast(0);
+                    noc_data_in(5) <= DATA_True_Broadcast(0);
+                    noc_data_in(6) <= DATA_True_Broadcast(0);
+                    noc_data_in(7) <= DATA_True_Broadcast(0);
+                    noc_data_in(8) <= DATA_True_Broadcast(0);
+                    noc_data_in(9) <= DATA_True_Broadcast(0);
+                    noc_data_in(10) <= DATA_True_Broadcast(0);
+                    noc_data_in(11) <= DATA_True_Broadcast(0);
+                    noc_data_in(12) <= DATA_True_Broadcast(0);
+                    noc_data_in(13) <= DATA_True_Broadcast(0);
+                    noc_data_in(14) <= DATA_True_Broadcast(0);
+                    noc_data_in(15) <= DATA_True_Broadcast(0);				  				  
+                end if;                
+            end if;
+        end if;
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
@@ -630,42 +674,42 @@ begin
 				pk_reg    <= (others => '0');
 				dist_reg  <= (others => '0'); 
 			elsif sig_fin = '1' and delay = '0' then
-			  if noc_cmd = "00011" or noc_cmd = "00100" then
-	  	    tag_ctr_2 <= tag_ctr_2 - 1;
-	  	    if tag_ctr_2 >= 15 then --30 then --azzz back to 15 to remove addr2 --azzzz 15 then  to add addr2 in tag line
-	  	      len_ctr(0) <= tag; 
-	  	      for i in 0 to 13 loop
-	  	        len_ctr(i+1) <= len_ctr(i);
-	  	      end loop;
-	  	    elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then --azzzz to remove addr2 --tag_ctr_2 < 30 and tag_ctr_2 >= 15 then  --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
-	  	      addr_n(0) <= tag;
-	  	      for i in 0 to 13 loop
-	  	        addr_n(i+1) <= addr_n(i);
-	  	      end loop; 		
-	  	    end if;
+			  if noc_cmd = "00011" or noc_cmd = "00100" or noc_cmd = "00010" then
+	  	          tag_ctr_2 <= tag_ctr_2 - 1;
+	  	          if tag_ctr_2 >= 15 then --30 then --azzz back to 15 to remove addr2 --azzzz 15 then  to add addr2 in tag line
+                      len_ctr(0) <= tag; 
+                      for i in 0 to 13 loop
+                        len_ctr(i+1) <= len_ctr(i);
+                      end loop;
+	  	          elsif tag_ctr_2 < 15 and tag_ctr_2 >= 0 then --azzzz to remove addr2 --tag_ctr_2 < 30 and tag_ctr_2 >= 15 then  --azzzz  tag_ctr_2 <= 15 and tag_ctr_2 >= 0 then   "to add addr2 in tag line"
+	  	              addr_n(0) <= tag;
+                      for i in 0 to 13 loop
+                        addr_n(i+1) <= addr_n(i);
+                      end loop; 		
+	  	          end if;
 			  elsif noc_cmd = "00101" then
-			  	tag_ctr_3 <= tag_ctr_3 - 1;
-			  	if tag_ctr_3 > 22 then
-			  		len_ctr(0) <= tag; 
-			  		for i in 0 to 13 loop
-			  			len_ctr(i+1) <= len_ctr(i);
-			  		end loop;
-			  	elsif tag_ctr_3 > 7 then
-			  		addr_n(0) <= tag;
-			  		for i in 0 to 13 loop
-			  			addr_n(i+1) <= addr_n(i);
-			  		end loop;
-			  	elsif tag_ctr_3 > 3 then
-			  		pk_reg(0) <= tag;
-			  		for i in 0 to 2 loop
-			  			pk_reg(i+1) <= pk_reg(i);
-			  		end loop;
-			  	elsif tag_ctr_3 >= 0 then
-			  		dist_reg(0) <= tag;
-			  		for i in 0 to 2 loop
-			  			dist_reg(i+1) <= dist_reg(i);
-			  		end loop;
-			  	end if;
+			  	  tag_ctr_3 <= tag_ctr_3 - 1;
+			  	  if tag_ctr_3 > 22 then
+			  		  len_ctr(0) <= tag; 
+			  		  for i in 0 to 13 loop
+			  			  len_ctr(i+1) <= len_ctr(i);
+			  		  end loop;
+			  	  elsif tag_ctr_3 > 7 then
+			  		  addr_n(0) <= tag;
+			  		  for i in 0 to 13 loop
+			  			  addr_n(i+1) <= addr_n(i);
+			  		  end loop;
+			  	  elsif tag_ctr_3 > 3 then
+			  		  pk_reg(0) <= tag;
+			  		  for i in 0 to 2 loop
+			  			  pk_reg(i+1) <= pk_reg(i);
+			  		  end loop;
+			  	  elsif tag_ctr_3 >= 0 then
+			  		  dist_reg(0) <= tag;
+			  		  for i in 0 to 2 loop
+			  			  dist_reg(i+1) <= dist_reg(i);
+			  		  end loop;
+			  	  end if;
 			  end if;
 	  	elsif delay2 = '1' then   -- azzz delay = '1' then changed to delay2 because of the delay before receiving data
 				tag_ctr_2 <= "011110"; --30 --azzzz to remove addr2 --"101101"; --azzzz 45 to add addr2 in tag line --"011110"; --30
@@ -679,6 +723,10 @@ begin
 			      	len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
 			      	addr_n  <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));		        	     	
 			      --Write block burst
+			      elsif noc_cmd = "00010" then
+			      	len_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(len_ctr))-1,15));
+			      	addr_n  <= std_logic_vector(to_unsigned(to_integer(unsigned(addr_n))+1,15));		        	     	
+			      --Write block true broadcast			      
 			      elsif noc_cmd = "00101" then
 			        if dist_ctr = (dist_ctr'range => '0') and noc_write = '0'then
 			        	pk_ctr <= pk_reg;

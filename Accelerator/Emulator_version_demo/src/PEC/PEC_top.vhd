@@ -63,7 +63,8 @@ architecture struct of PEC_top is
 --Tag line
       TAG          : in  std_logic;
       TAG_FB       : out std_logic;
---Data line   
+--Data line
+      DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
       DATA         : in  std_logic_vector(7 downto 0);
       DATA_OUT     : out std_logic_vector(7 downto 0);
       EXE          : out std_logic;     --Start execution
@@ -207,6 +208,7 @@ begin
       --RST_P  => rst_p,
       TAG          => tag,
       TAG_FB       => tag_out_i,
+      DATA_True_Broadcast   => DATA_True_Broadcast,
       DATA         => DATA,
       DATA_OUT     => data_out_i,
       exe          => exe,

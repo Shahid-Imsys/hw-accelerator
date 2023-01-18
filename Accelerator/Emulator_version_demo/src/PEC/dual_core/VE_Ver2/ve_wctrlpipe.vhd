@@ -55,7 +55,7 @@ entity ve_wctrlpipe is
     writebuffer_o : out std_logic_vector(63 downto 0);
 
     -- en
-    stall : in unsigned(7 downto 0) := (others => '0');
+    stall : in unsigned(3 downto 0) := (others => '0');
     en_o : out std_logic
   );
 end entity;
@@ -81,7 +81,7 @@ architecture rtl of ve_wctrlpipe is
   constant write_delay : integer := 10;
   -- signals
   signal en : std_logic;
-  signal en_cntr : unsigned(7 downto 0) := (others => '0');
+  signal en_cntr : unsigned(3 downto 0) := (others => '0');
   type en_array is array (0 to en_delay) of std_logic;
   signal en_pipe : en_array := (others => '0');
   -- piped signals

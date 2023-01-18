@@ -21,7 +21,6 @@ entity vearith is
     lodctrl     : in  lzod_ctrl;
     zpdata      : in  std_logic_vector(7 downto 0);
     zpweight    : in  std_logic_vector(7 downto 0);
-    bias        : in signed(31 downto 0);
     result      : out signed(32 downto 0);
     to_shift    : out ppshift_shift_ctrl;
     to_addbias  : out std_logic
@@ -60,7 +59,8 @@ architecture first of vearith is
 -- Constants
   constant czero   : std_logic_vector(7 downto 0) := "00000000";
   constant conefft : std_logic_vector(7 downto 0) := "10000000";
-  constant cone    : std_logic_vector(7 downto 0) := "00000001";
+  constant coneint : std_logic_vector(7 downto 0) := "00000001"; -- for max
+  constant cone    : std_logic_vector(7 downto 0) := "00010000"; -- for 12f
 
 -- Multiplexer outputs
   signal val7l0, val7l1, val7r0, val7r1 : std_logic_vector(7 downto 0);
@@ -78,6 +78,8 @@ architecture first of vearith is
 -- accumulator result
   signal acc7, acc6, acc5, acc4, acc3, acc2, acc1, acc0 : signed(31 downto 0);
   signal sign6, sign4, sign2, sign0 : std_logic;
+-- accumulator load signal
+  signal loadin : signed(31 downto 0);
 
   -- TODO: add abs sign
 
@@ -98,7 +100,6 @@ architecture first of vearith is
       en : in  std_logic;
       mul    : in  signed(17 downto 0);
       ctrl   : in  acco_ctrl;
-      bias   : in  signed(31 downto 0);
       result : out signed(31 downto 0)
       );
   end component;
@@ -109,7 +110,6 @@ architecture first of vearith is
       en       : in  std_logic;
       mul, mul_odd : in  signed(17 downto 0);
       ctrl         : in  acce_ctrl;
-      bias   : in  signed(31 downto 0);
       result       : out signed(31 downto 0);
       sign_o       : out std_logic
       );
@@ -127,6 +127,7 @@ architecture first of vearith is
       in2     : in  signed(31 downto 0);
       in1     : in  signed(31 downto 0);
       in0     : in  signed(31 downto 0);
+      loadin  : in  signed(31 downto 0);
       ctrl    : in  pp_ctrl;
       result  : out signed(32 downto 0)
       );
@@ -176,7 +177,7 @@ begin
     aR7     when R7,
     aR5     when R5,
     aR3     when R3,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -210,7 +211,6 @@ begin
       en => enable_acc,
       mul    => mul7,
       ctrl   => ctrl_acc.acc7,
-      bias => bias,
       result => acc7
       );
 
@@ -237,7 +237,7 @@ begin
     aR6     when R6,
     aR5     when R5,
     aR3     when R3,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL1     when L1,
     aF1     when F1,
@@ -272,7 +272,6 @@ begin
       mul     => mul6,
       mul_odd => mul7,
       ctrl    => ctrl_acc.acc6,
-      bias => bias,
       result  => acc6,
       sign_o  => sign6
       );
@@ -300,7 +299,7 @@ begin
     aR5     when R5,
     aR4     when R4,
     aR2     when R2,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -334,7 +333,6 @@ begin
       en => enable_acc,
       mul    => mul5,
       ctrl   => ctrl_acc.acc5,
-      bias   => bias,
       result => acc5
       );
 
@@ -360,7 +358,7 @@ begin
     aR6     when R6,
     aR4     when R4,
     aR2     when R2,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL0     when L0,
     aF0     when F0,
@@ -395,7 +393,6 @@ begin
       mul     => mul4,
       mul_odd => mul5,
       ctrl    => ctrl_acc.acc4,
-      bias => bias,
       result  => acc4,
       sign_o  => sign4
       );
@@ -422,6 +419,7 @@ begin
     aR3     when R3,
     aR1     when R1,
     cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL3     when L3;
 
@@ -451,7 +449,6 @@ begin
       clk    => clk,
       en => enable_acc,
       mul    => mul3,
-      bias => bias,
       ctrl   => ctrl_acc.acc3,
       result => acc3
       );
@@ -479,6 +476,7 @@ begin
     aR2     when R2,
     aR1     when R1,
     cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL3     when L3;
 
@@ -510,7 +508,6 @@ begin
       mul     => mul2,
       mul_odd => mul3,
       ctrl    => ctrl_acc.acc2,
-      bias => bias,
       result  => acc2,
       sign_o  => sign2
       );
@@ -535,7 +532,7 @@ begin
     aR2     when R2,
     aR1     when R1,
     aR0     when R0,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL2     when L2;
 
@@ -566,7 +563,6 @@ begin
       en => enable_acc,
       mul    => mul1,
       ctrl   => ctrl_acc.acc1,
-      bias => bias,
       result => acc1
       );
 
@@ -591,7 +587,7 @@ begin
     aR4     when R4,
     aR2     when R2,
     aR0     when R0,
-    cone    when one,
+    coneint when oneint,
     conefft when onefft,
     aL2     when L2;
 
@@ -623,7 +619,6 @@ begin
       mul     => mul0,
       mul_odd => mul1,
       ctrl    => ctrl_acc.acc0,
-      bias => bias,
       result  => acc0,
       sign_o  => sign0
       );
@@ -631,6 +626,8 @@ begin
 -- Post-processing
 
 -- Summation
+
+  loadin <= signed(weight(31 downto 0));
 
   summation : ppadd
     port map (
@@ -644,6 +641,7 @@ begin
       in2     => acc2,
       in1     => acc1,
       in0     => acc0,
+      loadin  => loadin,
       ctrl    => ppctrl,
       result  => result
       );

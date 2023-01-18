@@ -171,10 +171,11 @@ constant word_59 : std_logic_vector(127 downto 0) := "00000000000000000000001100
 constant load_lc  : std_logic_vector(127 downto 0) := x"00000080000000000000000000000000";
 --constant start    : std_logic_vector(127 downto 0) :="";
 --fft test data
-constant fft256_rand_data0  : string := "fft256_data0.dat";
-constant fft256_rand_data1  : string := "fft256_data1.dat";
-constant fft256_rand_weight : string := "fft256_weight.dat";
-constant fftcopy            : string := "fftcopy.dat";
+constant fft_test_data0     : string := "FFT_data0_4.dat";
+constant fft_test_data1     : string := "FFT_data1_4.dat";
+constant fft_test_tf        : string := "FFT_TF_4.dat";
+constant fft_points         : integer := 4;
+constant fft_stages         : std_logic_vector := x"00";--max 7 = 512 point
 
 
 begin
@@ -198,7 +199,7 @@ begin
   clk_e_neg <= not clk_e_pos;
   
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_data0.dat";
+  file load_text_file : text open read_mode is fft_test_data0;
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -213,7 +214,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_data1.dat";
+  file load_text_file : text open read_mode is fft_test_data1;
   variable text_line : line;
   variable val_bias : std_logic_vector(31 downto 0);
   begin
@@ -228,7 +229,7 @@ begin
   end process;
 
   process(load_mem)
-  file load_text_file : text open read_mode is "fft256_weight.dat";
+  file load_text_file : text open read_mode is fft_test_tf;
   variable text_line : line;
   variable val_bias : std_logic_vector(63 downto 0);
   begin
@@ -405,14 +406,14 @@ pl(94) <= '1';
 wait for 30 ns;
 pl(94) <= '0'; 
 pl <= re_loop;
-ybus <= x"FF";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 progress <= re_mode_l;
 pl <= au_test_loffset0;
 ybus <= x"01";
 wait for 30.01 ns;
 pl <= au_test_lcmp0;
-ybus <= x"ff";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 pl <= re_saddr_l;
 ybus <= x"00";
@@ -431,7 +432,7 @@ wait for 30 ns;
 ve_in <= data_memory0(0) & data_memory1(0);
 wait for 15 ns;
 DDI_VLD <= '1';
-for i in 1 to 255 loop
+for i in 1 to (fft_points/2) - 1 loop
   ve_in <= data_memory0(i) & data_memory1(i);
   wait for 15 ns;
 end loop;
@@ -446,7 +447,7 @@ pl <= au_test_roffset1;
 ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_rcmp0;
-ybus <= x"ff";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 pl <= re_saddr_r;
 ybus <= x"00";
@@ -465,7 +466,7 @@ wait for 30 ns;
 ve_in <= weight_memory(0);
 wait for 15 ns;
 DDI_VLD <= '1';
-for i in 1 to 255 loop
+for i in 1 to (fft_points/2) - 1 loop
   ve_in <= weight_memory(i);
   wait for 15 ns;
 end loop;
@@ -689,14 +690,14 @@ pl(94) <= '1';
 wait for 30 ns;
 pl(94) <= '0'; 
 pl <= re_loop;
-ybus <= x"FF";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 progress <= re_mode_l;
 pl <= au_test_loffset0;
 ybus <= x"01";
 wait for 30.01 ns;
 pl <= au_test_lcmp0;
-ybus <= x"ff";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 pl <= re_saddr_l;
 ybus <= x"00";
@@ -715,7 +716,7 @@ wait for 30 ns;
 ve_in <= data_memory0(0) & data_memory1(0);
 wait for 15 ns;
 DDI_VLD <= '1';
-for i in 1 to 255 loop
+for i in 1 to (fft_points/2) - 1 loop
   ve_in <= data_memory0(i) & data_memory1(i);
   wait for 15 ns;
 end loop;
@@ -730,7 +731,7 @@ pl <= au_test_roffset1;
 ybus <= x"00";
 wait for 30.01 ns;
 pl <= au_test_rcmp0;
-ybus <= x"ff";
+ybus <= std_logic_vector(to_unsigned(fft_points/2, 8));
 wait for 30.01 ns;
 pl <= re_saddr_r;
 ybus <= x"00";
@@ -749,7 +750,7 @@ wait for 30 ns;
 ve_in <= weight_memory(0);
 wait for 15 ns;
 DDI_VLD <= '1';
-for i in 1 to 255 loop
+for i in 1 to (fft_points/2) - 1 loop
   ve_in <= weight_memory(i);
   wait for 15 ns;
 end loop;
@@ -760,7 +761,7 @@ wait for 30 ns;
 pl(106) <= '1'; --fft
 wait for 30 ns;
 pl <= ve_loop;
-ybus <= x"06";
+ybus <= fft_stages;
 wait for 30.01 ns;
 pl(95) <= '1';
 wait for 30 ns;

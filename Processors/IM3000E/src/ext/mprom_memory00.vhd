@@ -125,37 +125,41 @@ architecture rtl of mprom_memory00 is
   end component;
 
   component SNPS_ROM_4Kx80_mprom00
-    generic (
-      preloadfilename : string);
-    port (
-      q   : out std_logic_vector(79 downto 0);
-      adr : in  std_logic_vector(11 downto 0);
-      me  : in  std_logic;
-      clk : in  std_logic;
-      ls  : in  std_logic;
-      test1  : in  std_logic;
-      rm  : in  std_logic_vector(3 downto 0);
-      rme  : in  std_logic
-      );
+    -- synthesis translate_off
+		generic (
+		  preloadfilename : string);  
+	-- synthesis translate_on  
+		port (
+		  q   : out std_logic_vector(79 downto 0);
+		  adr : in  std_logic_vector(11 downto 0);
+		  me  : in  std_logic;
+		  clk : in  std_logic;
+		  ls  : in  std_logic;
+		  test1  : in  std_logic;
+		  rm  : in  std_logic_vector(3 downto 0);
+		  rme  : in  std_logic
+		  );
   end component;
   
 begin  -- architecture rtl
 
   g_rom00_asic: if g_memory_type /= fpga generate
   i_mprom00_asic : SNPS_ROM_4Kx80_mprom00
-    generic map (
-      preloadfilename => "../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00.hex"
-      )
-    port map (
-      q   => rom_do,
-      adr => address,
-      me  => cs,
-      clk => clk_p,
-      ls  => '0',
-      test1  => test1,
-      rm => rm,
-      rme  => rme
-      );
+    -- synthesis translate_off 
+		generic map (
+		  preloadfilename => "../../../../IP/Synopsys/Embed-it_Integrator/compout/views/SNPS_ROM_4Kx80_mprom00/SNPS_ROM_4Kx80_mprom00.hex"
+		  )
+	-- synthesis translate_on	  
+		port map (
+		  q   => rom_do,
+		  adr => address,
+		  me  => cs,
+		  clk => clk_p,
+		  ls  => '0',
+		  test1  => test1,
+		  rm => rm,
+		  rme  => rme
+		  );
   else generate
     
   mprom00_fpga : fpga_SP180_4096X80BM1A

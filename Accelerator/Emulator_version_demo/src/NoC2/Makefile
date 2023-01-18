@@ -4,6 +4,7 @@ NOC2_DIR_WIN=$(PROJECT_PATH_WIN)/Accelerator/Emulator_version_demo/src/NoC2
 IP_DIR_WIN=$(PROJECT_PATH_WIN)/fpga_synth/gpp
 
 noc2_rtl: xilinx_ip mem_comp
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/noc_types_pkg.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Accelerator_Top.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Byte_counter_decoder.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/CMD_from_GPP.vhd
@@ -15,6 +16,7 @@ noc2_rtl: xilinx_ip mem_comp
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Register.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/NoC_state_machine.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Noc_Top.vhd
+	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/noc_bus.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Root_Memory.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Switch.vhd
 	$(COMP) $(COMP_RTL_FLAGS) $(NOC2_DIR_WIN)/Tag_Line_Block.vhd

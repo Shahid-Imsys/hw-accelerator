@@ -32,10 +32,11 @@ architecture first of ppshift is
   constant cone          : signed(32 downto 0)           := to_signed(1, 33);
   constant czero16       : std_logic_vector(15 downto 0) := (others => '0');
   constant cone16        : std_logic_vector(15 downto 0) := std_logic_vector(to_signed(256, 16));
+  constant cone16_12f    : std_logic_vector(15 downto 0) := std_logic_vector(to_signed(4096, 16));
   signal addinput0       : signed(32 downto 0);  -- Adder input multiplexer
   signal addinput1       : signed(32 downto 0);  -- Adder input multiplexer
   signal addresult       : signed(32 downto 0);  -- Adder result
-  signal accreg          : signed(32 downto 0);  -- Accumulator register
+  signal accreg          : signed(31 downto 0);  -- Accumulator register
   signal beforeshift     : signed(33 downto 0);
   signal aftershift      : signed(33 downto 0);
   signal shiftresult     : signed(33 downto 0);
@@ -178,13 +179,13 @@ begin
     if rising_edge(clk) then
       if enable_add_bias = '1' then
         if delayed_enable = enable then
-          accreg <= addresult;
+          accreg <= addresult(31 downto 0);
         end if;
       end if;
     end if;
   end process;
 
-  to_clip <= accreg(31 downto 0);
+  to_clip <= accreg;
 
   process(to_clip, clip_ctrl.clip)
   begin
@@ -210,6 +211,9 @@ begin
       when clipone16 =>
         -- set to one
         clipresult <= cone16;
+      when clipone16_12f =>
+        -- set to one
+        clipresult <= cone16_12f;
       when clipzero =>
         -- set to zero
         clipresult <= czero16;

@@ -64,35 +64,10 @@ entity pe1_rtc is
 
     --bmem
     dbus              : in    std_logic_vector(7 downto 0);
-    bmem_a8           : in    std_logic;
-    bmem_q            : out   std_logic_vector(7 downto 0);
-    bmem_d            : in    std_logic_vector(7 downto 0);
-    bmem_we_n         : in    std_logic;
-    bmem_ce_n         : in    std_logic;
---
-  --  --RAM0
-  --  RAM0_DO           : out   std_logic_vector (7 downto 0);
-  --  RAM0_DI           : in 	  std_logic_vector (7 downto 0);
-  --  RAM0_A            : in 	  std_logic_vector (13 downto 0);
-  --  RAM0_WEB          : in 	  std_logic;
-  --  RAM0_CS           : in 	  std_logic;
 
-  --  xout                : in  std_logic;  -- external high frequency oscillator clock --Now same as the xout clock, by CJ.
     pllout              : in  std_logic;
-  --  sel_pll             : in  std_logic;
-  --  xout_selected       : out std_logic;
     lp_pwr_ok           : in  std_logic;  -- Core power indicator, controls mrxout_o
-  --  rxout               : in  std_logic;  -- 32KHz oscillator input
-  --  mrxout_o            : out std_logic;  -- 32KHz oscillator output or external wake
-  --  rst_rtc             : in  std_logic;  -- Reset RTC counter byte
-  --  en_fclk             : in  std_logic;  -- Enable fast clocking of RTC counter byte
-  --  fclk                : in  std_logic;  -- Fast clock to RTC counter byte
-    ld_bmem             : in  std_logic;  -- Latch enable to the dis_bmem latch
-  --  rtc_sel             : in  std_logic_vector(2 downto 0);  -- RTC byte select
-  --  rtc_data            : out std_logic_vector(7 downto 0);  -- RTC data
-  --  dis_bmem            : out std_logic;  -- Disable power to BMEM
 
-  --  reset_iso_clear     : in  std_logic;
     halt_en             : in  std_logic;   --high active, will go to halt state
     nap_en              : in  std_logic;   --high active, will go to nap state
     wakeup_lp           : in  std_logic;  -- From wakeup_lp input IO
@@ -102,8 +77,7 @@ entity pe1_rtc is
     io_iso              : out std_logic;  -- to isolate the io signals in nap mode
     nap_rec             : out std_logic;  -- will recover from nap mode
     pmic_core_en        : out std_logic;
-    pmic_io_en          : out std_logic;
-    clk_mux_out         : out std_logic
+    pmic_io_en          : out std_logic
     );
 end pe1_rtc;
 
@@ -127,10 +101,6 @@ architecture rtl of pe1_rtc is
 
   -- bmem
   signal dbus_iso_0             : std_logic_vector(7 downto 0);
-  signal bmem_a8_iso_0          : std_logic;
-  signal bmem_d_iso_0           : std_logic_vector(7 downto 0);
-  signal bmem_we_n_iso_1        : std_logic;
-  signal bmem_ce_n_iso_1        : std_logic;
 
   -- RAM0
   signal RAM0_DI_iso_0       	: std_logic_vector(7 downto 0);
@@ -144,9 +114,7 @@ architecture rtl of pe1_rtc is
   signal rst_rtc_iso_0	: std_logic;
   signal en_fclk_iso_0	: std_logic;
   signal fclk_iso_0		  : std_logic;
-  signal ld_bmem_iso_0	: std_logic;
   signal rtc_sel_iso_0	: std_logic_vector(2 downto 0);
-  signal reset_iso_clear_iso_0   : std_logic;
   signal halt_en_iso_0   : std_logic;
   signal nap_en_iso_0    : std_logic;
   signal sel_pll_iso_0  : std_logic;
@@ -189,16 +157,8 @@ architecture rtl of pe1_rtc is
       iso			        : in  std_logic;  -- isolation controll signal, active high
 	  clk_iso				 : in  std_logic;  -- isolation controll signal, active high
       -- signals to be isolated
-    --  reset_iso_clear     : in  std_logic;
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
-    --  sel_pll         : in  std_logic;
-      pllout          : in  std_logic;
-    --  rst_rtc			    : in  std_logic;  -- Reset RTC counter byte
-    --  en_fclk			    : in  std_logic;  -- Enable fast clocking of RTC counter byte
-    --  fclk				    : in  std_logic;  -- Fast clock to RTC counter byte
-      ld_bmem			    : in  std_logic;  -- Latch enable to the dis_bmem latch
-    --  rtc_sel			    : in  std_logic_vector(2 downto 0);   -- RTC byte select
       clk_mux_out     : in  std_logic;
 
           --gmem1
@@ -215,27 +175,7 @@ architecture rtl of pe1_rtc is
 
       --bmem
       dbus              : in    std_logic_vector(7 downto 0);
-      bmem_a8           : in    std_logic;
-      bmem_d            : in    std_logic_vector(7 downto 0);
-      bmem_we_n         : in    std_logic;
-      bmem_ce_n         : in    std_logic;
 
-	  ----RAM0
-	  --RAM0_DI           : in    std_logic_vector(7 downto 0);
-    --  RAM0_A            : in    std_logic_vector(13 downto 0);
-    --  RAM0_WEB          : in    std_logic;
-    --  RAM0_CS           : in    std_logic;
-
-
-      -- signals isolated to 0
-    --  sel_pll_iso_0     : out std_logic;
-    --  pllout_iso_1      : out std_logic;
-    --  rst_rtc_iso_0	    : out std_logic;
-    --  en_fclk_iso_0	    : out std_logic;
-    --  fclk_iso_0			  : out std_logic;
-      ld_bmem_iso_0	    : out std_logic;
-    --  rtc_sel_iso_0	    : out std_logic_vector(2 downto 0);
-    --  reset_iso_clear_iso_0   : out std_logic;
       halt_en_iso_0   : out std_logic;
       nap_en_iso_0    : out std_logic;
 
@@ -246,12 +186,6 @@ architecture rtl of pe1_rtc is
       c2_gmem_d_iso_0   : out std_logic_vector(7 downto 0);
 
       dbus_iso_0        : out std_logic_vector(7 downto 0);
-      bmem_a8_iso_0     : out std_logic;
-      bmem_d_iso_0      : out std_logic_vector(7 downto 0);
---
-	  --RAM0_DI_iso_0       : out    std_logic_vector(7 downto 0);
-	  --RAM0_A_iso_0        : out    std_logic_vector(13 downto 0);
-    --  RAM0_CS_iso_0       : out    std_logic;
 
       clk_mux_out_iso_1   : out  std_logic;
 
@@ -259,10 +193,7 @@ architecture rtl of pe1_rtc is
       c1_gmem_we_n_iso_1  : out std_logic;
       c1_gmem_ce_n_iso_1  : out std_logic;
       c2_gmem_we_n_iso_1  : out std_logic;
-      c2_gmem_ce_n_iso_1  : out std_logic;
-      bmem_we_n_iso_1     : out std_logic;
-      bmem_ce_n_iso_1     : out std_logic
-	  --RAM0_WEB_iso_1      : out std_logic
+      c2_gmem_ce_n_iso_1  : out std_logic
       );
   end component;
 
@@ -327,49 +258,23 @@ begin  -- rtl
     port map (
       iso            => core_iso,
       clk_iso        => clk_iso,
-	  --reset_iso_clear    => reset_iso_clear ,
-      halt_en        => halt_en     ,
-      nap_en         => nap_en      ,
-    --  sel_pll        => sel_pll,
-      pllout         => pllout,
-    --  rst_rtc        => rst_rtc,
-    --  en_fclk        => en_fclk,
-    --  fclk           => fclk,
-      ld_bmem        => ld_bmem,
-    --  rtc_sel        => rtc_sel,
+      halt_en        => halt_en,
+      nap_en         => nap_en,
 
       c1_gmem_a      =>  c1_gmem_a,
       c1_gmem_d      =>  c1_gmem_d,
       c2_gmem_a      =>  c2_gmem_a,
       c2_gmem_d      =>  c2_gmem_d,
       dbus           =>  dbus,
-      bmem_a8        =>  bmem_a8,
-      bmem_d         =>  bmem_d,
       clk_mux_out    =>  clk_mux_out_int,
 
       c1_gmem_we_n   =>  c1_gmem_we_n,
       c1_gmem_ce_n   =>  c1_gmem_ce_n,
       c2_gmem_we_n   =>  c2_gmem_we_n,
       c2_gmem_ce_n   =>  c2_gmem_ce_n,
-      bmem_we_n      =>  bmem_we_n,
-      bmem_ce_n      =>  bmem_ce_n,
 
-
-    --  RAM0_DI       =>   RAM0_DI ,
-    --  RAM0_A        =>   RAM0_A  ,
-    --  RAM0_WEB      =>   RAM0_WEB,
-    --  RAM0_CS       =>   RAM0_CS ,
-
-    --  sel_pll_iso_0    => sel_pll_iso_0,
-    --  pllout_iso_1     => pllout_iso_1,
-    --  rst_rtc_iso_0    => rst_rtc_iso_0,
-    --  en_fclk_iso_0    => en_fclk_iso_0,
-    --  fclk_iso_0       => fclk_iso_0,
-    --  ld_bmem_iso_0    => ld_bmem_iso_0,
-    --  rtc_sel_iso_0    => rtc_sel_iso_0,
-    --  reset_iso_clear_iso_0 => reset_iso_clear_iso_0,
-      halt_en_iso_0     => halt_en_iso_0    ,
-      nap_en_iso_0      => nap_en_iso_0     ,
+      halt_en_iso_0     => halt_en_iso_0,
+      nap_en_iso_0      => nap_en_iso_0,
 
 
       c1_gmem_a_iso_0     =>  c1_gmem_a_iso_0,
@@ -377,21 +282,12 @@ begin  -- rtl
       c2_gmem_a_iso_0     =>  c2_gmem_a_iso_0,
       c2_gmem_d_iso_0     =>  c2_gmem_d_iso_0,
       dbus_iso_0          =>  dbus_iso_0,
-      bmem_a8_iso_0       =>  bmem_a8_iso_0,
-      bmem_d_iso_0        =>  bmem_d_iso_0,
       clk_mux_out_iso_1   =>  clk_mux_out_iso_1,
 
       c1_gmem_we_n_iso_1  =>  c1_gmem_we_n_iso_1,
       c1_gmem_ce_n_iso_1  =>  c1_gmem_ce_n_iso_1,
       c2_gmem_we_n_iso_1  =>  c2_gmem_we_n_iso_1,
-      c2_gmem_ce_n_iso_1  =>  c2_gmem_ce_n_iso_1,
-      bmem_we_n_iso_1     =>  bmem_we_n_iso_1,
-      bmem_ce_n_iso_1     =>  bmem_ce_n_iso_1
-
-	  --RAM0_DI_iso_0       =>   RAM0_DI_iso_0 ,
-    --  RAM0_A_iso_0        =>   RAM0_A_iso_0  ,
-    --  RAM0_WEB_iso_1      =>   RAM0_WEB_iso_1,
-    --  RAM0_CS_iso_0       =>   RAM0_CS_iso_0
+      c2_gmem_ce_n_iso_1  =>  c2_gmem_ce_n_iso_1
 
       );
 
@@ -527,7 +423,6 @@ end generate;
   --  clk1_selected => xout_selected,
   --  clk_mux_out   => clk_mux_out_int);
    clk_mux_out_int <= pllout;
-   clk_mux_out <= clk_mux_out_iso_1;
 
    --clk_mux_2: clk_mux
    --port map (
@@ -710,112 +605,16 @@ begin
   if pwr_on_rst_n = '0' then
         reset_iso <= '0';
   elsif rising_edge(clk_mux_out_int) then
-        if reset_iso_clear_iso_0 = '1' then
-            reset_iso <= '0';
-        elsif wakeup_lp = '1' and current_state = HALT then
+        --if reset_iso_clear_iso_0 = '1' then
+        --    reset_iso <= '0';
+        if wakeup_lp = '1' and current_state = HALT then
             reset_iso <= '1';
         end if;
   end if;
 end process;
 
---state_proc : process(clk_mux_out_int, arst_n)
---begin
---  if arst_n = '1' then
---    state <= s0;     --- active mode
---    pmic_en_int         <= '1';
---    lp_mode_latch       <= '0';
---    wakeup_lp_latch_int <= '0';
---  elsif rising_edge(clk_mux_out_int) then
---    case state is
---         when s0 =>                   --active mode
---              pmic_en_int       <= '1';
---              lp_mode_latch     <= '0';
---              state             <= s1;
---         when s1 =>                   --sleep pending mode, isolate input from power down,
---              if lp_mode_iso = '1' then
---                lp_mode_latch <= '1';
---                state <= s2;
---              else
---                state <= s1;
---              end if;
---         when s2 =>                   --sleep mode
---              pmic_en_int             <= '0';
---              wakeup_lp_latch_int     <= '0';
---              state                   <= s3;
---         when s3 =>                   --active pending
---              if wakeup_lp = '1' then
---                wakeup_lp_latch_int <= '1';
---                state <= s0;
---              else
---                state <= s3;
---              end if;
---         when others =>
---              NULL;
---    end case;
---  end if;
---end process state_proc;
-
 poweron_finish <= poweron_finish_int;
 --pwr_switch_on <= pwr_switch_on_int;
 --rtc_clk <= 0 when lp_mode_latch = '1' and state = s3 else clk_p;
 
-
----------------------------------------------------------------------
--- Entire Chip Reset generation &
--- power-on detection part
--------------------------------------------------------------------------------
-
-
-  -- The ripple counter clocks. For setting counter more efficiently, the
-  -- counter is split up into 6 parts. 'fclk_ok' may clock these parts separately.
-  --cp_gen: process (qn, en_fclk_iso_0, fclk_iso_0, rxout, rtc_sel_iso_0)
-  --begin
-  --  -- Normal clocking. All FF:s in one long ripple counter chain.
-  --  cp(0) <= rxout;
-  --  for i in 1 to 46 loop
-  --    cp(i) <= qn(i - 1);
-  --  end loop;
-  --  -- Fast clocking. The selected byte is clocked by fclk_ok.
-  --  if en_fclk_iso_0 = '1' then
-  --    if rtc_sel_iso_0 = 0 then
-  --      cp(0) <= fclk_iso_0;
-  --    end if;
-  --    for i in 1 to 5 loop
-  --      if rtc_sel_iso_0 = i then
-  --        cp((i*8)-1) <= fclk_iso_0;
-  --      end if;
-  --    end loop;
-  --  end if;
-  --end process cp_gen;
-
-  -- The 47 bits ripple counter.
-  --async_ripple_counter: for i in 0 to 46 generate
-  --  d_ff: block
-  --  begin  -- block d_ff
-  --    process (cp(i), rst_rtc_iso_0, rtc_sel_iso_0)
-  --    begin  -- process
-  --      if rst_rtc_iso_0 = '1' and rtc_sel_iso_0 = ((i+1)/8) then
-  --        qn(i) <= '1';
-  --      elsif rising_edge(cp(i)) then
-  --        qn(i) <= not qn(i);
-  --      end if;
-  --    end process;
-  --  end block d_ff;
-  --end generate async_ripple_counter;
-
-  -- Mux for the output data. All six bytes of the counter can be read,
-  -- the other two rtc_sel_ok combinations output test data.
-  --with rtc_sel_iso_0 select
-  --  rtc_data <= not qn(6 downto 0) & '0'  when "000",
-  --              not qn(14 downto 7)       when "001",
-  --              not qn(22 downto 15)      when "010",
-  --              not qn(30 downto 23)      when "011",
-  --              not qn(38 downto 31)      when "100",
-  --              not qn(46 downto 39)      when "101",
-  --              rst_rtc_iso_0 & en_fclk_iso_0 & fclk_iso_0 & ld_bmem_iso_0 &
-  --              rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) & rtc_sel_iso_0(0) when others;
-
-	-- MRXOUT is now only an external wake-up signal, RTC
-	-- oscillator test is done on another pin.
-  --mrxout_o <= qn(46);
 end rtl;

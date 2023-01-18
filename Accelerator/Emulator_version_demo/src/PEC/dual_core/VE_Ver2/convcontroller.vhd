@@ -21,7 +21,6 @@ entity convcontroller is
     bypass           : in std_logic;
     config           : in std_logic_vector(7 downto 0);
     pp_ctl           : in std_logic_vector(7 downto 0);
-    re_loop          : in std_logic_vector(7 downto 0);
     dot_cnt          : in std_logic_vector(7 downto 0);
     oc_cnt           : in std_logic_vector(7 downto 0);
     scale            : in std_logic_vector(4 downto 0);
@@ -44,7 +43,7 @@ entity convcontroller is
     ppshiftinst      : out ppshift_shift_ctrl;
     addbiasinst      : out ppshift_addbias_ctrl;
     clipinst         : out ppshift_clip_ctrl;
-    stall            : out unsigned(7 downto 0);
+    stall            : out unsigned(3 downto 0);
     busy             : out std_logic
   );
 end entity;
@@ -458,19 +457,19 @@ end process;
   begin
     if rising_edge(clk) then
       if rst = '0' then
-        stall <= x"00";
+        stall <= x"0";
       else
         if pp_ctl(4 downto 3) = "01" then 
           if conv_oloop = (unsigned(oc_cnt) - 7) and conv_loop = 1 then
-            stall <= x"01";--stall the ve core for one clock cycle to push the result back to mem buffer.
+            stall <= x"1";--stall the ve core for one clock cycle to push the result back to mem buffer.
           else
-            stall <= x"00";
+            stall <= x"0";
           end if;
         elsif bypass_reg = '1' then
           if (conv_oloop /= 0 or conv_loop /= 0) and data_valid = '0' and busy = '1' then --pause the ve 
-            stall <= unsigned(re_loop);
+            stall <= x"1";
           elsif data_valid = '1' then
-            stall <= x"00";
+            stall <= x"0";
           end if;
         end if;
       end if;

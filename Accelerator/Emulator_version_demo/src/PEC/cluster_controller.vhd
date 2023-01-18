@@ -212,8 +212,6 @@ end component;
   signal delay_c        : std_logic_vector(TAG_CMD_DECODE_TIME-9 downto 0);
   signal delay_b        : std_logic_vector(TAG_CMD_DECODE_TIME-4 downto 0);
   signal delay_pipe     : std_logic_vector(7 downto 0);    --for delay between tag shift finishes and sync pulse comes
-  signal dataout_vld_o  : std_logic;
-  signal continuous_mode: std_logic;
   signal FIFO_OUT_VLD   : std_logic;
  
   signal standby        : std_logic;
@@ -221,6 +219,7 @@ end component;
   signal tag_ctr_2      : unsigned(5 downto 0) := "011110"; --30  --"101101"; --azzz back to 30 to remove addr2, azzzz 45 "to add addr2 in tag line" --"011110"; --30
   signal tag_ctr_3      : unsigned(5 downto 0) := "100110"; --38
   signal tag_ctr_1      : unsigned(5 downto 0);
+  signal rdy_cycle      : integer range 0 to 7;
   
   type cmem_out_type is array(0 to 3) of std_logic_vector(127 downto 0);
   signal cmem_dout : cmem_out_type;
@@ -472,7 +471,7 @@ begin
 				  	byte_ctr <= "0000"; 
           end if;
 			elsif noc_cmd = "00100" then
-				if delay = '1' and (dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode='1')) then
+				if delay = '1' and dataout_vld = '1' then
 					byte_ctr <= std_logic_vector(to_unsigned(to_integer(unsigned(byte_ctr))+1,4));
 				else
 					byte_ctr <= "0000"; 
@@ -580,19 +579,7 @@ begin
 		end if;
 	end process;
 	
-	continuous_mode <= '1' when dataout_vld = '1' and sync_collector= "11" else
-	                   '0' when dataout_vld = '0' and sync_collector= "11" else 
-	                   '0';
-	
-	--one clock delay of noc_read to load data in noc_data_out register to output port
-	process(clk_e)
-	begin
-		if rising_edge(clk_e) then
-			dataout_vld_o <= dataout_vld;
-		end if;
-	end process;
-	
-	DDO_VLD <= dataout_vld;  --aaac1 was dataout_vld_o
+	DDO_VLD <= dataout_vld;
 	
 	--Write data from DATA port byte by byte to the noc_data_in register
 	data_write : process (clk_e, RST_E)--(noc_cmd, byte_ctr, delay, DATA)
@@ -611,10 +598,10 @@ begin
 	end process;
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
-	data_read : process (clk_e)--dataout_vld,byte_ctr,noc_data_out)
+	data_read : process (clk_e)
     begin
 		if rising_edge(clk_e) then
-	    if dataout_vld_o = '1' or (dataout_vld = '1' and continuous_mode = '1') then --dataout_vld = '1' then --aaac1 was dataout_vld_o = '1' then
+	    if dataout_vld = '1' then
 	      DATA_OUT <= noc_data_out(to_integer(unsigned(byte_ctr)));
 	    else
 	      DATA_OUT <= (others => '0');
@@ -964,16 +951,24 @@ begin
   begin
     if RST_E = '0' then
       c_rdy_i <= '1';
+      rdy_cycle <= 0;
     elsif rising_edge(clk_e) then
       if exe_i = '1' then
         c_rdy_i <= '0';
+        rdy_cycle <= 0;
       elsif PES_RDY = x"ffff" then
         c_rdy_i <= '1';
+        if rdy_cycle = 7 then
+          c_rdy_i <= '0';
+          rdy_cycle <= rdy_cycle;
+        else
+          rdy_cycle <= rdy_cycle + 1;
+        end if;
       end if;
     end if; 
   end process;
 		   
-  C_RDY <= c_rdy_i and not REQ_IN and not req_exe and not pe_write;
+  C_RDY <= c_rdy_i when rdy_cycle = 6 else '0';
 ----------------------------------------------------------------------------------	
 
 				

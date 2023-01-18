@@ -98,6 +98,34 @@ package register_pack_spi_test is
   constant adpll_status0_address_c : integer := 16#54#;
   constant adpll_status1_address_c : integer := 16#55#;
   constant adpll_status2_address_c : integer := 16#56#;
+  constant io_dack0_n_address_c    : integer := 16#57#;
+  constant io_dreq0_n_address_c    : integer := 16#58#;
+  constant io_dack1_n_address_c    : integer := 16#59#;
+  constant io_dreq1_n_address_c    : integer := 16#5A#;
+  constant io_dack2_n_address_c    : integer := 16#5B#;
+  constant io_dreq2_n_address_c    : integer := 16#5C#;
+  constant io_dack3_n_address_c    : integer := 16#5D#;
+  constant io_dreq3_n_address_c    : integer := 16#5E#;
+  constant io_d0_out_address_c     : integer := 16#5F#;
+  constant io_d0_in_address_c      : integer := 16#60#;
+  constant io_d1_out_address_c     : integer := 16#61#;
+  constant io_d1_in_address_c      : integer := 16#62#;
+  constant io_d2_out_address_c     : integer := 16#63#;
+  constant io_d2_in_address_c      : integer := 16#64#;
+  constant io_d3_out_address_c     : integer := 16#65#;
+  constant io_d3_in_address_c      : integer := 16#66#;
+  constant io_d4_out_address_c     : integer := 16#67#;
+  constant io_d4_in_address_c      : integer := 16#68#;
+  constant io_d5_out_address_c     : integer := 16#69#;
+  constant io_d5_in_address_c      : integer := 16#6A#;
+  constant io_d6_out_address_c     : integer := 16#6B#;
+  constant io_d6_in_address_c      : integer := 16#6C#;
+  constant io_d7_out_address_c     : integer := 16#6D#;
+  constant io_d7_in_address_c      : integer := 16#6E#;
+  constant io_ldout_n_address_c    : integer := 16#6F#;
+  constant io_next_n_address_c     : integer := 16#70#;
+  constant io_clk_address_c        : integer := 16#71#;
+  constant io_ioa_n_address_c      : integer := 16#72#;
 
   -- Register and field constants
 
@@ -3105,6 +3133,1046 @@ package register_pack_spi_test is
   constant adpll_status2_adpll_status_2_reset_c : adpll_status2_adpll_status_2_t := std_ulogic_vector(to_unsigned(0, adpll_status2_adpll_status_2_t'length));
   constant adpll_status2_adpll_status_2_scan_c  : adpll_status2_adpll_status_2_t := std_ulogic_vector(to_unsigned(0, adpll_status2_adpll_status_2_t'length));
 
+  ---------------------------------------------------------------------------
+  -- Register "io_dack0_n"
+  constant io_dack0_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant io_dack0_n_ste_size_c  : integer := 2;
+  constant io_dack0_n_ste_lsb_c   : integer := 2;
+  constant io_dack0_n_ste_msb_c   : integer := 3;
+  subtype io_dack0_n_ste_t is std_ulogic_vector(io_dack0_n_ste_size_c - 1 downto 0);
+  constant io_dack0_n_ste_reset_c : io_dack0_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack0_n_ste_t'length));
+  constant io_dack0_n_ste_scan_c  : io_dack0_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack0_n_ste_t'length));
+
+  -- Field "pd"
+  constant io_dack0_n_pd_size_c  : integer := 1;
+  constant io_dack0_n_pd_lsb_c   : integer := 1;
+  constant io_dack0_n_pd_msb_c   : integer := 1;
+  subtype io_dack0_n_pd_t is std_ulogic;
+  constant io_dack0_n_pd_reset_c : io_dack0_n_pd_t := '1';
+  constant io_dack0_n_pd_scan_c  : io_dack0_n_pd_t := '1';
+
+  -- Field "pu"
+  constant io_dack0_n_pu_size_c  : integer := 1;
+  constant io_dack0_n_pu_lsb_c   : integer := 0;
+  constant io_dack0_n_pu_msb_c   : integer := 0;
+  subtype io_dack0_n_pu_t is std_ulogic;
+  constant io_dack0_n_pu_reset_c : io_dack0_n_pu_t := '0';
+  constant io_dack0_n_pu_scan_c  : io_dack0_n_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dreq0_n"
+  constant io_dreq0_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_dreq0_n_ds_size_c  : integer := 2;
+  constant io_dreq0_n_ds_lsb_c   : integer := 4;
+  constant io_dreq0_n_ds_msb_c   : integer := 5;
+  subtype io_dreq0_n_ds_t is std_ulogic_vector(io_dreq0_n_ds_size_c - 1 downto 0);
+  constant io_dreq0_n_ds_reset_c : io_dreq0_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq0_n_ds_t'length));
+  constant io_dreq0_n_ds_scan_c  : io_dreq0_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq0_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_dreq0_n_sr_size_c  : integer := 1;
+  constant io_dreq0_n_sr_lsb_c   : integer := 3;
+  constant io_dreq0_n_sr_msb_c   : integer := 3;
+  subtype io_dreq0_n_sr_t is std_ulogic;
+  constant io_dreq0_n_sr_reset_c : io_dreq0_n_sr_t := '1';
+  constant io_dreq0_n_sr_scan_c  : io_dreq0_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_dreq0_n_co_size_c  : integer := 1;
+  constant io_dreq0_n_co_lsb_c   : integer := 2;
+  constant io_dreq0_n_co_msb_c   : integer := 2;
+  subtype io_dreq0_n_co_t is std_ulogic;
+  constant io_dreq0_n_co_reset_c : io_dreq0_n_co_t := '0';
+  constant io_dreq0_n_co_scan_c  : io_dreq0_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_dreq0_n_odp_size_c  : integer := 1;
+  constant io_dreq0_n_odp_lsb_c   : integer := 1;
+  constant io_dreq0_n_odp_msb_c   : integer := 1;
+  subtype io_dreq0_n_odp_t is std_ulogic;
+  constant io_dreq0_n_odp_reset_c : io_dreq0_n_odp_t := '0';
+  constant io_dreq0_n_odp_scan_c  : io_dreq0_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_dreq0_n_odn_size_c  : integer := 1;
+  constant io_dreq0_n_odn_lsb_c   : integer := 0;
+  constant io_dreq0_n_odn_msb_c   : integer := 0;
+  subtype io_dreq0_n_odn_t is std_ulogic;
+  constant io_dreq0_n_odn_reset_c : io_dreq0_n_odn_t := '0';
+  constant io_dreq0_n_odn_scan_c  : io_dreq0_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dack1_n"
+  constant io_dack1_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant io_dack1_n_ste_size_c  : integer := 2;
+  constant io_dack1_n_ste_lsb_c   : integer := 2;
+  constant io_dack1_n_ste_msb_c   : integer := 3;
+  subtype io_dack1_n_ste_t is std_ulogic_vector(io_dack1_n_ste_size_c - 1 downto 0);
+  constant io_dack1_n_ste_reset_c : io_dack1_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack1_n_ste_t'length));
+  constant io_dack1_n_ste_scan_c  : io_dack1_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack1_n_ste_t'length));
+
+  -- Field "pd"
+  constant io_dack1_n_pd_size_c  : integer := 1;
+  constant io_dack1_n_pd_lsb_c   : integer := 1;
+  constant io_dack1_n_pd_msb_c   : integer := 1;
+  subtype io_dack1_n_pd_t is std_ulogic;
+  constant io_dack1_n_pd_reset_c : io_dack1_n_pd_t := '1';
+  constant io_dack1_n_pd_scan_c  : io_dack1_n_pd_t := '1';
+
+  -- Field "pu"
+  constant io_dack1_n_pu_size_c  : integer := 1;
+  constant io_dack1_n_pu_lsb_c   : integer := 0;
+  constant io_dack1_n_pu_msb_c   : integer := 0;
+  subtype io_dack1_n_pu_t is std_ulogic;
+  constant io_dack1_n_pu_reset_c : io_dack1_n_pu_t := '0';
+  constant io_dack1_n_pu_scan_c  : io_dack1_n_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dreq1_n"
+  constant io_dreq1_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_dreq1_n_ds_size_c  : integer := 2;
+  constant io_dreq1_n_ds_lsb_c   : integer := 4;
+  constant io_dreq1_n_ds_msb_c   : integer := 5;
+  subtype io_dreq1_n_ds_t is std_ulogic_vector(io_dreq1_n_ds_size_c - 1 downto 0);
+  constant io_dreq1_n_ds_reset_c : io_dreq1_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq1_n_ds_t'length));
+  constant io_dreq1_n_ds_scan_c  : io_dreq1_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq1_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_dreq1_n_sr_size_c  : integer := 1;
+  constant io_dreq1_n_sr_lsb_c   : integer := 3;
+  constant io_dreq1_n_sr_msb_c   : integer := 3;
+  subtype io_dreq1_n_sr_t is std_ulogic;
+  constant io_dreq1_n_sr_reset_c : io_dreq1_n_sr_t := '1';
+  constant io_dreq1_n_sr_scan_c  : io_dreq1_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_dreq1_n_co_size_c  : integer := 1;
+  constant io_dreq1_n_co_lsb_c   : integer := 2;
+  constant io_dreq1_n_co_msb_c   : integer := 2;
+  subtype io_dreq1_n_co_t is std_ulogic;
+  constant io_dreq1_n_co_reset_c : io_dreq1_n_co_t := '0';
+  constant io_dreq1_n_co_scan_c  : io_dreq1_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_dreq1_n_odp_size_c  : integer := 1;
+  constant io_dreq1_n_odp_lsb_c   : integer := 1;
+  constant io_dreq1_n_odp_msb_c   : integer := 1;
+  subtype io_dreq1_n_odp_t is std_ulogic;
+  constant io_dreq1_n_odp_reset_c : io_dreq1_n_odp_t := '0';
+  constant io_dreq1_n_odp_scan_c  : io_dreq1_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_dreq1_n_odn_size_c  : integer := 1;
+  constant io_dreq1_n_odn_lsb_c   : integer := 0;
+  constant io_dreq1_n_odn_msb_c   : integer := 0;
+  subtype io_dreq1_n_odn_t is std_ulogic;
+  constant io_dreq1_n_odn_reset_c : io_dreq1_n_odn_t := '0';
+  constant io_dreq1_n_odn_scan_c  : io_dreq1_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dack2_n"
+  constant io_dack2_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant io_dack2_n_ste_size_c  : integer := 2;
+  constant io_dack2_n_ste_lsb_c   : integer := 2;
+  constant io_dack2_n_ste_msb_c   : integer := 3;
+  subtype io_dack2_n_ste_t is std_ulogic_vector(io_dack2_n_ste_size_c - 1 downto 0);
+  constant io_dack2_n_ste_reset_c : io_dack2_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack2_n_ste_t'length));
+  constant io_dack2_n_ste_scan_c  : io_dack2_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack2_n_ste_t'length));
+
+  -- Field "pd"
+  constant io_dack2_n_pd_size_c  : integer := 1;
+  constant io_dack2_n_pd_lsb_c   : integer := 1;
+  constant io_dack2_n_pd_msb_c   : integer := 1;
+  subtype io_dack2_n_pd_t is std_ulogic;
+  constant io_dack2_n_pd_reset_c : io_dack2_n_pd_t := '1';
+  constant io_dack2_n_pd_scan_c  : io_dack2_n_pd_t := '1';
+
+  -- Field "pu"
+  constant io_dack2_n_pu_size_c  : integer := 1;
+  constant io_dack2_n_pu_lsb_c   : integer := 0;
+  constant io_dack2_n_pu_msb_c   : integer := 0;
+  subtype io_dack2_n_pu_t is std_ulogic;
+  constant io_dack2_n_pu_reset_c : io_dack2_n_pu_t := '0';
+  constant io_dack2_n_pu_scan_c  : io_dack2_n_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dreq2_n"
+  constant io_dreq2_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_dreq2_n_ds_size_c  : integer := 2;
+  constant io_dreq2_n_ds_lsb_c   : integer := 4;
+  constant io_dreq2_n_ds_msb_c   : integer := 5;
+  subtype io_dreq2_n_ds_t is std_ulogic_vector(io_dreq2_n_ds_size_c - 1 downto 0);
+  constant io_dreq2_n_ds_reset_c : io_dreq2_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq2_n_ds_t'length));
+  constant io_dreq2_n_ds_scan_c  : io_dreq2_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq2_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_dreq2_n_sr_size_c  : integer := 1;
+  constant io_dreq2_n_sr_lsb_c   : integer := 3;
+  constant io_dreq2_n_sr_msb_c   : integer := 3;
+  subtype io_dreq2_n_sr_t is std_ulogic;
+  constant io_dreq2_n_sr_reset_c : io_dreq2_n_sr_t := '1';
+  constant io_dreq2_n_sr_scan_c  : io_dreq2_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_dreq2_n_co_size_c  : integer := 1;
+  constant io_dreq2_n_co_lsb_c   : integer := 2;
+  constant io_dreq2_n_co_msb_c   : integer := 2;
+  subtype io_dreq2_n_co_t is std_ulogic;
+  constant io_dreq2_n_co_reset_c : io_dreq2_n_co_t := '0';
+  constant io_dreq2_n_co_scan_c  : io_dreq2_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_dreq2_n_odp_size_c  : integer := 1;
+  constant io_dreq2_n_odp_lsb_c   : integer := 1;
+  constant io_dreq2_n_odp_msb_c   : integer := 1;
+  subtype io_dreq2_n_odp_t is std_ulogic;
+  constant io_dreq2_n_odp_reset_c : io_dreq2_n_odp_t := '0';
+  constant io_dreq2_n_odp_scan_c  : io_dreq2_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_dreq2_n_odn_size_c  : integer := 1;
+  constant io_dreq2_n_odn_lsb_c   : integer := 0;
+  constant io_dreq2_n_odn_msb_c   : integer := 0;
+  subtype io_dreq2_n_odn_t is std_ulogic;
+  constant io_dreq2_n_odn_reset_c : io_dreq2_n_odn_t := '0';
+  constant io_dreq2_n_odn_scan_c  : io_dreq2_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dack3_n"
+  constant io_dack3_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant io_dack3_n_ste_size_c  : integer := 2;
+  constant io_dack3_n_ste_lsb_c   : integer := 2;
+  constant io_dack3_n_ste_msb_c   : integer := 3;
+  subtype io_dack3_n_ste_t is std_ulogic_vector(io_dack3_n_ste_size_c - 1 downto 0);
+  constant io_dack3_n_ste_reset_c : io_dack3_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack3_n_ste_t'length));
+  constant io_dack3_n_ste_scan_c  : io_dack3_n_ste_t := std_ulogic_vector(to_unsigned(0, io_dack3_n_ste_t'length));
+
+  -- Field "pd"
+  constant io_dack3_n_pd_size_c  : integer := 1;
+  constant io_dack3_n_pd_lsb_c   : integer := 1;
+  constant io_dack3_n_pd_msb_c   : integer := 1;
+  subtype io_dack3_n_pd_t is std_ulogic;
+  constant io_dack3_n_pd_reset_c : io_dack3_n_pd_t := '1';
+  constant io_dack3_n_pd_scan_c  : io_dack3_n_pd_t := '1';
+
+  -- Field "pu"
+  constant io_dack3_n_pu_size_c  : integer := 1;
+  constant io_dack3_n_pu_lsb_c   : integer := 0;
+  constant io_dack3_n_pu_msb_c   : integer := 0;
+  subtype io_dack3_n_pu_t is std_ulogic;
+  constant io_dack3_n_pu_reset_c : io_dack3_n_pu_t := '0';
+  constant io_dack3_n_pu_scan_c  : io_dack3_n_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_dreq3_n"
+  constant io_dreq3_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_dreq3_n_ds_size_c  : integer := 2;
+  constant io_dreq3_n_ds_lsb_c   : integer := 4;
+  constant io_dreq3_n_ds_msb_c   : integer := 5;
+  subtype io_dreq3_n_ds_t is std_ulogic_vector(io_dreq3_n_ds_size_c - 1 downto 0);
+  constant io_dreq3_n_ds_reset_c : io_dreq3_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq3_n_ds_t'length));
+  constant io_dreq3_n_ds_scan_c  : io_dreq3_n_ds_t := std_ulogic_vector(to_unsigned(2, io_dreq3_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_dreq3_n_sr_size_c  : integer := 1;
+  constant io_dreq3_n_sr_lsb_c   : integer := 3;
+  constant io_dreq3_n_sr_msb_c   : integer := 3;
+  subtype io_dreq3_n_sr_t is std_ulogic;
+  constant io_dreq3_n_sr_reset_c : io_dreq3_n_sr_t := '1';
+  constant io_dreq3_n_sr_scan_c  : io_dreq3_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_dreq3_n_co_size_c  : integer := 1;
+  constant io_dreq3_n_co_lsb_c   : integer := 2;
+  constant io_dreq3_n_co_msb_c   : integer := 2;
+  subtype io_dreq3_n_co_t is std_ulogic;
+  constant io_dreq3_n_co_reset_c : io_dreq3_n_co_t := '0';
+  constant io_dreq3_n_co_scan_c  : io_dreq3_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_dreq3_n_odp_size_c  : integer := 1;
+  constant io_dreq3_n_odp_lsb_c   : integer := 1;
+  constant io_dreq3_n_odp_msb_c   : integer := 1;
+  subtype io_dreq3_n_odp_t is std_ulogic;
+  constant io_dreq3_n_odp_reset_c : io_dreq3_n_odp_t := '0';
+  constant io_dreq3_n_odp_scan_c  : io_dreq3_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_dreq3_n_odn_size_c  : integer := 1;
+  constant io_dreq3_n_odn_lsb_c   : integer := 0;
+  constant io_dreq3_n_odn_msb_c   : integer := 0;
+  subtype io_dreq3_n_odn_t is std_ulogic;
+  constant io_dreq3_n_odn_reset_c : io_dreq3_n_odn_t := '0';
+  constant io_dreq3_n_odn_scan_c  : io_dreq3_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d0_out"
+  constant io_d0_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d0_out_ds_size_c  : integer := 2;
+  constant io_d0_out_ds_lsb_c   : integer := 4;
+  constant io_d0_out_ds_msb_c   : integer := 5;
+  subtype io_d0_out_ds_t is std_ulogic_vector(io_d0_out_ds_size_c - 1 downto 0);
+  constant io_d0_out_ds_reset_c : io_d0_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d0_out_ds_t'length));
+  constant io_d0_out_ds_scan_c  : io_d0_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d0_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d0_out_sr_size_c  : integer := 1;
+  constant io_d0_out_sr_lsb_c   : integer := 3;
+  constant io_d0_out_sr_msb_c   : integer := 3;
+  subtype io_d0_out_sr_t is std_ulogic;
+  constant io_d0_out_sr_reset_c : io_d0_out_sr_t := '1';
+  constant io_d0_out_sr_scan_c  : io_d0_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d0_out_co_size_c  : integer := 1;
+  constant io_d0_out_co_lsb_c   : integer := 2;
+  constant io_d0_out_co_msb_c   : integer := 2;
+  subtype io_d0_out_co_t is std_ulogic;
+  constant io_d0_out_co_reset_c : io_d0_out_co_t := '0';
+  constant io_d0_out_co_scan_c  : io_d0_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d0_out_odp_size_c  : integer := 1;
+  constant io_d0_out_odp_lsb_c   : integer := 1;
+  constant io_d0_out_odp_msb_c   : integer := 1;
+  subtype io_d0_out_odp_t is std_ulogic;
+  constant io_d0_out_odp_reset_c : io_d0_out_odp_t := '0';
+  constant io_d0_out_odp_scan_c  : io_d0_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d0_out_odn_size_c  : integer := 1;
+  constant io_d0_out_odn_lsb_c   : integer := 0;
+  constant io_d0_out_odn_msb_c   : integer := 0;
+  subtype io_d0_out_odn_t is std_ulogic;
+  constant io_d0_out_odn_reset_c : io_d0_out_odn_t := '0';
+  constant io_d0_out_odn_scan_c  : io_d0_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d0_in"
+  constant io_d0_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d0_in_ste_size_c  : integer := 2;
+  constant io_d0_in_ste_lsb_c   : integer := 2;
+  constant io_d0_in_ste_msb_c   : integer := 3;
+  subtype io_d0_in_ste_t is std_ulogic_vector(io_d0_in_ste_size_c - 1 downto 0);
+  constant io_d0_in_ste_reset_c : io_d0_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d0_in_ste_t'length));
+  constant io_d0_in_ste_scan_c  : io_d0_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d0_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d0_in_pd_size_c  : integer := 1;
+  constant io_d0_in_pd_lsb_c   : integer := 1;
+  constant io_d0_in_pd_msb_c   : integer := 1;
+  subtype io_d0_in_pd_t is std_ulogic;
+  constant io_d0_in_pd_reset_c : io_d0_in_pd_t := '0';
+  constant io_d0_in_pd_scan_c  : io_d0_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d0_in_pu_size_c  : integer := 1;
+  constant io_d0_in_pu_lsb_c   : integer := 0;
+  constant io_d0_in_pu_msb_c   : integer := 0;
+  subtype io_d0_in_pu_t is std_ulogic;
+  constant io_d0_in_pu_reset_c : io_d0_in_pu_t := '0';
+  constant io_d0_in_pu_scan_c  : io_d0_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d1_out"
+  constant io_d1_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d1_out_ds_size_c  : integer := 2;
+  constant io_d1_out_ds_lsb_c   : integer := 4;
+  constant io_d1_out_ds_msb_c   : integer := 5;
+  subtype io_d1_out_ds_t is std_ulogic_vector(io_d1_out_ds_size_c - 1 downto 0);
+  constant io_d1_out_ds_reset_c : io_d1_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d1_out_ds_t'length));
+  constant io_d1_out_ds_scan_c  : io_d1_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d1_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d1_out_sr_size_c  : integer := 1;
+  constant io_d1_out_sr_lsb_c   : integer := 3;
+  constant io_d1_out_sr_msb_c   : integer := 3;
+  subtype io_d1_out_sr_t is std_ulogic;
+  constant io_d1_out_sr_reset_c : io_d1_out_sr_t := '1';
+  constant io_d1_out_sr_scan_c  : io_d1_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d1_out_co_size_c  : integer := 1;
+  constant io_d1_out_co_lsb_c   : integer := 2;
+  constant io_d1_out_co_msb_c   : integer := 2;
+  subtype io_d1_out_co_t is std_ulogic;
+  constant io_d1_out_co_reset_c : io_d1_out_co_t := '0';
+  constant io_d1_out_co_scan_c  : io_d1_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d1_out_odp_size_c  : integer := 1;
+  constant io_d1_out_odp_lsb_c   : integer := 1;
+  constant io_d1_out_odp_msb_c   : integer := 1;
+  subtype io_d1_out_odp_t is std_ulogic;
+  constant io_d1_out_odp_reset_c : io_d1_out_odp_t := '0';
+  constant io_d1_out_odp_scan_c  : io_d1_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d1_out_odn_size_c  : integer := 1;
+  constant io_d1_out_odn_lsb_c   : integer := 0;
+  constant io_d1_out_odn_msb_c   : integer := 0;
+  subtype io_d1_out_odn_t is std_ulogic;
+  constant io_d1_out_odn_reset_c : io_d1_out_odn_t := '0';
+  constant io_d1_out_odn_scan_c  : io_d1_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d1_in"
+  constant io_d1_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d1_in_ste_size_c  : integer := 2;
+  constant io_d1_in_ste_lsb_c   : integer := 2;
+  constant io_d1_in_ste_msb_c   : integer := 3;
+  subtype io_d1_in_ste_t is std_ulogic_vector(io_d1_in_ste_size_c - 1 downto 0);
+  constant io_d1_in_ste_reset_c : io_d1_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d1_in_ste_t'length));
+  constant io_d1_in_ste_scan_c  : io_d1_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d1_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d1_in_pd_size_c  : integer := 1;
+  constant io_d1_in_pd_lsb_c   : integer := 1;
+  constant io_d1_in_pd_msb_c   : integer := 1;
+  subtype io_d1_in_pd_t is std_ulogic;
+  constant io_d1_in_pd_reset_c : io_d1_in_pd_t := '0';
+  constant io_d1_in_pd_scan_c  : io_d1_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d1_in_pu_size_c  : integer := 1;
+  constant io_d1_in_pu_lsb_c   : integer := 0;
+  constant io_d1_in_pu_msb_c   : integer := 0;
+  subtype io_d1_in_pu_t is std_ulogic;
+  constant io_d1_in_pu_reset_c : io_d1_in_pu_t := '0';
+  constant io_d1_in_pu_scan_c  : io_d1_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d2_out"
+  constant io_d2_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d2_out_ds_size_c  : integer := 2;
+  constant io_d2_out_ds_lsb_c   : integer := 4;
+  constant io_d2_out_ds_msb_c   : integer := 5;
+  subtype io_d2_out_ds_t is std_ulogic_vector(io_d2_out_ds_size_c - 1 downto 0);
+  constant io_d2_out_ds_reset_c : io_d2_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d2_out_ds_t'length));
+  constant io_d2_out_ds_scan_c  : io_d2_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d2_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d2_out_sr_size_c  : integer := 1;
+  constant io_d2_out_sr_lsb_c   : integer := 3;
+  constant io_d2_out_sr_msb_c   : integer := 3;
+  subtype io_d2_out_sr_t is std_ulogic;
+  constant io_d2_out_sr_reset_c : io_d2_out_sr_t := '1';
+  constant io_d2_out_sr_scan_c  : io_d2_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d2_out_co_size_c  : integer := 1;
+  constant io_d2_out_co_lsb_c   : integer := 2;
+  constant io_d2_out_co_msb_c   : integer := 2;
+  subtype io_d2_out_co_t is std_ulogic;
+  constant io_d2_out_co_reset_c : io_d2_out_co_t := '0';
+  constant io_d2_out_co_scan_c  : io_d2_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d2_out_odp_size_c  : integer := 1;
+  constant io_d2_out_odp_lsb_c   : integer := 1;
+  constant io_d2_out_odp_msb_c   : integer := 1;
+  subtype io_d2_out_odp_t is std_ulogic;
+  constant io_d2_out_odp_reset_c : io_d2_out_odp_t := '0';
+  constant io_d2_out_odp_scan_c  : io_d2_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d2_out_odn_size_c  : integer := 1;
+  constant io_d2_out_odn_lsb_c   : integer := 0;
+  constant io_d2_out_odn_msb_c   : integer := 0;
+  subtype io_d2_out_odn_t is std_ulogic;
+  constant io_d2_out_odn_reset_c : io_d2_out_odn_t := '0';
+  constant io_d2_out_odn_scan_c  : io_d2_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d2_in"
+  constant io_d2_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d2_in_ste_size_c  : integer := 2;
+  constant io_d2_in_ste_lsb_c   : integer := 2;
+  constant io_d2_in_ste_msb_c   : integer := 3;
+  subtype io_d2_in_ste_t is std_ulogic_vector(io_d2_in_ste_size_c - 1 downto 0);
+  constant io_d2_in_ste_reset_c : io_d2_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d2_in_ste_t'length));
+  constant io_d2_in_ste_scan_c  : io_d2_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d2_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d2_in_pd_size_c  : integer := 1;
+  constant io_d2_in_pd_lsb_c   : integer := 1;
+  constant io_d2_in_pd_msb_c   : integer := 1;
+  subtype io_d2_in_pd_t is std_ulogic;
+  constant io_d2_in_pd_reset_c : io_d2_in_pd_t := '0';
+  constant io_d2_in_pd_scan_c  : io_d2_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d2_in_pu_size_c  : integer := 1;
+  constant io_d2_in_pu_lsb_c   : integer := 0;
+  constant io_d2_in_pu_msb_c   : integer := 0;
+  subtype io_d2_in_pu_t is std_ulogic;
+  constant io_d2_in_pu_reset_c : io_d2_in_pu_t := '0';
+  constant io_d2_in_pu_scan_c  : io_d2_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d3_out"
+  constant io_d3_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d3_out_ds_size_c  : integer := 2;
+  constant io_d3_out_ds_lsb_c   : integer := 4;
+  constant io_d3_out_ds_msb_c   : integer := 5;
+  subtype io_d3_out_ds_t is std_ulogic_vector(io_d3_out_ds_size_c - 1 downto 0);
+  constant io_d3_out_ds_reset_c : io_d3_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d3_out_ds_t'length));
+  constant io_d3_out_ds_scan_c  : io_d3_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d3_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d3_out_sr_size_c  : integer := 1;
+  constant io_d3_out_sr_lsb_c   : integer := 3;
+  constant io_d3_out_sr_msb_c   : integer := 3;
+  subtype io_d3_out_sr_t is std_ulogic;
+  constant io_d3_out_sr_reset_c : io_d3_out_sr_t := '1';
+  constant io_d3_out_sr_scan_c  : io_d3_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d3_out_co_size_c  : integer := 1;
+  constant io_d3_out_co_lsb_c   : integer := 2;
+  constant io_d3_out_co_msb_c   : integer := 2;
+  subtype io_d3_out_co_t is std_ulogic;
+  constant io_d3_out_co_reset_c : io_d3_out_co_t := '0';
+  constant io_d3_out_co_scan_c  : io_d3_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d3_out_odp_size_c  : integer := 1;
+  constant io_d3_out_odp_lsb_c   : integer := 1;
+  constant io_d3_out_odp_msb_c   : integer := 1;
+  subtype io_d3_out_odp_t is std_ulogic;
+  constant io_d3_out_odp_reset_c : io_d3_out_odp_t := '0';
+  constant io_d3_out_odp_scan_c  : io_d3_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d3_out_odn_size_c  : integer := 1;
+  constant io_d3_out_odn_lsb_c   : integer := 0;
+  constant io_d3_out_odn_msb_c   : integer := 0;
+  subtype io_d3_out_odn_t is std_ulogic;
+  constant io_d3_out_odn_reset_c : io_d3_out_odn_t := '0';
+  constant io_d3_out_odn_scan_c  : io_d3_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d3_in"
+  constant io_d3_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d3_in_ste_size_c  : integer := 2;
+  constant io_d3_in_ste_lsb_c   : integer := 2;
+  constant io_d3_in_ste_msb_c   : integer := 3;
+  subtype io_d3_in_ste_t is std_ulogic_vector(io_d3_in_ste_size_c - 1 downto 0);
+  constant io_d3_in_ste_reset_c : io_d3_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d3_in_ste_t'length));
+  constant io_d3_in_ste_scan_c  : io_d3_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d3_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d3_in_pd_size_c  : integer := 1;
+  constant io_d3_in_pd_lsb_c   : integer := 1;
+  constant io_d3_in_pd_msb_c   : integer := 1;
+  subtype io_d3_in_pd_t is std_ulogic;
+  constant io_d3_in_pd_reset_c : io_d3_in_pd_t := '0';
+  constant io_d3_in_pd_scan_c  : io_d3_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d3_in_pu_size_c  : integer := 1;
+  constant io_d3_in_pu_lsb_c   : integer := 0;
+  constant io_d3_in_pu_msb_c   : integer := 0;
+  subtype io_d3_in_pu_t is std_ulogic;
+  constant io_d3_in_pu_reset_c : io_d3_in_pu_t := '0';
+  constant io_d3_in_pu_scan_c  : io_d3_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d4_out"
+  constant io_d4_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d4_out_ds_size_c  : integer := 2;
+  constant io_d4_out_ds_lsb_c   : integer := 4;
+  constant io_d4_out_ds_msb_c   : integer := 5;
+  subtype io_d4_out_ds_t is std_ulogic_vector(io_d4_out_ds_size_c - 1 downto 0);
+  constant io_d4_out_ds_reset_c : io_d4_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d4_out_ds_t'length));
+  constant io_d4_out_ds_scan_c  : io_d4_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d4_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d4_out_sr_size_c  : integer := 1;
+  constant io_d4_out_sr_lsb_c   : integer := 3;
+  constant io_d4_out_sr_msb_c   : integer := 3;
+  subtype io_d4_out_sr_t is std_ulogic;
+  constant io_d4_out_sr_reset_c : io_d4_out_sr_t := '1';
+  constant io_d4_out_sr_scan_c  : io_d4_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d4_out_co_size_c  : integer := 1;
+  constant io_d4_out_co_lsb_c   : integer := 2;
+  constant io_d4_out_co_msb_c   : integer := 2;
+  subtype io_d4_out_co_t is std_ulogic;
+  constant io_d4_out_co_reset_c : io_d4_out_co_t := '0';
+  constant io_d4_out_co_scan_c  : io_d4_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d4_out_odp_size_c  : integer := 1;
+  constant io_d4_out_odp_lsb_c   : integer := 1;
+  constant io_d4_out_odp_msb_c   : integer := 1;
+  subtype io_d4_out_odp_t is std_ulogic;
+  constant io_d4_out_odp_reset_c : io_d4_out_odp_t := '0';
+  constant io_d4_out_odp_scan_c  : io_d4_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d4_out_odn_size_c  : integer := 1;
+  constant io_d4_out_odn_lsb_c   : integer := 0;
+  constant io_d4_out_odn_msb_c   : integer := 0;
+  subtype io_d4_out_odn_t is std_ulogic;
+  constant io_d4_out_odn_reset_c : io_d4_out_odn_t := '0';
+  constant io_d4_out_odn_scan_c  : io_d4_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d4_in"
+  constant io_d4_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d4_in_ste_size_c  : integer := 2;
+  constant io_d4_in_ste_lsb_c   : integer := 2;
+  constant io_d4_in_ste_msb_c   : integer := 3;
+  subtype io_d4_in_ste_t is std_ulogic_vector(io_d4_in_ste_size_c - 1 downto 0);
+  constant io_d4_in_ste_reset_c : io_d4_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d4_in_ste_t'length));
+  constant io_d4_in_ste_scan_c  : io_d4_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d4_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d4_in_pd_size_c  : integer := 1;
+  constant io_d4_in_pd_lsb_c   : integer := 1;
+  constant io_d4_in_pd_msb_c   : integer := 1;
+  subtype io_d4_in_pd_t is std_ulogic;
+  constant io_d4_in_pd_reset_c : io_d4_in_pd_t := '0';
+  constant io_d4_in_pd_scan_c  : io_d4_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d4_in_pu_size_c  : integer := 1;
+  constant io_d4_in_pu_lsb_c   : integer := 0;
+  constant io_d4_in_pu_msb_c   : integer := 0;
+  subtype io_d4_in_pu_t is std_ulogic;
+  constant io_d4_in_pu_reset_c : io_d4_in_pu_t := '0';
+  constant io_d4_in_pu_scan_c  : io_d4_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d5_out"
+  constant io_d5_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d5_out_ds_size_c  : integer := 2;
+  constant io_d5_out_ds_lsb_c   : integer := 4;
+  constant io_d5_out_ds_msb_c   : integer := 5;
+  subtype io_d5_out_ds_t is std_ulogic_vector(io_d5_out_ds_size_c - 1 downto 0);
+  constant io_d5_out_ds_reset_c : io_d5_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d5_out_ds_t'length));
+  constant io_d5_out_ds_scan_c  : io_d5_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d5_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d5_out_sr_size_c  : integer := 1;
+  constant io_d5_out_sr_lsb_c   : integer := 3;
+  constant io_d5_out_sr_msb_c   : integer := 3;
+  subtype io_d5_out_sr_t is std_ulogic;
+  constant io_d5_out_sr_reset_c : io_d5_out_sr_t := '1';
+  constant io_d5_out_sr_scan_c  : io_d5_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d5_out_co_size_c  : integer := 1;
+  constant io_d5_out_co_lsb_c   : integer := 2;
+  constant io_d5_out_co_msb_c   : integer := 2;
+  subtype io_d5_out_co_t is std_ulogic;
+  constant io_d5_out_co_reset_c : io_d5_out_co_t := '0';
+  constant io_d5_out_co_scan_c  : io_d5_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d5_out_odp_size_c  : integer := 1;
+  constant io_d5_out_odp_lsb_c   : integer := 1;
+  constant io_d5_out_odp_msb_c   : integer := 1;
+  subtype io_d5_out_odp_t is std_ulogic;
+  constant io_d5_out_odp_reset_c : io_d5_out_odp_t := '0';
+  constant io_d5_out_odp_scan_c  : io_d5_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d5_out_odn_size_c  : integer := 1;
+  constant io_d5_out_odn_lsb_c   : integer := 0;
+  constant io_d5_out_odn_msb_c   : integer := 0;
+  subtype io_d5_out_odn_t is std_ulogic;
+  constant io_d5_out_odn_reset_c : io_d5_out_odn_t := '0';
+  constant io_d5_out_odn_scan_c  : io_d5_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d5_in"
+  constant io_d5_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d5_in_ste_size_c  : integer := 2;
+  constant io_d5_in_ste_lsb_c   : integer := 2;
+  constant io_d5_in_ste_msb_c   : integer := 3;
+  subtype io_d5_in_ste_t is std_ulogic_vector(io_d5_in_ste_size_c - 1 downto 0);
+  constant io_d5_in_ste_reset_c : io_d5_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d5_in_ste_t'length));
+  constant io_d5_in_ste_scan_c  : io_d5_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d5_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d5_in_pd_size_c  : integer := 1;
+  constant io_d5_in_pd_lsb_c   : integer := 1;
+  constant io_d5_in_pd_msb_c   : integer := 1;
+  subtype io_d5_in_pd_t is std_ulogic;
+  constant io_d5_in_pd_reset_c : io_d5_in_pd_t := '0';
+  constant io_d5_in_pd_scan_c  : io_d5_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d5_in_pu_size_c  : integer := 1;
+  constant io_d5_in_pu_lsb_c   : integer := 0;
+  constant io_d5_in_pu_msb_c   : integer := 0;
+  subtype io_d5_in_pu_t is std_ulogic;
+  constant io_d5_in_pu_reset_c : io_d5_in_pu_t := '0';
+  constant io_d5_in_pu_scan_c  : io_d5_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d6_out"
+  constant io_d6_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d6_out_ds_size_c  : integer := 2;
+  constant io_d6_out_ds_lsb_c   : integer := 4;
+  constant io_d6_out_ds_msb_c   : integer := 5;
+  subtype io_d6_out_ds_t is std_ulogic_vector(io_d6_out_ds_size_c - 1 downto 0);
+  constant io_d6_out_ds_reset_c : io_d6_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d6_out_ds_t'length));
+  constant io_d6_out_ds_scan_c  : io_d6_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d6_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d6_out_sr_size_c  : integer := 1;
+  constant io_d6_out_sr_lsb_c   : integer := 3;
+  constant io_d6_out_sr_msb_c   : integer := 3;
+  subtype io_d6_out_sr_t is std_ulogic;
+  constant io_d6_out_sr_reset_c : io_d6_out_sr_t := '1';
+  constant io_d6_out_sr_scan_c  : io_d6_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d6_out_co_size_c  : integer := 1;
+  constant io_d6_out_co_lsb_c   : integer := 2;
+  constant io_d6_out_co_msb_c   : integer := 2;
+  subtype io_d6_out_co_t is std_ulogic;
+  constant io_d6_out_co_reset_c : io_d6_out_co_t := '0';
+  constant io_d6_out_co_scan_c  : io_d6_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d6_out_odp_size_c  : integer := 1;
+  constant io_d6_out_odp_lsb_c   : integer := 1;
+  constant io_d6_out_odp_msb_c   : integer := 1;
+  subtype io_d6_out_odp_t is std_ulogic;
+  constant io_d6_out_odp_reset_c : io_d6_out_odp_t := '0';
+  constant io_d6_out_odp_scan_c  : io_d6_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d6_out_odn_size_c  : integer := 1;
+  constant io_d6_out_odn_lsb_c   : integer := 0;
+  constant io_d6_out_odn_msb_c   : integer := 0;
+  subtype io_d6_out_odn_t is std_ulogic;
+  constant io_d6_out_odn_reset_c : io_d6_out_odn_t := '0';
+  constant io_d6_out_odn_scan_c  : io_d6_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d6_in"
+  constant io_d6_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d6_in_ste_size_c  : integer := 2;
+  constant io_d6_in_ste_lsb_c   : integer := 2;
+  constant io_d6_in_ste_msb_c   : integer := 3;
+  subtype io_d6_in_ste_t is std_ulogic_vector(io_d6_in_ste_size_c - 1 downto 0);
+  constant io_d6_in_ste_reset_c : io_d6_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d6_in_ste_t'length));
+  constant io_d6_in_ste_scan_c  : io_d6_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d6_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d6_in_pd_size_c  : integer := 1;
+  constant io_d6_in_pd_lsb_c   : integer := 1;
+  constant io_d6_in_pd_msb_c   : integer := 1;
+  subtype io_d6_in_pd_t is std_ulogic;
+  constant io_d6_in_pd_reset_c : io_d6_in_pd_t := '0';
+  constant io_d6_in_pd_scan_c  : io_d6_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d6_in_pu_size_c  : integer := 1;
+  constant io_d6_in_pu_lsb_c   : integer := 0;
+  constant io_d6_in_pu_msb_c   : integer := 0;
+  subtype io_d6_in_pu_t is std_ulogic;
+  constant io_d6_in_pu_reset_c : io_d6_in_pu_t := '0';
+  constant io_d6_in_pu_scan_c  : io_d6_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d7_out"
+  constant io_d7_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_d7_out_ds_size_c  : integer := 2;
+  constant io_d7_out_ds_lsb_c   : integer := 4;
+  constant io_d7_out_ds_msb_c   : integer := 5;
+  subtype io_d7_out_ds_t is std_ulogic_vector(io_d7_out_ds_size_c - 1 downto 0);
+  constant io_d7_out_ds_reset_c : io_d7_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d7_out_ds_t'length));
+  constant io_d7_out_ds_scan_c  : io_d7_out_ds_t := std_ulogic_vector(to_unsigned(2, io_d7_out_ds_t'length));
+
+  -- Field "sr"
+  constant io_d7_out_sr_size_c  : integer := 1;
+  constant io_d7_out_sr_lsb_c   : integer := 3;
+  constant io_d7_out_sr_msb_c   : integer := 3;
+  subtype io_d7_out_sr_t is std_ulogic;
+  constant io_d7_out_sr_reset_c : io_d7_out_sr_t := '1';
+  constant io_d7_out_sr_scan_c  : io_d7_out_sr_t := '1';
+
+  -- Field "co"
+  constant io_d7_out_co_size_c  : integer := 1;
+  constant io_d7_out_co_lsb_c   : integer := 2;
+  constant io_d7_out_co_msb_c   : integer := 2;
+  subtype io_d7_out_co_t is std_ulogic;
+  constant io_d7_out_co_reset_c : io_d7_out_co_t := '0';
+  constant io_d7_out_co_scan_c  : io_d7_out_co_t := '0';
+
+  -- Field "odp"
+  constant io_d7_out_odp_size_c  : integer := 1;
+  constant io_d7_out_odp_lsb_c   : integer := 1;
+  constant io_d7_out_odp_msb_c   : integer := 1;
+  subtype io_d7_out_odp_t is std_ulogic;
+  constant io_d7_out_odp_reset_c : io_d7_out_odp_t := '0';
+  constant io_d7_out_odp_scan_c  : io_d7_out_odp_t := '0';
+
+  -- Field "odn"
+  constant io_d7_out_odn_size_c  : integer := 1;
+  constant io_d7_out_odn_lsb_c   : integer := 0;
+  constant io_d7_out_odn_msb_c   : integer := 0;
+  subtype io_d7_out_odn_t is std_ulogic;
+  constant io_d7_out_odn_reset_c : io_d7_out_odn_t := '0';
+  constant io_d7_out_odn_scan_c  : io_d7_out_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_d7_in"
+  constant io_d7_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#00#, register_t'length));
+
+  -- Field "ste"
+  constant io_d7_in_ste_size_c  : integer := 2;
+  constant io_d7_in_ste_lsb_c   : integer := 2;
+  constant io_d7_in_ste_msb_c   : integer := 3;
+  subtype io_d7_in_ste_t is std_ulogic_vector(io_d7_in_ste_size_c - 1 downto 0);
+  constant io_d7_in_ste_reset_c : io_d7_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d7_in_ste_t'length));
+  constant io_d7_in_ste_scan_c  : io_d7_in_ste_t := std_ulogic_vector(to_unsigned(0, io_d7_in_ste_t'length));
+
+  -- Field "pd"
+  constant io_d7_in_pd_size_c  : integer := 1;
+  constant io_d7_in_pd_lsb_c   : integer := 1;
+  constant io_d7_in_pd_msb_c   : integer := 1;
+  subtype io_d7_in_pd_t is std_ulogic;
+  constant io_d7_in_pd_reset_c : io_d7_in_pd_t := '0';
+  constant io_d7_in_pd_scan_c  : io_d7_in_pd_t := '0';
+
+  -- Field "pu"
+  constant io_d7_in_pu_size_c  : integer := 1;
+  constant io_d7_in_pu_lsb_c   : integer := 0;
+  constant io_d7_in_pu_msb_c   : integer := 0;
+  subtype io_d7_in_pu_t is std_ulogic;
+  constant io_d7_in_pu_reset_c : io_d7_in_pu_t := '0';
+  constant io_d7_in_pu_scan_c  : io_d7_in_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_ldout_n"
+  constant io_ldout_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_ldout_n_ds_size_c  : integer := 2;
+  constant io_ldout_n_ds_lsb_c   : integer := 4;
+  constant io_ldout_n_ds_msb_c   : integer := 5;
+  subtype io_ldout_n_ds_t is std_ulogic_vector(io_ldout_n_ds_size_c - 1 downto 0);
+  constant io_ldout_n_ds_reset_c : io_ldout_n_ds_t := std_ulogic_vector(to_unsigned(2, io_ldout_n_ds_t'length));
+  constant io_ldout_n_ds_scan_c  : io_ldout_n_ds_t := std_ulogic_vector(to_unsigned(2, io_ldout_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_ldout_n_sr_size_c  : integer := 1;
+  constant io_ldout_n_sr_lsb_c   : integer := 3;
+  constant io_ldout_n_sr_msb_c   : integer := 3;
+  subtype io_ldout_n_sr_t is std_ulogic;
+  constant io_ldout_n_sr_reset_c : io_ldout_n_sr_t := '1';
+  constant io_ldout_n_sr_scan_c  : io_ldout_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_ldout_n_co_size_c  : integer := 1;
+  constant io_ldout_n_co_lsb_c   : integer := 2;
+  constant io_ldout_n_co_msb_c   : integer := 2;
+  subtype io_ldout_n_co_t is std_ulogic;
+  constant io_ldout_n_co_reset_c : io_ldout_n_co_t := '0';
+  constant io_ldout_n_co_scan_c  : io_ldout_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_ldout_n_odp_size_c  : integer := 1;
+  constant io_ldout_n_odp_lsb_c   : integer := 1;
+  constant io_ldout_n_odp_msb_c   : integer := 1;
+  subtype io_ldout_n_odp_t is std_ulogic;
+  constant io_ldout_n_odp_reset_c : io_ldout_n_odp_t := '0';
+  constant io_ldout_n_odp_scan_c  : io_ldout_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_ldout_n_odn_size_c  : integer := 1;
+  constant io_ldout_n_odn_lsb_c   : integer := 0;
+  constant io_ldout_n_odn_msb_c   : integer := 0;
+  subtype io_ldout_n_odn_t is std_ulogic;
+  constant io_ldout_n_odn_reset_c : io_ldout_n_odn_t := '0';
+  constant io_ldout_n_odn_scan_c  : io_ldout_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_next_n"
+  constant io_next_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_next_n_ds_size_c  : integer := 2;
+  constant io_next_n_ds_lsb_c   : integer := 4;
+  constant io_next_n_ds_msb_c   : integer := 5;
+  subtype io_next_n_ds_t is std_ulogic_vector(io_next_n_ds_size_c - 1 downto 0);
+  constant io_next_n_ds_reset_c : io_next_n_ds_t := std_ulogic_vector(to_unsigned(2, io_next_n_ds_t'length));
+  constant io_next_n_ds_scan_c  : io_next_n_ds_t := std_ulogic_vector(to_unsigned(2, io_next_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_next_n_sr_size_c  : integer := 1;
+  constant io_next_n_sr_lsb_c   : integer := 3;
+  constant io_next_n_sr_msb_c   : integer := 3;
+  subtype io_next_n_sr_t is std_ulogic;
+  constant io_next_n_sr_reset_c : io_next_n_sr_t := '1';
+  constant io_next_n_sr_scan_c  : io_next_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_next_n_co_size_c  : integer := 1;
+  constant io_next_n_co_lsb_c   : integer := 2;
+  constant io_next_n_co_msb_c   : integer := 2;
+  subtype io_next_n_co_t is std_ulogic;
+  constant io_next_n_co_reset_c : io_next_n_co_t := '0';
+  constant io_next_n_co_scan_c  : io_next_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_next_n_odp_size_c  : integer := 1;
+  constant io_next_n_odp_lsb_c   : integer := 1;
+  constant io_next_n_odp_msb_c   : integer := 1;
+  subtype io_next_n_odp_t is std_ulogic;
+  constant io_next_n_odp_reset_c : io_next_n_odp_t := '0';
+  constant io_next_n_odp_scan_c  : io_next_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_next_n_odn_size_c  : integer := 1;
+  constant io_next_n_odn_lsb_c   : integer := 0;
+  constant io_next_n_odn_msb_c   : integer := 0;
+  subtype io_next_n_odn_t is std_ulogic;
+  constant io_next_n_odn_reset_c : io_next_n_odn_t := '0';
+  constant io_next_n_odn_scan_c  : io_next_n_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_clk"
+  constant io_clk_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_clk_ds_size_c  : integer := 2;
+  constant io_clk_ds_lsb_c   : integer := 4;
+  constant io_clk_ds_msb_c   : integer := 5;
+  subtype io_clk_ds_t is std_ulogic_vector(io_clk_ds_size_c - 1 downto 0);
+  constant io_clk_ds_reset_c : io_clk_ds_t := std_ulogic_vector(to_unsigned(2, io_clk_ds_t'length));
+  constant io_clk_ds_scan_c  : io_clk_ds_t := std_ulogic_vector(to_unsigned(2, io_clk_ds_t'length));
+
+  -- Field "sr"
+  constant io_clk_sr_size_c  : integer := 1;
+  constant io_clk_sr_lsb_c   : integer := 3;
+  constant io_clk_sr_msb_c   : integer := 3;
+  subtype io_clk_sr_t is std_ulogic;
+  constant io_clk_sr_reset_c : io_clk_sr_t := '1';
+  constant io_clk_sr_scan_c  : io_clk_sr_t := '1';
+
+  -- Field "co"
+  constant io_clk_co_size_c  : integer := 1;
+  constant io_clk_co_lsb_c   : integer := 2;
+  constant io_clk_co_msb_c   : integer := 2;
+  subtype io_clk_co_t is std_ulogic;
+  constant io_clk_co_reset_c : io_clk_co_t := '0';
+  constant io_clk_co_scan_c  : io_clk_co_t := '0';
+
+  -- Field "odp"
+  constant io_clk_odp_size_c  : integer := 1;
+  constant io_clk_odp_lsb_c   : integer := 1;
+  constant io_clk_odp_msb_c   : integer := 1;
+  subtype io_clk_odp_t is std_ulogic;
+  constant io_clk_odp_reset_c : io_clk_odp_t := '0';
+  constant io_clk_odp_scan_c  : io_clk_odp_t := '0';
+
+  -- Field "odn"
+  constant io_clk_odn_size_c  : integer := 1;
+  constant io_clk_odn_lsb_c   : integer := 0;
+  constant io_clk_odn_msb_c   : integer := 0;
+  subtype io_clk_odn_t is std_ulogic;
+  constant io_clk_odn_reset_c : io_clk_odn_t := '0';
+  constant io_clk_odn_scan_c  : io_clk_odn_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "io_ioa_n"
+  constant io_ioa_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant io_ioa_n_ds_size_c  : integer := 2;
+  constant io_ioa_n_ds_lsb_c   : integer := 4;
+  constant io_ioa_n_ds_msb_c   : integer := 5;
+  subtype io_ioa_n_ds_t is std_ulogic_vector(io_ioa_n_ds_size_c - 1 downto 0);
+  constant io_ioa_n_ds_reset_c : io_ioa_n_ds_t := std_ulogic_vector(to_unsigned(2, io_ioa_n_ds_t'length));
+  constant io_ioa_n_ds_scan_c  : io_ioa_n_ds_t := std_ulogic_vector(to_unsigned(2, io_ioa_n_ds_t'length));
+
+  -- Field "sr"
+  constant io_ioa_n_sr_size_c  : integer := 1;
+  constant io_ioa_n_sr_lsb_c   : integer := 3;
+  constant io_ioa_n_sr_msb_c   : integer := 3;
+  subtype io_ioa_n_sr_t is std_ulogic;
+  constant io_ioa_n_sr_reset_c : io_ioa_n_sr_t := '1';
+  constant io_ioa_n_sr_scan_c  : io_ioa_n_sr_t := '1';
+
+  -- Field "co"
+  constant io_ioa_n_co_size_c  : integer := 1;
+  constant io_ioa_n_co_lsb_c   : integer := 2;
+  constant io_ioa_n_co_msb_c   : integer := 2;
+  subtype io_ioa_n_co_t is std_ulogic;
+  constant io_ioa_n_co_reset_c : io_ioa_n_co_t := '0';
+  constant io_ioa_n_co_scan_c  : io_ioa_n_co_t := '0';
+
+  -- Field "odp"
+  constant io_ioa_n_odp_size_c  : integer := 1;
+  constant io_ioa_n_odp_lsb_c   : integer := 1;
+  constant io_ioa_n_odp_msb_c   : integer := 1;
+  subtype io_ioa_n_odp_t is std_ulogic;
+  constant io_ioa_n_odp_reset_c : io_ioa_n_odp_t := '0';
+  constant io_ioa_n_odp_scan_c  : io_ioa_n_odp_t := '0';
+
+  -- Field "odn"
+  constant io_ioa_n_odn_size_c  : integer := 1;
+  constant io_ioa_n_odn_lsb_c   : integer := 0;
+  constant io_ioa_n_odn_msb_c   : integer := 0;
+  subtype io_ioa_n_odn_t is std_ulogic;
+  constant io_ioa_n_odn_reset_c : io_ioa_n_odn_t := '0';
+  constant io_ioa_n_odn_scan_c  : io_ioa_n_odn_t := '0';
+
   component register_block_spi_test
 
     port (
@@ -3444,6 +4512,122 @@ package register_pack_spi_test is
           adpll_status0_adpll_status_0 : in  adpll_status0_adpll_status_0_t;
           adpll_status1_adpll_status_1 : in  adpll_status1_adpll_status_1_t;
           adpll_status2_adpll_status_2 : in  adpll_status2_adpll_status_2_t;
+          io_dack0_n_ste : out io_dack0_n_ste_t;
+          io_dack0_n_pd : out io_dack0_n_pd_t;
+          io_dack0_n_pu : out io_dack0_n_pu_t;
+          io_dreq0_n_ds : out io_dreq0_n_ds_t;
+          io_dreq0_n_sr : out io_dreq0_n_sr_t;
+          io_dreq0_n_co : out io_dreq0_n_co_t;
+          io_dreq0_n_odp : out io_dreq0_n_odp_t;
+          io_dreq0_n_odn : out io_dreq0_n_odn_t;
+          io_dack1_n_ste : out io_dack1_n_ste_t;
+          io_dack1_n_pd : out io_dack1_n_pd_t;
+          io_dack1_n_pu : out io_dack1_n_pu_t;
+          io_dreq1_n_ds : out io_dreq1_n_ds_t;
+          io_dreq1_n_sr : out io_dreq1_n_sr_t;
+          io_dreq1_n_co : out io_dreq1_n_co_t;
+          io_dreq1_n_odp : out io_dreq1_n_odp_t;
+          io_dreq1_n_odn : out io_dreq1_n_odn_t;
+          io_dack2_n_ste : out io_dack2_n_ste_t;
+          io_dack2_n_pd : out io_dack2_n_pd_t;
+          io_dack2_n_pu : out io_dack2_n_pu_t;
+          io_dreq2_n_ds : out io_dreq2_n_ds_t;
+          io_dreq2_n_sr : out io_dreq2_n_sr_t;
+          io_dreq2_n_co : out io_dreq2_n_co_t;
+          io_dreq2_n_odp : out io_dreq2_n_odp_t;
+          io_dreq2_n_odn : out io_dreq2_n_odn_t;
+          io_dack3_n_ste : out io_dack3_n_ste_t;
+          io_dack3_n_pd : out io_dack3_n_pd_t;
+          io_dack3_n_pu : out io_dack3_n_pu_t;
+          io_dreq3_n_ds : out io_dreq3_n_ds_t;
+          io_dreq3_n_sr : out io_dreq3_n_sr_t;
+          io_dreq3_n_co : out io_dreq3_n_co_t;
+          io_dreq3_n_odp : out io_dreq3_n_odp_t;
+          io_dreq3_n_odn : out io_dreq3_n_odn_t;
+          io_d0_out_ds : out io_d0_out_ds_t;
+          io_d0_out_sr : out io_d0_out_sr_t;
+          io_d0_out_co : out io_d0_out_co_t;
+          io_d0_out_odp : out io_d0_out_odp_t;
+          io_d0_out_odn : out io_d0_out_odn_t;
+          io_d0_in_ste : out io_d0_in_ste_t;
+          io_d0_in_pd : out io_d0_in_pd_t;
+          io_d0_in_pu : out io_d0_in_pu_t;
+          io_d1_out_ds : out io_d1_out_ds_t;
+          io_d1_out_sr : out io_d1_out_sr_t;
+          io_d1_out_co : out io_d1_out_co_t;
+          io_d1_out_odp : out io_d1_out_odp_t;
+          io_d1_out_odn : out io_d1_out_odn_t;
+          io_d1_in_ste : out io_d1_in_ste_t;
+          io_d1_in_pd : out io_d1_in_pd_t;
+          io_d1_in_pu : out io_d1_in_pu_t;
+          io_d2_out_ds : out io_d2_out_ds_t;
+          io_d2_out_sr : out io_d2_out_sr_t;
+          io_d2_out_co : out io_d2_out_co_t;
+          io_d2_out_odp : out io_d2_out_odp_t;
+          io_d2_out_odn : out io_d2_out_odn_t;
+          io_d2_in_ste : out io_d2_in_ste_t;
+          io_d2_in_pd : out io_d2_in_pd_t;
+          io_d2_in_pu : out io_d2_in_pu_t;
+          io_d3_out_ds : out io_d3_out_ds_t;
+          io_d3_out_sr : out io_d3_out_sr_t;
+          io_d3_out_co : out io_d3_out_co_t;
+          io_d3_out_odp : out io_d3_out_odp_t;
+          io_d3_out_odn : out io_d3_out_odn_t;
+          io_d3_in_ste : out io_d3_in_ste_t;
+          io_d3_in_pd : out io_d3_in_pd_t;
+          io_d3_in_pu : out io_d3_in_pu_t;
+          io_d4_out_ds : out io_d4_out_ds_t;
+          io_d4_out_sr : out io_d4_out_sr_t;
+          io_d4_out_co : out io_d4_out_co_t;
+          io_d4_out_odp : out io_d4_out_odp_t;
+          io_d4_out_odn : out io_d4_out_odn_t;
+          io_d4_in_ste : out io_d4_in_ste_t;
+          io_d4_in_pd : out io_d4_in_pd_t;
+          io_d4_in_pu : out io_d4_in_pu_t;
+          io_d5_out_ds : out io_d5_out_ds_t;
+          io_d5_out_sr : out io_d5_out_sr_t;
+          io_d5_out_co : out io_d5_out_co_t;
+          io_d5_out_odp : out io_d5_out_odp_t;
+          io_d5_out_odn : out io_d5_out_odn_t;
+          io_d5_in_ste : out io_d5_in_ste_t;
+          io_d5_in_pd : out io_d5_in_pd_t;
+          io_d5_in_pu : out io_d5_in_pu_t;
+          io_d6_out_ds : out io_d6_out_ds_t;
+          io_d6_out_sr : out io_d6_out_sr_t;
+          io_d6_out_co : out io_d6_out_co_t;
+          io_d6_out_odp : out io_d6_out_odp_t;
+          io_d6_out_odn : out io_d6_out_odn_t;
+          io_d6_in_ste : out io_d6_in_ste_t;
+          io_d6_in_pd : out io_d6_in_pd_t;
+          io_d6_in_pu : out io_d6_in_pu_t;
+          io_d7_out_ds : out io_d7_out_ds_t;
+          io_d7_out_sr : out io_d7_out_sr_t;
+          io_d7_out_co : out io_d7_out_co_t;
+          io_d7_out_odp : out io_d7_out_odp_t;
+          io_d7_out_odn : out io_d7_out_odn_t;
+          io_d7_in_ste : out io_d7_in_ste_t;
+          io_d7_in_pd : out io_d7_in_pd_t;
+          io_d7_in_pu : out io_d7_in_pu_t;
+          io_ldout_n_ds : out io_ldout_n_ds_t;
+          io_ldout_n_sr : out io_ldout_n_sr_t;
+          io_ldout_n_co : out io_ldout_n_co_t;
+          io_ldout_n_odp : out io_ldout_n_odp_t;
+          io_ldout_n_odn : out io_ldout_n_odn_t;
+          io_next_n_ds : out io_next_n_ds_t;
+          io_next_n_sr : out io_next_n_sr_t;
+          io_next_n_co : out io_next_n_co_t;
+          io_next_n_odp : out io_next_n_odp_t;
+          io_next_n_odn : out io_next_n_odn_t;
+          io_clk_ds : out io_clk_ds_t;
+          io_clk_sr : out io_clk_sr_t;
+          io_clk_co : out io_clk_co_t;
+          io_clk_odp : out io_clk_odp_t;
+          io_clk_odn : out io_clk_odn_t;
+          io_ioa_n_ds : out io_ioa_n_ds_t;
+          io_ioa_n_sr : out io_ioa_n_sr_t;
+          io_ioa_n_co : out io_ioa_n_co_t;
+          io_ioa_n_odp : out io_ioa_n_odp_t;
+          io_ioa_n_odn : out io_ioa_n_odn_t;
 
 
           -- SPI Interface

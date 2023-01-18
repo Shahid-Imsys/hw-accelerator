@@ -41,7 +41,6 @@ entity pe1_cpc is
     -- Clock and reset inputs
     rst_cn      : in std_logic;      -- system reset
     clk_p       : in std_logic;
-    clk_s_pos   : in std_logic;      -- SP clock
     clk_e_pos   : in std_logic;      -- exe clock
     -- Control inputs
     runmode     : in std_logic;      -- TIM in run mode
@@ -51,7 +50,6 @@ entity pe1_cpc is
     ld_mpgm     : in std_logic;      -- ZH
     -- Data inputs
     mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
-    pmem_q      : in std_logic_vector(1 downto 0);  -- Patch memory data
     curr_mpga   : in std_logic_vector(7 downto 0); -- Current pe1_mpgm address
     mar         : in std_logic_vector(7 downto 0); -- MAR register, from CLC
     dbus        : in std_logic_vector(7 downto 0); -- D bus
@@ -73,13 +71,8 @@ entity pe1_cpc is
     dfsr        : out std_logic_vector(7 downto 0);  -- data to 'MPLL'
     -- External pins
     msdin       : in  std_logic;         -- Serial data input
-    msdout      : out std_logic;         -- Serial data out
---    -- TRCMEM signals
-    trcmem_q    : in  std_logic_vector(31 downto 0); -- Data in from trace memory
-    trcmem_d    : out std_logic_vector(31 downto 0); -- Data out to trace memory
-    trcmem_a    : out std_logic_vector(7 downto 0);  -- Trace memory address
-    trcmem_ce_n : out std_logic;        -- Trace memory chip select(active low)
-    trcmem_we_n : out std_logic);       -- Trace memory write enable(active low)
+    msdout      : out std_logic         -- Serial data out
+  );
     attribute dont_touch : string;
     attribute dont_touch of pe1_cpc : entity is "yes";
 end pe1_cpc;
@@ -96,10 +89,6 @@ architecture rtl of pe1_cpc is
   signal byte_cnt       : std_logic_vector(3 downto 0);--std_logic_vector(3 downto 0);--CJ
   signal byte_cnt_zero  : std_logic;
   signal dbreg          : std_logic_vector(7 downto 0);
-  -- TRC signals
-  constant mem_addr_sz  : positive := 8;
-  signal rdata          : std_logic_vector(7 downto 0);
-  signal go             : std_logic;
   -- Internal copies
   signal dfsr_int       : std_logic_vector(7 downto 0);
   signal plsel_nint     : std_logic;
@@ -134,7 +123,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 rx_en <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 rx_en <= (not msdin or rx_en) and not rx_stop and not cnt_tc;
         end if;
       end if;
@@ -147,7 +136,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             sipo_reg <= (others => '0');
-        elsif rx_en = '1' and clk_s_pos = '0' then
+        elsif rx_en = '1' then
           sipo_reg <= msdin & sipo_reg(7 downto 1);
         end if;
       end if;
@@ -161,7 +150,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if rx_en = '1' then
                     cnt <= cnt + 1;
                 else
@@ -179,7 +168,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 rx_stop <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 rx_stop <= cnt_tc;
             end if;
         end if;
@@ -206,7 +195,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 msdout_int <= '1';
-            elsif clk_s_pos = '0' then
+            else
                 if tx_load = '1' then
                     msdout_int <= '0';
                 elsif msdout_int = '0' or tx_en = '1' then
@@ -226,7 +215,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 tx_en <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 tx_en <= not msdout_int or (tx_en and not cnt_tc);
             end if;
         end if;
@@ -241,7 +230,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             piso_reg <= (others => '0');
-        elsif clk_s_pos = '0' then
+        else
             if tx_load = '1' then
               piso_reg <= dtsr;
             elsif msdout_int = '0' or tx_en = '1' then
@@ -259,7 +248,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if tx_en = '1' then
                     cnt <= cnt + 1;
                 else
@@ -291,7 +280,7 @@ begin
             if rst_cn = '0' then
                 cmd_reg <= (others => '0');
                 byte_cnt <= (others => '0');
-            elsif clk_s_pos = '0' then
+            else
                 if tx_load = '1' then
                     cmd_reg <= (others => '0');
                     byte_cnt <= (others => '0');
@@ -330,7 +319,7 @@ begin
         if rising_edge(clk_p) then--rising_edge(clk_s)
             if rst_cn = '0' then
                 byte_rec_dly <= '0';
-            elsif clk_s_pos = '0' then
+            else
                 byte_rec_dly <= byte_rec;
             end if;
         end if;
@@ -361,7 +350,7 @@ begin
                 plsel_nint      <= '0';
                 plcpe_nint      <= '1';
                 mpram_we_nint   <= '1';
-            elsif wcdap = '1' and clk_s_pos = '0' then
+            elsif wcdap = '1' then
                 plsel_nint    <= dfsr_int(0);
                 plcpe_nint    <= dfsr_int(1);
                 mpram_we_nint <= dfsr_int(2);
@@ -377,7 +366,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             dtcl <= (others => '0');
-        elsif wdclc = '1' and clk_s_pos = '0' then
+        elsif wdclc = '1' then
             dtcl <= dfsr_int;
         end if;
       end if;
@@ -389,7 +378,7 @@ begin
       if rising_edge(clk_p) then--rising_edge(clk_s)
         if rst_cn = '0' then
             dtal <= (others => '0');
-        elsif wdalc = '1' and clk_s_pos = '0' then
+        elsif wdalc = '1' then
             dtal <= dfsr_int;
         end if;
       end if;
@@ -424,7 +413,7 @@ begin
   begin
 
     -- Mux for microprogram data. Feeds into the dtsr mux below.
-    mpd_mux: process(byte_cnt, mp_q, pmem_q)
+    mpd_mux: process(byte_cnt, mp_q)
     begin
       case byte_cnt is
         when "0001" =>
@@ -469,7 +458,7 @@ begin
     -- Mux for data to transmit shift register (dtsr).
     dtsr_mux: process(tx_sel, dbus, ybus, mar, mpd_muxout, mpram_we_nint,
                       plcpe_nint, plsel_nint, runmode, spreq_n, spack_n,
-                      rdata, go, dbreg)
+                      dbreg)
     begin
       case tx_sel is
         when "000" =>
@@ -486,10 +475,11 @@ begin
         when "101" =>
           dtsr <= dbreg;
         when "110" =>
-          dtsr <= runmode & '0' & spreq_n & spack_n & go &
-                  mpram_we_nint & plcpe_nint & plsel_nint;
+          dtsr <= x"00";
+        --  dtsr <= runmode & '0' & spreq_n & spack_n &
+        --          mpram_we_nint & plcpe_nint & plsel_nint;
         when "111" =>
-          dtsr <= rdata;
+          dtsr <= x"00";
         when others => null;
       end case;
     end process dtsr_mux;
@@ -520,35 +510,33 @@ begin
     end process;
 
 --    -- Instance of trace
-    trace : entity work.pe1_debug_trace
-      generic map(
-        mem_addr_sz     => mem_addr_sz,
-        set_trace_cmd   => x"6",
-        go_trace_cmd    => x"7",
-        read_trace_cmd  => x"F")
-      port map(
+--    trace : entity work.pe1_debug_trace
+--      generic map(
+--        mem_addr_sz     => mem_addr_sz,
+--        set_trace_cmd   => x"6",
+--        go_trace_cmd    => x"7",
+--        read_trace_cmd  => x"F")
+--      port map(
 --        clk_e   => clk_e,
-        clk_p   => clk_p,
-        clk_e_pos => clk_e_pos,
-        clk_s_pos   => clk_s_pos,
-        rst_cn     => rst_cn,
-        go      => go,
-        wdata   => wdata,
-        wr      => byte_rec,
-        cmdstrt => cmdstrt,
-        cmdend  => cmdend,
-        rdata   => rdata,
-        rd      => rd,
-        rsel    => open,
-        mpg_a   => curr_mpga,
-        d       => dbus,
-        y       => ybus,
-        i       => trcmem_q,
-        o       => open,--trcmem_d,
-        a       => trcmem_a,
-        adsc_n  => trcmem_ce_n,
-        gw_n    => open,--trcmem_we_n,
-        oe_n    => open);
+--        clk_p   => clk_p,
+--        clk_e_pos => clk_e_pos,
+--        rst_cn     => rst_cn,
+--        go      => go,
+--        wdata   => wdata,
+--        wr      => byte_rec,
+--        cmdstrt => cmdstrt,
+--        cmdend  => cmdend,
+--        rdata   => rdata,
+--        rd      => rd,
+--        rsel    => open,
+--        mpg_a   => curr_mpga,
+--        d       => dbus,
+--        y       => ybus,
+--        o       => trcmem_d,
+--        a       => trcmem_a,
+--        adsc_n  => trcmem_ce_n,
+--        gw_n    => trcmem_we_n,
+--        oe_n    => open);
 --    go <= '0';
 --    rdata <= (others => '0');
 

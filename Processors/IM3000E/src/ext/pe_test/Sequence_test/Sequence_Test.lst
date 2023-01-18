@@ -3141,40 +3141,42 @@ FILE: ..\mpgm\Tmpgm\Sequence_Test.mas
                                                (00012) 
                                                (00013) #0000:
                                                (00014) 
-00: 0000 0000 0000 0002 204B 0504 8A80 4042/00 (00015) DSOURCE CONSTANT 20, PASS D TO W00;
+00: 0000 0000 0000 0078 0064 0406 00A0 0140/00 (00015) DSOURCE CONSTANT 80, LOAD CRBC;
                                                (00016) 
-                                               (00017) LABEL:
+01: 0000 0000 0000 0002 204B 0504 8A80 4042/00 (00017) DSOURCE CONSTANT 20, PASS D TO W00;
                                                (00018) 
-01: 0000 0000 0000 1002 0001 2504 0004 0012/00 (00019)     ASOURCE W00, DECR A, TO W00;
-02: 0000 0000 0000 4068 2062 2002 0BA0 8040/00 (00020)     GOTO LABEL IF NOT FZ;
-                                               (00021) 
-03: 0000 0000 0000 0002 004B 1504 8AC0 0042/00 (00022)     DSOURCE CONSTANT 50, PASS D TO W00;
+                                               (00019) LABEL:
+                                               (00020) 
+02: 0000 0000 0000 1002 0001 2504 0004 0012/00 (00021)     ASOURCE W00, DECR A, TO W00;
+03: 0000 0000 0000 4068 2062 2002 8AA0 A040/00 (00022)     GOTO LABEL IF NOT FZ;
                                                (00023) 
-                                               (00024) LABEL_LOOP_16:
-                                               (00025)     ( A-D
-04: 0000 0000 0000 9068 0028 1406 0030 0010/00 (00026)     DSOURCE CONSTANT 10, ASOURCE W00, SUBAD;
-05: 0000 0000 0000 4068 0262 2022 8BA0 A040/00 (00027)     GOTO LABEL_LOOP_8 IF FN;
-                                               (00028) 
-                                               (00029)     ( Else do all this code here!
+04: 0000 0000 0000 0002 004B 1504 8AC0 0042/00 (00024)     DSOURCE CONSTANT 50, PASS D TO W00;
+                                               (00025) 
+                                               (00026) LABEL_LOOP_16:
+                                               (00027)     ( A-D
+05: 0000 0000 0000 9068 0028 1406 0030 0010/00 (00028)     DSOURCE CONSTANT 10, ASOURCE W00, SUBAD;
+06: 0000 0000 0000 4068 0262 2002 0AA0 8050/00 (00029)     GOTO LABEL_LOOP_8 IF FN;
                                                (00030) 
-06: 0000 0000 0000 9002 0001 1420 0010 8012/00 (00031)     DSOURCE CONSTANT 10, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_16;
+                                               (00031)     ( Else do all this code here!
                                                (00032) 
-                                               (00033) 
-                                               (00034) LABEL_LOOP_8:
-07: 0000 0000 0000 9002 0001 0404 0010 0092/00 (00035)     DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00;
-08: 0000 0000 0000 4068 0262 2002 8AA0 A050/00 (00036)     GOTO LABEL_DONE IF FN;
-                                               (00037) 
-                                               (00038)     ( Else do all this code here!
+07: 0000 0000 0000 9002 0001 1420 0110 8012/00 (00033)     DSOURCE CONSTANT 10, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_16;
+                                               (00034) 
+                                               (00035) 
+                                               (00036) LABEL_LOOP_8:
+08: 0000 0000 0000 9002 0001 0404 0010 0092/00 (00037)     DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00;
+09: 0000 0000 0000 4068 0262 2002 8BA0 A050/00 (00038)     GOTO LABEL_DONE IF FN;
                                                (00039) 
-09: 0000 0000 0000 9002 0001 0420 8110 A092/00 (00040)     DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_8;
+                                               (00040)     ( Else do all this code here!
                                                (00041) 
-                                               (00042) 
-                                               (00043) LABEL_DONE:
+0A: 0000 0000 0000 9002 0001 0400 0010 8082/00 (00042)     DSOURCE CONSTANT 8, ASOURCE W00, SUBAD TO W00, UNC GOTO LABEL_LOOP_8;
+                                               (00043) 
                                                (00044) 
-                                               (00045) READY:
-0A: 8000 0000 0000 0068 0062 2402 8AA0 A050/00 (00046)     PE_RDY, 
-                                               (00047)     UNC GOTO READY;
-                                               (00048) 
-                                               (00049) 
-100: 8000 0000 0000 0068 0062 2406 0AA0 0040/00 (00050) #FFFF: PE_RDY; ( DEBUG_NOP;
-                                               (00051) *END*
+                                               (00045) LABEL_DONE:
+                                               (00046) 
+                                               (00047) READY:
+0B: 8000 0000 0000 0068 0062 2402 8BA0 A050/00 (00048)     PE_RDY, 
+                                               (00049)     UNC GOTO READY;
+                                               (00050) 
+                                               (00051) 
+100: 8000 0000 0000 0068 0062 2406 0AA0 0040/00 (00052) #FFFF: PE_RDY; ( DEBUG_NOP;
+                                               (00053) *END*

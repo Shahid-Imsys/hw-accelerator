@@ -57,42 +57,20 @@ entity pe1_core is
 ---------------------------------------------------------------------
     -- Clocks to/from clock block
     clk_p        : in  std_logic;  -- PLL clock
-    clk_c_en     : in  std_logic;  -- CP clock
     even_c       : in  std_logic;
     --clk_c2_pos   : in  std_logic;  -- clk_c / 2
     clk_e_pos    : out std_logic;  -- Execution clock
     clk_e_neg    : out std_logic;  -- Execution clock
-    clk_i_pos    : in  std_logic;  -- I/O clock
-    clk_d_pos    : in  std_logic;  -- DRAM clock
-    clk_s_pos    : in  std_logic;  -- SP clock
     -- Control outputs to the clock block
     rst_n        : out std_logic;  -- Asynchronous reset to clk_gen
     rst_cn       : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
-    en_d         : out std_logic;  -- Enable clk_d
     fast_d       : out std_logic;  -- clk_d speed select
-    --din_e       : out std_logic;  -- D input to FF generating clk_e
     din_i        : out std_logic;  -- D input to FF generating clk_i
     din_u        : out std_logic;  -- D input to FF generating clk_u
     din_s        : out std_logic;  -- D input to FF generating clk_s
     clk_in_off   : out std_logic;  -- close all input clock
     clk_main_off : out std_logic; -- close main clock except clk_p
     sdram_en     : out std_logic; --off chip sdram enable
-    --flash Control
-    out_line     : out std_logic;  -- one line is 8x4 = 32 bytes
-    hold_flash   : in std_logic;
-    hold_flash_d : in std_logic;
-    flash_en     : out std_logic;
-    flash_mode   : out std_logic_vector (3 downto 0);
-	  ld_dqi_flash : in std_logic;
-    -- Control signals to/from the oscillator and PLL
-    pll_frange  : out std_logic;  -- Frequency range select
-    pll_n       : out std_logic_vector(5 downto 0);   -- Multiplier
-    pll_m       : out std_logic_vector(2 downto 0);   -- Divider
-    en_xosc     : out std_logic;  -- Enable XOSC
-    en_pll      : out std_logic;  -- Enable PLL
-		sel_pll     : out std_logic;  -- Select PLL as clock source
-		test_pll    : out std_logic;  -- PLL in test mode
-    xout        : in  std_logic;  -- XOSC ref. clock output
     -- Power on signal
     pwr_ok      : in  std_logic;  -- Power is on
     -- Execution signal
@@ -105,7 +83,6 @@ entity pe1_core is
     c2_core2_en    : out std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
     c2_clkreq_gen  : out std_logic;
-    --c2_even_c      : out std_logic;
     c2_ready       : in std_logic;
     c2_crb_sel     : in  std_logic_vector(3 downto 0);
     c2_crb_out     : out std_logic_vector(7 downto 0);
@@ -118,45 +95,22 @@ entity pe1_core is
     c2_t_ras       : out std_logic_vector(2 downto 0);
     c2_t_rcd       : out std_logic_vector(1 downto 0);
     c2_t_rp        : out std_logic_vector(1 downto 0);
---    c2_en_mexec   	: out std_logic;
-    -- BMEM block signals
-    bmem_a8     : out  std_logic;
-    bmem_q      : in   std_logic_vector(7 downto 0);
-    bmem_d      : out  std_logic_vector(7 downto 0);
-    bmem_we_n   : out  std_logic;
     short_cycle : out std_logic;
-    bmem_ce_n   : out  std_logic;
     -- CC signal
     req_c1     : out std_logic;
     req_rd_c1  : out std_logic;
     ack_c1     : in std_logic;
     ddi_vld    : in std_logic; --Added by CJ
-	-- router control signals
---	router_ir_en : out std_logic;    --delete by HYX, 20141027
---	north_en	 : out std_logic;       --delete by HYX, 20141027
---	south_en	 : out std_logic;       --delete by HYX, 20141027
---	west_en	 	 : out std_logic;      --delete by HYX, 20141027
---	east_en	 	 : out std_logic;      --delete by HYX, 20141027
---	router_clk_en : out std_logic;   --delete by HYX, 20141027
     -- RTC block signals
     reset_core_n    : in std_logic;
     reset_iso       : in std_logic; -- reset isolate signal, can differ start from begginning or halt mode
-    reset_iso_clear : out std_logic;
 	  poweron_finish  : in std_logic;
     nap_rec         : in std_logic;  -- will recover from nap mode
     halt_en         : out std_logic;
     nap_en          : out std_logic;
-  --  rst_rtc     : out std_logic;  -- Reset RTC counter byte
-  --  en_fclk     : out std_logic;  -- Enable fast clocking of RTC counter byte
-  --  fclk        : out std_logic;  -- Fast clock to RTC counter byte
-    ld_bmem     : out std_logic;  -- Latch enable to the en_bmem latch
-  --  rtc_sel     : out std_logic_vector(2 downto 0);   -- RTC byte select
-  --  rtc_data    : in  std_logic_vector(7 downto 0);   -- RTC data
     --  Signals to/from Peripheral block
-    dfp         : in  std_logic_vector(7 downto 0);
     dbus        : out std_logic_vector(7 downto 0);
     rst_en      : out std_logic;
-    --rst_en2     : out std_logic;
     pd          : out std_logic_vector(2 downto 0);  -- pl_pd
     aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
     idreq       : in  std_logic_vector(7 downto 0);
@@ -170,15 +124,8 @@ entity pe1_core is
     iden        : in  std_logic;
     dqm_size    : out std_logic_vector(1 downto 0);
     adc_dac     : out std_logic;
-    en_uart1    : out std_logic;
-    en_uart2    : out std_logic;
-    en_uart3    : out std_logic;
-    en_eth      : out std_logic_vector(1 downto 0);
     en_tiu      : out std_logic;
-    run_tiu     : out std_logic;
-    en_tstamp   : out std_logic_vector(1 downto 0);
     en_iobus    : out std_logic_vector(1 downto 0);
-    ddqm        : out std_logic_vector(7  downto 0);
     irq0        : in  std_logic;  -- Interrupt request 0
     irq1        : in  std_logic;  -- Interrupt request 1
     adc_ref2v		: out	std_logic;	-- Select 2V internal ADC reference (1V)
@@ -186,8 +133,6 @@ entity pe1_core is
     -- Memory signals
 ---------------------------------------------------------------------
     -- MPROM signals
-    mprom_a     : out std_logic_vector(13 downto 0);-- Address
-    mprom_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
     mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address  -- CJ
@@ -203,24 +148,6 @@ entity pe1_core is
     gmem_q      : in  std_logic_vector(7 downto 0);
     gmem_ce_n   : out std_logic;
     gmem_we_n   : out std_logic;
-    -- IOMEM signals
-    iomem_a     : out std_logic_vector(9 downto 0);
-    iomem_d     : out std_logic_vector(15 downto 0);
-    iomem_q     : in  std_logic_vector(15 downto 0);
-    iomem_ce_n  : out std_logic_vector(1 downto 0);
-    iomem_we_n  : out std_logic;
-    -- TRCMEM signals (Trace memory)
-    trcmem_a    : out std_logic_vector(7 downto 0);
-    trcmem_d    : out std_logic_vector(31 downto 0);
-    trcmem_q    : in  std_logic_vector(31 downto 0);
-    trcmem_ce_n : out std_logic;
-    trcmem_we_n : out std_logic;
-    -- PMEM signals (Patch memory)
-    pmem_a      : out std_logic_vector(10 downto 0);
-    pmem_d      : out std_logic_vector(1  downto 0);
-    pmem_q      : in  std_logic_vector(1  downto 0);
-    pmem_ce_n   : out std_logic;
-    pmem_we_n   : out std_logic;
 ---------------------------------------------------------------------
     -- PADS
 ---------------------------------------------------------------------
@@ -233,30 +160,12 @@ entity pe1_core is
     msdin_i     : in  std_logic;  -- Serial data in (debug)
     msdout_o    : out std_logic;  -- Serial data out
     mrstout_o   : out std_logic;  -- Reset out
-    mxout_o     : out std_logic;  -- Oscillator test output
-    mexec_o     : out std_logic;  -- clk_e test output
     mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL
     mwake_i     : in  std_logic;  -- wake up
-    -- DRAM signals
-	  en_pmem2	: out std_logic; --patch memory enable for program ROM
-    d_addr      : out std_logic_vector(31 downto 0);--2012-02-09 14:00:40 maning
-    dcs_o       : out std_logic;  -- Chip select
-    dras_o      : out std_logic;  -- Row address strobe
-    dcas_o      : out std_logic;  -- Column address strobe
-    dwe_o       : out std_logic;  -- Write enable
-    ddq_i       : in  std_logic_vector(7 downto 0); -- Ext memory data input bus
-    ddq_o       : out std_logic_vector(7 downto 0); -- Data output bus
-    ddq_en      : out std_logic;  -- Data output bus enable
-    da_o        : out std_logic_vector(13 downto 0);  -- Address
-    dba_o       : out std_logic_vector(1 downto 0); -- Bank address
-    dcke_o      : out std_logic_vector(3 downto 0); -- Clock enable
     --CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
     dout_c      : out std_logic_vector(159 downto 0);
-
-    -- Port A
-    pa_i        : in  std_logic_vector(4 downto 0);
 	--pl_out          : out std_logic_vector(79 downto 0);--maning
 		-- I/O cell configuration control outputs
     d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
@@ -573,7 +482,7 @@ begin
   begin
     if rising_edge(clk_p) then--
       if rst_en_int = '0' then
-        pl <= x"8" & x"0000000000000000000000000000000";
+        pl <= x"00000000000000000000000000000000";
       elsif clk_e_pos_int = '0' then --rising_edge(clk_e)
         if exe = '1' then
           pl <= init_mpgm;
@@ -624,12 +533,8 @@ begin
       mpram_a     => mpram_a,
       mprom_oe    => mprom_oe,
       mpram_oe    => mpram_oe,
-      mprom_ce    => mprom_ce,
-      mpram_ce    => mpram_ce,
-      -- PMEM
-      pmem_a      => pmem_a,
-      pmem_q      => pmem_q,
-      pmem_ce_n   => pmem_ce_n);
+      mpram_ce    => mpram_ce
+      );
 
   --mprom_a     <= mpga; --deleted by CJ
   process(clk_p) --1 clk_e delay of input to microprogram memory
@@ -642,8 +547,6 @@ begin
   end process;
   --n_temp <= not temp;
   mpram_we_n  <= not temp1 when ld_mpgm = '1' else mpram_we_nint and lmpwe_n; --CJ
-  pmem_d      <= udo(1 downto 0);
-  pmem_we_n   <= mpram_we_nint and lmpwe_n;
 
 ---------------------------------------------------------------------
 -- CRB - configuration register block -- async reset
@@ -664,7 +567,6 @@ begin
       rd_crb      => rd_crb,
       c2_ready    => c2_ready,
       mwake_i     => mwake_i,
-      pa_i        => pa_i,
       -- Data paths
       dbus        => dbus_int,
       state_ps3   => state_ps3,
@@ -678,8 +580,6 @@ begin
       pup_irq     => pup_irq,
       en_i        => en_i,
       -- MORG register
-	    en_pmem2	  => en_pmem2,
-      en_d        => en_d,
       r_size      => r_size,
       c_size      => c_size,
       dqm_size    => dqm_size_int,
@@ -690,25 +590,15 @@ begin
       t_rp        => t_rp,
       -- PLLC register
       en_tiu      => en_tiu,
-      run_tiu     => run_tiu,
       dis_pll     => dis_pll,
       dis_xosc    => dis_xosc,
-      en_tstamp   => en_tstamp,
-      en_mxout    => en_mxout,
       clk_sel    => clk_sel,
       -- PLLM register
-			pll_frange	=> pll_frange,
-      pll_n       => pll_n,
-      pll_m       => pll_m,
       -- SECC register
       en_s        => en_s,
       speed_s     => speed_s,
       -- PMXC register
       adc_dac     => adc_dac,
-      en_uart1    => en_uart1,
-      en_uart2    => en_uart2,
-      en_uart3    => en_uart3,
-      en_eth      => en_eth,
       en_iobus    => en_iobus,
       -- UACC register
       adc_ref2v   => adc_ref2v,
@@ -721,11 +611,7 @@ begin
       en_mckout1  => en_mckout1,
       clk_in_off   => clk_in_off   ,
       clk_main_off => clk_main_off ,
-      sdram_en => sdram_en,
       reqrun      => reqrun,
-      --flash control
-      flash_en    => flash_en,
-      flash_mode => flash_mode,
 	    -- IOCTRL register & pad control   --delete by HYX, 20141027
       d_hi           => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
       d_sr           => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
@@ -737,13 +623,8 @@ begin
       p3_hi          => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
       p3_sr          => p3_sr          ,   --: out std_logic; -- Slew rate limit on port group 3 pins
     	-- BMEM block interface
-      bmem_a8     => bmem_a8,
       core2_en    => c2_core2_en,
-      bmem_q      => bmem_q ,
-      bmem_d      => bmem_d,
-      bmem_we_n   => bmem_we_n,
       short_cycle => short_cycle_int,
-      bmem_ce_n   => bmem_ce_n,
 
       crb_out_c2  => c2_crb_out,
       crb_sel_c2  => c2_crb_sel,
@@ -751,8 +632,7 @@ begin
       poweron_finish   => poweron_finish   ,-- differ start from begginning or halt mode
       nap_rec     => nap_rec     , -- will recover from nap mode
       halt_en     => halt_en     ,
-      nap_en      => nap_en      ,
-      ld_bmem     => ld_bmem);
+      nap_en      => nap_en);
 
     fast_d		    <= fast_d_int;
 	  dqm_size	    <= dqm_size_int;
@@ -780,7 +660,6 @@ begin
       -- Clock
       clk_p       => clk_p,
       even_c      => even_c,
-      clk_c_en    => clk_c_en,
       --clk_c2_pos      => clk_c2_pos,
       clk_e_pos   => clk_e_pos_int,
 	    clk_e_neg	  => clk_e_neg_int,
@@ -807,8 +686,6 @@ begin
       mbypass_i   => mbypass_i,
       -- Inputs from other pe1_core blocks
       hold_e      => hold_e_int,
-      hold_flash  => hold_flash,
-      hold_flash_d => hold_flash_d,
       gen_spreq   => gen_spreq,
       rsc_n       => rsc_n,
       stop_step   => stop_step,
@@ -819,10 +696,6 @@ begin
       wdog_n      => wdog_n,
       -- Outputs to outside pe1_core
       mrstout     => mrstout_o,
-      en_xosc     => en_xosc,
-      en_pll      => en_pll,
-      sel_pll     => sel_pll,
-      test_pll    => test_pll,
       mirqout     => mirqout_o,
       mckout1     => mckout1_o,
       --din_e       => din_e,
@@ -844,7 +717,6 @@ begin
       rst_cn      => rst_cn_int,
       rst_en      => rst_en_int,
       reset_core_n => reset_core_n,
-	    reset_iso_clear => reset_iso_clear,
       reset_iso => reset_iso
 	  );
 
@@ -1037,7 +909,6 @@ begin
       dsi           => dsi,
       gdata         => gdata,
       dtal          => dtal,
-      dfp           => dfp,
       --CJ added
       VE_OUT_D      => ve_out_d_int,
       CDFM          => cdfm_int,
@@ -1084,7 +955,6 @@ begin
       clk_p       => clk_p,
       clk_e_neg   => clk_e_neg_int,
       clk_c2_pos  => even_c,
-      clk_d_pos   => clk_d_pos,
       clk_e_pos   => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
       even_c      => even_c,
@@ -1116,23 +986,7 @@ begin
       i_double    => i_double,
       lmpen       => lmpen,
       adl_cy      => adl_cy,
-      hold_e      => mmr_hold_e,
-      -- SDRAM signals
-      d_addr      => d_addr,
-      d_cs        => dcs_o,
-      d_ras       => dras_o,
-      d_cas       => dcas_o,
-      d_we        => dwe_o,
-      d_dqi       => ddq_i,
-      d_dqo       => ddq_o,
-      --ve_data     => ve_in_int,
-      en_dqo      => ddq_en,
-      out_line    => out_line,
-	    ld_dqi_flash => ld_dqi_flash,
-      d_a         => da_o,
-      d_ba        => dba_o,
-      d_dqm       => ddqm,
-      d_cke       => dcke_o);
+      hold_e      => mmr_hold_e);
       --MPGMM_IN     => mpgmin,
       --LD_MPGM     => ld_mpgm);  --CJ
 
@@ -1166,7 +1020,6 @@ begin
       -- Clock and reset inputs
       rst_cn      => rst_cn_int,
       clk_p       => clk_p,
-      clk_s_pos   => clk_s_pos,
       clk_e_pos   => clk_e_pos_int,
       -- Control inputs
       runmode     => runmode,
@@ -1176,7 +1029,6 @@ begin
       ld_mpgm     => ld_mpgm,
       -- Data inputs
       mp_q        => mp_q,
-      pmem_q      => pmem_q,
       curr_mpga   => curr_mpga,
       mar         => mar,
       dbus        => dbus_int,
@@ -1198,13 +1050,7 @@ begin
       dfsr        => dfsr,
       -- External pins
       msdin       => msdin_i,
-      msdout      => msdout_o,--,
-      -- TRCMEM signals
-      trcmem_q    => trcmem_q,
-      trcmem_d    => trcmem_d,
-      trcmem_a    => trcmem_a,
-      trcmem_ce_n => trcmem_ce_n,
-      trcmem_we_n => trcmem_we_n
+      msdout      => msdout_o
       );
 
 ---------------------------------------------------------------------
@@ -1216,12 +1062,10 @@ begin
       --ack_sig        => ack_sig,  --CJ
       rst_en         => rst_en_int,
       clk_p          => clk_p,
-      clk_c_en       => clk_c_en,
       clk_c2_pos     => even_c,
       clk_e_pos      => clk_e_pos_int,
       clk_e_neg      => clk_e_neg_int,
       --gate_e         => clk_e_pos_int,
-      clk_i_pos      => clk_i_pos,
       -- Microprogram fields
       pl             => pl,
       -- Static control inputs
@@ -1247,13 +1091,7 @@ begin
       ilioa          => ilioa,
       ildout         => ildout,
       inext          => inext,
-      iden           => iden,
-      -- IOMEM signals
-      iomem_ce_n     => iomem_ce_n,
-      iomem_we_n     => iomem_we_n,
-      iomem_a        => iomem_a,
-      iomem_d        => iomem_d,
-      iomem_q        => iomem_q);
+      iden           => iden);
 
       --CJ Added
 ---------------------------------------------------------------------

@@ -19,7 +19,6 @@
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use work.Acc_types_pkg.all;
 
 package noc_types_pkg is
   subtype BYTE2 is std_logic_vector(7 downto 0); 

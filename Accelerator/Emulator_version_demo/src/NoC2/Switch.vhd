@@ -60,17 +60,35 @@ begin
     switch_mux_In(14)   <= switch_Input(119 downto 112);
     switch_mux_In(15)   <= switch_Input(127 downto 120);
 
-	process (Decoder,switch_mux_In)
-    begin
-		for i in 0 to 15 loop
-			if Decoder(i) ='1' then
-				switch_bus <= switch_mux_In(i);
---			else 
---			 	switch_bus <= (others => '0');  --for removing inferring latch
-			end if;
-		end loop;
-	end process;
-	
+--	process (Decoder,switch_mux_In)
+--    begin
+--		for i in 0 to 15 loop
+--			if Decoder(i) ='1' then
+--				switch_bus <= switch_mux_In(i);
+----			else 
+----			 	switch_bus <= (others => '0');  --for removing inferring latch
+--			end if;
+--		end loop;
+--	end process;
+
+    switch_bus <= switch_mux_In(0) when Decoder(0) ='1' else
+                  switch_mux_In(1) when Decoder(1) ='1' else
+                  switch_mux_In(2) when Decoder(2) ='1' else
+                  switch_mux_In(3) when Decoder(3) ='1' else
+                  switch_mux_In(4) when Decoder(4) ='1' else
+                  switch_mux_In(5) when Decoder(5) ='1' else
+                  switch_mux_In(6) when Decoder(6) ='1' else
+                  switch_mux_In(7) when Decoder(7) ='1' else
+                  switch_mux_In(8) when Decoder(8) ='1' else
+                  switch_mux_In(9) when Decoder(9) ='1' else
+                  switch_mux_In(10) when Decoder(10) ='1' else
+                  switch_mux_In(11) when Decoder(11) ='1' else
+                  switch_mux_In(12) when Decoder(12) ='1' else
+                  switch_mux_In(13) when Decoder(13) ='1' else
+                  switch_mux_In(14) when Decoder(14) ='1' else
+                  switch_mux_In(15) when Decoder(15) ='1' else
+                  (others => '0');
+                                    	
 	process (switch_mux_In,switch_input_muxes)
     begin
 		for i in 0 to 15 loop

@@ -358,7 +358,7 @@ architecture rtl of digital_chip is
   signal io_ldout_n_out    : std_logic;	
   signal io_next_n_out     : std_logic;	
   signal io_clk_out	       : std_logic;  
-<<<<<<< HEAD
+
   signal io_ioa_n_out	   : std_logic; */  
            
   
@@ -382,10 +382,6 @@ architecture rtl of digital_chip is
   signal enet_rxd1_in       : std_logic;
   --signal enet_rxd2_in       : std_logic;    -- RMII Not used
   signal enet_rxer_in       : std_logic;      -- RMII RX_ER to RXD3
-=======
-  signal io_ioa_n_out	   : std_logic;
-*/
->>>>>>> 4dc8446b9d0cb57d8797fb64fcec4b4a7be06edd
     
 					        
   signal spi_sclk_in        : std_logic;
@@ -494,18 +490,11 @@ begin  -- architecture rtl
         pll_ref_clk   => pll_ref_clk_in,
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
-<<<<<<< HEAD
-        MRESET  => mreset,
-        MRSTOUT => mrstout,  -- Missing pad.
-        MIRQOUT => mirqout_out,
-        MCKOUT0 => mckout0,
-        MCKOUT1 => MCKOUT1,
-        MTEST   => mtest_in,
-        MIRQ0   => mirq0,
-        MIRQ1   => mirq1,
-=======
+
+
+
         MRESET        => mreset,
-        MRSTOUT       => mrstout_n,  -- Missing pad.
+        MRSTOUT       => mrstout,  -- Missing pad.
         MIRQOUT       => mirqout_out,
         MCKOUT0       => mckout0,
         MCKOUT1       => MCKOUT1,
@@ -514,7 +503,7 @@ begin  -- architecture rtl
         MBYPASS       => '0', --MBYPASS,
         MIRQ0         => mirq0,
         MIRQ1         => mirq1,
->>>>>>> 4dc8446b9d0cb57d8797fb64fcec4b4a7be06edd
+
         -- SW debug
         MSDIN         => msdin_in,
         MSDOUT        => msdout_out,

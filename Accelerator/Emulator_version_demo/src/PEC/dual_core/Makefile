@@ -11,7 +11,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/ram64x8.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_sct.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_stack9x14.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_debug_trace.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/vetypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/instructiontypes.vhd \
 				  $(DUAL_CORE_DIR_WIN)/VE_Ver2/fpga_mem64x64.vhd \
@@ -60,7 +59,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acore.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SU180_256X128X1BM1A.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SY180_1024X8X1CM8.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_flash_inf.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_ios.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_core.vhd \
 				  $(DUAL_CORE_DIR_WIN)/PE_pair_top.vhd

@@ -134,7 +134,7 @@ architecture rtl of fpga_top is
       MPMIC_IO   : out std_logic;
 
       -- Analog internal signals
-      pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+      pwr_ok     : in  std_logic;       -- Power on detector output (active high)
       dis_bmem   : out std_logic;       -- Disable for vdd_bmem (active high)
       vdd_bmem   : in  std_logic;       -- Power for the BMEM block
       VCC18LP    : in  std_logic;       -- Power for the RTC block
@@ -142,10 +142,10 @@ architecture rtl of fpga_top is
       ach_sel0   : out std_logic;       -- ADC channel select, bit 0
       ach_sel1   : out std_logic;       -- ADC channel select, bit 1
       ach_sel2   : out std_logic;       -- ADC channel select, bit 2
-      adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
-      adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
-      adc_extref : out std_logic;  -- Select external ADC reference (internal)
-      adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
+      adc_bits   : in  std_logic;       -- Bitstream from the analog part of ADC
+      adc_ref2v  : out std_logic;       -- Select 2V internal ADC reference (1V)
+      adc_extref : out std_logic;       -- Select external ADC reference (internal)
+      adc_diff   : out std_logic;       -- Select differential ADC mode (single-ended)
       adc_en     : out std_logic;       -- Enable for the ADC
       dac0_bits  : out std_logic;       -- Bitstream to DAC0
       dac1_bits  : out std_logic;       -- Bitstream to DAC1
@@ -215,8 +215,6 @@ architecture rtl of fpga_top is
       ospi_rwds_in     : in  std_logic;
       ospi_rwds_out    : out std_logic;
       ospi_rwds_enable : out std_logic;
-
-      led_clk        : out std_logic;
 
       -- SPI, chip control interface
       spi_sclk      : in  std_logic;
@@ -450,6 +448,8 @@ begin
   -- These two need to have a 1/2 relationship
   HCLK      <= clk_50m;
   clk_p_acc <= clk_100m;
+  
+  led_clk   <= clk_100m;
 
   digital_top_inst : digital_top
     generic map (
@@ -544,8 +544,6 @@ begin
       ospi_rwds_in     => OSPI_RWDS_i,
       ospi_rwds_out    => OSPI_RWDS_o,
       ospi_rwds_enable => OSPI_RWDS_e,
-
-      led_clk => led_clk,
 
       spi_sclk      => spi_sclk,
       spi_cs_n      => spi_cs_n,

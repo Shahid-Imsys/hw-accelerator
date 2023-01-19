@@ -111,18 +111,18 @@ entity top is
     clock_in_off : out std_logic;
 
     -- Analog internal signals
-    pwr_ok     : in  std_logic;  -- Power on detector output (active high)
+    pwr_ok     : in  std_logic;         -- Power on detector output (active high)
     dis_bmem   : out std_logic;         -- Disable for vdd_bmem (active high)
     vdd_bmem   : in  std_logic;         -- Power for the BMEM block
     VCC18LP    : in  std_logic;         -- Power for the RTC block
-    rxout      : in  std_logic;         -- RTC oscillator output
+    rxout      : in  std_logic;         -- RTC oscillator input
     ach_sel0   : out std_logic;         -- ADC channel select, bit 0
     ach_sel1   : out std_logic;         -- ADC channel select, bit 1
     ach_sel2   : out std_logic;         -- ADC channel select, bit 2
-    adc_bits   : in  std_logic;  -- Bitstream from the analog part of ADC
-    adc_ref2v  : out std_logic;  -- Select 2V internal ADC reference (1V)
-    adc_extref : out std_logic;  -- Select external ADC reference (internal)
-    adc_diff   : out std_logic;  -- Select differential ADC mode (single-ended)
+    adc_bits   : in  std_logic;         -- Bitstream from the analog part of ADC
+    adc_ref2v  : out std_logic;         -- Select 2V internal ADC reference (1V)
+    adc_extref : out std_logic;         -- Select external ADC reference (internal)
+    adc_diff   : out std_logic;         -- Select differential ADC mode (single-ended)
     adc_en     : out std_logic;         -- Enable for the ADC
     dac0_bits  : out std_logic;         -- Bitstream to DAC0
     dac1_bits  : out std_logic;         -- Bitstream to DAC1
@@ -663,6 +663,20 @@ architecture struct of top is
 
 begin
 
+  -- Dummy drivers for currently non connected signals
+  ach_sel0     <= '0';
+  ach_sel1     <= '0';
+  ach_sel2     <= '0';
+  adc_bits_int <= '0';
+  --
+  dac0_bits <= '0';
+  dac1_bits <= '0';
+  dac0_en   <= '0';
+  dac1_en   <= '0';
+  --
+  tiu_tstamp <= '0';
+
+
   -- IO-bus signals to NOC adapter
   ext_i_pos  <= clk_i_pos;
   ext_ilioa  <= ilioa;
@@ -990,9 +1004,9 @@ begin
       xout_selected => xout_selected,
       lp_pwr_ok     => MLP_PWR_OK,
       rxout         => rxout,           -- 32KHz oscillator input
-      mrxout_o      => mrxout_o,  -- 32KHz oscillator output or external wake
+      mrxout_o      => mrxout_o,        -- 32KHz oscillator output or external wake
       rst_rtc       => rst_rtc,         -- Reset RTC counter byte
-      en_fclk       => en_fclk,   -- Enable fast clocking of RTC counter byte
+      en_fclk       => en_fclk,         -- Enable fast clocking of RTC counter byte
       fclk          => fclk,            -- Fast clock to RTC counter byte
       ld_bmem       => ld_bmem,         -- Latch enable to the dis_bmem latch
       rtc_sel       => rtc_sel,         -- RTC byte select

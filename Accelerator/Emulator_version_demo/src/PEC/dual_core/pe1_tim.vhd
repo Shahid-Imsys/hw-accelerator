@@ -59,7 +59,6 @@ entity pe1_tim is
 		-- Clock
 		clk_p           : in  std_logic; -- clock buffer to PLL
 		even_c          : in std_logic;
-		clk_c_en        : in  std_logic; -- PLL clock input
 		--clk_c2_pos  : out  std_logic; -- clk_c / 2
 		clk_e_pos       : out  std_logic; -- Execution clock input
 		clk_e_neg       : out std_logic;
@@ -90,8 +89,6 @@ entity pe1_tim is
 		mbypass_i       : in  std_logic; -- MBYPASS pad input
 		-- Inputs from other pe1_core blocks
 		hold_e          : in  std_logic; -- Hold input for clk_e, stops high when set
-		hold_flash      : in  std_logic;
-		hold_flash_d    : in std_logic;
 		gen_spreq       : in  std_logic; -- Generate SPREQ (act H)
 		rsc_n           : in  std_logic; -- DCRS command from CPC (active low)
 		stop_step       : in  std_logic; -- SSCU command from CPC (active high)
@@ -104,14 +101,9 @@ entity pe1_tim is
 		-- power down wake up reset , added by HYX, 20150706
 		reset_core_n    : in std_logic;
 		reset_iso       : in std_logic;  -- isolate the reset by power_ok
-		reset_iso_clear : out std_logic;
 
 		-- Outputs to outside pe1_core
 		mrstout         : out std_logic; -- MRSTOUT pad output
-		en_xosc         : out std_logic; -- enable XOSC
-		en_pll          : out std_logic; -- enable PLL
-		sel_pll         : out std_logic; -- select PLL as clock source
-		test_pll        : out std_logic; -- PLL in test mode
 		mirqout         : out std_logic; -- MIRQOUT pin, for irq to SP (act low)
 		mckout1         : out std_logic; -- Programmable division of clk_c, to external pin
 		--din_e      : out std_logic; -- To clock block for clk_e generation
@@ -195,7 +187,7 @@ begin
 -------------------------------------------------------------------------------
 	rst_nint_int0 <= (pwr_ok or reset_iso) and mreset and wdog_n;
 
-	reset_iso_clear <= pwr_ok and rst_cn_int;--reset isolate will be cleared if power ok and reset is finished
+	--reset_iso_clear <= pwr_ok and rst_cn_int;--reset isolate will be cleared if power ok and reset is finished
 
 	process (clk_p, rst_nint_int0, reset_core_n)
 	begin
@@ -221,9 +213,8 @@ begin
   	rst_n <= rst_nint;
 --	en_pll_int <= (not dis_pll) and (not mbypass_i) and rst_nint;
 	en_pll_int <= (not dis_pll) and (not mbypass_i);--clock can be switched to external clock but still keep PLL active
-	en_pll <= en_pll_int and rst_nint;-- use for pll pdn
- 	test_pll	<= mtest_i_int1 ;--and mpordis_i
-	en_xosc <= (not dis_xosc) and rst_nint;
+	--en_pll <= en_pll_int and rst_nint;-- use for pll pdn
+ 	--test_pll	<= mtest_i_int1 ;--and mpordis_i
 
 	-- First step of rst_cn_cnt, clock with clkreq_gen, it
 	-- contains no spikes.
@@ -302,7 +293,6 @@ begin
 			end if;
 		end if;
 	end process sel_pll_gen;
-	sel_pll <= sel_pll_int;
 
 ---------------------------------------------------------------------
 -- Reset generation
@@ -332,8 +322,8 @@ begin
 	-- Generate din_e, this is the D input expression for the
 	-- FF in the clock block that generates clk_e. Also generate
 	-- gate_e, a copy of clk_e used for gating, not for clocking.
-	clk_e_neg <= not even_c or held_e_int or hold_flash;
-  clk_e_pos <= even_c or held_e_int or hold_flash;
+	clk_e_neg <= not even_c or held_e_int;
+  clk_e_pos <= even_c or held_e_int;
     --gate_e <= even_c or held_e_int;
 
 	-- These FFs split clk_c by four and eight for clk_i generation.
@@ -344,7 +334,7 @@ begin
 		    if rst_cn_int = '0' or en_i = '0' then
 			    split_i4 <= '0';
 			    split_i8 <= '0';
-		    elsif clk_c_en = '1' then
+        else
 			    if speed_i = "10" or speed_i = "11" then
 				    split_i4 <= not even_c xor split_i4;
 			    end if;
@@ -392,7 +382,7 @@ begin
 	    if rising_edge(clk_p) then
 		    if rst_cn_int = '0' then
 			    gate_i <= '1';
-		    elsif (clk_c_en = '1') then
+        else
 			    gate_i <= din_i_int;
 			end if;
 		end if;
@@ -416,7 +406,7 @@ begin
 		    if rst_cn_int = '0' then
 			    fract_u <= "000";
 			    ctr_u <= "0000";
-		    elsif clk_c_en = '1' then
+        else
 			    if ctr_u = "0000" then
 				    fract_u <= sum_u(2 downto 0);
 				    ctr_u <= speed_u(6 downto 3) + sum_u(3);
@@ -438,7 +428,7 @@ begin
 		    if rst_cn_int = '0' or en_s = '0' then
 			    split_s4 <= '0';
 			    split_s8 <= '0';
-		    elsif clk_c_en = '1' then
+        else
 			    if speed_s = "10" or speed_s = "11" then
 				    split_s4 <= not even_c xor split_s4;
 			    end if;
@@ -475,7 +465,7 @@ begin
 	    if rising_edge(clk_p) then
 		    if rst_cn_int = '0' then
 			    gate_s <= '1';
-		    elsif (clk_c_en = '1') then
+        else
 			    gate_s <= din_s_int;
 			end if;
 		end if;
@@ -646,7 +636,7 @@ begin
 	-- held_e is high when hold_e is high or runmode is low.
 	-- single_step high overrides hold_e though, and forces
 	-- held_e low.
-	held_e_int <= (not single_step) and (hold_e or (not runmode_int) or hold_flash_d);
+	held_e_int <= (not single_step) and (hold_e or (not runmode_int));
 	held_e <= held_e_int;
 
 ---------------------------------------------------------------------
@@ -688,7 +678,7 @@ begin
 			    spackn_int <= '0';
 			    spack_cmd_c2 <= '0';
 		    elsif (even_c = '0') then
-			    if call_sp = '1' and held_e_int = '0' and hold_flash = '0' then
+			    if call_sp = '1' and held_e_int = '0' then
 			    	spackn_int <= '1';
 			    elsif spack_cmd = '1' and spack_cmd_c2 = '0' then
 			    	spackn_int <= '0';
@@ -716,7 +706,7 @@ begin
 		    elsif even_c = '0' then
 			    if gen_spreq = '1' and gen_spreq_c2 = '0' then
 			    	spreqn_int <= '0';
-			    elsif ack_spreq = '1' and held_e_int = '0' and hold_flash = '0' then
+			    elsif ack_spreq = '1' and held_e_int = '0' then
 			    	spreqn_int <= '1';
 			    end if;
 			    gen_spreq_c2 <= gen_spreq;

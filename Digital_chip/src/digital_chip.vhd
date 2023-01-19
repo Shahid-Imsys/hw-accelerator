@@ -119,18 +119,17 @@ entity digital_chip is
     msdout  : inout std_logic;
     mirqout : inout std_logic;
 
-
     -- IM4000 Boot interface
     pa0_sin : inout std_logic;
     pa5_cs_n : inout std_logic;
     pa6_sck : inout std_logic;
     pa7_sout : inout std_logic;
 
-    -- I/O bus
-
-    -- DAC and ADC pins
+    -- DAC pins
     aout0 : inout std_logic;
     aout1 : inout std_logic;
+    
+    -- ADC pin
     ach0  : inout  std_logic;
 
     -- UART
@@ -315,7 +314,7 @@ architecture rtl of digital_chip is
   
   signal mtest_in : std_logic;
   signal mwake_in : std_logic;
-  signal mrxout_out : std_logic;
+  signal mrxout_in : std_logic;
 
   signal d_lo : std_logic;
   signal p1_hi : std_logic;
@@ -337,7 +336,8 @@ architecture rtl of digital_chip is
   signal ospi_rwds_enable : std_logic;
  
 	--IO Interface, left open
-/*   signal io_dack0_n_in     : std_logic;	
+/*
+  signal io_dack0_n_in     : std_logic;	
   signal io_dreq0_n_out    : std_logic;	
   signal io_dack1_n_in     : std_logic;	
   signal io_dreq1_n_out    : std_logic;	
@@ -358,6 +358,7 @@ architecture rtl of digital_chip is
   signal io_ldout_n_out    : std_logic;	
   signal io_next_n_out     : std_logic;	
   signal io_clk_out	       : std_logic;  
+<<<<<<< HEAD
   signal io_ioa_n_out	   : std_logic; */  
            
   
@@ -381,6 +382,10 @@ architecture rtl of digital_chip is
   signal enet_rxd1_in       : std_logic;
   --signal enet_rxd2_in       : std_logic;    -- RMII Not used
   signal enet_rxer_in       : std_logic;      -- RMII RX_ER to RXD3
+=======
+  signal io_ioa_n_out	   : std_logic;
+*/
+>>>>>>> 4dc8446b9d0cb57d8797fb64fcec4b4a7be06edd
     
 					        
   signal spi_sclk_in        : std_logic;
@@ -489,6 +494,7 @@ begin  -- architecture rtl
         pll_ref_clk   => pll_ref_clk_in,
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
+<<<<<<< HEAD
         MRESET  => mreset,
         MRSTOUT => mrstout,  -- Missing pad.
         MIRQOUT => mirqout_out,
@@ -497,10 +503,45 @@ begin  -- architecture rtl
         MTEST   => mtest_in,
         MIRQ0   => mirq0,
         MIRQ1   => mirq1,
+=======
+        MRESET        => mreset,
+        MRSTOUT       => mrstout_n,  -- Missing pad.
+        MIRQOUT       => mirqout_out,
+        MCKOUT0       => mckout0,
+        MCKOUT1       => MCKOUT1,
+        mckout1_en    => open,
+        MTEST         => mtest_in,
+        MBYPASS       => '0', --MBYPASS,
+        MIRQ0         => mirq0,
+        MIRQ1         => mirq1,
+>>>>>>> 4dc8446b9d0cb57d8797fb64fcec4b4a7be06edd
         -- SW debug
-        MSDIN   => msdin_in,
-        MSDOUT  => msdout_out,
+        MSDIN         => msdin_in,
+        MSDOUT        => msdout_out,
 
+        MWAKEUP_LP    => '0',    -- MWAKE,
+        MLP_PWR_OK    => mreset, -- MLP_PWR_OK,
+
+        -- Analog internal signals
+        pwr_ok     => pwr_ok,
+        dis_bmem   => open,
+        vdd_bmem   => '0',
+        VCC18LP    => '1',
+        rxout      => mrxout_in,
+        ach_sel0   => open,
+        ach_sel1   => open,
+        ach_sel2   => open,
+        adc_bits   => adc_bits,
+        adc_ref2v  => open,
+        adc_extref => open,
+        adc_diff   => open,
+        adc_en     => open,
+        dac0_bits  => dac0_bits,
+        dac1_bits  => dac1_bits,
+        dac0_en    => open,
+        dac1_en    => open,
+        clk_a      => open,
+              
         -- Port A
         pa_i  => pa_i,
         pa_en => pa_en,
@@ -552,11 +593,6 @@ begin  -- architecture rtl
         p3_hi => p3_hi,
         p3_sr => p3_sr,
 
-
-        MBYPASS    => '0', --MBYPASS,
-        MWAKEUP_LP => '0', --MWAKE,
-        MLP_PWR_OK => mreset,  --MLP_PWR_OK,
-
         ospi_cs_n  => ospi_cs_n,
         ospi_ck_n  => ospi_ck_n,
         ospi_ck_p  => ospi_ck_p,
@@ -567,16 +603,7 @@ begin  -- architecture rtl
         ospi_rwds_in => ospi_rwds_in,
         ospi_rwds_out => ospi_rwds_out,
         ospi_rwds_enable => ospi_rwds_enable,
-
-        spi_sclk      => spi_sclk_in,
-        spi_cs_n      => spi_cs_n_in,
-        spi_mosi      => spi_mosi_in,
-        spi_miso      => spi_miso_out,
-        spi_miso_oe_n => spi_miso_oe_n,
-        pad_config    => pad_config,
-        pll_config    => pll_config,
-        adpll_config  => adpll_config,
-
+        
         -- enet_mdin  => enet_mdin,
         -- enet_mdout => enet_mdout,
         -- enet_mdc   => enet_mdc_out,
@@ -589,12 +616,15 @@ begin  -- architecture rtl
         -- enet_rxer  => enet_rxer_in,
         -- enet_rxd0  => enet_rxd0_in,
         -- enet_rxd1  => enet_rxd1_in,
-
-        pwr_ok   => pwr_ok,
-        vdd_bmem => '0',
-        VCC18LP  => '1',
-        rxout    => mrxout,
-        adc_bits => adc_bits
+        
+        spi_sclk      => spi_sclk_in,
+        spi_cs_n      => spi_cs_n_in,
+        spi_mosi      => spi_mosi_in,
+        spi_miso      => spi_miso_out,
+        spi_miso_oe_n => spi_miso_oe_n,
+        pad_config    => pad_config,
+        pll_config    => pll_config,
+        adpll_config  => adpll_config
       );
 
     ---------------------------------------------------------------------------
@@ -1093,6 +1123,25 @@ begin  -- architecture rtl
         odn => pad_config.io_dreq3_n.odn
         );		
 		
+    io_io_d0_pad : entity work.inoutput_pad
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => io_d0,
+        -- GPIO
+        do  => '1',
+        ds  => pad_config.io_d0.ds & "00",
+        sr  => pad_config.io_d0.sr,
+        co  => pad_config.io_d0.co,
+        oe  => '1',          
+        odp => pad_config.io_d0.odp,
+        odn => pad_config.io_d0.odn,
+        ste => pad_config.io_d0.ste,
+        pd  => pad_config.io_d0.pd,
+        pu  => pad_config.io_d0.pu,
+        di  => open
+        );
 	
     io_io_d1_pad : entity work.inoutput_pad
       generic map (
@@ -1983,21 +2032,19 @@ begin  -- architecture rtl
         );
     
       
-    --i_mrxout_pad : entity work.output_pad  input in digital_top but output pad in excel-dok?
-    --  generic map (
-    --    direction => vertical)
-    --  port map (
-    --    -- PAD
-    --    pad => mrxout,
-    --    --GPIO
-    --    do  => mrxout_out,
-    --    ds  => "1000",
-    --    sr  => '1',
-    --    co  => '0',
-    --    oe  => '1',
-    --    odp => '0',
-    --    odn => '0'
-    --    );
+    i_mrxout_pad : entity work.input_pad -- input in digital_top but output pad in excel-dok?
+      generic map (
+        direction => vertical)
+      port map (
+        -- PAD
+        pad => mrxout,
+        --GPI
+        ie  => '1',
+        ste => (others => '0'),
+        pd  => '0',
+        pu  => '0',
+        di  => mrxout_in
+        );
 
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
      --  port map (

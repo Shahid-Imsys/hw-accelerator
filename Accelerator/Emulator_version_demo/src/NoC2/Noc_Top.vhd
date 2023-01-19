@@ -331,7 +331,6 @@ architecture structural of Noc_Top is
     signal RM_Data_Out          : std_logic_vector(127 downto 0);
     --NoC_INPUT_REG
     signal NoC_Input_reg_Out    : std_logic_vector(127 downto 0);
-    signal NoC_Input_reg_Out_p  : std_logic_vector(127 downto 0);
     
     --NOC REG
     signal NOC_reg_mux_ctrl     : std_logic_vector(1 downto 0);
@@ -366,16 +365,13 @@ architecture structural of Noc_Top is
     signal FIFO_Ready3          : std_logic;
     signal PEC_WE_p1            : std_logic;
     signal PEC_WE_p2            : std_logic;
+    signal PEC_byte_data_p1     : std_logic_vector(127 downto 0);
     
     --RM ADDRESS GEN
     signal Load_IR              : std_logic;
     signal Reset_IR             : std_logic;
 	signal RM_byte_as           : unsigned(3 downto 0);
-	signal RM_as_err            : std_logic;	
-
-    attribute mark_debug : string;
-    attribute mark_debug of RM_address: signal is "true"; 
-    
+	signal RM_as_err            : std_logic;	    
 
 begin
 
@@ -393,10 +389,10 @@ begin
 		        Mode_reg <= Control_Data_Out(4 downto 0);
 		    end if;
 		    
-		    Sync_pulse_i_p      <= Sync_pulse_i;		    
-		    NoC_Input_reg_Out_p <= NoC_Input_reg_Out;
+		    Sync_pulse_i_p      <= Sync_pulse_i;
 		    PEC_WE_p2           <= PEC_WE_p1;
 		    PEC_WE_p1           <= PEC_WE;
+		    PEC_byte_data_p1    <= PEC_byte_data;
 		end if;	
 	end process;
 	
@@ -555,7 +551,7 @@ begin
         clk                     => clk,
         Reset                   => Reset,    
         write_enable            => PEC_WE_p2,
-        NoC_Input_reg_In        => PEC_byte_data,
+        NoC_Input_reg_In        => PEC_byte_data_p1,
         NoC_Input_reg_Out       => NoC_Input_reg_Out
     );
     

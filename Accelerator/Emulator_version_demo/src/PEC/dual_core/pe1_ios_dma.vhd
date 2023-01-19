@@ -40,12 +40,10 @@ entity pe1_ios_dma is
     -- Clock and reset signals
     rst_en      : in  std_logic;  -- Reset (active low)
     clk_p       : in std_logic;
-    clk_c_en    : in  std_logic;  -- Oscillator clock
     clk_c2_pos  : in  std_logic;  -- clk_c / 2
     clk_e_pos   : in  std_logic;  -- Execution clock
     clk_e_neg   : in  std_logic;  -- Execution clock
     --gate_e      : in  std_logic;  -- Copy of execution clock used for gating
-    clk_i_pos       : in  std_logic;  -- I/O clock
     -- Static control inputs
     use_direct  : in  std_logic;  -- Set when the direct bus is used
     dbl_direct  : in  std_logic;  -- Set if direct traffic is double-speed
@@ -73,16 +71,9 @@ entity pe1_ios_dma is
     idreq       : in  std_logic_vector(DMA_CHANNELS-1 downto 0);  -- DMA request
     idi         : in  std_logic_vector(7 downto 0); -- I/O data bus input from pins
     ido_core    : in  std_logic_vector(7 downto 0); -- I/O data bus input from pe1_core
-    ido_mem     : out std_logic_vector(7 downto 0); -- I/O data bus output from IOMEM
     iden_mem    : out std_logic;  -- I/O data bus enable from IOMEM
     ido_dma     : out std_logic_vector(7 downto 0); -- I/O data bus output from DMA ctrl
-    iden_dma    : out std_logic;  -- I/O data bus enable from DMA ctrl
-    -- IOMEM signals
-    iomem_ce_n  : out std_logic_vector(1 downto 0);   -- Chip enable (active low)
-    iomem_we_n  : out std_logic;  -- Write enable (active low)
-    iomem_a     : out std_logic_vector(IOMEM_ADDR_WIDTH-2 downto 0);  -- Address
-    iomem_d     : out std_logic_vector(15 downto 0);  -- Data in
-    iomem_q     : in  std_logic_vector(15 downto 0)); -- Data out
+    iden_dma    : out std_logic); -- Data out
 end pe1_ios_dma;
 
 architecture rtl of pe1_ios_dma is
@@ -153,7 +144,7 @@ begin
             dmap_sel  <= '0';
             piop_sel  <= '0';
             buf_sel   <= '0';
-        elsif clk_i_pos = '0' then
+        else
             rst_mode <= '0';
             if ilioa = '0' then
               base_sel  <= '0';
@@ -189,7 +180,7 @@ begin
     if rising_edge(clk_p) then --rising_edge(clk_i)
         if rst_en = '0' then
             byte_cnt <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             if ilioa = '0' then
               byte_cnt <= (others => '0');
             elsif any_sel = '1' and (ildout = '0' or inext = '0') and byte_cnt /= "11" then
@@ -205,7 +196,7 @@ begin
     if rising_edge(clk_p) then--rising_edge(clk_i)
         if rst_en = '0' then
             ch_sel <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             if any_sel = '1' and ildout = '0' and byte_cnt = 0 then
               ch_sel <= ido_core(DMA_CHBITS-1 downto 0);
             end if;
@@ -223,7 +214,7 @@ begin
         if rst_en = '0' then
             priority <= (others => '0');
             ber <= (others => (others => '0'));
-        elsif clk_i_pos = '0' then
+        else
             if base_sel = '1' and ildout = '0' and byte_cnt = 1 then
               priority(conv_integer(ch_sel)) <= ido_core(7);
               ber(conv_integer(ch_sel)) <= ido_core(IOMEM_ADDR_WIDTH-5 downto 0);
@@ -253,13 +244,11 @@ begin
       dir <= (others => '0');
       suse <= (others => '0');
     elsif rising_edge(clk_p) then--rising_edge(clk_i)
-        if clk_i_pos = '0' then
-            if mode_sel = '1' and ildout = '0' and byte_cnt = 1 then
-              active(conv_integer(ch_sel)) <= ido_core(7);
-              dir(conv_integer(ch_sel))    <= ido_core(6);
-              suse(conv_integer(ch_sel))   <= ido_core(5);
-            end if;
-        end if;
+      if mode_sel = '1' and ildout = '0' and byte_cnt = 1 then
+        active(conv_integer(ch_sel)) <= ido_core(7);
+        dir(conv_integer(ch_sel))    <= ido_core(6);
+        suse(conv_integer(ch_sel))   <= ido_core(5);
+      end if;
     end if;
   end process mode_regs;
   mode_out <= active(conv_integer(ch_sel)) &
@@ -343,7 +332,6 @@ begin
         clk_p    => clk_p,
         clk_c2_pos=> clk_c2_pos,
         clk_e_pos     => clk_e_pos,
-        clk_i_pos     => clk_i_pos,
         rst_en   => rst_en,
         active    => active(i),
         dir       => dir(i),
@@ -395,7 +383,7 @@ begin
     if rising_edge(clk_p) then--rising_edge(clk_i)
         if  rst_en = '0' then
             save_dmap <= (others => '0');
-        elsif clk_i_pos = '0' then
+        else
             if dmap_sel = '1' and byte_cnt = 1 and inext = '0' then
               save_dmap <= xmaddr(7 downto 0);
             end if;
@@ -412,7 +400,6 @@ begin
   pe1_ios_dackgen: entity work.pe1_ios_dackgen
     port map (
         clk_p  => clk_p,
-      clk_i_pos       => clk_i_pos,
       rst_en      => rst_en,
       idreq       => idreq,
       active      => active,
@@ -434,18 +421,18 @@ begin
   -- Chip enable to even or odd half of memory whenever processor or I/O
   -- accesses, selected by the low bit of the logical address. Enable both
   -- halves on processor double-byte accesses.
-  iomem_ce_n(0) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '0'
-                   else '0' when pio_ce = '1' and dbl_direct = '1'
-                   else '1';
-  iomem_ce_n(1) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '1'
-                   else '0' when pio_ce = '1' and dbl_direct = '1'
-                   else '1';
+  --iomem_ce_n(0) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '0'
+  --                 else '0' when pio_ce = '1' and dbl_direct = '1'
+  --                 else '1';
+  --iomem_ce_n(1) <= '0' when (pio_ce = '1' or dma_ce = '1') and maddr(0) = '1'
+  --                 else '0' when pio_ce = '1' and dbl_direct = '1'
+  --                 else '1';
 
   -- Write enable is true on write accesses from either side.
-  iomem_we_n <= '0' when (dma_we = '1' or pio_we = '1') else '1';
+  --iomem_we_n <= '0' when (dma_we = '1' or pio_we = '1') else '1';
 
   -- Physical address to both halves is high ten bits of logical address.
-  iomem_a <= maddr(IOMEM_ADDR_WIDTH-1 downto 1);
+  --iomem_a <= maddr(IOMEM_ADDR_WIDTH-1 downto 1);
 
   ------------------------------------------------------------------------------
   -- Data path
@@ -488,14 +475,14 @@ begin
   -- side is writing to memory, otherwise from the even input register
   -- when double byte transfers on the direct bus are used, else from
   -- the odd input register.
-  iomem_d(7 downto 0) <= idi when dma_we = '1' else
-                         even_in when dbl_direct = '1' else
-                         odd_in;
+  --iomem_d(7 downto 0) <= idi when dma_we = '1' else
+  --                       even_in when dbl_direct = '1' else
+  --                       odd_in;
 
   -- Data in to the odd IOMEM half, taken from the id bus when the DMA
   -- side is writing to memory, otherwise from the odd input register.
-  iomem_d(15 downto 8) <= idi when dma_we = '1' else
-                          odd_in;
+  --iomem_d(15 downto 8) <= idi when dma_we = '1' else
+  --                        odd_in;
 
   -- On I/O side read accesses, save low bit of logical address to determine
   -- from which half data shall be taken in the next cycle. Also enable the
@@ -505,7 +492,7 @@ begin
     if rising_edge(clk_p) then--rising_edge(clk_i)
         if rst_en = '0' then
             iden_mem <= '0';
-        elsif clk_i_pos = '0' then
+        else
             iden_mem <= '0';
             if dma_ce = '1' and dma_we = '0' then
               ido_sel <= maddr(0);
@@ -522,7 +509,7 @@ begin
     if rising_edge(clk_p) then
         if  rst_en = '0' then
             ido_le <= '0';
-        elsif clk_c_en = '1' then
+        else
             ido_le <= dma_ce and (not dma_we);
         end if;
     end if;
@@ -530,18 +517,18 @@ begin
 
   -- Read IOMEM data from the selected half is latched here while being
   -- presented on the I/O bus.
-  ido_mem_latch: process (iomem_q, ido_sel, ido_le)
-    variable id_mux : std_logic_vector(7 downto 0);
-  begin
-    ido_mem <= x"00";
-    if ido_le = '1' then
-      if ido_sel = '1' then
-        ido_mem <= iomem_q(15 downto 8);
-      else
-        ido_mem <= iomem_q(7 downto 0);
-      end if;
-    end if;
-  end process ido_mem_latch;
+  --ido_mem_latch: process (iomem_q, ido_sel, ido_le)
+  --  variable id_mux : std_logic_vector(7 downto 0);
+  --begin
+  --  ido_mem <= x"00";
+  --  if ido_le = '1' then
+  --    if ido_sel = '1' then
+  --      ido_mem <= iomem_q(15 downto 8);
+  --    else
+  --      ido_mem <= iomem_q(7 downto 0);
+  --    end if;
+  --  end if;
+  --end process ido_mem_latch;
 
   -- On processor side read accesses, save low bit of logical address (or
   -- rather the current piop pointer, since the logical address has changed
@@ -558,8 +545,8 @@ begin
             odd_out <= (others => '0');
         elsif next_e = '1' and clk_e_pos = '0' then
             out_sel   <= piop(conv_integer(ch_sel))(0);
-            even_out  <= iomem_q(7 downto 0);
-            odd_out   <= iomem_q(15 downto 8);
+          --  even_out  <= iomem_q(7 downto 0);
+          --  odd_out   <= iomem_q(15 downto 8);
       end if;
     end if;
   end process out_regs;

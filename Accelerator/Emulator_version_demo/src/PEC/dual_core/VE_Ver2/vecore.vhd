@@ -243,9 +243,10 @@ begin
 
   outreg <= outreg_int;
 
-  feedback_update : process(bias, clk)
+  F0 <= bias;
+  
+  feedback_update : process(clk)
   begin
-    F0 <= bias;
     if rising_edge(clk) then
       if enable_shift = '1' then
         if feedback_shift = shift_to_3 then

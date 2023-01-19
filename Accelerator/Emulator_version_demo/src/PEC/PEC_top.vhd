@@ -21,9 +21,13 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use work.cluster_pkg.all;
+use work.noc_types_pkg.all;
 
 entity PEC_top is
-  generic (USE_ASIC_MEMORIES : boolean := true);
+  generic(
+    USE_ASIC_MEMORIES      : boolean := true;
+    PEC_NUMBER             : integer := 2
+  );  
   port (
     CLK_P    : in  std_logic;
     CLK_E    : in  std_logic;
@@ -32,6 +36,7 @@ entity PEC_top is
     TAG      : in  std_logic;
     TAG_FB   : out std_logic;
     C_RDY    : out std_logic;
+    DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
     DATA     : in  std_logic_vector(7 downto 0);
     DATA_OUT : out std_logic_vector(7 downto 0)
     );
@@ -58,7 +63,8 @@ architecture struct of PEC_top is
 --Tag line
       TAG          : in  std_logic;
       TAG_FB       : out std_logic;
---Data line   
+--Data line
+      DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
       DATA         : in  std_logic_vector(7 downto 0);
       DATA_OUT     : out std_logic_vector(7 downto 0);
       EXE          : out std_logic;     --Start execution
@@ -118,7 +124,6 @@ architecture struct of PEC_top is
       EVEN_C     : in  std_logic;
       MRESET     : in  std_logic;  -- system reset               low active
       MIRQOUT    : out std_logic;       -- interrupt request output    
-      MCKOUT0    : out std_logic;       -- for trace adapter
       MCKOUT1    : out std_logic;       -- programable clock out
       MTEST      : in  std_logic;  --                            high active                 
       MBYPASS    : in  std_logic;
@@ -203,6 +208,7 @@ begin
       --RST_P  => rst_p,
       TAG          => tag,
       TAG_FB       => tag_out_i,
+      DATA_True_Broadcast   => DATA_True_Broadcast,
       DATA         => DATA,
       DATA_OUT     => data_out_i,
       exe          => exe,
@@ -272,7 +278,6 @@ begin
         EVEN_C     => even_p_i,
         MRESET     => rst_i,
         MIRQOUT    => open,
-        MCKOUT0    => open,
         MCKOUT1    => open,
         MTEST      => '0',
         MBYPASS    => '0',

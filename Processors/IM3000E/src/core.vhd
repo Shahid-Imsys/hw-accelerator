@@ -433,9 +433,11 @@ architecture struct of core is
   attribute mark_debug of pl: signal is "true";     
 
 begin
+
 ---------------------------------------------------------------------
 -- External test clock gating 
 ---------------------------------------------------------------------
+  mexec_o <= '0';
 --  mxout_o	<= xout and en_mxout when mtest_i = '1' else
 --						 '1';
 --  mexec_o	<= clk_e_pos_int and en_mexec when mtest_i = '1' else

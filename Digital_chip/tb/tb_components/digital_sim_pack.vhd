@@ -125,8 +125,8 @@ package body digital_top_sim_pack is
 
       --Error of Fast data transfer between memory function: not using in current testprogram
       when 16#A0# => write_code(core, "FASTMEM_ERR");
-      when 16#A1# => write_code(core, "FAST_ERR1");
-      when 16#A2# => write_code(core, "FAST_ERR2");
+      when 16#A1# => write_code(core, "FAST_RD_ERR");
+      when 16#A2# => write_code(core, "FAST_WR_ERR");
 
                      --when 16#A3# => write_code(core, "CORE1");
 
@@ -175,6 +175,8 @@ package body digital_top_sim_pack is
       when 16#C4# => write_code(core, "RAM0: all test task end");
       when 16#C5# => write_code(core, "RAM: all test task end");
       --when 16#C6# => write_code(core, "IOMEM_TASK_END");   --RAM1-4 read/write error
+            
+      when 16#C8# => write_code(core, "RAM_ACCESS_ERROR");
 
       when 16#CA# => write_code(core, "GMEM zero-one test begin");
       when 16#CB# => write_code(core, "GMEM checkerboard test begin");

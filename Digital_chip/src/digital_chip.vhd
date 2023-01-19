@@ -47,20 +47,26 @@ entity digital_chip is
     preset_n    : inout std_logic;  -- Power on reset
     mreset_n    : inout std_logic;  -- Functional reset
     mrstout_n   : inout std_logic;  -- reset output for external components
-
+                                    -- also used for enet_rst_n pad to make digital_chip similar to fpga_top
     -- Ethernet Interface
-    enet_mdio : inout std_logic;
-    enet_mdc  : inout std_logic;
-    enet_clk  : inout std_logic;
-    enet_txen : inout std_logic;
-    enet_txer : inout std_logic;
-    enet_txd0 : inout std_logic;
-    enet_txd1 : inout std_logic;
-    enet_rxdv : inout std_logic;
-    enet_rxer : inout std_logic;
-    enet_rxd0 : inout std_logic;
-    enet_rxd1 : inout std_logic;
+    -- enet_rst_n : out std_logic;          -- connected with mrstout_n 
 
+    enet_mdc   : out   std_logic;
+    enet_mdio  : inout std_logic;
+--    enet_txclk : inout std_logic;           -- Use RXCLK?
+    enet_txen  : out   std_logic;           -- RMII TX_EN to TX_CTL -- enet_txctl in fpga
+    enet_txd0  : out   std_logic;
+    enet_txd1  : out   std_logic;
+    --enet_txd2  : out   std_logic;         -- RMII Not used ( TODO GND or floating? )
+    enet_txer  : out   std_logic;           -- RMII TX_ER to TXD3, enet_txd3 in fpga
+    enet_clk : inout std_logic;             -- in fpga enet_rxclk
+    enet_rxdv  : inout std_logic;            -- RMII DV to RX_CTL, enet_rxctl in fpga
+    enet_rxd0  : inout std_logic;
+    enet_rxd1  : inout std_logic;
+    --enet_rxd2  : inout std_logic;         -- RMII Not used
+    enet_rxer  : inout std_logic;           -- RMII RX_ER to RXD3
+	
+	
     -- Octal_spi
     emem_clk   : out   std_logic;
     emem_rst_n : out   std_logic;
@@ -140,6 +146,7 @@ entity digital_chip is
     pg5 : inout std_logic;
     pg6 : inout std_logic;
     pg7 : inout std_logic;
+    
 
     mtest  : inout std_logic;  -- port for testmode
     mwake  : inout std_logic;  -- Wake up signal, from what???
@@ -272,20 +279,43 @@ architecture rtl of digital_chip is
 
   signal vbias : std_logic;
 
-  signal pa_o : std_logic_vector(7 downto 0);
-  signal pa_i : std_logic_vector(7 downto 0);
-  signal pa_en : std_logic_vector(7 downto 0);
+    -- Ports
+  signal pa_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pb_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pc_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pd_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pe_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pf_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pg_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal ph_i : std_logic_vector(7 downto 0) := (others => '0');
+--  signal pi_i : std_logic_vector(7 downto 0) := (others => '0');
+  signal pj_i : std_logic_vector(7 downto 0) := (others => '0');
 
+  signal pa_o : std_logic_vector(7 downto 0);
+  signal pb_o : std_logic_vector(7 downto 0);
+  signal pc_o : std_logic_vector(7 downto 0);
+  signal pd_o : std_logic_vector(7 downto 0);
+  signal pe_o : std_logic_vector(7 downto 0);
+  signal pf_o : std_logic_vector(7 downto 0);
   signal pg_o : std_logic_vector(7 downto 0);
-  signal pg_i : std_logic_vector(7 downto 0);
+  signal ph_o : std_logic_vector(7 downto 0);
+ -- signal pi_o : std_logic_vector(7 downto 0);
+  signal pj_o : std_logic_vector(7 downto 0);
+
+  signal pa_en : std_logic_vector(7 downto 0);
+  signal pb_en : std_logic_vector(7 downto 0);
+  signal pc_en : std_logic_vector(7 downto 0);
+  signal pd_en : std_logic_vector(7 downto 0);
+  signal pe_en : std_logic_vector(7 downto 0);
+  signal pf_en : std_logic_vector(7 downto 0);
   signal pg_en : std_logic_vector(7 downto 0);
+  signal ph_en : std_logic_vector(7 downto 0);
+--  signal pi_en : std_logic_vector(7 downto 0);
+  signal pj_en : std_logic_vector(7 downto 0);  
+  
   signal mtest_in : std_logic;
   signal mwake_in : std_logic;
   signal mrxout_out : std_logic;
-
-  signal pj_o : std_logic_vector(7 downto 0);
-  signal pj_i : std_logic_vector(7 downto 0);
-  signal pj_en : std_logic_vector(7 downto 0);
 
   signal d_lo : std_logic;
   signal p1_hi : std_logic;
@@ -331,29 +361,37 @@ architecture rtl of digital_chip is
   signal io_ioa_n_out	   : std_logic; */  
            
   
+--  signal enet_rst_n_out     : std_logic;
+   
+  signal enet_mdc_out       : std_logic;
+  signal enet_mdio_in    : std_logic;
+  signal enet_mdio_out    : std_logic;
+  
+   
+--  signal enet_txclk_in      : std_logic;      -- Use RXCLK?
+  signal enet_txen_out      : std_logic;      -- RMII TX_EN to TX_CTL -- enet_txctl in fpga
+  signal enet_txd0_out      : std_logic;
+  signal enet_txd1_out      : std_logic;
+  --signal enet_txd2_out    : std_logic;      -- RMII Not used ( TODO GND or floating? )
+  signal enet_txer_out      : std_logic;      -- RMII TX_ER to TXD3, enet_txd3 in fpga
+				            
+  signal enet_rxclk_in      : std_logic;        -- in fpga_top enet_rxclk
+  signal enet_rxdv_in       : std_logic;      -- RMII DV to RX_CTL, enet_rxctl in fpga
+  signal enet_rxd0_in       : std_logic;
+  signal enet_rxd1_in       : std_logic;
+  --signal enet_rxd2_in       : std_logic;    -- RMII Not used
+  signal enet_rxer_in       : std_logic;      -- RMII RX_ER to RXD3
     
-  signal enet_mdin     : std_logic;
-  signal enet_mdout    : std_logic;
-  signal enet_mdc_out  : std_logic;
-  signal enet_txd0_out : std_logic;
-  signal enet_txd1_out : std_logic;
-  signal enet_txen_out : std_logic;
-  signal enet_txer_out : std_logic;
-  signal enet_clk_in   : std_logic;
-  signal enet_rxdv_in  : std_logic;
-  signal enet_rxer_in  : std_logic;
-  signal enet_rxd0_in  : std_logic;
-  signal enet_rxd1_in  : std_logic;
-
-  signal spi_sclk_in   : std_logic;
-  signal spi_cs_n_in   : std_logic;
-  signal spi_mosi_in   : std_logic;
-  signal spi_miso_out  : std_logic;
-  signal spi_miso_oe   : std_logic;
-  signal spi_miso_oe_n : std_logic;
-  signal pad_config    : pad_config_record_t;
-  signal pll_config    : pll_registers_record_t;
-  signal adpll_config  : adpll_registers_record_t;
+					        
+  signal spi_sclk_in        : std_logic;
+  signal spi_cs_n_in        : std_logic;
+  signal spi_mosi_in        : std_logic;
+  signal spi_miso_out       : std_logic;
+  signal spi_miso_oe        : std_logic;
+  signal spi_miso_oe_n      : std_logic;
+  signal pad_config         : pad_config_record_t;
+  signal pll_config         : pll_registers_record_t;
+  signal adpll_config       : adpll_registers_record_t;
 
   signal dac0_bits : std_logic;
   signal dac1_bits : std_logic;
@@ -361,8 +399,33 @@ architecture rtl of digital_chip is
   signal adc_bits : std_logic;
 
   signal pwr_ok : std_logic;
+  
+
 
 begin  -- architecture rtl
+
+  -- Ethernet
+  --  enet_rst_n_out <= mrstout;              -- mrstout is going to pad mrstout_n
+
+  enet_mdc_out   <= pb_o(2);
+  enet_mdio_out  <= pb_o(1);
+  pb_i(1)        <= enet_mdio_in;
+  --
+  -- pf_i(1)        <= enet_txclk_in;            -- Use RXCLK?
+  enet_txen_out   <= pf_o(0);                   -- RMII TX_EN to TX_CTL -- enet_txctl in fpga
+  enet_txd0_out  <= pf_o(2);                
+  enet_txd1_out  <= pf_o(3);                
+  -- enet_txd2_out  <= '0';                    -- RMII Not used ( TODO GND or floating? )
+  enet_txer_out  <= pg_o(0);                  -- RMII TX_ER to TXD3, enet_txd3 in fpga
+									        
+  pg_i(1) <= enet_rxclk_in;                   -- enet_clk at port
+  pf_i(4) <= enet_rxdv_in;                    -- RMII DV to RX_CTL, enet_rxctl in fpga
+  pf_i(6) <= enet_rxd0_in;                     
+  pf_i(7) <= enet_rxd1_in;                     
+  --pg_i(6) <= enet_rxd2;                     -- RMII Not used
+  pf_i(5) <= enet_rxer_in;                    -- RMII RX_ER to RXD3
+  
+  
 
   i_pll : ri_adpll_gf22fdx_2gmp
     port map (
@@ -427,7 +490,7 @@ begin  -- architecture rtl
         pll_locked    => pll_locked,
         pre_spi_rst_n => pre_spi_rst_n,
         MRESET  => mreset,
-        MRSTOUT => mrstout_n,  -- Missing pad.
+        MRSTOUT => mrstout,  -- Missing pad.
         MIRQOUT => mirqout_out,
         MCKOUT0 => mckout0,
         MCKOUT1 => MCKOUT1,
@@ -443,33 +506,33 @@ begin  -- architecture rtl
         pa_en => pa_en,
         pa_o  => pa_o,
         -- Port B
-        pb_i  => x"00", --pb_i,
-        pb_en => open, --pb_en,
-        pb_o  => open, --pb_o,
+        pb_i  => pb_i,   --x"00", --pb_i,
+        pb_en => pb_en,  --open, --pb_en,
+        pb_o  => pb_o,  --open, --pb_o,
         -- Port C
-        pc_i  => x"00", --pc_i,
-        pc_en => open, --pc_en,
-        pc_o  => open, --pc_o,
+        pc_i  => pc_i, --x"00",--pc_i,
+        pc_en => pc_en,--open, --pc_en,
+        pc_o  => pc_o, --open, --pc_o,
         -- Port D
-        pd_i  => x"00", --pd_i,
-        pd_en => open, --pd_en,
-        pd_o  => open, --pd_o,
+        pd_i  => pd_i, --x"00",--pd_i,
+        pd_en => pd_en,--open, --pd_en,
+        pd_o  => pd_o, --open, --pd_o,
         -- Port Eopen,
-        pe_i  => x"00", --pe_i,
-        pe_en => open, --pe_en,
-        pe_o  => open, --pe_o,
+        pe_i  => pe_i,  --x"00",--pe_i,
+        pe_en => pe_en, --open, --pe_en,
+        pe_o  => pe_o,  --open, --pe_o,
         -- Port F
-        pf_i  => x"00", --pf_i,
-        pf_en => open, --pf_en,
-        pf_o  => open, --pf_o,
+        pf_i  => pf_i,  --x"00",-- pf_i,
+        pf_en => pf_en, --open, -- pf_en,
+        pf_o  => pf_o,  --open, -- pf_o,
         -- Port G
         pg_i  => pg_i,
         pg_en => pg_en,
         pg_o  => pg_o,
         -- Port H
-        ph_i  => x"00", --ph_i,
-        ph_en => open, --ph_en,
-        ph_o  => open, --ph_o,
+        ph_i  => ph_i,  --x"00",--ph_i,
+        ph_en => ph_en, --open, --ph_en,
+        ph_o  => ph_o,  -- open, --ph_o,
         -- Port I
         -- pi_i  => x"00", --pi_i,
         -- pi_en => open, --pi_en,
@@ -1287,28 +1350,27 @@ begin  -- architecture rtl
         pu  => pad_config.ach0.pu,
         di  => adc_bits
         );
-
-    i_enet_mdio_pad : entity work.inoutput_pad
+    
+	 ---------------------------------------------------------
+    --Ethernet Pad	
+		
+	/* o_enet_rst_n_pad : entity work.output_pad  
       generic map (
-        direction => horizontal)
+        direction =>  horizontal)
       port map (
         -- PAD
-        pad => enet_mdio,
-        -- GPIO
-        do  => enet_mdout,
-        ds  => pad_config.enet_mdio.ds & "00",
-        sr  => pad_config.enet_mdio.sr,
-        co  => pad_config.enet_mdio.co,
-        oe  => '1', 
-        odp => pad_config.enet_mdio.odp,
-        odn => pad_config.enet_mdio.odn,
-        ste => pad_config.enet_mdio.ste,
-        pd  => pad_config.enet_mdio.pd,
-        pu  => pad_config.enet_mdio.pu,
-        di  => enet_mdin
-        );
+        pad => enet_rst_n,
+        --GPIO
+        do  => enet_rst_n_out,
+        ds  => pad_config.enet_rst_n.ds & "00",
+        sr  => pad_config.enet_rst_n.sr,
+        co  => pad_config.enet_rst_n.co,
+        oe  => '1',       
+        odp => pad_config.enet_rst_n.odp,
+        odn => pad_config.enet_rst_n.odn
+        ); */
 
-    i_enet_mdc_pad : entity work.output_pad  
+    o_enet_mdc_pad : entity work.output_pad  
       generic map (
         direction =>  horizontal)
       port map (
@@ -1319,11 +1381,96 @@ begin  -- architecture rtl
         ds  => pad_config.enet_mdc.ds & "00",
         sr  => pad_config.enet_mdc.sr,
         co  => pad_config.enet_mdc.co,
-        oe  => '1',
+        oe  => pb_en(2), --'1',
         odp => pad_config.enet_mdc.odp,
         odn => pad_config.enet_mdc.odn
         );
 
+    io_enet_mdio_pad : entity work.inoutput_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_mdio,
+        -- GPIO
+        do  => enet_mdio_out,
+        ds  => pad_config.enet_mdio.ds & "00",
+        sr  => pad_config.enet_mdio.sr,
+        co  => pad_config.enet_mdio.co,
+        oe  => pb_en(1),  --'1', 
+        odp => pad_config.enet_mdio.odp,
+        odn => pad_config.enet_mdio.odn,
+        ste => pad_config.enet_mdio.ste,
+        pd  => pad_config.enet_mdio.pd,
+        pu  => pad_config.enet_mdio.pu,
+        di  => enet_mdio_in
+        );		
+	
+	
+	/* i_enet_txclk_pad : entity work.input_pad
+      generic map (
+        direction => horizontal)
+      port map (
+        -- PAD
+        pad => enet_txclk,
+        --GPI
+        ie  => '1',
+        ste => pad_config.enet_txclk.ste,
+        pd  => pad_config.enet_txclk.pd,
+        pu  => pad_config.enet_txclk.pu,
+        di  => enet_txclk_in
+        ); */
+	 	
+	o_enet_txen_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txen,
+        --GPIO
+        do  => enet_txen_out,
+        ds  => pad_config.enet_txen.ds & "00",
+        sr  => pad_config.enet_txen.sr,
+        co  => pad_config.enet_txen.co,
+        oe  => pf_en(0),
+        odp => pad_config.enet_txen.odp,
+        odn => pad_config.enet_txen.odn
+        );
+		
+	
+    o_enet_txd0_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txd0,
+        --GPIO
+        do  => enet_txd0_out,
+        ds  => pad_config.enet_txd0.ds & "00",
+        sr  => pad_config.enet_txd0.sr,
+        co  => pad_config.enet_txd0.co,
+        oe  => pf_en(2),
+        odp => pad_config.enet_txd0.odp,
+        odn => pad_config.enet_txd0.odn
+        );
+
+    o_enet_txd1_pad : entity work.output_pad  
+      generic map (
+        direction =>  horizontal)
+      port map (
+        -- PAD
+        pad => enet_txd1,
+        --GPIO
+        do  => enet_txd1_out,
+        ds  => pad_config.enet_txd1.ds & "00",
+        sr  => pad_config.enet_txd1.sr,
+        co  => pad_config.enet_txd1.co,
+        oe  => pf_en(3),
+        odp => pad_config.enet_txd1.odp,
+        odn => pad_config.enet_txd1.odn
+        );
+
+	
     i_enet_txer_pad : entity work.output_pad  
       generic map (
         direction =>  horizontal)
@@ -1335,58 +1482,11 @@ begin  -- architecture rtl
         ds  => pad_config.enet_txer.ds & "00",
         sr  => pad_config.enet_txer.sr,
         co  => pad_config.enet_txer.co,
-        oe  => '1',
+        oe  => pg_en(0),  --'1',
         odp => pad_config.enet_txer.odp,
         odn => pad_config.enet_txer.odn
         );
 
-    i_enet_txd0_pad : entity work.output_pad  
-      generic map (
-        direction =>  horizontal)
-      port map (
-        -- PAD
-        pad => enet_txd0,
-        --GPIO
-        do  => enet_txd0_out,
-        ds  => pad_config.enet_txd0.ds & "00",
-        sr  => pad_config.enet_txd0.sr,
-        co  => pad_config.enet_txd0.co,
-        oe  => '1',
-        odp => pad_config.enet_txd0.odp,
-        odn => pad_config.enet_txd0.odn
-        );
-
-    i_enet_txd1_pad : entity work.output_pad  
-      generic map (
-        direction =>  horizontal)
-      port map (
-        -- PAD
-        pad => enet_txd1,
-        --GPIO
-        do  => enet_txd1_out,
-        ds  => pad_config.enet_txd1.ds & "00",
-        sr  => pad_config.enet_txd1.sr,
-        co  => pad_config.enet_txd1.co,
-        oe  => '1',
-        odp => pad_config.enet_txd1.odp,
-        odn => pad_config.enet_txd1.odn
-        );
-
-    i_enet_txen_pad : entity work.output_pad  
-      generic map (
-        direction =>  horizontal)
-      port map (
-        -- PAD
-        pad => enet_txen,
-        --GPIO
-        do  => enet_txen_out,
-        ds  => pad_config.enet_txen.ds & "00",
-        sr  => pad_config.enet_txen.sr,
-        co  => pad_config.enet_txen.co,
-        oe  => '1',
-        odp => pad_config.enet_txen.odp,
-        odn => pad_config.enet_txen.odn
-        );
 
     i_enet_clk_pad : entity work.input_pad
       generic map (
@@ -1399,10 +1499,10 @@ begin  -- architecture rtl
         ste => pad_config.enet_clk.ste,
         pd  => pad_config.enet_clk.pd,
         pu  => pad_config.enet_clk.pu,
-        di  => enet_clk_in
-        );
-
-    i_enet_rxdv_pad : entity work.input_pad
+        di  => enet_rxclk_in
+        );		
+		
+	i_enet_rxdv_pad : entity work.input_pad
       generic map (
         direction => horizontal)
       port map (
@@ -1415,8 +1515,8 @@ begin  -- architecture rtl
         pu  => pad_config.enet_rxdv.pu,
         di  => enet_rxdv_in
         );
-
-    i_enet_rxd0_pad : entity work.input_pad
+		
+	i_enet_rxd0_pad : entity work.input_pad
       generic map (
         direction => horizontal)
       port map (
@@ -1442,9 +1542,9 @@ begin  -- architecture rtl
         pd  => pad_config.enet_rxd1.pd,
         pu  => pad_config.enet_rxd1.pu,
         di  => enet_rxd1_in
-        );
-
-    i_enet_rxer_pad : entity work.input_pad
+        );	
+		
+	i_enet_rxer_pad : entity work.input_pad
       generic map (
         direction => horizontal)
       port map (
@@ -1456,7 +1556,8 @@ begin  -- architecture rtl
         pd  => pad_config.enet_rxer.pd,
         pu  => pad_config.enet_rxer.pu,
         di  => enet_rxer_in
-        );
+        );	
+
 		
 	i_spi_reset_n_pad : entity work.input_pad
       generic map (
@@ -1577,7 +1678,9 @@ begin  -- architecture rtl
         di  => mreset
         );
 
-    i_mrst_out_pad : entity work.input_pad
+     
+	-- enet_rst_n pad to make digital_chip similar to fpga_top
+	 i_mrst_out_pad : entity work.input_pad
       generic map (
         direction => vertical)
       port map (
@@ -1589,10 +1692,26 @@ begin  -- architecture rtl
         pd  => '0',
         pu  => '0',
         di  => mrstout
-        );
+        );  
+		
+	/* i_mrst_out_pad : entity work.output_pad  
+      generic map (
+        direction =>  veritical)
+      port map (
+        -- PAD
+        pad => mrstout_n,
+        --GPIO
+        do  => mrstout,
+        ds  => pad_config.mrstout_n.ds & "00",
+        sr  => pad_config.mrstout_n.sr,
+        co  => pad_config.mrstout_n.co,
+        oe  => '1',
+        odp => pad_config.mrstout_n.odp,
+        odn => pad_config.mrstout_n.odn
+        );	 */
 
-  pa_i(4 downto 3) <= "00"; -- 00 = fcore / 2 (DataBook STO-DEV7026 R1.2 p.23)
-  pa_i(2 downto 1) <= "01"; -- 01 =           (DataBook STO-DEV7026 R1.2 section 3.3.1)
+    pa_i(4 downto 3) <= "00"; -- 00 = fcore / 2 (DataBook STO-DEV7026 R1.2 p.23)
+    pa_i(2 downto 1) <= "01"; -- 01 =           (DataBook STO-DEV7026 R1.2 section 3.3.1)
   
     i_pa0_sin_pad : entity work.inoutput_pad
       generic map (
@@ -1673,6 +1792,7 @@ begin  -- architecture rtl
         pu  => pad_config.pa7_sout.pu,
         di  => pa_i(7)
         );
+    
 
     i_pg0_pad : entity work.inoutput_pad
       generic map (
@@ -1832,7 +1952,7 @@ begin  -- architecture rtl
         pd  => pad_config.pg7.pd,
         pu  => pad_config.pg7.pu,
         di  => pg_i(7)
-        );
+        ); 
 
     i_mtest_pad : entity work.input_pad
       generic map (

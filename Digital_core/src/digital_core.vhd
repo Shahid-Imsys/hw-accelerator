@@ -216,7 +216,7 @@ architecture rtl of digital_core is
 
   component Accelerator_Top is
     Generic(
-        USE_ASIC_MEMORIES    : boolean := false
+        USE_ASIC_MEMORIES    : boolean := false;
         PEC_NUMBER           : integer := 1
     );
     port (

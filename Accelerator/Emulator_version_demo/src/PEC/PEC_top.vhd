@@ -123,8 +123,7 @@ architecture struct of PEC_top is
       EVEN_C     : in  std_logic;
       MRESET     : in  std_logic;  -- system reset               low active
       MIRQOUT    : out std_logic;       -- interrupt request output    
-      MCKOUT1    : out std_logic;       -- programable clock out
-      MTEST      : in  std_logic;  --                            high active                 
+      MCKOUT1    : out std_logic;       -- programable clock out              
       MBYPASS    : in  std_logic;
       -- SW debug                                                               
       MSDIN      : in  std_logic;       -- serial data in (debug)     
@@ -277,7 +276,6 @@ begin
         MRESET     => rst_i,
         MIRQOUT    => open,
         MCKOUT1    => open,
-        MTEST      => '0',
         MBYPASS    => '0',
         -- SW debug=>                                             
         MSDIN      => '0',

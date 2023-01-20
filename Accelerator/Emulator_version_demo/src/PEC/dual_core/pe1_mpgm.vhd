@@ -44,24 +44,19 @@ use ieee.std_logic_1164.all;
 entity pe1_mpgm is
 	port (
 		-- Clock and reset
-		rst_cn      : in  std_logic;
-		clk_p       : in  std_logic;
-		clk_e_neg   : in  std_logic;
+		--rst_cn      : in  std_logic;
+		--clk_p       : in  std_logic;
+		--clk_e_neg   : in  std_logic;
 		-- Control signals
 		even_c      : in  std_logic;  -- High during even clk_c cycles
 		held_e      : in  std_logic;  -- High when clk_e is held
-		plsel_n     : in  std_logic;  -- From CPC, low when SP controls PL
 		lmpen       : in  std_logic;  -- From MMR, high when self-loading pe1_mpgm
-		lmpwe_n     : in  std_logic;  -- From MPLL, low when self-load write
-		en_pmem     : in  std_logic;  -- Enable patch memory, from CRB
 		-- Inputs
 		mpga        : in  std_logic_vector(7 downto 0);  -- from CLC, pe1_mpgm address  --CJ
-		latch       : in  std_logic_vector(7 downto 0);   -- Latch register, used when loading
 		y_reg       : in  std_logic_vector(7 downto 0);   -- Y bus, used when loading
 		-- Outputs to MPRAM/MPROM
 		mpram_a     : out std_logic_vector(7 downto 0);  -- MPG RAM address    --CJ
-		mprom_oe    : out std_logic_vector(1 downto 0);   -- ROM output enable (active high)
-		mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
+		--mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
 		mpram_ce    : out std_logic_vector(1 downto 0)		-- RAM chip enable (active high)
   );
 end pe1_mpgm;
@@ -69,7 +64,7 @@ end pe1_mpgm;
 architecture rtl of pe1_mpgm is
 
 	signal mpram_ce_int   : std_logic_vector(1 downto 0);
-	signal oe_sel  	      : std_logic_vector(1 downto 0);
+	--signal oe_sel  	      : std_logic_vector(1 downto 0);
 	signal ram_addr	      : std_logic_vector(7 downto 0); --CJ
 
 begin  -- rtl
@@ -159,12 +154,12 @@ begin  -- rtl
 	--pmem_ce_n <= pmem_ce_nint;
 
 	-- Output enable generation
-	process (clk_p)
-	begin
-	    if rising_edge(clk_p) then
-		    if rst_cn = '0' then
-			    oe_sel <= "00";
-		    elsif (clk_e_neg = '0') then   --falling edge of clk_e
+	--process (clk_p)
+	--begin
+	--    if rising_edge(clk_p) then
+	--	    if rst_cn = '0' then
+	--		    oe_sel <= "00";
+	--	    elsif (clk_e_neg = '0') then   --falling edge of clk_e
 			    --if mprom_ce_int(0) = '1' then      --Deleted by CJ
 			    --	oe_sel <= "00";
 			    --elsif mprom_ce_int(1) = '1' then
@@ -174,14 +169,12 @@ begin  -- rtl
 			    --else
 			    --	oe_sel <= "11";
 			    --end if;
-				oe_sel <= "10";
-			end if;
-		end if;
-	end process;
+	--			oe_sel <= "10";
+	--		end if;
+	--	end if;
+	--end process;
 
-	mprom_oe(0) <= '1' when oe_sel = "00" and (even_c = '0' or held_e = '1') else '0'; --
-	mprom_oe(1) <= '1' when oe_sel = "01" and (even_c = '0' or held_e = '1') else '0'; --
-	mpram_oe(0) <= '1' when oe_sel = "10" and (even_c = '0' or held_e = '1') else '0'; --
-	mpram_oe(1) <= '1' when oe_sel = "11" and (even_c = '0' or held_e = '1') else '0'; --
+	--mpram_oe(0) <= '1' when oe_sel = "10" and (even_c = '0' or held_e = '1') else '0'; --
+	--mpram_oe(1) <= '1' when oe_sel = "11" and (even_c = '0' or held_e = '1') else '0'; --
 
 end rtl;

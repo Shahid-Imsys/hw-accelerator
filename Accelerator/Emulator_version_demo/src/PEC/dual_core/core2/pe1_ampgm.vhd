@@ -44,26 +44,24 @@ entity pe1_ampgm is
 	port (
 		-- Clock and reset
 		core2_en    : in std_logic;
-		rst_cn      : in  std_logic;
-		clk_p       : in  std_logic;
-		clk_e_neg       : in  std_logic;
+		--rst_cn      : in  std_logic;
+		--clk_p       : in  std_logic;
+		--clk_e_neg       : in  std_logic;
 		-- Control signals
 		even_c      : in  std_logic;  -- High during even clk_c cycles
-		held_e      : in  std_logic;  -- High when clk_e is held
-		en_pmem     : in  std_logic;  -- Enable patch memory, from CRB
+		--held_e      : in  std_logic;  -- High when clk_e is held
 		-- Inputs
 		mpga        : in  std_logic_vector(7 downto 0);  -- from CLC, pe1_mpgm address
 		-- Outputs to MPRAM/MPROM
 		mpram_a     : out std_logic_vector(7 downto 0);  -- MPG RAM address
-		mprom_oe    : out std_logic_vector(1 downto 0);   -- ROM output enable (active high)
-		mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
+		--mpram_oe    : out std_logic_vector(1 downto 0);   -- RAM output enable (active high)
 		mpram_ce    : out std_logic_vector(1 downto 0) 		-- RAM chip enable (active high)
   );   									
 end pe1_ampgm;
 
 architecture rtl of pe1_ampgm is
 	signal mpram_ce_int   : std_logic_vector(1 downto 0);
-	signal oe_sel  				: std_logic_vector(1 downto 0);
+	--signal oe_sel  				: std_logic_vector(1 downto 0);
 	signal ram_addr				: std_logic_vector(7 downto 0);
 
 begin  -- rtl
@@ -92,7 +90,7 @@ begin  -- rtl
 	ram_addr <= mpga;
 	mpram_a <= ram_addr;
 
-	process (even_c, held_e, core2_en)
+	process (even_c, core2_en)
 	begin
 		--mprom_ce_int	<= "00";
 		mpram_ce_int	<= "00";
@@ -132,42 +130,26 @@ begin  -- rtl
 	--pmem_ce_n <= pmem_ce_nint;
 
 	-- Output enable generation
-	process (clk_p)
-	begin
-	    if rising_edge(clk_p) then
-		    if rst_cn = '0' then
-			    oe_sel <= "00";
-		    elsif (clk_e_neg = '0') then   --falling edge of clk_e
+	--process (clk_p)
+	--begin
+	--    if rising_edge(clk_p) then
+	--	    if rst_cn = '0' then
+	--		    oe_sel <= "00";
+	--	    elsif (clk_e_neg = '0') then   --falling edge of clk_e
 			    --if mprom_ce_int(0) = '1' then
 			    --	oe_sel <= "00";
 			    --elsif mprom_ce_int(1) = '1' then
 			    --	oe_sel <= "01";
 			    --elsif mpram_ce_int(0) = '1' then
-			    	oe_sel <= "10";
+			    --	oe_sel <= "10";
 			    --else
 			    --	oe_sel <= "11";
 			    --end if;
-			end if;
-		end if;
-	end process;
-
-	mprom_oe(0) <= '1' when oe_sel = "00" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
-	mprom_oe(1) <= '1' when oe_sel = "01" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
-	mpram_oe(0) <= '1' when oe_sel = "10" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
-	mpram_oe(1) <= '1' when oe_sel = "11" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
-
-	-- Patch detection, disabled when writing
-	--process (clk_p)
-	--begin
-	--    if rising_edge(clk_p) then
-	--	    if rst_cn = '0' then
-	--		    patch_en	<= '0';
-	--	    elsif (clk_e_neg = '0') then   --falling edge of clk_e
-	--		    patch_en	<= not pmem_ce_nint;
 	--		end if;
 	--	end if;
 	--end process;
 
-	--patched <= patch_en and (pmem_q(0) or pmem_q(1));
+	--mpram_oe(0) <= '1' when oe_sel = "10" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
+	--mpram_oe(1) <= '1' when oe_sel = "11" and (even_c = '0' or held_e = '1') and core2_en = '1' else '0'; --
 
 end rtl;

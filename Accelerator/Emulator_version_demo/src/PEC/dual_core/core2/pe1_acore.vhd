@@ -68,7 +68,6 @@ entity pe1_acore is
 	rsc_n           : in std_logic;
 	clkreq_gen      : in std_logic;
     crb_out     : in std_logic_vector(7 downto 0);
-    en_pmem     : in  std_logic;
     en_wdog     : in std_logic;
     pup_clk     : in std_logic;
     pup_irq    	: in std_logic_vector(1 downto 0);
@@ -88,14 +87,12 @@ entity pe1_acore is
 ---------------------------------------------------------------------
     -- Memory signals
 ---------------------------------------------------------------------
-    -- MPROM signals
-    mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address
     mpram_d     : out std_logic_vector(127 downto 0);-- Data to memory
     mpram_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
-    mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
-    mpram_we_n  : out std_logic;                    -- Write enable(active low)
+    --mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
+    --mpram_we_n  : out std_logic;                    -- Write enable(active low)
     -- MPROM/MPRAM data out bus
     mp_q        : in  std_logic_vector(127 downto 0);-- Data from MPROM/MPRAM
     -- GMEM signals
@@ -147,8 +144,6 @@ architecture struct of pe1_acore is
   --signal pend_i     : std_logic;
   signal ld_mar     : std_logic;
   signal runmode    : std_logic;
-  signal spack_n    : std_logic;
-  signal spreq_n    : std_logic;
   signal rst_en_int : std_logic;
   signal hold_e_int : std_logic;
 
@@ -348,25 +343,23 @@ begin
     port map (
       -- Clock and reset
 	  core2_en    => core2_en_buf,
-      rst_cn      => rst_cn,
-      clk_e_neg       => clk_e_neg_int,
-      clk_p       => clk_p,
+      --rst_cn      => rst_cn,
+      --clk_e_neg       => clk_e_neg_int,
+      --clk_p       => clk_p,
       -- Control signals
       even_c      => odd_c,
-      held_e      => held_e,
-      en_pmem     => en_pmem,
+      --held_e      => held_e,
       -- Inputs
       mpga        => mpga,
       -- Outputs to MPRAM/MPROM
       mpram_a     => mpram_a,
-      mprom_oe    => mprom_oe,
-      mpram_oe    => mpram_oe,
+      --mpram_oe    => mpram_oe,
       mpram_ce    => mpram_ce
       );
 
   --mprom_a     <= mpga;
   mpram_d     <= mpgmin;--(others => '1');
-  mpram_we_n  <= '1';
+  --mpram_we_n  <= '1';
 
 ---------------------------------------------------------------------
 -- TIM - timing logic

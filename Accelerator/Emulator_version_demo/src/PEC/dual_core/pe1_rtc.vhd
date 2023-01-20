@@ -74,10 +74,7 @@ entity pe1_rtc is
     poweron_finish      : out std_logic;  --
     reset_iso           : out std_logic;  -- to isolate the pe1_core reset
     reset_core_n        : out std_logic;  -- to reset pe1_core, low active
-    io_iso              : out std_logic;  -- to isolate the io signals in nap mode
-    nap_rec             : out std_logic;  -- will recover from nap mode
-    pmic_core_en        : out std_logic;
-    pmic_io_en          : out std_logic
+    nap_rec             : out std_logic  -- will recover from nap mode
     );
 end pe1_rtc;
 
@@ -475,23 +472,10 @@ end process pwr_mode_next;
 pwr_mode_signals : process (clk_mux_out_int,pwr_on_rst_n)
 begin
     IF pwr_on_rst_n = '0'   THEN
-        pmic_core_en    <= '1';
-		pmic_io_en      <= '1';
 		core_iso        <= '1';
 		reset_core_n    <= '0';
 		nap_rec         <= '0';
     ELSIF rising_edge(clk_mux_out_int) THEN
-        IF next_state = HALT THEN
-            pmic_core_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_core_en    <= '1';
-        END IF;
-
-        IF next_state = HALT or next_state = NAP THEN
-            pmic_io_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_io_en    <= '1';
-        END IF;
 
         IF next_state = ACT THEN
             core_iso    <= '0';
@@ -515,7 +499,6 @@ begin
 
 end process pwr_mode_signals;
 
-io_iso <= core_iso;
 
 process (clk_mux_out_int,pwr_on_rst_n)
 begin

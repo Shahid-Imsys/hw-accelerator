@@ -275,6 +275,8 @@ begin
   process (state, prev_state, l0, l1, l2, i, e, start, instris1, instris2, ntm1, l0p1, l1m1, stage, e_is_max, l2_is_max, l1_is_max, l0_is_max)
   begin
     next_state <= state;
+    next_stage <= stage;
+    done <= '0';
     case stage is
       when ldl =>
         if state = xSYTRF then -- xSYTRF
@@ -1001,6 +1003,11 @@ begin
   -- instructions
   process (state, prev_state, i, e, instris0, instris1, stage, l2_is_max, l2)
   begin
+
+    bias_ren <= '0';
+    bias_addr_ctrl <= ctrl;
+    lzod <= (word => "00", store => none, output => none);
+    feedback_ctrl <= keep;
 
     case stage is
       when ldl =>

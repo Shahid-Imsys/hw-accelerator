@@ -79,7 +79,7 @@ end entity ram_memory;
       );
   end component;
 
-  component test_mem
+  component main_mem_p2
     port (
       clka  : in  std_logic;
       ena   : in  std_logic;
@@ -90,7 +90,7 @@ end entity ram_memory;
       );
   end component;
 
-  component test_mem_p0
+  component main_mem_p3
     port (
       clka  : in  std_logic;
       ena   : in  std_logic;
@@ -101,7 +101,106 @@ end entity ram_memory;
       );
   end component;
 
-  component test_mem_p1
+  component main_mem_p4
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p5
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p6
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p7
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p8
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p9
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p10
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p11
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p12
+    port (
+      clka  : in  std_logic;
+      ena   : in  std_logic;
+      wea   : in  std_logic_vector(0 downto 0);
+      addra : in  std_logic_vector(13 downto 0);
+      dina  : in  std_logic_vector(7 downto 0);
+      douta : out std_logic_vector(7 downto 0)
+      );
+  end component;
+
+  component main_mem_p13
     port (
       clka  : in  std_logic;
       ena   : in  std_logic;
@@ -154,7 +253,7 @@ begin  -- architecture str
 
   elsif fpgaMemIndex = 0 generate
 
-    fpga0 : test_mem_p0
+    fpga0 : main_mem_p0
       port map (
         clka  => clk,
         ena   => cs,
@@ -166,7 +265,7 @@ begin  -- architecture str
 
   elsif fpgaMemIndex = 1 generate
 
-    fpga1 : test_mem_p1
+    fpga1 : main_mem_p1
       port map (
         clka  => clk,
         ena   => cs,
@@ -178,7 +277,7 @@ begin  -- architecture str
 
   elsif fpgaMemIndex = 2 generate
 
-    fpga2 : main_mem_p0
+    fpga2 : main_mem_p2
       port map (
         clka  => clk,
         ena   => cs,
@@ -190,7 +289,127 @@ begin  -- architecture str
 
   elsif fpgaMemIndex = 3 generate
 
-    fpga3 : main_mem_p1
+    fpga3 : main_mem_p3
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 4 generate
+
+    fpga4 : main_mem_p4
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 5 generate
+
+    fpga5 : main_mem_p5
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 6 generate
+
+    fpga6 : main_mem_p6
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 7 generate
+
+    fpga7 : main_mem_p7
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 8 generate
+
+    fpga8 : main_mem_p8
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 9 generate
+
+    fpga9 : main_mem_p9
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 10 generate
+
+    fpga10 : main_mem_p10
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 11 generate
+
+    fpga11 : main_mem_p11
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 12 generate
+
+    fpga12 : main_mem_p12
+      port map (
+        clka  => clk,
+        ena   => cs,
+        wea   => wea_v,
+        addra => address,
+        dina  => ram_di,
+        douta => ram_do
+        );
+
+  elsif fpgaMemIndex = 13 generate
+
+    fpga13 : main_mem_p13
       port map (
         clka  => clk,
         ena   => cs,

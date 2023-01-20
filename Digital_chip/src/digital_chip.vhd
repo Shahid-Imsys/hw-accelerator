@@ -160,28 +160,6 @@ end entity digital_chip;
 
 architecture rtl of digital_chip is
 
-  component RIIO_EG1D80V_GPIO_LVT28_V
-    port (
-      -- PAD
-      PAD_B : inout std_logic;
-      --GPIO
-      DO_I  : in    std_logic;
-      DS_I  : in    std_logic_vector(3 downto 0);
-      SR_I  : in    std_logic;
-      CO_I  : in    std_logic;
-      OE_I  : in    std_logic;
-      ODP_I : in    std_logic;
-      ODN_I : in    std_logic;
-      IE_I  : in    std_logic;
-      STE_I : in    std_logic_vector(1 downto 0);
-      PD_I  : in    std_logic;
-      PU_I  : in    std_logic;
-      DI_O  : out   std_logic;
-
-      VBIAS : inout std_logic
-      );
-  end component;
-
   component output_pad
     port (
       -- PAD
@@ -315,7 +293,7 @@ architecture rtl of digital_chip is
   signal mtest_in   : std_logic;
   signal mwake_in   : std_logic;
   signal mrxout_in  : std_logic;
-  signal mrxout_out : std_logic;
+  --signal mrxout_out : std_logic;
 
   signal d_lo : std_logic;
   signal p1_hi : std_logic;
@@ -427,7 +405,8 @@ begin  -- architecture rtl
   --pg_i(6) <= enet_rxd2;                     -- RMII Not used
   pf_i(5) <= enet_rxer_in;                    -- RMII RX_ER to RXD3
   
-  
+  spi_miso_oe <= not spi_miso_oe_n;
+ 
 
   i_pll : ri_adpll_gf22fdx_2gmp
     port map (
@@ -1718,8 +1697,8 @@ begin  -- architecture rtl
         );
 
      
-	-- enet_rst_n pad to make digital_chip similar to fpga_top
-	 i_mrst_out_pad : entity work.input_pad
+    -- enet_rst_n pad to make digital_chip similar to fpga_top
+    i_mrst_out_pad : entity work.input_pad
       generic map (
         direction => vertical)
       port map (
@@ -2028,7 +2007,7 @@ begin  -- architecture rtl
         -- PAD
         pad => mrxout,
         -- GPIO
-        do  => mrxout_out,
+        do  => '1', -- mrxout_out,
         ds  => pad_config.mrxout.ds & "00",
         sr  => pad_config.mrxout.sr,
         co  => pad_config.mrxout.co,
@@ -2039,28 +2018,6 @@ begin  -- architecture rtl
         pd  => pad_config.mrxout.pd,
         pu  => pad_config.mrxout.pu,
         di  => mrxout_in
-        ); 
-      
-     --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
-     --  port map (
-     --    PAD_B => emem_d4,
-     --    --GPIO
-     --    DO_I 
-     --    DS_I => "1000",
-     --    SR_I => '1',
-     --    CO_I => '0',
-     --    OE_I => '1',
-     --    ODP_I => '0',
-     --    ODN_I => '0',
-     --    IE_I => '1',
-     --    STE_I => "00",
-     --    PD_I => '0',
-     --    PU_I => '0',
-     --    DI_O
-
-     --    VBIAS
-     --    );
-
-      spi_miso_oe <= not spi_miso_oe_n;
+        );
 
 end architecture rtl;

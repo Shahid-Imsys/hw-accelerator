@@ -312,11 +312,11 @@ entity register_block_spi_test is
           mwake_ste : out mwake_ste_t;
           mwake_pd : out mwake_pd_t;
           mwake_pu : out mwake_pu_t;
-          mrxout_ds : out mrxout_ds_t;
-          mrxout_sr : out mrxout_sr_t;
-          mrxout_co : out mrxout_co_t;
-          mrxout_odp : out mrxout_odp_t;
-          mrxout_odn : out mrxout_odn_t;
+          mrxout_out_ds : out mrxout_out_ds_t;
+          mrxout_out_sr : out mrxout_out_sr_t;
+          mrxout_out_co : out mrxout_out_co_t;
+          mrxout_out_odp : out mrxout_out_odp_t;
+          mrxout_out_odn : out mrxout_out_odn_t;
           pll_1_main_div_n1 : out pll_1_main_div_n1_t;
           pll_1_main_div_n2 : out pll_1_main_div_n2_t;
           pll_1_main_div_n3 : out pll_1_main_div_n3_t;
@@ -459,6 +459,9 @@ entity register_block_spi_test is
           io_ioa_n_co : out io_ioa_n_co_t;
           io_ioa_n_odp : out io_ioa_n_odp_t;
           io_ioa_n_odn : out io_ioa_n_odn_t;
+          mrxout_in_ste : out mrxout_in_ste_t;
+          mrxout_in_pd : out mrxout_in_pd_t;
+          mrxout_in_pu : out mrxout_in_pu_t;
 
 
           -- SPI Interface
@@ -774,11 +777,11 @@ architecture rtl of register_block_spi_test  is
     signal s_mwake_ste : mwake_ste_t;
     signal s_mwake_pd : mwake_pd_t;
     signal s_mwake_pu : mwake_pu_t;
-    signal s_mrxout_ds : mrxout_ds_t;
-    signal s_mrxout_sr : mrxout_sr_t;
-    signal s_mrxout_co : mrxout_co_t;
-    signal s_mrxout_odp : mrxout_odp_t;
-    signal s_mrxout_odn : mrxout_odn_t;
+    signal s_mrxout_out_ds : mrxout_out_ds_t;
+    signal s_mrxout_out_sr : mrxout_out_sr_t;
+    signal s_mrxout_out_co : mrxout_out_co_t;
+    signal s_mrxout_out_odp : mrxout_out_odp_t;
+    signal s_mrxout_out_odn : mrxout_out_odn_t;
     signal s_pll_1_main_div_n1 : pll_1_main_div_n1_t;
     signal s_pll_1_main_div_n2 : pll_1_main_div_n2_t;
     signal s_pll_1_main_div_n3 : pll_1_main_div_n3_t;
@@ -921,6 +924,9 @@ architecture rtl of register_block_spi_test  is
     signal s_io_ioa_n_co : io_ioa_n_co_t;
     signal s_io_ioa_n_odp : io_ioa_n_odp_t;
     signal s_io_ioa_n_odn : io_ioa_n_odn_t;
+    signal s_mrxout_in_ste : mrxout_in_ste_t;
+    signal s_mrxout_in_pd : mrxout_in_pd_t;
+    signal s_mrxout_in_pu : mrxout_in_pu_t;
 
     signal s_address : integer range 0 to (2**7) - 1;
 
@@ -1230,11 +1236,11 @@ begin
       s_mwake_ste <= mwake_ste_reset_c;
       s_mwake_pd <= mwake_pd_reset_c;
       s_mwake_pu <= mwake_pu_reset_c;
-      s_mrxout_ds <= mrxout_ds_reset_c;
-      s_mrxout_sr <= mrxout_sr_reset_c;
-      s_mrxout_co <= mrxout_co_reset_c;
-      s_mrxout_odp <= mrxout_odp_reset_c;
-      s_mrxout_odn <= mrxout_odn_reset_c;
+      s_mrxout_out_ds <= mrxout_out_ds_reset_c;
+      s_mrxout_out_sr <= mrxout_out_sr_reset_c;
+      s_mrxout_out_co <= mrxout_out_co_reset_c;
+      s_mrxout_out_odp <= mrxout_out_odp_reset_c;
+      s_mrxout_out_odn <= mrxout_out_odn_reset_c;
       s_pll_1_main_div_n1 <= pll_1_main_div_n1_reset_c;
       s_pll_1_main_div_n2 <= pll_1_main_div_n2_reset_c;
       s_pll_1_main_div_n3 <= pll_1_main_div_n3_reset_c;
@@ -1374,6 +1380,9 @@ begin
       s_io_ioa_n_co <= io_ioa_n_co_reset_c;
       s_io_ioa_n_odp <= io_ioa_n_odp_reset_c;
       s_io_ioa_n_odn <= io_ioa_n_odn_reset_c;
+      s_mrxout_in_ste <= mrxout_in_ste_reset_c;
+      s_mrxout_in_pd <= mrxout_in_pd_reset_c;
+      s_mrxout_in_pu <= mrxout_in_pu_reset_c;
     elsif clk 'event and clk = '1' then  -- rising clock edge
       if enable = '1' then
         case s_address is
@@ -1902,13 +1911,13 @@ begin
               s_mwake_pd <= data_in(mwake_pd_msb_c);
               s_mwake_pu <= data_in(mwake_pu_msb_c);
             end if;
-          when mrxout_address_c => 
+          when mrxout_out_address_c => 
             if write_cmd = '1' then
-              s_mrxout_ds <= data_in(mrxout_ds_msb_c downto mrxout_ds_lsb_c);
-              s_mrxout_sr <= data_in(mrxout_sr_msb_c);
-              s_mrxout_co <= data_in(mrxout_co_msb_c);
-              s_mrxout_odp <= data_in(mrxout_odp_msb_c);
-              s_mrxout_odn <= data_in(mrxout_odn_msb_c);
+              s_mrxout_out_ds <= data_in(mrxout_out_ds_msb_c downto mrxout_out_ds_lsb_c);
+              s_mrxout_out_sr <= data_in(mrxout_out_sr_msb_c);
+              s_mrxout_out_co <= data_in(mrxout_out_co_msb_c);
+              s_mrxout_out_odp <= data_in(mrxout_out_odp_msb_c);
+              s_mrxout_out_odn <= data_in(mrxout_out_odn_msb_c);
             end if;
           when pll_1_address_c => 
             if write_cmd = '1' then
@@ -2157,6 +2166,12 @@ begin
               s_io_ioa_n_odp <= data_in(io_ioa_n_odp_msb_c);
               s_io_ioa_n_odn <= data_in(io_ioa_n_odn_msb_c);
             end if;
+          when mrxout_in_address_c => 
+            if write_cmd = '1' then
+              s_mrxout_in_ste <= data_in(mrxout_in_ste_msb_c downto mrxout_in_ste_lsb_c);
+              s_mrxout_in_pd <= data_in(mrxout_in_pd_msb_c);
+              s_mrxout_in_pu <= data_in(mrxout_in_pu_msb_c);
+            end if;
           when others => null;
         end case;
       end if;
@@ -2220,36 +2235,37 @@ begin
                                 s_pg6_out_ds, s_pg6_out_sr, s_pg6_out_co, s_pg6_out_odp, s_pg6_out_odn, s_pg6_in_ste,
                                 s_pg6_in_pd, s_pg6_in_pu, s_pg7_out_ds, s_pg7_out_sr, s_pg7_out_co, s_pg7_out_odp,
                                 s_pg7_out_odn, s_pg7_in_ste, s_pg7_in_pd, s_pg7_in_pu, s_mtest_ste, s_mtest_pd, s_mtest_pu,
-                                s_mwake_ste, s_mwake_pd, s_mwake_pu, s_mrxout_ds, s_mrxout_sr, s_mrxout_co, s_mrxout_odp,
-                                s_mrxout_odn, s_pll_1_main_div_n1, s_pll_1_main_div_n2, s_pll_1_main_div_n3,
-                                s_pll_1_main_div_n4, s_pll_2_open_loop, s_pll_2_out_div_sel, s_pll_2_ci, s_pll_cp_cp, s_pll_ft_ft,
-                                s_pll_3_divcore_sel, s_pll_3_coarse, s_pll_4_auto_coarsetune, s_pll_4_enforce_lock,
-                                s_pll_4_pfd_select, s_pll_4_lock_window_sel, s_pll_4_div_core_mux_sel, s_pll_4_filter_shift,
-                                s_pll_4_en_fast_lock, s_pll_5_sar_limit, s_pll_5_set_op_lock, s_pll_5_disable_lock,
-                                s_pll_5_ref_bypass, s_pll_5_ct_compensation, s_adpll_status0_adpll_status_0,
-                                s_adpll_status1_adpll_status_1, s_adpll_status2_adpll_status_2, s_io_dack0_n_ste, s_io_dack0_n_pd,
-                                s_io_dack0_n_pu, s_io_dreq0_n_ds, s_io_dreq0_n_sr, s_io_dreq0_n_co, s_io_dreq0_n_odp,
-                                s_io_dreq0_n_odn, s_io_dack1_n_ste, s_io_dack1_n_pd, s_io_dack1_n_pu, s_io_dreq1_n_ds,
-                                s_io_dreq1_n_sr, s_io_dreq1_n_co, s_io_dreq1_n_odp, s_io_dreq1_n_odn, s_io_dack2_n_ste,
-                                s_io_dack2_n_pd, s_io_dack2_n_pu, s_io_dreq2_n_ds, s_io_dreq2_n_sr, s_io_dreq2_n_co,
-                                s_io_dreq2_n_odp, s_io_dreq2_n_odn, s_io_dack3_n_ste, s_io_dack3_n_pd, s_io_dack3_n_pu,
-                                s_io_dreq3_n_ds, s_io_dreq3_n_sr, s_io_dreq3_n_co, s_io_dreq3_n_odp, s_io_dreq3_n_odn,
-                                s_io_d0_out_ds, s_io_d0_out_sr, s_io_d0_out_co, s_io_d0_out_odp, s_io_d0_out_odn,
-                                s_io_d0_in_ste, s_io_d0_in_pd, s_io_d0_in_pu, s_io_d1_out_ds, s_io_d1_out_sr, s_io_d1_out_co,
-                                s_io_d1_out_odp, s_io_d1_out_odn, s_io_d1_in_ste, s_io_d1_in_pd, s_io_d1_in_pu, s_io_d2_out_ds,
-                                s_io_d2_out_sr, s_io_d2_out_co, s_io_d2_out_odp, s_io_d2_out_odn, s_io_d2_in_ste,
-                                s_io_d2_in_pd, s_io_d2_in_pu, s_io_d3_out_ds, s_io_d3_out_sr, s_io_d3_out_co,
-                                s_io_d3_out_odp, s_io_d3_out_odn, s_io_d3_in_ste, s_io_d3_in_pd, s_io_d3_in_pu, s_io_d4_out_ds,
-                                s_io_d4_out_sr, s_io_d4_out_co, s_io_d4_out_odp, s_io_d4_out_odn, s_io_d4_in_ste,
-                                s_io_d4_in_pd, s_io_d4_in_pu, s_io_d5_out_ds, s_io_d5_out_sr, s_io_d5_out_co,
-                                s_io_d5_out_odp, s_io_d5_out_odn, s_io_d5_in_ste, s_io_d5_in_pd, s_io_d5_in_pu, s_io_d6_out_ds,
-                                s_io_d6_out_sr, s_io_d6_out_co, s_io_d6_out_odp, s_io_d6_out_odn, s_io_d6_in_ste,
-                                s_io_d6_in_pd, s_io_d6_in_pu, s_io_d7_out_ds, s_io_d7_out_sr, s_io_d7_out_co,
-                                s_io_d7_out_odp, s_io_d7_out_odn, s_io_d7_in_ste, s_io_d7_in_pd, s_io_d7_in_pu,
-                                s_io_ldout_n_ds, s_io_ldout_n_sr, s_io_ldout_n_co, s_io_ldout_n_odp, s_io_ldout_n_odn,
-                                s_io_next_n_ds, s_io_next_n_sr, s_io_next_n_co, s_io_next_n_odp, s_io_next_n_odn, s_io_clk_ds,
-                                s_io_clk_sr, s_io_clk_co, s_io_clk_odp, s_io_clk_odn, s_io_ioa_n_ds, s_io_ioa_n_sr,
-                                s_io_ioa_n_co, s_io_ioa_n_odp, s_io_ioa_n_odn)
+                                s_mwake_ste, s_mwake_pd, s_mwake_pu, s_mrxout_out_ds, s_mrxout_out_sr, s_mrxout_out_co,
+                                s_mrxout_out_odp, s_mrxout_out_odn, s_pll_1_main_div_n1, s_pll_1_main_div_n2,
+                                s_pll_1_main_div_n3, s_pll_1_main_div_n4, s_pll_2_open_loop, s_pll_2_out_div_sel, s_pll_2_ci,
+                                s_pll_cp_cp, s_pll_ft_ft, s_pll_3_divcore_sel, s_pll_3_coarse, s_pll_4_auto_coarsetune,
+                                s_pll_4_enforce_lock, s_pll_4_pfd_select, s_pll_4_lock_window_sel, s_pll_4_div_core_mux_sel,
+                                s_pll_4_filter_shift, s_pll_4_en_fast_lock, s_pll_5_sar_limit, s_pll_5_set_op_lock,
+                                s_pll_5_disable_lock, s_pll_5_ref_bypass, s_pll_5_ct_compensation,
+                                s_adpll_status0_adpll_status_0, s_adpll_status1_adpll_status_1, s_adpll_status2_adpll_status_2,
+                                s_io_dack0_n_ste, s_io_dack0_n_pd, s_io_dack0_n_pu, s_io_dreq0_n_ds, s_io_dreq0_n_sr,
+                                s_io_dreq0_n_co, s_io_dreq0_n_odp, s_io_dreq0_n_odn, s_io_dack1_n_ste, s_io_dack1_n_pd,
+                                s_io_dack1_n_pu, s_io_dreq1_n_ds, s_io_dreq1_n_sr, s_io_dreq1_n_co, s_io_dreq1_n_odp,
+                                s_io_dreq1_n_odn, s_io_dack2_n_ste, s_io_dack2_n_pd, s_io_dack2_n_pu, s_io_dreq2_n_ds,
+                                s_io_dreq2_n_sr, s_io_dreq2_n_co, s_io_dreq2_n_odp, s_io_dreq2_n_odn, s_io_dack3_n_ste,
+                                s_io_dack3_n_pd, s_io_dack3_n_pu, s_io_dreq3_n_ds, s_io_dreq3_n_sr, s_io_dreq3_n_co,
+                                s_io_dreq3_n_odp, s_io_dreq3_n_odn, s_io_d0_out_ds, s_io_d0_out_sr, s_io_d0_out_co,
+                                s_io_d0_out_odp, s_io_d0_out_odn, s_io_d0_in_ste, s_io_d0_in_pd, s_io_d0_in_pu, s_io_d1_out_ds,
+                                s_io_d1_out_sr, s_io_d1_out_co, s_io_d1_out_odp, s_io_d1_out_odn, s_io_d1_in_ste,
+                                s_io_d1_in_pd, s_io_d1_in_pu, s_io_d2_out_ds, s_io_d2_out_sr, s_io_d2_out_co,
+                                s_io_d2_out_odp, s_io_d2_out_odn, s_io_d2_in_ste, s_io_d2_in_pd, s_io_d2_in_pu, s_io_d3_out_ds,
+                                s_io_d3_out_sr, s_io_d3_out_co, s_io_d3_out_odp, s_io_d3_out_odn, s_io_d3_in_ste,
+                                s_io_d3_in_pd, s_io_d3_in_pu, s_io_d4_out_ds, s_io_d4_out_sr, s_io_d4_out_co,
+                                s_io_d4_out_odp, s_io_d4_out_odn, s_io_d4_in_ste, s_io_d4_in_pd, s_io_d4_in_pu, s_io_d5_out_ds,
+                                s_io_d5_out_sr, s_io_d5_out_co, s_io_d5_out_odp, s_io_d5_out_odn, s_io_d5_in_ste,
+                                s_io_d5_in_pd, s_io_d5_in_pu, s_io_d6_out_ds, s_io_d6_out_sr, s_io_d6_out_co,
+                                s_io_d6_out_odp, s_io_d6_out_odn, s_io_d6_in_ste, s_io_d6_in_pd, s_io_d6_in_pu, s_io_d7_out_ds,
+                                s_io_d7_out_sr, s_io_d7_out_co, s_io_d7_out_odp, s_io_d7_out_odn, s_io_d7_in_ste,
+                                s_io_d7_in_pd, s_io_d7_in_pu, s_io_ldout_n_ds, s_io_ldout_n_sr, s_io_ldout_n_co,
+                                s_io_ldout_n_odp, s_io_ldout_n_odn, s_io_next_n_ds, s_io_next_n_sr, s_io_next_n_co,
+                                s_io_next_n_odp, s_io_next_n_odn, s_io_clk_ds, s_io_clk_sr, s_io_clk_co, s_io_clk_odp,
+                                s_io_clk_odn, s_io_ioa_n_ds, s_io_ioa_n_sr, s_io_ioa_n_co, s_io_ioa_n_odp, s_io_ioa_n_odn,
+                                s_mrxout_in_ste, s_mrxout_in_pd, s_mrxout_in_pu)
   begin
     data_out <= (others => '0');
 
@@ -2632,12 +2648,12 @@ begin
           data_out(mwake_ste_msb_c downto mwake_ste_lsb_c) <= s_mwake_ste;
           data_out(mwake_pd_msb_c) <= s_mwake_pd;
           data_out(mwake_pu_msb_c) <= s_mwake_pu;
-        when mrxout_address_c => 
-          data_out(mrxout_ds_msb_c downto mrxout_ds_lsb_c) <= s_mrxout_ds;
-          data_out(mrxout_sr_msb_c) <= s_mrxout_sr;
-          data_out(mrxout_co_msb_c) <= s_mrxout_co;
-          data_out(mrxout_odp_msb_c) <= s_mrxout_odp;
-          data_out(mrxout_odn_msb_c) <= s_mrxout_odn;
+        when mrxout_out_address_c => 
+          data_out(mrxout_out_ds_msb_c downto mrxout_out_ds_lsb_c) <= s_mrxout_out_ds;
+          data_out(mrxout_out_sr_msb_c) <= s_mrxout_out_sr;
+          data_out(mrxout_out_co_msb_c) <= s_mrxout_out_co;
+          data_out(mrxout_out_odp_msb_c) <= s_mrxout_out_odp;
+          data_out(mrxout_out_odn_msb_c) <= s_mrxout_out_odn;
         when pll_1_address_c => 
           data_out(pll_1_main_div_n1_msb_c) <= s_pll_1_main_div_n1;
           data_out(pll_1_main_div_n2_msb_c downto pll_1_main_div_n2_lsb_c) <= s_pll_1_main_div_n2;
@@ -2818,6 +2834,10 @@ begin
           data_out(io_ioa_n_co_msb_c) <= s_io_ioa_n_co;
           data_out(io_ioa_n_odp_msb_c) <= s_io_ioa_n_odp;
           data_out(io_ioa_n_odn_msb_c) <= s_io_ioa_n_odn;
+        when mrxout_in_address_c => 
+          data_out(mrxout_in_ste_msb_c downto mrxout_in_ste_lsb_c) <= s_mrxout_in_ste;
+          data_out(mrxout_in_pd_msb_c) <= s_mrxout_in_pd;
+          data_out(mrxout_in_pu_msb_c) <= s_mrxout_in_pu;
         when others => null;
       end case;
     end if;
@@ -3125,11 +3145,11 @@ begin
   mwake_ste <= s_mwake_ste;
   mwake_pd <= s_mwake_pd;
   mwake_pu <= s_mwake_pu;
-  mrxout_ds <= s_mrxout_ds;
-  mrxout_sr <= s_mrxout_sr;
-  mrxout_co <= s_mrxout_co;
-  mrxout_odp <= s_mrxout_odp;
-  mrxout_odn <= s_mrxout_odn;
+  mrxout_out_ds <= s_mrxout_out_ds;
+  mrxout_out_sr <= s_mrxout_out_sr;
+  mrxout_out_co <= s_mrxout_out_co;
+  mrxout_out_odp <= s_mrxout_out_odp;
+  mrxout_out_odn <= s_mrxout_out_odn;
   pll_1_main_div_n1 <= s_pll_1_main_div_n1;
   pll_1_main_div_n2 <= s_pll_1_main_div_n2;
   pll_1_main_div_n3 <= s_pll_1_main_div_n3;
@@ -3272,6 +3292,9 @@ begin
   io_ioa_n_co <= s_io_ioa_n_co;
   io_ioa_n_odp <= s_io_ioa_n_odp;
   io_ioa_n_odn <= s_io_ioa_n_odn;
+  mrxout_in_ste <= s_mrxout_in_ste;
+  mrxout_in_pd <= s_mrxout_in_pd;
+  mrxout_in_pu <= s_mrxout_in_pu;
 
 end rtl;
 

@@ -85,7 +85,7 @@ package data_types_pack is
     pg7         : inoutput_pad_config_record_t;
     mtest       : input_pad_config_record_t;
     mwake       : input_pad_config_record_t;
-    mrxout      : output_pad_config_record_t;
+    mrxout      : inoutput_pad_config_record_t;
 	
     io_dack0_n  : input_pad_config_record_t;	
     io_dreq0_n  : output_pad_config_record_t;	
@@ -100,7 +100,7 @@ package data_types_pack is
     io_d1       : inoutput_pad_config_record_t;
     io_d2       : inoutput_pad_config_record_t;
     io_d3       : inoutput_pad_config_record_t;
-	io_d4       : inoutput_pad_config_record_t;
+	  io_d4       : inoutput_pad_config_record_t;
     io_d5       : inoutput_pad_config_record_t;	
     io_d6       : inoutput_pad_config_record_t;	
     io_d7       : inoutput_pad_config_record_t;	

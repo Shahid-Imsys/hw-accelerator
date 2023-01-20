@@ -6,7 +6,6 @@ use ieee.std_logic_unsigned.all;
 entity pe1_rtc_iso is
     port (
       iso             : in  std_logic;  -- isolation controll signal, active high
-      clk_iso         : in  std_logic;
 	  -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;

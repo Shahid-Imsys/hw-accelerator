@@ -181,7 +181,6 @@ end component;
   signal write_req      : std_logic;
   signal datain_vld     : std_logic;
   signal dataout_vld    : std_logic;
-  signal data_to_pe_en  : std_logic;
   --Control registers
   type reg is array (15 downto 0) of std_logic_vector(7 downto 0);
   signal mem_in         : reg;                             --Input register to memory

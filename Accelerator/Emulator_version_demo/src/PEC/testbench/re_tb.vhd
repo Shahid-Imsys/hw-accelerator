@@ -159,23 +159,16 @@ constant bias_saddr : std_logic_vector(127 downto 0)       := x"0000019000000000
 --------------------------------------------------------------------------------------------------
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant pp_ctl     : std_logic_vector(127 downto 0)       := x"00000170000000000000000000000000";
---write post processing relevant registers 54-59
-constant word_54 : std_logic_vector(127 downto 0) := "00000000000000000000001010000000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
-constant word_55 : std_logic_vector(127 downto 0) := "00000000000000000000001010100000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
-constant word_56 : std_logic_vector(127 downto 0) := "00000000000000000000001011000000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
-constant word_57 : std_logic_vector(127 downto 0) := "00000000000000000000001011100000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
-constant word_58 : std_logic_vector(127 downto 0) := "00000000000000000000001100000000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
-constant word_59 : std_logic_vector(127 downto 0) := "00000000000000000000001100100000000000000000000000000000011010000000000001100010000001010000011010101010101000000000000001000000";
 -- fft test
 --constant mode_fft : std_logic_vector(127 downto 0) :="";
 constant load_lc  : std_logic_vector(127 downto 0) := x"00000080000000000000000000000000";
 --constant start    : std_logic_vector(127 downto 0) :="";
 --fft test data
-constant fft_test_data0     : string := "FFT_data0_4.dat";
-constant fft_test_data1     : string := "FFT_data1_4.dat";
-constant fft_test_tf        : string := "FFT_TF_4.dat";
-constant fft_points         : integer := 4;
-constant fft_stages         : std_logic_vector := x"00";--max 7 = 512 point
+constant fft_test_data0     : string := "FFT_data0_16.dat";
+constant fft_test_data1     : string := "FFT_data1_16.dat";
+constant fft_test_tf        : string := "FFT_TF_16.dat";
+constant fft_points         : integer := 16;
+constant fft_stages         : std_logic_vector := x"02";--max 7 = 512 point
 
 
 begin

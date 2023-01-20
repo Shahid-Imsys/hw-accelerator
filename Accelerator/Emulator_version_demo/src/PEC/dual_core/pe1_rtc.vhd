@@ -74,16 +74,11 @@ entity pe1_rtc is
     poweron_finish      : out std_logic;  --
     reset_iso           : out std_logic;  -- to isolate the pe1_core reset
     reset_core_n        : out std_logic;  -- to reset pe1_core, low active
-    io_iso              : out std_logic;  -- to isolate the io signals in nap mode
-    nap_rec             : out std_logic;  -- will recover from nap mode
-    pmic_core_en        : out std_logic;
-    pmic_io_en          : out std_logic
+    nap_rec             : out std_logic  -- will recover from nap mode
     );
 end pe1_rtc;
 
 architecture rtl of pe1_rtc is
-  signal cp					: std_logic_vector(46 downto 0);
-  signal qn					: std_logic_vector(46 downto 0);
 
 	-- These signals need to be kept through synthesis!
 
@@ -102,31 +97,15 @@ architecture rtl of pe1_rtc is
   -- bmem
   signal dbus_iso_0             : std_logic_vector(7 downto 0);
 
-  -- RAM0
-  signal RAM0_DI_iso_0       	: std_logic_vector(7 downto 0);
-  signal RAM0_A_iso_0        	: std_logic_vector(13 downto 0);
-  signal RAM0_CS_iso_0       	: std_logic;
-  signal RAM0_WEB_iso_1      	: std_logic;
-
-
   signal clk_mux_out_iso_1      : std_logic;
-
-  signal rst_rtc_iso_0	: std_logic;
-  signal en_fclk_iso_0	: std_logic;
-  signal fclk_iso_0		  : std_logic;
-  signal rtc_sel_iso_0	: std_logic_vector(2 downto 0);
   signal halt_en_iso_0   : std_logic;
   signal nap_en_iso_0    : std_logic;
-  signal sel_pll_iso_0  : std_logic;
-  signal pllout_iso_1   : std_logic;
   signal poweron_finish_int : std_logic;
-  signal pmic_en_int  : std_logic;
 --  signal pwr_switch_on_int : std_logic_vector(3 downto 0);
   signal clk_mux_out_int  : std_logic;
   signal arst_n   : std_logic;
   signal lp_rst_cnt : std_logic_vector(4 downto 0);
   signal core_iso : std_logic;
-  signal clk_iso  : std_logic;
   signal lp_rst_cnt_off_int  : std_logic;
   signal pwr_on_rst_n  : std_logic;
 
@@ -136,26 +115,10 @@ architecture rtl of pe1_rtc is
   TYPE states IS (INIT, ACT, HALTP, HALTP2, HALTPC, HALT, HALTR, NAPP, NAPP2, NAPPC, NAP, NAPR);
   SIGNAL next_state : states;
   SIGNAL current_state : states;
---
---  signal state  : std_logic_vector(1 downto 0);
---  signal next_state  : std_logic_vector(1 downto 0);
---  constant s0   : std_logic_vector(1 downto 0) := "00";
---  constant s1   : std_logic_vector(1 downto 0) := "01";
---  constant s2   : std_logic_vector(1 downto 0) := "10";
---  constant s3   : std_logic_vector(1 downto 0) := "11";
-
-  --attribute syn_keep	: boolean;
-  --attribute syn_keep of rst_rtc_ok	: signal is true;
-  --attribute syn_keep of en_fclk_ok	: signal is true;
-  --attribute syn_keep of fclk_ok			: signal is true;
-  --attribute syn_keep of ld_bmem_ok	: signal is true;
-  --attribute syn_keep of rtc_sel_ok	: signal is true;
-
     -- Isolation cells for the pe1_rtc
   component pe1_rtc_iso
     port (
       iso			        : in  std_logic;  -- isolation controll signal, active high
-	  clk_iso				 : in  std_logic;  -- isolation controll signal, active high
       -- signals to be isolated
       halt_en         : in  std_logic;
       nap_en          : in  std_logic;
@@ -257,7 +220,6 @@ begin  -- rtl
   rtc_iso0: pe1_rtc_iso
     port map (
       iso            => core_iso,
-      clk_iso        => clk_iso,
       halt_en        => halt_en,
       nap_en         => nap_en,
 
@@ -412,37 +374,7 @@ gmem_asic_gen : if USE_ASIC_MEMORIES generate
 
 end generate;
 
-
-   --Clock switching logic, designed to handle asynchronous clocks.
-  -- clk_mux_1: clk_mux
-  -- port map (
-  --  clk1          => xout,
-  --  clk2          => pllout_iso_1,
-  --  sel           => sel_pll_iso_0,
-  --  rst_n         => lp_pwr_ok,
-  --  clk1_selected => xout_selected,
-  --  clk_mux_out   => clk_mux_out_int);
    clk_mux_out_int <= pllout;
-
-   --clk_mux_2: clk_mux
-   --port map (
-   -- clk1          => clk_mux_out1,
-   -- clk2          => hf_osc,
-   -- sel           => lp_mode_latch,
-   -- rst_n         => rst_n,
-   -- clk_mux_out   => clk_mux_out2);
-   --clk_p_int   <= clk_mux_out2;
-
-
-	-- Disable latch for the power to BMEM
-  --process (ld_bmem_iso_0, rtc_sel_iso_0)
-  --begin
-	--	if ld_bmem_iso_0 = '1' then
-	--		dis_bmem <= rtc_sel_iso_0(0);
-	--	end if;
-  --end process;
-
-
 
 arst_n <= lp_pwr_ok and not wakeup_lp;
 
@@ -540,35 +472,15 @@ end process pwr_mode_next;
 pwr_mode_signals : process (clk_mux_out_int,pwr_on_rst_n)
 begin
     IF pwr_on_rst_n = '0'   THEN
-        pmic_core_en    <= '1';
-		pmic_io_en      <= '1';
 		core_iso        <= '1';
-		clk_iso         <= '1';
 		reset_core_n    <= '0';
 		nap_rec         <= '0';
     ELSIF rising_edge(clk_mux_out_int) THEN
-        IF next_state = HALT THEN
-            pmic_core_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_core_en    <= '1';
-        END IF;
-
-        IF next_state = HALT or next_state = NAP THEN
-            pmic_io_en    <= '0';
-        ELSIF wakeup_lp = '1' THEN
-            pmic_io_en    <= '1';
-        END IF;
 
         IF next_state = ACT THEN
             core_iso    <= '0';
         ELSE
             core_iso    <= '1';
-        END IF;
-
-        IF next_state = ACT or next_state = HALTP or next_state = HALTP2 or next_state = NAPP or next_state = NAPP2 THEN
-            clk_iso    <= '0';
-        ELSE
-            clk_iso    <= '1';
         END IF;
 
         IF next_state = HALTR THEN
@@ -587,7 +499,6 @@ begin
 
 end process pwr_mode_signals;
 
-io_iso <= core_iso;
 
 process (clk_mux_out_int,pwr_on_rst_n)
 begin
@@ -605,8 +516,6 @@ begin
   if pwr_on_rst_n = '0' then
         reset_iso <= '0';
   elsif rising_edge(clk_mux_out_int) then
-        --if reset_iso_clear_iso_0 = '1' then
-        --    reset_iso <= '0';
         if wakeup_lp = '1' and current_state = HALT then
             reset_iso <= '1';
         end if;
@@ -614,7 +523,4 @@ begin
 end process;
 
 poweron_finish <= poweron_finish_int;
---pwr_switch_on <= pwr_switch_on_int;
---rtc_clk <= 0 when lp_mode_latch = '1' and state = s3 else clk_p;
-
 end rtl;

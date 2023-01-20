@@ -35,8 +35,6 @@ entity PE_pair_top is
     MCKOUT1    : out   std_logic;                  -- programable clock out
     MTEST      : in    std_logic;                  --                            high active
     MBYPASS    : in    std_logic;
-    MIRQ0      : in    std_logic;                  --                            low active
-    MIRQ1      : in    std_logic;                  --                            low active
     -- SW debug
     MSDIN      : in    std_logic;                  -- serial data in (debug)
     MSDOUT     : out   std_logic;                  -- serial data out
@@ -353,9 +351,6 @@ architecture struct of PE_pair_top is
   signal mreset_i     : std_logic;
   signal mtest_i      : std_logic;
 
-  -- Core clock buffers
-  signal clk_e_pos  : std_logic;
-  signal clk_e_neg  : std_logic;
 
   signal halt_en             : std_logic;   --high active, will go to halt state
   signal nap_en              : std_logic;   --high active, will go to nap state
@@ -363,10 +358,7 @@ architecture struct of PE_pair_top is
   signal poweron_finish      : std_logic;  --
   signal reset_iso           : std_logic;  -- to isolate the pe1_core reset
   signal reset_core_n        : std_logic;  -- to reset pe1_core, low active
-  signal io_iso              : std_logic;  -- to isolate the io signals in nap mode
   signal nap_rec             : std_logic;  -- will recover from nap mode
-  signal pmic_core_en        : std_logic;
-  signal pmic_io_en          : std_logic;
 
   signal lp_pwr_ok       : std_logic;
 
@@ -376,8 +368,6 @@ architecture struct of PE_pair_top is
   -- Signals to other blocks
   signal ddi_vld_c1    : std_logic; --CJ
   signal ddi_vld_c2    : std_logic; --CJ
-  signal rst_n         : std_logic;
-  signal rst_cn        : std_logic;
   signal fast_d        : std_logic;
   signal din_i         : std_logic;
   signal din_u         : std_logic;
@@ -914,10 +904,7 @@ end generate;
       poweron_finish => poweron_finish,
       reset_iso      => reset_iso     ,
       reset_core_n   => reset_core_n  ,
-      io_iso         => io_iso        ,
       nap_rec        => nap_rec       ,
-      pmic_core_en   => pmic_core_en  ,
-      pmic_io_en     => pmic_io_en    ,
       --gmem1
       c1_gmem_a      => c1_gmem_a     ,
       c1_gmem_q      => c1_gmem_q     ,
@@ -944,11 +931,7 @@ end generate;
     clk_p         => HCLK             , --: in  std_logic;  -- PLL clock
     even_c        => even_c           ,
     ready         => C1_RDY           ,
-    clk_e_pos     => clk_e_pos        , --: out  std_logic;  -- Execution clock
-    clk_e_neg     => clk_e_neg        , --: out  std_logic;  -- Execution clock
     -- Control outputs to the clock block
-    rst_n         => rst_n            , --: out std_logic;  -- Asynchronous reset to clk_gen
-    rst_cn        => rst_cn           , --: out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     fast_d        => fast_d           , --: out std_logic;  -- clk_d speed select
     din_i         => din_i            , --: out std_logic;  -- D input to FF generating clk_i
     din_u         => din_u            , --: out std_logic;  -- D input to FF generating clk_u

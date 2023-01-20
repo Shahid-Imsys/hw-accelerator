@@ -93,13 +93,12 @@ architecture rtl of pe1_mmr is
   signal m_addr         : std_logic_vector(31 downto 0);
   --signal en_dqo_int     : std_logic;
 
-  signal line_changed     : std_logic;-- for flash
-  signal page_changed     : std_logic;-- for flash
+  --signal line_changed     : std_logic;-- for flash
+  --signal page_changed     : std_logic;-- for flash
 
   signal pl_memcp_sig:   std_logic_vector(1 downto 0); -- MEMCP field of u-instruction
   signal pl_pc_sig:      std_logic_vector(3 downto 0);  --from the microprogram word
   signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
-  signal clk_e_neg_in :  std_logic;
 
   -- Introducing 'inv_col' to differ clock and combinational usage of 'col',
   -- in order to avoid Synplify ASIC generates a high fan_out on 'col'.
@@ -135,7 +134,6 @@ begin
     -- This is the combinatorial part of the state machine
     -- for the SDRAM timing logic.
 	pl_memcp_sig <= pl(2)&pl(36);
-  clk_e_neg_in <= clk_e_neg;
     mtl_next: process (state, pl_memcp_sig, held_e, allras)
     begin
       next_state <= state;
@@ -397,20 +395,20 @@ begin
     end process;
     wait_pr <= '1' when pr_ctr /= "00" else '0';
 
-  process (clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                page_changed <= '0';
-            elsif clk_e_pos = '0' then
-                if inv_col = '1' then
-                    page_changed <= '1';
-                elsif state = RdPending then
-                    page_changed <= '0';   --if current page is read
-                end if;
-            end if;
-        end if;
-    end process;
+  --process (clk_p)
+  --  begin
+  --      if rising_edge(clk_p) then
+  --          if rst_en = '0' then
+  --              page_changed <= '0';
+  --          elsif clk_e_pos = '0' then
+  --              if inv_col = '1' then
+  --                  page_changed <= '1';
+  --              elsif state = RdPending then
+  --                  page_changed <= '0';   --if current page is read
+  --              end if;
+  --          end if;
+  --      end if;
+  --  end process;
 
   end block mtl;
 
@@ -577,8 +575,8 @@ begin
         end if;
     end process;
 
-    line_changed <= '0' when adl_h4 = adl(7 downto 4) else
-                    '1';                                            --line is changed if the high 4 bits are not the same
+    --line_changed <= '0' when adl_h4 = adl(7 downto 4) else
+    --                '1';                                            --line is changed if the high 4 bits are not the same
     ---------------------------------------------------------------------
     -- ADH
     ---------------------------------------------------------------------
@@ -681,9 +679,9 @@ begin
     signal mux_c      : std_logic_vector(29 downto 20);
     signal mux_r      : std_logic_vector(24 downto 20);
     signal mux_dqm    : std_logic_vector(21 downto 20);
-    signal dqm_2      : std_logic;
-    signal dqm_4      : std_logic;
-    signal dqm_8      : std_logic;
+    --signal dqm_2      : std_logic;
+    --signal dqm_4      : std_logic;
+    --signal dqm_8      : std_logic;
     signal lm_addr    : std_logic_vector(32 downto 0);
     signal row_addr_buf :   std_logic_vector(15 downto 0);
   begin  -- block adrc

@@ -58,19 +58,13 @@ entity pe1_core is
     -- Clocks to/from clock block
     clk_p        : in  std_logic;  -- PLL clock
     even_c       : in  std_logic;
-    --clk_c2_pos   : in  std_logic;  -- clk_c / 2
-    clk_e_pos    : out std_logic;  -- Execution clock
-    clk_e_neg    : out std_logic;  -- Execution clock
     -- Control outputs to the clock block
-    rst_n        : out std_logic;  -- Asynchronous reset to clk_gen
-    rst_cn       : out std_logic;  -- Reset, will hold all clocks except c,rx,tx
     fast_d       : out std_logic;  -- clk_d speed select
     din_i        : out std_logic;  -- D input to FF generating clk_i
     din_u        : out std_logic;  -- D input to FF generating clk_u
     din_s        : out std_logic;  -- D input to FF generating clk_s
     clk_in_off   : out std_logic;  -- close all input clock
     clk_main_off : out std_logic; -- close main clock except clk_p
-    sdram_en     : out std_logic; --off chip sdram enable
     -- Power on signal
     pwr_ok      : in  std_logic;  -- Power is on
     -- Execution signal
@@ -720,10 +714,6 @@ begin
       reset_iso => reset_iso
 	  );
 
-  rst_cn <= rst_cn_int;
-  rst_n <= rst_n_int;
-  clk_e_pos <= clk_e_pos_int;
-  clk_e_neg <= clk_e_neg_int;
 ---------------------------------------------------------------------
 -- CLC -- sync reset
 ---------------------------------------------------------------------

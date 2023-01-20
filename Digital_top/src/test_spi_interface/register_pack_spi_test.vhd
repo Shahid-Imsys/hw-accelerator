@@ -87,7 +87,7 @@ package register_pack_spi_test is
   constant pg7_in_address_c        : integer := 16#49#;
   constant mtest_address_c         : integer := 16#4A#;
   constant mwake_address_c         : integer := 16#4B#;
-  constant mrxout_address_c        : integer := 16#4C#;
+  constant mrxout_out_address_c    : integer := 16#4C#;
   constant pll_1_address_c         : integer := 16#4D#;
   constant pll_2_address_c         : integer := 16#4E#;
   constant pll_cp_address_c        : integer := 16#4F#;
@@ -126,6 +126,7 @@ package register_pack_spi_test is
   constant io_next_n_address_c     : integer := 16#70#;
   constant io_clk_address_c        : integer := 16#71#;
   constant io_ioa_n_address_c      : integer := 16#72#;
+  constant mrxout_in_address_c     : integer := 16#73#;
 
   -- Register and field constants
 
@@ -2842,48 +2843,48 @@ package register_pack_spi_test is
   constant mwake_pu_scan_c  : mwake_pu_t := '0';
 
   ---------------------------------------------------------------------------
-  -- Register "mrxout"
-  constant mrxout_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+  -- Register "mrxout_out"
+  constant mrxout_out_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
 
   -- Field "ds"
-  constant mrxout_ds_size_c  : integer := 2;
-  constant mrxout_ds_lsb_c   : integer := 4;
-  constant mrxout_ds_msb_c   : integer := 5;
-  subtype mrxout_ds_t is std_ulogic_vector(mrxout_ds_size_c - 1 downto 0);
-  constant mrxout_ds_reset_c : mrxout_ds_t := std_ulogic_vector(to_unsigned(2, mrxout_ds_t'length));
-  constant mrxout_ds_scan_c  : mrxout_ds_t := std_ulogic_vector(to_unsigned(2, mrxout_ds_t'length));
+  constant mrxout_out_ds_size_c  : integer := 2;
+  constant mrxout_out_ds_lsb_c   : integer := 4;
+  constant mrxout_out_ds_msb_c   : integer := 5;
+  subtype mrxout_out_ds_t is std_ulogic_vector(mrxout_out_ds_size_c - 1 downto 0);
+  constant mrxout_out_ds_reset_c : mrxout_out_ds_t := std_ulogic_vector(to_unsigned(2, mrxout_out_ds_t'length));
+  constant mrxout_out_ds_scan_c  : mrxout_out_ds_t := std_ulogic_vector(to_unsigned(2, mrxout_out_ds_t'length));
 
   -- Field "sr"
-  constant mrxout_sr_size_c  : integer := 1;
-  constant mrxout_sr_lsb_c   : integer := 3;
-  constant mrxout_sr_msb_c   : integer := 3;
-  subtype mrxout_sr_t is std_ulogic;
-  constant mrxout_sr_reset_c : mrxout_sr_t := '1';
-  constant mrxout_sr_scan_c  : mrxout_sr_t := '1';
+  constant mrxout_out_sr_size_c  : integer := 1;
+  constant mrxout_out_sr_lsb_c   : integer := 3;
+  constant mrxout_out_sr_msb_c   : integer := 3;
+  subtype mrxout_out_sr_t is std_ulogic;
+  constant mrxout_out_sr_reset_c : mrxout_out_sr_t := '1';
+  constant mrxout_out_sr_scan_c  : mrxout_out_sr_t := '1';
 
   -- Field "co"
-  constant mrxout_co_size_c  : integer := 1;
-  constant mrxout_co_lsb_c   : integer := 2;
-  constant mrxout_co_msb_c   : integer := 2;
-  subtype mrxout_co_t is std_ulogic;
-  constant mrxout_co_reset_c : mrxout_co_t := '0';
-  constant mrxout_co_scan_c  : mrxout_co_t := '0';
+  constant mrxout_out_co_size_c  : integer := 1;
+  constant mrxout_out_co_lsb_c   : integer := 2;
+  constant mrxout_out_co_msb_c   : integer := 2;
+  subtype mrxout_out_co_t is std_ulogic;
+  constant mrxout_out_co_reset_c : mrxout_out_co_t := '0';
+  constant mrxout_out_co_scan_c  : mrxout_out_co_t := '0';
 
   -- Field "odp"
-  constant mrxout_odp_size_c  : integer := 1;
-  constant mrxout_odp_lsb_c   : integer := 1;
-  constant mrxout_odp_msb_c   : integer := 1;
-  subtype mrxout_odp_t is std_ulogic;
-  constant mrxout_odp_reset_c : mrxout_odp_t := '0';
-  constant mrxout_odp_scan_c  : mrxout_odp_t := '0';
+  constant mrxout_out_odp_size_c  : integer := 1;
+  constant mrxout_out_odp_lsb_c   : integer := 1;
+  constant mrxout_out_odp_msb_c   : integer := 1;
+  subtype mrxout_out_odp_t is std_ulogic;
+  constant mrxout_out_odp_reset_c : mrxout_out_odp_t := '0';
+  constant mrxout_out_odp_scan_c  : mrxout_out_odp_t := '0';
 
   -- Field "odn"
-  constant mrxout_odn_size_c  : integer := 1;
-  constant mrxout_odn_lsb_c   : integer := 0;
-  constant mrxout_odn_msb_c   : integer := 0;
-  subtype mrxout_odn_t is std_ulogic;
-  constant mrxout_odn_reset_c : mrxout_odn_t := '0';
-  constant mrxout_odn_scan_c  : mrxout_odn_t := '0';
+  constant mrxout_out_odn_size_c  : integer := 1;
+  constant mrxout_out_odn_lsb_c   : integer := 0;
+  constant mrxout_out_odn_msb_c   : integer := 0;
+  subtype mrxout_out_odn_t is std_ulogic;
+  constant mrxout_out_odn_reset_c : mrxout_out_odn_t := '0';
+  constant mrxout_out_odn_scan_c  : mrxout_out_odn_t := '0';
 
   ---------------------------------------------------------------------------
   -- Register "pll_1"
@@ -4173,6 +4174,34 @@ package register_pack_spi_test is
   constant io_ioa_n_odn_reset_c : io_ioa_n_odn_t := '0';
   constant io_ioa_n_odn_scan_c  : io_ioa_n_odn_t := '0';
 
+  ---------------------------------------------------------------------------
+  -- Register "mrxout_in"
+  constant mrxout_in_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant mrxout_in_ste_size_c  : integer := 2;
+  constant mrxout_in_ste_lsb_c   : integer := 2;
+  constant mrxout_in_ste_msb_c   : integer := 3;
+  subtype mrxout_in_ste_t is std_ulogic_vector(mrxout_in_ste_size_c - 1 downto 0);
+  constant mrxout_in_ste_reset_c : mrxout_in_ste_t := std_ulogic_vector(to_unsigned(0, mrxout_in_ste_t'length));
+  constant mrxout_in_ste_scan_c  : mrxout_in_ste_t := std_ulogic_vector(to_unsigned(0, mrxout_in_ste_t'length));
+
+  -- Field "pd"
+  constant mrxout_in_pd_size_c  : integer := 1;
+  constant mrxout_in_pd_lsb_c   : integer := 1;
+  constant mrxout_in_pd_msb_c   : integer := 1;
+  subtype mrxout_in_pd_t is std_ulogic;
+  constant mrxout_in_pd_reset_c : mrxout_in_pd_t := '1';
+  constant mrxout_in_pd_scan_c  : mrxout_in_pd_t := '1';
+
+  -- Field "pu"
+  constant mrxout_in_pu_size_c  : integer := 1;
+  constant mrxout_in_pu_lsb_c   : integer := 0;
+  constant mrxout_in_pu_msb_c   : integer := 0;
+  subtype mrxout_in_pu_t is std_ulogic;
+  constant mrxout_in_pu_reset_c : mrxout_in_pu_t := '0';
+  constant mrxout_in_pu_scan_c  : mrxout_in_pu_t := '0';
+
   component register_block_spi_test
 
     port (
@@ -4481,11 +4510,11 @@ package register_pack_spi_test is
           mwake_ste : out mwake_ste_t;
           mwake_pd : out mwake_pd_t;
           mwake_pu : out mwake_pu_t;
-          mrxout_ds : out mrxout_ds_t;
-          mrxout_sr : out mrxout_sr_t;
-          mrxout_co : out mrxout_co_t;
-          mrxout_odp : out mrxout_odp_t;
-          mrxout_odn : out mrxout_odn_t;
+          mrxout_out_ds : out mrxout_out_ds_t;
+          mrxout_out_sr : out mrxout_out_sr_t;
+          mrxout_out_co : out mrxout_out_co_t;
+          mrxout_out_odp : out mrxout_out_odp_t;
+          mrxout_out_odn : out mrxout_out_odn_t;
           pll_1_main_div_n1 : out pll_1_main_div_n1_t;
           pll_1_main_div_n2 : out pll_1_main_div_n2_t;
           pll_1_main_div_n3 : out pll_1_main_div_n3_t;
@@ -4628,6 +4657,9 @@ package register_pack_spi_test is
           io_ioa_n_co : out io_ioa_n_co_t;
           io_ioa_n_odp : out io_ioa_n_odp_t;
           io_ioa_n_odn : out io_ioa_n_odn_t;
+          mrxout_in_ste : out mrxout_in_ste_t;
+          mrxout_in_pd : out mrxout_in_pd_t;
+          mrxout_in_pu : out mrxout_in_pu_t;
 
 
           -- SPI Interface

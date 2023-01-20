@@ -312,9 +312,10 @@ architecture rtl of digital_chip is
 --  signal pi_en : std_logic_vector(7 downto 0);
   signal pj_en : std_logic_vector(7 downto 0);  
   
-  signal mtest_in : std_logic;
-  signal mwake_in : std_logic;
-  signal mrxout_in : std_logic;
+  signal mtest_in   : std_logic;
+  signal mwake_in   : std_logic;
+  signal mrxout_in  : std_logic;
+  signal mrxout_out : std_logic;
 
   signal d_lo : std_logic;
   signal p1_hi : std_logic;
@@ -494,7 +495,7 @@ begin  -- architecture rtl
 
 
         MRESET        => mreset,
-        MRSTOUT       => mrstout,  -- Missing pad.
+        MRSTOUT       => mrstout_n,  -- Missing pad.
         MIRQOUT       => mirqout_out,
         MCKOUT0       => mckout0,
         MCKOUT1       => MCKOUT1,
@@ -2020,21 +2021,26 @@ begin  -- architecture rtl
         di  => mwake_in
         );
     
-      
-    i_mrxout_pad : entity work.input_pad -- input in digital_top but output pad in excel-dok?
+    i_mrxout_pad : entity work.inoutput_pad
       generic map (
         direction => vertical)
       port map (
         -- PAD
         pad => mrxout,
-        --GPI
-        ie  => '1',
-        ste => (others => '0'),
-        pd  => '0',
-        pu  => '0',
+        -- GPIO
+        do  => mrxout_out,
+        ds  => pad_config.mrxout.ds & "00",
+        sr  => pad_config.mrxout.sr,
+        co  => pad_config.mrxout.co,
+        oe  => '1', 
+        odp => pad_config.mrxout.odp,
+        odn => pad_config.mrxout.odn,
+        ste => pad_config.mrxout.ste,
+        pd  => pad_config.mrxout.pd,
+        pu  => pad_config.mrxout.pu,
         di  => mrxout_in
-        );
-
+        ); 
+      
      --i_eme_d4_pad : RIIO_EG1D80V_GPIO_LVT28_H (
      --  port map (
      --    PAD_B => emem_d4,

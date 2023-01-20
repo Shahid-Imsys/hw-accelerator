@@ -891,8 +891,8 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "test_mem_p0.mif",
-        fpgaMemIndex  => 0 )
+        initFile      => "main_mem_p0.mif",
+        fpgaMemIndex  => i )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -906,8 +906,8 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "test_mem_p1.mif",
-        fpgaMemIndex  => 1 )
+        initFile      => "main_mem_p1.mif",
+        fpgaMemIndex  => i )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -921,8 +921,8 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "main_mem_p0.mif",
-        fpgaMemIndex  => 2 )
+        initFile      => "main_mem_p2.mif",
+        fpgaMemIndex  => i )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -936,8 +936,8 @@ begin
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
-        initFile      => "main_mem_p1.mif",
-        fpgaMemIndex  => 3 )
+        initFile      => "main_mem_p3.mif",
+        fpgaMemIndex  => i )
       port map (
         clk     => clk_p,
         address => ram_a(i),
@@ -947,12 +947,162 @@ begin
         cs      => ram_cs(i));
   end generate;
 
-  ram_genx : for i in 4 to MEMNUM-1 generate
+  ram_gen4 : for i in 4 to 4 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p4.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen5 : for i in 5 to 5 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p5.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen6 : for i in 6 to 6 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p6.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen7 : for i in 7 to 7 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p7.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen8 : for i in 8 to 8 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p8.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen9 : for i in 9 to 9 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p9.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen10 : for i in 10 to 10 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p10.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen11 : for i in 11 to 11 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p11.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen12 : for i in 12 to 12 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p12.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_gen13 : for i in 13 to 13 generate
+    ram_memory_inst : ram_memory
+      generic map (
+        g_memory_type => g_memory_type,
+        initFile      => "main_mem_p13.mif",
+        fpgaMemIndex  => i )
+      port map (
+        clk     => clk_p,
+        address => ram_a(i),
+        ram_di  => ram_di(i),
+        ram_do  => ram_do(i),
+        we_n    => ram_web(i),
+        cs      => ram_cs(i));
+  end generate;
+
+  ram_genx : for i in 14 to MEMNUM-1 generate
     ram_memory_inst : ram_memory
       generic map (
         g_memory_type => g_memory_type,
         initFile      => "main_mem.mif",
-        fpgaMemIndex  => 4 )
+        fpgaMemIndex  => i )
       port map (
         clk     => clk_p,
         address => ram_a(i),

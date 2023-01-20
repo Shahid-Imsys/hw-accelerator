@@ -4,14 +4,14 @@
 import argparse
 
 class mp2coe:
-    def __init__(self):
+    def __init__(self, infile, outfile):
         self.maxLines   = 16384
         self.bitPerWord = 8
 
-        self.mpFileName = 'Sequence_Test.mp'
+        self.mpFileName = infile
         self.mpData = []
 
-        self.coeFileName = 'test_mem.coe'
+        self.coeFileName = outfile
 
         self.read_mp()
         self.write_coe()
@@ -86,8 +86,9 @@ class mp2coe:
 
 if __name__ == "__main__":
 
-    #parser = argparse.ArgumentParser()
-    #parser.add_argument('--infile', help='infile ', action='store', type=str, default='')
-    #arg = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('infile',  help='.mp file to convert', type=str)
+    parser.add_argument('outfile', help='.coe file to write',  type=str)
+    args = parser.parse_args()
 
-    main = mp2coe()
+    main = mp2coe( args.infile, args.outfile )

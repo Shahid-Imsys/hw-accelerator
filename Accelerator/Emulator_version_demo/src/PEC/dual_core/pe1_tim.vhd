@@ -78,14 +78,14 @@ entity pe1_tim is
 		speed_ps1       : in  std_logic_vector(3 downto 0);   --Prescaler 1 control
 		speed_ps2       : in  std_logic_vector(5 downto 0);   --Prescaler 2 control
 		speed_ps3       : in  std_logic_vector(4 downto 0);   --Prescaler 3 control
-		dis_xosc        : in  std_logic; -- disable xosc from CRB
+		--dis_xosc        : in  std_logic; -- disable xosc from CRB
 		dis_pll         : in  std_logic; -- disable pll  from CRB
-		clk_sel         : in  std_logic;-- clock select from CRB
+		--clk_sel         : in  std_logic;-- clock select from CRB
 		-- Inputs from outside pe1_core
 		mreset          : in  std_logic; -- Asynchronous reset (active low)
 		pwr_ok          : in  std_logic; -- Power-on from PWRON
 		--mpordis_i       : in  std_logic; -- MPORDIS pad input
-		mtest_i         : in  std_logic; -- MTEST pad input
+		--mtest_i         : in  std_logic; -- MTEST pad input
 		mbypass_i       : in  std_logic; -- MBYPASS pad input
 		-- Inputs from other pe1_core blocks
 		hold_e          : in  std_logic; -- Hold input for clk_e, stops high when set
@@ -103,13 +103,9 @@ entity pe1_tim is
 		reset_iso       : in std_logic;  -- isolate the reset by power_ok
 
 		-- Outputs to outside pe1_core
-		mrstout         : out std_logic; -- MRSTOUT pad output
 		mirqout         : out std_logic; -- MIRQOUT pin, for irq to SP (act low)
 		mckout1         : out std_logic; -- Programmable division of clk_c, to external pin
 		--din_e      : out std_logic; -- To clock block for clk_e generation
-		din_i           : out std_logic; -- To clock block for clk_i generation
-		din_u           : out std_logic; -- To clock block for clk_u generation
-		din_s           : out std_logic; -- To clock block for clk_s generation
 		-- Outputs to other pe1_core blocks
 		--even_c     : out std_logic; -- High during even clk_c cycles
 		--gate_e     : out std_logic; -- A copy of clk_e, used for gating
@@ -152,8 +148,8 @@ architecture rtl of pe1_tim is
 	signal rst_nint      : std_logic;
 	signal rst_nint_int0 : std_logic;--added by maning
 	signal rst_nint_int1 : std_logic;--added by maning
-	signal mtest_i_int0  : std_logic;--added by maning
-	signal mtest_i_int1  : std_logic;--added by maning
+	--signal mtest_i_int0  : std_logic;--added by maning
+	--signal mtest_i_int1  : std_logic;--added by maning
 	signal rst_cn_cnt    : std_logic_vector(2 downto 0);
 	signal rst_cn_cnt1   : std_logic_vector(4 downto 0); -- for use in wake up mode added by maning
 	signal rst_cn_off    : std_logic;
@@ -163,8 +159,8 @@ architecture rtl of pe1_tim is
 	signal din_i_int     : std_logic;
 	signal din_s_int     : std_logic;
 	signal rst_cn_int    : std_logic;
-	signal sel_pll_int   : std_logic;
-	signal rst_en_int    : std_logic;
+	--signal sel_pll_int   : std_logic;
+	--signal rst_en_int    : std_logic;
 	signal runmode_int   : std_logic;
 	signal held_e_int    : std_logic;
 	signal mckout1_int   : std_logic;
@@ -201,14 +197,14 @@ begin
 		end if;
 	end process;
 
-	process (clk_p)
-	begin
-		--if falling_edge(clk_p) then
-		if rising_edge(clk_p) then      --Changed by CJ
-			mtest_i_int0 <= mtest_i;
-			mtest_i_int1 <= mtest_i_int0;
-		end if;
-	end process;
+	--process (clk_p)
+	--begin
+	--	--if falling_edge(clk_p) then
+	--	if rising_edge(clk_p) then      --Changed by CJ
+	--		mtest_i_int0 <= mtest_i;
+	--		mtest_i_int1 <= mtest_i_int0;
+	--	end if;
+	--end process;
 
   	rst_n <= rst_nint;
 --	en_pll_int <= (not dis_pll) and (not mbypass_i) and rst_nint;
@@ -261,7 +257,6 @@ begin
 		end if;
 	end process rst_cn_gen;
 	rst_cn  <= rst_cn_int;
-	mrstout <= rst_cn_int;
 
 --
 --	process (clk_p)
@@ -283,16 +278,16 @@ begin
 	sel_pll_on <= '1' when rst_cn_cnt(1) = '1' else '0';  --at least 1 ms for PLL be stable
 	-- Generate sel_pll, delays the use of PLL after en_pll
 	-- has acticated, to allow it to stabilize.
-	sel_pll_gen: process (clk_p, en_pll_int, rst_nint, clk_sel)
-	begin
-		if en_pll_int = '0' or rst_nint = '0' or clk_sel = '1' then
-			sel_pll_int <= '0';
-		elsif rising_edge(clk_p) then
-			if sel_pll_on = '1' then
-				sel_pll_int <= '1';
-			end if;
-		end if;
-	end process sel_pll_gen;
+	--sel_pll_gen: process (clk_p, en_pll_int, rst_nint, clk_sel)
+	--begin
+	--	if en_pll_int = '0' or rst_nint = '0' or clk_sel = '1' then
+	--		sel_pll_int <= '0';
+	--	elsif rising_edge(clk_p) then
+	--		if sel_pll_on = '1' then
+	--			sel_pll_int <= '1';
+	--		end if;
+	--	end if;
+	--end process sel_pll_gen;
 
 ---------------------------------------------------------------------
 -- Reset generation
@@ -374,7 +369,7 @@ begin
 			pend_i <= '0';
 		end if;
 	end process;
-	din_i <= din_i_int;
+	--din_i <= din_i_int;
 
 	-- Generate gate_i, which is exactly the same as clk_i but is used for gating.
 	process (clk_p)
@@ -417,8 +412,8 @@ begin
 		end if;
 	end process;
 	sum_u <= "0000" + fract_u + speed_u(2 downto 0);
-	din_u <=  '1' when ctr_u = "0000" else
-						'0';
+	--din_u <=  '1' when ctr_u = "0000" else
+	--					'0';
 
 	-- These FFs split clk_c by four and eight for clk_s generation.
 	-- They are not toggled if they are not needed, when clk_s is fast.
@@ -458,7 +453,7 @@ begin
 			din_s_int <= '0';
 		end if;
 	end process;
-    din_s <= din_s_int;
+    --din_s <= din_s_int;
     -- Generate gate_s, which is exactly the same as clk_i but is used for gating.
 	process (clk_p)
 	begin

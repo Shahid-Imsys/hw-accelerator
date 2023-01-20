@@ -60,11 +60,8 @@ entity pe1_core is
     even_c       : in  std_logic;
     -- Control outputs to the clock block
     fast_d       : out std_logic;  -- clk_d speed select
-    din_i        : out std_logic;  -- D input to FF generating clk_i
-    din_u        : out std_logic;  -- D input to FF generating clk_u
-    din_s        : out std_logic;  -- D input to FF generating clk_s
-    clk_in_off   : out std_logic;  -- close all input clock
-    clk_main_off : out std_logic; -- close main clock except clk_p
+    --clk_in_off   : out std_logic;  -- close all input clock
+    --clk_main_off : out std_logic; -- close main clock except clk_p
     -- Power on signal
     pwr_ok      : in  std_logic;  -- Power is on
     -- Execution signal
@@ -76,11 +73,10 @@ entity pe1_core is
     --signals to core2
     c2_core2_en    : out std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
-    c2_clkreq_gen  : out std_logic;
+    --c2_clkreq_gen  : out std_logic;
     c2_ready       : in std_logic;
     c2_crb_sel     : in  std_logic_vector(3 downto 0);
     c2_crb_out     : out std_logic_vector(7 downto 0);
-    c2_en_pmem     : out  std_logic;
     c2_en_wdog     : out std_logic;
     c2_pup_clk     : out std_logic;
     c2_pup_irq     : out std_logic_vector(1 downto 0);
@@ -104,9 +100,7 @@ entity pe1_core is
     nap_en          : out std_logic;
     --  Signals to/from Peripheral block
     dbus        : out std_logic_vector(7 downto 0);
-    rst_en      : out std_logic;
-    pd          : out std_logic_vector(2 downto 0);  -- pl_pd
-    aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
+    --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
     idreq       : in  std_logic_vector(7 downto 0);
     idi         : in  std_logic_vector(7 downto 0);
     idack       : out std_logic_vector(7 downto 0);
@@ -117,22 +111,20 @@ entity pe1_core is
     inext       : out std_logic;
     iden        : in  std_logic;
     dqm_size    : out std_logic_vector(1 downto 0);
-    adc_dac     : out std_logic;
-    en_tiu      : out std_logic;
-    en_iobus    : out std_logic_vector(1 downto 0);
+    --adc_dac     : out std_logic;
+    --en_tiu      : out std_logic;
+    --en_iobus    : out std_logic_vector(1 downto 0);
     irq0        : in  std_logic;  -- Interrupt request 0
     irq1        : in  std_logic;  -- Interrupt request 1
     adc_ref2v		: out	std_logic;	-- Select 2V internal ADC reference (1V)
 ---------------------------------------------------------------------
     -- Memory signals
 ---------------------------------------------------------------------
-    -- MPROM signals
-    mprom_oe    : out std_logic_vector(1 downto 0); --Output enable(active high)
     -- MPRAM signals
     mpram_a     : out std_logic_vector(7 downto 0);-- Address  -- CJ
     mpram_d     : out std_logic_vector(127 downto 0);-- Data to memory --CJ
     mpram_ce    : out std_logic_vector(1 downto 0); -- Chip enable(active high)
-    mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
+    --mpram_oe    : out std_logic_vector(1 downto 0); -- Output enable(active high)
     mpram_we_n  : out std_logic;                    -- Write enable(active low)
     -- MPROM/MPRAM data out bus
     mp_q        : in  std_logic_vector(127 downto 0);-- Data from MPROM/MPRAM
@@ -150,27 +142,14 @@ entity pe1_core is
     mreset_i    : in  std_logic;  -- Asynchronous reset input
     mirqout_o   : out std_logic;  -- Interrupt  request output
     mckout1_o   : out std_logic;  -- Programmable clock out
-    mckout1_o_en: out std_logic;  -- enable
     msdin_i     : in  std_logic;  -- Serial data in (debug)
     msdout_o    : out std_logic;  -- Serial data out
-    mrstout_o   : out std_logic;  -- Reset out
-    mtest_i     : in  std_logic;  -- Test mode
+    --mtest_i     : in  std_logic;  -- Test mode
     mbypass_i   : in  std_logic;  -- bypass PLL
-    mwake_i     : in  std_logic;  -- wake up
+    --mwake_i     : in  std_logic;  -- wake up
     --CC interface signals
     din_c       : in std_logic_vector(127 downto 0);
-    dout_c      : out std_logic_vector(159 downto 0);
-	--pl_out          : out std_logic_vector(79 downto 0);--maning
-		-- I/O cell configuration control outputs
-    d_hi        : out std_logic; -- High drive on DRAM interface, now used for other outputs
-    d_sr        : out std_logic; -- Slew rate limit on DRAM interface
-    d_lo        : out std_logic; -- Low drive on DRAM interface
-    p1_hi       : out std_logic; -- High drive on port group 1 pins
-    p1_sr       : out std_logic; -- Slew rate limit on port group 1 pins
-    p2_hi       : out std_logic; -- High drive on port group 2 pins
-    p2_sr       : out std_logic; -- Slew rate limit on port group 2 pins
-    p3_hi       : out std_logic; -- High drive on port group 3 pins
-    p3_sr       : out std_logic -- Slew rate limit on port group 3 pins
+    dout_c      : out std_logic_vector(159 downto 0)
     );
 
 end pe1_core;
@@ -190,11 +169,9 @@ architecture struct of pe1_core is
   signal mp_alud    : std_logic;
   signal mp_shin_pa : std_logic_vector(3 downto 0);
   signal mp_gass    : std_logic_vector(1 downto 0);
-  signal mpram_a_int: std_logic_vector(7 downto 0);
 
   -- CRB signals
   signal crb_out    	: std_logic_vector(7 downto 0);
-  signal en_pmem    	: std_logic;
   signal speed_i    	: std_logic_vector(1 downto 0);
   signal en_wdog    	: std_logic;
   signal pup_clk    	: std_logic;
@@ -208,9 +185,9 @@ architecture struct of pe1_core is
   signal t_rcd      	: std_logic_vector(1 downto 0);
   signal t_rp       	: std_logic_vector(1 downto 0);
   signal dis_pll    	: std_logic;
-  signal dis_xosc   	: std_logic;
-  signal en_mxout   	: std_logic;
-  signal clk_sel   	  : std_logic;
+  --signal dis_xosc   	: std_logic;
+  --signal en_mxout   	: std_logic;
+  --signal clk_sel   	  : std_logic;
   signal en_s       	: std_logic;
   signal speed_s    	: std_logic_vector(1 downto 0);
   signal speed_u    	: std_logic_vector(6 downto 0);
@@ -303,7 +280,7 @@ architecture struct of pe1_core is
   signal lmpen      : std_logic;
   signal adl_cy     : std_logic;
   signal mmr_hold_e : std_logic;
-  signal exe_i      : std_logic;      --Added by CJ
+  --signal exe_i      : std_logic;      --Added by CJ
   signal dfm_rdy    : std_logic; --CJ
   signal dtm_fifo_rdy : std_logic; --CJ
   signal dtm_buf_empty : std_logic;
@@ -331,7 +308,6 @@ architecture struct of pe1_core is
   signal i_direct   : std_logic_vector(7 downto 0);
   signal dfio       : std_logic_vector(7 downto 0);
   signal ios_hold_e : std_logic;
-  signal ack_sig    : std_logic;
 
   attribute syn_keep              : boolean;
   attribute syn_keep of pend_i    : signal is true;
@@ -381,15 +357,14 @@ begin
 ---------------------------------------------------------------------
 -- Signals also used by Peri block
 ---------------------------------------------------------------------
-  rst_en <= rst_en_int;
   dbus <= dbus_int;
-  pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
-  aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
+  --pd <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
+  --aaddr <= pl(23)&pl(6)&pl(54)&pl(27)&pl(49);
   ready <= pl(127) and not dtm_fifo_rdy;
 ---------------------------------------------------------------------
 -- Microinstruction loading
 ---------------------------------------------------------------------
-  exe_i <= exe;
+  --exe_i <= exe;
   req_c1 <= req;
   req_rd_c1 <= req_rd;
   ack <= ACK_C1;
@@ -509,24 +484,19 @@ begin
   pe1_mpgm: entity work.pe1_mpgm
     port map (
       -- Clock and reset
-      rst_cn      => rst_cn_int,
-      clk_p       => clk_p,
-      clk_e_neg    => clk_e_neg_int,
+      --rst_cn      => rst_cn_int,
+      --clk_p       => clk_p,
+      --clk_e_neg    => clk_e_neg_int,
       -- Control signals
       even_c      => even_c,
       held_e      => held_e,
-      plsel_n     => plsel_n,
       lmpen       => lmpen,
-      lmpwe_n     => lmpwe_n,
-      en_pmem     => en_pmem,
       -- Inputs
       mpga        => mpga,
-      latch       => latch,
       y_reg       => y_reg,
       -- Outputs to MPRAM/MPROM
       mpram_a     => mpram_a,
-      mprom_oe    => mprom_oe,
-      mpram_oe    => mpram_oe,
+      --mpram_oe    => mpram_oe,
       mpram_ce    => mpram_ce
       );
 
@@ -560,14 +530,13 @@ begin
       ld_crb      => ld_crb,
       rd_crb      => rd_crb,
       c2_ready    => c2_ready,
-      mwake_i     => mwake_i,
+      --mwake_i     => mwake_i,
       -- Data paths
       dbus        => dbus_int,
       state_ps3   => state_ps3,
       crb_out     => crb_out,
       -- Static control outputs
       -- CCFF register
-      en_pmem     => en_pmem,
       speed_i     => speed_i,
       en_wdog     => en_wdog,
       pup_clk     => pup_clk,
@@ -583,17 +552,17 @@ begin
       t_rcd       => t_rcd,
       t_rp        => t_rp,
       -- PLLC register
-      en_tiu      => en_tiu,
+      --en_tiu      => en_tiu,
       dis_pll     => dis_pll,
-      dis_xosc    => dis_xosc,
-      clk_sel    => clk_sel,
+      --dis_xosc    => dis_xosc,
+      --clk_sel    => clk_sel,
       -- PLLM register
       -- SECC register
       en_s        => en_s,
       speed_s     => speed_s,
       -- PMXC register
-      adc_dac     => adc_dac,
-      en_iobus    => en_iobus,
+      --adc_dac     => adc_dac,
+      --en_iobus    => en_iobus,
       -- UACC register
       adc_ref2v   => adc_ref2v,
       speed_u     => speed_u,
@@ -603,19 +572,9 @@ begin
       -- PSC2 register
       speed_ps3   => speed_ps3,
       en_mckout1  => en_mckout1,
-      clk_in_off   => clk_in_off   ,
-      clk_main_off => clk_main_off ,
+      --clk_in_off   => clk_in_off   ,
+      --clk_main_off => clk_main_off ,
       reqrun      => reqrun,
-	    -- IOCTRL register & pad control   --delete by HYX, 20141027
-      d_hi           => d_hi           ,   --: out std_logic; -- High drive on DRAM interface
-      d_sr           => d_sr           ,   --: out std_logic; -- Slew rate limit on DRAM interface
-      d_lo           => d_lo           ,   --: out std_logic; -- Low drive on DRAM interface
-      p1_hi          => p1_hi          ,   --: out std_logic; -- High drive on port group 1 pins
-      p1_sr          => p1_sr          ,   --: out std_logic; -- Slew rate limit on port group 1 pins
-      p2_hi          => p2_hi          ,   --: out std_logic; -- High drive on port group 2 pins
-      p2_sr          => p2_sr          ,   --: out std_logic; -- Slew rate limit on port group 2 pins
-      p3_hi          => p3_hi          ,   --: out std_logic; -- High drive on port group 3 pins
-      p3_sr          => p3_sr          ,   --: out std_logic; -- Slew rate limit on port group 3 pins
     	-- BMEM block interface
       core2_en    => c2_core2_en,
       short_cycle => short_cycle_int,
@@ -631,8 +590,6 @@ begin
     fast_d		    <= fast_d_int;
 	  dqm_size	    <= dqm_size_int;
     c2_rsc_n      <= rsc_n;
-    c2_clkreq_gen <= clkreq_gen;
-    c2_en_pmem    <= en_pmem  ;
     c2_en_wdog    <= en_wdog  ;
     c2_pup_clk    <= pup_clk  ;
     c2_pup_irq    <= pup_irq  ;
@@ -648,7 +605,6 @@ begin
 -- TIM - timing logic
 ---------------------------------------------------------------------
   hold_e_int <= ios_hold_e or mmr_hold_e;
-  mckout1_o_en <= en_mckout1;
   pe1_tim: entity work.pe1_tim
     port map (
       -- Clock
@@ -669,14 +625,14 @@ begin
       speed_ps1   => speed_ps1,
       speed_ps2   => speed_ps2,
       speed_ps3   => speed_ps3,
-      dis_xosc    => dis_xosc,
+      --dis_xosc    => dis_xosc,
       dis_pll     => dis_pll,
-      clk_sel     => clk_sel,
+      --clk_sel     => clk_sel,
       -- Inputs from outside pe1_core
       mreset      => mreset_i,
       pwr_ok      => pwr_ok,
       --mpordis_i   => mpordis_i,
-      mtest_i     => mtest_i,
+      --mtest_i     => mtest_i,
       mbypass_i   => mbypass_i,
       -- Inputs from other pe1_core blocks
       hold_e      => hold_e_int,
@@ -689,13 +645,9 @@ begin
       sleep       => sleep,
       wdog_n      => wdog_n,
       -- Outputs to outside pe1_core
-      mrstout     => mrstout_o,
       mirqout     => mirqout_o,
       mckout1     => mckout1_o,
       --din_e       => din_e,
-      din_i       => din_i,
-      din_u       => din_u,
-      din_s       => din_s,
       -- Outputs to other pe1_core blocks
       --even_c      => even_c,
       --gate_e      => gate_e,

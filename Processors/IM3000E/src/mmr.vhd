@@ -702,7 +702,7 @@ begin
     signal dqm_4      : std_logic;
     signal dqm_8      : std_logic;
     signal lm_addr    : std_logic_vector(32 downto 0);   
-    signal row_addr_buf :   std_logic_vector(15 downto 0);   
+    signal row_addr_buf :   std_logic_vector(23 downto 0);   
   begin  -- block adrc
     -- Some of the address bits have latches to prevent
     -- ADH/ADP/SADP changes during the active time to affect
@@ -717,25 +717,13 @@ begin
             if rst_en = '0' then
                 row_addr_buf <= (others => '0');
             elsif inv_col = '1' and clk_d_pos = '0' then
-                row_addr_buf(3 downto 0) <= m_addr(11 downto 8);
-                row_addr_buf(15 downto 4) <= m_addr(31 downto 20);
+                row_addr_buf(23 downto 0) <= m_addr(31 downto 8);
             end if;
     end process;
-    lm_addr(11 downto 8) <= m_addr(11 downto 8) when inv_col = '1' else
-                            row_addr_buf(3 downto 0);
-    lm_addr(31 downto 20) <= m_addr(31 downto 20) when inv_col = '1' else
-                            row_addr_buf(15 downto 4);
---    process (inv_col, m_addr)
---    begin
---      if inv_col = '1' then
---        lm_addr(11 downto 8) <= m_addr(11 downto 8);
---        lm_addr(31 downto 20) <= m_addr(31 downto 20);
---      end if;
---    end process;
-    lm_addr(7 downto 0) <= m_addr(7 downto 0);
-    lm_addr(19 downto 12) <= m_addr(19 downto 12);
---     lm_addr(32) <= m_addr(32);
     lm_addr(32) <= '0';
+    lm_addr(31 downto 8) <= m_addr(31 downto 8) when inv_col = '1' else
+                            row_addr_buf(23 downto 0);
+    lm_addr(7 downto 0) <= m_addr(7 downto 0);
     
     -- Column address, flip lsb during second half of cycle when
     -- doing double-byte transfers. 

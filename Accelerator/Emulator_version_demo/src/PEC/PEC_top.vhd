@@ -126,8 +126,6 @@ architecture struct of PEC_top is
       MCKOUT1    : out std_logic;       -- programable clock out
       MTEST      : in  std_logic;  --                            high active                 
       MBYPASS    : in  std_logic;
-      MIRQ0      : in  std_logic;  --                            low active
-      MIRQ1      : in  std_logic;  --                            low active
       -- SW debug                                                               
       MSDIN      : in  std_logic;       -- serial data in (debug)     
       MSDOUT     : out std_logic;       -- serial data out  
@@ -281,8 +279,6 @@ begin
         MCKOUT1    => open,
         MTEST      => '0',
         MBYPASS    => '0',
-        MIRQ0      => '1',
-        MIRQ1      => '1',
         -- SW debug=>                                             
         MSDIN      => '0',
         MSDOUT     => open,

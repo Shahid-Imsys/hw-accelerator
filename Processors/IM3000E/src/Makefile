@@ -81,8 +81,18 @@ fpga_ip:
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p0/sim/main_mem_p0.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p1/sim/main_mem_p1.v
-	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/test_mem_p0/sim/test_mem_p0.v
-	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/test_mem_p1/sim/test_mem_p1.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p2/sim/main_mem_p2.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p3/sim/main_mem_p3.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p4/sim/main_mem_p4.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p5/sim/main_mem_p5.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p6/sim/main_mem_p6.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p7/sim/main_mem_p7.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p8/sim/main_mem_p8.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p9/sim/main_mem_p9.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p10/sim/main_mem_p10.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p11/sim/main_mem_p11.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p12/sim/main_mem_p12.v
+	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/main_mem_p13/sim/main_mem_p13.v
 	$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/mpram_mem/sim/mpram_mem.v
 	#$(V_COMP) $(IP_DIR_WIN)/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
 

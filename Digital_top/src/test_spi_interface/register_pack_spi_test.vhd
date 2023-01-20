@@ -127,6 +127,8 @@ package register_pack_spi_test is
   constant io_clk_address_c        : integer := 16#71#;
   constant io_ioa_n_address_c      : integer := 16#72#;
   constant mrxout_in_address_c     : integer := 16#73#;
+  constant mreset_n_address_c      : integer := 16#74#;
+  constant mrstout_n_address_c     : integer := 16#75#;
 
   -- Register and field constants
 
@@ -4202,6 +4204,78 @@ package register_pack_spi_test is
   constant mrxout_in_pu_reset_c : mrxout_in_pu_t := '0';
   constant mrxout_in_pu_scan_c  : mrxout_in_pu_t := '0';
 
+  ---------------------------------------------------------------------------
+  -- Register "mreset_n"
+  constant mreset_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#02#, register_t'length));
+
+  -- Field "ste"
+  constant mreset_n_ste_size_c  : integer := 2;
+  constant mreset_n_ste_lsb_c   : integer := 2;
+  constant mreset_n_ste_msb_c   : integer := 3;
+  subtype mreset_n_ste_t is std_ulogic_vector(mreset_n_ste_size_c - 1 downto 0);
+  constant mreset_n_ste_reset_c : mreset_n_ste_t := std_ulogic_vector(to_unsigned(0, mreset_n_ste_t'length));
+  constant mreset_n_ste_scan_c  : mreset_n_ste_t := std_ulogic_vector(to_unsigned(0, mreset_n_ste_t'length));
+
+  -- Field "pd"
+  constant mreset_n_pd_size_c  : integer := 1;
+  constant mreset_n_pd_lsb_c   : integer := 1;
+  constant mreset_n_pd_msb_c   : integer := 1;
+  subtype mreset_n_pd_t is std_ulogic;
+  constant mreset_n_pd_reset_c : mreset_n_pd_t := '1';
+  constant mreset_n_pd_scan_c  : mreset_n_pd_t := '1';
+
+  -- Field "pu"
+  constant mreset_n_pu_size_c  : integer := 1;
+  constant mreset_n_pu_lsb_c   : integer := 0;
+  constant mreset_n_pu_msb_c   : integer := 0;
+  subtype mreset_n_pu_t is std_ulogic;
+  constant mreset_n_pu_reset_c : mreset_n_pu_t := '0';
+  constant mreset_n_pu_scan_c  : mreset_n_pu_t := '0';
+
+  ---------------------------------------------------------------------------
+  -- Register "mrstout_n"
+  constant mrstout_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant mrstout_n_ds_size_c  : integer := 2;
+  constant mrstout_n_ds_lsb_c   : integer := 4;
+  constant mrstout_n_ds_msb_c   : integer := 5;
+  subtype mrstout_n_ds_t is std_ulogic_vector(mrstout_n_ds_size_c - 1 downto 0);
+  constant mrstout_n_ds_reset_c : mrstout_n_ds_t := std_ulogic_vector(to_unsigned(2, mrstout_n_ds_t'length));
+  constant mrstout_n_ds_scan_c  : mrstout_n_ds_t := std_ulogic_vector(to_unsigned(2, mrstout_n_ds_t'length));
+
+  -- Field "sr"
+  constant mrstout_n_sr_size_c  : integer := 1;
+  constant mrstout_n_sr_lsb_c   : integer := 3;
+  constant mrstout_n_sr_msb_c   : integer := 3;
+  subtype mrstout_n_sr_t is std_ulogic;
+  constant mrstout_n_sr_reset_c : mrstout_n_sr_t := '1';
+  constant mrstout_n_sr_scan_c  : mrstout_n_sr_t := '1';
+
+  -- Field "co"
+  constant mrstout_n_co_size_c  : integer := 1;
+  constant mrstout_n_co_lsb_c   : integer := 2;
+  constant mrstout_n_co_msb_c   : integer := 2;
+  subtype mrstout_n_co_t is std_ulogic;
+  constant mrstout_n_co_reset_c : mrstout_n_co_t := '0';
+  constant mrstout_n_co_scan_c  : mrstout_n_co_t := '0';
+
+  -- Field "odp"
+  constant mrstout_n_odp_size_c  : integer := 1;
+  constant mrstout_n_odp_lsb_c   : integer := 1;
+  constant mrstout_n_odp_msb_c   : integer := 1;
+  subtype mrstout_n_odp_t is std_ulogic;
+  constant mrstout_n_odp_reset_c : mrstout_n_odp_t := '0';
+  constant mrstout_n_odp_scan_c  : mrstout_n_odp_t := '0';
+
+  -- Field "odn"
+  constant mrstout_n_odn_size_c  : integer := 1;
+  constant mrstout_n_odn_lsb_c   : integer := 0;
+  constant mrstout_n_odn_msb_c   : integer := 0;
+  subtype mrstout_n_odn_t is std_ulogic;
+  constant mrstout_n_odn_reset_c : mrstout_n_odn_t := '0';
+  constant mrstout_n_odn_scan_c  : mrstout_n_odn_t := '0';
+
   component register_block_spi_test
 
     port (
@@ -4660,6 +4734,14 @@ package register_pack_spi_test is
           mrxout_in_ste : out mrxout_in_ste_t;
           mrxout_in_pd : out mrxout_in_pd_t;
           mrxout_in_pu : out mrxout_in_pu_t;
+          mreset_n_ste : out mreset_n_ste_t;
+          mreset_n_pd : out mreset_n_pd_t;
+          mreset_n_pu : out mreset_n_pu_t;
+          mrstout_n_ds : out mrstout_n_ds_t;
+          mrstout_n_sr : out mrstout_n_sr_t;
+          mrstout_n_co : out mrstout_n_co_t;
+          mrstout_n_odp : out mrstout_n_odp_t;
+          mrstout_n_odn : out mrstout_n_odn_t;
 
 
           -- SPI Interface

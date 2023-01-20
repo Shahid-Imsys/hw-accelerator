@@ -462,6 +462,14 @@ entity register_block_spi_test is
           mrxout_in_ste : out mrxout_in_ste_t;
           mrxout_in_pd : out mrxout_in_pd_t;
           mrxout_in_pu : out mrxout_in_pu_t;
+          mreset_n_ste : out mreset_n_ste_t;
+          mreset_n_pd : out mreset_n_pd_t;
+          mreset_n_pu : out mreset_n_pu_t;
+          mrstout_n_ds : out mrstout_n_ds_t;
+          mrstout_n_sr : out mrstout_n_sr_t;
+          mrstout_n_co : out mrstout_n_co_t;
+          mrstout_n_odp : out mrstout_n_odp_t;
+          mrstout_n_odn : out mrstout_n_odn_t;
 
 
           -- SPI Interface
@@ -927,6 +935,14 @@ architecture rtl of register_block_spi_test  is
     signal s_mrxout_in_ste : mrxout_in_ste_t;
     signal s_mrxout_in_pd : mrxout_in_pd_t;
     signal s_mrxout_in_pu : mrxout_in_pu_t;
+    signal s_mreset_n_ste : mreset_n_ste_t;
+    signal s_mreset_n_pd : mreset_n_pd_t;
+    signal s_mreset_n_pu : mreset_n_pu_t;
+    signal s_mrstout_n_ds : mrstout_n_ds_t;
+    signal s_mrstout_n_sr : mrstout_n_sr_t;
+    signal s_mrstout_n_co : mrstout_n_co_t;
+    signal s_mrstout_n_odp : mrstout_n_odp_t;
+    signal s_mrstout_n_odn : mrstout_n_odn_t;
 
     signal s_address : integer range 0 to (2**7) - 1;
 
@@ -1383,6 +1399,14 @@ begin
       s_mrxout_in_ste <= mrxout_in_ste_reset_c;
       s_mrxout_in_pd <= mrxout_in_pd_reset_c;
       s_mrxout_in_pu <= mrxout_in_pu_reset_c;
+      s_mreset_n_ste <= mreset_n_ste_reset_c;
+      s_mreset_n_pd <= mreset_n_pd_reset_c;
+      s_mreset_n_pu <= mreset_n_pu_reset_c;
+      s_mrstout_n_ds <= mrstout_n_ds_reset_c;
+      s_mrstout_n_sr <= mrstout_n_sr_reset_c;
+      s_mrstout_n_co <= mrstout_n_co_reset_c;
+      s_mrstout_n_odp <= mrstout_n_odp_reset_c;
+      s_mrstout_n_odn <= mrstout_n_odn_reset_c;
     elsif clk 'event and clk = '1' then  -- rising clock edge
       if enable = '1' then
         case s_address is
@@ -2172,6 +2196,20 @@ begin
               s_mrxout_in_pd <= data_in(mrxout_in_pd_msb_c);
               s_mrxout_in_pu <= data_in(mrxout_in_pu_msb_c);
             end if;
+          when mreset_n_address_c => 
+            if write_cmd = '1' then
+              s_mreset_n_ste <= data_in(mreset_n_ste_msb_c downto mreset_n_ste_lsb_c);
+              s_mreset_n_pd <= data_in(mreset_n_pd_msb_c);
+              s_mreset_n_pu <= data_in(mreset_n_pu_msb_c);
+            end if;
+          when mrstout_n_address_c => 
+            if write_cmd = '1' then
+              s_mrstout_n_ds <= data_in(mrstout_n_ds_msb_c downto mrstout_n_ds_lsb_c);
+              s_mrstout_n_sr <= data_in(mrstout_n_sr_msb_c);
+              s_mrstout_n_co <= data_in(mrstout_n_co_msb_c);
+              s_mrstout_n_odp <= data_in(mrstout_n_odp_msb_c);
+              s_mrstout_n_odn <= data_in(mrstout_n_odn_msb_c);
+            end if;
           when others => null;
         end case;
       end if;
@@ -2265,7 +2303,8 @@ begin
                                 s_io_ldout_n_odp, s_io_ldout_n_odn, s_io_next_n_ds, s_io_next_n_sr, s_io_next_n_co,
                                 s_io_next_n_odp, s_io_next_n_odn, s_io_clk_ds, s_io_clk_sr, s_io_clk_co, s_io_clk_odp,
                                 s_io_clk_odn, s_io_ioa_n_ds, s_io_ioa_n_sr, s_io_ioa_n_co, s_io_ioa_n_odp, s_io_ioa_n_odn,
-                                s_mrxout_in_ste, s_mrxout_in_pd, s_mrxout_in_pu)
+                                s_mrxout_in_ste, s_mrxout_in_pd, s_mrxout_in_pu, s_mreset_n_ste, s_mreset_n_pd, s_mreset_n_pu,
+                                s_mrstout_n_ds, s_mrstout_n_sr, s_mrstout_n_co, s_mrstout_n_odp, s_mrstout_n_odn)
   begin
     data_out <= (others => '0');
 
@@ -2838,6 +2877,16 @@ begin
           data_out(mrxout_in_ste_msb_c downto mrxout_in_ste_lsb_c) <= s_mrxout_in_ste;
           data_out(mrxout_in_pd_msb_c) <= s_mrxout_in_pd;
           data_out(mrxout_in_pu_msb_c) <= s_mrxout_in_pu;
+        when mreset_n_address_c => 
+          data_out(mreset_n_ste_msb_c downto mreset_n_ste_lsb_c) <= s_mreset_n_ste;
+          data_out(mreset_n_pd_msb_c) <= s_mreset_n_pd;
+          data_out(mreset_n_pu_msb_c) <= s_mreset_n_pu;
+        when mrstout_n_address_c => 
+          data_out(mrstout_n_ds_msb_c downto mrstout_n_ds_lsb_c) <= s_mrstout_n_ds;
+          data_out(mrstout_n_sr_msb_c) <= s_mrstout_n_sr;
+          data_out(mrstout_n_co_msb_c) <= s_mrstout_n_co;
+          data_out(mrstout_n_odp_msb_c) <= s_mrstout_n_odp;
+          data_out(mrstout_n_odn_msb_c) <= s_mrstout_n_odn;
         when others => null;
       end case;
     end if;
@@ -3295,6 +3344,14 @@ begin
   mrxout_in_ste <= s_mrxout_in_ste;
   mrxout_in_pd <= s_mrxout_in_pd;
   mrxout_in_pu <= s_mrxout_in_pu;
+  mreset_n_ste <= s_mreset_n_ste;
+  mreset_n_pd <= s_mreset_n_pd;
+  mreset_n_pu <= s_mreset_n_pu;
+  mrstout_n_ds <= s_mrstout_n_ds;
+  mrstout_n_sr <= s_mrstout_n_sr;
+  mrstout_n_co <= s_mrstout_n_co;
+  mrstout_n_odp <= s_mrstout_n_odp;
+  mrstout_n_odn <= s_mrstout_n_odn;
 
 end rtl;
 

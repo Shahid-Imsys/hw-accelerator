@@ -86,6 +86,8 @@ package data_types_pack is
     mtest       : input_pad_config_record_t;
     mwake       : input_pad_config_record_t;
     mrxout      : inoutput_pad_config_record_t;
+    mreset_n    : input_pad_config_record_t;
+    mrstout_n   : output_pad_config_record_t;	
 	
     io_dack0_n  : input_pad_config_record_t;	
     io_dreq0_n  : output_pad_config_record_t;	

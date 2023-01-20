@@ -143,7 +143,7 @@ architecture struct of pe1_acore is
   signal held_e     : std_logic;
   --signal pend_i     : std_logic;
   signal ld_mar     : std_logic;
-  signal runmode    : std_logic;
+  --signal runmode    : std_logic;
   signal rst_en_int : std_logic;
   signal hold_e_int : std_logic;
 
@@ -153,13 +153,13 @@ architecture struct of pe1_acore is
   signal trace      : std_logic;
   signal ld_nreg    : std_logic;
   signal reqrun     : std_logic;
-  signal wdog_n     : std_logic;
-  signal ld_crb     : std_logic;
-  signal rst_seqc_n : std_logic;
+  --signal wdog_n     : std_logic;
+  --signal ld_crb     : std_logic;
+  --signal rst_seqc_n : std_logic;
   signal dsi        : std_logic_vector(7 downto 0);
   signal mpga       : std_logic_vector(7 downto 0);
   signal curr_mpga  : std_logic_vector(7 downto 0);
-  signal mar        : std_logic_vector(7 downto 0);
+  --signal mar        : std_logic_vector(7 downto 0);
 
   -- ALU signals
   signal flag_fn      : std_logic;
@@ -206,10 +206,9 @@ architecture struct of pe1_acore is
   signal direct     : std_logic_vector(7 downto 0);
   signal use_direct : std_logic;
   signal dbl_direct : std_logic;
-  signal sel_direct : std_logic_vector(1 downto 0);
+  --signal sel_direct : std_logic_vector(1 downto 0);
   signal g_double   : std_logic;
-  signal i_double   : std_logic;
-  signal lmpen      : std_logic;
+  --signal lmpen      : std_logic;
   signal adl_cy     : std_logic;
   signal mmr_hold_e : std_logic;
   signal dfm_rdy    : std_logic; --CJ
@@ -227,9 +226,6 @@ architecture struct of pe1_acore is
   signal dtcl         : std_logic_vector(7 downto 0);
   --signal mpram_we_nint: std_logic;
 
-  -- IOS signals
-  signal i_direct   : std_logic_vector(7 downto 0);
-  signal dfio       : std_logic_vector(7 downto 0);
   --signal ios_hold_e : std_logic;
   signal req        : std_logic;
   signal req_rd     : std_logic;
@@ -387,7 +383,7 @@ begin
       --gate_e      => gate_e,
       held_e      => held_e,
       ld_mar      => ld_mar,
-      runmode     => runmode,
+      runmode     => open,
       rst_en      => rst_en_int);
 
 
@@ -457,15 +453,15 @@ begin
       trace         => trace,
       ld_nreg       => ld_nreg,
       reqrun        => reqrun,
-      wdog_n        => wdog_n,
-      ld_crb        => ld_crb,
-      rst_seqc_n    => rst_seqc_n,
+      wdog_n        => open,
+      ld_crb        => open,
+      rst_seqc_n    => open,
       --Data Outputs
       dsi           => dsi,
       --Microprogram address outputs
       mpga          => mpga,
       curr_mpga     => curr_mpga,
-      mar           => mar);
+      mar           => open);
 
 ---------------------------------------------------------------------
 -- ALU
@@ -572,7 +568,6 @@ begin
       gctr          => gctr,
       crb_out       => crb_out,
       dfm           => dfm,
-      dfio          => dfio,
       dsi           => dsi,
       gdata         => gdata,
       dtal          => dtal,
@@ -641,16 +636,14 @@ begin
       dbus        => dbus_int,
       ybus        => ybus,
       g_direct    => g_direct,
-      i_direct    => i_direct,
       dfm         => dfm,
       direct      => direct,
       -- Outputs
       use_direct  => use_direct,
       dbl_direct  => dbl_direct,
-      sel_direct  => sel_direct,
+      sel_direct  => open,
       g_double    => g_double,
-      i_double    => i_double,
-      lmpen       => lmpen,
+      lmpen       => open,
       adl_cy      => adl_cy,
       hold_e      => mmr_hold_e);
 ---------------------------------------------------------------------
@@ -706,8 +699,6 @@ begin
         VE_AUTO_SEND => ve_auto_send_int
       );
 
-    i_direct <= x"00";
-    dfio <= x"00";
     dtal <= x"00";
     dtcl <= x"00";
 end;

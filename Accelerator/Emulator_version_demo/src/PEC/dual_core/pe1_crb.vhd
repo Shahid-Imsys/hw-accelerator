@@ -113,12 +113,10 @@ entity pe1_crb is
     -- power management register added in 2012-06-14 16:29:32 by maning
     --clk_in_off  : out std_logic;
     --clk_main_off : out std_logic;
-    reqrun      : in std_logic;
 
     core2_en    : out std_logic;
     crb_out_c2  : out std_logic_vector(7 downto 0); -- CRB output, to DSL in core2_en
     crb_sel_c2  : in std_logic_vector(3 downto 0); -- CRB output select, from core2
-    c2_ready    : in std_logic; -- core2 ready signal, from core2
     short_cycle : out std_logic;
     -- RTC block interface
     poweron_finish   : in std_logic; -- differ start from begginning or halt mode

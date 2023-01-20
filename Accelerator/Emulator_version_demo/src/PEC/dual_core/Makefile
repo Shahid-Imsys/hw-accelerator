@@ -42,9 +42,6 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/pe1_dsl.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_gmem.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_gp_pkg.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_ios_dackgen.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_ios_dmap.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_ios_dma.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_mbm.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_mmr.vhd \
 				  $(DUAL_CORE_DIR_WIN)/pe1_mpll.vhd \
@@ -59,6 +56,5 @@ dual_core_rtl:
 				  $(DUAL_CORE_DIR_WIN)/core2/pe1_acore.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SU180_256X128X1BM1A.vhd \
 				  $(DUAL_CORE_DIR_WIN)/ext/FPGA_SY180_1024X8X1CM8.vhd \
-				  $(DUAL_CORE_DIR_WIN)/pe1_ios.vhd \
 			 	  $(DUAL_CORE_DIR_WIN)/pe1_core.vhd \
 				  $(DUAL_CORE_DIR_WIN)/PE_pair_top.vhd

@@ -61,7 +61,6 @@ entity pe1_dsl is
     gctr          : in  std_logic_vector(7 downto 0);
     crb_out       : in  std_logic_vector(7 downto 0);
     dfm           : in  std_logic_vector(7 downto 0);
-    dfio          : in  std_logic_vector(7 downto 0);
     dsi           : in  std_logic_vector(7 downto 0);
     gdata         : in  std_logic_vector(7 downto 0);
     dtal          : in  std_logic_vector(7 downto 0);
@@ -88,12 +87,10 @@ architecture rtl of pe1_dsl is
   signal yprio       : std_logic_vector(7 downto 0);
   signal dsl_pa      : std_logic;
   signal llfrg       : std_logic;
-  signal dsg         : std_logic;
   signal mp_dsl_pa   : std_logic;
   signal mp_llfrg    : std_logic;
   signal mp_dsg      : std_logic;
   signal d_sign_int  : std_logic;
-  signal ve_data_sel : std_logic_vector(7 downto 0); --VE input 0-7 selector, Added by CJ
 
   -- Microprogram fields
   signal pl_sig6    : std_logic_vector(3 downto 0);
@@ -111,7 +108,7 @@ begin
   pl_sig4 <= pl(45);
   D_source_selector : process (pl_sig4, pl_sig5, pl_sig6, alu_flags,
                                latch_int, y_reg, mbmd, gctr, crb_out, dfm,
-                               dfio, dsi, gdata, dtal, yprio, d_sign_int,ve_out_d,cdfm, ID_NUM)
+                               dsi, gdata, dtal, yprio, d_sign_int,ve_out_d,cdfm, ID_NUM)
   begin
     if pl_sig4 = '0' then	--CONSTANT
       d_int <= pl_sig5(3 downto 0) & pl_sig6;
@@ -139,8 +136,8 @@ begin
           d_int <= crb_out;
         when "01000" =>		--MEM
           d_int <= dfm;
-        when "01001" =>		--INDATA
-          d_int <= dfio;
+        --when "01001" =>		--INDATA
+        --  d_int <= dfio;
         when "01010" =>		--CU
           d_int <= dsi;
         when "01011" =>		--YFLIPPED

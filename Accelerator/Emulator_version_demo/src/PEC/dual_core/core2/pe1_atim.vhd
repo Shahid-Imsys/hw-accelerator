@@ -78,7 +78,6 @@ end;
 architecture rtl of pe1_atim is
 	signal reqrun_s      : std_logic;
 	signal rst_state_n   : std_logic;
-	signal rst_en_int    : std_logic;
 	--signal din_e_int     : std_logic;
 	signal runmode_int   : std_logic;
 	signal held_e_int    : std_logic;

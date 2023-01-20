@@ -68,7 +68,7 @@ entity pe1_mmr is
     dbus:       in  std_logic_vector(7 downto 0);  -- D bus, from DSL
     ybus:       in  std_logic_vector(7 downto 0);  -- Y bus, from ALU
     g_direct:   in  std_logic_vector(7 downto 0); -- Direct data bus from GMEM
-    i_direct:   in  std_logic_vector(7 downto 0); -- Direct data bus from IOMEM
+    --i_direct:   in  std_logic_vector(7 downto 0); -- Direct data bus from IOMEM
     dfm:        out std_logic_vector(7 downto 0); -- Data from memory to DSL
     direct:     out std_logic_vector(7 downto 0); -- Direct bus to GMEM,IOMEM
     -- Outputs
@@ -76,7 +76,6 @@ entity pe1_mmr is
     dbl_direct: out std_logic;  -- Set if direct traffic is double-speed
     sel_direct: out std_logic_vector(1 downto 0); -- Select source of direct bus
     g_double:   out std_logic;
-    i_double:   out std_logic;
     lmpen:      out std_logic;
     adl_cy:     out std_logic;
     hold_e:     out std_logic  -- Set high by this block to delay clk_e
@@ -519,8 +518,8 @@ begin
                 dirc(5);
     g_double <= fast_d when dirc(1) = '1' else
                 dirc(4);
-    i_double <= fast_d when dirc(1) = '1' else
-                dirc(3);
+    --i_double <= fast_d when dirc(1) = '1' else
+    --            dirc(3);
     lmpen <= dirc(2);
     use_direct_int <= dirc(1);
     dbl_direct_int <= dirc(1) and fast_d;
@@ -960,7 +959,7 @@ begin
     -- from i_direct (the direct data bus from IOMEM) if sel_direct is 01,
     -- or from g_direct (the direct data bus from GMEM) if sel_direct is 00.
     direct_int <= m_direct when sel_direct_int(1) = '1' else
-                  i_direct when sel_direct_int(0) = '1' else
+                  --i_direct when sel_direct_int(0) = '1' else
                   g_direct;
 
     -- Decoding of the PD field from the microprogram word. ld_dtm is high

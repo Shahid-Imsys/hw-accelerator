@@ -74,7 +74,6 @@ entity pe1_core is
     c2_core2_en    : out std_logic;  -- core2 enable
     c2_rsc_n       : out std_logic;
     --c2_clkreq_gen  : out std_logic;
-    c2_ready       : in std_logic;
     c2_crb_sel     : in  std_logic_vector(3 downto 0);
     c2_crb_out     : out std_logic_vector(7 downto 0);
     c2_en_wdog     : out std_logic;
@@ -101,15 +100,13 @@ entity pe1_core is
     --  Signals to/from Peripheral block
     dbus        : out std_logic_vector(7 downto 0);
     --aaddr       : out std_logic_vector(4 downto 0);  -- pl_aaddr
-    idreq       : in  std_logic_vector(7 downto 0);
-    idi         : in  std_logic_vector(7 downto 0);
-    idack       : out std_logic_vector(7 downto 0);
-    ios_iden    : out std_logic;
-    ios_ido     : out std_logic_vector(7 downto 0);
-    ilioa       : out std_logic;
-    ildout      : out std_logic;
-    inext       : out std_logic;
-    iden        : in  std_logic;
+    --idreq       : in  std_logic_vector(7 downto 0);
+    --idi         : in  std_logic_vector(7 downto 0);
+    --idack       : out std_logic_vector(7 downto 0);
+    --ios_ido     : out std_logic_vector(7 downto 0);
+    --ilioa       : out std_logic;
+    --ildout      : out std_logic;
+    --inext       : out std_logic;
     dqm_size    : out std_logic_vector(1 downto 0);
     --adc_dac     : out std_logic;
     --en_tiu      : out std_logic;
@@ -274,9 +271,8 @@ architecture struct of pe1_core is
   signal direct     : std_logic_vector(7 downto 0);
   signal use_direct : std_logic;
   signal dbl_direct : std_logic;
-  signal sel_direct : std_logic_vector(1 downto 0);
+  --signal sel_direct : std_logic_vector(1 downto 0);
   signal g_double   : std_logic;
-  signal i_double   : std_logic;
   signal lmpen      : std_logic;
   signal adl_cy     : std_logic;
   signal mmr_hold_e : std_logic;
@@ -304,10 +300,6 @@ architecture struct of pe1_core is
   signal dfsr         : std_logic_vector(7 downto 0);
   signal mpram_we_nint: std_logic;
 
-  -- IOS signals
-  signal i_direct   : std_logic_vector(7 downto 0);
-  signal dfio       : std_logic_vector(7 downto 0);
-  signal ios_hold_e : std_logic;
 
   attribute syn_keep              : boolean;
   attribute syn_keep of pend_i    : signal is true;
@@ -529,7 +521,6 @@ begin
       -- Other control inputs
       ld_crb      => ld_crb,
       rd_crb      => rd_crb,
-      c2_ready    => c2_ready,
       --mwake_i     => mwake_i,
       -- Data paths
       dbus        => dbus_int,
@@ -574,7 +565,6 @@ begin
       en_mckout1  => en_mckout1,
       --clk_in_off   => clk_in_off   ,
       --clk_main_off => clk_main_off ,
-      reqrun      => reqrun,
     	-- BMEM block interface
       core2_en    => c2_core2_en,
       short_cycle => short_cycle_int,
@@ -604,7 +594,7 @@ begin
 ---------------------------------------------------------------------
 -- TIM - timing logic
 ---------------------------------------------------------------------
-  hold_e_int <= ios_hold_e or mmr_hold_e;
+  hold_e_int <= mmr_hold_e;--ios_hold_e or mmr_hold_e;
   pe1_tim: entity work.pe1_tim
     port map (
       -- Clock
@@ -847,7 +837,6 @@ begin
       gctr          => gctr,
       crb_out       => crb_out,
       dfm           => dfm,
-      dfio          => dfio,
       dsi           => dsi,
       gdata         => gdata,
       dtal          => dtal,
@@ -917,15 +906,14 @@ begin
       dbus        => dbus_int,
       ybus        => ybus,
       g_direct    => g_direct,
-      i_direct    => i_direct,
+      --i_direct    => i_direct,
       dfm         => dfm,
       direct      => direct,
       -- Outputs
       use_direct  => use_direct,
       dbl_direct  => dbl_direct,
-      sel_direct  => sel_direct,
+      sel_direct  => open,
       g_double    => g_double,
-      i_double    => i_double,
       lmpen       => lmpen,
       adl_cy      => adl_cy,
       hold_e      => mmr_hold_e);
@@ -995,45 +983,6 @@ begin
       msdout      => msdout_o
       );
 
----------------------------------------------------------------------
--- IOS --sync reset
----------------------------------------------------------------------
-  pe1_ios: entity work.pe1_ios
-    port map (
-      -- Clock and reset signals
-      --ack_sig        => ack_sig,  --CJ
-      rst_en         => rst_en_int,
-      clk_p          => clk_p,
-      clk_c2_pos     => even_c,
-      clk_e_pos      => clk_e_pos_int,
-      clk_e_neg      => clk_e_neg_int,
-      --gate_e         => clk_e_pos_int,
-      -- Microprogram fields
-      pl             => pl,
-      -- Static control inputs
-      use_direct     => use_direct,
-      dbl_direct     => dbl_direct,
-      i_double       => i_double,
-      -- Control inputs
-      pend_i         => pend_i,
-      held_e         => held_e,
-      -- Data paths
-      dbus           => dbus_int,
-      direct         => direct,
-      i_direct       => i_direct,
-      dfio           => dfio,
-      -- Control outputs
-      hold_e         => ios_hold_e,
-      -- I/O bus
-      idack          => idack,
-      idreq          => idreq,
-      idi            => idi,
-      ios_iden       => ios_iden,
-      ido            => ios_ido,
-      ilioa          => ilioa,
-      ildout         => ildout,
-      inext          => inext,
-      iden           => iden);
 
       --CJ Added
 ---------------------------------------------------------------------

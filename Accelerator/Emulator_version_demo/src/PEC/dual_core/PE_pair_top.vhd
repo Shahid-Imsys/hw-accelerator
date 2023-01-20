@@ -401,17 +401,8 @@ architecture struct of PE_pair_top is
   -----------------------------------------------------------------------------
   -- pe1_core driven
   signal dbus        : std_logic_vector(7 downto 0);
-  signal idack       : std_logic_vector(7 downto 0);
-  signal ios_iden    : std_logic;
-  signal ios_ido     : std_logic_vector(7 downto 0);
-  signal ilioa       : std_logic;
-  signal ildout      : std_logic;
-  signal inext       : std_logic;
-  signal iden        : std_logic;
   signal dqm_size    : std_logic_vector(1 downto 0);
   -- Peri driven
-  signal idreq       : std_logic_vector(7 downto 0);
-  signal idi         : std_logic_vector(7 downto 0);
   signal irq0        : std_logic;
   signal irq1        : std_logic;
   -----------------------------------------------------------------------------
@@ -429,15 +420,12 @@ architecture struct of PE_pair_top is
 -------------------------------------------------------------------------------
   signal c1_req_i    : std_logic;  -- Request signal of core1
   signal c1_req_rd_i : std_logic;  -- signal indicate that core1 is reading out request from CMDR fifo.
-  signal c1_ack_i    : std_logic;
   signal c1_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor --CJ
   signal c1_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor --CJ
   signal c2_req_i    : std_logic;  --Requset signal of pe1_core 2.
   signal c2_req_rd_i : std_logic;  -- signal indicate that core2 is reading out request from CMDR fifo.
-  signal c2_ack_i    : std_logic;
   signal c2_d_dqi    : std_logic_vector(159 downto 0); -- Data in from processor
   signal c2_d_dqo    : std_logic_vector(127 downto 0); -- Data out to processor
-  signal core2_rdy   : std_logic;
 
   signal c2_mpram_a    : std_logic_vector(7 downto 0); --CJ
   signal c2_mpram_d    : std_logic_vector(127 downto 0); --CJ
@@ -478,13 +466,10 @@ begin
   c1_req_rd <= c1_req_rd_i;
   C2_req <= c2_req_i;
   c2_req_rd <= c2_req_rd_i;
-  c1_ack_i <= C1_ACK;
-  c2_ack_i <= C2_ACK;
   C1_REQ_D <=c1_d_dqi;
   C2_REQ_D <= c2_d_dqi;
   c1_d_dqo <= C1_IN_D;
   c2_d_dqo <= C2_IN_D;
-  C2_RDY   <= core2_rdy;
 
 
   mp_RAM0_WE <= mp_RAM0_CS and not mp_RAM0_WEB;
@@ -879,7 +864,6 @@ end generate;
 
     c2_core2_en   => c2_core2_en      ,
     c2_rsc_n      => c2_rsc_n         ,
-    c2_ready      => core2_rdy        ,
     c2_crb_sel    => c2_crb_sel       ,
     c2_crb_out    => c2_crb_out       ,
     c2_en_wdog    => c2_en_wdog       ,
@@ -909,15 +893,6 @@ end generate;
     dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
     --pd            => pd_s             ,--: out std_logic_vector(2 downto 0);  -- pl_pd
     --aaddr         => aaddr            ,--: out std_logic_vector(4 downto 0);  -- pl_aaddr
-    idreq         => idreq            ,--: in  std_logic_vector(7 downto 0);
-    idi           => idi              ,--: in  std_logic_vector(7 downto 0);
-    idack         => idack            ,--: out std_logic_vector(7 downto 0);
-    ios_iden      => ios_iden         ,--: out std_logic;
-    ios_ido       => ios_ido          ,--: out std_logic_vector(7 downto 0);
-    ilioa         => ilioa            ,--: out std_logic;
-    ildout        => ildout           ,--: out std_logic;
-    inext         => inext            ,--: out std_logic;
-    iden          => iden             ,--: in  std_logic;
     dqm_size      => dqm_size         ,--: out std_logic_vector(1 downto 0);
     irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0
     irq1          => irq1             ,--: in  std_logic;  -- Interrupt request 1
@@ -945,7 +920,7 @@ end generate;
     -- Clocks to/from clock block
     clk_p         => HCLK             ,
     even_c        => even_c           ,
-    ready         => core2_rdy        ,
+    ready         => C2_RDY           ,
     -- signals from the master pe1_core
     rst_cn        => c2_core2_en      ,       --reset core2 if disabled
     rsc_n         => c2_rsc_n         ,
@@ -1030,10 +1005,6 @@ end generate;
   -----------------------------------------------------------------------------
   -- Peripherals
   -----------------------------------------------------------------------------
-
-	iden <= '0';
-	idreq <= "11111111";
-	idi <= "00000000";
 	irq0 <= '1';
 	irq1 <= '1';
 

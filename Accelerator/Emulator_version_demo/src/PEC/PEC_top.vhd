@@ -48,7 +48,7 @@ architecture struct of PEC_top is
     generic(
       USE_ASIC_MEMORIES   : boolean := false;
       PEC_NUMBER          : integer := 2;
-      single_pe_sim       : boolean := false;
+      --single_pe_sim       : boolean := false;
       TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
     );
     port(

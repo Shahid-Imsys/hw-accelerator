@@ -41,7 +41,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cluster_pkg.all;
 use work.noc_types_pkg.all;
-use work.all;
+--use work.all;
 
 --use work.defines.all;
 
@@ -49,7 +49,7 @@ entity cluster_controller is
 	generic(
 	    USE_ASIC_MEMORIES   : boolean := false;
 	    PEC_NUMBER          : integer := 2;
-        single_pe_sim       : boolean := false;
+        --single_pe_sim       : boolean := false;
 		TAG_CMD_DECODE_TIME : integer := 38     --Number of clock cycles for peci_busy to deassert
 												--To be moved to defines
 	);

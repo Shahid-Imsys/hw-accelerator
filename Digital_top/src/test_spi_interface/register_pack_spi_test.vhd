@@ -129,6 +129,7 @@ package register_pack_spi_test is
   constant mrxout_in_address_c     : integer := 16#73#;
   constant mreset_n_address_c      : integer := 16#74#;
   constant mrstout_n_address_c     : integer := 16#75#;
+  constant emem_clk_n_address_c    : integer := 16#76#;
 
   -- Register and field constants
 
@@ -4276,6 +4277,50 @@ package register_pack_spi_test is
   constant mrstout_n_odn_reset_c : mrstout_n_odn_t := '0';
   constant mrstout_n_odn_scan_c  : mrstout_n_odn_t := '0';
 
+  ---------------------------------------------------------------------------
+  -- Register "emem_clk_n"
+  constant emem_clk_n_reset_c : register_t := std_ulogic_vector(to_unsigned(16#28#, register_t'length));
+
+  -- Field "ds"
+  constant emem_clk_n_ds_size_c  : integer := 2;
+  constant emem_clk_n_ds_lsb_c   : integer := 4;
+  constant emem_clk_n_ds_msb_c   : integer := 5;
+  subtype emem_clk_n_ds_t is std_ulogic_vector(emem_clk_n_ds_size_c - 1 downto 0);
+  constant emem_clk_n_ds_reset_c : emem_clk_n_ds_t := std_ulogic_vector(to_unsigned(2, emem_clk_n_ds_t'length));
+  constant emem_clk_n_ds_scan_c  : emem_clk_n_ds_t := std_ulogic_vector(to_unsigned(2, emem_clk_n_ds_t'length));
+
+  -- Field "sr"
+  constant emem_clk_n_sr_size_c  : integer := 1;
+  constant emem_clk_n_sr_lsb_c   : integer := 3;
+  constant emem_clk_n_sr_msb_c   : integer := 3;
+  subtype emem_clk_n_sr_t is std_ulogic;
+  constant emem_clk_n_sr_reset_c : emem_clk_n_sr_t := '1';
+  constant emem_clk_n_sr_scan_c  : emem_clk_n_sr_t := '1';
+
+  -- Field "co"
+  constant emem_clk_n_co_size_c  : integer := 1;
+  constant emem_clk_n_co_lsb_c   : integer := 2;
+  constant emem_clk_n_co_msb_c   : integer := 2;
+  subtype emem_clk_n_co_t is std_ulogic;
+  constant emem_clk_n_co_reset_c : emem_clk_n_co_t := '0';
+  constant emem_clk_n_co_scan_c  : emem_clk_n_co_t := '0';
+
+  -- Field "odp"
+  constant emem_clk_n_odp_size_c  : integer := 1;
+  constant emem_clk_n_odp_lsb_c   : integer := 1;
+  constant emem_clk_n_odp_msb_c   : integer := 1;
+  subtype emem_clk_n_odp_t is std_ulogic;
+  constant emem_clk_n_odp_reset_c : emem_clk_n_odp_t := '0';
+  constant emem_clk_n_odp_scan_c  : emem_clk_n_odp_t := '0';
+
+  -- Field "odn"
+  constant emem_clk_n_odn_size_c  : integer := 1;
+  constant emem_clk_n_odn_lsb_c   : integer := 0;
+  constant emem_clk_n_odn_msb_c   : integer := 0;
+  subtype emem_clk_n_odn_t is std_ulogic;
+  constant emem_clk_n_odn_reset_c : emem_clk_n_odn_t := '0';
+  constant emem_clk_n_odn_scan_c  : emem_clk_n_odn_t := '0';
+
   component register_block_spi_test
 
     port (
@@ -4742,6 +4787,11 @@ package register_pack_spi_test is
           mrstout_n_co : out mrstout_n_co_t;
           mrstout_n_odp : out mrstout_n_odp_t;
           mrstout_n_odn : out mrstout_n_odn_t;
+          emem_clk_n_ds : out emem_clk_n_ds_t;
+          emem_clk_n_sr : out emem_clk_n_sr_t;
+          emem_clk_n_co : out emem_clk_n_co_t;
+          emem_clk_n_odp : out emem_clk_n_odp_t;
+          emem_clk_n_odn : out emem_clk_n_odn_t;
 
 
           -- SPI Interface

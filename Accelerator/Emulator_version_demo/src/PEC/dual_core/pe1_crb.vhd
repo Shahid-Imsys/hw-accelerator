@@ -81,9 +81,9 @@ entity pe1_crb is
     pup_irq     : out std_logic_vector(1 downto 0);
     en_i        : out std_logic;
     -- MORG register
-    r_size      : out std_logic_vector(1 downto 0);
-    c_size      : out std_logic_vector(1 downto 0);
-    dqm_size    : out std_logic_vector(1 downto 0);
+    --r_size      : out std_logic_vector(1 downto 0);
+    --c_size      : out std_logic_vector(1 downto 0);
+    --dqm_size    : out std_logic_vector(1 downto 0);
     -- MTIM register
     fast_d      : out std_logic;
     t_ras       : out std_logic_vector(2 downto 0);
@@ -133,9 +133,9 @@ architecture rtl of pe1_crb is
   signal pup_clk_int    : std_logic;
   signal pup_irq_int    : std_logic_vector(1 downto 0);
   signal en_i_int       : std_logic;
-  signal r_size_int     : std_logic_vector(1 downto 0);
-  signal c_size_int     : std_logic_vector(1 downto 0);
-  signal dqm_size_int   : std_logic_vector(1 downto 0);
+  --signal r_size_int     : std_logic_vector(1 downto 0);
+  --signal c_size_int     : std_logic_vector(1 downto 0);
+  --signal dqm_size_int   : std_logic_vector(1 downto 0);
   signal fast_d_int     : std_logic;
   signal t_ras_int      : std_logic_vector(2 downto 0);
   signal t_rcd_int      : std_logic_vector(1 downto 0);
@@ -192,9 +192,9 @@ begin
       pup_irq_int   <= "00";
       en_i_int      <= '0';
       -- MORG register
-      r_size_int    <= "00";
-      c_size_int    <= "00";
-      dqm_size_int  <= "00";
+      --r_size_int    <= "00";
+      --c_size_int    <= "00";
+      --dqm_size_int  <= "00";
       -- MTIM register
       fast_d_int    <= '1';  --change default value to 1
       t_ras_int     <= "111";
@@ -246,10 +246,10 @@ begin
             pup_clk_int   <= dbus(3);
             pup_irq_int   <= dbus(2 downto 1);
             en_i_int      <= dbus(0);
-          when "0001" => -- MORG register
-            r_size_int    <= dbus(5 downto 4);
-            c_size_int    <= dbus(3 downto 2);
-            dqm_size_int  <= dbus(1 downto 0);
+          --when "0001" => -- MORG register
+          --  r_size_int    <= dbus(5 downto 4);
+          --  c_size_int    <= dbus(3 downto 2);
+          --  dqm_size_int  <= dbus(1 downto 0);
           when "0010" => -- MTIM register
             fast_d_int    <= dbus(7);
             t_ras_int     <= dbus(6 downto 4);
@@ -439,7 +439,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
 --234567890123456789012345678901234567890123456789012345678901234567890123456789
   process (crb_sel, speed_i_int, en_wdog_int, pup_clk_int,
-           en_i_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
+           en_i_int, fast_d_int,
            t_ras_int, t_rcd_int, dis_pll_int,
            en_s_int, speed_s_int, security,
            stick, pup_irq_int,
@@ -456,10 +456,10 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out(3)          <= pup_clk_int;
         crb_out(2 downto 1) <= pup_irq_int;
         crb_out(0)          <= en_i_int;
-      when "0001" => -- MORG register
-        crb_out(5 downto 4) <= r_size_int;
-        crb_out(3 downto 2) <= c_size_int;
-        crb_out(1 downto 0) <= dqm_size_int;
+      --when "0001" => -- MORG register
+      --  crb_out(5 downto 4) <= r_size_int;
+      --  crb_out(3 downto 2) <= c_size_int;
+      --  crb_out(1 downto 0) <= dqm_size_int;
       when "0010" => -- MTIM register
         crb_out(7)          <= fast_d_int;
         crb_out(6 downto 4) <= t_ras_int;
@@ -526,7 +526,7 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
 
 --234567890123456789012345678901234567890123456789012345678901234567890123456789
   process (crb_sel_c2, speed_i_int, en_wdog_int, pup_clk_int,
-           en_i_int, r_size_int, c_size_int, dqm_size_int, fast_d_int,
+           en_i_int, fast_d_int,
            t_ras_int, t_rcd_int, dis_pll_int,
            en_s_int, speed_s_int, security,
            stick, pup_irq_int,
@@ -543,10 +543,10 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
         crb_out_c2(3)          <= pup_clk_int;
         crb_out_c2(2 downto 1) <= pup_irq_int;
         crb_out_c2(0)          <= en_i_int;
-      when "0001" => -- MORG register
-        crb_out_c2(5 downto 4) <= r_size_int;
-        crb_out_c2(3 downto 2) <= c_size_int;
-        crb_out_c2(1 downto 0) <= dqm_size_int;
+      --when "0001" => -- MORG register
+      --  crb_out_c2(5 downto 4) <= r_size_int;
+      --  crb_out_c2(3 downto 2) <= c_size_int;
+      --  crb_out_c2(1 downto 0) <= dqm_size_int;
       when "0010" => -- MTIM register
         crb_out_c2(7)          <= fast_d_int;
         crb_out_c2(6 downto 4) <= t_ras_int;
@@ -616,9 +616,9 @@ process (clk_p, rst_cn, ld_crb, pl_sig15, dbus, nap_rec)
   pup_clk     <= pup_clk_int;
   pup_irq     <= pup_irq_int;
   en_i        <= en_i_int;
-  r_size      <= r_size_int;
-  c_size      <= c_size_int;
-  dqm_size    <= dqm_size_int;
+  --r_size      <= r_size_int;
+  --c_size      <= c_size_int;
+  --dqm_size    <= dqm_size_int;
   fast_d      <= fast_d_int;
   t_ras       <= t_ras_int;
   t_rcd       <= t_rcd_int;

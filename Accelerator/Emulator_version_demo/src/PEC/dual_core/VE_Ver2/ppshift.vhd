@@ -51,7 +51,7 @@ architecture first of ppshift is
   signal stage1          : signed(33 downto 0);
   signal addresult_tmp   : signed(33 downto 0);
   signal to_clip         : signed(31 downto 0);
-  signal outreg_en       : std_logic_vector(7 downto 0);  -- Binary enable bits
+  --signal outreg_en       : std_logic_vector(7 downto 0);  -- Binary enable bits
   signal delayed_enable  : enable_t;
   signal lod_neg_delayed : std_logic;
   signal bias_add_ctrl2  : ppacc_t;

@@ -46,7 +46,7 @@ entity pe1_mmr is
     -- Clock and reset functions
     clk_p       : in std_logic;
     rst_en:     in  std_logic;  -- Asynchronous master reset
-    clk_e_neg    : in std_logic;
+    --clk_e_neg    : in std_logic;
     clk_c2_pos:     in  std_logic;  --
     clk_e_pos:      in  std_logic;  -- Execution clock
     --gate_e:     in  std_logic; -- Copy of execution clock used for gating
@@ -56,9 +56,9 @@ entity pe1_mmr is
     pl:   in  std_logic_vector(127 downto 0); --field of u-instruction
 
     -- Static control inputs
-    r_size:     in  std_logic_vector(1 downto 0);
-    c_size:     in  std_logic_vector(1 downto 0);
-    dqm_size:   in  std_logic_vector(1 downto 0);
+    --r_size:     in  std_logic_vector(1 downto 0);
+    --c_size:     in  std_logic_vector(1 downto 0);
+    --dqm_size:   in  std_logic_vector(1 downto 0);
     t_ras:      in  std_logic_vector(2 downto 0); -- tRAS timing of SDRAM
     t_rcd:      in  std_logic_vector(1 downto 0); -- tRCD timing of SDRAM
     t_rp:       in  std_logic_vector(1 downto 0); -- tRP timing of SDRAM
@@ -89,7 +89,7 @@ architecture rtl of pe1_mmr is
   signal sel_direct_int : std_logic_vector(1 downto 0);
   signal col            : std_logic;
   signal ld_dqi         : std_logic;
-  signal m_addr         : std_logic_vector(31 downto 0);
+  --signal m_addr         : std_logic_vector(31 downto 0);
   --signal en_dqo_int     : std_logic;
 
   --signal line_changed     : std_logic;-- for flash
@@ -97,7 +97,7 @@ architecture rtl of pe1_mmr is
 
   signal pl_memcp_sig:   std_logic_vector(1 downto 0); -- MEMCP field of u-instruction
   signal pl_pc_sig:      std_logic_vector(3 downto 0);  --from the microprogram word
-  signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
+  --signal pl_pd_sig:      std_logic_vector(2 downto 0);  --from the microprogram word
 
   -- Introducing 'inv_col' to differ clock and combinational usage of 'col',
   -- in order to avoid Synplify ASIC generates a high fan_out on 'col'.
@@ -415,28 +415,28 @@ begin
 -- MAPC - address registers
 --*******************************************************************
   mapc: block
-    signal ld_adp       : std_logic;
-    signal ld_adh       : std_logic;
+    --signal ld_adp       : std_logic;
+    --signal ld_adh       : std_logic;
     signal change_adl   : std_logic;
     signal stp_ld_adl   : std_logic;
     signal y_d_adl      : std_logic;
     signal dec_inc_adl  : std_logic;
-    signal ld_sadp      : std_logic;
-    signal sel_adp      : std_logic_vector(1 downto 0);
-    signal use_adp      : std_logic_vector(1 downto 0);
-    signal sadp_a       : std_logic_vector(7 downto 0);
-    signal sadp_i       : std_logic_vector(7 downto 0);
-    signal sadp_d       : std_logic_vector(7 downto 0);
-    signal sadp_p       : std_logic_vector(7 downto 0);
-    signal adp_a        : std_logic_vector(7 downto 0);
-    signal adp_i        : std_logic_vector(7 downto 0);
-    signal adp_d        : std_logic_vector(7 downto 0);
-    signal adp_p        : std_logic_vector(7 downto 0);
-    signal adh          : std_logic_vector(7 downto 0);
+    --signal ld_sadp      : std_logic;
+    --signal sel_adp      : std_logic_vector(1 downto 0);
+    --signal use_adp      : std_logic_vector(1 downto 0);
+    --signal sadp_a       : std_logic_vector(7 downto 0);
+    --signal sadp_i       : std_logic_vector(7 downto 0);
+    --signal sadp_d       : std_logic_vector(7 downto 0);
+    --signal sadp_p       : std_logic_vector(7 downto 0);
+    --signal adp_a        : std_logic_vector(7 downto 0);
+    --signal adp_i        : std_logic_vector(7 downto 0);
+    --signal adp_d        : std_logic_vector(7 downto 0);
+    --signal adp_p        : std_logic_vector(7 downto 0);
+    --signal adh          : std_logic_vector(7 downto 0);
     signal adl          : std_logic_vector(7 downto 0);
     signal adl_inc      : std_logic_vector(7 downto 0);
     --signal adl_h3       : std_logic_vector(2 downto 0);--high 3 bits of old adl
-    signal adl_h4       : std_logic_vector(3 downto 0);--high 4 bits of old adl
+    --signal adl_h4       : std_logic_vector(3 downto 0);--high 4 bits of old adl
     signal ld_dirc      : std_logic;
     signal dirc         : std_logic_vector(7 downto 0);
     signal ma2          : std_logic;
@@ -455,8 +455,8 @@ begin
     pl_pc_sig <= (pl(25) xor pl(49))&(pl(21) xor pl(70))&pl(35)&pl(55);
 	mapc_decode_pc: process(pl_pc_sig, ma1, ma2)
     begin
-      ld_adp <= '0';
-      ld_adh <= '0';
+  --    ld_adp <= '0';
+  --    ld_adh <= '0';
       change_adl <= '0';
       stp_ld_adl <= '-';
       y_d_adl <= '-';
@@ -464,9 +464,9 @@ begin
       ld_dirc <= '0';
       case pl_pc_sig is
         when PC_LOADADHA|PC_LOADADHI|PC_LOADADHD|PC_LOADADHP => -- LOAD ADH
-          ld_adh <= '1';
+  --        ld_adh <= '1';
         when PC_LOADADPA|PC_LOADADPI|PC_LOADADPD|PC_LOADADPP => -- LOAD ADP
-          ld_adp <= '1';
+  --        ld_adp <= '1';
         when PC_LADLFROMY =>         -- LOAD ADL FROM Y
           change_adl <= '1';
           stp_ld_adl <= '0';
@@ -494,7 +494,7 @@ begin
       end case;
     end process;
 
-    sel_adp <= pl_pc_sig(1 downto 0);
+    --sel_adp <= pl_pc_sig(1 downto 0);
 
     ---------------------------------------------------------------------
     -- DIRC register
@@ -558,9 +558,9 @@ begin
         if rising_edge(clk_p) then
             if rst_en = '0' then
                 adl <= x"00";
-                adl_h4 <= "0000";
+    --            adl_h4 <= "0000";
             elsif change_adl = '1' and clk_e_pos = '0' then
-                adl_h4 <= adl(7 downto 4);--save the old adl
+    --            adl_h4 <= adl(7 downto 4);--save the old adl
                 if stp_ld_adl = '1' then
                     adl <= adl_inc;
                 else
@@ -582,18 +582,18 @@ begin
     -- ADH register. Can be loaded from ybus. When adh is loaded,
     -- use_adp is also loaded to select which sadp/adp registers
     -- to use for address generation.
-    mapc_adh: process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                adh <= x"00";
-                use_adp <= "00";
-            elsif ld_adh = '1' and clk_e_pos = '0' then
-                adh <= ybus;
-                use_adp <= sel_adp;
-            end if;
-        end if;
-    end process;
+    --mapc_adh: process(clk_p)
+    --begin
+    --    if rising_edge(clk_p) then
+    --        if rst_en = '0' then
+    --            adh <= x"00";
+    --            use_adp <= "00";
+    --        elsif ld_adh = '1' and clk_e_pos = '0' then
+    --            adh <= ybus;
+    --            use_adp <= sel_adp;
+    --        end if;
+    --    end if;
+    --end process;
 
     ---------------------------------------------------------------------
     -- ADP, SADP
@@ -602,66 +602,66 @@ begin
     -- ld_sadp is also set, for one cycle, to allow loading of sadp in the
     -- cycle immediately following the one where adp was loaded. sel_adp
     -- is used to select which adp/sadp register to load.
-    mapc_adp: process(clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                ld_sadp <= '0';
-                adp_a <= x"00";
-                adp_i <= x"00";
-                adp_d <= x"00";
-                adp_p <= x"00";
-                sadp_a <= x"00";
-                sadp_i <= x"00";
-                sadp_d <= x"00";
-                sadp_p <= x"00";
-            elsif clk_e_pos = '0' then
-                ld_sadp <= '0';
-                if ld_adp = '1' then
-                    if ld_sadp = '0' then
-                        ld_sadp <= '1';
-                        case sel_adp is
-                            when "00" =>
-                                adp_a <= ybus;
-                            when "01" =>
-                                adp_i <= ybus;
-                            when "10" =>
-                                adp_d <= ybus;
-                            when "11" =>
-                                adp_p <= ybus;
-                            when others => null;
-                        end case;
-                    else
-                        case sel_adp is
-                            when "00" =>
-                                sadp_a <= ybus;
-                            when "01" =>
-                                sadp_i <= ybus;
-                            when "10" =>
-                                sadp_d <= ybus;
-                            when "11" =>
-                                sadp_p <= ybus;
-                            when others => null;
-                        end case;
-                    end if;
-                end if;
-            end if;
-        end if;
-    end process;
+    --mapc_adp: process(clk_p)
+    --begin
+    --    if rising_edge(clk_p) then
+    --        if rst_en = '0' then
+    --            ld_sadp <= '0';
+    --            adp_a <= x"00";
+    --            adp_i <= x"00";
+    --            adp_d <= x"00";
+    --            adp_p <= x"00";
+    --            sadp_a <= x"00";
+    --            sadp_i <= x"00";
+    --            sadp_d <= x"00";
+    --            sadp_p <= x"00";
+    --        elsif clk_e_pos = '0' then
+    --            ld_sadp <= '0';
+    --            if ld_adp = '1' then
+    --                if ld_sadp = '0' then
+    --                    ld_sadp <= '1';
+    --                    case sel_adp is
+    --                        when "00" =>
+    --                            adp_a <= ybus;
+    --                        when "01" =>
+    --                            adp_i <= ybus;
+    --                        when "10" =>
+    --                            adp_d <= ybus;
+    --                        when "11" =>
+    --                            adp_p <= ybus;
+    --                        when others => null;
+    --                    end case;
+    --                else
+    --                    case sel_adp is
+    --                        when "00" =>
+    --                            sadp_a <= ybus;
+    --                        when "01" =>
+    --                            sadp_i <= ybus;
+    --                        when "10" =>
+    --                            sadp_d <= ybus;
+    --                        when "11" =>
+    --                            sadp_p <= ybus;
+    --                        when others => null;
+    --                    end case;
+    --                end if;
+    --            end if;
+    --        end if;
+    --    end if;
+    --end process;
 
     -- Address generation. The two high bytes are taken from the
     -- sadp/adp register pair selected by use_adp, the two low
     -- bytes are always taken from adh/adl.
-    m_addr(31 downto 24)  <=  sadp_a when use_adp = "00" else
-                              sadp_i when use_adp = "01" else
-                              sadp_d when use_adp = "10" else
-                              sadp_p;
-    m_addr(23 downto 16)  <=  adp_a when use_adp = "00" else
-                              adp_i when use_adp = "01" else
-                              adp_d when use_adp = "10" else
-                              adp_p;
-    m_addr(15 downto 8)   <=  adh;
-    m_addr(7 downto 0)    <=  adl;
+    --m_addr(31 downto 24)  <=  sadp_a when use_adp = "00" else
+    --                          sadp_i when use_adp = "01" else
+    --                          sadp_d when use_adp = "10" else
+    --                          sadp_p;
+    --m_addr(23 downto 16)  <=  adp_a when use_adp = "00" else
+    --                          adp_i when use_adp = "01" else
+    --                          adp_d when use_adp = "10" else
+    --                          adp_p;
+    --m_addr(15 downto 8)   <=  adh;
+    --m_addr(7 downto 0)    <=  adl;
 
   end block mapc;
 
@@ -672,18 +672,18 @@ begin
 --*******************************************************************
 -- ADRC - address and control mux
 --*******************************************************************
-  adrc: block
-    signal row_addr   : std_logic_vector(13 downto 0);
-    signal col_addr   : std_logic_vector(13 downto 0);
-    signal mux_c      : std_logic_vector(29 downto 20);
-    signal mux_r      : std_logic_vector(24 downto 20);
-    signal mux_dqm    : std_logic_vector(21 downto 20);
+--  adrc: block
+    --signal row_addr   : std_logic_vector(13 downto 0);
+    --signal col_addr   : std_logic_vector(13 downto 0);
+    --signal mux_c      : std_logic_vector(29 downto 20);
+    --signal mux_r      : std_logic_vector(24 downto 20);
+    --signal mux_dqm    : std_logic_vector(21 downto 20);
     --signal dqm_2      : std_logic;
     --signal dqm_4      : std_logic;
     --signal dqm_8      : std_logic;
-    signal lm_addr    : std_logic_vector(32 downto 0);
-    signal row_addr_buf :   std_logic_vector(15 downto 0);
-  begin  -- block adrc
+    --signal lm_addr    : std_logic_vector(32 downto 0);
+    --signal row_addr_buf :   std_logic_vector(15 downto 0);
+--  begin  -- block adrc
     -- Some of the address bits have latches to prevent
     -- ADH/ADP/SADP changes during the active time to affect
     -- the memory address.
@@ -691,20 +691,20 @@ begin
     --if load ADH is followed by read SDRAM data, there will be problem
     --2012-03-22 09:38:12 change latch back to register and add a group of registers
     --d_addr  <= lm_addr(31 downto 0);
-    process
-    begin
-        WAIT UNTIL (rising_edge(clk_p));
-            if rst_en = '0' then
-                row_addr_buf <= (others => '0');
-            elsif inv_col = '1' then
-                row_addr_buf(3 downto 0) <= m_addr(11 downto 8);
-                row_addr_buf(15 downto 4) <= m_addr(31 downto 20);
-            end if;
-    end process;
-    lm_addr(11 downto 8) <= m_addr(11 downto 8) when inv_col = '1' else
-                            row_addr_buf(3 downto 0);
-    lm_addr(31 downto 20) <= m_addr(31 downto 20) when inv_col = '1' else
-                            row_addr_buf(15 downto 4);
+    --process
+    --begin
+    --    WAIT UNTIL (rising_edge(clk_p));
+    --        if rst_en = '0' then
+    --            row_addr_buf <= (others => '0');
+    --        elsif inv_col = '1' then
+    --            row_addr_buf(3 downto 0) <= m_addr(11 downto 8);
+    --            row_addr_buf(15 downto 4) <= m_addr(31 downto 20);
+    --        end if;
+    --end process;
+    --lm_addr(11 downto 8) <= m_addr(11 downto 8) when inv_col = '1' else
+    --                        row_addr_buf(3 downto 0);
+    --lm_addr(31 downto 20) <= m_addr(31 downto 20) when inv_col = '1' else
+    --                        row_addr_buf(15 downto 4);
 --    process (inv_col, m_addr)
 --    begin
 --      if inv_col = '1' then
@@ -712,42 +712,42 @@ begin
 --        lm_addr(31 downto 20) <= m_addr(31 downto 20);
 --      end if;
 --    end process;
-    lm_addr(7 downto 0) <= m_addr(7 downto 0);
-    lm_addr(19 downto 12) <= m_addr(19 downto 12);
+--    lm_addr(7 downto 0) <= m_addr(7 downto 0);
+--    lm_addr(19 downto 12) <= m_addr(19 downto 12);
 --     lm_addr(32) <= m_addr(32);
-    lm_addr(32) <= '0';
+--    lm_addr(32) <= '0';
 
     -- Column address, flip lsb during second half of cycle when
     -- doing double-byte transfers.
     -- 3-4 gates
-    col_addr(13) <= '0';
-    col_addr(12 downto 11) <= lm_addr(11 downto 10);
-    col_addr(10) <= '0';
-    col_addr(9 downto 1) <= lm_addr(9 downto 1);
-    col_addr(0) <= lm_addr(0) xor (dbl_direct_int and not clk_e_pos);
+    --col_addr(13) <= '0';
+    --col_addr(12 downto 11) <= lm_addr(11 downto 10);
+    --col_addr(10) <= '0';
+    --col_addr(9 downto 1) <= lm_addr(9 downto 1);
+    --col_addr(0) <= lm_addr(0) xor (dbl_direct_int and not clk_e_pos);
 
     -- Row address
     -- 10 x 2to1, 1 x NOR3, 1 x NAND3, 3 x NOR2, 1 x AND2, 1 x OR2 =
     -- 10x3 + 1.5 + 1.5 + 3x1 + 1.5 + 1.5 = 39 gates
-    row_addr(7 downto 0) <= lm_addr(19 downto 12);
-    row_addr(8) <= lm_addr(8) when r_size(1) = '0' and c_size = "00" else
-                   lm_addr(20) when r_size = "00" else
-                   lm_addr(22);
-    row_addr(9) <= lm_addr(9) when c_size(1) = '0' and
-                   (r_size(1) = '0' or c_size(0) = '0') else
-                   lm_addr(24) when r_size(1) = '1' else
-                   lm_addr(21) when r_size(0) = '0' else
-                   lm_addr(23);
-    row_addr(10) <= lm_addr(10) when c_size(1) = '0' or
-                    (r_size(1) = '0' and c_size(0) = '0') else
-                    lm_addr(24) when r_size(1) = '0' else
-                    lm_addr(25) when r_size(0) = '0' else
-                    lm_addr(26);
-    row_addr(11) <= lm_addr(11) when not(r_size(1) = '1' and c_size = "11") else
-                    lm_addr(26) when r_size(0) = '0' else
-                    lm_addr(27);
-    row_addr(12) <= lm_addr(23);
-    row_addr(13) <= lm_addr(25);
+    --row_addr(7 downto 0) <= lm_addr(19 downto 12);
+    --row_addr(8) <= lm_addr(8) when r_size(1) = '0' and c_size = "00" else
+    --               lm_addr(20) when r_size = "00" else
+    --               lm_addr(22);
+    --row_addr(9) <= lm_addr(9) when c_size(1) = '0' and
+    --               (r_size(1) = '0' or c_size(0) = '0') else
+    --               lm_addr(24) when r_size(1) = '1' else
+    --               lm_addr(21) when r_size(0) = '0' else
+    --               lm_addr(23);
+    --row_addr(10) <= lm_addr(10) when c_size(1) = '0' or
+    --                (r_size(1) = '0' and c_size(0) = '0') else
+    --                lm_addr(24) when r_size(1) = '0' else
+    --                lm_addr(25) when r_size(0) = '0' else
+    --                lm_addr(26);
+    --row_addr(11) <= lm_addr(11) when not(r_size(1) = '1' and c_size = "11") else
+    --                lm_addr(26) when r_size(0) = '0' else
+    --                lm_addr(27);
+    --row_addr(12) <= lm_addr(23);
+    --row_addr(13) <= lm_addr(25);
 
     -- Row/column address selector
     -- 12 x 2to1, 2 x AND2, 1 x INV = 12x3 + 2x1.5 + 0.5 = 39.5 gates
@@ -765,45 +765,45 @@ begin
 
     -- 10-bit address shifter controlled by c_size
     -- 10 x 4to1 = 10x7.5 = 75 gates
-    process (c_size, lm_addr)
-    begin
-      for i in 20 to 29 loop
-        case c_size is
-          when "00"   =>  mux_c(i) <= lm_addr(i+0);
-          when "01"   =>  mux_c(i) <= lm_addr(i+1);
-          when "10"   =>  mux_c(i) <= lm_addr(i+2);
-          when others =>  mux_c(i) <= lm_addr(i+3);
-        end case;
-      end loop;
-    end process;
+    --process (c_size, lm_addr)
+    --begin
+    --  for i in 20 to 29 loop
+    --    case c_size is
+    --      when "00"   =>  mux_c(i) <= lm_addr(i+0);
+    --      when "01"   =>  mux_c(i) <= lm_addr(i+1);
+    --      when "10"   =>  mux_c(i) <= lm_addr(i+2);
+    --      when others =>  mux_c(i) <= lm_addr(i+3);
+    --    end case;
+    --  end loop;
+    --end process;
 
     -- 5-bit address shifter controlled by r_size
     -- 5 x 4to1 = 5x7.5 = 37.5 gates
-    process (r_size, mux_c)
-    begin
-      for i in 20 to 24 loop
-        case r_size is
-          when "00"   =>  mux_r(i) <= mux_c(i+0);
-          when "01"   =>  mux_r(i) <= mux_c(i+2);
-          when "10"   =>  mux_r(i) <= mux_c(i+4);
-          when others =>  mux_r(i) <= mux_c(i+5);
-        end case;
-      end loop;
-    end process;
+    --process (r_size, mux_c)
+    --begin
+    --  for i in 20 to 24 loop
+    --    case r_size is
+    --      when "00"   =>  mux_r(i) <= mux_c(i+0);
+    --      when "01"   =>  mux_r(i) <= mux_c(i+2);
+    --      when "10"   =>  mux_r(i) <= mux_c(i+4);
+    --      when others =>  mux_r(i) <= mux_c(i+5);
+    --    end case;
+    --  end loop;
+    --end process;
 
     -- 2-bit address shifter controlled by dqm_size
     -- 2 x 4to1 = 2x7.5 = 15 gates
-    process (dqm_size, mux_r)
-    begin
-      for i in 20 to 21 loop
-        case dqm_size is
-          when "00"   =>  mux_dqm(i) <= mux_r(i+0);
-          when "01"   =>  mux_dqm(i) <= mux_r(i+1);
-          when "10"   =>  mux_dqm(i) <= mux_r(i+2);
-          when others =>  mux_dqm(i) <= mux_r(i+3);
-        end case;
-      end loop;
-    end process;
+    --process (dqm_size, mux_r)
+    --begin
+    --  for i in 20 to 21 loop
+    --    case dqm_size is
+    --      when "00"   =>  mux_dqm(i) <= mux_r(i+0);
+    --      when "01"   =>  mux_dqm(i) <= mux_r(i+1);
+    --      when "10"   =>  mux_dqm(i) <= mux_r(i+2);
+    --      when others =>  mux_dqm(i) <= mux_r(i+3);
+    --    end case;
+    --  end loop;
+    --end process;
 
     -- DQM line demultiplexer
     -- 1 x NOR2, 1 x NAND2, 3 x INV, 2 x OR2, 8 x NAND4 = 1 + 1 + 3x0.5 + 2x1.5
@@ -838,7 +838,7 @@ begin
     --    d_cke <= "1111";
     --  end if;
     --end process;
-  end block adrc;
+--  end block adrc;
 
 --*******************************************************************
 -- DTMC - dtm and dfm registers
@@ -854,11 +854,11 @@ begin
     signal dfm_odd      : std_logic_vector(7 downto 0);
     signal m_direct     : std_logic_vector(7 downto 0);
     -- Signals to control DTM
-    signal ld_dtm       : std_logic;
-    signal sely_d       : std_logic;
+    --signal ld_dtm       : std_logic;
+    --signal sely_d       : std_logic;
     -- DTM registers
-    signal dtm          : std_logic_vector(7 downto 0);
-    signal dtm_even     : std_logic_vector(7 downto 0);
+    --signal dtm          : std_logic_vector(7 downto 0);
+    --signal dtm_even     : std_logic_vector(7 downto 0);
 
     -- Signals needed just because VHDL is stupid
     signal dfm_int      : std_logic_vector(7 downto 0);
@@ -965,44 +965,44 @@ begin
     -- Decoding of the PD field from the microprogram word. ld_dtm is high
     -- when DTM should be loaded, sely_d selects the source when the direct
     -- bus is not used, high selects Y bus, low selects D bus.
-    pl_pd_sig <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
-	  ld_dtm <= pl_pd_sig(1);
-    sely_d <= not pl_pd_sig(2) and pl_pd_sig(0);
+    --pl_pd_sig <= (pl(19) xor pl(66))&(pl(43) xor pl(39))& pl(38);
+	  --ld_dtm <= pl_pd_sig(1);
+    --sely_d <= not pl_pd_sig(2) and pl_pd_sig(0);
 
     -- This is the DTM register. It is loaded from direct, dbus or ybus
     -- when ld_dtm is set.
-    process (clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                dtm <= x"00";
-            elsif ld_dtm = '1' and clk_e_pos = '0' then
-                if use_direct_int = '1' then
-                    dtm <= direct_int;
-                elsif sely_d = '1' then
-                    dtm <= ybus;
-                else
-                    dtm <= dbus;
-                end if;
-            end if;
-        end if;
-    end process;
+    --process (clk_p)
+    --begin
+    --    if rising_edge(clk_p) then
+    --        if rst_en = '0' then
+    --            dtm <= x"00";
+    --        elsif ld_dtm = '1' and clk_e_pos = '0' then
+    --            if use_direct_int = '1' then
+    --                dtm <= direct_int;
+    --            elsif sely_d = '1' then
+    --                dtm <= ybus;
+    --            else
+    --                dtm <= dbus;
+    --            end if;
+    --        end if;
+    --    end if;
+    --end process;
 
     -- This is the dtm_even register, the even address part of the data
     -- bus when double-speed is used. It is loaded if ld_dtm is set and
     -- double-speed is selected.
-    process (clk_p)
-    begin
-        if rising_edge(clk_p) then
-            if rst_en = '0' then
-                dtm_even <= x"00";
-            elsif clk_e_neg = '0' then
-                if ld_dtm = '1' and dbl_direct_int = '1' then
-                    dtm_even <= direct_int;
-                end if;
-            end if;
-        end if;
-    end process;
+    --process (clk_p)
+    --begin
+    --    if rising_edge(clk_p) then
+    --        if rst_en = '0' then
+    --            dtm_even <= x"00";
+    --        elsif clk_e_neg = '0' then
+    --            if ld_dtm = '1' and dbl_direct_int = '1' then
+    --                dtm_even <= direct_int;
+    --            end if;
+    --        end if;
+    --    end if;
+    --end process;
 
     -- This is the data output bus to the SDRAM, it always outputs the dtm
     -- register, except when we are transferring two bytes per

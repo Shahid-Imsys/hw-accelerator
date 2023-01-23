@@ -43,14 +43,14 @@ entity pe1_cpc is
     clk_p       : in std_logic;
     clk_e_pos   : in std_logic;      -- exe clock
     -- Control inputs
-    runmode     : in std_logic;      -- TIM in run mode
-    spreq_n     : in std_logic;      -- SP request from TIM
-    spack_n     : in std_logic;      -- SP acknowledge from TIM
+    --runmode     : in std_logic;      -- TIM in run mode
+    --spreq_n     : in std_logic;      -- SP request from TIM
+    --spack_n     : in std_logic;      -- SP acknowledge from TIM
     ld_mar      : in std_logic;      -- Catch bus (CALL SP) from TIM
     ld_mpgm     : in std_logic;      -- ZH
     -- Data inputs
     mp_q        : in std_logic_vector(127 downto 0); -- Microprogram data
-    curr_mpga   : in std_logic_vector(7 downto 0); -- Current pe1_mpgm address
+    --curr_mpga   : in std_logic_vector(7 downto 0); -- Current pe1_mpgm address
     mar         : in std_logic_vector(7 downto 0); -- MAR register, from CLC
     dbus        : in std_logic_vector(7 downto 0); -- D bus
     ybus        : in std_logic_vector(7 downto 0); -- Y bus
@@ -457,8 +457,7 @@ begin
 
     -- Mux for data to transmit shift register (dtsr).
     dtsr_mux: process(tx_sel, dbus, ybus, mar, mpd_muxout, mpram_we_nint,
-                      plcpe_nint, plsel_nint, runmode, spreq_n, spack_n,
-                      dbreg)
+                      plcpe_nint, plsel_nint, dbreg)
     begin
       case tx_sel is
         when "000" =>
@@ -488,26 +487,26 @@ begin
   -----------------------------------------------------------------------------
   -- Microprogram trace adapter instantiation.
   -----------------------------------------------------------------------------
-  trc: block
-    signal cmdstrt : std_logic;
-    signal cmdend  : std_logic;
-    signal rd      : std_logic;
-    signal wdata   : std_logic_vector(7 downto 0);
+  --trc: block
+    --signal cmdstrt : std_logic;
+    --signal cmdend  : std_logic;
+    --signal rd      : std_logic;
+    --signal wdata   : std_logic_vector(7 downto 0);
 
-  begin
-    cmdstrt <= byte_cnt_zero;
-    cmdend  <= '1' when byte_cnt = 1 else '0';
-    rd      <= tx_load when tx_sel(2 downto 0) = "111" else '0';
+  --begin
+    --cmdstrt <= byte_cnt_zero;
+    --cmdend  <= '1' when byte_cnt = 1 else '0';
+    --rd      <= tx_load when tx_sel(2 downto 0) = "111" else '0';
 
     -- The command for trace is swapped
-    process (cmdstrt, dfsr_int)
-    begin
-      if cmdstrt = '1' then
-        wdata <= "0000" & dfsr_int(7 downto 4);
-      else
-        wdata <= dfsr_int;
-      end if;
-    end process;
+    --process (cmdstrt, dfsr_int)
+    --begin
+    --  if cmdstrt = '1' then
+    --    wdata <= "0000" & dfsr_int(7 downto 4);
+    --  else
+    --    wdata <= dfsr_int;
+    --  end if;
+    --end process;
 
 --    -- Instance of trace
 --    trace : entity work.pe1_debug_trace
@@ -541,6 +540,6 @@ begin
 --    rdata <= (others => '0');
 
 
-  end block;
+--  end block;
 end rtl;
 

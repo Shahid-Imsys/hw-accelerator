@@ -116,7 +116,7 @@ end;
 architecture rtl of pe1_clc is
   -- Overlapping pe1_mpgm fields
   signal pl_map    : std_logic_vector(3 downto 0);
-  signal pl_aux1   : std_logic_vector(2 downto 0);
+  --signal pl_aux1   : std_logic_vector(2 downto 0);
   -- Internal buses
   signal pc        : std_logic_vector(7 downto 0); --CJ
   signal di        : std_logic_vector(7 downto 0);
@@ -150,9 +150,9 @@ architecture rtl of pe1_clc is
   signal ld_trace  : std_logic;
   signal set_ackclk: std_logic;
   signal ld_invps  : std_logic;
-  signal selblk_pa : std_logic;
+  --signal selblk_pa : std_logic;
   -- From SCT, select block
-  signal selblk_aux1: std_logic;
+  --signal selblk_aux1: std_logic;
   -- Request flipflops
   signal special   : std_logic;
   signal fwi       : std_logic;
@@ -192,7 +192,7 @@ begin
   pl_sig1 <= pl(115)&pl(52)&pl(73)&pl(78)&pl(57)&pl(46);
   pl_sig8   <= pl(28)&pl(62)&(pl(26) xor pl(17))&(pl(3) xor pl(59))&(pl(58) xor pl(28))&pl(17)&pl(10)&pl(59)&(pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24) ;
   pl_map  <= (pl(4)xor pl(76))&(pl(37) xor pl(75))&pl(13)&pl(24);
-  pl_aux1 <= pl_sig1(4 downto 2);
+  --pl_aux1 <= pl_sig1(4 downto 2);
   pl_ld_mpgm <= ld_mpgm; --Added by CJ
 ----------------------------------------------------------------------
   -- Sequence control decode logic.
@@ -229,7 +229,7 @@ begin
       st_we_n      => st_we_n,
       ctr_dec      => ctr_dec,
       ctr_ld       => ctr_ld,
-      selblk_aux1  => selblk_aux1,
+      --selblk_aux1  => selblk_aux1,
       rst_seqc_n   => rst_seqc_n,
       dsi          => dsi,
       rin          => ctr_in,
@@ -506,7 +506,7 @@ begin
     ld_special <= '0';
     ld_ir <= '0';
     cuirq <= '0';
-    selblk_pa <= '0';
+    --selblk_pa <= '0';
 
     if pl_sig12 = '0' then
       case pl_sig18 is
@@ -523,7 +523,7 @@ begin
           PA_SELBLK1|
           PA_SELBLK2|
           PA_SELBLK3 =>         -- (11xx) SELECT BLKx
-          selblk_pa <= '1';
+          --selblk_pa <= '1';
         when others => null;
       end case;
     end if;

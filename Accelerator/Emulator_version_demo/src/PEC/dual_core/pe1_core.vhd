@@ -79,8 +79,6 @@ entity pe1_core is
     c2_en_wdog     : out std_logic;
     c2_pup_clk     : out std_logic;
     c2_pup_irq     : out std_logic_vector(1 downto 0);
-    c2_r_size      : out std_logic_vector(1 downto 0);
-    c2_c_size      : out std_logic_vector(1 downto 0);
     c2_t_ras       : out std_logic_vector(2 downto 0);
     c2_t_rcd       : out std_logic_vector(1 downto 0);
     c2_t_rp        : out std_logic_vector(1 downto 0);
@@ -107,7 +105,6 @@ entity pe1_core is
     --ilioa       : out std_logic;
     --ildout      : out std_logic;
     --inext       : out std_logic;
-    dqm_size    : out std_logic_vector(1 downto 0);
     --adc_dac     : out std_logic;
     --en_tiu      : out std_logic;
     --en_iobus    : out std_logic_vector(1 downto 0);
@@ -174,9 +171,6 @@ architecture struct of pe1_core is
   signal pup_clk    	: std_logic;
   signal pup_irq    	: std_logic_vector(1 downto 0);
   signal en_i       	: std_logic;
-  signal r_size     	: std_logic_vector(1 downto 0);
-  signal c_size     	: std_logic_vector(1 downto 0);
-  signal dqm_size_int	: std_logic_vector(1 downto 0);
   signal fast_d_int 	: std_logic;
   signal t_ras      	: std_logic_vector(2 downto 0);
   signal t_rcd      	: std_logic_vector(1 downto 0);
@@ -203,7 +197,7 @@ architecture struct of pe1_core is
   signal state_ps3  : std_logic_vector(4 downto 0);
   signal clkreq_gen : std_logic;
   signal ld_mar     : std_logic;
-  signal runmode    : std_logic;
+  --signal runmode    : std_logic;
   signal spack_n    : std_logic;
   signal spreq_n    : std_logic;
   signal rst_n_int : std_logic;
@@ -534,9 +528,9 @@ begin
       pup_irq     => pup_irq,
       en_i        => en_i,
       -- MORG register
-      r_size      => r_size,
-      c_size      => c_size,
-      dqm_size    => dqm_size_int,
+      --r_size      => r_size,
+      --c_size      => c_size,
+      --dqm_size    => dqm_size_int,
       -- MTIM register
       fast_d      => fast_d_int,
       t_ras       => t_ras,
@@ -578,13 +572,10 @@ begin
       nap_en      => nap_en);
 
     fast_d		    <= fast_d_int;
-	  dqm_size	    <= dqm_size_int;
     c2_rsc_n      <= rsc_n;
     c2_en_wdog    <= en_wdog  ;
     c2_pup_clk    <= pup_clk  ;
     c2_pup_irq    <= pup_irq  ;
-    c2_r_size     <= r_size   ;
-    c2_c_size     <= c_size   ;
     c2_t_ras      <= t_ras    ;
     c2_t_rcd      <= t_rcd    ;
     c2_t_rp       <= t_rp     ;
@@ -646,7 +637,7 @@ begin
       state_ps3   => state_ps3,
       clkreq_gen  => clkreq_gen,
       ld_mar      => ld_mar,
-      runmode     => runmode,
+      --runmode     => runmode,
       spack_n     => spack_n,
       spreq_n     => spreq_n,
       rst_n       => rst_n_int,
@@ -884,7 +875,6 @@ begin
       -- Clock and reset functions
       rst_en      => rst_en_int,
       clk_p       => clk_p,
-      clk_e_neg   => clk_e_neg_int,
       clk_c2_pos  => even_c,
       clk_e_pos   => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
@@ -893,9 +883,9 @@ begin
       -- Microprogram control
       pl          => pl,
       -- Static control inputs
-      r_size      => r_size,
-      c_size      => c_size,
-      dqm_size    => dqm_size_int,
+      --r_size      => r_size,
+      --c_size      => c_size,
+      --dqm_size    => dqm_size_int,
       t_ras       => t_ras,
       t_rcd       => t_rcd,
       t_rp        => t_rp,
@@ -952,14 +942,14 @@ begin
       clk_p       => clk_p,
       clk_e_pos   => clk_e_pos_int,
       -- Control inputs
-      runmode     => runmode,
-      spreq_n     => spreq_n,
-      spack_n     => spack_n,
+      --runmode     => runmode,
+      --spreq_n     => spreq_n,
+      --spack_n     => spack_n,
       ld_mar      => ld_mar,
       ld_mpgm     => ld_mpgm,
       -- Data inputs
       mp_q        => mp_q,
-      curr_mpga   => curr_mpga,
+      --curr_mpga   => curr_mpga,
       mar         => mar,
       dbus        => dbus_int,
       ybus        => ybus,

@@ -68,7 +68,7 @@ entity pe1_sct is
 		st_we_n			: out std_logic;	-- Stack write enable (active low)
 		ctr_dec			: out std_logic;	-- Decrement counter/register (active high)
 		ctr_ld			: out std_logic;	-- Load counter/register (active high)
-		selblk_aux1	: out std_logic;  -- Select block AUX1 function (active high)
+		--selblk_aux1	: out std_logic;  -- Select block AUX1 function (active high)
 		rst_seqc_n	: out std_logic;  -- SEQC controlled reset (active low)
 		--Data Outputs
 		dsi					: out std_logic_vector(7 downto 0);   -- Data to DSL (DSOURCE CU)
@@ -88,7 +88,7 @@ architecture rtl of pe1_sct is
 	signal pl_bitmsk		: std_logic_vector(3 downto 0);		-- BITMSK field (COND(3:0))
 	-- Address select signals
 	signal rin_sel			: std_logic_vector(2 downto 0);		-- rin source select
-	signal rin_short		: std_logic;	-- Set high four bits of rin to zero
+	--signal rin_short		: std_logic;	-- Set high four bits of rin to zero
 	signal shmadis			: std_logic;	-- Disable bitmask
 	signal ds_ctr				: std_logic;	-- Enable stack ctr/counter read
 	-- Address selector outputs
@@ -166,7 +166,7 @@ begin
 		-- Default values
 		rst_clc			<= not rst_en;	-- Default the same as rst_en (inverse polarity).
 		rin_sel			<= RIN_AD;			-- Default is AD (rin low part driven from ad).
-		rin_short		<= '0';	-- Default inactive (rin high part driven from ad, not 'Z').
+		--rin_short		<= '0';	-- Default inactive (rin high part driven from ad, not 'Z').
 		ds_ctr			<= '0';	-- Default inactive (stack ctr/counter read disabled).
 		shmadis 		<= '1';	-- Default active (bitmask disabled).
 		seq_pop			<= '0';	-- Default inactive (no SEQC controlled pop).
@@ -177,7 +177,7 @@ begin
 		seq_dec			<= '0';	-- Default inactive (no SEQC controlled counter decrement).
 		ctr_ld			<= '0';	-- Default inactive (no counter load).
 		auxfunc 		<= '0';	-- Default inactive (no AUX stack/ctr functions enabled).
-		selblk_aux1 <= '0';	-- Default inactive (no AUX select block enabled).
+		--selblk_aux1 <= '0';	-- Default inactive (no AUX select block enabled).
 		plus1_int		:= '0';	-- Default inactive (no "PLUS 1" function selected).
 		rst_seqc_n	<= '1';	-- Default inactive (no SEQC controlled reset).
 
@@ -185,7 +185,7 @@ begin
 			when SEQC_RESET =>				-- (00) RESET
 				if pl_cpol = '0' then
 					rin_sel <= RIN_Z;			-- Makes low part (7..0) of address zero
-					rin_short <= '1';			-- Makes middle part (11..8) of address zero
+					--rin_short <= '1';			-- Makes middle part (11..8) of address zero
 					mpa_int := z_ri_ri;		-- Makes high part (13..12) of address zero
 					rst_clc	<= '1';				-- CLC reset.
 					rst_seqc_n	<= '0';		-- SEQC controlled reset out to CRB.
@@ -265,8 +265,8 @@ begin
 			when SEQC_UDO =>					-- (09) UNC DO d
 				if pl_aux1(0) = '0' then
 					auxfunc <= '1';				-- Auxillary stack/counter functions enabled
-				else
-					selblk_aux1 <= '1';		-- Select block replaces pushing aux funcs
+				--else
+				--	selblk_aux1 <= '1';		-- Select block replaces pushing aux funcs
 				end if;
 				mpa_int := pc_pc_ri;		-- Always jump short
 				seq_may_psh <= '1';			-- Unconditional push
@@ -281,8 +281,8 @@ begin
 			when SEQC_ULDO =>					-- (0B) UNC LDO ad
 				if pl_aux1(0) = '0' then
 					auxfunc <= '1';				-- Auxillary stack/counter functions enabled
-				else
-					selblk_aux1 <= '1';		-- Select block replaces pushing aux funcs
+				--else
+				--	selblk_aux1 <= '1';		-- Select block replaces pushing aux funcs
 				end if;
 				mpa_int := pc_ri_ri;		-- Always jump long
 				seq_may_psh <= '1';			-- Unconditional push
@@ -400,7 +400,7 @@ begin
 				mpa_int := pc_pc_pc;		-- Always continue
 				ctr_ld <= '1';					-- Always load ctr
 				if pl_cpol = '0' then
-					rin_short <= '1';			-- Load ctr short (8 bit) if not cpol
+					--rin_short <= '1';			-- Load ctr short (8 bit) if not cpol
 				end if;
 			------------------------------------------------------------------------
 			when SEQC_LDCTR =>				-- (18) (L)LOAD CTR FROM x
@@ -413,7 +413,7 @@ begin
 				mpa_int := pc_pc_pc;		-- Always continue
 				ctr_ld <= '1';					-- Always load ctr
 				if pl_cpol = '0' then
-					rin_short <= '1';			-- Load ctr short (8 bit) if not cpol
+					--rin_short <= '1';			-- Load ctr short (8 bit) if not cpol
 				end if;
 			------------------------------------------------------------------------
 			when SEQC_RCUC0 =>				-- (19) REPEAT CSTACK UNTIL CTR=0
@@ -508,7 +508,7 @@ begin
 		-- determined by the errcode signal.
 		if rst_err = '1' then	-- Reset state (same as SEQC_RESET with cpol = 0)
 			rin_sel <= RIN_Z;		-- Makes low part (7..0) of address zero + errcode
-			rin_short <= '1';		-- Makes middle part (11..8) of address zero
+			--rin_short <= '1';		-- Makes middle part (11..8) of address zero
 			mpa_int := z_ri_ri;	-- Makes high part (13..12) of address zero
 		end if;
 

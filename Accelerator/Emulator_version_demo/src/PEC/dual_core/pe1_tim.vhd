@@ -115,7 +115,7 @@ entity pe1_tim is
 		state_ps3       : out std_logic_vector(4 downto 0); -- Transfer prescaler 3 to CRB for access
 		clkreq_gen      : out std_logic; -- Programmable division of clk_c, for clkreq generation
 		ld_mar          : out std_logic; -- Load the MAR register at CALL SP (act high)
-		runmode         : out std_logic; -- For status information to SP
+		--runmode         : out std_logic; -- For status information to SP
 		spack_n         : out std_logic; -- SP acknowledge,(act low)
 		spreq_n         : out std_logic; -- SP request, (act low)
     rst_n           : out std_logic; -- Asynchronous reset to clk_gen
@@ -609,7 +609,7 @@ begin
 			end if;
 		end if;
 	end process;
-	runmode <= runmode_int;
+	--runmode <= runmode_int;
 
 	-- single_step step is used to edge detect stop_step to the
 	-- clk_c2 domain, to avoid multiple steps when clk_s is slow.

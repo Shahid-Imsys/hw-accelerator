@@ -375,8 +375,6 @@ architecture struct of PE_pair_top is
   signal  c2_en_wdog    : std_logic;
   signal  c2_pup_clk    : std_logic;
   signal  c2_pup_irq    : std_logic_vector(1 downto 0);
-  signal  c2_r_size     : std_logic_vector(1 downto 0);
-  signal  c2_c_size     : std_logic_vector(1 downto 0);
   signal  c2_t_ras      : std_logic_vector(2 downto 0);
   signal  c2_t_rcd      : std_logic_vector(1 downto 0);
   signal  c2_t_rp       : std_logic_vector(1 downto 0);
@@ -401,7 +399,6 @@ architecture struct of PE_pair_top is
   -----------------------------------------------------------------------------
   -- pe1_core driven
   signal dbus        : std_logic_vector(7 downto 0);
-  signal dqm_size    : std_logic_vector(1 downto 0);
   -- Peri driven
   signal irq0        : std_logic;
   signal irq1        : std_logic;
@@ -869,8 +866,6 @@ end generate;
     c2_en_wdog    => c2_en_wdog       ,
     c2_pup_clk    => c2_pup_clk       ,
     c2_pup_irq    => c2_pup_irq       ,
-    c2_r_size     => c2_r_size        ,
-    c2_c_size     => c2_c_size        ,
     c2_t_ras      => c2_t_ras         ,
     c2_t_rcd      => c2_t_rcd         ,
     c2_t_rp       => c2_t_rp          ,
@@ -893,7 +888,6 @@ end generate;
     dbus          => dbus             ,--: out std_logic_vector(7 downto 0);
     --pd            => pd_s             ,--: out std_logic_vector(2 downto 0);  -- pl_pd
     --aaddr         => aaddr            ,--: out std_logic_vector(4 downto 0);  -- pl_aaddr
-    dqm_size      => dqm_size         ,--: out std_logic_vector(1 downto 0);
     irq0          => irq0             ,--: in  std_logic;  -- Interrupt request 0
     irq1          => irq1             ,--: in  std_logic;  -- Interrupt request 1
     adc_ref2v  	  => open             ,--: out	std_logic;	-- Select 2V internal ADC reference (1V)
@@ -931,12 +925,9 @@ end generate;
     en_wdog       => c2_en_wdog       ,
     pup_clk       => c2_pup_clk       ,
     pup_irq    	  => c2_pup_irq    	  ,
-    r_size     	  => c2_r_size     	  ,
-    c_size     	  => c2_c_size     	  ,
     t_ras      	  => c2_t_ras      	  ,
     t_rcd      	  => c2_t_rcd      	  ,
     t_rp       	  => c2_t_rp       	  ,
-    dqm_size      => dqm_size         ,
     fast_d        => fast_d           ,
     short_cycle   => short_cycle      ,
 

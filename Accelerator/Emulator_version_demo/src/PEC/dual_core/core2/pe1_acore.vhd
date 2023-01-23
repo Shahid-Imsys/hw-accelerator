@@ -71,13 +71,10 @@ entity pe1_acore is
     en_wdog     : in std_logic;
     pup_clk     : in std_logic;
     pup_irq    	: in std_logic_vector(1 downto 0);
-    r_size     	: in std_logic_vector(1 downto 0);
-    c_size     	: in std_logic_vector(1 downto 0);
     t_ras      	: in std_logic_vector(2 downto 0);
     t_rcd      	: in std_logic_vector(1 downto 0);
     t_rp       	: in std_logic_vector(1 downto 0);
 --    en_mexec   	: in std_logic;
-    dqm_size    : in std_logic_vector(1 downto 0);   --input from pe1_crb
     fast_d      : in std_logic;  -- clk_d speed select     input from pe1_crb
     short_cycle : in std_logic;
     -- signal to core1
@@ -615,7 +612,6 @@ begin
       -- Clock and reset functions
       rst_en      => rst_en_int,
       clk_p       => clk_p,
-      clk_e_neg    => clk_e_neg_int,
       clk_c2_pos      => odd_c,
       clk_e_pos       => clk_e_pos_int,
       --gate_e      => clk_e_pos_int,
@@ -624,9 +620,9 @@ begin
       -- Microprogram control
       pl          => pl,
       -- Static control inputs
-      r_size      => r_size,
-      c_size      => c_size,
-      dqm_size    => dqm_size,
+      --r_size      => r_size,
+      --c_size      => c_size,
+      --dqm_size    => dqm_size,
       t_ras       => t_ras,
       t_rcd       => t_rcd,
       t_rp        => t_rp,

@@ -1015,7 +1015,7 @@ begin
         DIN           => din_c,
         DOUT          => dout_c,
         YBUS          => ybus,
-        LD_MPGM       => ld_mpgm,
+        --LD_MPGM       => ld_mpgm,
         VE_DIN        => ve_in_int,
         DBUS_DATA     => cdfm_int,
         MPGMM_IN      => mpgmin,

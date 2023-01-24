@@ -51,7 +51,7 @@ entity pe1_acmdr is
         DOUT      : out std_logic_vector(159 downto 0);
         --Core interface
         YBUS      : in std_logic_vector(7 downto 0);
-        LD_MPGM   : in std_logic;
+        --LD_MPGM   : in std_logic;
         VE_DIN    : out std_logic_vector(63 downto 0); --to vector engine
         DBUS_DATA : out std_logic_vector(7 downto 0);  --to DSL
         MPGMM_IN  : out std_logic_vector(127 downto 0); --to microprogram memory
@@ -79,26 +79,21 @@ architecture rtl of pe1_acmdr is
     signal send_req_d    : std_logic;
     signal send_req      : std_logic;
     signal requesting    : std_logic;
-    signal cnt_reg       : unsigned(7 downto 0);
-    signal transfer_type : std_logic_vector(1 downto 0);
-
     signal ve_data_int : std_logic_vector(63 downto 0);
     signal mp_data_int : std_logic_vector(127 downto 0);
     signal dbus_reg    : std_logic_vector(127 downto 0);
-    signal output_int  : std_logic_vector(32 downto 0);
     signal dbus_int    : std_logic_vector(7 downto 0);
     signal dtm_reg     : std_logic_vector(31 downto 0);
     signal ve_in_cnt   : std_logic_vector(1 downto 0);
     signal ld_dtm_v    : std_logic;
     signal fifo_wr_en  : std_logic;
     signal fifo_rd_en  : std_logic;
-    signal init_mpgm_rq : std_logic_vector(31 downto 0);
+    --signal init_mpgm_rq : std_logic_vector(31 downto 0);
     signal empty       : std_logic;
     signal fifo_full   : std_logic;
     signal fb          : std_logic;
     signal req         : std_logic := '0';
     signal rd_trig     : std_logic;
-    signal srst        : std_logic;
 
     signal output_register : std_logic_vector(159 downto 0);
     signal col_ctr : integer range 5 downto 0;
@@ -170,7 +165,7 @@ begin
             pl_send_req <= pl(113);
         end if;
     end process;
-    init_mpgm_rq <= "01000111001111110000000000000000";
+    --init_mpgm_rq <= "01000111001111110000000000000000";
     process(clk_p)
     begin
       if rising_edge(clk_p) then  
@@ -290,7 +285,6 @@ begin
     REQ_OUT <= req;
     REQ_RD_OUT <= rd_trig;
     fb  <= ACK_IN;
-    srst <= not rst_en;
     process(clk_p)
     begin
       if rising_edge(clk_p) then

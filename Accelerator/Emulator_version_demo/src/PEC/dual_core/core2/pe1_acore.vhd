@@ -683,7 +683,7 @@ begin
         DIN      => din_c,
         DOUT     =>dout_c,
         YBUS     =>ybus,
-        LD_MPGM  =>std_logic'('0'),
+        --LD_MPGM  =>std_logic'('0'),
         VE_DIN   =>ve_in_int,
         DBUS_DATA=>cdfm_int,
         MPGMM_IN =>mpgmin,

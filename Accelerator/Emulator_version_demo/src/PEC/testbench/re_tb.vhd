@@ -63,6 +63,7 @@ end component;
 
 type mem is array(511 downto 0) of std_logic_vector(127 downto 0);
 type mem_d is array(255 downto 0) of std_logic_vector(31 downto 0);
+type mem_dd is array(511 downto 0) of std_logic_vector(31 downto 0);
 type mem_w is array(255 downto 0) of std_logic_vector(63 downto 0);
 type processes is (load_para, exe, re_mode_l, re_mode_r, re_mode_b, p_mode_a, p_mode_b, conv_mode_l, conv_mode_r, conv_mode_b, mode_c, bypass, FFT);
 signal virtual_mem : mem;
@@ -70,18 +71,19 @@ signal data_counter : unsigned(8 downto 0) := '0' & x"00";
 signal clk_p : std_logic;
 signal clk_e_pos : std_logic;
 signal clk_e_neg : std_logic;
-signal rst : std_logic;
+signal rst, ve_push_dtm : std_logic;
 signal pl : std_logic_vector(127 downto 0);
 signal ybus : std_logic_vector(7 downto 0);
 signal ddi_vld : std_logic;
 signal re_rdy : std_logic;
 signal ve_rdy, ve_rdy_delay : std_logic;
-signal read_out_done, load_mem : std_logic;
+signal read_out_done, load_mem, fft_read_done : std_logic;
 signal ve_in : std_logic_vector(63 downto 0);
 signal ve_out_d : std_logic_vector(7 downto 0);
 signal ve_out_dtm : std_logic_vector(127 downto 0);
 signal progress : processes;
-signal debug   : integer;
+signal debug, i   : integer;
+signal fft_resmem : mem_dd;
 signal data_memory0, data_memory1 : mem_d;
 signal weight_memory : mem_w;
 
@@ -717,6 +719,7 @@ end loop;
 DDI_VLD <= '0';
 
 wait for 30 ns;
+progress <= re_mode_r;
 pl <= au_test_roffset0;
 ybus <= x"01";
 wait for 30.01 ns;
@@ -752,6 +755,7 @@ DDI_VLD <= '0';
 wait for 30 ns;
 --ddi_vld <= '1';
 pl(106) <= '1'; --fft
+progress <= fft;
 wait for 30 ns;
 pl <= ve_loop;
 ybus <= fft_stages;
@@ -759,7 +763,7 @@ wait for 30.01 ns;
 pl(95) <= '1';
 wait for 30 ns;
 pl(95) <= '0';
-wait for 200000 ns;
+wait until fft_read_done = '1';
 
 
 --pl(94)<= '0';
@@ -800,6 +804,27 @@ begin
   end if;
 end process;
 
+process(clk_p, rst)
+begin
+  if rst = '0' then
+    i <= 0;
+    fft_read_done <= '0';
+  elsif rising_edge(clk_p) then
+    if progress = fft and ve_push_dtm = '1' and i < fft_points then
+      fft_resmem(i) <= ve_out_dtm(31 downto 0);
+      fft_resmem(i+1) <= ve_out_dtm(63 downto 32);
+      fft_resmem(i+2) <= ve_out_dtm(95 downto 64);
+      fft_resmem(i+3) <= ve_out_dtm(127 downto 96);
+      i <= i + 4;
+    else
+      if i >= fft_points then
+        i <= 0;
+        fft_read_done <= '1';
+      end if;
+    end if;
+  end if;
+end process;
+
 process(clk_p)
 begin
 if rising_edge(clk_p) then
@@ -827,7 +852,7 @@ port map(
     VE_RDY       => ve_rdy,
     VE_IN        => ve_in,
     VE_DTM_RDY   => open,
-    VE_PUSH_DTM  => open,
+    VE_PUSH_DTM  => ve_push_dtm,
     VE_AUTO_SEND => open,
     VE_OUT_D     => ve_out_d,
     VE_OUT_DTM   => ve_out_dtm

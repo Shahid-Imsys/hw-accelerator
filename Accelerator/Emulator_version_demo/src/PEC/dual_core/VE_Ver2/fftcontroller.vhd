@@ -54,7 +54,7 @@ architecture first of fftcontroller is
   signal data0addrmasked   : std_logic_vector(7 downto 0) := (others => '0');
   signal data1addrmasked   : std_logic_vector(7 downto 0) := (others => '0');
   signal swap_int          : std_logic                    := '0';
-  signal swap_swap         : swap_t;
+  signal swap_swap, swap_memreg : swap_t;
   signal finalcycle        : std_logic                    := '0';
   signal maxstagereached   : std_logic                    := '0';
 begin
@@ -206,6 +206,7 @@ begin
   swap_int <= bfcounter(7) xor bfcounter(6) xor bfcounter(5) xor bfcounter(4) xor
               bfcounter(3) xor bfcounter(2) xor bfcounter(1) xor bfcounter(0);
   swap_swap <= swap when swap_int = '1' else noswap;
+  swap_memreg <= swap when (swap_int = '1' and stagecounter /= 0) else noswap;
   -- Select bit or bit to the right to later on insert a 0 or a 1
   process(maskreg, bfcounter)
   begin
@@ -263,7 +264,7 @@ begin
 
   -- Read out in first cycle
   read_en  <= '1' when cyclecounter = 0 and genenable = '1' else '0';
-  memreg_c <= (swap => swap_swap, datareg => enable, weightreg => enable)
+  memreg_c <= (swap => swap_memreg, datareg => enable, weightreg => enable)
               when cyclecounter = 0 else
               (swap => swap_swap, datareg => hold, weightreg => hold);
   -- Write in first cycle

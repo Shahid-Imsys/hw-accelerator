@@ -404,7 +404,7 @@ architecture rtl of ve is
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
-  signal fft_en, fft_done, finalstage, matinv_en, matinv_done : std_logic;
+  signal fft_en, fft_done, fft_resload, finalstage, matinv_en, matinv_done : std_logic;
   signal left_loading, right_loading, bias_loading : std_logic_vector(3 downto 0);
   signal left_rst, right_rst, bias_rst : std_logic;
   signal lrst_from_conv, rrst_from_conv : std_logic;
@@ -709,7 +709,7 @@ begin
       if rst = '0' then
         ve_rdy <= '1';
       elsif clk_e_pos = '0' then
-        ve_rdy <= not conv_busy and not bypass_reg;-- and fft_done;--fft_done_pipe(10);
+        ve_rdy <= not conv_busy and not bypass_reg and fft_done_pipe(10);-- and fft_done;
       end if;
     end if;
   end process;
@@ -1654,24 +1654,28 @@ begin
       if rst = '0' then
         swap <= '0';
         res_assign <= '0';
+        fft_resload <= '0';
       else
         swap <= swap_int;
         res_assign <= read_en_o;
-        if fft_done_pipe(10) = '1' and res_assign = '1' then
+        if fft_done_pipe(10) = '1' and res_assign = '1' and mode_latch = fft then
           if CLK_E_NEG = '0' then
-            if swap = '1' then
-              fft_result(127 downto 64) <= data0 & data1;
-            else
-              fft_result(127 downto 64) <= data1 & data0; 
-            end if;
-          else
             if swap = '1' then
               fft_result(63 downto 0) <= data0 & data1;
             else
-              fft_result(63 downto 0) <= data1 & data0;
+              fft_result(63 downto 0) <= data1 & data0; 
             end if;
+            fft_resload <= '0';
+          else
+            if swap = '1' then
+              fft_result(127 downto 64) <= data0 & data1;
+            else
+              fft_result(127 downto 64) <= data1 & data0;
+            end if;
+            fft_resload <= '1';
           end if;
         else
+          fft_resload <= '0';
           fft_result <= (others => '0');
         end if;
       end if;
@@ -1686,6 +1690,7 @@ begin
         dtm_data_reg <= (others => (others => '0'));
         output_c <= (others => '0');
         pushback_en <= '0';
+        load_dtm_out <= '0';
         VE_OUT_D <= (others => '0');
       elsif reg_in = CONS_DFY_REG_SHIFT_IN then --write feedback(dfy) register through y bus
         if clk_e_neg = '1' then
@@ -1728,15 +1733,15 @@ begin
     end case;
   end process;
 
-  dtm_ctl_out : process(pp_ctl, load_dtm_out)
+  dtm_ctl_out : process(pp_ctl, load_dtm_out, fft_resload)
   begin
     if pp_ctl(5) = '1' then
-      ve_dtm_rdy <= load_dtm_out;
+      ve_dtm_rdy <= load_dtm_out or fft_resload;
     else
       ve_dtm_rdy <= '0';
     end if;
     if pp_ctl(6) = '1' then
-      ve_push_dtm <= load_dtm_out;
+      ve_push_dtm <= load_dtm_out or fft_resload;
     else
       ve_push_dtm <= '0';
     end if;

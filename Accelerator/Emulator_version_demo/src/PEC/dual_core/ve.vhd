@@ -1710,7 +1710,7 @@ begin
           dtm_data_reg(to_integer(unsigned(output_c))) <= outreg(7 downto 0);
           output_c <= std_logic_vector(to_unsigned(to_integer(unsigned(output_c))+1,4));
         else --to dbus
-          VE_OUT_D <= outreg(7 downto 0);
+          VE_OUT_D <= dtm_data_reg(to_integer(unsigned(pl_ve_byte)));
         end if;
       end if;
       if pp_ctl(4 downto 3) = "10" and output_c(1 downto 0) = "11" and output_ena = '1' then

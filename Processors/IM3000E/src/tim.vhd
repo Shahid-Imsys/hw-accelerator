@@ -435,12 +435,9 @@ begin
       end case;
       counter_s <= counter_s + 1;
     end if;
-    if en_s = '0' then
-      din_s_int <= '0';
-    end if;
   end process;
   
-  din_s <= din_s_int;
+  din_s <= '0' when en_s = '0' else din_s_int;
   
   -- Prescaler 1 is used to generate mckout1, which is a clock output
   -- pin, and as input to prescaler 2.

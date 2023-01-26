@@ -417,7 +417,7 @@ begin
   -- FF in the clock block that generates clk_s.
   
   
-  process (clk_p, rst_cn_int, en_s)
+  process (clk_p, rst_cn_int)
   begin
     if (rst_cn_int = '0') then
       counter_s <= (others => '0');

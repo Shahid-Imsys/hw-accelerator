@@ -5,12 +5,20 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package vetypes is
+  -- VE top types --
   type au_param is array(3 downto 0) of unsigned(7 downto 0);
   type dfy_word is array(7 downto 0) of std_logic_vector(7 downto 0);
   type dtm_word is array(15 downto 0) of std_logic_vector(7 downto 0);
   type mode is (idle, re_mode, conv, fft, matrix);
   type read_state is (waiting, computing, reading_mem);
 
+  -- matrix inversion controller types --
+  type a_addr_type is (kk, ik, ii, ij);
+  type l_addr_type is (kk, ik, jk);
+  type state_type is (xSYTRF, xTRSM, xSYDRK, xGEMDM, idle, writing, working, matmulhalf, rzero, lidi, tmpli); -- TODO: divide into states for each stage?
+  type addr_type is (a, l, d, di, last, li, s, li2, di2, d2, w2, t2, t22);
+
+  -- data path types--
   type sign_t is (s, u);
   type swap_t is (noswap, swap, switch);
   type addsub_t is (add, sub);

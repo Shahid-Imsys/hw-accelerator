@@ -170,6 +170,7 @@ constant fft_test_data0     : string := "FFT_256_data0.dat";
 constant fft_test_data1     : string := "FFT_256_data1.dat";
 constant fft_test_tf        : string := "FFT_256_tf.dat";
 constant fft_out_ref        : string := "FFT_256_out_ref.dat";
+constant fft_out            : string := "FFT_256_out.dat";
 constant fft_points         : integer := 256;
 constant fft_stages         : std_logic_vector := x"06";--max 7 = 512 point
 
@@ -251,6 +252,18 @@ begin
         hread(text_line, val_bias);
         fft_outref(i) <= val_bias;
       end loop ;
+    end if;
+  end process;
+
+  process(fft_read_done)
+  file save_text_file : text open write_mode is fft_out;
+  variable text_line : line;
+  begin
+    if fft_read_done = '1' then
+      for i in 0 to fft_points - 1 loop
+        hwrite(text_line, fft_resmem(i));
+        writeline(save_text_file, text_line);
+      end loop;
     end if;
   end process;
 

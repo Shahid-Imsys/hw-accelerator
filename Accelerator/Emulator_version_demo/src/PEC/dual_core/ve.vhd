@@ -404,7 +404,7 @@ architecture rtl of ve is
   signal ve_loop_reg, ve_oloop_reg : std_logic_vector(7 downto 0);
   signal ve_fftaddr_d0, ve_fftaddr_d1, ve_fftaddr_tf : std_logic_vector(7 downto 0);
   signal fft_stages : unsigned(2 downto 0);
-  signal fft_en, fft_done, fft_resload, finalstage, matinv_en, matinv_done : std_logic;
+  signal fft_en, fft_done, fft_resload, finalstage, matinv_en, matinv_done, matinv_done_reg : std_logic;
   signal left_loading, right_loading, bias_loading : std_logic_vector(3 downto 0);
   signal left_rst, right_rst, bias_rst : std_logic;
   signal lrst_from_conv, rrst_from_conv : std_logic;
@@ -709,7 +709,20 @@ begin
       if rst = '0' then
         ve_rdy <= '1';
       elsif clk_e_pos = '0' then
-        ve_rdy <= not conv_busy and not bypass_reg and fft_done_pipe(10);-- and fft_done;
+        ve_rdy <= not conv_busy and not bypass_reg and fft_done_pipe(10) and matinv_done;-- and fft_done;
+      end if;
+    end if;
+  end process;
+
+  process(clk_p) -- latch martix inversion done signal, since it being set to high for only one clock p.
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        matinv_done <= '1';
+      elsif matinv_start = '1' then
+        matinv_done <= '0';
+      elsif matinv_done_reg = '1' then
+        matinv_done <= '1';
       end if;
     end if;
   end process;
@@ -725,21 +738,21 @@ begin
           when idle => 
             if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '0' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and re_switch = '0' then  
+            elsif conv_enable = '0' and fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '1' and re_switch = '0' then
               mode_latch <= matrix;
             else
               mode_latch <= idle;
             end if;
           when re_mode =>
-            if (conv_enable = '1' and re_switch = '0') or (re_source = '1' and pushback_en = '0') then
+            if (conv_enable = '1' and fft_mode = '0' and re_switch = '0') or (re_source = '1' and pushback_en = '0') then
               mode_latch <= conv;
-            elsif fft_mode = '1' and re_switch = '0' then  
+            elsif conv_enable = '0' and fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif re_rdy = '1' then --back to initial state TBD
             --  mode_latch <= idle;
@@ -749,9 +762,9 @@ begin
           when conv =>
             if re_switch = '1' or (re_source = '1' and pushback_en = '1') then --pushback
               mode_latch <= re_mode;
-            elsif fft_mode = '1' and re_switch = '0' then  
+            elsif conv_enable = '0' and fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -761,9 +774,9 @@ begin
           when fft =>
             if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '0' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '1' and re_switch = '0' then
               mode_latch <= matrix;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;  
@@ -773,9 +786,9 @@ begin
           when matrix => 
             if re_switch = '1' then
               mode_latch <= re_mode;
-            elsif conv_enable = '1' and re_switch = '0' then
+            elsif conv_enable = '1' and fft_mode = '0' and re_switch = '0' then
               mode_latch <= conv;
-            elsif fft_mode = '1' and re_switch = '0' then  
+            elsif conv_enable = '0' and fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
             --elsif ve_rdy = '1' then
             --  mode_latch <= idle;
@@ -789,7 +802,7 @@ begin
   end process;
 
   fft_en <= '1' when mode_latch = fft else '0'; -- more enable signals should be added to controllers later
-  matinv_en <= '1' when mode_latch = matrix else '0';
+  matinv_en <= en_o when mode_latch = matrix else '0';
 
   --********************************
   --Mode c. Shared by RE and VE
@@ -802,8 +815,6 @@ begin
         ring_load <= '0';
         ring_rd <= '0';
         ring_wr <= '0';
-      --elsif cnt_rst = '1' and start = '0' then
-      --  ring_rst <= '1';
       elsif (re_busy = '1' and mode_c_l = '1') or (re_start = '1' and mode_c = '1' and clk_e_pos = '0') then --make this an automatic process --1215
         if (re_source = '0' and DDI_VLD = '1') or re_source = '1' then
           ring_load <= '1';
@@ -1109,7 +1120,7 @@ begin
       write_en_o   <= write_en_to_mux;
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= write_en_w_to_mux;
-      write_en_b_o <= read_en_b_to_mux;
+      read_en_b_o <= read_en_b_to_mux;
     end if;
   end process;
 
@@ -1420,7 +1431,7 @@ begin
       start                 => matinv_start,
       en_i                  => matinv_en,
       nt                    => nt,
-      done                  => matinv_done,
+      done                  => matinv_done_reg,
       data0_addr_o          => matinv_data0_addr,
       data1_addr_o          => matinv_data1_addr,
       weight_addr_o         => matinv_weight_addr,

@@ -11,7 +11,7 @@ entity matinvcontroller12f is
     clk : in std_logic;
     start : in std_logic;
     en_i : in std_logic;
-    nt : in std_logic_vector(3 downto 0) := "0011";--integer range 0 to 15 := 3;
+    nt : in std_logic_vector(3 downto 0);--integer range 0 to 15 := 3;
     done : out std_logic;
 
     data0_addr_o : out std_logic_vector(7 downto 0);

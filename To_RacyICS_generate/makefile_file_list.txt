@@ -22,6 +22,20 @@ xvlog /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/load_mpram.v
 xvlog /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/load_ram.v
 xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/dist_mem_gen_v8_0.v
 xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem/sim/main_mem.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p0/sim/main_mem_p0.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p1/sim/main_mem_p1.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p2/sim/main_mem_p2.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p3/sim/main_mem_p3.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p4/sim/main_mem_p4.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p5/sim/main_mem_p5.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p6/sim/main_mem_p6.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p7/sim/main_mem_p7.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p8/sim/main_mem_p8.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p9/sim/main_mem_p9.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p10/sim/main_mem_p10.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p11/sim/main_mem_p11.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p12/sim/main_mem_p12.v
+xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/main_mem_p13/sim/main_mem_p13.v
 xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/mpram_mem/sim/mpram_mem.v
 #xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.gen/sources_1/ip/eth_tx_fifo/sim/eth_tx_fifo.v
 xvhdl --2008 /home/shahid/hw-accelerator/Processors/IM3000E/src/mpgmfield_lib.vhd \
@@ -90,6 +104,7 @@ xvhdl --2008 /home/shahid/hw-accelerator/Processors/IM3000E/src/mpgmfield_lib.vh
 		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SP180_4096X80BM1A.vhd \
 		 	  /home/shahid/hw-accelerator/Processors/IM3000E/src/ext/fpga_SY180_1024X8X1CM8.vhd
 xvlog /home/shahid/hw-accelerator/fpga_synth/gpp/gpp.ip_user_files/ipstatic/simulation/blk_mem_gen_v8_4.v
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/noc_types_pkg.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Accelerator_Top.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Byte_counter_decoder.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/CMD_from_GPP.vhd
@@ -101,6 +116,7 @@ xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/N
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Register.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/NoC_state_machine.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Noc_Top.vhd
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/noc_bus.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Root_Memory.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Switch.vhd
 xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/Tag_Line_Block.vhd
@@ -117,7 +133,6 @@ xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/P
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ram64x8.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_sct.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_stack9x14.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_debug_trace.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/fpga_mem64x64.vhd \
@@ -147,12 +162,8 @@ xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/P
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_cpc.vhd \
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_crb.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_dsl.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_fgen.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gmem.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_gp_pkg.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dackgen.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dmap.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios_dma.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mbm.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mmr.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_mpll.vhd \
@@ -160,8 +171,6 @@ xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/P
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_rtc_iso.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_tim.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/vetypes.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//VE_Ver2/instructiontypes.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ve.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acmdr.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_ampgm.vhd \
@@ -169,12 +178,11 @@ xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/P
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//core2/pe1_acore.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/FPGA_SU180_256X128X1BM1A.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//ext/FPGA_SY180_1024X8X1CM8.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_flash_inf.vhd \
-			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_ios.vhd \
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//pe1_core.vhd \
 			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/dual_core//PE_pair_top.vhd
-xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_pkg.vhd
-xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_controller.vhd \
+xvhdl --2008 /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_pkg.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/NoC2/noc_types_pkg.vhd \
+			  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/cluster_controller.vhd \
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/FPGA_CMEM_32KX16.vhd   \
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/PEC_top.vhd            \
 		 	  /home/shahid/hw-accelerator/Accelerator/Emulator_version_demo/src/PEC/req_dis_logic.vhd      \

@@ -1,0 +1,949 @@
+Imsys Tools 0.19.0 -- MASM
+Microprogram version: 0.0.0.1
+
+FILE: ./Include.mas
+                  (00001) 
+FILE: ./DefinitionsNOC.mas
+                  (00001) (==========================================================================
+                  (00002) ( DefinitionNOC.mas
+                  (00003) (
+                  (00004) ( This file contains definition of the NOC instruction set.  
+                  (00005) (
+                  (00006) ( Copyright 2022 Imsys AB
+                  (00007) ( All Rights Reserved
+                  (00008) (
+                  (00009) (==========================================================================
+                  (00010) ( Revision History
+                  (00011) ( 
+                  (00012) ( Date          Vers    Notes
+                  (00013) ( -------------------------------------------------------------------------
+                  (00014) ( 2022-04-20    0.1     Initial version.
+                  (00015) ( 2022-05-24    0.2     Changed codes for SYNC PULSE, INTERCHANGE TP, LOAD REQ_FF
+                  (00016) (                       and LOAD BOOT_FF. Removed STEP MDC.
+                  (00017) ( 2022-06-03    0.3     Added ERROR and some minor changes.
+                  (00018) ( 2022-06-07    0.4     Removed EN TP RW. Changed code for SYNC PULSE.
+                  (00019) (                       Renamed EN TP WR to EN TP.    
+                  (00020) ( 2022-07-29    0.5     Added "WAIT UNTIL PEC WRITE ENABLE=1"
+                  (00021) ( 2022-08-09    0.6     Modified according to doc "NOC2 SM operations rev pA5.xlsx".
+                  (00022) ( 2022-08-13    0.7     Changed 'RESET BOOT' to 'RESET BOOT AS CNTR'.
+                  (00023) (==========================================================================
+                  (00024) *INIT*
+                  (00025) 
+                  (00026) MICROINSTRUCTION SIZE IS 4;
+                  (00027) MICROPROGRAM LENGTH IS 200;
+                  (00028) 
+                  (00029) (==========================================================================
+                  (00030) *FIELDS*
+                  (00031) (
+                  (00032) ( INSTRUCTION FORMAT
+                  (00033) (
+                  (00034) (-----------------------------------------------------------------------
+                  (00035) ( LENGTH NAME    DEFAULT   DESCRIPTION
+                  (00036) (-----------------------------------------------------------------------
+                  (00037)     4    PAD        0      ;(Padding    
+                  (00038)     1    MSB        0      ;(MSB
+                  (00039)     3    JMPCOND    0      ;(Jump condition
+                  (00040)     4    JMPWAIT    0      ;(Jump/Wait
+                  (00041)     2    DECODE2    0      ;(Decoder 2
+                  (00042)     1    ENIO       0      ;(En IO data
+                  (00043)     1    ENTPRD     0      ;(En TP read
+                  (00044)     1    ENRM       0      ;(En RM
+                  (00045)     1    ENTPWR     0      ;(En TP write
+                  (00046)     1    ICHGTP     0      ;(Interchange TP
+                  (00047)     1    LDNOC      0      ;(Load NOC reg
+                  (00048)     4    DECODE1    0      ;(Decoder 1
+                  (00049)     8    CTRLDATA   0      ;(Control data
+                  (00050)    -8                      ;
+                  (00051)     1    CTRLDATA7  0      ;(Control data bit 7
+                  (00052)     1    CTRLDATA6  0      ;(Control data bit 6
+                  (00053)     1    CTRLDATA5  0      ;(Control data bit 5
+                  (00054)     1    CTRLDATA4  0      ;(Control data bit 4
+                  (00055)     1    CTRLDATA3  0      ;(Control data bit 3
+                  (00056)     1    CTRLDATA2  0      ;(Control data bit 2
+                  (00057)     1    CTRLDATA1  0      ;(Control data bit 1
+                  (00058)     1    CTRLDATA0  0      ;(Control data bit 0
+                  (00059) (TOTAL LENGTH ABOVE IS 32 BITS.
+                  (00060) (THE FOLLOWING FIELD IS NOT INCLUDED IN THE MICROPROGRAM MEMORY:
+                  (00061)     8	 NOTE	    0	  ;(NOTE DIGIT TO BE PRINTED IN OUTPUT LISTINGS
+                  (00062)     
+                  (00063) 'RULES SECTION
+                  (00064) *RULES*
+                  (00065) 
+                  (00066) LET CONDITION NOTEIS1 BE FIELD NOTE IS 1;
+                  (00067) LET CONDITION NOTEIS2 BE FIELD NOTE IS 2;
+                  (00068) LET CONDITION NOTEIS3 BE FIELD NOTE IS 3;
+                  (00069) LET CONDITION NOTEIS4 BE FIELD NOTE IS 4;
+                  (00070) 
+                  (00071) (IGNORES FOR DOUBLE ASSIGNMENTS
+                  (00072) ALWAYS IGNORE DOUBLE ASSIGNMENT FOR NOTE;
+                  (00073) IF NOTEIS1 THEN IGNORE DOUBLE ASSIGNMENT FOR JMPWAIT;
+                  (00074) IF NOTEIS2 THEN IGNORE DOUBLE ASSIGNMENT FOR DECODE2;
+                  (00075) IF NOTEIS3 THEN IGNORE DOUBLE ASSIGNMENT FOR DECODE2;
+                  (00076) IF NOTEIS4 THEN IGNORE DOUBLE ASSIGNMENT FOR DECODE2;
+                  (00077) (==========================================================================
+                  (00078) *CODES*
+                  (00079) (
+                  (00080) ( NOTES
+                  (00081) (
+                  (00082) (THE FOLLOWING WORDS WILL GENERATE A DIGIT IN THE "NOTE" FIELD.
+                  (00083) (THE DIGIT WILL APPEAR ALSO IN THE LISTING MADE BY ASSEMBLER PASS 3.
+                  (00084) (
+                  (00085) DBLASS_JMPWAIT:     NOTE1;   (Double assignment in JMPCOND
+                  (00086) DBLASS_D2_1:        NOTE2;   (Double assignment in DECODE2=1
+                  (00087) DBLASS_D2_2:        NOTE3;   (Double assignment in DECODE2=2
+                  (00088) DBLASS_D2_3:        NOTE4;   (Double assignment in DECODE2=3
+                  (00089) (
+                  (00090) NOTE1: NOTE:=1;
+                  (00091) NOTE2: NOTE1 NOTE:=2;
+                  (00092) NOTE3: NOTE2 NOTE:=3;
+                  (00093) NOTE4: NOTE3 NOTE:=4;
+                  (00094) (-------------------------------------------------------------------------------
+                  (00095) NOP:        ''
+                  (00096) (-------------------------------------------------------------------------------
+                  (00097) ( Block selection for jumps
+                  (00098) BLK0:       MSB:=0;     (BLK0 is default
+                  (00099) BLK1:       MSB:=1;
+                  (00100) (-------------------------------------------------------------------------------
+                  (00101) LOAD:       'LD'
+                  (00102) WRITE:      'WR'
+                  (00103) 
+                  (00104) LDMUX:      'DECODE1:=1 CTRLDATA:='
+                  (00105) LDMODE:     'DECODE1:=2 CTRLDATA:='
+                  (00106) LDLR:       'DECODE1:=3 CTRLDATA:='
+                  (00107) LDPEC:      'DECODE1:=4 CTRLDATA:='
+                  (00108) LDTAG:      'LDTAG'
+                  (00109) LDTAGSHIFT: 'DECODE1:=5 CTRLDATA:='
+                  (00110) 
+                  (00111) LDRETURN:   'LDRET'
+                  (00112) LDRETREG1:  'DECODE1:=6 CTRLDATA:=@'
+                  (00113) LDRETREG2:  'DECODE1:=7 CTRLDATA:=@'
+                  (00114) 
+                  (00115) STEP:       'STEP'
+                  (00116) STEPBC:     DECODE1:=8;
+                  (00117) 
+                  (00118) LDIR:       DECODE1:=9;
+                  (00119) 
+                  (00120) LDGPP:      'LDGPP'
+                  (00121) LDGPPCMD:   'LDGPPCMD'
+                  (00122) LDGPPCMDREG: 'LDGPPCMDREG'
+                  (00123) LDGPPCMDREG1: DECODE1:=A CTRLDATA:=1; 
+                  (00124) LDGPPCMDREG2: DECODE1:=A CTRLDATA:=2; 
+                  (00125) LDGPPCMDREG3: DECODE1:=A CTRLDATA:=4; 
+                  (00126) 
+                  (00127) LDPROG:     'LDPROG'
+                  (00128) LDPROGMEM:  DECODE1:=B;
+                  (00129) 
+                  (00130) ( Direct Control
+                  (00131) LDNOC:      'LDNOC'
+                  (00132) LDNOCREG:   LDNOC:=1;
+                  (00133) INTERCHANGE: 'INCHG'
+                  (00134) INCHGTP:    ICHGTP:=1;
+                  (00135) EN:         'EN'
+                  (00136) ENTP:       ENTPWR:=1;
+                  (00137) ENRM:       ENRM:=1;
+                  (00138) ENIO:       'ENIO'
+                  (00139) ENIODATA:   ENIO:=1;
+                  (00140) SYNC:       'SYNC'
+                  (00141) SYNCPULSE:  ENTPRD:=1;
+                  (00142) 
+                  (00143) START:      'STRT'
+                  (00144) STRTTAG:    'STTAG'
+                  (00145) STTAGSHIFT: DECODE2:=1 CTRLDATA0:=1 DBLASS_D2_1;
+                  (00146) LDRM:       'LDRM'
+                  (00147) LDRMAS:     DECODE2:=1 CTRLDATA1:=1 DBLASS_D2_1;
+                  (00148) RESET:      'RESET'
+                  (00149) RESETTCP:   DECODE2:=1 CTRLDATA3:=1 DBLASS_D2_1;
+                  (00150) LDTC=TS:    DECODE2:=1 CTRLDATA4:=1 DBLASS_D2_1;
+                  (00151) LDTC=TS/16: DECODE2:=1 CTRLDATA4:=1 CTRLDATA5:=1 DBLASS_D2_1;
+                  (00152) 
+                  (00153) WRREQ:      DECODE2:=2 CTRLDATA2:=1 DBLASS_D2_2;
+                  (00154) LDBOOT_FF=0:  DECODE2:=2 CTRLDATA3:=1 DBLASS_D2_2;
+                  (00155) LDBOOT_FF=1:  DECODE2:=2 CTRLDATA3:=1 CTRLDATA4:=1 DBLASS_D2_2;
+                  (00156) 
+                  (00157) NOC:        'NOC'
+                  (00158) NOCREADY:   DECODE2:=2 CTRLDATA1:=1 DBLASS_D2_2;
+                  (00159) RESETBOOT:  'RESB'
+                  (00160) RESBAS:     'RESBA'
+                  (00161) RESBACNTR:  DECODE2:=2 CTRLDATA5:=1 DBLASS_D2_2;
+                  (00162) ERROR:      DECODE2:=2 CTRLDATA6:=1 DBLASS_D2_2;
+                  (00163) 
+                  (00164) STEPLC:     DECODE2:=3 CTRLDATA2:=1 DBLASS_D2_3;
+                  (00165) DECR:       'DECR'
+                  (00166) RESETIR:    DECODE2:=3 CTRLDATA3:=1 DBLASS_D2_3;
+                  (00167) DECRTC:     DECODE2:=3 CTRLDATA4:=1 DBLASS_D2_3;
+                  (00168) RESETLC:    DECODE2:=3 CTRLDATA5:=1 DBLASS_D2_3;
+                  (00169) RESETBC:    DECODE2:=3 CTRLDATA6:=1 DBLASS_D2_3;
+                  (00170) 
+                  (00171) (-----------------------------------------------------------
+                  (00172) ( Unconditional jumps
+                  (00173) (-----------------------------------------------------------
+                  (00174) GOTO:       'JMPWAIT:=1 CTRLDATA:=@'
+                  (00175) RETURN1:    JMPWAIT:=2;
+                  (00176) RETURN2:    JMPWAIT:=3;
+                  (00177) JUMP:       'JMP'
+                  (00178) JMPOPCODE:  JMPWAIT:=C;
+                  (00179) (-----------------------------------------------------------
+                  (00180) ( Conditional jumps
+                  (00181) (-----------------------------------------------------------
+                  (00182) IF:         'IF'
+                  (00183) ELSE:       'ELSE'
+                  (00184) 
+                  (00185) ( Conditions
+                  (00186) CMD_FF_Z:       'JMPCOND:=0'
+                  (00187) FF_RDY1_Z:      'JMPCOND:=1'
+                  (00188) FF_RDY2_Z:      'JMPCOND:=2'
+                  (00189) WR_ACK_Z:       'JMPCOND:=3'
+                  (00190) FF_RDY3_Z:      'JMPCOND:=4'
+                  (00191) TC_Z:           'JMPCOND:=5'
+                  (00192) LC_EQ_LR:       'JMPCOND:=6'
+                  (00193) RM:             'JMPCOND:=7'
+                  (00194) 
+                  (00195) ELSERETURN1:    JMPWAIT:=4 DBLASS_JMPWAIT;
+                  (00196) 
+                  (00197) ( IF CMD FF=0 ...
+                  (00198) IFCMD:              'IFCM'
+                  (00199) IFCMFF=0:           'IFCMFFZ'
+                  (00200) IFCMFFZGOTO:        'CMD_FF_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00201) IFCMFFZRETURN1:     'CMD_FF_Z JMPWAIT:=6'
+                  (00202) IFCMFFZRETURN2:     'CMD_FF_Z JMPWAIT:=7'
+                  (00203) IFCMFFZJUMP:        'IFCMFFZJ'
+                  (00204) IFCMFFZJOPCODE:     'CMD_FF_Z JMPWAIT:=D'
+                  (00205) 
+                  (00206) ( IF FIFO READY1=0 ...
+                  (00207) IFFIFO:             'IFFF'
+                  (00208) IFFFREADY1=0:       'IFFFR1Z'
+                  (00209) IFFFR1ZGOTO:        'FF_RDY1_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00210) IFFFR1ZRETURN1:     'FF_RDY1_Z JMPWAIT:=6'
+                  (00211) IFFFR1ZRETURN2:     'FF_RDY1_Z JMPWAIT:=7'
+                  (00212) IFFFR1ZJUMP:        'IFFFR1ZJ'
+                  (00213) IFFFR1ZJOPCODE:     'FF_RDY1_Z JMPWAIT:=D'
+                  (00214) 
+                  (00215) ( IF FIFO READY2=0 ...
+                  (00216) IFFFREADY2=0:       'IFFFR2Z'
+                  (00217) IFFFR2ZGOTO:        'FF_RDY2_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00218) IFFFR2ZRETURN1:     'FF_RDY2_Z JMPWAIT:=6'
+                  (00219) IFFFR2ZRETURN2:     'FF_RDY2_Z JMPWAIT:=7'
+                  (00220) IFFFR2ZJUMP:        'IFFFR2ZJ'
+                  (00221) IFFFR2ZJOPCODE:     'FF_RDY2_Z JMPWAIT:=D'
+                  (00222) 
+                  (00223) ( IF FIFO READY3=0 ...
+                  (00224) IFFFREADY3=0:       'IFFFR3Z'
+                  (00225) IFFFR3ZGOTO:        'FF_RDY3_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00226) IFFFR3ZRETURN1:     'FF_RDY3_Z JMPWAIT:=6'
+                  (00227) IFFFR3ZRETURN2:     'FF_RDY3_Z JMPWAIT:=7'
+                  (00228) IFFFR3ZJUMP:        'IFFFR3ZJ'
+                  (00229) IFFFR3ZJOPCODE:     'FF_RDY3_Z JMPWAIT:=D'
+                  (00230) 
+                  (00231) ( IF WRITE ACK=0 ...
+                  (00232) IFWRITE:            'IFWR'
+                  (00233) IFWRACK=0:          'IFWRAZ'
+                  (00234) IFWRAZGOTO:         'WR_ACK_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00235) IFWRAZRETURN1:      'WR_ACK_Z JMPWAIT:=6'
+                  (00236) IFWRAZRETURN2:      'WR_ACK_Z JMPWAIT:=7'
+                  (00237) IFWRAZJUMP:         'IFWRAZJ'
+                  (00238) IFWRAZJOPCODE:      'WR_ACK_Z JMPWAIT:=D'
+                  (00239) 
+                  (00240) ( IF TC=0 ...
+                  (00241) IFTC=0:             'IFTCZ'
+                  (00242) IFTCZGOTO:          'TC_Z JMPWAIT:=5 CTRLDATA:=@'
+                  (00243) IFTCZRETURN1:       'TC_Z JMPWAIT:=6'
+                  (00244) IFTCZRETURN2:       'TC_Z JMPWAIT:=7'
+                  (00245) IFTCZJUMP:          'IFTCZJ'
+                  (00246) IFTCZJOPCODE:       'TC_Z JMPWAIT:=D'
+                  (00247) 
+                  (00248) ( IF LC=LR ...
+                  (00249) IFLC=LR:            'IFLCEQLR'
+                  (00250) IFLCEQLRGOTO:       'LC_EQ_LR JMPWAIT:=5 CTRLDATA:=@'
+                  (00251) IFLCEQLRRETURN1:    'LC_EQ_LR JMPWAIT:=6'
+                  (00252) IFLCEQLRRETURN2:    'LC_EQ_LR JMPWAIT:=7'
+                  (00253) IFLCEQLRJUMP:       'IFLCEQLRJ'
+                  (00254) IFLCEQLRJOPCODE:    'LC_EQ_LR JMPWAIT:=D'
+                  (00255) 
+                  (00256) ( IF RM AS ERR ...
+                  (00257) IFRM:               'IFRM'
+                  (00258) IFRMAS:             'IFRMA'
+                  (00259) IFRMAERR:           'IFRMAE'
+                  (00260) IFRMAEGOTO:         'RM JMPWAIT:=5 CTRLDATA:=@'
+                  (00261) IFRMAERETURN1:      'RM JMPWAIT:=6'
+                  (00262) IFRMAERETURN2:      'RM JMPWAIT:=7'
+                  (00263) IFRMAEJUMP:         'IFRMAEJ'
+                  (00264) IFRMAEJOPCODE:      'RM JMPWAIT:=D'
+                  (00265) 
+                  (00266) (----------------------------------------------------------
+                  (00267) ( WAIT UNTIL ...
+                  (00268) WAIT:           'WAIT'
+                  (00269) WAITUNTIL:      'WU'
+                  (00270) 
+                  (00271) ( WAIT UNTIL LC=LR
+                  (00272) WULC=LR:        JMPWAIT:=9;
+                  (00273) 
+                  (00274) ( WAIT UNTIL TAG SHIFT=0
+                  (00275) WUTAG:          'WUT'
+                  (00276) WUTSHIFT=0:     JMPWAIT:=A;
+                  (00277) 
+                  (00278) ( WAIT UNTIL TC=0
+                  (00279) WUTC=0:         JMPWAIT:=B;
+                  (00280) 
+                  (00281) ( WAIT UNTIL PEC_WE=1
+                  (00282) WUPEC:          'WUPEC'
+                  (00283) WUPEC_WE=1:     JMPWAIT:=8;
+                  (00284) (-------------------------------------------------------------------------------
+                  (00285) 
+FILE: ./Include.mas
+                  (00003) 
+                  (00004) *PROGRAM*       ( Start of program
+                  (00005) 
+                  (00006) ( Labels in ROM
+                  (00007) #07:    ROM.07:
+                  (00008) 
+200: 0000 0000/00 (00009) #FFFF: NOP;     ( The default instruction
+                  (00010) #0000:
+                  (00011) 
+                  (00012) ( Include files
+FILE: ./NOC2code.mas
+                  (00001) (Code for NOC2 state machine 
+                  (00002) (Rev pA10)
+                  (00003) 
+                  (00004) (Note 1: one instruction after a jump instruction is always executed before the instruction at the jump address is executed
+                  (00005) (Note 2: LR and LC must be loaded two instructions before a WAIT UNTIL LC=LR instruction
+                  (00006) (Note 3: CMD register must be loaded two instructions before a jump to as = op code
+                  (00007) (Note 4: TC must be loaded two instructions before a jump with condition TC=0 and a WAIT UNTIL TC=0 instruction
+                  (00008) (Note 5: there must be one instruction between START TAG shift and WAIT UNTIL TAG SHIFT=0
+                  (00009) 
+                  (00010) #0:
+                  (00011) START:
+000: 0000 0000/00 (00012)         NOP;
+001: 0000 0000/00 (00013)         NOP;
+                  (00014) 
+                  (00015) (Wait for command from host
+                  (00016) 
+                  (00017) A1:
+002: 0050 0002/00 (00018)         IF CMD FF=0 GOTO A1;                    (check for command from GPP
+003: 0000 0000/00 (00019)         NOP;
+                  (00020) A2:
+004: 0000 0A01/00 (00021)         LOAD GPP CMD REG1;                      (command -> CMD1
+005: 000C 0068/04 (00022)         RESET LC, RESET BC, RESET IR;
+                  (00023) 
+                  (00024) (Jump to use case
+                  (00025) 
+006: 00C0 020F/00 (00026)         LOAD MODE 0F, JUMP OPCODE;              (open EN TP READ, EN TP WRITE, EN RM, EN IO DATA            
+007: 0000 0100/00 (00027)         LOAD MUX 00;
+                  (00028) #0C:
+00C: 0008 0028/03 (00029)         LOAD BOOT_FF=0, RESET BOOT AS CNTR;     (Boot mode
+00D: 0010 0007/00 (00030)         GOTO ROM.07;                            (Boot NOC
+00E: 0000 0000/00 (00031)         NOP;
+                  (00032) #10:
+010: 0010 003C/00 (00033)         GOTO B1;                                (EM->MUX->RM                 
+011: 0000 0642/00 (00034)         LOAD RETURN REG1 B4;
+                  (00035) 
+012: 0010 003C/00 (00036)         GOTO B1;                                (EM->TP->RM
+013: 0000 0651/00 (00037)         LOAD RETURN REG1 C4;
+                  (00038) 
+014: 0010 0068/00 (00039)         GOTO D1;                                (EM->MUX->CM unicast
+015: 0000 0671/00 (00040)         LOAD RETURN REG1 D4;
+                  (00041) 
+016: 0010 0082/00 (00042)         GOTO E1;                                (EM->MUX->CM broadcast
+017: 0000 0785/00 (00043)         LOAD RETURN REG2 E2;
+                  (00044) 
+018: 0010 0068/00 (00045)         GOTO D1;                                (EM->TP->CM unicast
+019: 0000 0699/00 (00046)         LOAD RETURN REG1 F4;
+                  (00047) 
+01A: 0810 0000/00 (00048)         GOTO G1, BLK1;                          (RM->MUX->EM
+01B: 0800 0606/00 (00049)         LOAD RETURN REG1 G4, BLK1;
+                  (00050) 
+01C: 0810 0000/00 (00051)         GOTO G1, BLK1;                          (RM->TP->EM
+01D: 0800 0619/00 (00052)         LOAD RETURN REG1 H4, BLK1;
+                  (00053) 
+01E: 0010 00B1/00 (00054)         GOTO J1;                               (RM->CM unicast
+01F: 0000 07BA/00 (00055)         LOAD RETURN REG2 J2;
+                  (00056) 
+020: 0010 00C4/00 (00057)         GOTO K1;                               (RM->CM broadcast seq addressing
+021: 0000 07CC/00 (00058)         LOAD RETURN REG2 K2;
+                  (00059) 
+022: 0010 00C4/00 (00060)         GOTO K1;                               (RM->CM boadcast indexed addressing
+023: 0000 07D5/00 (00061)         LOAD RETURN REG2 K5;
+                  (00062) 
+024: 0810 002B/00 (00063)         GOTO L1, BLK1;                          (CM->MUX->EM
+025: 0800 0635/00 (00064)         LOAD RETURN REG1 L4, BLK1;
+                  (00065) 
+026: 0810 002B/00 (00066)         GOTO L1, BLK1;                          (CM->TP->EM
+027: 0800 0652/00 (00067)         LOAD RETURN REG1 M4, BLK1;
+                  (00068) 
+028: 0810 006F/00 (00069)         GOTO N1, BLK1;                          (CM->RM
+029: 0800 0776/00 (00070)         LOAD RETURN REG2 N2, BLK1;
+                  (00071) 
+                  (00072)         (GOTO P1, BLK1;                         (CM->CM
+                  (00073)         (LOAD RETURN REG2 P2, BLK1;
+                  (00074) #38:
+038: 0810 0089/00 (00075)         GOTO X1, BLK1;                          (Execute
+039: 0000 0426/00 (00076)         LOAD PEC 26;                            (PEC command = PEEx
+                  (00077) 
+03A: 0810 0089/00 (00078)         GOTO X1, BLK1;                          (Continue
+03B: 0000 0428/00 (00079)         LOAD PEC 28;                            (PEC command = PE Cont
+                  (00080) 
+                  (00081) (---------------------------------- EM->RM ------------------------------------
+                  (00082) 
+                  (00083) B1:
+03C: 0004 0012/02 (00084)         LOAD RM AS, LOAD TC=TS;
+03D: 0000 0183/00 (00085)         LOAD MUX 83;                            (select write RM, IO data in
+03E: 0810 00E7/00 (00086)         GOTO WR1, BLK1;
+03F: 0000 0740/00 (00087)         LOAD RETURN REG2 B2;
+                  (00088) B2:
+040: 0024 0030/02 (00089)         LOAD TC=TS/16, RETURN1;
+041: 0000 0308/00 (00090)         LOAD LR 08;
+                  (00091) 
+                  (00092) ( EM->MUX->RM
+                  (00093) 
+                  (00094) B4:
+042: 0250 0042/00 (00095)         IF FIFO READY2=0 GOTO B4;
+043: 0000 0000/00 (00096)         NOP;
+044: 0002 1000/00 (00097)         EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg
+                  (00098) B5:
+045: 009E 9014/04 (00099)         EN IO DATA, LOAD NOC REG, EN RM, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+046: 009E 9004/04 (00100)            EN IO DATA, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+047: 0452 904C/00 (00101)         EN IO DATA, LOAD NOC REG, EN RM, IF FIFO READY3=0 GOTO B6;
+048: 0552 904F/00 (00102)         EN IO DATA, LOAD NOC REG, EN RM, IF TC=0 GOTO B7;
+049: 000E 9020/04 (00103)         EN IO DATA, LOAD NOC REG, EN RM, RESET LC;
+04A: 0012 9045/00 (00104)         EN IO DATA, LOAD NOC REG, EN RM, GOTO B5;
+04B: 0002 9000/00 (00105)         EN IO DATA, LOAD NOC REG, EN RM;
+                  (00106) 
+                  (00107) (Data not available in RX FIFO
+                  (00108) 
+                  (00109) B6:
+04C: 000E 9020/04 (00110)         EN IO DATA, LOAD NOC REG, EN RM, RESET LC;
+04D: 0012 9042/00 (00111)         EN IO DATA, LOAD NOC REG, EN RM, GOTO B4;
+04E: 0000 8000/00 (00112)         EN RM;
+                  (00113) 
+                  (00114) (End of transfer
+                  (00115) 
+                  (00116) B7:
+04F: 0012 9000/00 (00117)         EN IO DATA, LOAD NOC REG, EN RM, GOTO START;
+050: 0008 8002/03 (00118)         EN RM, NOC READY;
+                  (00119) 
+                  (00120) ( EM->TP->RM
+                  (00121) 
+                  (00122) (Write from RX FIFO to TP. Read from TP to RM except for first transfer.
+                  (00123) 
+                  (00124) C4:
+051: 0000 0182/00 (00125)         LOAD MUX 82;                            (select write RM, En TP in
+052: 0000 020D/00 (00126)         LOAD MODE 0D;                           (block RM access
+                  (00127) C5:
+053: 0250 0053/00 (00128)         IF FIFO READY2=0 GOTO C5;
+054: 0000 0000/00 (00129)         NOP;
+055: 0002 5000/00 (00130)         EN IO DATA, EN TP, LOAD NOC REG;
+                  (00131) C6:
+056: 009E D014/04 (00132)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+057: 009E D004/04 (00133)            EN IO DATA, EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+058: 0452 D05D/00 (00134)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, IF FIFO READY3=0 GOTO C7;
+059: 0552 D060/00 (00135)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, IF TC=0 GOTO C8;
+05A: 000E D020/04 (00136)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, RESET LC;
+05B: 0012 F056/00 (00137)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP, GOTO C6;
+05C: 0002 D20F/00 (00138)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, LOAD MODE 0F;       (open RM access
+                  (00139) 
+                  (00140) (Data not available in RX FIFO
+                  (00141) 
+                  (00142) C7:
+05D: 000E D020/04 (00143)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, RESET LC;
+05E: 0012 F053/00 (00144)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP, GOTO C5;
+05F: 0000 820F/00 (00145)         EN RM, LOAD MODE 0F;                                        (open RM access
+                  (00146) 
+                  (00147) (End of transfer
+                  (00148) 
+                  (00149) C8:
+060: 0002 F000/00 (00150)         EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP;     (RX FIFO word 15->TP;
+061: 0000 8207/00 (00151)         EN RM, LOAD MODE 07;                                        (block TP write, open RM access 
+062: 0000 030C/00 (00152)         LOAD LR 0C;  
+063: 0000 5000/00 (00153)         EN TP, LOAD NOC REG;
+064: 009C D004/04 (00154)         EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+065: 009C D004/04 (00155)            EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+066: 0010 8000/00 (00156)         EN RM, GOTO START;
+067: 0008 0002/03 (00157)         NOC READY;
+                  (00158) 
+                  (00159) (----------------------------- EM->CM -------------------------------------
+                  (00160) 
+                  (00161) D1:
+068: 0004 0010/02 (00162)         LOAD TC=TS;
+069: 0810 00E7/00 (00163)         GOTO WR1, BLK1;
+06A: 0000 076B/00 (00164)         LOAD RETURN REG2 D2;
+                  (00165) D2:
+06B: 0004 0030/02 (00166)         LOAD TC=TS/16;
+06C: 0000 0423/00 (00167)         LOAD PEC 23;                            (PEC command = WriteBlockC
+06D: 0810 00E0/00 (00168)         GOTO TG1, BLK1;
+06E: 0000 076F/00 (00169)         LOAD RETURN REG2 D3;
+                  (00170) D3:
+06F: 0020 021F/00 (00171) 	RETURN1, LOAD MODE 1F;                  (enable NOC byte data
+070: 0000 0307/00 (00172)         LOAD LR 07;
+                  (00173) 
+                  (00174) ( EM->MUX->CM unicast
+                  (00175) 
+                  (00176) D4:
+071: 0250 0071/00 (00177)         IF FIFO READY2=0 GOTO D4;
+072: 0000 0000/00 (00178)         NOP;
+073: 0001 0000/00 (00179)         SYNC PULSE;
+074: 0000 0103/00 (00180)         LOAD MUX 03;                            (select IO data in
+                  (00181) D5:
+075: 0002 1000/00 (00182)         EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg
+076: 009E 1014/04 (00183)         EN IO DATA, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+077: 009E 1004/04 (00184)            EN IO DATA, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+078: 0452 107D/00 (00185)         EN IO DATA, LOAD NOC REG, IF FIFO READY3=0 GOTO D6;
+079: 0552 1080/00 (00186)         EN IO DATA, LOAD NOC REG, IF TC=0 GOTO D7;
+07A: 000E 1020/04 (00187)         EN IO DATA, LOAD NOC REG, RESET LC;
+07B: 0013 1075/00 (00188)         EN IO DATA, LOAD NOC REG, SYNC PULSE, GOTO D5;
+07C: 0002 1000/00 (00189)         EN IO DATA, LOAD NOC REG;
+                  (00190) 
+                  (00191) (Data not available in RX FIFO
+                  (00192) 
+                  (00193) D6:
+07D: 000E 1020/04 (00194)         EN IO DATA, LOAD NOC REG, RESET LC;
+07E: 0012 1071/00 (00195)         EN IO DATA, LOAD NOC REG, GOTO D4;
+07F: 0002 1000/00 (00196)         EN IO DATA, LOAD NOC REG;
+                  (00197) 
+                  (00198) (End of transfer
+                  (00199) 
+                  (00200) D7:
+080: 0012 1000/00 (00201)         EN IO DATA, LOAD NOC REG, GOTO START;
+081: 000A 1002/03 (00202)         EN IO DATA, LOAD NOC REG, NOC READY;
+                  (00203) 
+                  (00204) ( EM->MUX->CM broadcast
+                  (00205) 
+                  (00206) E1:
+082: 0004 0010/02 (00207)         LOAD TC=TS;
+083: 0810 00E7/00 (00208)         GOTO WR1, BLK1;
+084: 0000 0123/00 (00209)         LOAD MUX 23;                            (select broadcast, IO data in
+                  (00210) E2:
+085: 0000 0423/00 (00211)         LOAD PEC 23;                            (PEC command = WriteBlockC
+086: 0810 00E0/00 (00212)         GOTO TG1, BLK1;
+087: 0000 0788/00 (00213)         LOAD RETURN REG2 E3;
+                  (00214) E3:
+088: 0150 0088/00 (00215)         IF FIFO READY1=0 GOTO E3;
+089: 0000 0000/00 (00216)         NOP;
+08A: 0001 0211/00 (00217)         SYNC PULSE, LOAD MODE 11;               (enable NOC byte data, open En IO data
+08B: 0000 0307/00 (00218)         LOAD LR 07;
+08C: 0002 1000/00 (00219)         EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg 
+                  (00220) E4:
+08D: 009C 0814/04 (00221)         STEP BC, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+08E: 009C 0804/04 (00222)            STEP BC, STEP LC, WAIT UNTIL LC=LR;
+08F: 0150 0895/00 (00223)         STEP BC, IF FIFO READY1=0 GOTO E5;
+090: 0D50 08F7/00 (00224)         STEP BC, IF TC=0 GOTO EOT, BLK1;        (check if end of transfer
+091: 000C 0820/04 (00225)         STEP BC, RESET LC;
+092: 0001 0800/00 (00226)         STEP BC, SYNC PULSE;
+093: 0010 088D/00 (00227)         STEP BC, GOTO E4;
+094: 000E 1040/04 (00228)         EN IO DATA, LOAD NOC REG, RESET BC; 
+                  (00229) 
+                  (00230) (Data not available in RX FIFO
+                  (00231) 
+                  (00232) E5:
+095: 0000 0800/00 (00233)         STEP BC;
+096: 0000 0800/00 (00234)         STEP BC;
+097: 0010 0888/00 (00235)         STEP BC, GOTO E3;
+098: 000C 0060/04 (00236)         RESET BC, RESET LC;
+                  (00237) 
+                  (00238) 
+                  (00239) ( EM->TP->CM unicast
+                  (00240) 
+                  (00241) (Move data from RX FIFO to TP. Move data from TP to CM
+                  (00242) 
+                  (00243) F4:
+099: 0250 0099/00 (00244)         IF FIFO READY2=0 GOTO F4;
+09A: 0000 0000/00 (00245)         NOP;
+09B: 0000 0102/00 (00246)         LOAD MUX 02;                            (select TP in
+                  (00247) F5:
+09C: 0002 5000/00 (00248)         EN IO DATA, EN TP, LOAD NOC REG;        (RX FIFO -> NOC reg
+09D: 009E 5014/04 (00249)         EN IO DATA, EN TP, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+09E: 009E 5004/04 (00250)            EN IO DATA, EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+09F: 0452 50A4/00 (00251)         EN IO DATA, EN TP, LOAD NOC REG, IF FIFO READY3=0 GOTO F6;
+0A0: 0552 50AB/00 (00252)         EN IO DATA, EN TP, LOAD NOC REG, IF TC=0 GOTO F8;
+0A1: 000E 5020/04 (00253)         EN IO DATA, EN TP, LOAD NOC REG, RESET LC;
+0A2: 0013 509C/00 (00254)         EN IO DATA, EN TP, LOAD NOC REG, SYNC PULSE, GOTO F5;
+0A3: 0002 7000/00 (00255)         EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP;
+                  (00256) 
+                  (00257) (Data not available in RX FIFO
+                  (00258) 
+                  (00259) F6:
+0A4: 000E 5020/04 (00260)         EN IO DATA, EN TP, LOAD NOC REG, RESET LC;
+0A5: 0002 5000/00 (00261)         EN IO DATA, EN TP, LOAD NOC REG;
+0A6: 0002 7000/00 (00262)         EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP;
+                  (00263) F7:
+0A7: 0250 00A7/00 (00264)         IF FIFO READY2=0 GOTO F7;
+0A8: 0000 0000/00 (00265)         NOP;
+0A9: 0011 009C/00 (00266)         SYNC PULSE, GOTO F5;
+0AA: 0000 0000/00 (00267)         NOP;
+                  (00268) 
+                  (00269) (End of transfer
+                  (00270) 
+                  (00271)  F8:
+0AB: 0003 530D/00 (00272)         EN IO DATA, EN TP, LOAD NOC REG, SYNC PULSE, LOAD LR 0D;
+0AC: 0002 7217/00 (00273)         EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP, LOAD MODE 17;    (block TP write 
+0AD: 009C 5004/04 (00274)         EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;                   (TP word 0->NOC reg
+0AE: 009C 5004/04 (00275)            EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+0AF: 0010 0000/00 (00276)         GOTO START;
+0B0: 0008 0002/03 (00277)         NOC READY;
+                  (00278) 
+                  (00279) (----------------------------- RM->CM ---------------------------------------
+                  (00280) 
+                  (00281) ( RM->CM unicast
+                  (00282) 
+                  (00283) J1:
+0B1: 0004 0012/02 (00284)         LOAD RM AS, LOAD TC=TS;
+0B2: 0000 0101/00 (00285)         LOAD MUX 01;                                    (select RM in
+0B3: 0000 021F/00 (00286)         LOAD MODE 1F;                                   (enable NOC byte data
+0B4: 0D50 00F9/00 (00287)         IF TC=0 GOTO ERR, BLK1;
+0B5: 0000 0000/00 (00288)         NOP;
+0B6: 0004 0030/02 (00289)         LOAD TC=TS/16;
+0B7: 0000 0423/00 (00290)         LOAD PEC 23;                                    (PEC cmd = WriteBlockC
+0B8: 0810 00E0/00 (00291)         GOTO TG1, BLK1;
+0B9: 0000 0309/00 (00292)         LOAD LR 09;
+                  (00293) J2:
+0BA: 0001 0000/00 (00294)         SYNC PULSE;
+0BB: 0000 8000/00 (00295)         EN RM;
+                  (00296) J3:
+0BC: 009C 9014/04 (00297)         EN RM, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+0BD: 009C 9004/04 (00298)           EN RM, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+0BE: 0550 90C2/00 (00299)         EN RM, LOAD NOC REG, IF TC=0 GOTO J4;
+0BF: 000C 9020/04 (00300)         EN RM, LOAD NOC REG, RESET LC;
+0C0: 0011 90BC/00 (00301)         EN RM, LOAD NOC REG, SYNC PULSE, GOTO J3;
+0C1: 0000 9000/00 (00302)         EN RM, LOAD NOC REG;
+                  (00303)         
+                  (00304) (End of transfer
+                  (00305) 
+0C2: 0010 9000/00 (00306) J4:     EN RM, LOAD NOC REG, GOTO START;
+0C3: 0008 1002/03 (00307)         LOAD NOC REG, NOC READY;
+                  (00308) 
+                  (00309) ( RM->CM broadcast
+                  (00310) 
+                  (00311) K1:
+0C4: 0004 0012/02 (00312)         LOAD RM AS, LOAD TC=TS;
+0C5: 0000 0121/00 (00313)         LOAD MUX 21;                                    (select broadcast, RM in
+0C6: 0000 021F/00 (00314)         LOAD MODE 1F;                                   (enable NOC byte data
+0C7: 0D50 00F9/00 (00315)         IF TC=0 GOTO ERR, BLK1;
+0C8: 0000 0000/00 (00316)         NOP;
+0C9: 0000 0423/00 (00317)         LOAD PEC 23;                                    (PEC cmd = WriteBlockC
+0CA: 0810 00E0/00 (00318)         GOTO TG1, BLK1;
+0CB: 0000 0308/00 (00319)         LOAD LR 08;
+                  (00320) 
+                  (00321) (Sequencial addressing
+                  (00322) 
+                  (00323) K2:
+0CC: 0001 0000/00 (00324)         SYNC PULSE;
+0CD: 0000 8000/00 (00325)         EN RM;
+                  (00326) K3:
+0CE: 000C 1040/04 (00327)         LOAD NOC REG, RESET BC;
+0CF: 009C 0814/04 (00328)         STEP BC, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+0D0: 009C 0804/04 (00329)           STEP BC, STEP LC, WAIT UNTIL LC=LR;
+0D1: 0D50 08F7/00 (00330)         STEP BC, IF TC=0 GOTO EOT, BLK1;                (check if end of transfer
+0D2: 000C 0820/04 (00331)         STEP BC, RESET LC;
+0D3: 0011 88CE/00 (00332)         STEP BC, EN RM, SYNC PULSE, GOTO K3;
+0D4: 0000 0800/00 (00333)         STEP BC;
+                  (00334) 
+                  (00335) (Indexed addressing
+                  (00336) 
+                  (00337) K5:
+0D5: 0050 00D5/00 (00338)         IF CMD FF=0 GOTO K5;
+0D6: 0000 0000/00 (00339)         NOP;
+0D7: 0000 0A02/00 (00340)         LOAD GPP CMD REG2;                              (address steps -> CMD reg 2
+0D8: 0000 0000/00 (00341) 		NOP;
+0D9: 0000 0000/00 (00342) 		NOP;
+0DA: 0000 0000/00 (00343) 		NOP;
+                  (00344) K6:
+0DB: 0050 00DB/00 (00345)         IF CMD FF=0 GOTO K6;
+0DC: 0000 0000/00 (00346)         NOP;
+0DD: 0000 0A04/00 (00347)         LOAD GPP CMD REG3;                              (end values -> CMD reg 3
+0DE: 0000 0129/00 (00348)         LOAD MUX 29;                                    (select broadcast, index as, RM in
+0DF: 0000 0307/00 (00349)         LOAD LR 07;
+0E0: 0000 0900/00 (00350)         LOAD IR;
+0E1: 0000 0900/00 (00351)         LOAD IR;
+0E2: 0001 0900/00 (00352)         LOAD IR, SYNC PULSE;
+0E3: 0000 8900/00 (00353)         LOAD IR, EN RM;
+                  (00354) K7:
+0E4: 009C 9914/04 (00355)         LOAD IR, EN RM, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+0E5: 009C 9904/04 (00356)           LOAD IR, EN RM, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+0E6: 0550 99EC/00 (00357)         LOAD IR, EN RM, LOAD NOC REG, IF TC=0 GOTO K8;
+0E7: 000C 9920/04 (00358)         LOAD IR, EN RM, LOAD NOC REG, RESET LC;
+0E8: 0F50 99F9/00 (00359)         LOAD IR, EN RM, LOAD NOC REG, IF RM AS ERR GOTO ERR, BLK1;
+0E9: 0000 9900/00 (00360)         LOAD IR, EN RM, LOAD NOC REG;
+0EA: 0011 99E4/00 (00361)         LOAD IR, EN RM, LOAD NOC REG, SYNC PULSE, GOTO K7;
+0EB: 0000 9900/00 (00362)         LOAD IR, EN RM, LOAD NOC REG;
+                  (00363) 
+                  (00364) (End of transfer
+                  (00365) 
+                  (00366) K8:
+0EC: 0000 9000/00 (00367)         EN RM, LOAD NOC REG;
+0ED: 0000 9000/00 (00368)         EN RM, LOAD NOC REG;
+0EE: 0010 9000/00 (00369)         EN RM, LOAD NOC REG, GOTO START;
+0EF: 0008 1002/03 (00370)         LOAD NOC REG, NOC READY;
+                  (00371) 
+                  (00372) (----------------------------- RM->EM ----------------------------------------
+                  (00373) 
+                  (00374) #100:
+                  (00375) G1:
+100: 0004 0012/02 (00376)         LOAD RM AS, LOAD TC=TS;
+101: 0000 0115/00 (00377)         LOAD MUX 15;                                    (select upstream, Mux/Demux out, RM in
+102: 0810 00E7/00 (00378)         GOTO WR1, BLK1;
+103: 0800 0704/00 (00379)         LOAD RETURN REG2 G2, BLK1;
+                  (00380) G2:
+104: 0024 0030/02 (00381)         LOAD TC=TS/16, RETURN1;
+105: 0000 0307/00 (00382)         LOAD LR 07;
+                  (00383) 
+                  (00384) ( RM->MUX-EM
+                  (00385) 
+                  (00386) G4:
+106: 0A50 0006/00 (00387)         IF FIFO READY2=0 GOTO G4, BLK1;
+107: 0000 0000/00 (00388)         NOP;
+108: 0000 8000/00 (00389)         EN RM;
+109: 0000 9000/00 (00390)         EN RM, LOAD NOC REG;                            (RM word 0->NOC reg
+                  (00391) G5:
+10A: 009E 9014/04 (00392)         EN RM, LOAD NOC REG, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+10B: 009E 9004/04 (00393)            EN RM, LOAD NOC REG, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+10C: 0C52 9012/00 (00394)         EN RM, LOAD NOC REG, EN IO DATA, IF FIFO READY3=0 GOTO G6, BLK1;
+10D: 0D52 9016/00 (00395)         EN RM, LOAD NOC REG, EN IO DATA, IF TC=0 GOTO G7, BLK1;
+10E: 000E 9020/04 (00396)         EN RM, LOAD NOC REG, EN IO DATA, RESET LC;
+10F: 0002 9000/00 (00397)         EN RM, LOAD NOC REG, EN IO DATA;
+110: 0812 900A/00 (00398)         EN RM, LOAD NOC REG, EN IO DATA, GOTO G5, BLK1;
+111: 0002 9000/00 (00399)         EN RM, LOAD NOC REG, EN IO DATA;
+                  (00400) 
+                  (00401)  (Space not available in TX FIFO
+                  (00402) 
+                  (00403) G6:
+112: 000E 9020/04 (00404)         EN RM, LOAD NOC REG, EN IO DATA, RESET LC;
+113: 0002 9000/00 (00405)         EN RM, LOAD NOC REG, EN IO DATA;
+114: 0812 1006/00 (00406)         LOAD NOC REG, EN IO DATA, GOTO G4, BLK1;
+115: 0002 0000/00 (00407)         EN IO DATA;
+                  (00408) 
+                  (00409) (End of transfer
+                  (00410) 
+                  (00411) G7:
+116: 0002 9000/00 (00412)         EN RM, LOAD NOC REG, EN IO DATA;
+117: 0012 1000/00 (00413)         LOAD NOC REG, EN IO DATA, GOTO START;
+118: 000A 0002/03 (00414)         EN IO DATA, NOC READY;
+                  (00415) 
+                  (00416) ( RM->TP->EM
+                  (00417) 
+                  (00418) (Write to TP from RM. Read from TP to TX FIFO except for first transfer.
+                  (00419) 
+                  (00420) H4:
+119: 0000 0111/00 (00421)         LOAD MUX 11;                                    (select upstream, TP out, RM in)
+11A: 0000 020E/00 (00422)         LOAD MODE 0E;                                   (block En IO data
+                  (00423) H5:
+11B: 0A50 001B/00 (00424)         IF FIFO READY2=0 GOTO H5, BLK1;
+11C: 0000 0000/00 (00425)         NOP;
+11D: 0000 8000/00 (00426)         EN RM;
+11E: 0000 9000/00 (00427)         EN RM, LOAD NOC REG;
+                  (00428) H6:
+11F: 009E D014/04 (00429)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+120: 009E D004/04 (00430)            EN RM, LOAD NOC REG, EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+121: 0C52 D027/00 (00431)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, IF FIFO READY3=0 GOTO H7, BLK1;
+122: 0D52 D0EE/00 (00432)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO ET1, BLK1;         (check if end of transfer
+123: 000E D020/04 (00433)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+124: 0002 D000/00 (00434)         EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+125: 0812 D01F/00 (00435)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, GOTO H6, BLK1;
+126: 0002 F20F/00 (00436)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;   (open En IO data
+                  (00437) 
+                  (00438) (Space not available in TX FIFO
+                  (00439) 
+                  (00440) H7:
+127: 000E D020/04 (00441)         EN RM, LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+128: 0002 D000/00 (00442)         EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+129: 0812 501B/00 (00443)         LOAD NOC REG, EN TP, EN IO DATA, GOTO H5, BLK1;
+12A: 0002 620F/00 (00444)         EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;     (open En IO data
+                  (00445) 
+                  (00446) 
+                  (00447)  (---------------------------------------- CM->EM --------------------------------------     
+                  (00448) 
+                  (00449) L1:
+12B: 0004 0010/02 (00450)         LOAD TC=TS;
+12C: 0000 0114/00 (00451)         LOAD MUX 14;                                                    (select upstream, switch data, input reg
+12D: 0810 00E7/00 (00452)         GOTO WR1, BLK1;
+12E: 0800 072F/00 (00453)         LOAD RETURN REG2 L2, BLK1;
+                  (00454) L2:
+12F: 0004 0030/02 (00455)         LOAD TC=TS/16;
+130: 0000 0424/00 (00456)         LOAD PEC 24;                                                    (PEC command = ReadBlock
+131: 0810 00E0/00 (00457)         GOTO TG1, BLK1;
+132: 0800 0733/00 (00458)         LOAD RETURN REG2 L3, BLK1;
+                  (00459) L3:
+133: 0020 0000/00 (00460)         RETURN1;
+134: 0000 0302/00 (00461)         LOAD LR 02;
+                  (00462) 
+                  (00463) ( CM->MUX->EM
+                  (00464) 
+                  (00465) L4:
+135: 0A50 0035/00 (00466)         IF FIFO READY2=0 GOTO L4, BLK1;
+136: 0000 0000/00 (00467)         NOP;
+137: 0081 0000/00 (00468)         SYNC PULSE, WAIT UNTIL PEC_WE=1;                                (wait for write enable from PEC
+138: 0080 0000/00 (00469)           WAIT UNTIL PEC_WE=1;
+139: 0000 1000/00 (00470)         LOAD NOC REG;                                                   (byte 0 -> NOC reg
+                  (00471) L5:
+13A: 009E 1014/04 (00472)         LOAD NOC REG, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+13B: 009E 1004/04 (00473)            LOAD NOC REG, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+13C: 0D52 1047/00 (00474)         LOAD NOC REG, EN IO DATA, IF TC=0 GOTO L6, BLK1;                (jump if end of transfer
+13D: 0C52 1048/00 (00475)         LOAD NOC REG, EN IO DATA, IF FIFO READY3=0 GOTO L7, BLK1;       (jump if space not available in TX FIFO
+13E: 000E 1020/04 (00476)         LOAD NOC REG, EN IO DATA, RESET LC;
+13F: 0003 1000/00 (00477) 		LOAD NOC REG, EN IO DATA, SYNC PULSE;
+140: 0002 1000/00 (00478)         LOAD NOC REG, EN IO DATA;
+141: 0002 1000/00 (00479)         LOAD NOC REG, EN IO DATA;
+142: 0002 1000/00 (00480)         LOAD NOC REG, EN IO DATA;
+143: 0002 1000/00 (00481)         LOAD NOC REG, EN IO DATA; 
+144: 0002 1000/00 (00482)         LOAD NOC REG, EN IO DATA; 
+145: 0812 103A/00 (00483)         LOAD NOC REG, EN IO DATA, GOTO L5, BLK1;
+146: 0002 1000/00 (00484)         LOAD NOC REG, EN IO DATA; 
+                  (00485) L6:
+147: 000E 1020/04 (00486)         LOAD NOC REG, EN IO DATA, RESET LC;
+                  (00487) L7:
+148: 0002 1000/00 (00488)         LOAD NOC REG, EN IO DATA;
+149: 0002 1000/00 (00489)         LOAD NOC REG, EN IO DATA;
+14A: 0002 1000/00 (00490) 		LOAD NOC REG, EN IO DATA;
+14B: 0002 1000/00 (00491)         LOAD NOC REG, EN IO DATA;
+14C: 0D52 1050/00 (00492)         LOAD NOC REG, EN IO DATA, IF TC=0 GOTO L8, BLK1;                (jump if end of transfer
+14D: 0002 1000/00 (00493)         LOAD NOC REG, EN IO DATA; 
+14E: 0812 1035/00 (00494)         LOAD NOC REG, EN IO DATA, GOTO L4, BLK1;
+14F: 0002 0000/00 (00495)         EN IO DATA;
+                  (00496)  L8:
+150: 0012 1000/00 (00497)         LOAD NOC REG, EN IO DATA, GOTO START;
+151: 000A 0002/03 (00498)         EN IO DATA, NOC READY;
+                  (00499) 
+                  (00500) ( CM->TP->EM
+                  (00501) 
+                  (00502) M4:
+152: 0000 020E/00 (00503)         LOAD MODE 0E;                                                    (block EN IO data
+153: 0000 0110/00 (00504)         LOAD MUX 10;                                                     (select upstream, TP out, input reg
+                  (00505) M5:
+154: 0A50 0054/00 (00506)         IF FIFO READY2=0 GOTO M5, BLK1;
+155: 0000 0000/00 (00507)         NOP;
+156: 0081 0000/00 (00508)         SYNC PULSE, WAIT UNTIL PEC_WE=1;                                 (wait for write enable from PEC
+157: 0080 0000/00 (00509)           WAIT UNTIL PEC_WE=1;
+158: 0000 1000/00 (00510)         LOAD NOC REG;                                                    (byte 0 -> NOC reg
+                  (00511) M6:
+159: 009E 5014/04 (00512)         LOAD NOC REG, EN TP, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+15A: 009E 5004/04 (00513)            LOAD NOC REG, EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+15B: 0D52 5066/00 (00514)         LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO M7, BLK1;                 (jump if end of transfer
+15C: 0C52 5067/00 (00515)         LOAD NOC REG, EN TP, EN IO DATA, IF FIFO READY3=0 GOTO M8, BLK1;        (jump if space not available in TX FIFO
+15D: 000E 5020/04 (00516)         LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+15E: 0003 5000/00 (00517)         LOAD NOC REG, EN TP, EN IO DATA, SYNC PULSE;
+15F: 0002 5000/00 (00518)         LOAD NOC REG, EN TP, EN IO DATA;
+160: 0002 5000/00 (00519) 		LOAD NOC REG, EN TP, EN IO DATA;
+161: 0002 5000/00 (00520)         LOAD NOC REG, EN TP, EN IO DATA; 
+162: 0002 5000/00 (00521)         LOAD NOC REG, EN TP, EN IO DATA;
+163: 0002 5000/00 (00522)         LOAD NOC REG, EN TP, EN IO DATA; 
+164: 0812 5059/00 (00523)         LOAD NOC REG, EN TP, EN IO DATA, GOTO M6, BLK1;
+165: 0002 720F/00 (00524)         LOAD NOC REG, EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;          (open En IO data
+                  (00525) M7:
+166: 000E 5020/04 (00526)         LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+                  (00527) M8: 
+167: 0002 5000/00 (00528)         LOAD NOC REG, EN TP, EN IO DATA;
+168: 0002 5000/00 (00529) 		LOAD NOC REG, EN TP, EN IO DATA;
+169: 0002 5000/00 (00530)         LOAD NOC REG, EN TP, EN IO DATA;
+16A: 0002 5000/00 (00531)         LOAD NOC REG, EN TP, EN IO DATA;
+16B: 0D52 50EF/00 (00532)         LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO ET2, BLK1;                (jump if end of transfer
+16C: 0002 5000/00 (00533)         LOAD NOC REG, EN TP, EN IO DATA;
+16D: 0812 5054/00 (00534)         LOAD NOC REG, EN TP, EN IO DATA, GOTO M5, BLK1;
+16E: 0002 620F/00 (00535)         EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;                        (open En IO data
+                  (00536) 
+                  (00537) 
+                  (00538) (---------------------------------- CM->RM -----------------------------------------------
+                  (00539) 
+                  (00540) N1:
+16F: 0004 0012/02 (00541)         LOAD RM AS, LOAD TC=TS;
+170: 0000 0190/00 (00542)         LOAD MUX 90;                                            (select write RM, upstream, input reg
+171: 0D50 00F9/00 (00543)         IF TC=0 GOTO ERR, BLK1;
+172: 0000 0000/00 (00544)         NOP;
+173: 0004 0030/02 (00545)         LOAD TC=TS/16;
+174: 0810 00E0/00 (00546)         GOTO TG1, BLK1;
+175: 0000 0424/00 (00547)         LOAD PEC 24;                                            (PEC command = ReadBlock        
+                  (00548) N2:
+176: 0081 0303/00 (00549)         SYNC PULSE, LOAD LR 03, WAIT UNTIL PEC_WE=1;
+177: 0080 0000/00 (00550)           WAIT UNTIL PEC_WE=1;
+178: 0000 1000/00 (00551)         LOAD NOC REG;                                           (byte 0 -> NOC reg
+                  (00552) N3:
+179: 009C 9014/04 (00553)         LOAD NOC REG, EN RM, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+17A: 009C 9004/04 (00554)           LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+17B: 0D50 907F/00 (00555)         LOAD NOC REG, EN RM, IF TC=0 GOTO N4, BLK1;             (jump if end of transfer
+17C: 000C 9020/04 (00556)         LOAD NOC REG, EN RM, RESET LC; 
+17D: 0001 9000/00 (00557)         LOAD NOC REG, EN RM, SYNC PULSE;
+17E: 0000 9000/00 (00558) 		LOAD NOC REG, EN RM;
+                  (00559) N4:
+17F: 0000 9000/00 (00560)         LOAD NOC REG, EN RM;
+180: 0000 9000/00 (00561)         LOAD NOC REG, EN RM;
+181: 0D50 9085/00 (00562)         LOAD NOC REG, EN RM, IF TC=0 GOTO N5, BLK1;             (jump if end of transfer
+182: 0000 9000/00 (00563)         LOAD NOC REG, EN RM;
+183: 0810 9079/00 (00564)         LOAD NOC REG, EN RM, GOTO N3, BLK1;
+184: 0000 9000/00 (00565)         LOAD NOC REG, EN RM;
+                  (00566) N5:
+185: 0000 9000/00 (00567)         LOAD NOC REG, EN RM;
+186: 0000 9000/00 (00568) 		LOAD NOC REG, EN RM;
+187: 0010 9000/00 (00569)         LOAD NOC REG, EN RM, GOTO START;
+188: 0008 8002/03 (00570)         EN RM, NOC READY;
+                  (00571) 
+                  (00572)         
+                  (00573) (------------------------ Execute, Continue ----------------------------------------
+                  (00574) 
+                  (00575) X1:
+189: 0800 078C/00 (00576)         LOAD RETURN REG2 X2, BLK1;
+18A: 0810 00E1/00 (00577)         GOTO TG2, BLK1;
+18B: 0000 0506/00 (00578)         LOAD TAG SHIFT 06;                      (TAG shift counter = 6
+                  (00579) X2:
+18C: 0010 0000/00 (00580)         GOTO START;
+18D: 0008 0002/03 (00581)         NOC READY;
+                  (00582) 
+                  (00583) (-------------------------------- Subroutines--------------------------------------
+                  (00584) 
+                  (00585) #1E0:
+                  (00586) 
+                  (00587) (TAG SHIFT
+                  (00588) 
+                  (00589) TG1:
+1E0: 0000 0524/00 (00590)         LOAD TAG SHIFT 24;                      (TAG shift counter = 36
+                  (00591) TG2:
+1E1: 0004 0001/02 (00592)         START TAG SHIFT;
+1E2: 0000 0000/00 (00593) 	NOP;
+1E3: 00A0 0000/00 (00594)         WAIT UNTIL TAG SHIFT=0;
+1E4: 00A0 0000/00 (00595)            WAIT UNTIL TAG SHIFT=0;
+1E5: 0030 0000/00 (00596)         RETURN2;
+1E6: 0000 0000/00 (00597)         NOP;
+                  (00598) 
+                  (00599) (Write address and length to NOC adapter)
+                  (00600) 
+                  (00601) WR1:
+1E7: 0D50 00F9/00 (00602)         IF TC=0 GOTO ERR, BLK1;
+1E8: 0000 0000/00 (00603)         NOP;
+                  (00604) WR2:
+1E9: 0008 0004/03 (00605)         WRITE REQ;
+                  (00606) WR3:
+1EA: 0B50 00EA/00 (00607)         IF WRITE ACK=0 GOTO WR3, BLK1;
+1EB: 0000 0000/00 (00608)         NOP;
+1EC: 0030 0000/00 (00609)         RETURN2;
+1ED: 0000 0000/00 (00610)         NOP;
+                  (00611) 
+                  (00612) (End of transfer - TP->EM
+                  (00613) 
+                  (00614) ET1:
+1EE: 0002 D000/00 (00615)         EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+                  (00616) ET2:
+1EF: 0002 530D/00 (00617)         LOAD NOC REG, EN TP, EN IO DATA, LOAD LR 0D;
+1F0: 0002 6207/00 (00618)         EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 07;     (block TP write, open En IO data
+1F1: 0A50 00F1/00 (00619) ET3:    IF FIFO READY2=0 GOTO ET3, BLK1;
+1F2: 0000 0000/00 (00620)         NOP;		
+1F3: 009E 4004/04 (00621)         EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+1F4: 009E 4004/04 (00622)            EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+1F5: 0010 0000/00 (00623)         GOTO START;
+1F6: 0008 0002/03 (00624)         NOC READY;        
+                  (00625) 
+                  (00626) (End of transfer - broadcast to CM
+                  (00627) 
+                  (00628) EOT:
+1F7: 0010 0800/00 (00629)         STEP BC, GOTO START;
+1F8: 0008 0802/03 (00630)         STEP BC, NOC READY;
+                  (00631) 
+                  (00632) (NOC error
+                  (00633) 
+                  (00634) ERR:
+1F9: 0010 0000/00 (00635)         GOTO START;
+1FA: 0008 0040/03 (00636)         ERROR;
+                  (00637) 
+                  (00638) 
+                  (00639) 
+FILE: ./Include.mas
+                  (00014) 
+                  (00015) *END*           ( End of program
+                  (00016) 
+                  (00017) 
+                  (00018) 
+                  (00019) 

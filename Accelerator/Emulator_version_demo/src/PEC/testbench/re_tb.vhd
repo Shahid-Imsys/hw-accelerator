@@ -83,7 +83,7 @@ signal ve_out_d : std_logic_vector(7 downto 0);
 signal ve_out_dtm : std_logic_vector(127 downto 0);
 signal progress : processes;
 signal debug, i   : integer;
-signal fft_resmem : mem_dd;
+signal fft_resmem, fft_outref : mem_dd;
 signal data_memory0, data_memory1 : mem_d;
 signal weight_memory : mem_w;
 
@@ -166,11 +166,12 @@ constant pp_ctl     : std_logic_vector(127 downto 0)       := x"0000017000000000
 constant load_lc  : std_logic_vector(127 downto 0) := x"00000080000000000000000000000000";
 --constant start    : std_logic_vector(127 downto 0) :="";
 --fft test data
-constant fft_test_data0     : string := "FFT_data0_16.dat";
-constant fft_test_data1     : string := "FFT_data1_16.dat";
-constant fft_test_tf        : string := "FFT_TF_16.dat";
-constant fft_points         : integer := 16;
-constant fft_stages         : std_logic_vector := x"02";--max 7 = 512 point
+constant fft_test_data0     : string := "FFT_256_data0.dat";
+constant fft_test_data1     : string := "FFT_256_data1.dat";
+constant fft_test_tf        : string := "FFT_256_tf.dat";
+constant fft_out_ref        : string := "FFT_256_out_ref.dat";
+constant fft_points         : integer := 256;
+constant fft_stages         : std_logic_vector := x"06";--max 7 = 512 point
 
 
 begin
@@ -234,6 +235,21 @@ begin
         readline(load_text_file,text_line);
         hread(text_line, val_bias);
         weight_memory(i) <= val_bias;
+      end loop ;
+    end if;
+  end process;
+
+  process(load_mem)
+  file load_text_file : text open read_mode is fft_out_ref;
+  variable text_line : line;
+  variable val_bias : std_logic_vector(31 downto 0);
+  begin
+    if load_mem = '1' then
+      for i in 0 to 511 loop
+        exit when endfile(load_text_file);
+        readline(load_text_file,text_line);
+        hread(text_line, val_bias);
+        fft_outref(i) <= val_bias;
       end loop ;
     end if;
   end process;
@@ -765,7 +781,11 @@ wait for 30 ns;
 pl(95) <= '0';
 wait until fft_read_done = '1';
 
-
+for i in 0 to fft_points -1 loop
+  assert (fft_resmem(i) = fft_outref(i))
+  report "Incorrect output data in fft_resmem"&integer'image(i) severity warning;
+  wait for 10 ns;
+end loop;
 --pl(94)<= '0';
 --pl(93) <= '1';
 --wait for 30 ns;

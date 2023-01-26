@@ -449,9 +449,9 @@ architecture rtl of ve is
   signal N_point : integer;
   signal bits    : integer;
   signal n       : integer; 
-  signal mem_no, swap_int, swap : std_logic;
+  signal mem_no, swap_int : std_logic;
   signal bit_rev : std_logic_vector(7 downto 0);
-  signal pl_ve_byte : std_logic_vector(3 downto 0);
+  signal out_byte_sel : std_logic_vector(3 downto 0);
 
 
   signal data0addr_to_memory : std_logic_vector(7 downto 0);
@@ -463,7 +463,7 @@ architecture rtl of ve is
   signal shifter_ena : std_logic;
   signal clip_ena  : std_logic;
   signal output_ena : std_logic;
-  signal output_c : std_logic_vector(3 downto 0); --output byte counter 
+  signal output_c : unsigned(3 downto 0); --output byte counter 
   signal mode_c_l : std_logic;
   --output control signals
   signal load_dtm_out : std_logic;
@@ -521,7 +521,7 @@ begin
   --re_start and ve_start signals and mode abcd or relaod signal. 
   bypass       <= PL(121);-- buffer bypass
   dfy_dest_sel <= PL(119 downto 116); --DEST_BYTE
-  pl_ve_byte   <= PL(112 downto 109);
+  out_byte_sel <= PL(112 downto 109);
   conv_enable  <= PL(107);
   fft_mode     <= PL(106);
   reg_in       <= PL(105 downto 100);
@@ -1652,22 +1652,20 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
-        swap <= '0';
         res_assign <= '0';
         fft_resload <= '0';
       else
-        swap <= swap_int;
         res_assign <= read_en_o;
         if fft_done_pipe(10) = '1' and res_assign = '1' and mode_latch = fft then
           if CLK_E_NEG = '0' then
-            if swap = '1' then
+            if swap_int = '1' then
               fft_result(63 downto 0) <= data0 & data1;
             else
               fft_result(63 downto 0) <= data1 & data0; 
             end if;
             fft_resload <= '0';
           else
-            if swap = '1' then
+            if swap_int = '1' then
               fft_result(127 downto 64) <= data0 & data1;
             else
               fft_result(127 downto 64) <= data1 & data0;
@@ -1698,19 +1696,19 @@ begin
         end if;
       elsif output_ena = '1' then 
         if pp_ctl(4 downto 3) = "01" then --to feedback(dfy) register
-          dfy_reg(to_integer(unsigned(output_c))) <= outreg(7 downto 0);
+          dfy_reg(to_integer(output_c)) <= outreg(7 downto 0);
           if output_c = x"7" then
             output_c <=(others => '0');
             pushback_en <= '1';
           else
-            output_c <= std_logic_vector(to_unsigned(to_integer(unsigned(output_c))+1,4));
+            output_c <= output_c + 1;
             pushback_en <= '0';
           end if;
         elsif pp_ctl(4 downto 3) = "10" then --to DTM data register
-          dtm_data_reg(to_integer(unsigned(output_c))) <= outreg(7 downto 0);
-          output_c <= std_logic_vector(to_unsigned(to_integer(unsigned(output_c))+1,4));
+          dtm_data_reg(to_integer(output_c)) <= outreg(7 downto 0);
+          output_c <= output_c + 1;
         else --to dbus
-          VE_OUT_D <= dtm_data_reg(to_integer(unsigned(pl_ve_byte)));
+          VE_OUT_D <= dtm_data_reg(to_integer(unsigned(out_byte_sel)));
         end if;
       end if;
       if pp_ctl(4 downto 3) = "10" and output_c(1 downto 0) = "11" and output_ena = '1' then

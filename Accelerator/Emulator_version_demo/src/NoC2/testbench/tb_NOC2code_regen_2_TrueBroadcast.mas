@@ -1,0 +1,710 @@
+(Code for NOC2 state machine 
+(Rev pA10)
+
+(Note 1: one instruction after a jump instruction is always executed before the instruction at the jump address is executed
+(Note 2: LR and LC must be loaded two instructions before a WAIT UNTIL LC=LR instruction
+(Note 3: CMD register must be loaded two instructions before a jump to as = op code
+(Note 4: TC must be loaded two instructions before a jump with condition TC=0 and a WAIT UNTIL TC=0 instruction
+(Note 5: there must be one instruction between START TAG shift and WAIT UNTIL TAG SHIFT=0
+
+#0:
+START:
+        NOP;
+        NOP;
+
+(Wait for command from host
+
+A1:
+        IF CMD FF=0 GOTO A1;                    (check for command from GPP
+        NOP;
+A2:
+        LOAD GPP CMD REG1;                      (command -> CMD1
+        RESET LC, RESET BC, RESET IR;
+
+(Jump to use case
+
+        LOAD MODE 0F, JUMP OPCODE;              (open EN TP READ, EN TP WRITE, EN RM, EN IO DATA            
+        LOAD MUX 00;
+#0C:
+        LOAD BOOT_FF=0, RESET BOOT AS CNTR;     (Boot mode
+        GOTO ROM.07;                            (Boot NOC
+        NOP;
+#10:
+        GOTO B1;                                (EM->MUX->RM                 
+        LOAD RETURN REG1 B4;
+
+        GOTO B1;                                (EM->TP->RM
+        LOAD RETURN REG1 C4;
+
+        GOTO D1;                                (EM->MUX->CM unicast
+        LOAD RETURN REG1 D4;
+
+        GOTO E1;                                (EM->MUX->CM broadcast
+        LOAD RETURN REG2 E2;
+
+        GOTO D1;                                (EM->TP->CM unicast
+        LOAD RETURN REG1 F4;
+
+        GOTO G1, BLK1;                          (RM->MUX->EM
+        LOAD RETURN REG1 G4, BLK1;
+
+        GOTO G1, BLK1;                          (RM->TP->EM
+        LOAD RETURN REG1 H4, BLK1;
+
+        GOTO J1;                               (RM->CM unicast
+        LOAD RETURN REG2 J2;
+
+        GOTO K1;                               (RM->CM broadcast seq addressing
+        LOAD RETURN REG2 K2;
+
+        GOTO K1;                               (RM->CM boadcast indexed addressing
+        LOAD RETURN REG2 K5;
+
+        GOTO L1, BLK1;                          (CM->MUX->EM
+        LOAD RETURN REG1 L4, BLK1;
+
+        GOTO L1, BLK1;                          (CM->TP->EM
+        LOAD RETURN REG1 M4, BLK1;
+
+        GOTO N1, BLK1;                          (CM->RM
+        LOAD RETURN REG2 N2, BLK1;
+
+        (GOTO P1, BLK1;                         (CM->CM
+        (LOAD RETURN REG2 P2, BLK1;
+		
+		GOTO S1, BLK1;							(EM->MUX->CM True broadcast
+		LOAD RETURN REG1 S4, BLK1;
+		
+#38:
+        GOTO X1, BLK1;                          (Execute
+        LOAD PEC 26;                            (PEC command = PEEx
+
+        GOTO X1, BLK1;                          (Continue
+        LOAD PEC 28;                            (PEC command = PE Cont
+
+(---------------------------------- EM->RM ------------------------------------
+
+B1:
+        LOAD RM AS, LOAD TC=TS;
+        LOAD MUX 83;                            (select write RM, IO data in
+        GOTO WR1, BLK1;
+        LOAD RETURN REG2 B2;
+B2:
+        LOAD TC=TS/16, RETURN1;
+        LOAD LR 08;
+
+( EM->MUX->RM
+
+B4:
+        IF FIFO READY2=0 GOTO B4;
+        NOP;
+        EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg
+B5:
+        EN IO DATA, LOAD NOC REG, EN RM, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN IO DATA, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+        EN IO DATA, LOAD NOC REG, EN RM, IF FIFO READY3=0 GOTO B6;
+        EN IO DATA, LOAD NOC REG, EN RM, IF TC=0 GOTO B7;
+        EN IO DATA, LOAD NOC REG, EN RM, RESET LC;
+        EN IO DATA, LOAD NOC REG, EN RM, GOTO B5;
+        EN IO DATA, LOAD NOC REG, EN RM;
+
+(Data not available in RX FIFO
+
+B6:
+        EN IO DATA, LOAD NOC REG, EN RM, RESET LC;
+        EN IO DATA, LOAD NOC REG, EN RM, GOTO B4;
+        EN RM;
+
+(End of transfer
+
+B7:
+        EN IO DATA, LOAD NOC REG, EN RM, GOTO START;
+        EN RM, NOC READY;
+
+( EM->TP->RM
+
+(Write from RX FIFO to TP. Read from TP to RM except for first transfer.
+
+C4:
+        LOAD MUX 82;                            (select write RM, En TP in
+        LOAD MODE 0D;                           (block RM access
+C5:
+        IF FIFO READY2=0 GOTO C5;
+        NOP;
+        EN IO DATA, EN TP, LOAD NOC REG;
+C6:
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN IO DATA, EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, IF FIFO READY3=0 GOTO C7;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, IF TC=0 GOTO C8;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, RESET LC;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP, GOTO C6;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, LOAD MODE 0F;       (open RM access
+
+(Data not available in RX FIFO
+
+C7:
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, RESET LC;
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP, GOTO C5;
+        EN RM, LOAD MODE 0F;                                        (open RM access
+
+(End of transfer
+
+C8:
+        EN IO DATA, EN TP, LOAD NOC REG, EN RM, INTERCHANGE TP;     (RX FIFO word 15->TP;
+        EN RM, LOAD MODE 07;                                        (block TP write, open RM access 
+        LOAD LR 0C;  
+        EN TP, LOAD NOC REG;
+        EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+           EN TP, LOAD NOC REG, EN RM, STEP LC, WAIT UNTIL LC=LR;
+        EN RM, GOTO START;
+        NOC READY;
+
+(----------------------------- EM->CM -------------------------------------
+
+D1:
+        LOAD TC=TS;
+        GOTO WR1, BLK1;
+        LOAD RETURN REG2 D2;
+D2:
+        LOAD TC=TS/16;
+        LOAD PEC 23;                            (PEC command = WriteBlockC
+        GOTO TG1, BLK1;
+        LOAD RETURN REG2 D3;
+D3:
+	RETURN1, LOAD MODE 1F;                  (enable NOC byte data
+        LOAD LR 07;
+
+( EM->MUX->CM unicast
+
+D4:
+        IF FIFO READY2=0 GOTO D4;
+        NOP;
+        SYNC PULSE;
+        LOAD MUX 03;                            (select IO data in
+D5:
+        EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg
+        EN IO DATA, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN IO DATA, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        EN IO DATA, LOAD NOC REG, IF FIFO READY3=0 GOTO D6;
+        EN IO DATA, LOAD NOC REG, IF TC=0 GOTO D7;
+        EN IO DATA, LOAD NOC REG, RESET LC;
+        EN IO DATA, LOAD NOC REG, SYNC PULSE, GOTO D5;
+        EN IO DATA, LOAD NOC REG;
+
+(Data not available in RX FIFO
+
+D6:
+        EN IO DATA, LOAD NOC REG, RESET LC;
+        EN IO DATA, LOAD NOC REG, GOTO D4;
+        EN IO DATA, LOAD NOC REG;
+
+(End of transfer
+
+D7:
+        EN IO DATA, LOAD NOC REG, GOTO START;
+        EN IO DATA, LOAD NOC REG, NOC READY;
+
+( EM->MUX->CM broadcast
+
+E1:
+        LOAD TC=TS;
+        GOTO WR1, BLK1;
+        LOAD MUX 23;                            (select broadcast, IO data in
+E2:
+        LOAD PEC 23;                            (PEC command = WriteBlockC
+        GOTO TG1, BLK1;
+        LOAD RETURN REG2 E3;
+E3:
+        IF FIFO READY1=0 GOTO E3;
+        NOP;
+        SYNC PULSE, LOAD MODE 11;               (enable NOC byte data, open En IO data
+        LOAD LR 07;
+        EN IO DATA, LOAD NOC REG;               (RX FIFO->NOC reg 
+E4:
+        STEP BC, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           STEP BC, STEP LC, WAIT UNTIL LC=LR;
+        STEP BC, IF FIFO READY1=0 GOTO E5;
+        STEP BC, IF TC=0 GOTO EOT, BLK1;        (check if end of transfer
+        STEP BC, RESET LC;
+        STEP BC, SYNC PULSE;
+        STEP BC, GOTO E4;
+        EN IO DATA, LOAD NOC REG, RESET BC; 
+
+(Data not available in RX FIFO
+
+E5:
+        STEP BC;
+        STEP BC;
+        STEP BC, GOTO E3;
+        RESET BC, RESET LC;
+
+
+( EM->TP->CM unicast
+
+(Move data from RX FIFO to TP. Move data from TP to CM
+
+F4:
+        IF FIFO READY2=0 GOTO F4;
+        NOP;
+        LOAD MUX 02;                            (select TP in
+F5:
+        EN IO DATA, EN TP, LOAD NOC REG;        (RX FIFO -> NOC reg
+        EN IO DATA, EN TP, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN IO DATA, EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        EN IO DATA, EN TP, LOAD NOC REG, IF FIFO READY3=0 GOTO F6;
+        EN IO DATA, EN TP, LOAD NOC REG, IF TC=0 GOTO F8;
+        EN IO DATA, EN TP, LOAD NOC REG, RESET LC;
+        EN IO DATA, EN TP, LOAD NOC REG, SYNC PULSE, GOTO F5;
+        EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP;
+
+(Data not available in RX FIFO
+
+F6:
+        EN IO DATA, EN TP, LOAD NOC REG, RESET LC;
+        EN IO DATA, EN TP, LOAD NOC REG;
+        EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP;
+F7:
+        IF FIFO READY2=0 GOTO F7;
+        NOP;
+        SYNC PULSE, GOTO F5;
+        NOP;
+
+(End of transfer
+
+ F8:
+        EN IO DATA, EN TP, LOAD NOC REG, SYNC PULSE, LOAD LR 0D;
+        EN IO DATA, EN TP, LOAD NOC REG, INTERCHANGE TP, LOAD MODE 17;    (block TP write 
+        EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;                   (TP word 0->NOC reg
+           EN TP, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        GOTO START;
+        NOC READY;
+
+(----------------------------- RM->CM ---------------------------------------
+
+( RM->CM unicast
+
+J1:
+        LOAD RM AS, LOAD TC=TS;
+        LOAD MUX 01;                                    (select RM in
+        LOAD MODE 1F;                                   (enable NOC byte data
+        IF TC=0 GOTO ERR, BLK1;
+        NOP;
+        LOAD TC=TS/16;
+        LOAD PEC 23;                                    (PEC cmd = WriteBlockC
+        GOTO TG1, BLK1;
+        LOAD LR 09;
+J2:
+        SYNC PULSE;
+        EN RM;
+J3:
+        EN RM, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+          EN RM, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        EN RM, LOAD NOC REG, IF TC=0 GOTO J4;
+        EN RM, LOAD NOC REG, RESET LC;
+        EN RM, LOAD NOC REG, SYNC PULSE, GOTO J3;
+        EN RM, LOAD NOC REG;
+        
+(End of transfer
+
+J4:     EN RM, LOAD NOC REG, GOTO START;
+        LOAD NOC REG, NOC READY;
+
+( RM->CM broadcast
+
+K1:
+        LOAD RM AS, LOAD TC=TS;
+        LOAD MUX 21;                                    (select broadcast, RM in
+        LOAD MODE 1F;                                   (enable NOC byte data
+        IF TC=0 GOTO ERR, BLK1;
+        NOP;
+        LOAD PEC 23;                                    (PEC cmd = WriteBlockC
+        GOTO TG1, BLK1;
+        LOAD LR 08;
+
+(Sequencial addressing
+
+K2:
+        SYNC PULSE;
+        EN RM;
+K3:
+        LOAD NOC REG, RESET BC;
+        STEP BC, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+          STEP BC, STEP LC, WAIT UNTIL LC=LR;
+        STEP BC, IF TC=0 GOTO EOT, BLK1;                (check if end of transfer
+        STEP BC, RESET LC;
+        STEP BC, EN RM, SYNC PULSE, GOTO K3;
+        STEP BC;
+
+(Indexed addressing
+
+K5:
+        IF CMD FF=0 GOTO K5;
+        NOP;
+        LOAD GPP CMD REG2;                              (address steps -> CMD reg 2
+		NOP;
+		NOP;
+		NOP;
+K6:
+        IF CMD FF=0 GOTO K6;
+        NOP;
+        LOAD GPP CMD REG3;                              (end values -> CMD reg 3
+        LOAD MUX 29;                                    (select broadcast, index as, RM in
+        LOAD LR 07;
+        LOAD IR;
+        LOAD IR;
+        LOAD IR, SYNC PULSE;
+        LOAD IR, EN RM;
+K7:
+        LOAD IR, EN RM, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+          LOAD IR, EN RM, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        LOAD IR, EN RM, LOAD NOC REG, IF TC=0 GOTO K8;
+        LOAD IR, EN RM, LOAD NOC REG, RESET LC;
+        LOAD IR, EN RM, LOAD NOC REG, IF RM AS ERR GOTO ERR, BLK1;
+        LOAD IR, EN RM, LOAD NOC REG;
+        LOAD IR, EN RM, LOAD NOC REG, SYNC PULSE, GOTO K7;
+        LOAD IR, EN RM, LOAD NOC REG;
+
+(End of transfer
+
+K8:
+        EN RM, LOAD NOC REG;
+        EN RM, LOAD NOC REG;
+        EN RM, LOAD NOC REG, GOTO START;
+        LOAD NOC REG, NOC READY;
+
+(----------------------------- RM->EM ----------------------------------------
+
+#100:
+G1:
+        LOAD RM AS, LOAD TC=TS;
+        LOAD MUX 15;                                    (select upstream, Mux/Demux out, RM in
+        GOTO WR1, BLK1;
+        LOAD RETURN REG2 G2, BLK1;
+G2:
+        LOAD TC=TS/16, RETURN1;
+        LOAD LR 07;
+
+( RM->MUX-EM
+
+G4:
+        IF FIFO READY2=0 GOTO G4, BLK1;
+        NOP;
+        EN RM;
+        EN RM, LOAD NOC REG;                            (RM word 0->NOC reg
+G5:
+        EN RM, LOAD NOC REG, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN RM, LOAD NOC REG, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+        EN RM, LOAD NOC REG, EN IO DATA, IF FIFO READY3=0 GOTO G6, BLK1;
+        EN RM, LOAD NOC REG, EN IO DATA, IF TC=0 GOTO G7, BLK1;
+        EN RM, LOAD NOC REG, EN IO DATA, RESET LC;
+        EN RM, LOAD NOC REG, EN IO DATA;
+        EN RM, LOAD NOC REG, EN IO DATA, GOTO G5, BLK1;
+        EN RM, LOAD NOC REG, EN IO DATA;
+
+ (Space not available in TX FIFO
+
+G6:
+        EN RM, LOAD NOC REG, EN IO DATA, RESET LC;
+        EN RM, LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA, GOTO G4, BLK1;
+        EN IO DATA;
+
+(End of transfer
+
+G7:
+        EN RM, LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA, GOTO START;
+        EN IO DATA, NOC READY;
+
+( RM->TP->EM
+
+(Write to TP from RM. Read from TP to TX FIFO except for first transfer.
+
+H4:
+        LOAD MUX 11;                                    (select upstream, TP out, RM in)
+        LOAD MODE 0E;                                   (block En IO data
+H5:
+        IF FIFO READY2=0 GOTO H5, BLK1;
+        NOP;
+        EN RM;
+        EN RM, LOAD NOC REG;
+H6:
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+           EN RM, LOAD NOC REG, EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, IF FIFO READY3=0 GOTO H7, BLK1;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO ET1, BLK1;         (check if end of transfer
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, GOTO H6, BLK1;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;   (open En IO data
+
+(Space not available in TX FIFO
+
+H7:
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA, GOTO H5, BLK1;
+        EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;     (open En IO data
+
+
+ (---------------------------------------- CM->EM --------------------------------------     
+
+L1:
+        LOAD TC=TS;
+        LOAD MUX 14;                                                    (select upstream, switch data, input reg
+        GOTO WR1, BLK1;
+        LOAD RETURN REG2 L2, BLK1;
+L2:
+        LOAD TC=TS/16;
+        LOAD PEC 24;                                                    (PEC command = ReadBlock
+        GOTO TG1, BLK1;
+        LOAD RETURN REG2 L3, BLK1;
+L3:
+        RETURN1;
+		LOAD LR 01;
+
+( CM->MUX->EM
+
+L4:
+        IF FIFO READY2=0 GOTO L4, BLK1;
+        NOP;
+        SYNC PULSE, WAIT UNTIL PEC_WE=1;                                (wait for write enable from PEC
+          WAIT UNTIL PEC_WE=1;
+        LOAD NOC REG;                                                   (byte 0 -> NOC reg
+		LOAD NOC REG, EN IO DATA;
+L5:	
+		
+        LOAD NOC REG, EN IO DATA, IF TC=0 GOTO L6, BLK1;                (jump if end of transfer
+        LOAD NOC REG, EN IO DATA, IF FIFO READY3=0 GOTO L7, BLK1;       (jump if space not available in TX FIFO
+		LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA, SYNC PULSE;		
+        LOAD NOC REG, EN IO DATA, DECR TC;
+		LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA;		
+		LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA; 
+        LOAD NOC REG, EN IO DATA; 
+        LOAD NOC REG, EN IO DATA, GOTO L5, BLK1;
+        LOAD NOC REG, EN IO DATA; 
+L6:
+        LOAD NOC REG, EN IO DATA;
+L7:
+		LOAD NOC REG, EN IO DATA, DECR TC;
+		LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA;
+		LOAD NOC REG, EN IO DATA;		
+		LOAD NOC REG, EN IO DATA;		
+        LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA;
+        LOAD NOC REG, EN IO DATA, IF TC=0 GOTO L8, BLK1;                (jump if end of transfer
+        LOAD NOC REG, EN IO DATA; 
+        LOAD NOC REG, EN IO DATA, GOTO L4, BLK1;
+        EN IO DATA;
+ L8:
+        LOAD NOC REG, EN IO DATA, GOTO START;
+        EN IO DATA, NOC READY;
+
+( CM->TP->EM
+
+M4:
+        LOAD MODE 0E;                                                    (block EN IO data
+        LOAD MUX 10;                                                     (select upstream, TP out, input reg
+M5:
+        IF FIFO READY2=0 GOTO M5, BLK1;
+        NOP;
+        SYNC PULSE, WAIT UNTIL PEC_WE=1;                                 (wait for write enable from PEC
+          WAIT UNTIL PEC_WE=1;
+        LOAD NOC REG;                                                    (byte 0 -> NOC reg
+M6:
+		LOAD NOC REG, EN TP, EN IO DATA, DECR TC;
+        LOAD NOC REG, EN TP, EN IO DATA, IF FIFO READY3=0 GOTO M7, BLK1;        (jump if space not available in TX FIFO
+        LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO M8, BLK1;                 (jump if end of transfer
+        LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA, SYNC PULSE;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA; 
+        LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA; 
+        LOAD NOC REG, EN TP, EN IO DATA, GOTO M6, BLK1;
+        LOAD NOC REG, EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;          (open En IO data
+M7:
+        LOAD NOC REG, EN TP, EN IO DATA, RESET LC;
+M8: 
+        LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;		
+        LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+		LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA, IF TC=0 GOTO ET2, BLK1;                (jump if end of transfer
+        LOAD NOC REG, EN TP, EN IO DATA;
+        LOAD NOC REG, EN TP, EN IO DATA, GOTO M5, BLK1;
+        EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 0F;                        (open En IO data
+
+
+(---------------------------------- CM->RM -----------------------------------------------
+
+N1:
+        LOAD RM AS, LOAD TC=TS;
+        LOAD MUX 90;                                            (select write RM, upstream, input reg
+        IF TC=0 GOTO ERR, BLK1;
+        NOP;
+        LOAD TC=TS/16;
+        GOTO TG1, BLK1;
+        LOAD PEC 24;                                            (PEC command = ReadBlock        
+N2:
+        SYNC PULSE, WAIT UNTIL PEC_WE=1;
+          WAIT UNTIL PEC_WE=1;
+        LOAD NOC REG;                                           (byte 0 -> NOC reg
+N3:
+        LOAD NOC REG, EN RM, DECR TC;
+        LOAD NOC REG, EN RM;
+        LOAD NOC REG, EN RM, IF TC=0 GOTO N4, BLK1;             (jump if end of transfer
+        LOAD NOC REG, EN RM, RESET LC; 
+        LOAD NOC REG, EN RM, SYNC PULSE;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+N4:
+        LOAD NOC REG, EN RM;
+        LOAD NOC REG, EN RM;
+        LOAD NOC REG, EN RM, IF TC=0 GOTO N5, BLK1;             (jump if end of transfer
+        LOAD NOC REG, EN RM;
+        LOAD NOC REG, EN RM, GOTO N3, BLK1;
+        LOAD NOC REG, EN RM;
+N5:
+        LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+		LOAD NOC REG, EN RM;
+        LOAD NOC REG, EN RM, GOTO START;
+        EN RM, NOC READY;
+
+(------------------------------True Broadcast---------------------------------------------
+( EM->MUX->CM True broadcast		
+
+S1:
+        LOAD TC=TS;
+		LOAD MUX 03;                            (select broadcast, IO data in
+        GOTO WR1, BLK1;
+		LOAD RETURN REG2 S2, BLK1;
+S2:
+        LOAD PEC 22;                            (PEC command = WriteTrueBroadcast
+        GOTO TG1, BLK1;
+        LOAD RETURN REG2 S3, BLK1;
+S3:
+		LOAD TC=TS/16;
+		RETURN1, LOAD MODE 11;                  (enable NOC byte data
+        LOAD LR 07;
+S4:
+		IF FIFO READY2=0 GOTO S4, BLK1;
+		NOP;
+		SYNC PULSE;
+S5:
+		SYNC PULSE, EN IO DATA, LOAD NOC REG;
+		SYNC PULSE, EN IO DATA, LOAD NOC REG, STEP LC, DECR TC, WAIT UNTIL LC=LR;
+			SYNC PULSE, EN IO DATA, LOAD NOC REG, STEP LC, WAIT UNTIL LC=LR;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, IF FIFO READY3=0 GOTO S6, BLK1;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, IF TC=0 GOTO S7, BLK1;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, RESET LC;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, GOTO S5, BLK1;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG;
+		
+(Data not available in RX FIFO
+
+S6:
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, RESET LC;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, GOTO S4, BLK1;
+        EN IO DATA, LOAD NOC REG;
+		
+(End of transfer
+
+S7:
+        EN IO DATA, LOAD NOC REG, GOTO START;
+        EN IO DATA, LOAD NOC REG, NOC READY;
+        
+(------------------------ Execute, Continue ----------------------------------------
+
+X1:
+        LOAD RETURN REG2 X2, BLK1;
+        GOTO TG2, BLK1;
+        LOAD TAG SHIFT 06;                      (TAG shift counter = 6
+X2:
+        GOTO START;
+        NOC READY;
+
+(-------------------------------- Subroutines--------------------------------------
+
+#1E0:
+
+(TAG SHIFT
+
+TG1:
+        LOAD TAG SHIFT 24;                      (TAG shift counter = 36
+TG2:
+        START TAG SHIFT;
+	NOP;
+        WAIT UNTIL TAG SHIFT=0;
+           WAIT UNTIL TAG SHIFT=0;
+        RETURN2;
+        NOP;
+
+(Write address and length to NOC adapter)
+
+WR1:
+        IF TC=0 GOTO ERR, BLK1;
+        NOP;
+WR2:
+        WRITE REQ;
+WR3:
+        IF WRITE ACK=0 GOTO WR3, BLK1;
+        NOP;
+        RETURN2;
+        NOP;
+
+(End of transfer - TP->EM
+
+ET1:
+        EN RM, LOAD NOC REG, EN TP, EN IO DATA;
+ET2:
+        LOAD NOC REG, EN TP, EN IO DATA, LOAD LR 0D;
+        EN TP, EN IO DATA, INTERCHANGE TP, LOAD MODE 07;     (block TP write, open En IO data
+ET3:    IF FIFO READY2=0 GOTO ET3, BLK1;
+        NOP;		
+        EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+           EN TP, EN IO DATA, STEP LC, WAIT UNTIL LC=LR;
+        GOTO START;
+        NOC READY;        
+
+(End of transfer - broadcast to CM
+
+EOT:
+        STEP BC, GOTO START;
+        STEP BC, NOC READY;
+
+(NOC error
+
+ERR:
+        GOTO START;
+        ERROR;
+
+
+
+(===============================================================================

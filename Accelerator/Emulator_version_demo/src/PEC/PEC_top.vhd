@@ -36,7 +36,7 @@ entity PEC_top is
     TAG      : in  std_logic;
     TAG_FB   : out std_logic;
     C_RDY    : out std_logic;
-    DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
+    DATA_True_Broadcast : in noc_data_t(15 downto 0);
     DATA     : in  std_logic_vector(7 downto 0);
     DATA_OUT : out std_logic_vector(7 downto 0)
     );
@@ -64,7 +64,7 @@ architecture struct of PEC_top is
       TAG          : in  std_logic;
       TAG_FB       : out std_logic;
 --Data line
-      DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
+      DATA_True_Broadcast : in noc_data_t(15 downto 0);
       DATA         : in  std_logic_vector(7 downto 0);
       DATA_OUT     : out std_logic_vector(7 downto 0);
       EXE          : out std_logic;     --Start execution

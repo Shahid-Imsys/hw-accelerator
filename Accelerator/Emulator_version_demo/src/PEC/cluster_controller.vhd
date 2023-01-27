@@ -66,7 +66,7 @@ entity cluster_controller is
 		TAG              : in  std_logic;
 		TAG_FB           : out std_logic;
 	--Data line
-	    DATA_True_Broadcast: in noc_data_t(PEC_NUMBER -1 downto 0);   
+	    DATA_True_Broadcast: in noc_data_t(15 downto 0);   
 		DATA             : in  std_logic_vector(7 downto 0);
 		DATA_OUT         : out std_logic_vector(7 downto 0);
 	--PE Control
@@ -229,6 +229,7 @@ end component;
   signal cmem_i    : integer range 0 to 3;
   signal cmem_d    : integer range 0 to 3;
   signal cmem_addr : std_logic_vector(12 downto 0);
+  signal noc_data_True_Broadcast : reg;
 
 
 begin
@@ -619,26 +620,15 @@ begin
                     noc_data_in(to_integer(unsigned(byte_ctr))) <= DATA;
                 end if;
                 if noc_cmd = "00010" then						--need to change later to connect all 16 bytes
-                    noc_data_in(0) <= DATA_True_Broadcast(0);
-                    noc_data_in(1) <= DATA_True_Broadcast(0);
-                    noc_data_in(2) <= DATA_True_Broadcast(0);
-                    noc_data_in(3) <= DATA_True_Broadcast(0);
-                    noc_data_in(4) <= DATA_True_Broadcast(0);
-                    noc_data_in(5) <= DATA_True_Broadcast(0);
-                    noc_data_in(6) <= DATA_True_Broadcast(0);
-                    noc_data_in(7) <= DATA_True_Broadcast(0);
-                    noc_data_in(8) <= DATA_True_Broadcast(0);
-                    noc_data_in(9) <= DATA_True_Broadcast(0);
-                    noc_data_in(10) <= DATA_True_Broadcast(0);
-                    noc_data_in(11) <= DATA_True_Broadcast(0);
-                    noc_data_in(12) <= DATA_True_Broadcast(0);
-                    noc_data_in(13) <= DATA_True_Broadcast(0);
-                    noc_data_in(14) <= DATA_True_Broadcast(0);
-                    noc_data_in(15) <= DATA_True_Broadcast(0);				  				  
+                    noc_data_in   <= noc_data_True_Broadcast;			  
                 end if;                
             end if;
         end if;
 	end process;
+	
+    DATA_True_Broadcast_gen : for i in 0 to 15 generate  
+        noc_data_True_Broadcast(i)   <= DATA_True_Broadcast(i);
+    end generate;	
 
 	--Read data to DATA_OUT port byte by byte from noc_data_out register.
 	data_read : process (clk_e)

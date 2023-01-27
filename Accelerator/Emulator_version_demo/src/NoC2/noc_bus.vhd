@@ -14,8 +14,8 @@ entity noc_bus is
     rst                     : in  std_logic;
     enable                  : in  std_logic;
 
-    data_from_noc_switch    : in  std_logic_vector((8*PEC_NUMBER) -1 downto 0);
-    data_to_cc              : out noc_data_t(PEC_NUMBER -1 downto 0);
+    data_from_noc_switch    : in  std_logic_vector(127 downto 0);
+    data_to_cc              : out noc_data_t(15 downto 0);
 
     data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
     data_to_noc_switch      : out noc_data_t(PEC_NUMBER -1 downto 0);
@@ -31,12 +31,13 @@ end entity noc_bus;
 architecture rtl of noc_bus is
 
   type noc_data_array_t is array (1 downto 0) of noc_data_t(PEC_NUMBER -1 downto 0);
+  type noc_data_array_16_t is array (1 downto 0) of noc_data_t(15 downto 0);
   type tag_array_t is array (1 downto 0) of std_logic;
   type tag_up_array_t is array (1 downto 0) of noc_tag_t(PEC_NUMBER -1 downto 0);
   
-  signal master_noc_data_array : noc_data_array_t;
+  signal master_noc_data_array : noc_data_array_16_t;
   signal cc_noc_data_array     : noc_data_array_t;
-  signal data_from_master      : noc_data_t(PEC_NUMBER -1 downto 0);
+  signal data_from_master      : noc_data_t(15 downto 0);
   signal data_to_master        : noc_data_t(PEC_NUMBER -1 downto 0);
   signal master_tag_array      : tag_array_t;
   signal tag_temp              : std_logic_vector(1 downto 0);
@@ -45,11 +46,13 @@ architecture rtl of noc_bus is
 
 begin  -- architecture rtl
 
-  split_in_data: for i in (PEC_NUMBER -1) downto 0 generate
+  split_in_data: for i in 15 downto 0 generate
     data_from_master(i) <= data_from_noc_switch(i*8 + 7 downto i*8);
-    data_to_noc_switch <= data_to_master;
   end generate split_in_data;
-  
+
+  split_in_data1: for i in PEC_NUMBER -1 downto 0 generate
+    data_to_noc_switch <= data_to_master;
+  end generate split_in_data1; 
   -----------------------------------------------------------------------------
   -- The data and tag line is straigth forward, only insert delays to compensate for length.
   -----------------------------------------------------------------------------

@@ -100,7 +100,7 @@ architecture Behavioral of Accelerator_Top is
         TAG      : in std_logic;
         TAG_FB   : out std_logic;
         C_RDY    : out std_logic;
-        DATA_True_Broadcast : in noc_data_t(PEC_NUMBER -1 downto 0);
+        DATA_True_Broadcast : in noc_data_t(15 downto 0);
         DATA     : in std_logic_vector(7 downto 0);        
         DATA_OUT : out std_logic_vector(7 downto 0)
     );
@@ -115,9 +115,9 @@ architecture Behavioral of Accelerator_Top is
         clk                     : in  std_logic;
         rst                     : in  std_logic;
         enable                  : in  std_logic;
-    
-        data_from_noc_switch    : in  std_logic_vector((8*PEC_NUMBER) -1 downto 0);
-        data_to_cc              : out noc_data_t(PEC_NUMBER -1 downto 0);
+        
+        data_from_noc_switch    : in  std_logic_vector(127 downto 0);
+        data_to_cc              : out noc_data_t(15 downto 0);        
     
         data_from_cc            : in  noc_data_t(PEC_NUMBER -1 downto 0);
         data_to_noc_switch      : out noc_data_t(PEC_NUMBER -1 downto 0);
@@ -141,7 +141,7 @@ architecture Behavioral of Accelerator_Top is
     signal PEC_WE_noc     : std_logic;
     signal Tag_Line_to_cc : std_logic;
     signal C_RDY_to_master: std_logic_vector(PEC_NUMBER -1 downto 0);
-    signal data_to_cc     : noc_data_t(PEC_NUMBER -1 downto 0);
+    signal data_to_cc     : noc_data_t(15 downto 0);
     signal data_from_cc   : noc_data_t(PEC_NUMBER -1 downto 0);
     signal Tag_to_master  : noc_tag_t(PEC_NUMBER -1 downto 0);
     signal Tag_from_cc    : noc_tag_t(PEC_NUMBER -1 downto 0);
@@ -195,7 +195,7 @@ begin
         rst                     => Reset,
         enable                  => '1',     --need to check
          
-        data_from_noc_switch    => Noc_byte_data((8*PEC_NUMBER)-1 downto 0),
+        data_from_noc_switch    => Noc_byte_data,
         data_to_cc              => data_to_cc,
     
         data_from_cc            => data_from_cc,

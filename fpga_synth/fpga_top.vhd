@@ -351,13 +351,13 @@ begin
   -- pad_config
 
   PA7_SOUT <= pa_p(7);
-  pa_i(7)  <= '0';                      -- PA7_SOUT;
+  pa_i(7)  <= PA7_SOUT;
 
   PA6_SCK <= pa_p(6);
-  pa_i(6) <= '0';                       -- PA6_SCK;
+  pa_i(6) <= PA6_SCK;
 
   PA5_CS_N <= pa_p(5);
-  pa_i(5)  <= '0';                      -- PA5_CS_N;
+  pa_i(5)  <= PA5_CS_N;
 
   -- 4 downto 3 is MCKOUT rate selection
   pa_i(4) <= '0';
@@ -368,7 +368,7 @@ begin
   pa_i(1) <= '1';
 
   PA0_SIN <= pa_p(0);
-  pa_i(0) <= '1';                       -- PA0_SIN;
+  pa_i(0) <= PA0_SIN;
 
   UTX     <= pj_p(0);
   pj_i(0) <= UTX;

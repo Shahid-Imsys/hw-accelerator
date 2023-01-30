@@ -235,8 +235,7 @@ architecture rtl of rtc is
       c2_gmem_we_n_iso_1 : out std_logic;
       c2_gmem_ce_n_iso_1 : out std_logic;
       bmem_we_n_iso_1    : out std_logic;
-      bmem_ce_n_iso_1    : out std_logic;
-      RAM0_WEB_iso_1     : out std_logic
+      bmem_ce_n_iso_1    : out std_logic
       );
   end component;
 

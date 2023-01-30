@@ -636,12 +636,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_ios.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_crb.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -649,18 +643,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_mpmem_inf.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_ios_dackgen.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_ios_dmap.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -685,12 +667,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_fgen.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/pe1_ios_dma.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -998,18 +974,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/VE_Ver2/ldlcontroller.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/VE_Ver2/lzod.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/VE_Ver2/fftcontroller.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1017,12 +981,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/VE_Ver2/addressingunit.vhd">
-        <FileInfo SFType="VHDL2008">
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/dual_core/VE_Ver2/ldlinvcontroller.vhd">
         <FileInfo SFType="VHDL2008">
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1130,12 +1088,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/ip/test_mem/test_mem.coe">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../Accelerator/Emulator_version_demo/src/PEC/fifo.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -1155,18 +1107,6 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/ip/main_mem_p1/main_mem_p1.coe">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/ip/test_mem_p0/test_mem_p0.coe">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/ip/test_mem_p1/test_mem_p1.coe">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>

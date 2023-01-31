@@ -546,19 +546,19 @@ begin
         GPP_CMD_SA          <= ucode_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
-        if NOC_CMD_flag /= '1' then
-          wait;
-        end if;
-        GPP_CMD_ACK         <= '1';    
-        wait for 1000 ns;
-        GPP_CMD_ACK         <= '0';                
+        --if NOC_CMD_flag /= '1' then
+        --  wait;
+        --end if;
+        --GPP_CMD_ACK         <= '1';    
+        --wait for 1000 ns;
+        --GPP_CMD_ACK         <= '0';                
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
         IO_WRITE_ACK        <= '0';
         wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
         -----------------------------Write data -------------------------        
-        FIFO_ready          <= "111111";  --FIFO_ready1 =1
+        FIFO_ready          <= "010000";  --FIFO_ready1 =1
         progress <= sending_ucode; 
         IO_data      <= ucode(0); 
         for i in 1 to (ucode_len) -1 loop      
@@ -578,24 +578,26 @@ begin
         GPP_CMD_SA          <= param_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
-        if NOC_CMD_flag /= '1' then
-          wait;
-        end if;
-        GPP_CMD_ACK         <= '1';    
-        wait for 1000 ns;
-        GPP_CMD_ACK         <= '0';                   
+        --if NOC_CMD_flag /= '1' then
+        --  wait;
+        --end if;
+        --GPP_CMD_ACK         <= '1';    
+        --wait for 1000 ns;
+        --GPP_CMD_ACK         <= '0';                   
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
         IO_WRITE_ACK        <= '0';
-        wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        --wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        wait until NOC_DATA_EN = '1';
         -----------------------------Write data -------------------------        
         FIFO_ready          <= "010000";  --FIFO_ready1 =1
         progress <= sending_params;  
-        for i in 0 to (param_len) -1 loop        
-            wait until NOC_DATA_EN = '1';
+        IO_data     <= param(0);
+        for i in 1 to (param_len) -1 loop        
+            wait until NOC_DATA_EN = '1' and rising_edge(clk_e);
             IO_data     <= param(i);
-            wait for 40 ns;
+            --wait for 40 ns;
         end loop;    
         progress <= waiting;     
         wait for 700 ns;   
@@ -604,29 +606,31 @@ begin
         -----------------------------------------------------------------
         progress            <= send_cmd;
         GPP_CMD_Flag        <= '1';
-        GPP_CMD_Data        <= x"0000000000000000000000000000002A";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
+        GPP_CMD_Data        <= x"00000000000000000000000000000016";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(kernels_len, 16)); 
         GPP_CMD_SA          <= kernels_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
-        if NOC_CMD_flag /= '1' then
-          wait;
-        end if;
-        GPP_CMD_ACK         <= '1';    
-        wait for 1000 ns;
-        GPP_CMD_ACK         <= '0';                    
+        --if NOC_CMD_flag /= '1' then
+        --  wait;
+        --end if;
+        --GPP_CMD_ACK         <= '1';    
+        --wait for 1000 ns;
+        --GPP_CMD_ACK         <= '0';                    
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
         IO_WRITE_ACK        <= '0';
-        wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        --wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        wait until NOC_DATA_EN = '1';
         -----------------------------Write data -------------------------        
-        FIFO_ready          <= "010000";  --FIFO_ready1 =1
+        FIFO_ready          <= "000001";  --FIFO_ready1 =1
         progress <= sending_kernels;  
-        for i in 0 to (kernels_len) -1 loop      
-            wait until NOC_DATA_EN = '1';
+        IO_data     <= kernel(0);
+        for i in 1 to (kernels_len) -1 loop      
+            wait until NOC_DATA_EN = '1' and rising_edge(clk_e);
             IO_data     <= kernel(i);
-            wait for 40 ns;
+            --wait for 40 ns;
         end loop;  
         progress <= waiting;        
         wait for 700 ns;   
@@ -635,29 +639,31 @@ begin
         -----------------------------------------------------------------
         progress            <= send_cmd;
         GPP_CMD_Flag        <= '1';
-        GPP_CMD_Data        <= x"0000000000000000000000000000002A";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
+        GPP_CMD_Data        <= x"00000000000000000000000000000016";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(bias_len, 16)); 
         GPP_CMD_SA          <= bias_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
-        if NOC_CMD_flag /= '1' then
-          wait;
-        end if;
-        GPP_CMD_ACK         <= '1';    
-        wait for 1000 ns;
-        GPP_CMD_ACK         <= '0';                   
+        --if NOC_CMD_flag /= '1' then
+        --  wait;
+        --end if;
+        --GPP_CMD_ACK         <= '1';    
+        --wait for 1000 ns;
+        --GPP_CMD_ACK         <= '0';                   
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
         IO_WRITE_ACK        <= '0';
-        wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        --wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        wait until NOC_DATA_EN = '1';
         -----------------------------Write data -------------------------        
-        FIFO_ready          <= "010000";  --FIFO_ready1 =1
+        FIFO_ready          <= "000001";  --FIFO_ready1 =1
         progress <= sending_bias;  
-        for i in 0 to (bias_len) -1 loop      
-            wait until NOC_DATA_EN = '1';
+        IO_data     <= bias(0);
+        for i in 1 to (bias_len) -1 loop      
+            wait until NOC_DATA_EN = '1' and rising_edge(clk_e);
             IO_data     <= bias(i);
-            wait for 40 ns;
+            --wait for 40 ns;
         end loop;  
         progress <= waiting;        
         wait for 700 ns;
@@ -666,29 +672,31 @@ begin
         -----------------------------------------------------------------
         progress            <= send_cmd;
         GPP_CMD_Flag        <= '1';
-        GPP_CMD_Data        <= x"0000000000000000000000000FFF002A";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
+        GPP_CMD_Data        <= x"0000000000000000000000000FFF0016";--x"00000000000000000000000008000016";--x"00000000000000000000000008000016"; --32 TS 20 --16 TS 10
         GPP_CMD_LEN         <= std_logic_vector(to_unsigned(data_len, 16)); 
         GPP_CMD_SA          <= data_sa;
         wait for 100 ns;
         GPP_CMD_Flag        <= '0';
-        if NOC_CMD_flag /= '1' then
-          wait;
-        end if;
-        GPP_CMD_ACK         <= '1';    
-        wait for 1000 ns;
-        GPP_CMD_ACK         <= '0';                    
+        --if NOC_CMD_flag /= '1' then
+        --  wait;
+        --end if;
+        --GPP_CMD_ACK         <= '1';    
+        --wait for 1000 ns;
+        --GPP_CMD_ACK         <= '0';                    
         wait for 400 ns;        
         IO_WRITE_ACK        <= '1';
         wait for 40 ns;
         IO_WRITE_ACK        <= '0';
-        wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        --wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
+        wait until NOC_DATA_EN = '1';
         -----------------------------Write data -------------------------        
-        FIFO_ready          <= "010000";  --FIFO_ready1 =1
+        FIFO_ready          <= "000001";  --FIFO_ready1 =1
         progress <= sending_data;  
-        for i in 0 to (data_len) -1 loop        
-            wait until NOC_DATA_EN = '1';
+        IO_data      <= data(0);
+        for i in 1 to (data_len) -1 loop        
+            wait until NOC_DATA_EN = '1' and rising_edge(clk_e);
             IO_data      <= data(i);
-            wait for 40 ns;
+            --wait for 40 ns;
         end loop;         
         progress <= waiting;
         wait for 700 ns;

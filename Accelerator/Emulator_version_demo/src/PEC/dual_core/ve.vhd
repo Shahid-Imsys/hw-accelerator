@@ -1700,10 +1700,9 @@ begin
         output_c <= (others => '0');
         pushback_en <= '0';
         load_dtm_out <= '0';
-        VE_OUT_D <= (others => '0');
       elsif reg_in = CONS_DFY_REG_SHIFT_IN then --write feedback(dfy) register through y bus
         if clk_e_neg = '1' then
-        dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
+          dfy_reg(to_integer(unsigned(dfy_dest_sel))) <= YBUS;
         end if;
       elsif output_ena = '1' then 
         if pp_ctl(4 downto 3) = "01" then --to feedback(dfy) register
@@ -1718,8 +1717,6 @@ begin
         elsif pp_ctl(4 downto 3) = "10" then --to DTM data register
           dtm_data_reg(to_integer(output_c)) <= outreg(7 downto 0);
           output_c <= output_c + 1;
-        else --to dbus
-          VE_OUT_D <= dtm_data_reg(to_integer(unsigned(out_byte_sel)));
         end if;
       end if;
       if pp_ctl(4 downto 3) = "10" and output_c(1 downto 0) = "11" and output_ena = '1' then
@@ -1728,11 +1725,14 @@ begin
         load_dtm_out <= '0';
       end if;
     end if;
-    --output to dtm
+    -- output to dtm
     for i in 0 to 15 loop
       ve_out_reg(8*i+7 downto 8*i) <= dtm_data_reg(i);
     end loop;
   end process;
+
+  -- output to d-bus
+  VE_OUT_D <= dtm_data_reg(to_integer(unsigned(out_byte_sel)));
 
   out_mux : process(all)
   begin

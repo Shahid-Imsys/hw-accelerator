@@ -940,7 +940,7 @@ FILE: ./NOC2code.mas
                   (00637) (End of transfer
                   (00638) 
                   (00639) S7:
-1B8: 0012 1000/00 (00640)         EN IO DATA, LOAD NOC REG, GOTO START;
+1B8: 0013 1000/00 (00640)         SYNC PULSE, EN IO DATA, LOAD NOC REG, GOTO START;
 1B9: 000A 1002/03 (00641)         EN IO DATA, LOAD NOC REG, NOC READY;
                   (00642)         
                   (00643) (------------------------ Execute, Continue ----------------------------------------

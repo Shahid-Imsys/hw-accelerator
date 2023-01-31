@@ -570,7 +570,7 @@ begin
                 noc_reg_rdy <= '0';
                 noc_write   <= '0';
                 noc_read    <= '0';
-            elsif delay = '1' then     
+            elsif delay2 = '1' then     
                 if noc_cmd = "00011" or noc_cmd = "00101" then
                     if byte_ctr = "1111" then 
                         noc_reg_rdy <= '1';

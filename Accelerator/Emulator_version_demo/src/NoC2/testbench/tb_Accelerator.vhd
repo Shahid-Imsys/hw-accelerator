@@ -1199,7 +1199,6 @@ begin
         IO_WRITE_ACK        <= '0';
         wait for 1600 ns;    --Based on this wait time, fifo_ready can come when code 49or4A is executed. after adding adapterFIFO will be fixed.
         -----------------------------Write data -------------------------        
---        FIFO_ready          <= "111000"; --FIFO_ready3 =1;
         FIFO_ready          <= "010000";  --FIFO_ready2 =1
         wait for 100 ns;
         progress <= 1;
@@ -1212,7 +1211,8 @@ begin
             end loop;
             wait for 60 ns;    
         end loop;
-----continuous write         
+----continuous write
+--        FIFO_ready          <= "111000"; --FIFO_ready3 =1;         
 --        for i in 0 to ((Data_Transfer_Size2) -1) loop
 --            wait until rising_edge(clk_e);
 --            IO_data             <= data_Input(i);
@@ -1232,18 +1232,18 @@ begin
         IO_WRITE_ACK        <= '0'; 
         wait for 1000 ns;
         FIFO_ready          <= "010000";  --FIFO_ready2 =1
-        wait for 440 ns;
-----continues read        
---        for i in 0 to (Data_Transfer_Size2) -1 loop
---            FIFO_ready          <= "111000"; --FIFO_ready3 =1;
---            wait for 40 ns;
---            FIFO_ready          <= "001000"; --FIFO_ready3,2 =0;
---            wait for 280 ns; 
---        end loop;
---non continues read
+        wait for 440 ns;   --300 ns for test tb
+--continues read        
         for i in 0 to (Data_Transfer_Size2) -1 loop
-            wait for 580 ns; 
+            FIFO_ready          <= "111000"; --FIFO_ready3 =1;
+            wait for 40 ns;
+            FIFO_ready          <= "001000"; --FIFO_ready3,2 =0;
+            wait for 280 ns; 
         end loop;
+----non continues read
+--        for i in 0 to (Data_Transfer_Size2) -1 loop
+--            wait for 580 ns; 
+--        end loop;
 ----mix read
 --        for i in 0 to ((Data_Transfer_Size2) -1)/2 loop
 --            FIFO_ready          <= "111000"; --FIFO_ready3 =1;

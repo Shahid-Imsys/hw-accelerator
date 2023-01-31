@@ -637,7 +637,7 @@ S6:
 (End of transfer
 
 S7:
-        EN IO DATA, LOAD NOC REG, GOTO START;
+        SYNC PULSE, EN IO DATA, LOAD NOC REG, GOTO START;
         EN IO DATA, LOAD NOC REG, NOC READY;
         
 (------------------------ Execute, Continue ----------------------------------------

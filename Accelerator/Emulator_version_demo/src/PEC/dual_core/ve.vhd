@@ -391,7 +391,7 @@ architecture rtl of ve is
   signal dfy_reg   : dfy_word;    --pushback(DFY) register
   signal dtm_data_reg : dtm_word;
   signal mode_latch : mode;
-  signal fft_read_state : read_state;
+  signal fft_state, matinv_state : read_state;
   signal au_lcmp, au_loffset, au_rcmp, au_roffset, au_bcmp, au_boffset : au_param;
   signal pa_cmp, pa_offset, pb_offset, pb_cmp : au_param;
   signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
@@ -469,7 +469,9 @@ architecture rtl of ve is
   signal load_dtm_out : std_logic;
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal outrd_en, woutrd_en, res_assign : std_logic;
-  signal mem_read_done : std_logic;
+  signal matinv_resrd_en, matinv_resrdw_en : std_logic;
+  signal matinv_resdrd_done, matinv_reswrd_done : std_logic;
+  signal fft_resrd_done : std_logic;
   signal data_read_enable_i   : std_logic;
   signal weight_read_enable_i : std_logic;
   signal rd_en_conv, b_rd_en_conv : std_logic;
@@ -498,7 +500,7 @@ architecture rtl of ve is
   signal data0_addr_o : std_logic_vector(7 downto 0);
   signal data1_addr_o : std_logic_vector(7 downto 0);
   signal weight_addr_o : std_logic_vector(7 downto 0);
-  signal fft_done_pipe : std_logic_vector(10 downto 0);
+  signal fft_done_pipe, matinv_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
   signal no_pushback : std_logic; -- remove later
   signal lrst         : std_logic;
@@ -709,7 +711,7 @@ begin
       if rst = '0' then
         ve_rdy <= '1';
       elsif clk_e_pos = '0' then
-        ve_rdy <= not conv_busy and not bypass_reg and fft_done_pipe(10) and matinv_done;-- and fft_done;
+        ve_rdy <= not conv_busy and not bypass_reg and fft_resrd_done and matinv_resdrd_done and matinv_reswrd_done;
       end if;
     end if;
   end process;
@@ -778,7 +780,7 @@ begin
               mode_latch <= conv;
             elsif conv_enable = '1' and fft_mode = '1' and re_switch = '0' then
               mode_latch <= matrix;
-            --elsif ve_rdy = '1' then
+            --elsif fft_resrd_done = '1' then
             --  mode_latch <= idle;  
             else
               mode_latch <= fft;
@@ -790,7 +792,7 @@ begin
               mode_latch <= conv;
             elsif conv_enable = '0' and fft_mode = '1' and re_switch = '0' then  
               mode_latch <= fft;
-            --elsif ve_rdy = '1' then
+            --elsif matinv_done = '1' then
             --  mode_latch <= idle;
             else
               mode_latch <= matrix;
@@ -1120,7 +1122,11 @@ begin
       write_en_o   <= write_en_to_mux;
       read_en_w_o  <= read_en_w_to_mux;
       write_en_w_o <= write_en_w_to_mux;
-      read_en_b_o <= read_en_b_to_mux;
+      read_en_b_o  <= read_en_b_to_mux;
+      if matinv_done_pipe(10) = '1' and matinv_done = '1' then
+        read_en_o <= matinv_resrd_en;
+        read_en_w_o <= matinv_resrdw_en;
+      end if;
     end if;
   end process;
 
@@ -1505,14 +1511,32 @@ begin
   process(clk_p)
   begin
     if rising_edge(clk_p) then
-      delay3(0) <= clip_ena;
-      for i in 0 to 2 loop
-        delay3(i+1) <= delay3(i);
-      end loop;
-      output_ena <= delay3(3); 
+      if rst = '0' then
+        delay3 <= (others => '0');
+        fft_done_pipe <= (others => '0');
+        matinv_done_pipe <= (others => '0');
+      else
+        delay3(0) <= clip_ena;
+        for i in 0 to 2 loop
+          delay3(i + 1) <= delay3(i);
+        end loop;
+        output_ena <= delay3(3); 
+
+        fft_done_pipe(0) <= fft_done;
+        for i in 0 to 9 loop
+          fft_done_pipe(i + 1) <= fft_done_pipe(i);
+        end loop;
+
+        matinv_done_pipe(0) <= matinv_done;
+        for i in 0 to 9 loop
+          matinv_done_pipe(i + 1) <= matinv_done_pipe(i);
+        end loop;
+      end if; 
     end if;
   end process;
-
+  ----------------------------------------------------------------------------
+  -- FFT results bit reverse
+  ----------------------------------------------------------------------------
   stage_to_points : process(clk_p)
   begin
     if rising_edge(clk_p) then
@@ -1554,26 +1578,26 @@ begin
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
-        fft_read_state <= waiting;
+        fft_state <= waiting;
         outrd_en <= '0';
         woutrd_en <= '0';
       else
-        case fft_read_state is 
+        case fft_state is 
           when waiting =>
             if fft_start = '1' then
-              fft_read_state <= computing;
+              fft_state <= computing;
             end if;
           when computing =>
-          if fft_done = '1' and fft_done_pipe(8) = '1' and mem_read_done = '0' then
+          if fft_done = '1' and fft_done_pipe(8) = '1' and fft_resrd_done = '0' then
             outrd_en <= '1';
-            fft_read_state <= reading_mem;
+            fft_state <= reading_dbuffer;
           end if;
-          when reading_mem =>
+          when reading_dbuffer =>
             if n = to_integer(shift_right(to_unsigned(N_point, 10), 1)) then -- n = N/2
               outrd_en <= '0';
-              fft_read_state <= waiting;
+              fft_state <= waiting;
             end if;
-          when others => fft_read_state <= waiting;
+          when others => fft_state <= waiting;
         end case;
       end if;
     end if;
@@ -1584,26 +1608,21 @@ begin
   begin
     if rising_edge(clk_p) then
       swap_int <= mem_no;
-      fft_done_pipe(0) <= fft_done;
-      for i in 0 to 9 loop
-        fft_done_pipe(i+1) <= fft_done_pipe(i);
-      end loop;
       if rst = '0' then
-        mem_read_done <= '0';
+        fft_resrd_done <= '1';
         mem_no <= '0';
         swap_int <= '0';
         n <= 0;
         bit_rev <= x"00";
-        fft_done_pipe <= (others => '0');
       else
-        if fft_read_state = waiting then
+        if fft_state = waiting then
           if fft_start = '1' then
-            mem_read_done <= '0';
+            fft_resrd_done <= '0';
           end if;
-        elsif mode_latch = fft and fft_read_state = reading_mem then 
+        elsif mode_latch = fft and fft_state = reading_dbuffer then 
           n_vector := std_logic_vector(to_unsigned(n, 8));       
           if n = to_integer(shift_right(to_unsigned(N_point, 10), 1)) then -- n = N/2
-            mem_read_done <= '1';
+            fft_resrd_done <= '1';
             n <= 0;
           else 
             case bits is 
@@ -1687,6 +1706,38 @@ begin
           fft_resload <= '0';
           fft_result <= (others => '0');
         end if;
+      end if;
+    end if;
+  end process;
+
+  ----------------------------------------------------------------------------
+  -- matrix inversion results read
+  ----------------------------------------------------------------------------
+  matinv_read_FSM : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        matinv_state <= waiting;
+      else
+        case matinv_state is 
+          when waiting =>
+            if matinv_start = '1' then
+              matinv_state <= computing;
+            end if;
+          when computing => 
+            if matinv_done = '1' and matinv_done_pipe(10) = '1' then
+              matinv_state <= reading_dbuffer;
+            end if;
+          when reading_dbuffer => 
+            if matinv_resdrd_done = '1' then
+              matinv_state <= reading_wbuffer;
+            end if;
+          when reading_wbuffer => 
+            if matinv_reswrd_done = '1' then
+              matinv_state <= waiting;
+            end if;
+          when others => matinv_state <= waiting;
+        end case;
       end if;
     end if;
   end process;

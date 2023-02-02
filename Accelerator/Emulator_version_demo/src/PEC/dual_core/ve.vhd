@@ -388,16 +388,16 @@ architecture rtl of ve is
   --------------------------------
   --Registers
   --------------------------------
-  signal dfy_reg   : dfy_word;    --pushback(DFY) register
+  signal dfy_reg : dfy_word;    --pushback(DFY) register
   signal dtm_data_reg : dtm_word;
   signal mode_latch : mode;
   signal fft_state, matinv_state : read_state;
   signal au_lcmp, au_loffset, au_rcmp, au_roffset, au_bcmp, au_boffset : au_param;
   signal pa_cmp, pa_offset, pb_offset, pb_cmp : au_param;
-  signal re_saddr_l, re_saddr_r  : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
+  signal re_saddr_l, re_saddr_r : std_logic_vector(7 downto 0); --Receive engine's left starting address when DFM is used as the source
   signal re_loop_reg : std_logic_vector(7 downto 0); --receive engine's loop counter register
-  signal re_saddr_a, re_saddr_b   : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source 
-  signal ve_saddr_l, ve_saddr_r  : std_logic_vector(7 downto 0); --Left starting address register
+  signal re_saddr_a, re_saddr_b : std_logic_vector(7 downto 0); --Receive engine mode A start address when DFY is used as the source 
+  signal ve_saddr_l, ve_saddr_r : std_logic_vector(7 downto 0); --Left starting address register
   signal left_baseaddress, right_baseaddress : std_logic_vector(7 downto 0);
   signal left_finaladdress, right_finaladdress, bias_finaladdress : std_logic_vector(7 downto 0);
   signal apushback_finaladdress, bpushback_finaladdress : std_logic_vector(7 downto 0);
@@ -415,12 +415,12 @@ architecture rtl of ve is
   signal apushback_rst, bpushback_rst : std_logic;
   signal ring_load, ring_rd, ring_wr, ext_load : std_logic;
   signal ext_tigger_en : std_logic;
-  signal config    : std_logic_vector(7 downto 0); --configure register
+  signal config : std_logic_vector(7 downto 0); --configure register
   signal ring_start_addr : std_logic_vector(7 downto 0);
-  signal zp_data, zpdata_i    : std_logic_vector(7 downto 0); --zero point addition data
-  signal zp_weight, zpweight_i  : std_logic_vector(7 downto 0); --zero point addition data
-  signal scale      : std_logic_vector(4 downto 0); --shift scale factor
-  signal pp_ctl  : std_logic_vector(7 downto 0); --expand this 8 bits, 1209
+  signal zp_data, zpdata_i : std_logic_vector(7 downto 0); --zero point addition data
+  signal zp_weight, zpweight_i : std_logic_vector(7 downto 0); --zero point addition data
+  signal scale : std_logic_vector(4 downto 0); --shift scale factor
+  signal pp_ctl : std_logic_vector(7 downto 0); --expand this 8 bits, 1209
   signal bias_index_start : std_logic_vector(7 downto 0);
   signal data0_addr_i, data1_addr_i : std_logic_vector(7 downto 0);
   signal weight_addr_i, bias_addr_i : std_logic_vector(7 downto 0);
@@ -429,18 +429,18 @@ architecture rtl of ve is
   signal conv_busy : std_logic; --VE start latch
   signal re_cnt_rst, conv_cnt_rst, cnt_rst  : std_logic;
   signal conv_enable : std_logic;
-  signal data0  : std_logic_vector(31 downto 0);
-  signal data1  : std_logic_vector(31 downto 0);
-  signal weight, weight_out  : std_logic_vector(63 downto 0);
+  signal data0 : std_logic_vector(31 downto 0);
+  signal data1 : std_logic_vector(31 downto 0);
+  signal weight, weight_out : std_logic_vector(63 downto 0);
   signal bias_buf_out : std_logic_vector(63 downto 0);
   signal bypass, bypass_reg, rcving_data, bypass_valid : std_logic;
   signal writebuffer : std_logic_vector(63 downto 0);
   signal mem_data_in, data_to_mem, bypassed_reg, bypassed_weight : std_logic_vector(63 downto 0);
-  signal mem_data_reg    : std_logic_vector(63 downto 0);
-  signal ve_out_reg, fft_result : std_logic_vector(127 downto 0);
+  signal mem_data_reg : std_logic_vector(63 downto 0);
+  signal ve_out_reg, fft_result, matinv_result : std_logic_vector(127 downto 0);
   signal read_en_b_i : std_logic;
   signal data_write_enable_i, weight_write_enable_i : std_logic;
-  signal write_en_o, write_en_w_o, write_en_b_o  : std_logic;
+  signal write_en_o, write_en_w_o, write_en_b_o : std_logic;
   signal dwen_from_re, wwen_from_re, bwen_from_re : std_logic;
   signal read_en_to_mux, read_en_w_to_mux, read_en_b_to_mux : std_logic;
   signal write_en_to_mux, write_en_w_to_mux : std_logic;
@@ -461,7 +461,7 @@ architecture rtl of ve is
   --data flow control signals
   signal adder_ena : std_logic;
   signal shifter_ena : std_logic;
-  signal clip_ena  : std_logic;
+  signal clip_ena : std_logic;
   signal output_ena : std_logic;
   signal output_c : unsigned(3 downto 0); --output byte counter 
   signal mode_c_l : std_logic;
@@ -470,6 +470,7 @@ architecture rtl of ve is
   signal read_en_o, read_en_w_o, read_en_b_o : std_logic;
   signal outrd_en, woutrd_en, res_assign : std_logic;
   signal matinv_resrd_en, matinv_resrdw_en : std_logic;
+  signal matinv_resrd_en_i, matinv_resrdw_en_i : std_logic;
   signal matinv_resdrd_done, matinv_reswrd_done : std_logic;
   signal fft_resrd_done : std_logic;
   signal data_read_enable_i   : std_logic;
@@ -489,7 +490,7 @@ architecture rtl of ve is
   signal matinv_weight_addr, matinv_bias_addr : std_logic_vector(7 downto 0);
   signal bias_addr_ctrl_i, matinv_bias_addr_ctrl : bias_addr_t;
   signal matinv_data_read_en, matinv_data_write_en, matinv_bias_ren : std_logic; 
-  signal matinv_weight_read_en, matinv_weight_write_en : std_logic;
+  signal matinv_weight_read_en, matinv_weight_write_en, matinv_resload : std_logic;
   signal lzod_i, matinv_lzod : lzod_ctrl;
   signal feedback_ctrl_i, matinv_feedback_ctrl : feedback_t;
   signal matinv_zpdata_o, matinv_zpweight_o : std_logic_vector(7 downto 0);
@@ -497,9 +498,7 @@ architecture rtl of ve is
   signal nt : std_logic_vector(3 downto 0);
   signal en_o : std_logic;
   signal pushback_en : std_logic;
-  signal data0_addr_o : std_logic_vector(7 downto 0);
-  signal data1_addr_o : std_logic_vector(7 downto 0);
-  signal weight_addr_o : std_logic_vector(7 downto 0);
+  signal data0_addr_o, data1_addr_o, weight_addr_o : std_logic_vector(7 downto 0);
   signal fft_done_pipe, matinv_done_pipe : std_logic_vector(10 downto 0);
   --signal ve_push_dtm : std_logic; --0126
   signal no_pushback : std_logic; -- remove later
@@ -840,7 +839,9 @@ begin
   --Address_MUX
   --**********************
   AUparam_mux : process(all)
+    variable nr : unsigned(3 downto 0);
   begin
+    nr := unsigned(nt);
     case mode_latch is 
       when re_mode => left_baseaddress  <= re_saddr_l when mode_c_l = '0' else ring_start_addr;                                                    
                       right_baseaddress <= re_saddr_r; 
@@ -859,6 +860,13 @@ begin
                       right_loading(3 downto 1) <= "000"; -- not use currently
                       bias_loading(0) <= bload_from_conv;
                       bias_loading(3 downto 1) <= "000"; -- not use currently
+      when matrix  => left_baseaddress <= x"00";
+                      right_baseaddress <= std_logic_vector(shift_right((nr*(nr + 1)), 1));
+                      left_loading(0) <= matinv_resrd_en;
+                      left_loading(3 downto 1) <= "000"; -- not use currently
+                      right_loading(0) <= matinv_resrdw_en;
+                      right_loading(3 downto 1) <= "000"; -- not use currently
+                      bias_loading <= x"0";
       when others  => left_baseaddress  <= x"00";
                       right_baseaddress <= x"00";
                       left_loading <= x"0";
@@ -931,6 +939,16 @@ begin
                         data0addr_to_memory  <= data0_addr_o;
                         data1addr_to_memory  <= data1_addr_o;
                       end if;
+      when matrix  => biasaddr_to_memory <= bias_addr_o;
+                      if matinv_done_pipe(10) = '1' and matinv_done = '1' then
+                        weightaddr_to_memory <= right_finaladdress;
+                        data0addr_to_memory  <= left_finaladdress;
+                        data1addr_to_memory  <= left_finaladdress;
+                      else
+                        weightaddr_to_memory <= weight_addr_o;
+                        data0addr_to_memory  <= data0_addr_o;
+                        data1addr_to_memory  <= data1_addr_o;
+                      end if;
       when others  => biasaddr_to_memory <= bias_addr_o;
                       weightaddr_to_memory <= weight_addr_o;
                       data0addr_to_memory  <= data0_addr_o;
@@ -954,7 +972,7 @@ begin
     nt           <= x"0";
     re_cnt_rst   <= '0';
     conv_cnt_rst <= '0';
-    bypass_valid    <= '0';
+    bypass_valid <= '0';
     rcving_data  <= '0';
     case mode_latch is
       when conv    => conv_start   <= start;
@@ -1678,7 +1696,7 @@ begin
     end if;
   end process;
 
-  process(clk_p)
+  fft_resload_to_reg : process(clk_p)
   begin
     if rising_edge(clk_p) then
       if rst = '0' then
@@ -1718,7 +1736,13 @@ begin
     if rising_edge(clk_p) then
       if rst = '0' then
         matinv_state <= waiting;
+        matinv_resrd_en <= '0';
+        matinv_resrdw_en <= '0';
+        matinv_resrd_en_i <= '0';
+        matinv_resrdw_en_i <= '0';
       else
+        matinv_resrd_en_i <= matinv_resrd_en;
+        matinv_resrdw_en_i <= matinv_resrdw_en;
         case matinv_state is 
           when waiting =>
             if matinv_start = '1' then
@@ -1729,15 +1753,86 @@ begin
               matinv_state <= reading_dbuffer;
             end if;
           when reading_dbuffer => 
+            matinv_resrd_en <= '1';
             if matinv_resdrd_done = '1' then
+              matinv_resrd_en <= '0';
               matinv_state <= reading_wbuffer;
             end if;
           when reading_wbuffer => 
+            matinv_resrdw_en <= '1';
             if matinv_reswrd_done = '1' then
+              matinv_resrdw_en <= '0';
               matinv_state <= waiting;
             end if;
           when others => matinv_state <= waiting;
         end case;
+      end if;
+    end if;
+  end process;
+
+  nt_to_addresses : process(clk_p)
+    variable nr : integer;
+    variable alinv_endrow : unsigned(7 downto 0);
+    variable ddinv_endrow : unsigned(7 downto 0);
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        alinv_endrow := (others => '0');
+        ddinv_endrow := (others => '0');
+        nr := 0;
+        matinv_resdrd_done <= '1';
+        matinv_reswrd_done <= '1';
+      else
+        if matinv_start = '1' then
+          nr := to_integer(unsigned(nt));
+          alinv_endrow := to_unsigned(nr*(nr+1), 8) - 1; --total number of rows (nt*(nt+1))/2
+          ddinv_endrow := shift_right(to_unsigned(nr*(nr+1), 8), 1) + (unsigned(nt)*2) - 1;
+          matinv_resdrd_done <= '0';
+          matinv_reswrd_done <= '0';
+        elsif mode_latch = matrix and matinv_state = reading_dbuffer then 
+          if left_finaladdress = std_logic_vector(alinv_endrow - 1) then
+            matinv_resdrd_done <= '1';
+          end if;
+        elsif mode_latch = matrix and matinv_state = reading_wbuffer then
+          if right_finaladdress = std_logic_vector(ddinv_endrow - 1) then
+            matinv_reswrd_done <= '1';
+          end if;
+        end if;
+      end if;
+    end if;
+  end process;
+
+  matinv_resload_to_reg : process(clk_p)
+  begin
+    if rising_edge(clk_p) then
+      if rst = '0' then
+        matinv_resload <= '0';
+      else
+        if matinv_done_pipe(10) = '1' and mode_latch = matrix then
+          if matinv_resrd_en_i = '1' then
+            if CLK_E_NEG = '0' then
+              matinv_result(63 downto 0) <= data1 & data0; 
+              matinv_resload <= '0';
+            else
+              matinv_result(127 downto 64) <= data1 & data0;
+              matinv_resload <= '1';
+            end if;
+          elsif matinv_resrdw_en_i = '1' then
+            if CLK_E_NEG = '1' then
+              matinv_result(63 downto 0) <= weight_out; 
+              matinv_resload <= '0';
+            else
+              matinv_result(127 downto 64) <= weight_out;
+              matinv_resload <= '1';
+            end if;
+          else
+            matinv_resload <= '0';
+            matinv_result <= (others => '0');
+          end if; 
+        else
+          matinv_resload <= '0';
+          matinv_result <= (others => '0');
+        end if;
       end if;
     end if;
   end process;
@@ -1789,19 +1884,20 @@ begin
   begin
     case mode_latch is 
       when fft => VE_OUT_DTM <= fft_result;
+      when matrix => VE_OUT_DTM <= matinv_result;
       when others => VE_OUT_DTM <= ve_out_reg;
     end case;
   end process;
 
-  dtm_ctl_out : process(pp_ctl, load_dtm_out, fft_resload)
+  dtm_ctl_out : process(all)
   begin
     if pp_ctl(5) = '1' then
-      ve_dtm_rdy <= load_dtm_out or fft_resload;
+      ve_dtm_rdy <= load_dtm_out or fft_resload or matinv_resload;
     else
       ve_dtm_rdy <= '0';
     end if;
     if pp_ctl(6) = '1' then
-      ve_push_dtm <= load_dtm_out or fft_resload;
+      ve_push_dtm <= load_dtm_out or fft_resload or matinv_resload;
     else
       ve_push_dtm <= '0';
     end if;

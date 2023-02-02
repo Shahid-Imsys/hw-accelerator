@@ -91,6 +91,11 @@ constant au_test_loffset0 : std_logic_vector(127 downto 0) := x"0000020000000000
 constant au_test_lcmp0 : std_logic_vector(127 downto 0)    := x"00000240000000000000000000000000";
 --------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------
+constant au_test_roffset0 : std_logic_vector(127 downto 0) := x"00000280000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+constant au_test_rcmp0 : std_logic_vector(127 downto 0)    := x"000002C0000000000000000000000000";
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 constant au_test_boffset0 : std_logic_vector(127 downto 0) := x"00000300000000000000000000000000";
 constant au_test_boffset1 : std_logic_vector(127 downto 0) := x"00000310000000000000000000000000";
 --------------------------------------------------------------------------------------------------
@@ -108,12 +113,12 @@ constant bias_saddr : std_logic_vector(127 downto 0)       := x"0000019000000000
 constant configure  : std_logic_vector(127 downto 0)       := x"00000110000000000000000000000000";
 constant pp_ctl     : std_logic_vector(127 downto 0)       := x"00000170000000000000000000000000";
 -- matinv test data
-constant matinv_test_data1  : string := "s1_matinv_8x8_data0.csv";
-constant matinv_test_data2  : string := "s1_matinv_8x8_data1.csv";
+constant matinv_test_data1  : string := "s1_matinv_30x30_data0.csv";
+constant matinv_test_data2  : string := "s1_matinv_30x30_data1.csv";
 constant matinv_table       : string := "R_hex.csv";
 --constant matin_out_ref      : string := "";
-constant nt_int             : integer := 4; -- 4-> 8*8
-constant nt_std             : std_logic_vector := x"4";--max 15 = f
+constant nt_int             : integer := 15; -- 4-> 8*8
+constant nt_std             : std_logic_vector := x"f";--max 15 = f
 
 
 begin
@@ -308,6 +313,16 @@ wait for 30.01 ns;
 pl(95) <= '1';
 wait for 30 ns;
 pl(95) <= '0';
+--------- read out set up ----------
+pl <= au_test_lcmp0;
+ybus <= std_logic_vector(to_unsigned((((1+nt_int)*nt_int) - 1), 8));
+wait for 30.01 ns;
+pl <= au_test_roffset0;
+ybus <= x"01";
+wait for 30.01 ns;
+pl <= au_test_rcmp0;
+ybus <= std_logic_vector(to_unsigned((((1+nt_int)*nt_int)/2 + nt_int*2 - 1), 8));
+wait for 30.01 ns;
 wait until ve_rdy = '1';
 wait for 2000 ns;
 
